@@ -1102,6 +1102,17 @@ _(expo-av ya viene en S2.1 — si se implementa onboarding antes, se instala aqu
 
 > Pequeñas mejoras detectadas durante el desarrollo. No bloquean el MVP pero mejoran la experiencia. Agregar aquí cualquier detalle que surja durante las sesiones.
 
+### Emails — mejoras post S1.13
+
+- [ ] **Tracking de aperturas (pixel 1×1)** — agregar columna `opened_at` en `email_logs`, endpoint `GET /track/email/{token}` que devuelve imagen transparente y registra la apertura, inyectar pixel en el layout base de emails. Mostrar tasa de apertura en `EmailLogResource` (total enviados, abiertos, fallidos por tipo/evento). Nota: Gmail bloquea imágenes por defecto; Apple Mail iOS 15+ pre-carga imágenes (falsos positivos). Útil como referencia, no como métrica exacta.
+
+### Emails — pendiente Sesión UI / Web (S2.1)
+
+- [ ] **Pantallas web para password reset y verificación de email** — actualmente las rutas del backend (`/password/reset/{token}` y `/auth/verify-email/{id}/{hash}`) muestran una página de redirect al deep link de la app. Cuando se implemente Next.js (S2.1), estas pantallas deben tener su versión web completa:
+  - `/password/reset?token=XXX&email=XXX` → formulario de nueva contraseña en el browser → llama `POST /api/v1/auth/reset-password`
+  - `/auth/verify-email/{id}/{hash}` → ya verifica y redirige, pero mostrar una página más cuidada post-verificación
+  - La página de redirect del backend (`deep-link-redirect.blade.php`) puede detectar user-agent para redirigir a web vs deep link según el dispositivo.
+
 ### Agenda
 
 - [ ] **Pantalla "Mi Agenda"** — vista filtrada con solo las sesiones marcadas como favoritas. El campo `is_favorite` ya existe, solo falta la screen y la ruta. Referencia: Webex hace esto bien. Podría ser un tab extra en la agenda o una sección en el home.
