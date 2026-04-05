@@ -1011,6 +1011,41 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 
 ## ─────────────────────────────────────────
 
+## SESIÓN 1.x — Banners / Carrusel de sponsors en pantalla Inicio
+
+## ─────────────────────────────────────────
+
+**⚠️ IMPORTANTE — NO CONFUNDIR:**
+- Módulo `banners` (slug: `banners`) = este carrusel/slideshow del home
+- Módulo `patrocinadores` (slug: `patrocinadores`) = directorio de sponsors con detalle → ya implementado en S1.5/S1.6
+- Son features separadas. El error de confundirlas ocurrió dos veces.
+
+**Cuándo implementar:** Antes del primer cliente real.
+**Tabla `banners` ya existe** — `id, event_id, sponsor_name, image_url, link_url, sort_order, enabled`
+**Lo que falta por completo:**
+
+**Backend:**
+- [ ] Model `Banner` con fillable + casts
+- [ ] `BannerResource` en Filament (con ImageUploadField para `image_url`, toggle enabled, reorder)
+- [ ] `GET /api/v1/events/{eventId}/banners` — lista banners habilitados ordenados
+- [ ] Test: banner habilitado aparece, deshabilitado no
+
+**App:**
+- [ ] Pantalla `/banners` (o más probable: componente embebido en el Inicio como carrusel)
+- [ ] `bannersApi.ts` + `useBanners(eventId)` hook
+- [ ] Carrusel autoplay con `expo-image` (o FlatList horizontal con snap)
+- [ ] Toca banner → abre `link_url` con `Linking.openURL`
+- [ ] Registro de ruta en `_layout.tsx` si es pantalla separada
+
+**UX sugerida:**
+- El carrusel aparece en la parte superior del tab Inicio (no como pantalla separada)
+- Si el evento no tiene banners habilitados, el carrusel simplemente no se muestra
+- Tamaño de imagen: 16:9 o 3:1 (horizontal, tipo banner publicitario)
+
+---
+
+## ─────────────────────────────────────────
+
 ## SESIÓN 1.x — Onboarding configurable desde admin
 
 ## ─────────────────────────────────────────
