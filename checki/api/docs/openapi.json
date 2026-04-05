@@ -1,0 +1,207 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "QR Check-In API",
+    "version": "1.0.0",
+    "description": "API para el sistema de control de asistencia en eventos corporativos multi-salón. Diseñada para tótems Android con lector QR HID en red local.",
+    "contact": { "name": "Soporte interno" }
+  },
+  "servers": [
+    { "url": "http://{host}/checkin/api", "description": "Servidor local del evento",
+      "variables": { "host": { "default": "192.168.1.100", "description": "IP del servidor en la red del evento" } } }
+  ],
+  "tags": [
+    { "name": "Tótem", "description": "Endpoints usados por los tótems Unity Android" },
+    { "name": "Sistema", "description": "Utilidades de infraestructura" }
+  ],
+  "paths": {
+    "/ping": {
+      "get": {
+        "tags": ["Sistema"],
+        "summary": "Health check",
+        "description": "Verifica que el servidor está operativo y responde. Útil para diagnóstico de conectividad desde los tótems.",
+        "operationId": "ping",
+        "responses": {
+          "200": {
+            "description": "Servidor operativo",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PingResponse" },
+                "example": { "ok": true, "timestamp": "2026-02-25 16:50:07" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/charla-activa": {
+      "get": {
+        "tags": ["Tótem"],
+        "summary": "Charla activa en un salón",
+        "description": "Devuelve la charla que está en curso ahora mismo en el salón del tótem. Si no hay ninguna activa, devuelve la próxima del día. El tótem llama a este endpoint cada 30 segundos para mantener la pantalla IDLE actualizada.",
+        "operationId": "getCharlaActiva",
+        "parameters": [
+          {
+            "name": "totem_id",
+            "in": "query",
+            "description": "ID del tótem. El servidor resuelve el salón automáticamente.",
+            "schema": { "type": "integer", "example": 1 }
+          },
+          {
+            "name": "salon_id",
+            "in": "query",
+            "description": "ID del salón (alternativa a totem_id).",
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK — charla activa y/o próxima",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CharlaActivaResponse" },
+                "examples": {
+                  "con_charla": {
+                    "summary": "Charla en curso",
+                    "value": {
+                      "charla": { "id": 3, "titulo": "Innovación en RRHH", "ponente": "Dr. García", "hora_inicio": "10:00:00", "hora_fin": "11:00:00" },
+                      "proxima": null
+                    }
+                  },
+                  "proxima": {
+                    "summary": "Sin charla activa, pero hay próxima",
+                    "value": {
+                      "charla": null,
+                      "proxima": { "id": 4, "titulo": "Marketing Digital", "ponente": "Sara López", "hora_inicio": "11:30:00", "hora_fin": "12:30:00" }
+                    }
+                  },
+                  "sin_charla": {
+                    "summary": "No hay más charlas hoy",
+                    "value": { "charla": null, "proxima": null }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Falta salon_id o totem_id",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/lectura": {
+      "post": {
+        "tags": ["Tótem"],
+        "summary": "Registrar escaneo QR",
+        "description": "Procesa un escaneo de QR y registra el checkin o checkout del asistente. El servidor determina automáticamente el tipo según el estado actual del asistente. Incluye debounce de 5 segundos por asistente+salón+tipo para evitar doble registro accidental.",
+        "operationId": "postLectura",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LecturaRequest" },
+              "example": {
+                "uid_qr": "QR-TEST-001",
+                "totem_id": 1,
+                "timestamp_totem": "2026-02-25 16:50:07"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK — checkin, checkout, o error de negocio",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LecturaResponse" },
+                "examples": {
+                  "checkin": {
+                    "summary": "Checkin exitoso",
+                    "value": { "tipo": "checkin", "nombre": "Ana García", "charla": "Innovación en RRHH", "color": "verde", "mensaje": "Bienvenido" }
+                  },
+                  "checkout": {
+                    "summary": "Checkout exitoso",
+                    "value": { "tipo": "checkout", "nombre": "Ana García", "minutos": 47, "color": "verde", "mensaje": "Hasta luego" }
+                  },
+                  "qr_invalido": {
+                    "summary": "QR no encontrado en BD",
+                    "value": { "tipo": "error", "color": "rojo", "mensaje": "QR no válido" }
+                  }
+                }
+              }
+            }
+          },
+          "200_empty": {
+            "description": "Body vacío — debounce activo (mismo tipo en menos de 5s). El tótem debe ignorarlo silenciosamente."
+          },
+          "400": {
+            "description": "Parámetros incorrectos o tótem no registrado",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PingResponse": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean", "example": true },
+          "timestamp": { "type": "string", "format": "date-time", "example": "2026-02-25 16:50:07" }
+        }
+      },
+      "CharlaData": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "id": { "type": "integer", "example": 3 },
+          "titulo": { "type": "string", "example": "Innovación en RRHH" },
+          "ponente": { "type": "string", "example": "Dr. García" },
+          "hora_inicio": { "type": "string", "example": "10:00:00" },
+          "hora_fin": { "type": "string", "example": "11:00:00" }
+        }
+      },
+      "CharlaActivaResponse": {
+        "type": "object",
+        "properties": {
+          "charla": { "$ref": "#/components/schemas/CharlaData" },
+          "proxima": { "$ref": "#/components/schemas/CharlaData" }
+        }
+      },
+      "LecturaRequest": {
+        "type": "object",
+        "required": ["uid_qr", "totem_id"],
+        "properties": {
+          "uid_qr": { "type": "string", "description": "Código QR escaneado (campo uid_qr de la tabla asistentes)", "example": "QR-TEST-001" },
+          "totem_id": { "type": "integer", "description": "ID del tótem que realiza el escaneo", "example": 1 },
+          "timestamp_totem": { "type": "string", "description": "Timestamp del tótem en formato MySQL (opcional, para auditoría)", "example": "2026-02-25 16:50:07" }
+        }
+      },
+      "LecturaResponse": {
+        "type": "object",
+        "properties": {
+          "tipo": { "type": "string", "enum": ["checkin", "checkout", "error"], "description": "Tipo de movimiento registrado" },
+          "nombre": { "type": "string", "description": "Nombre del asistente (ausente en errores)", "example": "Ana García" },
+          "charla": { "type": "string", "nullable": true, "description": "Título de la charla activa (solo checkin, puede ser null)", "example": "Innovación en RRHH" },
+          "minutos": { "type": "integer", "description": "Minutos que estuvo en sala (solo checkout)", "example": 47 },
+          "color": { "type": "string", "enum": ["verde", "naranja", "rojo"], "description": "Color de fondo para el tótem" },
+          "mensaje": { "type": "string", "description": "Texto a mostrar en pantalla", "example": "Bienvenido" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "tipo": { "type": "string", "example": "error" },
+          "color": { "type": "string", "example": "rojo" },
+          "mensaje": { "type": "string", "example": "uid_qr y totem_id son requeridos" }
+        }
+      }
+    }
+  }
+}

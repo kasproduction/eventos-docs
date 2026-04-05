@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventOS — Demo v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0A;--s1:#111;--s2:#181818;--s3:#202020;--s4:#2A2A2A;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.11);--b3:rgba(255,255,255,0.18);
+  --t1:#F5F5F5;--t2:rgba(245,245,245,0.52);--t3:rgba(245,245,245,0.26);
+  --acc:#C8FF00;--accr:200,255,0;
+  --acc2:rgba(200,255,0,0.10);--acc3:rgba(200,255,0,0.05);
+  --f:'Inter',sans-serif;--r:16px;--rxl:44px;
+}
+html,body{height:100%}
+body{background:#050505;font-family:var(--f);color:var(--t1);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:32px 16px;-webkit-font-smoothing:antialiased}
+
+.wrap{display:flex;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:390px}
+.demo-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,245,245,0.16)}
+
+/* Accent picker */
+.acc-picker{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:100px;padding:8px 16px}
+.acc-picker span{font-size:10px;color:var(--t3);letter-spacing:.05em}
+.swatch{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .2s,border-color .2s;flex-shrink:0}
+.swatch:hover{transform:scale(1.2)}
+.swatch.active{border-color:rgba(255,255,255,0.85);transform:scale(1.15)}
+
+/* Phone shell */
+.phone{width:100%;background:var(--bg);border-radius:var(--rxl);border:1px solid rgba(255,255,255,0.08);overflow:hidden;box-shadow:0 80px 160px -20px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,0.06);position:relative;height:812px;display:flex;flex-direction:column}
+.island{width:110px;height:30px;background:#000;border-radius:0 0 22px 22px;margin:0 auto;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:200;display:flex;align-items:center;justify-content:center;gap:8px}
+.island-cam{width:10px;height:10px;border-radius:50%;background:#1a1a1a;border:2px solid #2a2a2a}
+.island-dot{width:6px;height:6px;border-radius:50%;background:#0d2e0a;border:1px solid #1a4015}
+.sbar{display:flex;justify-content:space-between;align-items:center;padding:12px 24px 2px;font-size:12px;font-weight:600;color:var(--t2);flex-shrink:0;position:relative;z-index:99}
+.sbar-icons{display:flex;gap:6px;align-items:center}
+
+.screens{flex:1;position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transform:translateX(28px);transition:opacity .35s cubic-bezier(0.16,1,0.3,1),transform .35s cubic-bezier(0.16,1,0.3,1);scrollbar-width:none;-ms-overflow-style:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{opacity:1;pointer-events:all;transform:translateX(0)}
+.screen.back{transform:translateX(-28px)}
+
+.bnav{display:flex;border-top:1px solid var(--b1);padding:10px 4px 20px;flex-shrink:0;background:var(--bg);position:relative;z-index:99}
+.bi{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 0;transition:opacity .15s}
+.bi:active{opacity:.6}
+.bico{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.bi.on .bico{background:var(--acc2)}
+.blbl{font-size:9px;font-weight:600;color:var(--t3);letter-spacing:.03em}
+.bi.on .blbl{color:var(--acc)}
+
+/* ════════════════════════════════
+   SPLASH — partículas + logo
+════════════════════════════════ */
+.splash{min-height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px}
+#particle-canvas{position:absolute;inset:0;pointer-events:none}
+
+.splash-logo-wrap{position:relative;z-index:2;margin-bottom:22px}
+.splash-logo{width:80px;height:80px;border-radius:28px;background:var(--acc);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(var(--accr),.5);animation:logoPop .6s cubic-bezier(0.16,1,0.3,1) both,logoPulse 2.5s 1s ease-in-out infinite}
+@keyframes logoPop{from{opacity:0;transform:scale(0.4) rotate(-10deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes logoPulse{0%,100%{box-shadow:0 0 0 0 rgba(var(--accr),.4),0 20px 60px rgba(0,0,0,.6)}50%{box-shadow:0 0 0 18px rgba(var(--accr),.0),0 20px 60px rgba(0,0,0,.6)}}
+
+.splash-wordmark{font-size:34px;font-weight:900;letter-spacing:-.04em;margin-bottom:6px;position:relative;z-index:2;animation:slideUp .5s .15s ease both}
+.splash-wordmark em{font-style:normal;color:var(--acc)}
+.splash-event{font-size:13px;color:var(--t2);margin-bottom:44px;position:relative;z-index:2;font-weight:500;animation:slideUp .5s .2s ease both}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.load-wrap{width:100%;position:relative;z-index:2;animation:slideUp .5s .3s ease both}
+.load-track{width:100%;height:2px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;margin-bottom:20px;position:relative}
+.load-fill{height:100%;border-radius:100px;background:var(--acc);width:0;transition:width .5s cubic-bezier(0.4,0,0.2,1);box-shadow:0 0 14px rgba(var(--accr),.8)}
+.load-glow{position:absolute;top:-3px;height:8px;width:30px;background:radial-gradient(ellipse,rgba(var(--accr),.8),transparent);border-radius:100px;transition:left .5s cubic-bezier(0.4,0,0.2,1);transform:translateX(-50%)}
+
+.load-steps{display:flex;flex-direction:column;gap:9px}
+.lstep{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--t3);font-weight:500;opacity:0;transform:translateX(-10px);transition:opacity .3s,transform .3s,color .3s}
+.lstep.show{opacity:1;transform:translateX(0)}
+.lstep.done{color:var(--acc)}
+.lstep-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;transition:transform .2s}
+.lstep.done .lstep-dot{transform:scale(1.4)}
+
+.enter-btn{margin-top:36px;width:100%;padding:17px;background:var(--acc);border:none;border-radius:16px;font-size:14px;font-weight:800;color:#050505;cursor:pointer;letter-spacing:.01em;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s,scale .1s;position:relative;z-index:2;overflow:hidden}
+.enter-btn.show{opacity:1;transform:translateY(0)}
+.enter-btn:active{scale:.97}
+.enter-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);transform:translateX(-100%);transition:transform .4s}
+.enter-btn:hover::after{transform:translateX(100%)}
+
+/* ════════════════════════════════
+   HOME
+════════════════════════════════ */
+.home-header{display:flex;justify-content:space-between;align-items:center;padding:16px 18px 12px}
+.home-greeting{font-size:15px;font-weight:700}
+.notif-btn{width:38px;height:38px;border-radius:12px;background:var(--s2);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:scale .15s}
+.notif-btn:active{scale:.92}
+.notif-badge{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--acc);border:2px solid var(--bg)}
+
+.event-hero{margin:0 18px 14px;border-radius:22px;overflow:hidden;position:relative;cursor:pointer;height:186px;transition:scale .15s}
+.event-hero:active{scale:.99}
+.event-hero img{width:100%;height:100%;object-fit:cover;filter:brightness(.52)}
+.event-hero-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.75) 100%);padding:16px;display:flex;flex-direction:column;justify-content:space-between}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);border-radius:100px;padding:4px 11px;font-size:10px;font-weight:700;color:#fff;letter-spacing:.05em;align-self:flex-start}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
+.event-name{font-size:21px;font-weight:800;letter-spacing:-.03em;line-height:1.15;margin-bottom:9px}
+.event-chips{display:flex;gap:6px;flex-wrap:wrap}
+.echip{padding:3px 10px;border-radius:100px;font-size:9px;font-weight:600;background:rgba(255,255,255,.12);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.9)}
+.echip.hi{background:rgba(var(--accr),.2);border-color:rgba(var(--accr),.4);color:var(--acc)}
+
+.next-card{margin:0 18px 18px;background:var(--acc);border-radius:20px;padding:17px;cursor:pointer;position:relative;overflow:hidden;transition:scale .15s}
+.next-card:active{scale:.98}
+.next-card-bg{position:absolute;top:-35px;right:-35px;width:110px;height:110px;border-radius:50%;background:rgba(0,0,0,.07)}
+.next-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.42);margin-bottom:4px;position:relative;z-index:1}
+.next-title{font-size:15px;font-weight:800;color:#050505;letter-spacing:-.02em;line-height:1.2;margin-bottom:11px;position:relative;z-index:1}
+.next-bottom{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+.next-spkr{display:flex;align-items:center;gap:7px}
+.next-av{width:22px;height:22px;border-radius:50%;overflow:hidden;border:1.5px solid rgba(0,0,0,.15)}
+.next-av img{width:100%;height:100%;object-fit:cover}
+.next-time{font-size:11px;font-weight:600;color:rgba(0,0,0,.5)}
+.next-btn{background:#050505;color:var(--acc);font-size:10px;font-weight:700;padding:6px 14px;border-radius:100px}
+
+.sec-hd{display:flex;justify-content:space-between;align-items:center;padding:0 18px;margin-bottom:10px}
+.sec-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--t3)}
+.sec-link{font-size:11px;color:var(--acc);font-weight:600;cursor:pointer}
+
+.mod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 18px;margin-bottom:20px}
+.mod{background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;transition:border-color .2s,background .2s,scale .1s}
+.mod:active{scale:.94}
+.mod.on{border-color:rgba(var(--accr),.3);background:var(--acc3)}
+.mod-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.mod-lbl{font-size:9px;font-weight:600;color:var(--t2);text-align:center;line-height:1.2}
+.mod.on .mod-lbl{color:var(--acc)}
+
+.spk-row{display:flex;gap:12px;padding:0 18px;margin-bottom:20px;overflow-x:auto;scrollbar-width:none}
+.spk-row::-webkit-scrollbar{display:none}
+.spk-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.spk-chip-av{width:54px;height:54px;border-radius:50%;overflow:hidden;border:2px solid var(--b2);transition:border-color .2s,scale .15s}
+.spk-chip:active .spk-chip-av{scale:.92;border-color:var(--acc)}
+.spk-chip-av img{width:100%;height:100%;object-fit:cover}
+.spk-chip-name{font-size:10px;font-weight:600;text-align:center;line-height:1.2;max-width:58px}
+.spk-chip-role{font-size:8px;color:var(--t3);text-align:center;max-width:58px}
+
+.ticker-block{margin:0 18px 8px}
+.ticker-inner{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:10px 14px;overflow:hidden}
+.ticker-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);text-align:center;margin-bottom:8px}
+.ticker{display:flex;gap:20px;align-items:center;animation:tick 16s linear infinite;width:max-content}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tick-i{font-size:12px;font-weight:700;color:var(--t3);white-space:nowrap}
+.tick-s{color:var(--b2);font-size:10px}
+
+/* ════════════════════════════════
+   AGENDA
+════════════════════════════════ */
+.agenda-hd{padding:16px 18px 0}
+.agenda-title{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px}
+.agenda-sub{font-size:12px;color:var(--t2);margin-bottom:16px}
+.day-tabs{display:flex;gap:6px;padding:0 18px;margin-bottom:16px}
+.dtab{flex:1;text-align:center;padding:9px 4px;border-radius:12px;font-size:11px;font-weight:700;border:1px solid var(--b1);color:var(--t2);cursor:pointer;transition:all .2s}
+.dtab:active{scale:.97}
+.dtab.on{background:var(--acc);color:#050505;border-color:var(--acc)}
+.sess-list{display:flex;flex-direction:column;padding:0 18px 24px}
+.sr{display:flex;gap:10px;cursor:pointer}
+.sr:active .sc{scale:.99}
+.stime{font-size:10px;color:var(--t3);padding-top:15px;min-width:32px;font-weight:700}
+.sline{display:flex;flex-direction:column;align-items:center;padding-top:15px}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--s4);flex-shrink:0}
+.sdot.live{background:var(--acc);box-shadow:0 0 12px rgba(var(--accr),.7)}
+.sconn{width:1px;flex:1;background:var(--b1);min-height:24px;margin-top:4px}
+.sc{flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:13px;margin-bottom:8px;transition:border-color .2s}
+.sc.live{border-color:rgba(var(--accr),.25);background:var(--acc3)}
+.stag{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:3px}
+.stag.live{color:var(--acc)}
+.stit{font-size:13px;font-weight:700;line-height:1.3;margin-bottom:8px}
+.sspk{display:flex;align-items:center;gap:7px}
+.sspk-av{width:20px;height:20px;border-radius:50%;overflow:hidden;border:1.5px solid var(--b2);flex-shrink:0}
+.sspk-av img{width:100%;height:100%;object-fit:cover}
+.sspk-name{font-size:10px;color:var(--t2);font-weight:500}
+.sfav{margin-left:auto;width:24px;height:24px;border-radius:8px;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s,scale .15s}
+.sfav:active{scale:.85;background:var(--acc2)}
+
+/* ════════════════════════════════
+   SPEAKERS
+════════════════════════════════ */
+.spk-hd{padding:16px 18px 4px}
+.spk-title{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px}
+.spk-sub{font-size:12px;color:var(--t2);margin-bottom:16px}
+.spk-feat{margin:0 18px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:18px;padding:16px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:border-color .2s,scale .15s}
+.spk-feat:active{scale:.99;border-color:var(--acc)}
+.spk-feat-av{width:60px;height:60px;border-radius:50%;overflow:hidden;flex-shrink:0;border:3px solid var(--s4)}
+.spk-feat-av img{width:100%;height:100%;object-fit:cover}
+.spk-feat-tag{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--acc);margin-bottom:3px}
+.spk-feat-name{font-size:16px;font-weight:800;letter-spacing:-.02em;margin-bottom:2px}
+.spk-feat-sub{font-size:11px;color:var(--t2)}
+.spk-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px;margin-bottom:20px}
+.spk-card{background:var(--s2);border:1px solid var(--b1);border-radius:18px;padding:18px 14px 14px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:border-color .2s,scale .15s;gap:10px}
+.spk-card:active{scale:.96;border-color:var(--b3)}
+.spk-av{width:68px;height:68px;border-radius:50%;overflow:hidden;border:3px solid var(--s4);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.spk-av img{width:100%;height:100%;object-fit:cover}
+.spk-name{font-size:12px;font-weight:700;text-align:center;line-height:1.2}
+.spk-org{font-size:10px;color:var(--t2);text-align:center;margin-top:1px}
+.spk-tag{font-size:9px;font-weight:600;padding:3px 10px;border-radius:100px;background:var(--acc2);color:var(--acc);border:1px solid rgba(var(--accr),.2)}
+
+/* ════════════════════════════════
+   NETWORKING + MATCH
+════════════════════════════════ */
+.net-hd{padding:16px 18px 4px}
+.net-title{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px}
+.net-sub{font-size:12px;color:var(--t2);margin-bottom:14px}
+.net-search{margin:0 18px 14px;display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--b2);border-radius:14px;padding:11px 14px}
+.net-search-ico{color:var(--t3);font-size:14px}
+.net-search-input{flex:1;font-size:13px;color:var(--t2);background:none;border:none;outline:none;font-family:var(--f)}
+.net-list{display:flex;flex-direction:column;gap:8px;padding:0 18px 24px}
+.net-card{display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:13px;cursor:pointer;transition:border-color .2s,scale .15s}
+.net-card:active{scale:.98;border-color:var(--b3)}
+.net-av{width:46px;height:46px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--s4)}
+.net-av img{width:100%;height:100%;object-fit:cover}
+.net-info{flex:1}
+.net-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.net-role{font-size:11px;color:var(--t2)}
+.net-company{font-size:10px;color:var(--t3);margin-top:1px}
+.net-connect{width:34px;height:34px;border-radius:50%;background:var(--acc2);border:1px solid rgba(var(--accr),.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;transition:background .2s,scale .15s}
+.net-card:active .net-connect{background:var(--acc);scale:.9}
+
+/* MATCH OVERLAY */
+.match-overlay{
+  position:absolute;inset:0;z-index:500;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding-bottom:40px;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+  background:rgba(0,0,0,0);
+}
+.match-overlay.active{opacity:1;pointer-events:all;background:rgba(0,0,0,0.85)}
+.match-blur-bg{position:absolute;inset:0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+
+.match-photos{position:absolute;top:80px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:0}
+.match-photo-you,.match-photo-them{width:100px;height:100px;border-radius:50%;overflow:hidden;border:4px solid var(--bg);box-shadow:0 12px 40px rgba(0,0,0,.7);position:relative;z-index:2;transform:scale(0) translateY(30px);transition:transform .5s cubic-bezier(0.16,1,0.3,1),opacity .4s}
+.match-photo-you img,.match-photo-them img{width:100%;height:100%;object-fit:cover}
+.match-photo-you{transform-origin:right center;margin-right:-16px}
+.match-photo-them{transform-origin:left center;margin-left:-16px}
+.match-overlay.active .match-photo-you{transform:scale(1) translateY(0) rotate(-4deg);transition-delay:.05s}
+.match-overlay.active .match-photo-them{transform:scale(1) translateY(0) rotate(4deg);transition-delay:.12s}
+
+.match-heart{position:absolute;top:154px;left:50%;transform:translateX(-50%) scale(0);z-index:10;width:42px;height:42px;background:var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:3px solid var(--bg);transition:transform .4s cubic-bezier(0.16,1,0.3,1);box-shadow:0 0 30px rgba(var(--accr),.5)}
+.match-overlay.active .match-heart{transform:translateX(-50%) scale(1);transition-delay:.3s}
+
+.match-content{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;width:100%;padding:0 24px}
+.match-label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:10px;opacity:0;transform:translateY(12px);transition:opacity .4s .4s,transform .4s .4s}
+.match-overlay.active .match-label{opacity:1;transform:translateY(0)}
+.match-name{font-size:26px;font-weight:900;letter-spacing:-.04em;text-align:center;margin-bottom:4px;opacity:0;transform:translateY(12px);transition:opacity .4s .5s,transform .4s .5s}
+.match-overlay.active .match-name{opacity:1;transform:translateY(0)}
+.match-role{font-size:13px;color:var(--t2);text-align:center;margin-bottom:28px;opacity:0;transition:opacity .4s .6s}
+.match-overlay.active .match-role{opacity:1}
+.match-actions{display:flex;gap:10px;width:100%}
+.match-btn-msg{flex:1;padding:16px;background:var(--acc);border:none;border-radius:14px;font-size:14px;font-weight:800;color:#050505;cursor:pointer;opacity:0;transform:translateY(14px);transition:opacity .4s .65s,transform .4s .65s,scale .1s}
+.match-overlay.active .match-btn-msg{opacity:1;transform:translateY(0)}
+.match-btn-msg:active{scale:.97}
+.match-btn-skip{padding:16px 20px;background:var(--s3);border:1px solid var(--b2);border-radius:14px;font-size:14px;font-weight:700;color:var(--t1);cursor:pointer;opacity:0;transform:translateY(14px);transition:opacity .4s .7s,transform .4s .7s,scale .1s}
+.match-overlay.active .match-btn-skip{opacity:1;transform:translateY(0)}
+.match-btn-skip:active{scale:.97}
+
+/* Confetti canvas */
+#confetti-canvas{position:absolute;inset:0;pointer-events:none;z-index:5}
+
+/* ════════════════════════════════
+   QR / CHECK-IN
+════════════════════════════════ */
+.qr-wrap{padding:16px 18px 24px}
+.qr-profile{display:flex;align-items:center;gap:14px;background:var(--s2);border:1px solid var(--b1);border-radius:18px;padding:14px;margin-bottom:14px}
+.qr-profile-av{width:52px;height:52px;border-radius:50%;overflow:hidden;border:3px solid var(--s4);flex-shrink:0}
+.qr-profile-av img{width:100%;height:100%;object-fit:cover}
+.qr-name{font-size:16px;font-weight:800;letter-spacing:-.02em}
+.qr-role-row{display:flex;align-items:center;gap:5px;margin-top:2px}
+.qr-role-dot{width:5px;height:5px;border-radius:50%;background:var(--acc)}
+.qr-role{font-size:10px;color:var(--t2)}
+.qr-id{font-size:9px;color:var(--t3);margin-top:4px;font-family:monospace;letter-spacing:.06em}
+
+/* Scanner box */
+.scan-box{background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:24px 20px;margin-bottom:14px;display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;overflow:hidden}
+.scan-frame{position:relative;width:150px;height:150px}
+.scan-frame-corners{position:absolute;inset:0}
+.scan-frame-corners::before,.scan-frame-corners::after{content:'';position:absolute;width:24px;height:24px;border-color:var(--acc);border-style:solid}
+.scan-frame-corners::before{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
+.scan-frame-corners::after{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
+.scan-corners-2::before,.scan-corners-2::after{content:'';position:absolute;width:24px;height:24px;border-color:var(--acc);border-style:solid}
+.scan-corners-2::before{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0}
+.scan-corners-2::after{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px}
+
+/* QR pattern inside scanner */
+.qr-inner{background:#fff;border-radius:10px;padding:14px;display:grid;grid-template-columns:repeat(9,1fr);gap:2px;width:130px}
+.qc{aspect-ratio:1;border-radius:1.5px}
+
+/* Scan line */
+.scan-line{position:absolute;left:8px;right:8px;height:2px;background:linear-gradient(90deg,transparent,var(--acc),transparent);box-shadow:0 0 10px rgba(var(--accr),.8);top:8px;animation:scanAnim 2s ease-in-out infinite}
+@keyframes scanAnim{0%{top:8px;opacity:1}48%{top:calc(100% - 10px);opacity:1}50%{opacity:0}52%{top:8px;opacity:0}54%{opacity:1}100%{top:8px;opacity:1}}
+
+.scan-status{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--acc)}
+.scan-status-dot{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:pulse 1.4s infinite}
+.scan-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+
+/* Check-in success flash */
+.checkin-flash{position:absolute;inset:0;background:rgba(var(--accr),.15);opacity:0;pointer-events:none;border-radius:20px;transition:opacity .1s}
+.checkin-flash.pop{animation:flashPop .6s ease forwards}
+@keyframes flashPop{0%{opacity:1}100%{opacity:0}}
+
+.checkin-success{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;opacity:0;pointer-events:none;border-radius:20px;transition:opacity .3s;background:var(--s2);z-index:10}
+.checkin-success.show{opacity:1;pointer-events:all}
+.checkin-circle{width:64px;height:64px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:28px;transform:scale(0);transition:transform .4s cubic-bezier(0.16,1,0.3,1)}
+.checkin-success.show .checkin-circle{transform:scale(1)}
+.checkin-text{font-size:16px;font-weight:800;letter-spacing:-.02em;opacity:0;transform:translateY(8px);transition:opacity .3s .15s,transform .3s .15s}
+.checkin-success.show .checkin-text{opacity:1;transform:translateY(0)}
+.checkin-sub{font-size:12px;color:var(--t2);opacity:0;transition:opacity .3s .25s}
+.checkin-success.show .checkin-sub{opacity:1}
+
+.qr-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.qr-stat{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:14px 12px}
+.qr-stat-n{font-size:28px;font-weight:800;letter-spacing:-.04em;color:var(--acc);line-height:1}
+.qr-stat-l{font-size:10px;color:var(--t2);margin-top:4px}
+.share-btn{width:100%;padding:15px;background:var(--s2);border:1px solid var(--b2);border-radius:14px;font-size:13px;font-weight:700;color:var(--t1);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:border-color .2s,scale .15s}
+.share-btn:active{scale:.98;border-color:rgba(var(--accr),.4)}
+
+/* ════════════════════════════════
+   CHAT
+════════════════════════════════ */
+.chat-top{padding:16px 18px 12px;border-bottom:1px solid var(--b1)}
+.chat-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.chat-title{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.online-pill{display:flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--b1);border-radius:100px;padding:5px 10px}
+.online-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
+.online-count{font-size:10px;font-weight:600;color:var(--t2)}
+.chat-event-pill{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:10px 12px}
+.chat-ev-icon{width:32px;height:32px;border-radius:10px;background:var(--acc2);border:1px solid rgba(var(--accr),.25);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-ev-name{font-size:12px;font-weight:600}
+.chat-ev-sub{font-size:10px;color:var(--t3)}
+.chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:14px 18px;scrollbar-width:none}
+.chat-msgs::-webkit-scrollbar{display:none}
+.msg{display:flex;flex-direction:column;max-width:80%}
+.msg.sent{align-self:flex-end;align-items:flex-end}
+.msg.recv{align-self:flex-start}
+.msg-sender{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.msg-sender-av{width:16px;height:16px;border-radius:50%;overflow:hidden}
+.msg-sender-av img{width:100%;height:100%;object-fit:cover}
+.msg-sender-name{font-size:10px;font-weight:600;color:var(--t2)}
+.msg-bubble{padding:10px 14px;border-radius:18px;font-size:13px;line-height:1.45}
+.msg.recv .msg-bubble{background:var(--s3);border:1px solid var(--b1);border-bottom-left-radius:4px}
+.msg.sent .msg-bubble{background:var(--acc);color:#050505;border-bottom-right-radius:4px}
+.msg-time{font-size:9px;color:var(--t3);margin-top:4px}
+.typing-indicator{align-self:flex-start;background:var(--s3);border:1px solid var(--b1);border-radius:18px;border-bottom-left-radius:4px;padding:12px 16px;display:flex;gap:4px;align-items:center}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);animation:typingBounce 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.chat-input-area{padding:10px 18px 14px;border-top:1px solid var(--b1);display:flex;gap:8px;align-items:center}
+.chat-input{flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:24px;padding:11px 16px;font-size:13px;color:var(--t1);font-family:var(--f);outline:none}
+.chat-input::placeholder{color:var(--t3)}
+.chat-send{width:40px;height:40px;border-radius:50%;background:var(--acc);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:scale .15s}
+.chat-send:active{scale:.88}
+
+/* ════════════════════════════════
+   POLLS (encuesta en vivo)
+════════════════════════════════ */
+.poll-overlay{position:absolute;inset:0;z-index:400;display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s;background:rgba(0,0,0,0)}
+.poll-overlay.active{opacity:1;pointer-events:all;background:rgba(0,0,0,0.7)}
+.poll-sheet{background:var(--s1);border-radius:28px 28px 0 0;padding:20px 20px 32px;transform:translateY(100%);transition:transform .4s cubic-bezier(0.16,1,0.3,1)}
+.poll-overlay.active .poll-sheet{transform:translateY(0)}
+.poll-handle{width:40px;height:4px;background:var(--b2);border-radius:100px;margin:0 auto 16px}
+.poll-live-tag{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+.poll-q{font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.3;margin-bottom:18px}
+.poll-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.poll-opt{position:relative;background:var(--s3);border:1.5px solid var(--b1);border-radius:14px;padding:13px 14px;cursor:pointer;overflow:hidden;transition:border-color .2s}
+.poll-opt.voted{border-color:rgba(var(--accr),.4);background:var(--acc3)}
+.poll-opt-bar{position:absolute;top:0;bottom:0;left:0;background:rgba(var(--accr),.08);border-radius:14px;width:0;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+.poll-opt.voted .poll-opt-bar{background:rgba(var(--accr),.12)}
+.poll-opt-row{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+.poll-opt-label{font-size:13px;font-weight:600}
+.poll-opt-pct{font-size:12px;font-weight:700;color:var(--t3)}
+.poll-opt.voted .poll-opt-pct{color:var(--acc)}
+.poll-total{font-size:11px;color:var(--t3);text-align:center}
+
+/* ════════════════════════════════
+   SESSION DETAIL
+════════════════════════════════ */
+.detail-wrap{padding-bottom:24px}
+.detail-hero{position:relative;height:210px}
+.detail-hero img{width:100%;height:100%;object-fit:cover;display:block}
+.detail-hero-ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,10,0) 40%,rgba(10,10,10,1) 100%)}
+.detail-back{position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;z-index:10}
+.detail-body{padding:0 18px;margin-top:-16px;position:relative;z-index:2}
+.d-live-tag{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+.d-title{font-size:21px;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:10px}
+.d-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.d-chip{padding:4px 12px;border-radius:100px;font-size:10px;font-weight:600;background:var(--s3);border:1px solid var(--b2);color:var(--t2)}
+.d-spk{display:flex;align-items:center;gap:14px;background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:14px;margin-bottom:16px}
+.d-spk-av{width:50px;height:50px;border-radius:50%;overflow:hidden;border:3px solid var(--s4);flex-shrink:0}
+.d-spk-av img{width:100%;height:100%;object-fit:cover}
+.d-spk-tag{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--acc);margin-bottom:3px}
+.d-spk-name{font-size:15px;font-weight:800;letter-spacing:-.02em;margin-bottom:2px}
+.d-spk-role{font-size:11px;color:var(--t2)}
+.d-desc{font-size:13px;line-height:1.75;color:var(--t2);margin-bottom:20px}
+.d-btn-main{width:100%;padding:16px;background:var(--acc);border:none;border-radius:14px;font-size:14px;font-weight:700;color:#050505;cursor:pointer;margin-bottom:8px;transition:scale .15s}
+.d-btn-main:active{scale:.98}
+.d-btn-sec{width:100%;padding:14px;background:transparent;border:1px solid var(--b2);border-radius:14px;font-size:13px;font-weight:600;color:var(--t1);cursor:pointer;transition:border-color .2s,scale .15s}
+.d-btn-sec:active{scale:.98;border-color:var(--acc)}
+
+/* ════════════════════════════════
+   NOTIFS
+════════════════════════════════ */
+.notifs-wrap{padding:16px 18px}
+.notifs-title{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:16px}
+.notif-card{display:flex;gap:12px;background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:14px;margin-bottom:8px;cursor:pointer;transition:border-color .2s,scale .15s}
+.notif-card:active{scale:.99}
+.notif-card.feat{border-color:rgba(var(--accr),.25);background:var(--acc3)}
+.notif-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;background:var(--s3)}
+.notif-card.feat .notif-icon{background:var(--acc2)}
+.notif-text{font-size:12px;line-height:1.45;margin-bottom:6px}
+.notif-card.feat .notif-text{color:var(--acc)}
+.notif-meta{display:flex;align-items:center;gap:6px}
+.notif-time{font-size:9px;color:var(--t3)}
+.notif-tag{font-size:8px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--acc2);color:var(--acc);border:1px solid rgba(var(--accr),.2)}
+.notif-unread{width:7px;height:7px;border-radius:50%;background:var(--acc);margin-left:auto;flex-shrink:0}
+
+/* Toast notification */
+.toast{
+  position:absolute;top:56px;left:16px;right:16px;z-index:600;
+  background:var(--s2);border:1px solid rgba(var(--accr),.3);
+  border-radius:16px;padding:12px 14px;
+  display:flex;align-items:center;gap:10px;
+  transform:translateY(-80px);opacity:0;
+  transition:transform .4s cubic-bezier(0.16,1,0.3,1),opacity .4s;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-icon{font-size:18px;flex-shrink:0}
+.toast-body{flex:1}
+.toast-title{font-size:12px;font-weight:700;color:var(--acc);margin-bottom:1px}
+.toast-sub{font-size:11px;color:var(--t2)}
+
+/* ════ ROLE PICKER ════ */
+.role-picker{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:100px;padding:5px 8px}
+.role-picker span{font-size:10px;color:var(--t3);letter-spacing:.05em;padding-left:4px}
+.rpill{font-size:11px;font-weight:700;padding:6px 14px;border-radius:100px;cursor:pointer;color:var(--t2);transition:all .2s}
+.rpill:active{scale:.95}
+.rpill.active{background:var(--acc);color:#050505}
+
+/* ════ SPONSORS ════ */
+.spons-hd{padding:16px 18px 4px}
+.spons-title{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px}
+.spons-sub{font-size:12px;color:var(--t2);margin-bottom:14px}
+.tier-block{padding:0 18px;margin-bottom:6px}
+.tier-lbl{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.tier-lbl.gold{color:#F59E0B}.tier-lbl.silver{color:rgba(245,245,245,0.45)}.tier-lbl.bronze{color:#CD7C45}
+.tier-sep{flex:1;height:1px;background:currentColor;opacity:.2}
+.spons-card{display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:13px;margin-bottom:8px;cursor:pointer;transition:border-color .2s,scale .15s}
+.spons-card:active{scale:.98}
+.spons-card.gold-card{border-color:rgba(245,158,11,0.2);background:rgba(245,158,11,0.03)}
+.spons-logo{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.spons-info{flex:1;min-width:0}
+.spons-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.spons-desc{font-size:11px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spons-fav{width:30px;height:30px;border-radius:9px;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:background .2s,scale .15s;cursor:pointer}
+.spons-fav:active{scale:.82}
+.spons-fav.on{background:var(--acc2);border-color:rgba(var(--accr),.3);color:var(--acc)}
+/* Sponsor detail */
+.sd-hero{height:180px;background:linear-gradient(135deg,#0d1b2a,#1a2744);display:flex;align-items:center;justify-content:center;position:relative}
+.sd-back{position:absolute;top:16px;left:16px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer}
+.sd-hero-logo{width:76px;height:76px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.sd-body{padding:20px 18px 32px}
+.sd-name{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
+.sd-tier-tag{display:inline-flex;padding:3px 10px;border-radius:100px;font-size:9px;font-weight:700;background:rgba(245,158,11,.12);color:#F59E0B;border:1px solid rgba(245,158,11,.2);margin-bottom:14px}
+.sd-desc{font-size:13px;line-height:1.7;color:var(--t2);margin-bottom:20px}
+.sd-srv-title{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.sd-service{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--b1);border-radius:13px;padding:12px 14px;margin-bottom:6px}
+.sd-service-icon{font-size:16px;flex-shrink:0}
+.sd-service-name{font-size:12px;font-weight:600;margin-bottom:1px}
+.sd-service-sub{font-size:10px;color:var(--t3)}
+.sd-actions{display:flex;gap:8px;margin-top:20px}
+.sd-btn-main{flex:1;padding:14px;background:var(--s2);border:1px solid var(--b2);border-radius:13px;font-size:12px;font-weight:700;color:var(--t1);cursor:pointer;transition:scale .15s,background .2s}
+.sd-btn-main:active{scale:.98}
+.sd-btn-main.fav{background:var(--acc2);border-color:rgba(var(--accr),.3);color:var(--acc)}
+.sd-btn-web{padding:14px 18px;background:var(--acc);border:none;border-radius:13px;font-size:12px;font-weight:700;color:#050505;cursor:pointer;transition:scale .15s}
+.sd-btn-web:active{scale:.98}
+
+/* Emoji bar */
+.emoji-bar{display:none;flex-direction:row;justify-content:space-around;align-items:center;background:var(--s2);border-top:1px solid var(--b1);padding:8px 12px;}
+.emoji-bar.open{display:flex}
+.emoji-btn{font-size:22px;background:none;border:none;cursor:pointer;padding:4px 2px;border-radius:8px;transition:transform .15s;}
+.emoji-btn:active{transform:scale(1.3);}
+.emoji-toggle-btn{background:none;border:none;font-size:20px;cursor:pointer;padding:0 2px;line-height:1;}
+/* Input row reorganizado */
+.chat-input-row{display:flex;align-items:flex-end;gap:8px;padding:10px 14px 14px;background:var(--s1);border-top:1px solid var(--b1);}
+.chat-input-new{flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:22px;padding:9px 16px;color:var(--t1);font-size:13px;font-family:var(--f);resize:none;max-height:90px;outline:none;}
+.chat-send-new{width:36px;height:36px;border-radius:50%;background:#2563EB;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .2s;}
+/* Floating emoji */
+@keyframes floatUp{0%{transform:translateY(0) scale(1);opacity:1}60%{opacity:1}100%{transform:translateY(-130px) scale(1.2);opacity:0}}
+.emoji-float-item{position:absolute;bottom:16px;right:24px;font-size:34px;animation:floatUp 2s ease-out forwards;pointer-events:none;}
+/* Online pill actualizado */
+.online-pill{display:flex;align-items:center;gap:5px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.2);border-radius:100px;padding:3px 10px;}
+.online-dot{width:7px;height:7px;border-radius:50%;background:#22C55E;animation:pulse2 1.8s ease-in-out infinite;}
+@keyframes pulse2{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.online-count{font-size:10px;color:#22C55E;font-weight:600}
+
+/* ════ LEADS ════ */
+.leads-hd{padding:16px 18px 4px;display:flex;align-items:center;gap:8px}
+.leads-title{font-size:22px;font-weight:800;letter-spacing:-.03em;flex:1}
+.leads-action-btn{padding:6px 12px;border-radius:100px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--b2);background:var(--s2);color:var(--t2);transition:scale .15s;white-space:nowrap}
+.leads-action-btn:active{scale:.92}
+.leads-action-btn.primary{background:var(--acc);color:#050505;border-color:transparent}
+.leads-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 18px;margin-bottom:4px}
+.lead-stat{background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:10px 6px;text-align:center}
+.lead-stat-n{font-size:19px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.lead-stat-l{font-size:8px;color:var(--t2);margin-top:2px}
+.lead-stat.hot .lead-stat-n{color:#F87171}
+.lead-stat.warm .lead-stat-n{color:#FBBF24}
+.lead-stat.cold .lead-stat-n{color:#60A5FA}
+.lead-list{padding:0 18px 24px;display:flex;flex-direction:column;gap:7px}
+.lead-card{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:11px 12px;cursor:pointer;transition:border-color .2s,scale .15s}
+.lead-card:active{scale:.98}
+.lead-av{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:var(--acc2);border:1.5px solid rgba(var(--accr),.2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--acc);overflow:hidden}
+.lead-av img{width:100%;height:100%;object-fit:cover}
+.lead-info{flex:1;min-width:0}
+.lead-name{font-size:13px;font-weight:700;margin-bottom:1px}
+.lead-company{font-size:10px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lead-time{font-size:9px;color:var(--t3);margin-top:2px}
+.tier-badge{font-size:8px;font-weight:700;padding:3px 8px;border-radius:100px;letter-spacing:.03em;flex-shrink:0}
+.tier-badge.hot{background:rgba(248,113,113,.12);color:#F87171;border:1px solid rgba(248,113,113,.2)}
+.tier-badge.warm{background:rgba(251,191,36,.10);color:#FBBF24;border:1px solid rgba(251,191,36,.18)}
+.tier-badge.cold{background:rgba(96,165,250,.10);color:#60A5FA;border:1px solid rgba(96,165,250,.18)}
+.tier-badge.none{background:var(--s3);color:var(--t3);border:1px solid var(--b1)}
+
+/* ════ SCANNER LEADS ════ */
+.scan-lead-wrap{padding:16px 18px 24px}
+.scan-lead-title{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:14px}
+.capture-success{position:absolute;inset:0;background:var(--s2);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:10}
+.capture-success.show{opacity:1;pointer-events:all}
+.capture-av-big{width:68px;height:68px;border-radius:50%;background:var(--acc2);border:3px solid rgba(var(--accr),.3);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--acc);overflow:hidden}
+.capture-av-big img{width:100%;height:100%;object-fit:cover}
+.capture-name{font-size:16px;font-weight:800;letter-spacing:-.02em}
+.capture-role{font-size:11px;color:var(--t2)}
+.capture-tag{background:var(--acc);color:#050505;font-size:10px;font-weight:700;padding:5px 14px;border-radius:100px;letter-spacing:.04em}
+
+/* ════ MI STAND ════ */
+.stand-hd{padding:16px 18px 4px}
+.stand-title{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:2px}
+.stand-role-tag{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--acc);margin-bottom:14px;display:block}
+.stand-hero{margin:0 18px 16px;height:100px;border-radius:18px;background:linear-gradient(135deg,#0d1b2a,#1b2838);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border:1px solid var(--b1)}
+.stand-hero-logo{width:54px;height:54px;border-radius:16px;background:var(--acc);color:#050505;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900}
+.stand-hero-name{position:absolute;bottom:12px;left:16px;font-size:14px;font-weight:700}
+.stand-hero-leads{position:absolute;bottom:12px;right:14px;font-size:10px;color:var(--t2);background:rgba(0,0,0,.55);backdrop-filter:blur(4px);padding:3px 9px;border-radius:100px}
+.stand-sec-title{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);padding:0 18px;margin-bottom:8px}
+.stand-members{padding:0 18px;margin-bottom:14px;display:flex;flex-direction:column;gap:6px}
+.stand-member{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:11px 12px}
+.stand-av{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:var(--s4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--t2);overflow:hidden}
+.stand-av img{width:100%;height:100%;object-fit:cover}
+.stand-member-info{flex:1;min-width:0}
+.stand-member-name{font-size:12px;font-weight:700;margin-bottom:1px}
+.stand-member-email{font-size:10px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mbadge{font-size:8px;font-weight:700;padding:2px 8px;border-radius:100px;letter-spacing:.03em;white-space:nowrap}
+.mbadge.owner{background:var(--acc2);color:var(--acc);border:1px solid rgba(var(--accr),.2)}
+.mbadge.pending{background:var(--s3);color:var(--t3);border:1px solid var(--b1)}
+.mactions{display:flex;gap:5px}
+.maction-btn{font-size:9px;font-weight:600;padding:4px 9px;border-radius:100px;border:1px solid var(--b2);background:var(--s3);color:var(--t2);cursor:pointer;transition:scale .15s;white-space:nowrap}
+.maction-btn:active{scale:.9}
+.stand-add{margin:0 18px 12px;display:flex;align-items:center;gap:10px;background:var(--s2);border:1.5px dashed var(--b2);border-radius:14px;padding:12px 14px;cursor:pointer;transition:border-color .2s}
+.stand-add:active{border-color:rgba(var(--accr),.4)}
+.stand-add-ico{width:36px;height:36px;border-radius:50%;background:var(--acc2);border:1px solid rgba(var(--accr),.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.stand-add-text{font-size:12px;font-weight:600;color:var(--t2)}
+.stand-add-sub{font-size:10px;color:var(--t3)}
+.stand-transfer{margin:0 18px;padding:13px;background:transparent;border:1px solid var(--b2);border-radius:13px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;text-align:center;width:calc(100% - 36px);display:block;transition:border-color .2s}
+.stand-transfer:active{border-color:rgba(var(--accr),.3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="demo-label">EventOS — Demo Interactivo</div>
+
+  <div class="acc-picker">
+    <span>Acento</span>
+    <div class="swatch active" style="background:#C8FF00" onclick="setAcc('#C8FF00','200,255,0',this)"></div>
+    <div class="swatch" style="background:#FFFFFF" onclick="setAcc('#FFFFFF','255,255,255',this)"></div>
+    <div class="swatch" style="background:#60A5FA" onclick="setAcc('#60A5FA','96,165,250',this)"></div>
+    <div class="swatch" style="background:#F472B6" onclick="setAcc('#F472B6','244,114,182',this)"></div>
+    <div class="swatch" style="background:#34D399" onclick="setAcc('#34D399','52,211,153',this)"></div>
+    <div class="swatch" style="background:#FB923C" onclick="setAcc('#FB923C','251,146,60',this)"></div>
+    <div class="swatch" style="background:#A78BFA" onclick="setAcc('#A78BFA','167,139,250',this)"></div>
+  </div>
+
+  <div class="role-picker">
+    <span>Rol</span>
+    <div class="rpill active" id="rp-asi" onclick="switchRole('asistente',this)">👤 Asistente</div>
+    <div class="rpill" id="rp-vend" onclick="switchRole('vendedor',this)">🏪 Expositor</div>
+  </div>
+
+  <div class="phone" id="phone">
+    <canvas id="confetti-canvas" style="position:absolute;inset:0;pointer-events:none;z-index:5;width:100%;height:100%"></canvas>
+    <div class="island"><div class="island-cam"></div><div class="island-dot"></div></div>
+    <div class="sbar">
+      <span>9:41</span>
+      <div class="sbar-icons">
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="6" width="2.5" height="5" rx=".6" fill="rgba(245,245,245,0.35)"/><rect x="4" y="4" width="2.5" height="7" rx=".6" fill="rgba(245,245,245,0.5)"/><rect x="8" y="2" width="2.5" height="9" rx=".6" fill="rgba(245,245,245,0.7)"/><rect x="12" y="0" width="2.5" height="11" rx=".6" fill="rgba(245,245,245,0.9)"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 9a1 1 0 1 0 0 .001Z" fill="rgba(245,245,245,0.9)"/><path d="M5.3 6.5C6.2 5.6 7 5.2 8 5.2S9.8 5.6 10.7 6.5" stroke="rgba(245,245,245,0.7)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M2.8 4.1C4.2 2.7 6 2 8 2S11.8 2.7 13.2 4.1" stroke="rgba(245,245,245,0.45)" stroke-width="1.2" stroke-linecap="round" fill="none"/><path d="M0.5 1.8C2.5.7 5.1 0 8 0S13.5.7 15.5 1.8" stroke="rgba(245,245,245,0.2)" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="20" height="11" rx="2.5" stroke="rgba(245,245,245,0.4)" stroke-width="1"/><rect x="2" y="2" width="14" height="8" rx="1.5" fill="rgba(245,245,245,0.65)"/><path d="M21.5 4v4a2 2 0 0 0 0-4Z" fill="rgba(245,245,245,0.4)"/></svg>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+      <div class="toast-icon">🎤</div>
+      <div class="toast-body">
+        <div class="toast-title">Empieza en 5 minutos</div>
+        <div class="toast-sub">IA en Redes del Futuro · Auditorio A</div>
+      </div>
+    </div>
+
+    <div class="screens">
+
+      <!-- ══ SPLASH ══════════════════════════ -->
+      <div class="screen active" id="s-splash">
+        <div class="splash">
+          <canvas id="particle-canvas"></canvas>
+          <div class="splash-logo-wrap">
+            <div class="splash-logo">
+              <svg width="38" height="38" viewBox="0 0 38 38" fill="none"><path d="M8 19L19 8L30 19V33H23V25H15V33H8V19Z" fill="#050505"/></svg>
+            </div>
+          </div>
+          <div class="splash-wordmark">Event<em>OS</em></div>
+          <div class="splash-event">Tech Innovation Summit 2026</div>
+          <div class="load-wrap">
+            <div class="load-track">
+              <div class="load-fill" id="lfill"></div>
+              <div class="load-glow" id="lglow"></div>
+            </div>
+            <div class="load-steps">
+              <div class="lstep" id="ls0"><div class="lstep-dot"></div>Verificando credenciales</div>
+              <div class="lstep" id="ls1"><div class="lstep-dot"></div>Cargando agenda del evento</div>
+              <div class="lstep" id="ls2"><div class="lstep-dot"></div>Sincronizando contenido offline</div>
+              <div class="lstep" id="ls3"><div class="lstep-dot"></div>¡Todo listo!</div>
+            </div>
+          </div>
+          <button class="enter-btn" id="enter-btn" onclick="goTo('home')">Entrar al evento →</button>
+        </div>
+      </div>
+
+      <!-- ══ HOME ════════════════════════════ -->
+      <div class="screen" id="s-home">
+        <div class="home-header">
+          <div class="home-greeting">Hola, <strong>Ana</strong> 👋</div>
+          <div class="notif-btn" onclick="goTo('notifs')"><div class="notif-badge"></div>
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2C7.2 2 5 4.2 5 7v5l-1.5 1.5h13L15 12V7C15 4.2 12.8 2 10 2Z" stroke="rgba(245,245,245,0.5)" stroke-width="1.3" fill="none"/><path d="M8 16c0 1.1.9 2 2 2s2-.9 2-2" stroke="rgba(245,245,245,0.5)" stroke-width="1.3" fill="none"/></svg>
+          </div>
+        </div>
+        <div class="event-hero" onclick="goTo('detail')">
+          <img src="https://picsum.photos/seed/event1/800/400" alt="" onerror="this.style.background='#181818';this.remove()">
+          <div class="event-hero-overlay">
+            <div class="live-badge"><div class="pulse"></div>EN VIVO</div>
+            <div>
+              <div class="event-name">Tech Innovation<br>Summit 2026</div>
+              <div class="event-chips">
+                <span class="echip hi">✦ 847 asistentes</span>
+                <span class="echip">Abr 14–15</span>
+                <span class="echip">Bogotá</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="next-card" onclick="goTo('detail')">
+          <div class="next-card-bg"></div>
+          <div class="next-lbl">Próxima sesión — en 12 min</div>
+          <div class="next-title">IA en Redes del Futuro &<br>Telecomunicaciones</div>
+          <div class="next-bottom">
+            <div class="next-spkr">
+              <div class="next-av"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&q=80" alt=""></div>
+              <span class="next-time">10:30 · Sala A</span>
+            </div>
+            <span class="next-btn">Ver →</span>
+          </div>
+        </div>
+        <div class="sec-hd"><span class="sec-lbl">Módulos</span></div>
+        <div class="mod-grid">
+          <div class="mod on" onclick="goTo('agenda')">
+            <div class="mod-icon" style="background:var(--acc2)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="2.5" stroke="var(--acc)" stroke-width="1.3"/><line x1="5.5" y1="7" x2="12.5" y2="7" stroke="var(--acc)" stroke-width="1.1" stroke-linecap="round"/><line x1="5.5" y1="10.5" x2="9.5" y2="10.5" stroke="var(--acc)" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+            <span class="mod-lbl">Agenda</span>
+          </div>
+          <div class="mod" onclick="goTo('speakers')">
+            <div class="mod-icon" style="background:rgba(255,255,255,0.05)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="7" r="3.5" stroke="rgba(245,245,245,0.35)" stroke-width="1.3"/><path d="M2 16c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke="rgba(245,245,245,0.35)" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg></div>
+            <span class="mod-lbl">Speakers</span>
+          </div>
+          <div class="mod" onclick="goTo('networking')">
+            <div class="mod-icon" style="background:rgba(255,255,255,0.05)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="5" cy="9" r="2.5" stroke="rgba(245,245,245,0.35)" stroke-width="1.2"/><circle cx="13" cy="5.5" r="2.5" stroke="rgba(245,245,245,0.35)" stroke-width="1.2"/><circle cx="13" cy="12.5" r="2.5" stroke="rgba(245,245,245,0.35)" stroke-width="1.2"/><line x1="7.4" y1="8" x2="10.7" y2="6.5" stroke="rgba(245,245,245,0.35)" stroke-width="1.2"/><line x1="7.4" y1="10" x2="10.7" y2="11.5" stroke="rgba(245,245,245,0.35)" stroke-width="1.2"/></svg></div>
+            <span class="mod-lbl">Networking</span>
+          </div>
+          <div class="mod" onclick="goTo('qr')">
+            <div class="mod-icon" style="background:rgba(255,255,255,0.05)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="5.5" height="5.5" rx="1.2" stroke="rgba(245,245,245,0.35)" stroke-width="1.2"/><rect x="10.5" y="2" width="5.5" height="5.5" rx="1.2" stroke="rgba(245,245,245,0.35)" stroke-width="1.2"/><rect x="2" y="10.5" width="5.5" height="5.5" rx="1.2" stroke="rgba(245,245,245,0.35)" stroke-width="1.2"/><rect x="11" y="11" width="1.5" height="1.5" rx=".5" fill="rgba(245,245,245,0.35)"/><rect x="14" y="11" width="1.5" height="1.5" rx=".5" fill="rgba(245,245,245,0.35)"/><rect x="11" y="14" width="1.5" height="1.5" rx=".5" fill="rgba(245,245,245,0.35)"/><rect x="14" y="14" width="1.5" height="1.5" rx=".5" fill="rgba(245,245,245,0.35)"/></svg></div>
+            <span class="mod-lbl">Mi QR</span>
+          </div>
+          <div class="mod" onclick="goTo('chat')">
+            <div class="mod-icon" style="background:rgba(255,255,255,0.05)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M14 12.5C14 13.3 13.3 14 12.5 14H5L2.5 16V4.5C2.5 3.7 3.2 3 4 3H12.5C13.3 3 14 3.7 14 4.5V12.5Z" stroke="rgba(245,245,245,0.35)" stroke-width="1.3" fill="none"/></svg></div>
+            <span class="mod-lbl">Chat</span>
+          </div>
+          <div class="mod" onclick="showPoll()">
+            <div class="mod-icon" style="background:rgba(255,255,255,0.05)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><rect x="2" y="10" width="3" height="6" rx="1" fill="rgba(245,245,245,0.35)"/><rect x="7.5" y="6" width="3" height="10" rx="1" fill="rgba(245,245,245,0.35)"/><rect x="13" y="2" width="3" height="14" rx="1" fill="rgba(245,245,245,0.35)"/></svg></div>
+            <span class="mod-lbl">Encuestas</span>
+          </div>
+          <div class="mod" onclick="goTo('sponsors')">
+            <div class="mod-icon" style="background:rgba(255,255,255,0.05)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M9 2l1.8 3.6 4 .6-2.9 2.8.7 4L9 11l-3.6 2 .7-4L3.2 6.2l4-.6Z" stroke="rgba(245,245,245,0.35)" stroke-width="1.2" fill="none" stroke-linejoin="round"/></svg></div>
+            <span class="mod-lbl">Patrocinadores</span>
+          </div>
+        </div>
+        <div class="sec-hd">
+          <span class="sec-lbl">Speakers</span>
+          <span class="sec-link" onclick="goTo('speakers')">Ver todos →</span>
+        </div>
+        <div class="spk-row">
+          <div class="spk-chip" onclick="showMatch('Carlos Mejía','CTO · Claro Colombia','https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80')">
+            <div class="spk-chip-av"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&q=80" alt=""></div>
+            <div class="spk-chip-name">Carlos Mejía</div><div class="spk-chip-role">CTO · Claro</div>
+          </div>
+          <div class="spk-chip" onclick="showMatch('María Restrepo','VP Engineering · AWS','https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=200&q=80')">
+            <div class="spk-chip-av"><img src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=120&q=80" alt=""></div>
+            <div class="spk-chip-name">María Restrepo</div><div class="spk-chip-role">VP · AWS</div>
+          </div>
+          <div class="spk-chip" onclick="showMatch('Juan P. Vargas','CEO · DevHub CO','https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&q=80')">
+            <div class="spk-chip-av"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&q=80" alt=""></div>
+            <div class="spk-chip-name">Juan P. Vargas</div><div class="spk-chip-role">CEO · DevHub</div>
+          </div>
+          <div class="spk-chip" onclick="showMatch('Ana López','Design Lead · Figma','https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80')">
+            <div class="spk-chip-av"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&q=80" alt=""></div>
+            <div class="spk-chip-name">Ana López</div><div class="spk-chip-role">Design · Figma</div>
+          </div>
+        </div>
+        <div class="ticker-block">
+          <div class="ticker-inner">
+            <div class="ticker-lbl">Patrocinadores</div>
+            <div style="overflow:hidden"><div class="ticker">
+              <span class="tick-i">Microsoft</span><span class="tick-s">·</span><span class="tick-i">AWS</span><span class="tick-s">·</span><span class="tick-i">Google Cloud</span><span class="tick-s">·</span><span class="tick-i">Samsung</span><span class="tick-s">·</span><span class="tick-i">Cisco</span><span class="tick-s">·</span><span class="tick-i">Salesforce</span><span class="tick-s">·</span><span class="tick-i">Microsoft</span><span class="tick-s">·</span><span class="tick-i">AWS</span><span class="tick-s">·</span><span class="tick-i">Google Cloud</span><span class="tick-s">·</span><span class="tick-i">Samsung</span><span class="tick-s">·</span><span class="tick-i">Cisco</span><span class="tick-s">·</span><span class="tick-i">Salesforce</span><span class="tick-s">·</span>
+            </div></div>
+          </div>
+        </div>
+        <div style="height:16px"></div>
+        <div style="padding:0 18px 20px;display:flex;justify-content:center">
+          <div onclick="goTo('banned')" style="display:flex;align-items:center;gap:6px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:100px;padding:6px 14px;cursor:pointer">
+            <span style="font-size:11px">🚫</span>
+            <span style="font-size:10px;color:#FCA5A5;font-weight:600">Demo: Ban screen</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ AGENDA ══════════════════════════ -->
+      <div class="screen" id="s-agenda">
+        <div class="agenda-hd"><div class="agenda-title">Agenda</div><div class="agenda-sub">12 sesiones · Bogotá, Abr 14–15</div></div>
+        <div class="day-tabs"><div class="dtab on">Día 1 · Abr 14</div><div class="dtab">Día 2 · Abr 15</div></div>
+        <div class="sess-list">
+          <div class="sr" onclick="goTo('detail')"><div class="stime">9:00</div><div class="sline"><div class="sdot"></div><div class="sconn"></div></div><div class="sc"><div class="stag">Apertura</div><div class="stit">Bienvenida e inauguración oficial</div><div style="font-size:10px;color:var(--t3)">Auditorio Principal</div></div></div>
+          <div class="sr" onclick="goTo('detail')"><div class="stime">10:30</div><div class="sline"><div class="sdot live"></div><div class="sconn"></div></div><div class="sc live"><div class="stag live">● Ahora · Keynote</div><div class="stit">IA en Redes del Futuro & Telecomunicaciones</div><div class="sspk"><div class="sspk-av"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&q=80" alt=""></div><span class="sspk-name">Dr. Carlos Mejía · CTO Claro</span><div class="sfav on" style="margin-left:auto"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 13L3 8.5C1.5 7 1.5 4.5 3 3C4.5 1.5 6.5 1.5 8 3C9.5 1.5 11.5 1.5 13 3C14.5 4.5 14.5 7 13 8.5L8 13Z" stroke="var(--acc)" stroke-width="1.3" fill="var(--acc)"/></svg></div></div><div onclick="event.stopPropagation();goTo('chat')" style="display:inline-flex;align-items:center;gap:4px;background:rgba(37,99,235,0.12);border:1px solid rgba(37,99,235,0.2);border-radius:100px;padding:3px 10px;margin-top:6px;cursor:pointer"><span style="font-size:11px">💬</span><span style="font-size:10px;color:#60A5FA;font-weight:600">Chat</span></div></div></div>
+          <div class="sr"><div class="stime">12:00</div><div class="sline"><div class="sdot"></div><div class="sconn"></div></div><div class="sc"><div class="stag">Break</div><div class="stit">Almuerzo · Zona de Networking</div><div style="font-size:10px;color:var(--t3)">Nivel 2</div></div></div>
+          <div class="sr" onclick="goTo('detail')"><div class="stime">14:00</div><div class="sline"><div class="sdot"></div><div class="sconn"></div></div><div class="sc"><div class="stag">Panel</div><div class="stit">Cloud, Seguridad y Transformación Digital</div><div class="sspk"><div class="sspk-av"><img src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=80&q=80" alt=""></div><span class="sspk-name">María Restrepo · VP AWS</span><div class="sfav" style="margin-left:auto"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 13L3 8.5C1.5 7 1.5 4.5 3 3C4.5 1.5 6.5 1.5 8 3C9.5 1.5 11.5 1.5 13 3C14.5 4.5 14.5 7 13 8.5L8 13Z" stroke="rgba(245,245,245,0.3)" stroke-width="1.3" fill="none"/></svg></div></div><div onclick="event.stopPropagation();goTo('chat')" style="display:inline-flex;align-items:center;gap:4px;background:rgba(37,99,235,0.12);border:1px solid rgba(37,99,235,0.2);border-radius:100px;padding:3px 10px;margin-top:6px;cursor:pointer"><span style="font-size:11px">💬</span><span style="font-size:10px;color:#60A5FA;font-weight:600">Chat</span></div></div></div>
+          <div class="sr" onclick="goTo('detail')"><div class="stime">15:30</div><div class="sline"><div class="sdot"></div><div class="sconn"></div></div><div class="sc"><div class="stag">Workshop</div><div class="stit">Automatización con IA: casos reales</div><div class="sspk"><div class="sspk-av"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=80&q=80" alt=""></div><span class="sspk-name">Juan Pablo Vargas</span></div><div onclick="event.stopPropagation();goTo('chat')" style="display:inline-flex;align-items:center;gap:4px;background:rgba(37,99,235,0.12);border:1px solid rgba(37,99,235,0.2);border-radius:100px;padding:3px 10px;margin-top:6px;cursor:pointer"><span style="font-size:11px">💬</span><span style="font-size:10px;color:#60A5FA;font-weight:600">Chat</span></div></div></div>
+          <div class="sr"><div class="stime">17:00</div><div class="sline"><div class="sdot"></div></div><div class="sc"><div class="stag">Cierre</div><div class="stit">Cóctel de networking · Terraza Norte</div></div></div>
+        </div>
+      </div>
+
+      <!-- ══ SPEAKERS ══════════════════════ -->
+      <div class="screen" id="s-speakers">
+        <div class="spk-hd"><div class="spk-title">Speakers</div><div class="spk-sub">8 expertos compartiendo</div></div>
+        <div class="spk-feat" onclick="showMatch('Carlos Mejía','CTO · Claro Colombia','https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80')">
+          <div class="spk-feat-av"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&q=80" alt=""></div>
+          <div><div class="spk-feat-tag">Keynote Speaker</div><div class="spk-feat-name">Dr. Carlos Mejía</div><div class="spk-feat-sub">Chief Technology Officer · Claro Colombia</div></div>
+          <div style="margin-left:auto;color:var(--t3);font-size:20px">›</div>
+        </div>
+        <div class="spk-grid">
+          <div class="spk-card" onclick="showMatch('María Restrepo','VP Engineering · AWS','https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=200&q=80')"><div class="spk-av"><img src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=200&q=80" alt=""></div><div><div class="spk-name">María Restrepo</div><div class="spk-org">VP Eng · AWS</div></div><span class="spk-tag">Panel</span></div>
+          <div class="spk-card" onclick="showMatch('Juan P. Vargas','CEO · DevHub CO','https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&q=80')"><div class="spk-av"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&q=80" alt=""></div><div><div class="spk-name">Juan P. Vargas</div><div class="spk-org">CEO · DevHub</div></div><span class="spk-tag">Workshop</span></div>
+          <div class="spk-card" onclick="showMatch('Ana López','Design Lead · Figma','https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80')"><div class="spk-av"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80" alt=""></div><div><div class="spk-name">Ana López</div><div class="spk-org">Design Lead · Figma</div></div><span class="spk-tag">UX</span></div>
+          <div class="spk-card" onclick="showMatch('Sofía Chen','VP Product · Google','https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80')"><div class="spk-av"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80" alt=""></div><div><div class="spk-name">Sofía Chen</div><div class="spk-org">VP Product · Google</div></div><span class="spk-tag">AI/ML</span></div>
+          <div class="spk-card" onclick="showMatch('Andrés Gil','CTO · Rappi','https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80')"><div class="spk-av"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80" alt=""></div><div><div class="spk-name">Andrés Gil</div><div class="spk-org">CTO · Rappi</div></div><span class="spk-tag">Startup</span></div>
+          <div class="spk-card" onclick="showMatch('Laura Díaz','Founder · FinTechCO','https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80')"><div class="spk-av"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80" alt=""></div><div><div class="spk-name">Laura Díaz</div><div class="spk-org">Founder · FinTechCO</div></div><span class="spk-tag">Fintech</span></div>
+        </div>
+        <div style="height:8px"></div>
+      </div>
+
+      <!-- ══ NETWORKING ═════════════════════ -->
+      <div class="screen" id="s-networking">
+        <div class="net-hd"><div class="net-title">Networking</div><div class="net-sub">247 asistentes visibles</div></div>
+        <div class="net-search"><span class="net-search-ico">🔍</span><input class="net-search-input" placeholder="Buscar por nombre o empresa..." readonly></div>
+        <div class="net-list">
+          <div class="net-card" onclick="showMatch('David Arango','Product Manager · Bancolombia','https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80')"><div class="net-av"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80" alt=""></div><div class="net-info"><div class="net-name">David Arango</div><div class="net-role">Product Manager</div><div class="net-company">Bancolombia</div></div><div class="net-connect">+</div></div>
+          <div class="net-card" onclick="showMatch('Valentina Ríos','UX Designer · Rappi','https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80')"><div class="net-av"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80" alt=""></div><div class="net-info"><div class="net-name">Valentina Ríos</div><div class="net-role">UX Designer</div><div class="net-company">Rappi</div></div><div class="net-connect">+</div></div>
+          <div class="net-card" onclick="showMatch('Felipe Torres','Engineering Lead · Mercado Libre','https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80')"><div class="net-av"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80" alt=""></div><div class="net-info"><div class="net-name">Felipe Torres</div><div class="net-role">Engineering Lead</div><div class="net-company">Mercado Libre</div></div><div class="net-connect">+</div></div>
+          <div class="net-card" onclick="showMatch('Camila Vargas','Startup Founder · BogotaTech','https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=200&q=80')"><div class="net-av"><img src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=200&q=80" alt=""></div><div class="net-info"><div class="net-name">Camila Vargas</div><div class="net-role">Startup Founder</div><div class="net-company">BogotaTech</div></div><div class="net-connect">+</div></div>
+          <div class="net-card" onclick="showMatch('Sebastián Mora','Data Scientist · Davivienda','https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&q=80')"><div class="net-av"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&q=80" alt=""></div><div class="net-info"><div class="net-name">Sebastián Mora</div><div class="net-role">Data Scientist</div><div class="net-company">Davivienda</div></div><div class="net-connect">+</div></div>
+        </div>
+      </div>
+
+      <!-- ══ DETAIL ══════════════════════════ -->
+      <div class="screen" id="s-detail">
+        <div class="detail-wrap">
+          <div class="detail-hero">
+            <img src="https://picsum.photos/seed/event2/800/400" alt="" onerror="this.style.background='#181818';this.remove()">
+            <div class="detail-hero-ov"></div>
+            <div class="detail-back" onclick="goTo('agenda')">← Agenda</div>
+          </div>
+          <div class="detail-body">
+            <div class="d-live-tag"><div class="pulse"></div> En vivo ahora</div>
+            <div class="d-title">IA en Redes del Futuro & Telecomunicaciones</div>
+            <div class="d-chips"><span class="d-chip">Keynote</span><span class="d-chip">🕙 10:30 — 11:30</span><span class="d-chip">📍 Auditorio A</span></div>
+            <div class="d-spk">
+              <div class="d-spk-av"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&q=80" alt=""></div>
+              <div><div class="d-spk-tag">Speaker</div><div class="d-spk-name">Dr. Carlos Mejía</div><div class="d-spk-role">Chief Technology Officer · Claro Colombia</div></div>
+            </div>
+            <div class="d-desc">Exploraremos cómo la IA está redefiniendo la infraestructura de telecomunicaciones: desde redes auto-optimizables hasta modelos predictivos que reducen el downtime en más de un 60%.</div>
+            <button class="d-btn-main">★ Agregar a favoritos</button>
+            <button class="d-btn-sec" onclick="goTo('chat')">💬 Chat de la sesión</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ QR ══════════════════════════════ -->
+      <div class="screen" id="s-qr">
+        <div class="qr-wrap">
+          <div style="font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:14px">Mi Entrada</div>
+          <div class="qr-profile">
+            <div class="qr-profile-av"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&q=80" alt=""></div>
+            <div><div class="qr-name">Ana García</div><div class="qr-role-row"><div class="qr-role-dot"></div><span class="qr-role">Asistente VIP</span></div><div class="qr-id">ID #A-2024-0847</div></div>
+          </div>
+          <div class="scan-box" onclick="triggerCheckin()">
+            <div class="scan-frame">
+              <div class="scan-frame-corners"></div>
+              <div class="scan-corners-2" style="position:absolute;inset:0"></div>
+              <div class="qr-inner" id="qr-grid" style="position:relative;z-index:1"></div>
+              <div class="scan-line"></div>
+            </div>
+            <div class="scan-status"><div class="scan-status-dot"></div>Listo para escanear</div>
+            <div class="scan-label">Tech Innovation Summit 2026</div>
+            <div class="checkin-flash" id="checkin-flash"></div>
+            <div class="checkin-success" id="checkin-success">
+              <div class="checkin-circle">✓</div>
+              <div class="checkin-text">¡Check-in exitoso!</div>
+              <div class="checkin-sub">Bienvenida, Ana 👋</div>
+            </div>
+          </div>
+          <div class="qr-stats">
+            <div class="qr-stat"><div class="qr-stat-n">2</div><div class="qr-stat-l">En favoritos</div></div>
+            <div class="qr-stat"><div class="qr-stat-n">5</div><div class="qr-stat-l">Docs descargados</div></div>
+          </div>
+          <div class="share-btn">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M4 10V16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-6M10 3v10M7 6l3-3 3 3" stroke="rgba(245,245,245,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            Compartir entrada
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ CHAT ════════════════════════════ -->
+      <div class="screen" id="s-chat" style="display:flex;flex-direction:column;position:relative">
+        <div class="chat-top">
+          <div class="chat-head"><div class="chat-title">Chat de sesión</div><div class="online-pill"><div class="online-dot"></div><span class="online-count">312 online</span></div></div>
+          <div class="chat-event-pill">
+            <div class="chat-ev-icon"><svg width="14" height="14" viewBox="0 0 18 18" fill="none"><path d="M14 12.5C14 13.3 13.3 14 12.5 14H5L2.5 16V4.5C2.5 3.7 3.2 3 4 3H12.5C13.3 3 14 3.7 14 4.5V12.5Z" stroke="var(--acc)" stroke-width="1.3" fill="none"/></svg></div>
+            <div><div class="chat-ev-name">💬 IA en Redes del Futuro</div><div class="chat-ev-sub" style="display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:#22C55E;display:inline-block;animation:pulse2 1.8s ease-in-out infinite"></span>Chat · Sesión en curso</div></div>
+          </div>
+        </div>
+        <div class="emoji-float-layer" id="emoji-float-layer" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:10"></div>
+        <div class="chat-msgs" id="chat-msgs" style="position:relative">
+          <div class="msg recv"><div class="msg-sender"><div class="msg-sender-av"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=40&q=80" alt=""></div><span class="msg-sender-name">Juan P.</span></div><div class="msg-bubble">¡Increíble keynote! La parte de redes auto-optimizables fue 🔥</div><span class="msg-time">10:48</span></div>
+          <div class="msg recv"><div class="msg-sender"><div class="msg-sender-av"><img src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=40&q=80" alt=""></div><span class="msg-sender-name">María R.</span></div><div class="msg-bubble">Totalmente. El caso del 60% de reducción en downtime es brutal 👏</div><span class="msg-time">10:49</span></div>
+          <div class="msg sent"><div class="msg-bubble">¿Alguien sabe si habrá grabación disponible?</div><span class="msg-time">10:51</span></div>
+          <div class="msg recv"><div class="msg-sender"><div class="msg-sender-av"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&q=80" alt=""></div><span class="msg-sender-name">Ana L.</span></div><div class="msg-bubble">Sí, en Documentos estará el link al replay 📹</div><span class="msg-time">10:52</span></div>
+          <div class="typing-indicator" id="typing-ind" style="display:none"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+        </div>
+        <div class="emoji-bar" id="emoji-bar">
+          <button class="emoji-btn" onclick="sendEmoji('❤️')">❤️</button>
+          <button class="emoji-btn" onclick="sendEmoji('👏')">👏</button>
+          <button class="emoji-btn" onclick="sendEmoji('🔥')">🔥</button>
+          <button class="emoji-btn" onclick="sendEmoji('😂')">😂</button>
+          <button class="emoji-btn" onclick="sendEmoji('😮')">😮</button>
+          <button class="emoji-btn" onclick="sendEmoji('🎉')">🎉</button>
+          <button class="emoji-btn" onclick="sendEmoji('⭐')">⭐</button>
+          <button class="emoji-btn" onclick="sendEmoji('💯')">💯</button>
+        </div>
+        <div class="chat-input-row">
+          <button class="emoji-toggle-btn" onclick="toggleEmojiBar()">😊</button>
+          <textarea class="chat-input-new" id="chat-input-new" placeholder="Escribe un mensaje..." rows="1"></textarea>
+          <button class="chat-send-new" onclick="sendMsg()"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 17V3M4 9l6-6 6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+
+      <!-- ══ NOTIFS ═══════════════════════════ -->
+      <div class="screen" id="s-notifs">
+        <div class="notifs-wrap">
+          <div class="notifs-title">Avisos</div>
+          <div class="notif-card feat"><div class="notif-icon">🎤</div><div><div class="notif-text">El keynote de Carlos Mejía empieza en <strong>10 minutos</strong> — Auditorio Principal</div><div class="notif-meta"><span class="notif-time">Hace 2 min</span><span class="notif-tag">Ahora</span><div class="notif-unread"></div></div></div></div>
+          <div class="notif-card"><div class="notif-icon">📍</div><div><div class="notif-text">El workshop de 15:30 cambia a <strong>Sala C</strong> por capacidad</div><div class="notif-meta"><span class="notif-time">Hace 18 min</span><span class="notif-tag">Cambio</span><div class="notif-unread"></div></div></div></div>
+          <div class="notif-card"><div class="notif-icon">🍽️</div><div><div class="notif-text">El almuerzo está listo en el Nivel 2. Recuerda mostrar tu QR</div><div class="notif-meta"><span class="notif-time">Hace 45 min</span></div></div></div>
+          <div class="notif-card"><div class="notif-icon">📄</div><div><div class="notif-text">La presentación del Dr. Mejía ya está disponible en Documentos</div><div class="notif-meta"><span class="notif-time">Hace 1h</span></div></div></div>
+          <div class="notif-card"><div class="notif-icon">🎉</div><div><div class="notif-text">¡Bienvenida al Tech Innovation Summit! Tu entrada ha sido registrada</div><div class="notif-meta"><span class="notif-time">Ayer, 18:22</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- ══ BANNED ═══════════════════════════ -->
+      <div class="screen" id="s-banned">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;gap:20px">
+          <div style="width:72px;height:72px;border-radius:50%;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;font-size:32px">🚫</div>
+          <div>
+            <div style="font-size:20px;font-weight:800;letter-spacing:-.03em;color:var(--t1);margin-bottom:6px">Acceso suspendido</div>
+            <div style="font-size:13px;color:var(--t2);line-height:1.6">Tu acceso a este evento ha sido suspendido temporalmente por el organizador.</div>
+          </div>
+          <div style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:16px 18px;text-align:left;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <span style="font-size:13px;color:var(--t3);min-width:52px">Motivo</span>
+              <span style="font-size:13px;color:var(--t1);font-weight:500">Comportamiento inapropiado en el chat de la sesión</span>
+            </div>
+            <div style="height:1px;background:var(--b1)"></div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:13px;color:var(--t3);min-width:52px">Expira</span>
+              <span style="font-size:13px;color:#FCA5A5">24 horas · Abr 15, 18:00</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--t3);line-height:1.6">Si crees que esto es un error, contacta al organizador del evento en el stand de registro.</div>
+          <button onclick="goTo('splash')" style="width:100%;padding:14px;border-radius:14px;background:var(--s2);border:1px solid var(--b1);color:var(--t2);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--f)">Entendido · Cerrar sesión</button>
+        </div>
+      </div>
+
+      <!-- ══ HOME VENDEDOR ══════════════════════════ -->
+      <div class="screen" id="s-home-vendedor">
+        <div class="home-header">
+          <div class="home-greeting">Hola, <strong>Juan</strong> 👋</div>
+          <div class="notif-btn" onclick="goTo('notifs')"><div class="notif-badge"></div><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2C7.2 2 5 4.2 5 7v5l-1.5 1.5h13L15 12V7C15 4.2 12.8 2 10 2Z" stroke="rgba(245,245,245,0.5)" stroke-width="1.3" fill="none"/><path d="M8 16c0 1.1.9 2 2 2s2-.9 2-2" stroke="rgba(245,245,245,0.5)" stroke-width="1.3" fill="none"/></svg></div>
+        </div>
+        <div class="next-card" onclick="goTo('stand')">
+          <div class="next-card-bg"></div>
+          <div class="next-lbl">Mi Stand — TechCorp Colombia</div>
+          <div class="next-title">24 leads capturados<br>3 miembros del equipo</div>
+          <div class="next-bottom"><div class="next-spkr"><span style="font-size:11px;opacity:.5">🏪 Stand Gold · Activo</span></div><span class="next-btn">Gestionar →</span></div>
+        </div>
+        <div class="sec-hd"><span class="sec-lbl">Acciones</span></div>
+        <div class="mod-grid">
+          <div class="mod on" onclick="goTo('scanner')"><div class="mod-icon" style="background:var(--acc2)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="5.5" height="5.5" rx="1.2" stroke="var(--acc)" stroke-width="1.2"/><rect x="10.5" y="2" width="5.5" height="5.5" rx="1.2" stroke="var(--acc)" stroke-width="1.2"/><rect x="2" y="10.5" width="5.5" height="5.5" rx="1.2" stroke="var(--acc)" stroke-width="1.2"/><rect x="11" y="11" width="1.5" height="1.5" rx=".5" fill="var(--acc)"/><rect x="14" y="11" width="1.5" height="1.5" rx=".5" fill="var(--acc)"/><rect x="11" y="14" width="1.5" height="1.5" rx=".5" fill="var(--acc)"/><rect x="14" y="14" width="1.5" height="1.5" rx=".5" fill="var(--acc)"/></svg></div><span class="mod-lbl">Escanear</span></div>
+          <div class="mod" onclick="goTo('leads')"><div class="mod-icon" style="background:rgba(255,255,255,0.05)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="7" cy="7" r="3.5" stroke="rgba(245,245,245,0.35)" stroke-width="1.3"/><path d="M2 16c0-3 2.5-5 5-5" stroke="rgba(245,245,245,0.35)" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M14 10v6M11 13h6" stroke="rgba(245,245,245,0.35)" stroke-width="1.3" stroke-linecap="round"/></svg></div><span class="mod-lbl">Leads</span></div>
+          <div class="mod" onclick="goTo('stand')"><div class="mod-icon" style="background:rgba(255,255,255,0.05)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><rect x="2" y="8" width="14" height="8" rx="1.5" stroke="rgba(245,245,245,0.35)" stroke-width="1.3"/><path d="M5 8V5.5A4 4 0 0 1 13 5.5V8" stroke="rgba(245,245,245,0.35)" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg></div><span class="mod-lbl">Mi Stand</span></div>
+          <div class="mod" onclick="goTo('sponsors')"><div class="mod-icon" style="background:rgba(255,255,255,0.05)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M9 2l1.8 3.6 4 .6-2.9 2.8.7 4L9 11l-3.6 2 .7-4L3.2 6.2l4-.6Z" stroke="rgba(245,245,245,0.35)" stroke-width="1.2" fill="none" stroke-linejoin="round"/></svg></div><span class="mod-lbl">Patrocinadores</span></div>
+          <div class="mod" onclick="goTo('agenda')"><div class="mod-icon" style="background:rgba(255,255,255,0.05)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="2.5" stroke="rgba(245,245,245,0.35)" stroke-width="1.3"/><line x1="5.5" y1="7" x2="12.5" y2="7" stroke="rgba(245,245,245,0.35)" stroke-width="1.1" stroke-linecap="round"/><line x1="5.5" y1="10.5" x2="9.5" y2="10.5" stroke="rgba(245,245,245,0.35)" stroke-width="1.1" stroke-linecap="round"/></svg></div><span class="mod-lbl">Agenda</span></div>
+          <div class="mod" onclick="goTo('qr')"><div class="mod-icon" style="background:rgba(255,255,255,0.05)"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="5.5" height="5.5" rx="1.2" stroke="rgba(245,245,245,0.35)" stroke-width="1.2"/><rect x="10.5" y="2" width="5.5" height="5.5" rx="1.2" stroke="rgba(245,245,245,0.35)" stroke-width="1.2"/><rect x="2" y="10.5" width="5.5" height="5.5" rx="1.2" stroke="rgba(245,245,245,0.35)" stroke-width="1.2"/><rect x="11" y="11" width="1.5" height="1.5" rx=".5" fill="rgba(245,245,245,0.35)"/><rect x="14" y="11" width="1.5" height="1.5" rx=".5" fill="rgba(245,245,245,0.35)"/><rect x="11" y="14" width="1.5" height="1.5" rx=".5" fill="rgba(245,245,245,0.35)"/><rect x="14" y="14" width="1.5" height="1.5" rx=".5" fill="rgba(245,245,245,0.35)"/></svg></div><span class="mod-lbl">Mi QR</span></div>
+        </div>
+        <div class="sec-hd"><span class="sec-lbl">Leads recientes</span><span class="sec-link" onclick="goTo('leads')">Ver todos →</span></div>
+        <div style="padding:0 18px;display:flex;flex-direction:column;gap:6px;margin-bottom:20px">
+          <div class="lead-card"><div class="lead-av">DA</div><div class="lead-info"><div class="lead-name">David Arango</div><div class="lead-company">Product Manager · Bancolombia</div><div class="lead-time">hace 12 min</div></div><span class="tier-badge hot">🔴 Hot</span></div>
+          <div class="lead-card"><div class="lead-av">VR</div><div class="lead-info"><div class="lead-name">Valentina Ríos</div><div class="lead-company">UX Designer · Rappi</div><div class="lead-time">hace 28 min</div></div><span class="tier-badge warm">🟡 Warm</span></div>
+          <div class="lead-card"><div class="lead-av">FT</div><div class="lead-info"><div class="lead-name">Felipe Torres</div><div class="lead-company">Engineering Lead · Mercado Libre</div><div class="lead-time">hace 45 min</div></div><span class="tier-badge hot">🔴 Hot</span></div>
+        </div>
+      </div>
+
+      <!-- ══ SPONSORS ══════════════════════════ -->
+      <div class="screen" id="s-sponsors">
+        <div class="spons-hd"><div class="spons-title">Patrocinadores</div><div class="spons-sub">9 empresas · 3 niveles</div></div>
+        <div class="tier-block">
+          <div class="tier-lbl gold">🥇 Gold <div class="tier-sep"></div></div>
+          <div class="spons-card gold-card" onclick="goTo('sponsor-detail')"><div class="spons-logo" style="background:#FEF3C7;color:#92400E">MS</div><div class="spons-info"><div class="spons-name">Microsoft</div><div class="spons-desc">Cloud · IA · DevTools · Copilot</div></div><div class="spons-fav on" onclick="toggleFav(event,this)">★</div></div>
+          <div class="spons-card gold-card" onclick="goTo('sponsor-detail')"><div class="spons-logo" style="background:#FFF7ED;color:#9A3412">AWS</div><div class="spons-info"><div class="spons-name">Amazon Web Services</div><div class="spons-desc">Infraestructura · Serverless</div></div><div class="spons-fav" onclick="toggleFav(event,this)">☆</div></div>
+        </div>
+        <div class="tier-block">
+          <div class="tier-lbl silver">🥈 Silver <div class="tier-sep"></div></div>
+          <div class="spons-card" onclick="goTo('sponsor-detail')"><div class="spons-logo" style="background:#EFF6FF;color:#1D4ED8">GC</div><div class="spons-info"><div class="spons-name">Google Cloud</div><div class="spons-desc">Big Data · ML · Analytics</div></div><div class="spons-fav" onclick="toggleFav(event,this)">☆</div></div>
+          <div class="spons-card" onclick="goTo('sponsor-detail')"><div class="spons-logo" style="background:#F5F3FF;color:#6D28D9">SF</div><div class="spons-info"><div class="spons-name">Salesforce</div><div class="spons-desc">CRM · Automatización</div></div><div class="spons-fav" onclick="toggleFav(event,this)">☆</div></div>
+          <div class="spons-card" onclick="goTo('sponsor-detail')"><div class="spons-logo" style="background:#FFF1F2;color:#BE123C">SA</div><div class="spons-info"><div class="spons-name">Samsung</div><div class="spons-desc">Hardware · Displays · Móvil</div></div><div class="spons-fav" onclick="toggleFav(event,this)">☆</div></div>
+        </div>
+        <div class="tier-block">
+          <div class="tier-lbl bronze">🥉 Bronze <div class="tier-sep"></div></div>
+          <div class="spons-card" onclick="goTo('sponsor-detail')"><div class="spons-logo" style="background:#F0F9FF;color:#0369A1">CI</div><div class="spons-info"><div class="spons-name">Cisco</div><div class="spons-desc">Redes · Seguridad</div></div><div class="spons-fav" onclick="toggleFav(event,this)">☆</div></div>
+          <div class="spons-card" onclick="goTo('sponsor-detail')"><div class="spons-logo" style="background:#F0FDF4;color:#166534">OR</div><div class="spons-info"><div class="spons-name">Oracle</div><div class="spons-desc">Bases de datos · ERP</div></div><div class="spons-fav" onclick="toggleFav(event,this)">☆</div></div>
+          <div class="spons-card" onclick="goTo('sponsor-detail')"><div class="spons-logo" style="background:#FFFBEB;color:#92400E">HP</div><div class="spons-info"><div class="spons-name">HP Enterprise</div><div class="spons-desc">Servidores · Soluciones IT</div></div><div class="spons-fav" onclick="toggleFav(event,this)">☆</div></div>
+        </div>
+        <div style="height:24px"></div>
+      </div>
+
+      <!-- ══ SPONSOR DETAIL ══════════════════════════ -->
+      <div class="screen" id="s-sponsor-detail">
+        <div class="sd-hero">
+          <div class="sd-back" onclick="goTo('sponsors')">← Patrocinadores</div>
+          <div class="sd-hero-logo" style="background:#FEF3C7;color:#92400E">MS</div>
+        </div>
+        <div class="sd-body">
+          <div class="sd-name">Microsoft</div>
+          <div class="sd-tier-tag">🥇 Gold Sponsor</div>
+          <div class="sd-desc">Líderes globales en software, cloud e IA. Azure, Microsoft 365 y GitHub potencian a más de 1 millón de empresas en LATAM. En este evento presentan su suite de Copilot para empresas.</div>
+          <div class="sd-srv-title">Soluciones que presenta</div>
+          <div class="sd-service"><div class="sd-service-icon">☁️</div><div><div class="sd-service-name">Azure AI Studio</div><div class="sd-service-sub">Modelos personalizados en minutos</div></div></div>
+          <div class="sd-service"><div class="sd-service-icon">🤖</div><div><div class="sd-service-name">Copilot for Business</div><div class="sd-service-sub">IA generativa en toda la suite 365</div></div></div>
+          <div class="sd-service"><div class="sd-service-icon">🔒</div><div><div class="sd-service-name">Microsoft Sentinel</div><div class="sd-service-sub">SIEM cloud-native con IA para seguridad</div></div></div>
+          <div class="sd-actions">
+            <button class="sd-btn-main" id="sd-fav-btn" onclick="toggleSDFav(this)">☆ Guardar</button>
+            <button class="sd-btn-web">🌐 Sitio web</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ LEADS ══════════════════════════ -->
+      <div class="screen" id="s-leads">
+        <div class="leads-hd">
+          <div class="leads-title">Mis Leads</div>
+          <div class="leads-action-btn" onclick="goTo('stand')">👥 Equipo</div>
+          <div class="leads-action-btn primary" onclick="showToastMsg('📊 CSV generado','leads_techcorp_2026.csv descargado')">↑ CSV</div>
+        </div>
+        <div class="leads-stats">
+          <div class="lead-stat"><div class="lead-stat-n">24</div><div class="lead-stat-l">Total</div></div>
+          <div class="lead-stat hot"><div class="lead-stat-n">8</div><div class="lead-stat-l">🔴 Hot</div></div>
+          <div class="lead-stat warm"><div class="lead-stat-n">10</div><div class="lead-stat-l">🟡 Warm</div></div>
+          <div class="lead-stat cold"><div class="lead-stat-n">6</div><div class="lead-stat-l">🔵 Cold</div></div>
+        </div>
+        <div class="lead-list">
+          <div class="lead-card"><div class="lead-av">DA</div><div class="lead-info"><div class="lead-name">David Arango</div><div class="lead-company">Product Manager · Bancolombia</div><div class="lead-time">hace 12 min</div></div><span class="tier-badge hot">🔴 Hot</span></div>
+          <div class="lead-card"><div class="lead-av">VR</div><div class="lead-info"><div class="lead-name">Valentina Ríos</div><div class="lead-company">UX Designer · Rappi</div><div class="lead-time">hace 28 min</div></div><span class="tier-badge warm">🟡 Warm</span></div>
+          <div class="lead-card"><div class="lead-av">FT</div><div class="lead-info"><div class="lead-name">Felipe Torres</div><div class="lead-company">Engineering Lead · Mercado Libre</div><div class="lead-time">hace 45 min</div></div><span class="tier-badge hot">🔴 Hot</span></div>
+          <div class="lead-card"><div class="lead-av">CV</div><div class="lead-info"><div class="lead-name">Camila Vargas</div><div class="lead-company">Startup Founder · BogotaTech</div><div class="lead-time">hace 1h</div></div><span class="tier-badge cold">🔵 Cold</span></div>
+          <div class="lead-card"><div class="lead-av">SM</div><div class="lead-info"><div class="lead-name">Sebastián Mora</div><div class="lead-company">Data Scientist · Davivienda</div><div class="lead-time">hace 1h 20min</div></div><span class="tier-badge warm">🟡 Warm</span></div>
+          <div class="lead-card"><div class="lead-av">LM</div><div class="lead-info"><div class="lead-name">Laura Mendoza</div><div class="lead-company">CTO · Finaktiva</div><div class="lead-time">hace 2h · por Andrés R.</div></div><span class="tier-badge hot">🔴 Hot</span></div>
+          <div class="lead-card"><div class="lead-av">JO</div><div class="lead-info"><div class="lead-name">Jorge Ospina</div><div class="lead-company">Director IT · Grupo Éxito</div><div class="lead-time">hace 3h</div></div><span class="tier-badge none">Sin calificar</span></div>
+        </div>
+      </div>
+
+      <!-- ══ SCANNER LEADS ══════════════════════════ -->
+      <div class="screen" id="s-scanner">
+        <div class="scan-lead-wrap">
+          <div class="scan-lead-title">Escanear Lead</div>
+          <div class="scan-box" style="cursor:pointer" onclick="triggerLeadCapture()">
+            <div class="scan-frame">
+              <div class="scan-frame-corners"></div>
+              <div class="scan-corners-2" style="position:absolute;inset:0"></div>
+              <div class="qr-inner" id="scan-qr-grid" style="position:relative;z-index:1"></div>
+              <div class="scan-line"></div>
+            </div>
+            <div class="scan-status"><div class="scan-status-dot"></div>Apunta al QR del asistente</div>
+            <div class="scan-label">Toca para simular escaneo</div>
+            <div class="capture-success" id="capture-success">
+              <div class="capture-av-big">DA</div>
+              <div class="capture-name">David Arango</div>
+              <div class="capture-role">Product Manager · Bancolombia</div>
+              <div class="capture-tag">✓ Lead capturado</div>
+            </div>
+          </div>
+          <div style="background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:14px 16px">
+            <div style="font-size:9px;color:var(--t3);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Último escaneo</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="lead-av" style="width:36px;height:36px;font-size:11px">VR</div>
+              <div><div style="font-size:12px;font-weight:700">Valentina Ríos</div><div style="font-size:10px;color:var(--t2)">UX Designer · Rappi · hace 28 min</div></div>
+              <span class="tier-badge warm" style="margin-left:auto">🟡 Warm</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MI STAND ══════════════════════════ -->
+      <div class="screen" id="s-stand">
+        <div class="stand-hd">
+          <div class="stand-title">Mi Stand</div>
+          <span class="stand-role-tag">⭐ Propietario</span>
+        </div>
+        <div class="stand-hero">
+          <div class="stand-hero-logo">TC</div>
+          <div class="stand-hero-name">TechCorp Colombia</div>
+          <div class="stand-hero-leads">24 leads del equipo</div>
+        </div>
+        <div class="stand-sec-title">Equipo del Stand · 3/5 cupos</div>
+        <div class="stand-members">
+          <div class="stand-member">
+            <div class="stand-av"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=80&q=80" alt=""></div>
+            <div class="stand-member-info"><div class="stand-member-name">Juan Pablo Vargas</div><div class="stand-member-email">juan@techcorp.co</div></div>
+            <span class="mbadge owner">Propietario</span>
+          </div>
+          <div class="stand-member">
+            <div class="stand-av"><img src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=80&q=80" alt=""></div>
+            <div class="stand-member-info"><div class="stand-member-name">María Restrepo</div><div class="stand-member-email">maria@techcorp.co</div></div>
+            <div class="mactions"><button class="maction-btn" onclick="showToastMsg('🗑️ Removido','María fue removida del equipo')">Remover</button><button class="maction-btn" onclick="showToastMsg('⭐ Transferido','María es la nueva propietaria')">→ Owner</button></div>
+          </div>
+          <div class="stand-member">
+            <div class="stand-av">AR</div>
+            <div class="stand-member-info"><div class="stand-member-name">Andrés Ramírez</div><div class="stand-member-email">andres@techcorp.co</div></div>
+            <span class="mbadge pending">Pendiente</span>
+          </div>
+        </div>
+        <div class="stand-add" onclick="showToastMsg('📧 Invitación enviada','El colaborador recibirá el link de activación')">
+          <div class="stand-add-ico">+</div>
+          <div><div class="stand-add-text">Agregar colaborador</div><div class="stand-add-sub">Invitar por correo electrónico</div></div>
+        </div>
+        <div style="height:10px"></div>
+        <button class="stand-transfer" onclick="showToastMsg('⚠️ Selecciona un miembro','Elige quién recibirá la propiedad')">Transferir propiedad del stand</button>
+        <div style="height:32px"></div>
+      </div>
+
+    </div><!-- /screens -->
+
+    <!-- Match overlay -->
+    <div class="match-overlay" id="match-overlay">
+      <div class="match-blur-bg"></div>
+      <canvas id="confetti-canvas" width="390" height="812"></canvas>
+      <div class="match-photos">
+        <div class="match-photo-you"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80" alt=""></div>
+        <div class="match-heart">🤝</div>
+        <div class="match-photo-them" id="match-them-photo"><img id="match-them-img" src="" alt=""></div>
+      </div>
+      <div class="match-content">
+        <div class="match-label">¡Nueva Conexión!</div>
+        <div class="match-name" id="match-name">Carlos Mejía</div>
+        <div class="match-role" id="match-role">CTO · Claro Colombia</div>
+        <div class="match-actions">
+          <button class="match-btn-msg" onclick="closeMatch();goTo('chat')">💬 Enviar mensaje</button>
+          <button class="match-btn-skip" onclick="closeMatch()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poll overlay -->
+    <div class="poll-overlay" id="poll-overlay">
+      <div style="flex:1" onclick="closePoll()"></div>
+      <div class="poll-sheet">
+        <div class="poll-handle"></div>
+        <div class="poll-live-tag"><div class="pulse"></div> Encuesta en vivo</div>
+        <div class="poll-q">¿Cuál es el mayor desafío de IA en tu empresa?</div>
+        <div class="poll-opts" id="poll-opts">
+          <div class="poll-opt" onclick="votePoll(this,42)"><div class="poll-opt-bar"></div><div class="poll-opt-row"><span class="poll-opt-label">Falta de datos de calidad</span><span class="poll-opt-pct">—</span></div></div>
+          <div class="poll-opt" onclick="votePoll(this,31)"><div class="poll-opt-bar"></div><div class="poll-opt-row"><span class="poll-opt-label">Talento especializado</span><span class="poll-opt-pct">—</span></div></div>
+          <div class="poll-opt" onclick="votePoll(this,18)"><div class="poll-opt-bar"></div><div class="poll-opt-row"><span class="poll-opt-label">Infraestructura y costos</span><span class="poll-opt-pct">—</span></div></div>
+          <div class="poll-opt" onclick="votePoll(this,9)"><div class="poll-opt-bar"></div><div class="poll-opt-row"><span class="poll-opt-label">Regulación y ética</span><span class="poll-opt-pct">—</span></div></div>
+        </div>
+        <div class="poll-total" id="poll-total">247 respuestas en tiempo real</div>
+      </div>
+    </div>
+
+    <!-- Bottom nav -->
+    <div class="bnav" id="bnav-asi">
+      <div class="bi on" id="bn-home" onclick="navTo('home')"><div class="bico"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 9L10 3L17 9V18H13V13H7V18H3V9Z" stroke="var(--acc)" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg></div><span class="blbl">Inicio</span></div>
+      <div class="bi" id="bn-agenda" onclick="navTo('agenda')"><div class="bico"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2.5" stroke="rgba(245,245,245,0.3)" stroke-width="1.4"/><line x1="6.5" y1="8" x2="13.5" y2="8" stroke="rgba(245,245,245,0.3)" stroke-width="1.1" stroke-linecap="round"/><line x1="6.5" y1="12" x2="10.5" y2="12" stroke="rgba(245,245,245,0.3)" stroke-width="1.1" stroke-linecap="round"/></svg></div><span class="blbl">Agenda</span></div>
+      <div class="bi" id="bn-networking" onclick="navTo('networking')"><div class="bico"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="6" cy="10" r="2.8" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><circle cx="14" cy="6" r="2.8" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><circle cx="14" cy="14" r="2.8" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><line x1="8.7" y1="8.8" x2="11.4" y2="7.2" stroke="rgba(245,245,245,0.3)" stroke-width="1.2"/><line x1="8.7" y1="11.2" x2="11.4" y2="12.8" stroke="rgba(245,245,245,0.3)" stroke-width="1.2"/></svg></div><span class="blbl">Networking</span></div>
+      <div class="bi" id="bn-chat" onclick="navTo('chat')"><div class="bico"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M16 13C16 14.1 15.1 15 14 15H6L3.5 17V5C3.5 3.9 4.4 3 5.5 3H14C15.1 3 16 3.9 16 5V13Z" stroke="rgba(245,245,245,0.3)" stroke-width="1.4" fill="none"/></svg></div><span class="blbl">Chat</span></div>
+      <div class="bi" id="bn-qr" onclick="navTo('qr')"><div class="bico"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="6.5" height="6.5" rx="1.5" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><rect x="11.5" y="2" width="6.5" height="6.5" rx="1.5" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><rect x="2" y="11.5" width="6.5" height="6.5" rx="1.5" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><rect x="12" y="12" width="2" height="2" rx=".5" fill="rgba(245,245,245,0.3)"/><rect x="15.5" y="12" width="2" height="2" rx=".5" fill="rgba(245,245,245,0.3)"/><rect x="12" y="15.5" width="2" height="2" rx=".5" fill="rgba(245,245,245,0.3)"/><rect x="15.5" y="15.5" width="2" height="2" rx=".5" fill="rgba(245,245,245,0.3)"/></svg></div><span class="blbl">Mi QR</span></div>
+    </div>
+    <div class="bnav" id="bnav-vend" style="display:none">
+      <div class="bi on" id="bnv-home" onclick="navVend('home-vendedor')"><div class="bico" style="background:var(--acc2)"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 9L10 3L17 9V18H13V13H7V18H3V9Z" stroke="var(--acc)" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg></div><span class="blbl" style="color:var(--acc)">Inicio</span></div>
+      <div class="bi" id="bnv-leads" onclick="navVend('leads')"><div class="bico"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="8" cy="8" r="4" stroke="rgba(245,245,245,0.3)" stroke-width="1.4"/><path d="M3 18c0-3.5 2.7-6 5-6" stroke="rgba(245,245,245,0.3)" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M16 12v6M13 15h6" stroke="rgba(245,245,245,0.3)" stroke-width="1.4" stroke-linecap="round"/></svg></div><span class="blbl">Leads</span></div>
+      <div class="bi" id="bnv-scanner" onclick="navVend('scanner')"><div class="bico"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.5" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><rect x="12" y="2" width="6" height="6" rx="1.5" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><rect x="2" y="12" width="6" height="6" rx="1.5" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><rect x="12.5" y="12.5" width="2" height="2" fill="rgba(245,245,245,0.3)" rx=".5"/><rect x="15.5" y="12.5" width="2" height="2" fill="rgba(245,245,245,0.3)" rx=".5"/><rect x="12.5" y="15.5" width="2" height="2" fill="rgba(245,245,245,0.3)" rx=".5"/><rect x="15.5" y="15.5" width="2" height="2" fill="rgba(245,245,245,0.3)" rx=".5"/></svg></div><span class="blbl">Escanear</span></div>
+      <div class="bi" id="bnv-stand" onclick="navVend('stand')"><div class="bico"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="2" y="9" width="16" height="9" rx="1.5" stroke="rgba(245,245,245,0.3)" stroke-width="1.4"/><path d="M5 9V6.5A5 5 0 0 1 15 6.5V9" stroke="rgba(245,245,245,0.3)" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></div><span class="blbl">Mi Stand</span></div>
+      <div class="bi" id="bnv-qr" onclick="navVend('qr')"><div class="bico"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="6.5" height="6.5" rx="1.5" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><rect x="11.5" y="2" width="6.5" height="6.5" rx="1.5" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><rect x="2" y="11.5" width="6.5" height="6.5" rx="1.5" stroke="rgba(245,245,245,0.3)" stroke-width="1.3"/><rect x="12" y="12" width="2" height="2" rx=".5" fill="rgba(245,245,245,0.3)"/><rect x="15.5" y="12" width="2" height="2" rx=".5" fill="rgba(245,245,245,0.3)"/><rect x="12" y="15.5" width="2" height="2" rx=".5" fill="rgba(245,245,245,0.3)"/><rect x="15.5" y="15.5" width="2" height="2" rx=".5" fill="rgba(245,245,245,0.3)"/></svg></div><span class="blbl">Mi QR</span></div>
+    </div>
+
+  </div><!-- /phone -->
+</div>
+
+<script>
+// ── Accent color ─────────────────────────────
+function setAcc(hex,rgb,el){
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  const r=document.documentElement;
+  r.style.setProperty('--acc',hex);
+  r.style.setProperty('--accr',rgb);
+  r.style.setProperty('--acc2',`rgba(${rgb},0.10)`);
+  r.style.setProperty('--acc3',`rgba(${rgb},0.05)`);
+}
+
+// ── Navigation ───────────────────────────────
+let current='splash';
+function goTo(id){
+  const prev=document.getElementById('s-'+current);
+  const next=document.getElementById('s-'+id);
+  if(!next||id===current)return;
+  prev.classList.remove('active');prev.classList.add('back');
+  next.classList.add('active');
+  setTimeout(()=>prev.classList.remove('back'),350);
+  current=id;updateNav(id);
+  if(id==='home'){
+    setTimeout(()=>{
+      const t=document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'),3500);
+    },800);
+  }
+}
+function navTo(id){goTo(id)}
+function updateNav(id){
+  document.querySelectorAll('.bi').forEach(b=>{
+    b.classList.remove('on');
+    b.querySelector('.blbl').style.color='var(--t3)';
+    b.querySelector('.bico').style.background='transparent';
+  });
+  const a=document.getElementById('bn-'+id);
+  if(a){
+    a.classList.add('on');
+    a.querySelector('.blbl').style.color='var(--acc)';
+    a.querySelector('.bico').style.background='var(--acc2)';
+  }
+}
+
+// ── Particles (splash) ───────────────────────
+const pCanvas=document.getElementById('particle-canvas');
+const pCtx=pCanvas.getContext('2d');
+let particles=[];
+function resizePC(){
+  const p=document.querySelector('.splash');
+  if(!p)return;
+  pCanvas.width=p.offsetWidth;pCanvas.height=p.offsetHeight;
+}
+function spawnParticle(){
+  const acc=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim()||'#C8FF00';
+  return{x:Math.random()*pCanvas.width,y:Math.random()*pCanvas.height,r:Math.random()*1.8+0.5,vx:(Math.random()-.5)*0.4,vy:-Math.random()*0.6-0.2,alpha:Math.random()*0.5+0.1,color:acc};
+}
+function animParticles(){
+  if(!pCanvas.width)return;
+  pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+  if(particles.length<55)particles.push(spawnParticle());
+  particles=particles.filter(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.alpha-=0.003;
+    pCtx.save();pCtx.globalAlpha=p.alpha;pCtx.fillStyle=p.color;
+    pCtx.beginPath();pCtx.arc(p.x,p.y,p.r,0,Math.PI*2);pCtx.fill();pCtx.restore();
+    return p.alpha>0;
+  });
+  requestAnimationFrame(animParticles);
+}
+setTimeout(()=>{resizePC();animParticles();},100);
+
+// ── Splash sequence ──────────────────────────
+(function(){
+  const fill=document.getElementById('lfill');
+  const glow=document.getElementById('lglow');
+  const btn=document.getElementById('enter-btn');
+  const seq=[
+    {id:'ls0',pct:28,delay:700},
+    {id:'ls1',pct:58,delay:1500},
+    {id:'ls2',pct:84,delay:2300},
+    {id:'ls3',pct:100,delay:3100},
+  ];
+  seq.forEach((s,i)=>{
+    setTimeout(()=>{
+      const el=document.getElementById(s.id);
+      el.classList.add('show');
+      fill.style.width=s.pct+'%';
+      glow.style.left=s.pct+'%';
+      if(i>0)seq.slice(0,i).forEach(x=>document.getElementById(x.id).classList.add('done'));
+    },s.delay);
+  });
+  setTimeout(()=>btn.classList.add('show'),3700);
+
+  // Toast after entering home
+  setTimeout(()=>{
+    if(current==='home'){
+      const t=document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'),3500);
+    }
+  },5000);
+})();
+
+// ── QR grid ─────────────────────────────────
+function buildQR(){
+  const g=document.getElementById('qr-grid');if(!g)return;
+  const sz=9,corners=new Set();
+  for(let r=0;r<3;r++)for(let c=0;c<3;c++){corners.add(r*sz+c);corners.add(r*sz+(sz-1-c));corners.add((sz-1-r)*sz+c);}
+  const inner=new Set([10,12,14,28,30,32,46,48,50]);
+  g.innerHTML=Array.from({length:sz*sz},(_,i)=>{
+    const d=corners.has(i)||inner.has(i)||(Math.random()>.5);
+    return`<div class="qc" style="background:${d?'#050505':'#ffffff'}"></div>`;
+  }).join('');
+}
+buildQR();
+
+// ── Check-in animation ───────────────────────
+let checkinDone=false;
+function triggerCheckin(){
+  if(checkinDone)return;checkinDone=true;
+  const flash=document.getElementById('checkin-flash');
+  const success=document.getElementById('checkin-success');
+  flash.classList.add('pop');
+  setTimeout(()=>{success.classList.add('show');},300);
+  setTimeout(()=>{success.classList.remove('show');checkinDone=false;},3000);
+}
+
+// ── Match / Conexión overlay ─────────────────
+function showMatch(name,role,imgUrl){
+  document.getElementById('match-name').textContent=name;
+  document.getElementById('match-role').textContent=role;
+  document.getElementById('match-them-img').src=imgUrl;
+  const ov=document.getElementById('match-overlay');
+  ov.classList.add('active');
+  setTimeout(()=>launchConfetti(),400);
+}
+function closeMatch(){
+  document.getElementById('match-overlay').classList.remove('active');
+  stopConfetti();
+}
+
+// ── Confetti ─────────────────────────────────
+let confettiAF,confettiParticles=[],confettiRunning=false;
+function launchConfetti(){
+  const canvas=document.getElementById('confetti-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=390;canvas.height=812;
+  confettiRunning=true;
+  const colors=['#C8FF00','#ffffff','#60A5FA','#F472B6','#34D399','#FB923C'];
+  confettiParticles=Array.from({length:80},()=>({
+    x:Math.random()*390,y:-10-Math.random()*40,
+    r:Math.random()*5+3,
+    color:colors[Math.floor(Math.random()*colors.length)],
+    vx:(Math.random()-0.5)*4,vy:Math.random()*4+3,
+    rot:Math.random()*360,vrot:(Math.random()-0.5)*6,
+    alpha:1,shape:Math.random()>.5?'rect':'circle'
+  }));
+  function draw(){
+    if(!confettiRunning){ctx.clearRect(0,0,390,812);return;}
+    ctx.clearRect(0,0,390,812);
+    confettiParticles=confettiParticles.filter(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.vrot;p.vy+=0.08;
+      if(p.y>860)return false;
+      ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;
+      ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      if(p.shape==='rect'){ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);}
+      else{ctx.beginPath();ctx.arc(0,0,p.r,0,Math.PI*2);ctx.fill();}
+      ctx.restore();
+      return true;
+    });
+    if(confettiParticles.length>0)confettiAF=requestAnimationFrame(draw);
+    else{ctx.clearRect(0,0,390,812);}
+  }
+  draw();
+}
+function stopConfetti(){
+  confettiRunning=false;
+  cancelAnimationFrame(confettiAF);
+  const canvas=document.getElementById('confetti-canvas');
+  canvas.getContext('2d').clearRect(0,0,390,812);
+}
+
+// ── Poll ─────────────────────────────────────
+let pollVoted=false;
+function showPoll(){
+  document.getElementById('poll-overlay').classList.add('active');
+}
+function closePoll(){
+  document.getElementById('poll-overlay').classList.remove('active');
+}
+function votePoll(el,pct){
+  if(pollVoted)return;pollVoted=true;
+  const opts=document.querySelectorAll('.poll-opt');
+  const totals=[42,31,18,9];
+  opts.forEach((o,i)=>{
+    o.classList.add('voted');
+    const bar=o.querySelector('.poll-opt-bar');
+    const p=o.querySelector('.poll-opt-pct');
+    setTimeout(()=>{
+      bar.style.width=totals[i]+'%';
+      p.textContent=totals[i]+'%';
+    },i*80);
+  });
+  el.style.borderColor='rgba(var(--accr),.5)';
+  document.getElementById('poll-total').textContent='✓ Voto registrado · 248 respuestas';
+}
+
+// ── Chat simulate ────────────────────────────
+let emojiBarOpen = false;
+function toggleEmojiBar(){
+  emojiBarOpen = !emojiBarOpen;
+  const bar = document.getElementById('emoji-bar');
+  bar.classList.toggle('open', emojiBarOpen);
+  document.querySelector('.emoji-toggle-btn').textContent = emojiBarOpen ? '🙂' : '😊';
+}
+
+function sendEmoji(emoji){
+  const layer = document.getElementById('emoji-float-layer');
+  const el = document.createElement('div');
+  el.className = 'emoji-float-item';
+  el.textContent = emoji;
+  // Vary horizontal position slightly
+  el.style.right = (16 + Math.random() * 60) + 'px';
+  layer.appendChild(el);
+  setTimeout(() => el.remove(), 2100);
+}
+
+function sendMsg(){
+  const inp = document.getElementById('chat-input-new');
+  const text = inp.value.trim();
+  if(!text) return;
+  const msgs = document.getElementById('chat-msgs');
+  const typing = document.getElementById('typing-ind');
+  const m = document.createElement('div');
+  m.className = 'msg sent';
+  m.innerHTML = `<div class="msg-bubble">${text}</div><span class="msg-time">Ahora</span>`;
+  msgs.insertBefore(m, typing);
+  inp.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+  typing.style.display = 'flex';
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    typing.style.display = 'none';
+    const r = document.createElement('div'); r.className = 'msg recv';
+    const replies = ['¡Genial! 🙌', 'Totalmente de acuerdo 👏', '¿Nos vemos en el networking?', '¡Excelente punto!', 'Sí, el workshop de las 15:30 también vale la pena'];
+    r.innerHTML = `<div class="msg-sender"><div class="msg-sender-av"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=40&q=80" alt=""></div><span class="msg-sender-name">Juan P.</span></div><div class="msg-bubble">${replies[Math.floor(Math.random() * replies.length)]}</div><span class="msg-time">Ahora</span>`;
+    msgs.insertBefore(r, typing);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1600);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('chat-input-new');
+  if(inp) inp.addEventListener('keydown', e => { if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMsg(); }});
+});
+
+// ── Toast on home arrival (handled inside goTo above) ────
+
+// Day tabs
+document.querySelectorAll('.dtab').forEach(t=>{
+  t.onclick=function(){document.querySelectorAll('.dtab').forEach(x=>x.classList.remove('on'));this.classList.add('on')};
+});
+
+// ── Role switcher ──────────────────────────
+let currentRole='asistente';
+function switchRole(role,el){
+  document.querySelectorAll('.rpill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  currentRole=role;
+  if(role==='asistente'){
+    document.getElementById('bnav-asi').style.display='flex';
+    document.getElementById('bnav-vend').style.display='none';
+    goTo('home');updateNav('home');
+  } else {
+    document.getElementById('bnav-asi').style.display='none';
+    document.getElementById('bnav-vend').style.display='flex';
+    goTo('home-vendedor');
+  }
+}
+
+// ── Vendedor nav ────────────────────────────
+const vendNavMap={'home-vendedor':'bnv-home','leads':'bnv-leads','scanner':'bnv-scanner','stand':'bnv-stand','qr':'bnv-qr'};
+function navVend(id){
+  goTo(id);
+  document.querySelectorAll('#bnav-vend .bi').forEach(b=>{
+    b.classList.remove('on');
+    b.querySelector('.blbl').style.color='';
+    b.querySelector('.bico').style.background='transparent';
+  });
+  const el=document.getElementById(vendNavMap[id]||'bnv-home');
+  if(el){el.classList.add('on');el.querySelector('.blbl').style.color='var(--acc)';el.querySelector('.bico').style.background='var(--acc2)';}
+}
+
+// ── Toast helper ────────────────────────────
+function showToastMsg(title,sub){
+  const t=document.getElementById('toast');
+  t.querySelector('.toast-title').textContent=title;
+  t.querySelector('.toast-sub').textContent=sub;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ── Sponsor fav toggle ──────────────────────
+function toggleFav(event,el){
+  event.stopPropagation();
+  el.classList.toggle('on');
+  el.textContent=el.classList.contains('on')?'★':'☆';
+}
+function toggleSDFav(btn){
+  btn.classList.toggle('fav');
+  btn.textContent=btn.classList.contains('fav')?'★ Guardado':'☆ Guardar';
+}
+
+// ── Lead capture simulation ──────────────────
+let captureCooldown=false;
+function triggerLeadCapture(){
+  if(captureCooldown)return;captureCooldown=true;
+  const s=document.getElementById('capture-success');
+  s.classList.add('show');
+  setTimeout(()=>{s.classList.remove('show');captureCooldown=false;},3000);
+}
+
+// Build scan QR grid (same as main QR)
+(function(){
+  const g=document.getElementById('scan-qr-grid');if(!g)return;
+  const sz=9,corners=new Set();
+  for(let r=0;r<3;r++)for(let c=0;c<3;c++){corners.add(r*sz+c);corners.add(r*sz+(sz-1-c));corners.add((sz-1-r)*sz+c);}
+  const inner=new Set([10,12,14,28,30,32,46,48,50]);
+  g.innerHTML=Array.from({length:sz*sz},(_,i)=>{
+    const d=corners.has(i)||inner.has(i)||(Math.random()>.5);
+    return`<div class="qc" style="background:${d?'#050505':'#ffffff'}"></div>`;
+  }).join('');
+})();
+</script>
+</body>
+</html>

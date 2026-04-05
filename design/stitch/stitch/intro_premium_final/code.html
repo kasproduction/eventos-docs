@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#f4ffc6",
+              "on-primary": "#000000",
+              "background": "#000000",
+              "surface": "#000000",
+              "on-surface": "#ffffff",
+              "on-surface-variant": "#adaaaa",
+              "primary-container": "#f4ffc6",
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        min-height: 100dvh;
+        background-color: #000000;
+      }
+      .loading-bar-container {
+        height: 2px;
+        background: rgba(255, 255, 255, 0.1);
+        width: 100%;
+        overflow: hidden;
+      }
+      .loading-bar-fill {
+        height: 100%;
+        background: #f4ffc6;
+        width: 65%; /* Simulated progress */
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body overflow-hidden flex flex-col items-center">
+<!-- Main Content Container -->
+<main class="flex-1 flex flex-col justify-between w-full max-w-md px-8 pt-20 pb-12 relative z-10">
+<!-- Top Section: Logo & Headline -->
+<div>
+<!-- Logo Section -->
+<div class="mb-12">
+<div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-black text-3xl font-bold" style="font-variation-settings: 'FILL' 1;">
+                        event_seat
+                    </span>
+</div>
+</div>
+<!-- Massive Headline matching SCREEN_27 -->
+<div class="space-y-0">
+<span class="text-primary font-label text-xs uppercase tracking-[0.2em] font-bold mb-4 block">
+                    Exclusive Access
+                </span>
+<h1 class="font-headline text-5xl font-extrabold tracking-tighter leading-none mb-4">
+                    The Future <br/>
+                    of Creative <br/>
+<span class="text-primary">Intelligence.</span>
+</h1>
+<p class="font-headline text-on-surface-variant text-sm tracking-[0.2em] uppercase font-semibold mt-6">
+                    EventOS 2026
+                </p>
+</div>
+</div>
+<!-- Bottom Section: Loading & Button -->
+<div class="w-full space-y-12">
+<!-- Minimal Premium Loading State -->
+<div class="w-full space-y-4">
+<div class="flex justify-between items-end">
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant">System Initializing</span>
+<span class="text-primary text-xs font-bold font-headline">65%</span>
+</div>
+<div class="loading-bar-container rounded-full">
+<div class="loading-bar-fill rounded-full"></div>
+</div>
+</div>
+<!-- CTA Button matching SCREEN_27 -->
+<button class="w-full py-5 rounded-full bg-primary flex items-center justify-center transition-transform active:scale-95">
+<span class="font-headline font-extrabold text-black text-sm tracking-widest uppercase">
+                    Enter Event
+                </span>
+</button>
+</div>
+</main>
+<!-- Simple High-Contrast Footer -->
+<footer class="w-full px-8 pb-8">
+<div class="flex flex-col items-start gap-4 border-t border-white/10 pt-8">
+<div class="flex flex-col gap-1">
+<p class="text-primary font-bold font-headline text-[10px] tracking-widest uppercase">
+                    EventOS
+                </p>
+<p class="font-headline text-[10px] tracking-widest uppercase text-on-surface-variant/50">
+                    © 2026 Tech Innovation Summit
+                </p>
+</div>
+<div class="flex gap-6">
+<a class="font-headline text-[9px] tracking-widest uppercase text-on-surface-variant/40 hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="font-headline text-[9px] tracking-widest uppercase text-on-surface-variant/40 hover:text-primary transition-colors" href="#">Terms</a>
+</div>
+</div>
+</footer>
+</body></html>

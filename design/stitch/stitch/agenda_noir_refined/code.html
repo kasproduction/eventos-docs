@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-highest": "#262626",
+              "on-surface-variant": "#adaaaa",
+              "on-secondary-fixed": "#444100",
+              "primary-fixed-dim": "#c4ec00",
+              "on-secondary-container": "#fffac3",
+              "surface-tint": "#f4ffc6",
+              "on-tertiary": "#665600",
+              "inverse-on-surface": "#565554",
+              "surface-container": "#1a1919",
+              "primary-fixed": "#d1fc00",
+              "on-secondary": "#575400",
+              "on-background": "#ffffff",
+              "primary-dim": "#c7ef00",
+              "on-primary-container": "#4c5d00",
+              "surface-container-low": "#131313",
+              "error-container": "#b92902",
+              "secondary": "#efe754",
+              "on-tertiary-fixed": "#473b00",
+              "on-error-container": "#ffd2c8",
+              "surface": "#0e0e0e",
+              "inverse-primary": "#546600",
+              "outline": "#777575",
+              "on-tertiary-fixed-variant": "#675700",
+              "secondary-container": "#656100",
+              "on-tertiary-container": "#5c4e00",
+              "on-primary-fixed-variant": "#556800",
+              "on-primary-fixed": "#3c4a00",
+              "tertiary-fixed": "#fcdc43",
+              "primary-container": "#d1fc00",
+              "surface-container-high": "#201f1f",
+              "secondary-fixed-dim": "#e0d947",
+              "outline-variant": "#494847",
+              "tertiary-dim": "#edce35",
+              "surface-dim": "#0e0e0e",
+              "on-surface": "#ffffff",
+              "on-secondary-fixed-variant": "#625e00",
+              "inverse-surface": "#fcf8f8",
+              "on-primary": "#546600",
+              "error": "#ff7351",
+              "tertiary-fixed-dim": "#edce35",
+              "primary": "#f4ffc6",
+              "background": "#0e0e0e",
+              "tertiary-container": "#fcdc43",
+              "tertiary": "#ffeb9c",
+              "on-error": "#450900",
+              "surface-bright": "#2c2c2c",
+              "secondary-fixed": "#efe754",
+              "secondary-dim": "#e0d947",
+              "surface-variant": "#262626",
+              "error-dim": "#d53d18",
+              "surface-container-lowest": "#000000"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .glass-card {
+            background: rgba(38, 38, 38, 0.4);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(73, 72, 71, 0.15);
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { min-height: max(884px, 100dvh); }
+        .timeline-gradient {
+            background: linear-gradient(to bottom, #494847 0%, #494847 80%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- Top AppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-transparent">
+<div class="flex items-center gap-4">
+<h1 class="text-2xl font-black tracking-tighter text-[#f4ffc6] font-headline">EventOS</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#f4ffc6] text-2xl hover:opacity-80 transition-opacity scale-95 active:scale-90 transition-transform">notifications</button>
+</div>
+</header>
+<div class="flex min-h-screen pt-16 pb-32">
+<!-- Lateral Day Selector (Sidebar from SCREEN_46) -->
+<aside class="w-24 md:w-32 flex-shrink-0 flex flex-col items-center py-10 gap-8 border-r border-outline-variant/10">
+<div class="flex flex-col items-center gap-10 sticky top-24">
+<!-- Day 1 Active -->
+<div class="flex flex-col items-center group cursor-pointer">
+<span class="text-on-surface-variant font-label text-[10px] uppercase tracking-widest mb-2">OCT</span>
+<div class="w-14 h-24 rounded-full flex flex-col items-center justify-center bg-primary text-on-primary scale-110 shadow-lg shadow-primary/10 transition-all">
+<span class="text-xs font-bold">MON</span>
+<span class="text-2xl font-black font-headline">14</span>
+</div>
+</div>
+<!-- Day 2 -->
+<div class="flex flex-col items-center group cursor-pointer hover:opacity-100 opacity-40 transition-all">
+<span class="text-on-surface-variant font-label text-[10px] uppercase tracking-widest mb-2">OCT</span>
+<div class="w-12 h-20 rounded-full flex flex-col items-center justify-center bg-surface-container-high transition-all">
+<span class="text-[10px] font-semibold">TUE</span>
+<span class="text-xl font-bold font-headline">15</span>
+</div>
+</div>
+<!-- Day 3 -->
+<div class="flex flex-col items-center group cursor-pointer hover:opacity-100 opacity-40 transition-all">
+<span class="text-on-surface-variant font-label text-[10px] uppercase tracking-widest mb-2">OCT</span>
+<div class="w-12 h-20 rounded-full flex flex-col items-center justify-center bg-surface-container-high transition-all">
+<span class="text-[10px] font-semibold">WED</span>
+<span class="text-xl font-bold font-headline">16</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 px-6 py-10 w-full overflow-hidden">
+<header class="mb-12">
+<h2 class="text-5xl md:text-7xl font-black font-headline tracking-tighter leading-none mb-4">
+                Monday<br/><span class="text-primary">Schedule</span>
+</h2>
+<p class="text-on-surface-variant font-body max-w-sm text-sm">Day 01: Deep Dive into Future Technologies and Neural Interfacing.</p>
+</header>
+<!-- Timeline -->
+<div class="relative flex flex-col gap-10">
+<!-- Vertical Line -->
+<div class="absolute left-0 top-2 bottom-0 w-[2px] timeline-gradient opacity-30"></div>
+<!-- Session Items -->
+<div class="pl-8 space-y-12">
+<!-- Session 1: Completed -->
+<div class="relative group opacity-60">
+<div class="absolute -left-[41px] top-1 w-4 h-4 rounded-full bg-outline-variant border-4 border-background z-10"></div>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-2">
+<span class="text-on-surface font-black font-headline text-lg tracking-tight">09:00 AM</span>
+</div>
+<div class="glass-card rounded-2xl p-6 border border-white/5 shadow-xl">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-bold font-headline leading-tight line-through">Opening Keynote: Future of Noir</h3>
+<span class="material-symbols-outlined text-on-surface-variant">check_circle</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-xs">
+<span class="material-symbols-outlined text-sm">location_on</span>
+                                Main Auditorium
+                            </div>
+</div>
+</div>
+</div>
+<!-- Session 2: LIVE (Main card style from SCREEN_47) -->
+<div class="relative group">
+<!-- Live Pulse Dot -->
+<div class="absolute -left-[41px] top-1 w-4 h-4 rounded-full bg-primary border-4 border-background z-10 animate-pulse"></div>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<span class="text-primary font-black font-headline text-lg tracking-tight">10:30 AM</span>
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">Live</span>
+</div>
+<!-- Polished Card from SCREEN_47 style -->
+<div class="glass-card rounded-2xl p-6 border border-primary/20 shadow-2xl relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-3">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="text-primary font-label text-[10px] font-bold uppercase tracking-widest">Happening Now</span>
+</div>
+<h3 class="font-headline text-2xl font-extrabold tracking-tight leading-tight mb-3">Generative Aesthetics in Luxury Branding</h3>
+<p class="text-on-surface-variant text-xs leading-relaxed mb-6 font-light">Exploring how AI-driven design workflows are reshaping the high-end industries.</p>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-4 border-t border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary">
+<img class="w-full h-full object-cover" data-alt="Julianne De’Noir" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJ-Ty1YpLYLUeCmux9pe0xutupur5CeHdyutTKzp15xAzivwYKlqVUH9LuCUgpFffKkcpWlgGu7q80YOVdHmyQnLCPF3Ek79GkYrbiqSMwxWxDO_pPyYnzgMnFj1nnINh9yX27FK_2QUC1hhHCPkHm6VKuin0_JGEhyjh6LIDLb116hBHyGH57GfpxbgNjytSVea4sVW0h1tqpn5NWbDTkR0XOBc3HONkCPfyr9jGMyarH7h5nR1WImpTltvFShbrkz-EJNGfPv_rd"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline font-bold text-sm">Julianne De’Noir</span>
+<span class="text-[10px] text-primary font-medium tracking-wide uppercase">Lead Creative @ Lumina</span>
+</div>
+</div>
+<button class="bg-[#f4ffc6] text-[#546600] text-[10px] font-black px-6 py-2.5 rounded-full hover:opacity-90 active:scale-95 transition-all self-start md:self-center">
+                                        JOIN NOW
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Session 3: Upcoming -->
+<div class="relative group">
+<div class="absolute -left-[40px] top-1 w-3 h-3 rounded-full bg-outline-variant border-2 border-background z-10"></div>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-2">
+<span class="text-on-surface font-black font-headline text-lg tracking-tight">01:00 PM</span>
+</div>
+<div class="glass-card rounded-2xl p-6 border border-white/5 shadow-xl hover:bg-white/5 transition-colors">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xl font-bold font-headline leading-tight">The Sensory Web: Beyond Visuals</h3>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-white transition-colors">bookmark</button>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex -space-x-3">
+<div class="w-8 h-8 rounded-full border-2 border-background overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpYRJt7mnnoxVzZ7IvROrXz5jgxerS3CWZ9Kbn29Tb6GQSr54otV3bG8uJtfyH4nS_--2DTdv6P19zng28jyci1mvMMc-g71FSSO1dlVebY7L1Z8gMDVueXawFbjBFJsXeJRE6-5aaFW3VW3sU1BnFxq0HmQFojJvfcMD04T0iSRbSKwxWw7v4qbzXqGZtldF41cKpw7NflFgi-o940-IRwVIPglj5Awnk7EIn8ISJy0GjlEE7oT0J1n4a1x5dP6yEaUcjiNiVKJpk"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-background overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSEdxnk6J0xrW6SWD07tzuR42_e29_z9hRlwORxKTdBIDSAxX4Zh2PFm3Kaz8zEF0NHXKfs6A6e9SFu5Sz3c3iBBn6yNjh4TzNVp3lE8BLmu97f48-5yeDsTHZrcmncvsgEwVA136A0e_zpZ_dl2F4ssVfrmS6vhCXxBs7TZjxqZTIucbPeBMXKzlddVC2pytgdw0gxdAN5nxVB3HkvR8acQla_6Spwrm6zL2g6yRLPC837vtvFcy427diwZ5G2GWOExScwvFv0WUv"/>
+</div>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-xs">
+<span class="material-symbols-outlined text-sm">location_on</span>
+                                    Interactive Lab B
+                                </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Bottom Navigation Bar (Consistent with SCREEN_47) -->
+<nav class="fixed bottom-8 left-0 w-full z-50 flex justify-around items-center px-4">
+<div class="bg-[#131313]/70 backdrop-blur-xl fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md rounded-full border border-white/10 flex justify-around items-center px-4 py-3 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+<button class="text-white/40 p-3 hover:text-white transition-colors duration-300">
+<span class="material-symbols-outlined">home</span>
+</button>
+<button class="bg-[#f4ffc6] text-background rounded-full p-3 scale-110 duration-300 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+</button>
+<button class="text-white/40 p-3 hover:text-white transition-colors duration-300">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="text-white/40 p-3 hover:text-white transition-colors duration-300">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</nav>
+</body></html>

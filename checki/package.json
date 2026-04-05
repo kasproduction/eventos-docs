@@ -1,0 +1,12 @@
+{
+  "name": "checkin-admin",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tailwindcss -i ./admin/assets/css/input.css -o ./admin/assets/css/app.css --minify",
+    "watch": "tailwindcss -i ./admin/assets/css/input.css -o ./admin/assets/css/app.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0",
+    "daisyui": "^4.12.0"
+  }
+}
