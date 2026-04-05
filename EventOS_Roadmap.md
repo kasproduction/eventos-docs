@@ -40,7 +40,8 @@ cada sesión más fácil de debuggear.
 | 1.10 | Encuestas en vivo | ✅ Completa — mergeado a main (2026-04-04) |
 | 1.11 | Push notifications | ✅ Completa — mergeado a main (2026-04-04) |
 | 1.12 | Tracks + Session types | ✅ |
-| 1.13 | Automated emails | ⏳ Pendiente |
+| 1.13a | Emails automáticos + editor de plantillas | ✅ Completa — mergeado a main (2026-04-05) |
+| 1.13b | SMTP propio por organización | ✅ Completa — mergeado a main (2026-04-05) |
 
 ---
 
@@ -890,96 +891,121 @@ live_poll_votes:     id, poll_id, question_id, option_id (nullable), attendee_id
 
 ---
 
-### Sesión 1.13 — Automated emails
+### Sesión 1.13a — Emails automáticos + editor de plantillas ✅ 2026-04-05
 
-**Branch:** `feature/s113-emails`
+**Branch:** `feature/s113-emails` → mergeado a main
 **Repos:** `eventos-backend`
 
-**Objetivo:** Emails automáticos clave del ciclo de vida del evento. Sin deps nuevas — Laravel Mail nativo con Mailable + Queue.
+**11 tipos de email implementados:**
 
-**Emails a implementar:**
-
-| Trigger | Destinatario | Asunto |
-|---|---|---|
-| Invitación al evento | Asistente invitado | "Te han invitado a [Evento]" |
-| Bienvenida (primer login) | Asistente | "Bienvenido a [Evento]" |
-| Recordatorio 24h antes del evento | Todos los asistentes activos | "Mañana empieza [Evento]" |
-| Recordatorio 1h antes de sesión favorita | Asistente con favorito | "[Sesión] empieza en 1 hora" |
-| Ban aplicado | Usuario baneado | "Tu acceso ha sido restringido" |
-| Cancelación del evento | Todos los asistentes | "[Evento] ha sido cancelado" |
+| Tipo | Trigger |
+|---|---|
+| `invitation` | CSV import / envío manual desde Filament |
+| `welcome` | Registro exitoso en evento |
+| `reminder_24h` | Cron diario 8am — eventos que empiezan mañana |
+| `session_reminder` | Cron cada 5min — sesiones favoritas en 55-65min |
+| `banned` | Ban desde API o Filament |
+| `cancelled` | Cancelación del evento |
+| `password_reset` | POST /api/v1/auth/forgot-password |
+| `email_verification` | Registro + reenvío manual |
+| `csv_import_completed` | Al terminar job de importación CSV |
+| `registration_pending` | Registro con requires_approval=true |
+| `registration_approval` | Admin aprueba registro en Filament |
 
 **Backend:**
 
-- [ ] `config/mail.php` + `.env` MAIL_MAILER, MAIL_FROM_ADDRESS, MAIL_FROM_NAME
-- [ ] Mailable: `EventInvitationMail`, `WelcomeMail`, `EventReminderMail`, `SessionReminderMail`, `UserBannedMail`, `EventCancelledMail`
-- [ ] Views Blade por email (logo del evento, diseño básico responsive)
-- [ ] Queue jobs: despachar en los eventos correspondientes (Observer/Event+Listener)
-- [ ] Scheduler: `SessionReminderMail` — cron cada 5 min busca sesiones favoritas que empiecen en 60±5 min
-- [ ] Filament: toggle en EventResource para activar/desactivar cada tipo de email
-- [ ] `email_logs` table: `type`, `user_id`, `event_id`, `sent_at`, `status`
+- [x] `.env` MAIL_MAILER=smtp, MAIL_PORT=1025 (Mailpit), APP_DEEP_LINK_SCHEME=eventos
+- [x] `BaseEventosMail` + 11 Mailables concretos + `SponsorLeadMail` + `ContactRequestMail`
+- [x] Layout HTML responsive con branding del evento (logo, primary_color)
+- [x] `SendEmailJob` — genérico, 3 reintentos, logging automático en `email_logs`
+- [x] `SendEventRemindersJob` (cron diario 8am) + `SendSessionRemindersJob` (cron cada 5min)
+- [x] `EmailTemplate` model con `resolve(eventId, type, locale)` — fallback evento → sistema
+- [x] 26 plantillas sembradas ES + EN en `EmailTemplateSeeder`
+- [x] `email_logs` table: type, user_id, event_id, recipient_email, status, sent_at, error_message
+- [x] Password reset: token en `password_reset_tokens`, link → ruta web → deep link `eventos://`
+- [x] Email verification: signed URL 60min, ruta web verifica + redirige a deep link `eventos://`
+- [x] Vista Blade `auth/deep-link-redirect` con auto-redirect JS + botón fallback
+- [x] Filament `EmailTemplateResource` — editor Tiptap, variables hint, botón "Enviar prueba"
+- [x] Filament `EmailLogResource` — solo lectura, filtrable por tipo/estado/evento
 
-**Tests:**
+**Tests:** 9 pasando (resolución fallback, registro→welcome, registro→pending, ban, schedulers, log)
 
-- [ ] Invitar usuario → email sale a la cola
-- [ ] Primer login → WelcomeMail despachado
-- [ ] Ban → UserBannedMail despachado
-- [ ] Scheduler activa SessionReminderMail correctamente
+---
 
-**Definición de completado:** Invitar asistente desde Filament → email llega en < 30s. Scheduler activa recordatorio de sesión.
+### Sesión 1.13b — SMTP propio por organización ✅ 2026-04-05
+
+**Branch:** `feature/s113b-smtp-org` → mergeado a main
+**Repos:** `eventos-backend`
+
+**Backend:**
+
+- [x] Tabla `organization_email_settings` — password encriptada con cast `'encrypted'`
+- [x] `OrganizationEmailSettings::isReady()` — use_custom_smtp + is_verified + host + from_email
+- [x] `EmailService::mailerFor(?orgId)` — resuelve mailer custom o fallback al sistema
+- [x] `EmailService::testConnection(settings, toEmail)` — envía email de prueba real
+- [x] `SendEmailJob` actualizado — resuelve organization_id desde event_id automáticamente
+- [x] Filament `OrganizationEmailSettingsResource` — form completo + botón "Probar conexión"
+- [x] Botón verifica conexión, setea is_verified + verified_at, notificación success/danger
+
+**Tests:** 7 pasando (mailerFor fallback, isReady, password encriptada, SendEmailJob con org)
+
+**Definición de completado:** ✅ 141 tests pasando. Emails llegan a Mailpit en dev. SMTP propio verificable desde Filament.
 
 ---
 
 ## ─────────────────────────────────────────
 
-## SESIÓN 1.x — Upload de imágenes / archivos (Cloudflare R2)
+## SESIÓN 1.x — Upload de imágenes / archivos (Cloudflare R2) ✅ COMPLETADA (2026-04-05)
 
 ## ─────────────────────────────────────────
 
-**Cuándo implementar:** Después de S1.11 (Push notifications), antes del deploy con cliente real.
-**Depende de:** Cuenta Cloudflare configurada con bucket R2 + credenciales en `.env`.
-**Por qué está aplazado:** En dev todas las URLs de imágenes se llenan manualmente. No bloquea ninguna sesión de Fase 1.
+**Arquitectura implementada: R2 como primario + URL manual como fallback**
 
-**Cómo funciona cuando esté implementado:**
+No hay vendor lock-in: el campo en BD siempre almacena una URL pública. Si Cloudflare falla, el admin pega una URL de otro host. Si R2 no está configurado, el sistema sube automáticamente al disco `public` local.
 
-1. Admin da click en "Examinar" (botón nativo de Filament `FileUpload`)
-2. Laravel genera una **presigned URL** de R2 (válida 5 min)
-3. El archivo sube directo desde el browser a R2 — **nunca pasa por el servidor**
-4. R2 responde OK → Laravel guarda la URL pública en la BD
-5. La app muestra la imagen via CDN de Cloudflare (gratis, sin egress cost)
+**Flujo real implementado:**
+1. Admin ve un `FileUpload` en Filament → sube archivo → `StorageService::upload()` lo sube a R2 (o disco local si R2 no configurado) → URL pública se guarda en el campo `_url`
+2. Alternativamente: admin pega cualquier URL en el campo "URL de imagen (alternativa)" → se guarda directamente → sin subir archivo
+
+**`StorageService`:**
+- `upload(UploadedFile, directory): string` → intenta R2, fallback a `public` disk, siempre retorna URL
+- `delete(url): void` → borra de R2 o public disk; ignora URLs externas silenciosamente
+- `r2IsConfigured(): bool` → verifica que key, secret, bucket y endpoint estén en config
+- `activeDriver(): string` → retorna `'r2'` o `'public'`
+
+**`POST /api/v1/admin/uploads`** — sube archivo, retorna `{ url, driver, original_name }`
+**`DELETE /api/v1/admin/uploads`** — borra archivo por URL
+
+**`ImageUploadField::make(field, label, directory)`** — componente Filament reutilizable:
+- FileUpload (primary): usa `saveUploadedFileUsing` → R2/public → guarda URL en DB
+- TextInput (fallback): pegar URL de cualquier host, live(onBlur), escribe al mismo campo
+
+**Filament resources actualizados (FileUpload + URL fallback):**
+- [x] `SponsorResource` — `logo_url`, `banner_url`
+- [x] `SpeakerResource` — `photo_url`
+- [x] `DocumentResource` — `file_url` (PDFs, PPT, DOCX, imágenes)
+
+**Pendiente para Sesión UI o App:**
+- `users.photo_url` — foto de perfil (desde app: expo-image-picker → POST /admin/uploads)
+- `events.logo_url`, `events.banner_url` — requiere EventResource en Filament
+- `event_sessions.thumbnail_url` — requiere campo en EventSessionResource
+
+**Variables de entorno (dejar vacíos en dev para usar disco local):**
+```
+CLOUDFLARE_R2_KEY=
+CLOUDFLARE_R2_SECRET=
+CLOUDFLARE_R2_BUCKET=
+CLOUDFLARE_R2_ENDPOINT=     # https://<account-id>.r2.cloudflarestorage.com
+CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
+```
 
 **Cloudflare R2 pricing (2026):**
-
 - Storage: 10 GB gratis/mes, luego $0.015/GB
-- Escrituras: 1M gratis/mes, luego $4.50/millón
-- Lecturas: 10M gratis/mes, luego $0.36/millón
-- **Egress (descargas): $0 siempre** ← diferencial vs S3
-- Para un evento de 500-1000 asistentes: **el tier gratuito cubre todo**
+- Egress (descargas): **$0 siempre** ← diferencial vs S3
+- Para un evento de 500-1000 asistentes: el tier gratuito cubre todo
 
-**Campos afectados (hoy aceptan URL manual):**
-
-- `users.photo_url` — foto de perfil
-- `speakers.photo_url` — foto del ponente
-- `sponsors.logo_url`, `sponsors.banner_url` — imágenes del stand
-- `events.logo_url`, `events.banner_url` — branding del evento
-- `documents` — archivos PDF subidos por admins
-- `event_sessions.thumbnail_url` — miniatura de sesión
-
-**Backend:**
-
-- [ ] Configurar disco `r2` en `config/filesystems.php` (driver `s3` + endpoint R2)
-- [ ] `POST /api/v1/admin/uploads/presign` — genera presigned URL para PUT directo a R2
-- [ ] Registrar URL final en `file_uploads` (tabla ya existe)
-- [ ] Filament: reemplazar `TextInput url` por `FileUpload` en todos los resources afectados
-
-**App:**
-
-- [ ] `expo-image-picker` para subir foto de perfil del usuario
-- [ ] Mismo flujo: picker → presigned URL → PUT a R2 → guardar URL
-
-**Nuevas dependencias:**
-
-- Backend: `league/flysystem-aws-s3-v3` (compatible con R2, ya puede estar instalado)
-- App: `expo-image-picker`
+**Dependencia instalada:** `league/flysystem-aws-s3-v3:^3.32` — compatible con R2 (S3 API)
+**Extensiones PHP habilitadas en CLI:** `ext-fileinfo`, `ext-gd` (necesarias para tests de upload)
 
 ---
 
