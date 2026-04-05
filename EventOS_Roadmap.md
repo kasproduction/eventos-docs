@@ -985,6 +985,85 @@ live_poll_votes:     id, poll_id, question_id, option_id (nullable), attendee_id
 
 ## ─────────────────────────────────────────
 
+## SESIÓN 1.x — Onboarding configurable desde admin
+
+## ─────────────────────────────────────────
+
+**Cuándo:** En la misma sesión que Sesión UI o justo antes — es la primera impresión del usuario.
+**Depende de:** Fase 1 completa. R2 uploads ayuda pero no bloquea (las URLs se ingresan manualmente hasta entonces).
+
+### Objetivo
+Primera impresión espectacular, configurable 100% desde Filament sin tocar código.
+Se muestra una sola vez por evento (MMKV flag `onboarding_seen_{eventId}`), después del login, antes del home.
+
+### Tabla `onboarding_slides`
+
+| Campo | Tipo | Propósito |
+|---|---|---|
+| `event_id` | FK | Slides por evento |
+| `order` | integer | Orden drag & drop en Filament |
+| `media_url` | string | URL de imagen, Lottie JSON, o video MP4 |
+| `media_type` | enum | `image` \| `lottie` \| `video` |
+| `title` | string nullable | Título del slide |
+| `subtitle` | string nullable | Subtítulo / descripción |
+| `bg_color_from` | string | Color hex inicio del gradiente de fondo |
+| `bg_color_to` | string | Color hex fin del gradiente de fondo |
+| `title_color` | string | Color hex del texto (claro u oscuro según fondo) |
+| `auto_advance_seconds` | integer nullable | null = manual, número = auto-avanza en X segundos |
+| `active` | boolean | Toggle para desactivar sin borrar |
+
+### Campos de evento relacionados
+
+- `onboarding_cta_text` en `events` → texto del botón final (ej. "Empezar la experiencia")
+- `onboarding_skip_enabled` en `events` → si el usuario puede saltar el onboarding
+
+### Filament — `OnboardingSlideResource`
+
+- Grupo: `Configuración del evento`
+- Reordenamiento drag & drop (`ReorderAction` de Filament)
+- Preview de imagen/color inline en la tabla
+- Toggle activo/inactivo por fila
+
+### App — UX premium
+
+- **Transición entre slides:** parallax con Reanimated (el fondo se mueve más lento que el contenido — efecto profundidad)
+- **Animación de entrada por slide:** título sube desde abajo, subtítulo aparece con delay de 150ms
+- **Lottie:** `lottie-react-native` (dep nueva, ligera) — la app detecta si `media_url` termina en `.json` y renderiza Lottie en lugar de `<Image>`
+- **Video:** `expo-av` (ya planeado para S2.1) — loop automático silencioso
+- **Gradiente de fondo:** `expo-linear-gradient` (dep nueva, ligera)
+- **Haptic feedback:** `expo-haptics` al cambiar slide
+- **Dots animados:** indicador de progreso con dot activo que se expande (Reanimated)
+- **Skip button:** se desvanece al llegar al último slide
+- **Botón CTA final:** texto configurable desde admin, animación pulse al aparecer
+
+### Nuevas dependencias app
+
+| Paquete | Por qué |
+|---|---|
+| `lottie-react-native` | Animaciones Lottie JSON en cada slide |
+| `expo-linear-gradient` | Gradientes de fondo configurables por slide |
+| `expo-haptics` | Feedback táctil al deslizar |
+
+_(expo-av ya viene en S2.1 — si se implementa onboarding antes, se instala aquí)_
+
+### Backend
+
+- [ ] Migration `onboarding_slides` + campos en `events`
+- [ ] Model `OnboardingSlide`
+- [ ] `OnboardingSlideResource` Filament con reorder drag & drop
+- [ ] `GET /api/v1/events/{event}/onboarding` — devuelve slides activos ordenados
+
+### App
+
+- [ ] `useOnboarding(eventId)` hook
+- [ ] `app/(app)/onboarding.tsx` — pantalla con slides swipeables
+- [ ] Lógica en `index.tsx`: si token && !onboarding_seen → redirigir a onboarding primero
+- [ ] Al terminar: `setCached('onboarding_seen_${eventId}', true)` → navegar al home del rol
+
+---
+
+## ─────────────────────────────────────────
+
 ## SESIÓN UI — Diseño visual completo _(post Fase 1, antes de Fase 2)_
 
 ## ─────────────────────────────────────────
