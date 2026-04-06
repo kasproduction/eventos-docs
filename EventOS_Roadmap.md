@@ -1011,51 +1011,47 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 
 ## ─────────────────────────────────────────
 
-## SESIÓN 1.x — Banners / Carrusel de sponsors en pantalla Inicio
+## SESIÓN 1.x — Banners / Carrusel de sponsors en pantalla Inicio ✅ COMPLETADA (2026-04-05)
 
 ## ─────────────────────────────────────────
 
 **⚠️ IMPORTANTE — NO CONFUNDIR:**
 - Módulo `banners` (slug: `banners`) = este carrusel/slideshow del home
 - Módulo `patrocinadores` (slug: `patrocinadores`) = directorio de sponsors con detalle → ya implementado en S1.5/S1.6
-- Son features separadas. El error de confundirlas ocurrió dos veces.
-
-**Cuándo implementar:** Antes del primer cliente real.
-**Tabla `banners` ya existe** — `id, event_id, sponsor_name, image_url, link_url, sort_order, enabled`
-**Lo que falta por completo:**
+- Son features separadas. El error de confundirlas ocurrió dos veces. Ver `feedback_banners_vs_patrocinadores.md`.
 
 **Backend:**
-- [ ] Model `Banner` con fillable + casts
-- [ ] `BannerResource` en Filament (con ImageUploadField para `image_url`, toggle enabled, reorder)
-- [ ] `GET /api/v1/events/{eventId}/banners` — lista banners habilitados ordenados
-- [ ] Test: banner habilitado aparece, deshabilitado no
+- [x] Model `Banner` con fillable + casts + `UPDATED_AT = null` + scope `enabled()`
+- [x] `BannerResource` en Filament (ImageUploadField para `image_url`, ToggleColumn, reorder por `sort_order`)
+- [x] `GET /api/v1/events/{eventId}/banners` — lista banners habilitados ordenados
+- [x] 3 tests Feature pasando (habilitado aparece, deshabilitado no, sin banners → 200 vacío)
+- [x] Seeds: 4 banners en ContentSeeder (3 enabled, 1 disabled)
 
 **App:**
-- [ ] Pantalla `/banners` (o más probable: componente embebido en el Inicio como carrusel)
-- [ ] `bannersApi.ts` + `useBanners(eventId)` hook
-- [ ] Carrusel autoplay con `expo-image` (o FlatList horizontal con snap)
-- [ ] Toca banner → abre `link_url` con `Linking.openURL`
-- [ ] Registro de ruta en `_layout.tsx` si es pantalla separada
+- [x] `lib/bannersApi.ts` — interface `Banner` + `bannersApi.list(eventId)`
+- [x] `hooks/useBanners.ts` — React Query hook, staleTime 5min
+- [x] `BannerCarousel` component — FlatList + pagingEnabled + autoplay timer + dots indicadores
+- [x] Toca banner → `Linking.openURL(link_url)`
+- [x] Home presencial y virtual: carrusel embebido bajo el saludo, condicional a módulo `banners` habilitado
+- [x] Pantalla standalone `/banners` registrada en `_layout.tsx`
 
-**UX sugerida:**
-- El carrusel aparece en la parte superior del tab Inicio (no como pantalla separada)
-- Si el evento no tiene banners habilitados, el carrusel simplemente no se muestra
-- Tamaño de imagen: 16:9 o 3:1 (horizontal, tipo banner publicitario)
+**Comportamiento módulo `banners`:**
+- Módulo `banners` desactivado en Filament → carousel oculto en todo el home
+- Módulo activo pero banner individual `enabled=false` → ese banner no aparece (filtrado en API)
+- El slug `banners` NO aparece en el ModuleMenu grid (`HIDDEN_FROM_MENU`) — es solo carousel de layout
+- Control granular: activar/desactivar módulo entero O banners individuales
 
 ---
 
 ## ─────────────────────────────────────────
 
-## SESIÓN 1.x — Onboarding configurable desde admin
+## SESIÓN 1.x-A — Onboarding configurable: Backend + estructura base app ✅ COMPLETADA (2026-04-05)
 
 ## ─────────────────────────────────────────
 
-**Cuándo:** En la misma sesión que Sesión UI o justo antes — es la primera impresión del usuario.
-**Depende de:** Fase 1 completa. R2 uploads ayuda pero no bloquea (las URLs se ingresan manualmente hasta entonces).
+**Filosofía:** El onboarding es la puerta del producto. Si es plano, el cliente siente que compró algo barato. Si es fluido, animado y con su marca, ya vendiste la siguiente renovación.
 
-### Objetivo
-Primera impresión espectacular, configurable 100% desde Filament sin tocar código.
-Se muestra una sola vez por evento (MMKV flag `onboarding_seen_{eventId}`), después del login, antes del home.
+**Flujo implementado:** Abrir app → onboarding (pre-login, fetch público sin token) → login → home. Una sola vez, flag global `onboarding_seen` en MMKV. Si no hay slides → salta directo al login.
 
 ### Tabla `onboarding_slides`
 
@@ -1063,8 +1059,8 @@ Se muestra una sola vez por evento (MMKV flag `onboarding_seen_{eventId}`), desp
 |---|---|---|
 | `event_id` | FK | Slides por evento |
 | `order` | integer | Orden drag & drop en Filament |
-| `media_url` | string | URL de imagen, Lottie JSON, o video MP4 |
-| `media_type` | enum | `image` \| `lottie` \| `video` |
+| `media_url` | string | URL de imagen o Lottie JSON |
+| `media_type` | enum | `image` \| `lottie` |
 | `title` | string nullable | Título del slide |
 | `subtitle` | string nullable | Subtítulo / descripción |
 | `bg_color_from` | string | Color hex inicio del gradiente de fondo |
@@ -1073,53 +1069,92 @@ Se muestra una sola vez por evento (MMKV flag `onboarding_seen_{eventId}`), desp
 | `auto_advance_seconds` | integer nullable | null = manual, número = auto-avanza en X segundos |
 | `active` | boolean | Toggle para desactivar sin borrar |
 
-### Campos de evento relacionados
+### Campos añadidos a `events`
 
-- `onboarding_cta_text` en `events` → texto del botón final (ej. "Empezar la experiencia")
-- `onboarding_skip_enabled` en `events` → si el usuario puede saltar el onboarding
+| Campo | Propósito |
+|---|---|
+| `onboarding_cta_text` | Texto del botón final ("Empezar la experiencia", "Entrar al evento", etc.) |
+| `onboarding_skip_enabled` | Si el usuario puede saltar el onboarding |
 
 ### Filament — `OnboardingSlideResource`
 
 - Grupo: `Configuración del evento`
-- Reordenamiento drag & drop (`ReorderAction` de Filament)
-- Preview de imagen/color inline en la tabla
+- Reordenamiento drag & drop por `order`
+- Preview de imagen inline + color swatch del gradiente en tabla
 - Toggle activo/inactivo por fila
+- ImageUploadField para `media_url`
+- ColorPicker para `bg_color_from`, `bg_color_to`, `title_color`
 
-### App — UX premium
+### API
 
-- **Transición entre slides:** parallax con Reanimated (el fondo se mueve más lento que el contenido — efecto profundidad)
-- **Animación de entrada por slide:** título sube desde abajo, subtítulo aparece con delay de 150ms
-- **Lottie:** `lottie-react-native` (dep nueva, ligera) — la app detecta si `media_url` termina en `.json` y renderiza Lottie en lugar de `<Image>`
-- **Video:** `expo-av` (ya planeado para S2.1) — loop automático silencioso
-- **Gradiente de fondo:** `expo-linear-gradient` (dep nueva, ligera)
-- **Haptic feedback:** `expo-haptics` al cambiar slide
-- **Dots animados:** indicador de progreso con dot activo que se expande (Reanimated)
-- **Skip button:** se desvanece al llegar al último slide
-- **Botón CTA final:** texto configurable desde admin, animación pulse al aparecer
+- `GET /api/v1/events/{event}/onboarding` — slides activos ordenados + `cta_text` + `skip_enabled`
 
-### Nuevas dependencias app
+### Nuevas dependencias app (instalar en esta sesión)
 
 | Paquete | Por qué |
 |---|---|
-| `lottie-react-native` | Animaciones Lottie JSON en cada slide |
 | `expo-linear-gradient` | Gradientes de fondo configurables por slide |
-| `expo-haptics` | Feedback táctil al deslizar |
+| `lottie-react-native` | Animaciones Lottie JSON como media de slide |
+| `expo-haptics` | Feedback táctil al cambiar slide |
 
-_(expo-av ya viene en S2.1 — si se implementa onboarding antes, se instala aquí)_
+### App — Sesión A ✅
 
-### Backend
+- [x] `lib/onboardingApi.ts` — fetch público sin token, usa `EXPO_PUBLIC_EVENT_ID`
+- [x] `hooks/useOnboarding.ts` — React Query, staleTime 10min, eventId opcional
+- [x] `app/onboarding.tsx` — slides fullscreen, LinearGradient, Image/Lottie, dots pill, haptics, autoplay, skip, CTA
+- [x] Responsive: `Dimensions.height` fullscreen, `useSafeAreaInsets` para bottom UI
+- [x] Flujo pre-login: `index.tsx` chequea `onboarding_seen` síncrono → onboarding → login
+- [x] Al terminar/skip: `setCached('onboarding_seen', true)` → login (o home si ya tiene sesión)
+- [x] Autoplay configurable por slide (`auto_advance_seconds`)
+- [x] Dots tipo pill (activo = ancho w-20, inactivo = círculo w-6)
+- [x] `OnboardingSeeder` independiente: `php artisan db:seed --class=OnboardingSeeder`
+- [x] `EXPO_PUBLIC_EVENT_ID=1` en `.env`
 
-- [ ] Migration `onboarding_slides` + campos en `events`
-- [ ] Model `OnboardingSlide`
-- [ ] `OnboardingSlideResource` Filament con reorder drag & drop
-- [ ] `GET /api/v1/events/{event}/onboarding` — devuelve slides activos ordenados
+### Backend — checklist ✅
 
-### App
+- [x] Migration `create_onboarding_slides_table`
+- [x] Migration `add_onboarding_fields_to_events_table`
+- [x] Model `OnboardingSlide` + fillable + casts + scope `active()`
+- [x] Relación `Event::onboardingSlides()` + campos `onboarding_cta_text`, `onboarding_skip_enabled`
+- [x] `OnboardingSlideResource` Filament — ColorPicker, ImageUploadField, reorder, gradient preview blade
+- [x] `GET /api/v1/events/{eventId}/onboarding` — **ruta pública**, sin sanctum
+- [x] Seeds: 3 slides en `ContentSeeder` + `OnboardingSeeder` standalone
+- [x] 4 tests pasando (154 total en suite)
 
-- [ ] `useOnboarding(eventId)` hook
-- [ ] `app/(app)/onboarding.tsx` — pantalla con slides swipeables
-- [ ] Lógica en `index.tsx`: si token && !onboarding_seen → redirigir a onboarding primero
-- [ ] Al terminar: `setCached('onboarding_seen_${eventId}', true)` → navegar al home del rol
+---
+
+## ─────────────────────────────────────────
+
+## SESIÓN 1.x-B — Onboarding: Animaciones premium
+
+## ─────────────────────────────────────────
+
+**Depende de:** Sesión 1.x-A completada y funcionando.
+
+**Objetivo:** Transformar la pantalla funcional en una experiencia visualmente memorable.
+
+### Técnicas de animación a implementar
+
+| Efecto | Librería | Detalle |
+|---|---|---|
+| Entrada por elementos | Reanimated `withSpring` + `withDelay` | Título sube desde +40px, subtítulo aparece 150ms después, imagen hace fade+scale |
+| Parallax imagen | Reanimated `useAnimatedScrollHandler` | La imagen se mueve al 60% de la velocidad del gesto — profundidad |
+| Transición entre slides | Crossfade del gradiente de fondo | El nuevo fondo aparece con `withTiming(1, {duration: 400})` mientras el contenido entra desde el lado |
+| Dots tipo pill animados | Reanimated `useAnimatedStyle` | Dot activo se expande horizontalmente con spring (igual que Instagram Stories) |
+| Haptic al cambiar slide | `expo-haptics` | `impactAsync(ImpactFeedbackStyle.Light)` |
+| Pulse en botón CTA | Reanimated `withRepeat` + `withSequence` | Scale 1 → 1.04 → 1, infinito, suave |
+| Skip fade-out | Reanimated | El botón skip se desvanece al llegar al último slide |
+
+### App — checklist Sesión B
+
+- [ ] Reanimated: animación de entrada por slide (spring title + delay subtitle + fade-scale image)
+- [ ] Parallax: imagen se mueve a 0.6x la velocidad del scroll
+- [ ] Crossfade de gradiente entre slides
+- [ ] Dots pill animados con Reanimated
+- [ ] Haptic feedback en cambio de slide
+- [ ] Pulse animado en botón CTA (último slide)
+- [ ] Fade-out del botón Skip en último slide
+- [ ] Prueba visual en pantallas pequeñas (SE 375px) y grandes (Pro Max 430px)
 
 ---
 
