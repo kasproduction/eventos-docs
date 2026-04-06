@@ -1216,6 +1216,14 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - Screen "Mi Agenda": vista filtrada con solo las sesiones favoritas (`is_favorite` ya existe en DB)
 - Speaker ↔ Sesión bidireccional en Filament: asignar sesiones desde el resource de Speaker (pivot `session_speaker` ya existe)
 
+**Tests Pest (objetivo: ~6 tests):**
+- [ ] Sesión con `stream_url=null` → botón "Ver transmisión" no incluido en response de agenda
+- [ ] Sesión con `stream_url` válida → campo presente en API
+- [ ] `POST /api/v1/track` con `action=session_stream_view` + `duration_seconds` → registrado en `activity_log`
+- [ ] `GET /api/v1/events/{id}/agenda?favorites=true` devuelve solo sesiones con `is_favorite=true` del usuario autenticado
+- [ ] Agenda favoritos vacía → 200 con array vacío, no error
+- [ ] Agenda favoritos requiere autenticación → 401
+
 **Definición de completado:** Asistente toca "Ver transmisión" → WebView carga el stream. "Mi Agenda" muestra solo favoritos. Tiempo de visualización registrado.
 
 ---
@@ -1239,6 +1247,16 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - App: panel Q&A en pantalla de sesión. Moderador: Filament o panel simple in-app
 - Display proyectable: vista Blade full-screen con preguntas aprobadas, auto-refresh 3s (igual que polls)
 
+**Tests Pest (objetivo: ~8 tests):**
+- [ ] Asistente envía pregunta → `status=pending` en DB
+- [ ] GET público solo devuelve preguntas `approved` o `answered` (pending/dismissed ocultos)
+- [ ] Moderador aprueba → pregunta aparece en GET público
+- [ ] Moderador descarta → pregunta no aparece en GET público
+- [ ] `POST /upvote` agrega 1 voto, segundo upvote del mismo usuario → idempotente (no duplica)
+- [ ] GET admin devuelve todas las preguntas sin filtrar por status
+- [ ] Pregunta anónima → `attendee` no expuesto en GET público
+- [ ] Endpoint requiere autenticación → 401
+
 **Definición de completado:** Asistente envía pregunta → moderador aprueba → aparece en la pantalla del speaker. Upvotes ordenan las preguntas.
 
 ---
@@ -1260,6 +1278,15 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - Filament: `SessionRatingResource` — promedio por sesión, export CSV comentarios
 - App: modal de evaluación post-sesión (stars + textarea opcional)
 
+**Tests Pest (objetivo: ~7 tests):**
+- [ ] `POST /sessions/{id}/rate` solo permitido cuando `session.status='ended'` → sesión activa retorna 422
+- [ ] Rating enviado correctamente → registrado en DB con `rating`, `comment`, `attendee_id`
+- [ ] Segundo rating del mismo asistente en la misma sesión → 409 (UNIQUE constraint)
+- [ ] Rating sin comentario válido (campo nullable)
+- [ ] GET admin devuelve promedio correcto (ej: 3 ratings de 4,5,3 → promedio 4.0)
+- [ ] GET admin filtra por sesión correcta (no mezcla ratings de otras sesiones)
+- [ ] Endpoint requiere autenticación → 401
+
 **Definición de completado:** Sesión finaliza → asistente ve prompt de evaluación → evalúa → admin ve promedio en Filament.
 
 ---
@@ -1279,6 +1306,15 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - `POST /DELETE /api/v1/photos/{id}/like` — dar/quitar like
 - Filament: moderar fotos (aprobar/rechazar), toggle moderación (auto-aprobar o manual)
 - App: tab "Fotos" en home, camera roll picker, galería grid, likes inline
+
+**Tests Pest (objetivo: ~7 tests):**
+- [ ] Foto subida queda en `status=pending` (moderación manual activa)
+- [ ] Foto `pending` no aparece en GET galería pública
+- [ ] Admin aprueba → aparece en galería pública
+- [ ] Admin rechaza → no aparece en galería pública
+- [ ] `POST /photos/{id}/like` agrega like, registra en DB
+- [ ] Doble like del mismo usuario → idempotente (no duplica `likes_count`)
+- [ ] `DELETE /photos/{id}/like` quita like correctamente
 
 **Definición de completado:** Asistente sube foto → admin aprueba → aparece en galería de todos. Likes funcionan en tiempo real.
 
@@ -1302,6 +1338,14 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - Email automático con PDF adjunto al generar (usa `SendEmailJob` existente)
 - App: pantalla "Mis certificados" con botón descargar/compartir
 
+**Tests Pest (objetivo: ~6 tests):**
+- [ ] `GET /me/certificates` devuelve solo los certificados del usuario autenticado
+- [ ] Certificado revocado no aparece en `GET /me/certificates`
+- [ ] `GenerateCertificatesJob` crea un `certificate` por cada asistente con `check_in` registrado
+- [ ] Asistente sin check-in no recibe certificado al ejecutar el job
+- [ ] Certificado revocado registra `revoked_at` en DB
+- [ ] Endpoint requiere autenticación → 401
+
 **Definición de completado:** Admin genera certificados → asistentes reciben email + pueden descargar desde la app.
 
 ---
@@ -1319,6 +1363,13 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - `GET /api/v1/admin/events/{id}/report` — genera PDF (browsershot, job en queue) + devuelve URL
 - Filament: botón "Generar reporte" en EventResource → notificación campana con link al PDF
 - Datos agregados desde: `check_ins`, `activity_log`, `session_ratings`, `leads`, `live_poll_votes`, `email_logs`
+
+**Tests Pest (objetivo: ~5 tests):**
+- [ ] Endpoint solo accesible con rol `event_admin` o `org_admin` → asistente recibe 403
+- [ ] Reporte incluye `total_checkins` correcto (coincide con registros en `check_ins`)
+- [ ] Reporte incluye `avg_session_rating` correcto si hay evaluaciones
+- [ ] Reporte con evento sin datos → 200 con métricas en 0 (no error)
+- [ ] Job encolado correctamente al llamar el endpoint (Horizon queue visible)
 
 **Definición de completado:** Admin toca "Generar reporte" → recibe PDF con métricas del evento.
 
@@ -1346,6 +1397,13 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
   - Heatmap de actividad por hora del día
 - Export CSV de `activity_log` filtrado por evento/fecha/tipo
 
+**Tests Pest (objetivo: ~5 tests):**
+- [ ] Endpoint analytics solo accesible por admins del evento → 403 para asistente
+- [ ] `GET /admin/events/{id}/analytics` devuelve `total_checkins`, `online_now`, `top_modules`
+- [ ] Export CSV de `activity_log` devuelve `Content-Type: text/csv`
+- [ ] Filtro por fecha en export devuelve solo filas dentro del rango
+- [ ] Evento de otro organizador no accesible → 403
+
 **Definición de completado:** Admin abre Analytics → ve métricas en tiempo real actualizadas cada 30s. Puede exportar actividad cruda.
 
 ---
@@ -1364,6 +1422,14 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - App: sección "Sugeridos para ti" en tab Networking (encima del directorio)
 - Badge en card: "3 intereses en común" con los tags
 - Si el asistente no completó el survey → sección oculta con CTA "Completa tu perfil para ver sugerencias"
+
+**Tests Pest (objetivo: ~6 tests):**
+- [ ] Asistente sin intereses registrados → `suggested_contacts` vacío, no error
+- [ ] Asistente con 3 intereses comunes aparece antes que uno con 1 interés en común (ordenado DESC)
+- [ ] Ya-contactos mutuos excluidos de sugerencias
+- [ ] Asistentes bloqueados excluidos de sugerencias
+- [ ] `networking_visible=false` excluye al asistente de sugerencias de otros
+- [ ] Endpoint requiere autenticación → 401
 
 **Definición de completado:** Asistente con intereses ve sugerencias ordenadas por compatibilidad. Sin intereses → CTA para completarlos.
 
@@ -1388,6 +1454,17 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - Filament: `WallModerationResource` — lista posts pendientes de revisión, toggle auto-moderación
 - App: tab "Social" con feed infinito, botón + (crear post con foto opcional), comentarios, likes, reporte de contenido
 
+**Tests Pest (objetivo: ~9 tests):**
+- [ ] Post creado aparece en feed público cuando `status=published`
+- [ ] Post `hidden` no aparece en GET feed público
+- [ ] Admin oculta post → `status=hidden`, desaparece del feed
+- [ ] `POST /wall/{id}/like` agrega like, `likes_count` incrementa
+- [ ] Doble like del mismo usuario → idempotente (no duplica)
+- [ ] `DELETE /wall/{id}/like` quita like, `likes_count` decrementa
+- [ ] Comentario en post publicado → registrado en DB
+- [ ] Comentario en post `hidden` → 404 o 422 (no se puede comentar post oculto)
+- [ ] Endpoint requiere autenticación → 401
+
 **Definición de completado:** Asistente publica foto+texto → aparece en el feed de todos en tiempo real. Admin puede ocultar desde Filament.
 
 ---
@@ -1409,6 +1486,14 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - App: pantalla Leaderboard accesible desde home, posición propia destacada, animación al ganar puntos (Reanimated)
 - Filament: config de puntos por acción por evento, tabla de posiciones
 
+**Tests Pest (objetivo: ~6 tests):**
+- [ ] Check-in otorga los puntos configurados en `gamification_config`
+- [ ] Acción sin configuración de puntos → 0 puntos, sin error
+- [ ] `GET /events/{id}/leaderboard` devuelve top 50 ordenado por puntos DESC
+- [ ] Response del leaderboard incluye la posición del usuario autenticado aunque no esté en el top 50
+- [ ] `GET /me/points` devuelve puntos totales y log de acciones del usuario autenticado
+- [ ] Puntos de otro evento no afectan al leaderboard del evento actual
+
 **Definición de completado:** Asistente hace check-in → gana X puntos → ve su posición en el leaderboard.
 
 ---
@@ -1429,6 +1514,14 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - App: pantalla "Mi Pasaporte" — grid de stands con estado stamped/pending, barra de progreso, animación confetti al completar
 - Filament: activar/desactivar Passport por evento, ver quién completó el circuito, exportar ganadores CSV
 
+**Tests Pest (objetivo: ~6 tests):**
+- [ ] Stamp registrado correctamente para stand válido del evento
+- [ ] Stamp duplicado del mismo stand por el mismo asistente → 409 (UNIQUE)
+- [ ] `GET /me/passport` devuelve lista de stands stamped + progreso (`stamped/required`)
+- [ ] Al alcanzar `required_stamps` → response incluye `completed: true`
+- [ ] Stamp de stand de otro evento → 404 o 422
+- [ ] Endpoint requiere autenticación → 401
+
 **Definición de completado:** Asistente escanea QR de N stands requeridos → ve su pasaporte completado → admin ve lista de ganadores.
 
 ---
@@ -1447,6 +1540,12 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - `GET /api/v1/events/{id}/venue-map` — imagen + pins con info del stand asociado
 - Filament: subir imagen del plano (StorageService R2), colocar pins con coordenadas (campos numéricos X/Y %)
 - App: pantalla "Mapa" — imagen con zoom/pan (`react-native-gesture-handler` ya instalado), pins superpuestos, tap en pin → popup con nombre/descripción del stand → navegar a su perfil
+
+**Tests Pest (objetivo: ~4 tests):**
+- [ ] `GET /events/{id}/venue-map` devuelve `image_url` + array de `pins` con coordenadas
+- [ ] Pin con `sponsor_id` incluye datos del sponsor (`name`, `logo_url`, `tier`)
+- [ ] Evento sin mapa configurado → 200 con `data: null` (no 404)
+- [ ] Pins de otro evento no aparecen en la respuesta
 
 **Definición de completado:** Admin sube plano + posiciona stands → asistente ve mapa interactivo, toca un stand y ve su info.
 
@@ -1467,6 +1566,14 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - Reporte bookmarks: sesiones más guardadas como favorito
 - Todos exportables en CSV (inmediato) y PDF (browsershot, job en queue)
 - Filament: `ReportsResource` con tabs por tipo de reporte, filtros por evento y rango de fechas
+
+**Tests Pest (objetivo: ~6 tests):**
+- [ ] Reporte Q&A devuelve preguntas del evento correcto (no mezcla con otros eventos)
+- [ ] Reporte chat devuelve mensajes agrupados por sesión
+- [ ] Reporte bookmarks devuelve sesiones ordenadas por `favorites_count` DESC
+- [ ] Export CSV devuelve `Content-Type: text/csv` con cabeceras correctas
+- [ ] Filtro por rango de fechas excluye registros fuera del rango
+- [ ] Endpoint solo accesible por admins → 403 para asistente
 
 **Definición de completado:** Admin selecciona tipo de reporte + rango de fechas → descarga CSV o PDF con datos correctos.
 
@@ -1591,6 +1698,7 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 > **Nota:** El asistente virtual en Fase 1 accede por app móvil (`app/(app)/(virtual)/` ya implementado). La web (2.1) se construye en Fase 2 porque su diferencial es "acceder sin descargar la app" — sin ese diferencial no aporta valor en Fase 1.
 
 > **Nota streaming:** El streaming NO es propio — es un embed de la URL que el organizador ya tiene (YouTube Live, Vimeo, Streamyard). Cero costo adicional. Implementado en S1.14.
+
 
 ---
 
