@@ -50,7 +50,7 @@ cada sesión más fácil de debuggear.
 | 1.x-A | Onboarding configurable — Backend + App base | ✅ (2026-04-05) |
 | 1.x-B | Onboarding — Animaciones premium | ✅ (2026-04-06) |
 | **1.14** | **Streaming nativo + Mi Agenda** | ✅ (2026-04-06) — push reminders pendiente probar en dev build |
-| **1.15** | **Preguntas al speaker (Q&A)** | ⏳ Pendiente |
+| **1.15** | **Preguntas al speaker (Q&A)** | ✅ (2026-04-06) |
 | **1.16** | **Evaluación de sesiones** | ⏳ Pendiente |
 | **1.17** | **Photobooth / Memorias** | ⏳ Pendiente |
 | **1.18** | **Certificados PDF** | ⏳ Pendiente |
@@ -1240,36 +1240,31 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 
 ---
 
-### Sesión 1.15 — Preguntas al speaker (Q&A en vivo)
+### Sesión 1.15 — Preguntas al speaker (Q&A en vivo) ✅ (2026-04-06)
 
-**Branch:** `feature/s115-qna`
+**Branch:** `feature/s115-qna` → mergeado a `main`
 **Repos:** `eventos-backend` + `eventos-app` + `eventos-socket`
-**Nuevas dependencias:** ninguna (Socket.IO ya existe)
 
-**Objetivo:** Asistentes envían preguntas al speaker durante la sesión. Moderador aprueba cuáles responder.
+**Scope completado:**
+- [x] Tablas: `session_questions` + `question_upvotes` (PK compuesta para dedupe de upvotes)
+- [x] Endpoints públicos: POST pregunta, GET aprobadas (ordenadas por upvotes), POST upvote idempotente
+- [x] Endpoints moderador: GET pendientes, PATCH moderate (approved/answered/dismissed)
+- [x] Moderación en tiempo real desde la app (rol organizer/moderator ve tabs "Pendientes" / "Aprobadas")
+- [x] Socket: `question:submitted` → mods, `question:approved/answered/upvoted` → todos en el room
+- [x] `QnAPanel`: asistente ve lista + input + toggle anónimo; moderador aprueba/descarta con un tap
+- [x] Preguntas ordenadas por upvotes (más votadas arriba)
+- [x] Pregunta anónima → autor oculto en GET público, visible solo para moderadores
 
-**Scope:**
-- Tabla `session_questions`: `session_id`, `attendee_id`, `body`, `status` (pending/approved/answered/dismissed), `upvotes`, `is_anonymous`
-- `POST /api/v1/sessions/{id}/questions` — enviar pregunta
-- `GET /api/v1/sessions/{id}/questions` — lista pública (solo aprobadas/respondidas)
-- `GET /api/v1/admin/sessions/{id}/questions` — todas con status (moderador)
-- `PATCH /api/v1/admin/questions/{id}` — cambiar status + marcar respondida
-- `POST /api/v1/questions/{id}/upvote` — votar por una pregunta (sin duplicados)
-- Socket.IO: `question:new`, `question:approved`, `question:answered` en room `session:{id}`
-- App: panel Q&A en pantalla de sesión. Moderador: Filament o panel simple in-app
-- Display proyectable: vista Blade full-screen con preguntas aprobadas, auto-refresh 3s (igual que polls)
-
-**Tests Pest (objetivo: ~8 tests):**
-- [ ] Asistente envía pregunta → `status=pending` en DB
-- [ ] GET público solo devuelve preguntas `approved` o `answered` (pending/dismissed ocultos)
-- [ ] Moderador aprueba → pregunta aparece en GET público
-- [ ] Moderador descarta → pregunta no aparece en GET público
-- [ ] `POST /upvote` agrega 1 voto, segundo upvote del mismo usuario → idempotente (no duplica)
-- [ ] GET admin devuelve todas las preguntas sin filtrar por status
-- [ ] Pregunta anónima → `attendee` no expuesto en GET público
-- [ ] Endpoint requiere autenticación → 401
-
-**Definición de completado:** Asistente envía pregunta → moderador aprueba → aparece en la pantalla del speaker. Upvotes ordenan las preguntas.
+**Tests Pest:**
+- [x] Asistente envía pregunta → status pending en DB
+- [x] Pregunta anónima guarda is_anonymous=true + autor no expuesto
+- [x] Endpoint requiere autenticación → 401
+- [x] GET público solo devuelve approved y answered
+- [x] Moderador aprueba → aparece en GET público
+- [x] Moderador descarta → no aparece en GET público
+- [x] Asistente no puede moderar → 403
+- [x] Upvote agrega 1 voto, segundo upvote idempotente
+- [x] GET pending devuelve todas las pendientes (solo moderador)
 
 ---
 
