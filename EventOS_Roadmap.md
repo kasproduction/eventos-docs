@@ -17,15 +17,16 @@ cada sesión más fácil de debuggear.
 | Fase       | Nombre                        | Sesiones                                      |
 | ---------- | ----------------------------- | --------------------------------------------- |
 | **Fase 0** | Setup e infraestructura       | 0.1 → 0.4                                     |
-| **Fase 1** | Todo lo funcional             | 1.1 → 1.31 + 1.x (Storage, Banners, Onboarding) |
-| **Fase 2** | UI + features avanzadas       | 2.1 (UI) → 2.5 (Web/Video/Proximity)          |
+| **Fase 1** | Todo lo funcional             | 1.1 → 1.26 + 1.x (Storage, Banners, Onboarding, Pulido, Stress Test) |
+| **Sesión UI** | Barrido visual completo    | Una sola sesión al final de Fase 1            |
+| **Fase 2** | Features complejas aplazadas  | Web Next.js, Video calls LiveKit, Proximity chat |
 | **Fase 3** | SaaS + Monetización           | 3.1 → 3.4 _(aplazada)_                        |
 
-**Estrategia:** Primero todo funcional (Fase 1 completa), luego un barrido de UI + bugs + pulido (Fase 2). Así el producto final tiene UI diseñada sobre código estable, no al revés.
+**Estrategia:** Primero TODO funcional completo (Fase 1 + sesiones ex-Fase2), luego stress testing para validar arquitectura, y solo entonces el barrido de UI. Así el diseño final se aplica sobre features estables y una arquitectura validada. No se rediseña dos veces.
 
-**Milestone MVP lanzable:** Fase 0 + Fase 1 completa + deploy.
+**Milestone MVP lanzable:** Fase 0 + Fase 1 completa + Stress Test + UI sweep + deploy.
 
-## Estado Fase 1 (al 2026-04-06)
+## Estado del proyecto (al 2026-04-06)
 
 | Sesión | Feature | Estado |
 |--------|---------|--------|
@@ -39,15 +40,32 @@ cada sesión más fácil de debuggear.
 | 1.7 | Networking con solicitudes | ✅ |
 | 1.8 | Gestión usuarios + Bans | ✅ |
 | 1.9 | Chat en tiempo real por sesión | ✅ |
-| 1.10 | Encuestas en vivo | ✅ Completa — mergeado a main (2026-04-04) |
-| 1.11 | Push notifications | ✅ Completa — mergeado a main (2026-04-04) |
+| 1.10 | Encuestas en vivo | ✅ (2026-04-04) |
+| 1.11 | Push notifications | ✅ (2026-04-04) |
 | 1.12 | Tracks + Session types | ✅ |
-| 1.13a | Emails automáticos + editor de plantillas | ✅ Completa — mergeado a main (2026-04-05) |
-| 1.13b | SMTP propio por organización | ✅ Completa — mergeado a main (2026-04-05) |
-| 1.x Storage | Upload de imágenes / Cloudflare R2 | ✅ Completa (2026-04-05) |
-| 1.x Banners | Carrusel de sponsors en pantalla Inicio | ✅ Completa (2026-04-05) |
-| 1.x-A | Onboarding configurable — Backend + App base | ✅ Completa (2026-04-05) |
-| 1.x-B | Onboarding — Animaciones premium | ✅ Completa (2026-04-06) |
+| 1.13a | Emails automáticos + editor de plantillas | ✅ (2026-04-05) |
+| 1.13b | SMTP propio por organización | ✅ (2026-04-05) |
+| 1.x Storage | Upload de imágenes / Cloudflare R2 | ✅ (2026-04-05) |
+| 1.x Banners | Carrusel de sponsors en pantalla Inicio | ✅ (2026-04-05) |
+| 1.x-A | Onboarding configurable — Backend + App base | ✅ (2026-04-05) |
+| 1.x-B | Onboarding — Animaciones premium | ✅ (2026-04-06) |
+| **1.14** | **Streaming nativo + Mi Agenda** | ⏳ Pendiente |
+| **1.15** | **Preguntas al speaker (Q&A)** | ⏳ Pendiente |
+| **1.16** | **Evaluación de sesiones** | ⏳ Pendiente |
+| **1.17** | **Photobooth / Memorias** | ⏳ Pendiente |
+| **1.18** | **Certificados PDF** | ⏳ Pendiente |
+| **1.19** | **Reporte post-evento PDF** | ⏳ Pendiente |
+| **1.20** | **Analytics avanzado** | ⏳ Pendiente |
+| **1.21** | **Matchmaking por intereses** | ⏳ Pendiente |
+| **1.22** | **Social wall** | ⏳ Pendiente |
+| **1.23** | **Gamification + Leaderboard** | ⏳ Pendiente |
+| **1.24** | **Passport Contest (stamps QR de stands)** | ⏳ Pendiente |
+| **1.25** | **Floor plan del venue** | ⏳ Pendiente |
+| **1.26** | **Reports exportables detallados** | ⏳ Pendiente |
+| **1.x Pulido** | **Pulido funcional (mejoras pre-deploy)** | ⏳ Pendiente |
+| **1.x Stress** | **Stress & Load Testing (k6)** | ⏳ Pendiente |
+| **Sesión UI** | **Barrido visual completo** | ⏳ Pendiente (última antes de deploy) |
+| **Deploy** | **Docker + VPS + CI/CD** | ⏳ Pendiente |
 
 ---
 
@@ -1175,6 +1193,356 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 
 ## ─────────────────────────────────────────
 
+## SESIONES 1.14 → 1.26 — Features funcionales (ex-Fase 2)
+
+## ─────────────────────────────────────────
+
+> Estas sesiones fueron movidas de Fase 2 a Fase 1 (2026-04-06). Decisión: terminar TODO lo funcional antes del barrido de UI, así el diseño se aplica una sola vez sobre código estable.
+
+---
+
+### Sesión 1.14 — Streaming nativo + Mi Agenda
+
+**Branch:** `feature/s114-streaming`
+**Repos:** `eventos-app` + `eventos-backend`
+**Nuevas dependencias:** ninguna (`react-native-webview` ya instalado en S1.3b)
+
+**Objetivo:** Asistentes ven la transmisión embebida de la sesión en la app. Mejoras a la agenda.
+
+**Scope:**
+- Botón "Ver transmisión" en card/detalle de sesión — solo visible cuando `stream_url != null`
+- WebView que carga `stream_url` de la sesión
+- Tracking de tiempo de visualización: evento `session_stream_view` con duración en segundos en `activity_log`
+- Screen "Mi Agenda": vista filtrada con solo las sesiones favoritas (`is_favorite` ya existe en DB)
+- Speaker ↔ Sesión bidireccional en Filament: asignar sesiones desde el resource de Speaker (pivot `session_speaker` ya existe)
+
+**Definición de completado:** Asistente toca "Ver transmisión" → WebView carga el stream. "Mi Agenda" muestra solo favoritos. Tiempo de visualización registrado.
+
+---
+
+### Sesión 1.15 — Preguntas al speaker (Q&A en vivo)
+
+**Branch:** `feature/s115-qna`
+**Repos:** `eventos-backend` + `eventos-app` + `eventos-socket`
+**Nuevas dependencias:** ninguna (Socket.IO ya existe)
+
+**Objetivo:** Asistentes envían preguntas al speaker durante la sesión. Moderador aprueba cuáles responder.
+
+**Scope:**
+- Tabla `session_questions`: `session_id`, `attendee_id`, `body`, `status` (pending/approved/answered/dismissed), `upvotes`, `is_anonymous`
+- `POST /api/v1/sessions/{id}/questions` — enviar pregunta
+- `GET /api/v1/sessions/{id}/questions` — lista pública (solo aprobadas/respondidas)
+- `GET /api/v1/admin/sessions/{id}/questions` — todas con status (moderador)
+- `PATCH /api/v1/admin/questions/{id}` — cambiar status + marcar respondida
+- `POST /api/v1/questions/{id}/upvote` — votar por una pregunta (sin duplicados)
+- Socket.IO: `question:new`, `question:approved`, `question:answered` en room `session:{id}`
+- App: panel Q&A en pantalla de sesión. Moderador: Filament o panel simple in-app
+- Display proyectable: vista Blade full-screen con preguntas aprobadas, auto-refresh 3s (igual que polls)
+
+**Definición de completado:** Asistente envía pregunta → moderador aprueba → aparece en la pantalla del speaker. Upvotes ordenan las preguntas.
+
+---
+
+### Sesión 1.16 — Evaluación de sesiones
+
+**Branch:** `feature/s116-evaluaciones`
+**Repos:** `eventos-backend` + `eventos-app`
+**Nuevas dependencias:** ninguna
+
+**Objetivo:** Al terminar una sesión, el asistente puede evaluarla (stars + comentario). Admin ve resultados agregados.
+
+**Scope:**
+- Tabla `session_ratings`: `session_id`, `attendee_id`, `rating` (1-5), `comment` nullable, `submitted_at`
+- UNIQUE `(session_id, attendee_id)` — una evaluación por sesión por asistente
+- `POST /api/v1/sessions/{id}/rate` — enviar evaluación (solo después de que la sesión termine: `status='ended'`)
+- `GET /api/v1/admin/sessions/{id}/ratings` — resultados: promedio, distribución, comentarios
+- Push/badge en la app al terminar sesión favorita: "¿Cómo estuvo esta sesión?"
+- Filament: `SessionRatingResource` — promedio por sesión, export CSV comentarios
+- App: modal de evaluación post-sesión (stars + textarea opcional)
+
+**Definición de completado:** Sesión finaliza → asistente ve prompt de evaluación → evalúa → admin ve promedio en Filament.
+
+---
+
+### Sesión 1.17 — Photobooth / Memorias
+
+**Branch:** `feature/s117-photobooth`
+**Repos:** `eventos-backend` + `eventos-app`
+**Nuevas dependencias:** `expo-image-picker` (puede ya estar instalado desde uploads)
+
+**Objetivo:** Asistentes suben fotos del evento. Galería compartida moderada por admin.
+
+**Scope:**
+- Tabla `event_photos`: `event_id`, `attendee_id`, `photo_url`, `caption`, `status` (pending/approved/rejected), `likes_count`
+- `POST /api/v1/events/{id}/photos` — subir foto (multipart → R2/StorageService)
+- `GET /api/v1/events/{id}/photos` — galería pública (solo aprobadas, paginada)
+- `POST /DELETE /api/v1/photos/{id}/like` — dar/quitar like
+- Filament: moderar fotos (aprobar/rechazar), toggle moderación (auto-aprobar o manual)
+- App: tab "Fotos" en home, camera roll picker, galería grid, likes inline
+
+**Definición de completado:** Asistente sube foto → admin aprueba → aparece en galería de todos. Likes funcionan en tiempo real.
+
+---
+
+### Sesión 1.18 — Certificados PDF
+
+**Branch:** `feature/s118-certificados`
+**Repos:** `eventos-backend`
+**Nuevas dependencias:** `spatie/browsershot` (headless Chrome — verificar Laragon)
+
+**Objetivo:** Admin genera certificados de asistencia/participación en PDF para los asistentes.
+
+**Scope:**
+- Tabla `certificates`: `event_id`, `attendee_id`, `type` (attendance/speaker/sponsor), `issued_at`, `file_url`, `download_count`
+- Template Blade del certificado: nombre del evento, nombre del asistente, fecha, logo, firma digital (imagen)
+- `GET /api/v1/me/certificates` — mis certificados descargables
+- `POST /api/v1/admin/events/{id}/certificates/generate` — genera para todos los asistentes con check-in (job en queue)
+- `POST /api/v1/admin/certificates/{id}/revoke` — revocar certificado individual
+- Filament: `CertificateResource` — lista, acción "Generar todos", acción "Enviar por email"
+- Email automático con PDF adjunto al generar (usa `SendEmailJob` existente)
+- App: pantalla "Mis certificados" con botón descargar/compartir
+
+**Definición de completado:** Admin genera certificados → asistentes reciben email + pueden descargar desde la app.
+
+---
+
+### Sesión 1.19 — Reporte post-evento PDF
+
+**Branch:** `feature/s119-reporte-post-evento`
+**Repos:** `eventos-backend`
+**Nuevas dependencias:** `spatie/browsershot` (ya instalado en S1.18)
+
+**Objetivo:** Al terminar el evento, el admin descarga un reporte ejecutivo en PDF con métricas clave.
+
+**Scope:**
+- Template Blade del reporte: asistencia total vs registrados, check-ins por hora, módulos más usados, encuestas (resultados), evaluaciones (promedios), leads capturados, emails enviados/abiertos, top speakers por rating
+- `GET /api/v1/admin/events/{id}/report` — genera PDF (browsershot, job en queue) + devuelve URL
+- Filament: botón "Generar reporte" en EventResource → notificación campana con link al PDF
+- Datos agregados desde: `check_ins`, `activity_log`, `session_ratings`, `leads`, `live_poll_votes`, `email_logs`
+
+**Definición de completado:** Admin toca "Generar reporte" → recibe PDF con métricas del evento.
+
+---
+
+### Sesión 1.20 — Analytics avanzado
+
+**Branch:** `feature/s120-analytics`
+**Repos:** `eventos-backend`
+**Nuevas dependencias:** ninguna (`activity_log` ya existe)
+
+**Objetivo:** Dashboard de analítica en Filament con métricas de uso del evento en tiempo real y tendencias.
+
+**Scope:**
+- Filament page `EventAnalytics` — accesible desde EventResource
+- Métricas en tiempo real (polling 30s desde Filament):
+  - Asistentes online ahora (Redis SCARD `event:{id}:online`)
+  - Check-ins del día (curva por hora)
+  - Módulos más visitados (top 5 desde `activity_log`)
+  - Mensajes de chat enviados en la última hora
+  - Votos en encuestas activas
+- Métricas históricas:
+  - Retención: asistentes que abrieron la app N días consecutivos
+  - Funnel: registrado → check-in → usó networking → evaluó sesión
+  - Heatmap de actividad por hora del día
+- Export CSV de `activity_log` filtrado por evento/fecha/tipo
+
+**Definición de completado:** Admin abre Analytics → ve métricas en tiempo real actualizadas cada 30s. Puede exportar actividad cruda.
+
+---
+
+### Sesión 1.21 — Matchmaking por intereses
+
+**Branch:** `feature/s121-matchmaking`
+**Repos:** `eventos-backend` + `eventos-app`
+**Nuevas dependencias:** ninguna (tablas de intereses y networking ya en Fase 1)
+
+**Objetivo:** La app sugiere con quién conectar basándose en intereses comunes del onboarding survey.
+
+**Scope:**
+- `GET /api/v1/events/{id}/suggested-contacts` — asistentes con mayor overlap de `attendee_interests` (excluye ya-contactos y bloqueados)
+- Algoritmo: `COUNT(interests en común)` DESC, paginado, máx 20 sugerencias
+- App: sección "Sugeridos para ti" en tab Networking (encima del directorio)
+- Badge en card: "3 intereses en común" con los tags
+- Si el asistente no completó el survey → sección oculta con CTA "Completa tu perfil para ver sugerencias"
+
+**Definición de completado:** Asistente con intereses ve sugerencias ordenadas por compatibilidad. Sin intereses → CTA para completarlos.
+
+---
+
+### Sesión 1.22 — Social wall
+
+**Branch:** `feature/s122-social-wall`
+**Repos:** `eventos-backend` + `eventos-app` + `eventos-socket`
+**Nuevas dependencias:** ninguna (Socket.IO + StorageService ya existen)
+
+**Objetivo:** Feed social del evento: asistentes publican fotos/texto, comentan, dan likes. Moderación por admin.
+
+**Scope:**
+- Tabla `wall_posts`: `event_id`, `attendee_id`, `body`, `photo_url` nullable, `status` (published/hidden), `likes_count`
+- Tabla `wall_comments`: `post_id`, `attendee_id`, `body`, `status`
+- `POST /GET /api/v1/events/{id}/wall` — crear post + listar (cursor pagination)
+- `POST /DELETE /api/v1/wall/{id}/like` — like/unlike
+- `POST /GET /api/v1/wall/{id}/comments` — comentar + listar comentarios
+- `DELETE /api/v1/admin/wall/{id}` — moderar (ocultar post/comentario)
+- Socket.IO: `wall:post` nuevo post en room `event:{id}` — feed se actualiza en tiempo real
+- Filament: `WallModerationResource` — lista posts pendientes de revisión, toggle auto-moderación
+- App: tab "Social" con feed infinito, botón + (crear post con foto opcional), comentarios, likes, reporte de contenido
+
+**Definición de completado:** Asistente publica foto+texto → aparece en el feed de todos en tiempo real. Admin puede ocultar desde Filament.
+
+---
+
+### Sesión 1.23 — Gamification + Leaderboard
+
+**Branch:** `feature/s123-gamification`
+**Repos:** `eventos-backend` + `eventos-app`
+**Nuevas dependencias:** ninguna
+
+**Objetivo:** Sistema de puntos por actividad del evento. Ranking visible para todos los asistentes.
+
+**Scope:**
+- Tabla `points_log`: `event_id`, `attendee_id`, `action`, `points`, `created_at`
+- Config de puntos por evento (JSON en `events.gamification_config`): check-in, evaluación sesión, publicar en social wall, conectar con asistente, visitar stand, responder encuesta, completar perfil
+- `GET /api/v1/events/{id}/leaderboard` — top 50 asistentes por puntos, incluye posición del usuario actual
+- `GET /api/v1/me/points` — mis puntos totales + log de acciones
+- Puntos se otorgan automáticamente en los hooks existentes (check-in, vote, contact accepted, etc.)
+- App: pantalla Leaderboard accesible desde home, posición propia destacada, animación al ganar puntos (Reanimated)
+- Filament: config de puntos por acción por evento, tabla de posiciones
+
+**Definición de completado:** Asistente hace check-in → gana X puntos → ve su posición en el leaderboard.
+
+---
+
+### Sesión 1.24 — Passport Contest (stamps QR de stands)
+
+**Branch:** `feature/s124-passport`
+**Repos:** `eventos-backend` + `eventos-app`
+**Nuevas dependencias:** ninguna (QR S1.4 + Stands S1.6 ya existen)
+
+**Objetivo:** Asistentes escanean el QR de cada stand para coleccionar stamps. Al completar el circuito, ganan un premio.
+
+**Scope:**
+- Tabla `passport_stamps`: `event_id`, `attendee_id`, `sponsor_id`, `stamped_at` — UNIQUE `(event_id, attendee_id, sponsor_id)`
+- Config por evento: `required_stamps` (cuántos stands hay que visitar para ganar), `prize_description`
+- `POST /api/v1/events/{id}/passport/stamp` — registrar stamp (body: `qr_token` del stand)
+- `GET /api/v1/me/passport` — mis stamps + progreso
+- App: pantalla "Mi Pasaporte" — grid de stands con estado stamped/pending, barra de progreso, animación confetti al completar
+- Filament: activar/desactivar Passport por evento, ver quién completó el circuito, exportar ganadores CSV
+
+**Definición de completado:** Asistente escanea QR de N stands requeridos → ve su pasaporte completado → admin ve lista de ganadores.
+
+---
+
+### Sesión 1.25 — Floor plan del venue
+
+**Branch:** `feature/s125-floor-plan`
+**Repos:** `eventos-backend` + `eventos-app`
+**Nuevas dependencias:** ninguna (imagen estática + coordenadas)
+
+**Objetivo:** Admin sube el plano del recinto e indica la posición de cada stand. Asistentes ven mapa interactivo con stands clickeables.
+
+**Scope:**
+- Tabla `venue_maps`: `event_id`, `image_url`, `width`, `height` (dimensiones en px para calcular %)
+- Tabla `map_pins`: `map_id`, `sponsor_id` nullable, `label`, `x_percent`, `y_percent`, `icon_type` (stand/entrance/stage/bathroom/food)
+- `GET /api/v1/events/{id}/venue-map` — imagen + pins con info del stand asociado
+- Filament: subir imagen del plano (StorageService R2), colocar pins con coordenadas (campos numéricos X/Y %)
+- App: pantalla "Mapa" — imagen con zoom/pan (`react-native-gesture-handler` ya instalado), pins superpuestos, tap en pin → popup con nombre/descripción del stand → navegar a su perfil
+
+**Definición de completado:** Admin sube plano + posiciona stands → asistente ve mapa interactivo, toca un stand y ve su info.
+
+---
+
+### Sesión 1.26 — Reports exportables detallados
+
+**Branch:** `feature/s126-reports`
+**Repos:** `eventos-backend`
+**Nuevas dependencias:** `spatie/browsershot` (ya instalado en S1.18)
+
+**Objetivo:** Reportes adicionales para el organizador: Q&A, chat, networking lounge, sesiones favoritas. CSV + PDF.
+
+**Scope:**
+- Reporte actividad Q&A: preguntas por sesión, upvotes, % respondidas
+- Reporte chat: mensajes por sesión, asistentes más activos, pico de actividad por hora
+- Reporte networking lounge: asistentes con más conexiones, solicitudes enviadas/recibidas
+- Reporte bookmarks: sesiones más guardadas como favorito
+- Todos exportables en CSV (inmediato) y PDF (browsershot, job en queue)
+- Filament: `ReportsResource` con tabs por tipo de reporte, filtros por evento y rango de fechas
+
+**Definición de completado:** Admin selecciona tipo de reporte + rango de fechas → descarga CSV o PDF con datos correctos.
+
+---
+
+## ─────────────────────────────────────────
+
+## SESIÓN 1.x — Pulido funcional (mejoras pre-deploy)
+
+## ─────────────────────────────────────────
+
+**Cuándo:** Después de 1.26, antes de Stress Testing.
+**Objetivo:** Cerrar todos los pendientes funcionales detectados durante el desarrollo que no encajaron en una sesión específica.
+
+**Items a resolver:**
+
+### App
+- [ ] **Tab Inicio del vendedor** — card de resumen del stand encima del ModuleMenu (leads capturados hoy, cupos usados del stand)
+- [ ] **Módulos visibles por rol** — verificar que `ModuleSeeder` asigne módulos correctos por rol. Esperado: presencial (agenda/speakers/docs/anuncios/networking/mi-qr/patrocinadores/banners/paginas), virtual (mismo sin mi-qr), vendedor (leads/escaner/mi-stand/patrocinadores/anuncios)
+- [ ] **Reset onboarding** — botón "Ver introducción de nuevo" en perfil: `deleteCached('onboarding_seen')` + `router.replace('/onboarding')`
+- [ ] **Fix z-index controles onboarding** — `AnimatedFlatList` puede quedar encima de botones en Android. Fix: `zIndex: 10` en View de controles
+
+### Backend / Filament
+- [ ] **Tracking de aperturas email (pixel 1×1)** — columna `opened_at` en `email_logs`, endpoint `GET /track/email/{token}` devuelve imagen transparente 1×1 y registra apertura, pixel inyectado en layout base `BaseEventosMail`. Tasa apertura en `EmailLogResource`. Nota: Gmail bloquea imágenes por defecto; Apple Mail iOS 15+ pre-carga (falsos positivos). Útil como referencia.
+- [ ] **Admin módulos — rediseño form de creación** — Select "Tipo de módulo" → auto-rellena slug/nombre/icono/roles. Si es custom → campos controlados (URL iframe, permisos sandbox). Sin JSON libre.
+- [ ] **Speaker ↔ Sesión bidireccional en Filament** — asignar sesiones desde SpeakerResource (pivot `session_speaker` ya existe). Mover a S1.14 si se implementa allí.
+
+### Pendiente para Web (Fase 2)
+- [ ] **Pantallas web para password reset y verificación de email** — cuando se implemente Next.js, reemplazar el `deep-link-redirect.blade.php` con formulario web completo. La página actual redirige al deep link `eventos://` — funciona pero no es ideal sin la app instalada.
+
+---
+
+## ─────────────────────────────────────────
+
+## SESIÓN 1.x — Stress & Load Testing (k6)
+
+## ─────────────────────────────────────────
+
+**Cuándo:** Después del Pulido funcional, antes del barrido UI.
+**Por qué antes de UI:** Si el stress test revela que hay que cambiar arquitectura, los componentes UI ya rediseñados no se ven afectados. Arquitectura primero, estética después.
+
+**Herramienta:** [k6](https://k6.io/) — scripting en JS, open source, métricas en tiempo real.
+
+**Escenarios a simular:**
+
+| Escenario | Usuarios concurrentes | Objetivo |
+|---|---|---|
+| Login masivo | 500 simultáneos | p95 < 2s, 0% errores |
+| Check-in storm | 500 en 60s | Redis INCR atómico, 0 duplicados |
+| GET módulos / agenda | 1,000 simultáneos | p95 < 200ms (debe venir de Redis) |
+| Votación en encuesta | 300 votes/10s | Socket.IO aguanta, 0 votos perdidos |
+| Chat en sesión | 200 mensajes/min | Latencia < 500ms p95 |
+| Descarga CSV leads | 50 simultáneos | Queue procesa sin timeouts |
+
+**Métricas a capturar:**
+
+- Tiempo de respuesta: p50, p95, p99
+- Tasa de error por endpoint
+- Uso de CPU/RAM del VPS bajo carga
+- Hit rate de Redis cache (debe ser > 95% en endpoints GET de lista)
+- Cola de jobs Horizon: profundidad máxima, tiempo de procesamiento
+
+**Entregables de la sesión:**
+
+- [ ] Scripts k6 para cada escenario (`tests/load/*.js`)
+- [ ] Baseline report: qué soporta el VPS mínimo (2vCPU/4GB)
+- [ ] Tabla: N asistentes → VPS recomendado (< 500 / 500-2,000 / 2,000-10,000)
+- [ ] Lista de bottlenecks encontrados + fixes aplicados
+- [ ] Documentación de configuración Nginx + PHP-FPM óptima para cada tier
+
+**Definición de completado:** 500 usuarios concurrentes hacen check-in en 60 segundos sin errores. Reporte de capacidad documenta el límite real del hardware.
+
+---
+
+## ─────────────────────────────────────────
+
 ## SESIÓN UI — Diseño visual completo _(post Fase 1, antes de Fase 2)_
 
 ## ─────────────────────────────────────────
@@ -1207,90 +1575,22 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 
 ## ─────────────────────────────────────────
 
-## MEJORAS PRE-DEPLOY — Pulido antes de lanzar con cliente real
+## FASE 2 — Features complejas aplazadas
 
 ## ─────────────────────────────────────────
 
-> Pequeñas mejoras detectadas durante el desarrollo. No bloquean el MVP pero mejoran la experiencia. Agregar aquí cualquier detalle que surja durante las sesiones.
+> **Decisión 2026-04-06:** Las sesiones 2.2–2.12 y 2.15–2.16 se movieron a Fase 1 (sesiones 1.14–1.26). Quedan en Fase 2 solo los features que requieren infraestructura nueva significativa o son proyectos propios.
 
-### Emails — mejoras post S1.13
+| Sesión | Feature | Nuevas deps | Por qué aplazado |
+| ------ | ------- | ----------- | ---------------- |
+| 2.1 | **Web Next.js + Streaming** — portal web completo para asistentes virtuales: login, agenda, speakers, docs, anuncios, networking + embed de stream (YouTube Live, Vimeo, etc.) | `next`, `socket.io-client` (web) | Es un proyecto aparte (nuevo repo), no una sesión. Requiere diseño propio. |
+| 2.2 | **Photo/Caption Contest** — depende de Social wall (S1.22). Galería de fotos con votos, caption contest. | `expo-image-picker` (ya en S1.x) | Depende de S1.22 completada. |
+| 2.3 | **Video calls 1:1** — videollamada dentro del networking. Sala efímera con LiveKit. Solo app + web. | `livekit-client`, `@livekit/react-native-webrtc` | LiveKit = infraestructura de media server propia, costo mensual, complejidad alta. |
+| 2.4 | **Proximity chat web (spatial audio)** — espacio virtual tipo Gather con audio espacial. Solo Next.js. | `livekit-server-sdk`, `@livekit/components-react` | El más complejo del roadmap. Depende de 2.1 (web) + 2.3 (LiveKit). |
 
-- [ ] **Tracking de aperturas (pixel 1×1)** — agregar columna `opened_at` en `email_logs`, endpoint `GET /track/email/{token}` que devuelve imagen transparente y registra la apertura, inyectar pixel en el layout base de emails. Mostrar tasa de apertura en `EmailLogResource` (total enviados, abiertos, fallidos por tipo/evento). Nota: Gmail bloquea imágenes por defecto; Apple Mail iOS 15+ pre-carga imágenes (falsos positivos). Útil como referencia, no como métrica exacta.
+> **Nota:** El asistente virtual en Fase 1 accede por app móvil (`app/(app)/(virtual)/` ya implementado). La web (2.1) se construye en Fase 2 porque su diferencial es "acceder sin descargar la app" — sin ese diferencial no aporta valor en Fase 1.
 
-### Emails — pendiente Sesión UI / Web (S2.1)
-
-- [ ] **Pantallas web para password reset y verificación de email** — actualmente las rutas del backend (`/password/reset/{token}` y `/auth/verify-email/{id}/{hash}`) muestran una página de redirect al deep link de la app. Cuando se implemente Next.js (S2.1), estas pantallas deben tener su versión web completa:
-  - `/password/reset?token=XXX&email=XXX` → formulario de nueva contraseña en el browser → llama `POST /api/v1/auth/reset-password`
-  - `/auth/verify-email/{id}/{hash}` → ya verifica y redirige, pero mostrar una página más cuidada post-verificación
-  - La página de redirect del backend (`deep-link-redirect.blade.php`) puede detectar user-agent para redirigir a web vs deep link según el dispositivo.
-
-### Agenda
-
-- [ ] **Pantalla "Mi Agenda"** — vista filtrada con solo las sesiones marcadas como favoritas. El campo `is_favorite` ya existe, solo falta la screen y la ruta. Referencia: Webex hace esto bien. Podría ser un tab extra en la agenda o una sección en el home.
-- [ ] **Botón "Ver transmisión"** — en la card/detalle de sesión, mostrar botón solo cuando `stream_url != null`. Abrir con `expo-web-browser`. El campo ya existe en `event_sessions`.
-- [ ] **Speaker ↔ Sesión bidireccional en Filament** — al crear/editar un speaker, poder asignarle sus sesiones directamente (hoy solo funciona desde la sesión hacia el speaker). La pivot `session_speaker` ya existe.
-
-### Vendedor
-
-- [ ] **Tab Inicio del vendedor** — actualmente muestra ModuleMenu genérico. Considerar agregar card de resumen del stand (leads capturados hoy, cupos usados) encima del ModuleMenu.
-
-### Módulos visibles por rol (prioridad alta pre-deploy)
-
-- [ ] **Definir qué módulos ve cada rol en el home.** Hoy el ModuleMenu muestra los módulos que devuelve la API sin filtrar por rol en el frontend, lo que causa que roles vean rutas que no les corresponden (ej: vendedor ve Networking que no tiene sentido en su flujo, presencial ve Leads, etc.). Opciones:
-  - **A (recomendada):** El backend ya filtra por rol en `GET /events/{id}/modules` — verificar que el `ModuleSeeder` asigne los módulos correctos a cada rol. Así el filtro es centralizado.
-  - **B:** Filtrar en el frontend por `user.role` antes de renderizar el ModuleMenu.
-  - Módulos por rol esperados:
-    - `presencial`: agenda, speakers, documentos, anuncios, networking, mi-qr, patrocinadores, banners, paginas
-    - `virtual`: agenda, speakers, documentos, anuncios, networking, patrocinadores, banners, paginas
-    - `vendedor`: leads, escaner, mi-stand, patrocinadores, anuncios _(sin networking, sin mi-qr)_
-
-### Admin — Módulos
-
-- [ ] **Rediseño del form de creación de módulos** — actualmente el admin escribe el slug a mano y hay un textarea de JSON libre que no sirve para módulos estándar. El flujo correcto:
-  1. Select "Tipo de módulo" → lista de templates disponibles (agenda, speakers, documentos, anuncios, networking, chat, encuestas, mi-qr, leads, banners, + custom). Al elegir → auto-rellena nombre, ícono, roles por defecto, sort_order sugerido.
-  2. Si es módulo estándar → no hay config adicional (la app mapea por slug hardcoded, el JSON es irrelevante en Fase 1).
-  3. Si es `custom` (iframe) → aparecen campos controlados: URL del iframe, permisos sandbox (allow-scripts, allow-forms, etc.), altura fija o scroll. Sin JSON crudo.
-  - **Por qué no se hizo antes:** el JSON config no tiene efecto real en módulos estándar (la app ignora el campo). Los módulos del evento se crean por seeder — el admin normalmente solo activa/desactiva, raramente crea uno nuevo.
-
-- [ ] **Dos instancias del mismo módulo (ej: dos agendas)** — requiere cambio en la app: el router de Expo debe aceptar el módulo como parámetro y pasar config al screen (ej: `{track_id: 2}` para filtrar). En Fase 1 no aplica — ya existen tracks para separar sesiones dentro de una sola agenda. Revisar en Fase 2.
-
-### General
-
-_(agregar aquí más mejoras a medida que surjan)_
-
----
-
-## ─────────────────────────────────────────
-
-## FASE 2 — Experiencia completa _(aplazada)_
-
-## ─────────────────────────────────────────
-
-Módulos aplazados para después del MVP:
-
-| Sesión | Feature                                                                                                                                                                                                                                                                                                           | Nuevas deps cuando llegue                         |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| 2.1    | **Web Next.js + Streaming** — portal web para asistentes virtuales (login, agenda, speakers, docs, anuncios, networking) + iframe/embed de stream. El organizador provee la URL del stream (YouTube Live, Vimeo, Streamyard, etc.) — nosotros la embebemos. Sin SDK de video propio.                              | `next`, `socket.io-client` (web)                  |
-| 2.2    | **App — Streaming nativo (Expo)** — WebView con la `stream_url` de la sesión. El organizador pone su URL de YouTube/Vimeo/cualquier servicio. No se decodifica video — es un embed. Tiempo de visualización trackeado via timer en nuestra tabla `tracking` (evento `session_stream_view`, duración en segundos). | `react-native-webview`                            |
-| 2.3    | Preguntas al speaker                                                                                                                                                                                                                                                                                              | ninguna nueva                                     |
-| 2.4    | Evaluación de sesiones                                                                                                                                                                                                                                                                                            | ninguna nueva                                     |
-| 2.5    | Photobooth / Memorias                                                                                                                                                                                                                                                                                             | `expo-image-picker`                               |
-| 2.6    | Certificados PDF                                                                                                                                                                                                                                                                                                  | `spatie/browsershot` (queue pdf)                  |
-| 2.7    | Reporte post-evento PDF                                                                                                                                                                                                                                                                                           | `spatie/browsershot` (ya instalado)               |
-| 2.8    | Analytics avanzado                                                                                                                                                                                                                                                                                                | ninguna nueva                                     |
-| 2.9    | Matchmaking por intereses                                                                                                                                                                                                                                                                                         | ninguna nueva (tablas de networking ya en Fase 1) |
-| 2.10   | **Social wall** — feed de posts con fotos/texto del evento. Asistentes publican, comentan, dan likes. Moderación por admin.                                                                                                                                                                                       | ninguna nueva (Socket.IO ya existe)               |
-| 2.11   | **Gamification + Leaderboard** — sistema de puntos por actividad: check-in, preguntas al speaker, visitar stands, publicar en social wall, completar perfil. Ranking visible en home y por evento.                                                                                                               | ninguna nueva                                     |
-| 2.12   | **Passport Contest** — escanear QR de stands para acumular stamps. Admin define cuántos stands hay que visitar para ganar premio. Se construye sobre S1.4 (QR) + S1.6 (stands).                                                                                                                                 | ninguna nueva                                     |
-| 2.13   | **Photo/Caption Contest** — galería de fotos subidas por asistentes con votación por likes. Caption contest: admin sube foto, asistentes proponen leyendas. Se construye sobre Social wall (2.10).                                                                                                               | `expo-image-picker` (ya en 1.x uploads)           |
-| 2.14   | **Video calls 1:1** — llamada de video dentro del networking. Asistente A solicita videollamada → B acepta → sala efímera. Solo en app + web.                                                                                                                                                                    | `livekit-client`, `@livekit/react-native-webrtc`  |
-| 2.15   | **Floor plan del venue** — admin sube imagen del plano del recinto y posiciona logos/números de stands sobre ella. Asistentes ven el mapa interactivo (zoom/pan) con stands clickeables.                                                                                                                         | ninguna nueva (imagen estática + coordenadas)     |
-| 2.16   | **Reports exportables detallados** — extiende 2.8. Nuevos reportes: actividad Q&A, actividad chat por sesión, lounge report (tiempo en networking), bookmarks de sesiones. Exportables en CSV y PDF.                                                                                                             | `spatie/browsershot` (ya en 2.6)                  |
-| 2.17   | **Proximity chat web (spatial audio)** — solo en Next.js. Espacio virtual tipo Gather: avatares que se mueven con click/teclas, audio via Livekit, volumen se atenúa por distancia. Sala por evento. Se construye sobre 2.1 (web Next.js) + necesita Livekit server.                                            | `livekit-server-sdk`, `@livekit/components-react` |
-
-> **Nota (2026-03-30):** El asistente virtual en Fase 1 accede por app móvil — el layout `app/(app)/(virtual)/(tabs)/` ya está implementado. La web (Next.js) se construye en Fase 2 junto con streaming porque su diferencial principal es "ver transmisión desde el navegador sin descargar la app". Agregar la web sin streaming en Fase 1 no aportaría valor diferencial.
-
-> **Decisión de arquitectura streaming (2026-03-30):** El streaming NO es propio — es un WebView/iframe que embebe la URL que el organizador ya tiene (YouTube Live, Vimeo, Streamyard, etc.). Ventajas: cero costo adicional, cero dependencia de SDK de video, el cliente usa el servicio que ya tiene. El tiempo de visualización se mide con un timer propio (entrada/salida de la pantalla del stream) guardado en `tracking` — suficiente para el reporte post-evento por usuario y sesión.
+> **Nota streaming:** El streaming NO es propio — es un embed de la URL que el organizador ya tiene (YouTube Live, Vimeo, Streamyard). Cero costo adicional. Implementado en S1.14.
 
 ---
 
@@ -1317,10 +1617,10 @@ Módulos aplazados para después del MVP:
 | ------------- | ---------------------------------------------------------------- |
 | 0.2           | sanctum, spatie/permission, filament, horizon, telescope, sentry |
 | 1.3           | ezyang/htmlpurifier                                              |
-| 1.11          | kreait/laravel-firebase                                          |
+| 1.11          | expo-notifications (FCM via Expo Push API)                       |
 | 1.x (uploads) | league/flysystem-aws-s3-v3 (R2)                                  |
-| 2.5+          | spatie/browsershot                                               |
-| 2.17          | livekit-server-sdk                                               |
+| 1.18+         | spatie/browsershot (certificados, reportes PDF)                  |
+| F2.3          | livekit-server-sdk _(Fase 2 aplazada)_                           |
 | 3.2           | laravel/cashier                                                  |
 
 ### App (Expo)
@@ -1332,16 +1632,22 @@ Módulos aplazados para después del MVP:
 | 1.4           | expo-camera, expo-keep-awake                                                           |
 | 1.9           | socket.io-client                                                                       |
 | 1.11          | expo-notifications                                                                     |
-| 2.1           | expo-av                                                                                |
-| 1.x (uploads) | expo-image-picker                                                                      |
-| 2.14          | @livekit/react-native-webrtc (dev build requerido)                                     |
+| 1.14          | react-native-webview (ya instalado en S1.3b — verificar)                               |
+| 1.17          | expo-image-picker                                                                      |
+| F2.3          | @livekit/react-native-webrtc _(Fase 2 aplazada — requiere dev build)_                  |
+
+### Load Testing
+
+| Sesión       | Herramienta |
+| ------------ | ----------- |
+| 1.x (Stress) | k6 (open source, scripts en JS, sin deps de proyecto) |
 
 ### Socket.IO (Node.js)
 
 | Sesión | Paquete                                                     |
 | ------ | ----------------------------------------------------------- |
 | 0.4    | socket.io, @socket.io/redis-adapter, ioredis, axios, dotenv |
-| 2.17   | livekit-client, @livekit/components-react (web Next.js)      |
+| F2.4   | livekit-client, @livekit/components-react _(Fase 2 aplazada)_ |
 
 ---
 
@@ -1349,11 +1655,22 @@ Módulos aplazados para después del MVP:
 
 ```
 FASE 0:   0.1 → 0.2 → 0.3 → 0.4
-FASE 1:   1.1 → 1.2 → 1.3 → 1.4 → 1.5 → 1.6 → 1.7 → 1.8 → 1.9 → 1.10 → 1.11 → 1.12 → 1.13
-              ↑ MVP lanzable mínimo viable: hasta sesión 1.4
-FASE 2:   2.1 → 2.2 → 2.3 → 2.4 → 2.5 → 2.6 → 2.7 → 2.8 → 2.9
-          → 2.10 → 2.11 → 2.12 → 2.13 → 2.14 → 2.15 → 2.16 → 2.17
-              ↑ 2.17 (proximity chat) es el más complejo — hacerlo al final de Fase 2
+
+FASE 1 (funcional completa):
+  1.1 → 1.2 → 1.3 → 1.4 → 1.5 → 1.6 → 1.7 → 1.8 → 1.9 → 1.10 → 1.11 → 1.12 → 1.13
+  → 1.x(Storage) → 1.x(Banners) → 1.x-A → 1.x-B  ← ✅ completado
+  → 1.14 → 1.15 → 1.16 → 1.17 → 1.18 → 1.19 → 1.20 → 1.21
+  → 1.22 → 1.23 → 1.24 → 1.25 → 1.26
+  → 1.x(Pulido funcional)
+  → 1.x(Stress & Load Testing)  ← arquitectura validada antes de UI
+
+SESIÓN UI:  Barrido visual completo (diseño una sola vez sobre código estable)
+
+DEPLOY:     Docker + VPS + CI/CD + EAS Build
+
+FASE 2:   cuando haya cliente con requerimiento de web o video calls
+          2.1(Web Next.js) → 2.2(Photo Contest) → 2.3(Video calls) → 2.4(Proximity chat)
+
 FASE 3:   cuando haya segundo cliente o plan de monetización
 ```
 

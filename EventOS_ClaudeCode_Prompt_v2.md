@@ -400,6 +400,8 @@ Cuando admin cambia `enabled` o `config` → Laravel dispara push silenciosa
 
 ## 8. Roadmap completo por fases
 
+> **Estrategia actualizada (2026-04-06):** Todo lo funcional primero, UI como barrido final. Las sesiones que estaban en Fase 2 (streaming, Q&A, evaluaciones, photobooth, certificados, reportes, analytics, matchmaking, social wall, gamification, passport, floor plan) se movieron a Fase 1. La sesión UI se hace una sola vez al final, sobre código estable y arquitectura validada con stress testing. Solo quedan en Fase 2: Web Next.js, video calls LiveKit, y proximity chat. Ver `EventOS_Roadmap.md` para el orden de implementación detallado.
+
 ---
 
 ### FASE 0 — Infraestructura base (Sem 1–2)
@@ -2168,11 +2170,7 @@ stdout_logfile=/var/www/eventos/storage/logs/worker.log
 
 ---
 
-*Documento v2.6 — Contexto maestro EventOS para Claude Code*
-*Actualización final pre-código: Unity+Socket.IO bridge, sistema de licencias, i18n ES+EN desde Fase 1, formato error estándar, códigos custom, transacciones DB, idempotency keys, Service classes, Event/Listener pattern, SSRF prevention, utf8mb4, Redis DB split, pm2+Supervisor config, PHP-FPM tuning, MySQL tuning, VPS hardening, zero-downtime deploys, app.json+eas.json completos, 25 notas críticas nuevas (51-75), checklist pre-deploy, game module completo*
-*Actualización v2.6 (2026-04-04): S1.12 completa — session_tracks table, track_id en event_sessions, SessionTrackResource Filament con bulk assign y ColorPicker, API tracks, badges de color en agenda app con filtro data-driven, fix API 401 JSON (AuthenticateApi + bootstrap/app.php handler), OPcache 256MB, SPA mode Filament, deferLoading en todos los resources (notas 88-90)*
-*Idiomas: Español + Inglés | iOS 15+ | Android API 29+ | Facturación manual Fase 1*
+*Documento v2.7 — Contexto maestro EventOS para Claude Code*
+*Actualización v2.7 (2026-04-06): Estrategia de fases reorganizada — todo funcional primero (Fase 1 = 1.1→1.26 + Pulido + Stress Test), UI como barrido final una sola vez. Sessions 1.14–1.26 absorben lo que era Fase 2 (streaming, Q&A, evaluaciones, photobooth, certificados, reportes, analytics, matchmaking, social wall, gamification, passport, floor plan, reports detallados). Fase 2 reducida a: Web Next.js, Photo Contest, Video calls LiveKit, Proximity chat. Ver EventOS_Roadmap.md.*
+*Sesiones Fase 1 completadas (2026-04-06): 0.1–0.4, 1.1–1.13b, 1.x(Storage), 1.x(Banners), 1.x-A(Onboarding), 1.x-B(Onboarding animaciones) | Próximas: 1.14 (Streaming + Mi Agenda)*
 *✅ Todo confirmado: Bundle ID = com.kasproduction.eventos | Nombre app = "EventOS" | Dark mode = SÍ | iOS 15+ | Android API 29+ | ES + EN | Facturación manual Fase 1*
-*Sesiones completadas: 0.1, 0.2, 0.3, 0.4, 1.1, 1.2, 1.3a, 1.3b, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9a, 1.9b, 1.12, 1.10 | Próximo: S1.11 (Push notifications)*
-*Actualización: stack app completamente revisado (TanStack Query, MMKV, expo-secure-store, FlashList, expo-image, Zustand), Node.js + Socket.IO a escala documentado (Redis adapter, presencia, rate limiting, rooms), tablas chat_messages + live_polls + speaker_questions, estrategia stale-while-revalidate definida, R2 público/privado, notas 41-50*
-*Próximo paso: Fase 0 — Setup Laravel + MySQL + Redis*
