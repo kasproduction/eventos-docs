@@ -52,7 +52,7 @@ cada sesión más fácil de debuggear.
 | **1.14** | **Streaming nativo + Mi Agenda** | ✅ (2026-04-06) — push reminders pendiente probar en dev build |
 | **1.15** | **Preguntas al speaker (Q&A)** | ✅ (2026-04-06) |
 | **bugs** | **Fix favoritos Mi Agenda + Q&A moderación Filament** | ✅ (2026-04-06) |
-| **1.16** | **Evaluación de sesiones** | ⏳ Pendiente |
+| **1.16** | **Evaluación de sesiones** | ✅ (2026-04-06) |
 | **1.17** | **Photobooth / Memorias** | ⏳ Pendiente |
 | **1.18** | **Certificados PDF** | ⏳ Pendiente |
 | **1.19** | **Reporte post-evento PDF** | ⏳ Pendiente |
@@ -1270,33 +1270,36 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 
 ---
 
-### Sesión 1.16 — Evaluación de sesiones
+### Sesión 1.16 — Evaluación de sesiones ✅ COMPLETADA (2026-04-06)
 
-**Branch:** `feature/s116-evaluaciones`
+**Branch:** `feature/s116-evaluaciones` → mergeado a `main`
 **Repos:** `eventos-backend` + `eventos-app`
 **Nuevas dependencias:** ninguna
 
 **Objetivo:** Al terminar una sesión, el asistente puede evaluarla (stars + comentario). Admin ve resultados agregados.
 
-**Scope:**
-- Tabla `session_ratings`: `session_id`, `attendee_id`, `rating` (1-5), `comment` nullable, `submitted_at`
+**Lo implementado:**
+- Migración `session_ratings`: `session_id`, `attendee_id`, `rating` (unsignedTinyInteger 1-5), `comment` nullable
 - UNIQUE `(session_id, attendee_id)` — una evaluación por sesión por asistente
-- `POST /api/v1/sessions/{id}/rate` — enviar evaluación (solo después de que la sesión termine: `status='ended'`)
-- `GET /api/v1/admin/sessions/{id}/ratings` — resultados: promedio, distribución, comentarios
-- Push/badge en la app al terminar sesión favorita: "¿Cómo estuvo esta sesión?"
-- Filament: `SessionRatingResource` — promedio por sesión, export CSV comentarios
-- App: modal de evaluación post-sesión (stars + textarea opcional)
+- `POST /api/v1/events/{eventId}/sessions/{sessionId}/rate` — valida `status=finished`, evita duplicados (409)
+- `GET /api/v1/events/{eventId}/sessions/{sessionId}/ratings` — promedio, distribución 1-5, comentarios (solo organizer/moderador)
+- Filament `SessionRatingResource`: lista con evento/sesión/asistente/rating-estrellas, export CSV, badge con conteo diario
+- App `useSessionRating`: `submitRating` + `hasRated` con persistencia MMKV por evento
+- App `RatingModal`: bottom sheet, 5 estrellas interactivas, etiqueta por valor, comentario opcional
+- `session-stream/[id].tsx`: muestra modal automáticamente si `status=finished` y no evaluada (1.5s delay)
+- `AgendaScreen` (Mi Agenda): botón "Evaluar" en sesiones finalizadas + `RatingModal` integrado
 
-**Tests Pest (objetivo: ~7 tests):**
-- [ ] `POST /sessions/{id}/rate` solo permitido cuando `session.status='ended'` → sesión activa retorna 422
-- [ ] Rating enviado correctamente → registrado en DB con `rating`, `comment`, `attendee_id`
-- [ ] Segundo rating del mismo asistente en la misma sesión → 409 (UNIQUE constraint)
-- [ ] Rating sin comentario válido (campo nullable)
-- [ ] GET admin devuelve promedio correcto (ej: 3 ratings de 4,5,3 → promedio 4.0)
-- [ ] GET admin filtra por sesión correcta (no mezcla ratings de otras sesiones)
-- [ ] Endpoint requiere autenticación → 401
+**Tests Pest (8/8 ✅):**
+- [x] Asistente envía evaluación → registrada en DB
+- [x] Evaluación sin comentario válida (campo nullable)
+- [x] Solo permitido cuando `status=finished` → sesión activa retorna 422
+- [x] Segundo rating del mismo asistente → 409
+- [x] Endpoint requiere autenticación → 401
+- [x] Admin obtiene promedio correcto (4,5,3 → avg 4.0)
+- [x] GET ratings filtra por sesión correcta (no mezcla otras sesiones)
+- [x] Asistente no puede ver ratings de admin → 403
 
-**Definición de completado:** Sesión finaliza → asistente ve prompt de evaluación → evalúa → admin ve promedio en Filament.
+**Definición de completado:** ✅ Sesión finalizada → asistente ve modal de evaluación → evalúa → admin ve promedio y distribución en Filament.
 
 ---
 
