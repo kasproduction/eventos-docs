@@ -49,7 +49,7 @@ cada sesión más fácil de debuggear.
 | 1.x Banners | Carrusel de sponsors en pantalla Inicio | ✅ (2026-04-05) |
 | 1.x-A | Onboarding configurable — Backend + App base | ✅ (2026-04-05) |
 | 1.x-B | Onboarding — Animaciones premium | ✅ (2026-04-06) |
-| **1.14** | **Streaming nativo + Mi Agenda** | ✅ (2026-04-06) |
+| **1.14** | **Streaming nativo + Mi Agenda** | ✅ (2026-04-06) — push reminders pendiente probar en dev build |
 | **1.15** | **Preguntas al speaker (Q&A)** | ⏳ Pendiente |
 | **1.16** | **Evaluación de sesiones** | ⏳ Pendiente |
 | **1.17** | **Photobooth / Memorias** | ⏳ Pendiente |
