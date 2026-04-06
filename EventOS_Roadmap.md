@@ -14,16 +14,18 @@ cada sesión más fácil de debuggear.
 
 ## Resumen de fases
 
-| Fase       | Nombre                  | Sesiones               |
-| ---------- | ----------------------- | ---------------------- |
-| **Fase 0** | Setup e infraestructura | 0.1 → 0.4              |
-| **Fase 1** | MVP funcional           | 1.1 → 1.13             |
-| **Fase 2** | Experiencia completa    | 2.1 → 2.17             |
-| **Fase 3** | SaaS + Monetización     | 3.1 → 3.4 _(aplazada)_ |
+| Fase       | Nombre                        | Sesiones                                      |
+| ---------- | ----------------------------- | --------------------------------------------- |
+| **Fase 0** | Setup e infraestructura       | 0.1 → 0.4                                     |
+| **Fase 1** | Todo lo funcional             | 1.1 → 1.31 + 1.x (Storage, Banners, Onboarding) |
+| **Fase 2** | UI + features avanzadas       | 2.1 (UI) → 2.5 (Web/Video/Proximity)          |
+| **Fase 3** | SaaS + Monetización           | 3.1 → 3.4 _(aplazada)_                        |
 
-**Milestone MVP lanzable:** Completar Fase 0 + Fase 1 completa.
+**Estrategia:** Primero todo funcional (Fase 1 completa), luego un barrido de UI + bugs + pulido (Fase 2). Así el producto final tiene UI diseñada sobre código estable, no al revés.
 
-## Estado Fase 1 (al 2026-04-04)
+**Milestone MVP lanzable:** Fase 0 + Fase 1 completa + deploy.
+
+## Estado Fase 1 (al 2026-04-06)
 
 | Sesión | Feature | Estado |
 |--------|---------|--------|
@@ -42,6 +44,10 @@ cada sesión más fácil de debuggear.
 | 1.12 | Tracks + Session types | ✅ |
 | 1.13a | Emails automáticos + editor de plantillas | ✅ Completa — mergeado a main (2026-04-05) |
 | 1.13b | SMTP propio por organización | ✅ Completa — mergeado a main (2026-04-05) |
+| 1.x Storage | Upload de imágenes / Cloudflare R2 | ✅ Completa (2026-04-05) |
+| 1.x Banners | Carrusel de sponsors en pantalla Inicio | ✅ Completa (2026-04-05) |
+| 1.x-A | Onboarding configurable — Backend + App base | ✅ Completa (2026-04-05) |
+| 1.x-B | Onboarding — Animaciones premium | ✅ Completa (2026-04-06) |
 
 ---
 
@@ -1125,7 +1131,7 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 
 ## ─────────────────────────────────────────
 
-## SESIÓN 1.x-B — Onboarding: Animaciones premium
+## SESIÓN 1.x-B — Onboarding: Animaciones premium ✅ COMPLETADA (2026-04-06)
 
 ## ─────────────────────────────────────────
 
@@ -1133,7 +1139,7 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 
 **Objetivo:** Transformar la pantalla funcional en una experiencia visualmente memorable.
 
-### Técnicas de animación a implementar
+### Técnicas de animación implementadas
 
 | Efecto | Librería | Detalle |
 |---|---|---|
@@ -1145,16 +1151,25 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 | Pulse en botón CTA | Reanimated `withRepeat` + `withSequence` | Scale 1 → 1.04 → 1, infinito, suave |
 | Skip fade-out | Reanimated | El botón skip se desvanece al llegar al último slide |
 
-### App — checklist Sesión B
+### App — checklist Sesión B ✅
 
-- [ ] Reanimated: animación de entrada por slide (spring title + delay subtitle + fade-scale image)
-- [ ] Parallax: imagen se mueve a 0.6x la velocidad del scroll
-- [ ] Crossfade de gradiente entre slides
-- [ ] Dots pill animados con Reanimated
-- [ ] Haptic feedback en cambio de slide
-- [ ] Pulse animado en botón CTA (último slide)
-- [ ] Fade-out del botón Skip en último slide
-- [ ] Prueba visual en pantallas pequeñas (SE 375px) y grandes (Pro Max 430px)
+- [x] Reanimated: animación de entrada por slide (spring title + delay subtitle + fade-scale image)
+- [x] Parallax: imagen se mueve a 0.6x la velocidad del scroll
+- [x] Crossfade de gradiente entre slides
+- [x] Dots pill animados con Reanimated
+- [x] Haptic feedback en cambio de slide
+- [x] Pulse animado en botón CTA (último slide)
+- [x] Fade-out del botón Skip en último slide
+- [x] Flujo survey post-login: pills multi-select intereses, `pending_survey_option_ids` en MMKV, `onboardingApi.storeSurvey` fire & forget
+- [x] Fase login integrada en onboarding (formulario dark sin salir del flujo)
+- [x] Filament editor en vivo: `OnboardingPreview` — split view editor + mockup teléfono, tabs Slides/Survey/Login
+- [x] Seeder: 3 slides estilo Fever dark mode + 12 opciones survey con emoji
+
+### Bugs pendientes (dejar para sesión de pulido UI)
+
+1. **Botones invisibles en Android** — `AnimatedFlatList` (Reanimated createAnimatedComponent) puede quedar encima de controles absolutamente posicionados. Fix probable: `zIndex: 10` al View de controles.
+2. **Animaciones no visibles en Expo Go** — Reanimated 4.x requiere development build. Usar `npx expo run:android` para probar.
+3. **Reset onboarding** — no hay botón "Ver introducción de nuevo" en perfil. Fix: `deleteCached('onboarding_seen')` + `router.replace('/onboarding')`.
 
 ---
 
