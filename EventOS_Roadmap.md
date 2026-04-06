@@ -51,6 +51,7 @@ cada sesión más fácil de debuggear.
 | 1.x-B | Onboarding — Animaciones premium | ✅ (2026-04-06) |
 | **1.14** | **Streaming nativo + Mi Agenda** | ✅ (2026-04-06) — push reminders pendiente probar en dev build |
 | **1.15** | **Preguntas al speaker (Q&A)** | ✅ (2026-04-06) |
+| **bugs** | **Fix favoritos Mi Agenda + Q&A moderación Filament** | ✅ (2026-04-06) |
 | **1.16** | **Evaluación de sesiones** | ⏳ Pendiente |
 | **1.17** | **Photobooth / Memorias** | ⏳ Pendiente |
 | **1.18** | **Certificados PDF** | ⏳ Pendiente |
