@@ -1201,30 +1201,28 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 
 ---
 
-### Sesión 1.14 — Streaming nativo + Mi Agenda
+### Sesión 1.14 — Streaming nativo + Mi Agenda ✅ (2026-04-06)
 
-**Branch:** `feature/s114-streaming`
-**Repos:** `eventos-app` + `eventos-backend`
-**Nuevas dependencias:** ninguna (`react-native-webview` ya instalado en S1.3b)
+**Branch:** `feature/s114-streaming` → mergeado a `main`
+**Repos:** `eventos-app` + `eventos-backend` + `eventos-socket`
 
-**Objetivo:** Asistentes ven la transmisión embebida de la sesión en la app. Mejoras a la agenda.
+**Implementado:**
+- Split-screen: WebView (stream, top) + panel interactivo (bottom) — chat/poll/qna/none
+- `interactive_mode` enum por sesión, toggle en Filament — cambia en tiempo real via socket (`session:mode_changed`)
+- `stream_url` también reactiva: admin pega/borra URL → pantalla se actualiza sin salir (`useSessionMode` hook)
+- Placeholder `📡 Transmisión no disponible aún` cuando no hay URL
+- Tab "Mi Agenda" → abre directamente favoritos; Agenda general accesible como ruta stack
+- Botón ▶️ "Ver transmisión" siempre visible en todas las cards
+- Botón 📅 "Calendario" → descarga `.ics` y comparte (Google Cal, iOS, Outlook)
+- `ChatPanel` y `PollPanel` como componentes embebibles (reutilizables fuera de split-screen)
+- Optimistic update en toggle ★ favorito — ambos caches (`agenda` + `mi-agenda`) sincronizados
+- Tracking fire-and-forget `session_stream_view` con `duration_seconds` al salir/background
+- `SendAgendaRemindersJob`: push 15 min y 5 min antes para sesiones favoritas (dedupe Redis)
+- Speaker ↔ Sesión bidireccional en Filament (`SessionsRelationManager`)
 
-**Scope:**
-- Botón "Ver transmisión" en card/detalle de sesión — solo visible cuando `stream_url != null`
-- WebView que carga `stream_url` de la sesión
-- Tracking de tiempo de visualización: evento `session_stream_view` con duración en segundos en `activity_log`
-- Screen "Mi Agenda": vista filtrada con solo las sesiones favoritas (`is_favorite` ya existe en DB)
-- Speaker ↔ Sesión bidireccional en Filament: asignar sesiones desde el resource de Speaker (pivot `session_speaker` ya existe)
+**Tests:** 13 tests pasando (StreamingTest + AgendaRemindersTest)
 
-**Tests Pest (objetivo: ~6 tests):**
-- [ ] Sesión con `stream_url=null` → botón "Ver transmisión" no incluido en response de agenda
-- [ ] Sesión con `stream_url` válida → campo presente en API
-- [ ] `POST /api/v1/track` con `action=session_stream_view` + `duration_seconds` → registrado en `activity_log`
-- [ ] `GET /api/v1/events/{id}/agenda?favorites=true` devuelve solo sesiones con `is_favorite=true` del usuario autenticado
-- [ ] Agenda favoritos vacía → 200 con array vacío, no error
-- [ ] Agenda favoritos requiere autenticación → 401
-
-**Definición de completado:** Asistente toca "Ver transmisión" → WebView carga el stream. "Mi Agenda" muestra solo favoritos. Tiempo de visualización registrado.
+**Pendiente verificar:** Push reminders requieren dev build (expo-notifications no funciona en Expo Go SDK 53+)
 
 ---
 
