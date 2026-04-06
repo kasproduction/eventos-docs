@@ -1249,9 +1249,10 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - [x] Tablas: `session_questions` + `question_upvotes` (PK compuesta para dedupe de upvotes)
 - [x] Endpoints públicos: POST pregunta, GET aprobadas (ordenadas por upvotes), POST upvote idempotente
 - [x] Endpoints moderador: GET pendientes, PATCH moderate (approved/answered/dismissed)
-- [x] Moderación en tiempo real desde la app (rol organizer/moderator ve tabs "Pendientes" / "Aprobadas")
-- [x] Socket: `question:submitted` → mods, `question:approved/answered/upvoted` → todos en el room
-- [x] `QnAPanel`: asistente ve lista + input + toggle anónimo; moderador aprueba/descarta con un tap
+- [x] Moderación desde Filament admin — `QuestionsRelationManager` con polling 3s para revisión en vivo
+- [x] Acciones en Filament: Aprobar / Respondida / Descartar (con confirmación) + bulk approve/dismiss
+- [x] Socket: `question:submitted` → broadcast al room, `question:approved/answered/upvoted` → todos en el room
+- [x] `QnAPanel`: asistente ve lista de aprobadas + input + toggle anónimo (moderación NO en la app)
 - [x] Preguntas ordenadas por upvotes (más votadas arriba)
 - [x] Pregunta anónima → autor oculto en GET público, visible solo para moderadores
 
