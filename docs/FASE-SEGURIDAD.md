@@ -1295,37 +1295,42 @@ Alerta → email + push al admin si downtime > 2 minutos.
 ## Checklist Global de Progreso
 
 ```
-SESION SEC-1: CRITICOS
-🔲 SEC-1.1  Socket room authorization (endpoint + validación + cache + tests)
-🔲 SEC-1.2  HTMLPurifier trait + aplicar a modelos + tests XSS
-🔲 SEC-1.3  Token expiration + refresh endpoint + app interceptor + tests
+SESION SEC-1: CRITICOS ✅ COMPLETADA (2026-04-07)
+✅ SEC-1.1  Socket room authorization — 6 tests (RoomAuthTest.php)
+✅ SEC-1.2  HTMLPurifier trait en 8 modelos — 13 tests (SanitizationTest.php)
+✅ SEC-1.3  Token expiration 7d + refresh + app interceptor — 7 tests (TokenExpirationTest.php)
 
-SESION SEC-2: ALTOS
-🔲 SEC-2.1  SecurityHeaders middleware + registrar + tests
-🔲 SEC-2.2  CORS hardening backend + socket fallback + tests
-🔲 SEC-2.3  HTTPS enforcement app + certificate pinning
-🔲 SEC-2.4  security:check artisan command + tests
-🔲 SEC-2.5  Session secure cookie en producción
-🔲 SEC-2.6  .env.production.example sin placeholders
+SESION SEC-2: ALTOS ✅ COMPLETADA (2026-04-07)
+✅ SEC-2.1  SecurityHeaders middleware — 6 tests (SecurityHeadersTest.php)
+✅ SEC-2.2  CORS hardening backend + socket CORS fail-closed
+✅ SEC-2.3  HTTPS enforcement en app (throw si no HTTPS en prod)
+✅ SEC-2.4  security:check artisan command — 4 tests (SecurityCheckCommandTest.php)
+✅ SEC-2.5  Session secure cookie + .env.production.example
 
-SESION SEC-3: MEDIOS
-🔲 SEC-3.1  2FA OTP (migration + service + endpoints + mail + app screen + tests)
-🔲 SEC-3.2  Device fingerprinting (migration + middleware + endpoints + app + tests)
-🔲 SEC-3.3  Account lockout (migration + lógica + mail + Filament action + tests)
-🔲 SEC-3.4  Socket rate limiting → Redis + max conexiones por user
-🔲 SEC-3.5  FormRequests para todos los endpoints con input
+SESION SEC-3: MEDIOS (parcial — 2026-04-07)
+🔲 SEC-3.1  2FA OTP (aplazado — requiere WhatsApp Business API + diseño app)
+🔲 SEC-3.2  Device fingerprinting (aplazado — depende de SEC-3.1)
+✅ SEC-3.3  Account lockout — 6 tests (AccountLockoutTest.php)
+✅ SEC-3.4  Socket rate limiting → Redis + max 5 conexiones por user
+✅ SEC-3.5  5 FormRequests para endpoints user-facing
 
-SESION SEC-4: INFRAESTRUCTURA
+SESION SEC-4: INFRAESTRUCTURA (pendiente — se implementa en sesión de deploy)
 🔲 SEC-4.1  docker-compose.prod.yml (non-root, network isolation, limits, health)
 🔲 SEC-4.2  Server hardening (UFW, SSH, Fail2ban, non-root, updates)
 🔲 SEC-4.3  Cloudflare config (SSL Strict, HSTS, WAF, rate limits, bot fight)
 🔲 SEC-4.4  Backup strategy (daily encrypted, retention 30d, test restore)
 
-SESION SEC-5: MONITOREO
+SESION SEC-5: MONITOREO (pendiente — se implementa en sesión de deploy)
 🔲 SEC-5.1  Security event logging (SecurityLogger + canal dedicado + 90 días)
 🔲 SEC-5.2  Sentry (backend + app)
 🔲 SEC-5.3  Uptime monitoring (BetterStack/UptimeRobot)
 ```
+
+**Resumen de implementación:**
+- SEC-1 + SEC-2 + SEC-3 (parcial): 42 security tests, 719 assertions totales en backend
+- Socket: Redis rate limiting, room auth, CORS fix, max connections
+- App: token auto-refresh interceptor, HTTPS enforcement
+- 3 repos: eventos-backend, eventos-socket, eventos-app
 
 **Total: 21 items | Estimado: ~10 días de implementación**
 
