@@ -1640,14 +1640,14 @@ Fixes incluidos:
 ### App
 - [ ] **Tab Inicio del vendedor** — card de resumen del stand encima del ModuleMenu (leads capturados hoy, cupos usados del stand)
 - [ ] **Módulos visibles por rol** — verificar que `ModuleSeeder` asigne módulos correctos por rol. Esperado: presencial (agenda/speakers/docs/anuncios/networking/mi-qr/patrocinadores/banners/paginas), virtual (mismo sin mi-qr), vendedor (leads/escaner/mi-stand/patrocinadores/anuncios)
-- [ ] **Reset onboarding** — botón "Ver introducción de nuevo" en perfil: `deleteCached('onboarding_seen')` + `router.replace('/onboarding')`
-- [ ] **Fix z-index controles onboarding** — `AnimatedFlatList` puede quedar encima de botones en Android. Fix: `zIndex: 10` en View de controles
-- [ ] **Refetch automático** — agregar `refetchInterval` a pantallas clave (passport, gamificación, social wall) para que se actualicen sin pull-to-refresh
+- [x] **Reset onboarding** — botón "Ver introducción de nuevo" en perfil (3 roles)
+- [ ] **Fix z-index controles onboarding** — `AnimatedFlatList` puede quedar encima de botones en Android (requiere dev build para probar)
+- [x] **Refetch automático** — `refetchInterval` en wall (30s), leaderboard (30s), mis puntos (15s), passport (15s), fotos (30s)
 
 ### Backend / Filament
 - [ ] **Tracking de aperturas email (pixel 1×1)** — columna `opened_at` en `email_logs`, endpoint `GET /track/email/{token}` devuelve imagen transparente 1×1 y registra apertura, pixel inyectado en layout base `BaseEventosMail`. Tasa apertura en `EmailLogResource`. Nota: Gmail bloquea imágenes por defecto; Apple Mail iOS 15+ pre-carga (falsos positivos). Útil como referencia.
 - [ ] **Admin módulos — rediseño form de creación** — Select "Tipo de módulo" → auto-rellena slug/nombre/icono/roles. Si es custom → campos controlados (URL iframe, permisos sandbox). Sin JSON libre.
-- [ ] **Speaker ↔ Sesión bidireccional en Filament** — asignar sesiones desde SpeakerResource (pivot `session_speaker` ya existe). Mover a S1.14 si se implementa allí.
+- [x] **Speaker ↔ Sesión bidireccional en Filament** — SpeakersRelationManager en EventSessionResource (attach/detach)
 
 ### Pendiente para Web (Fase 2)
 - [ ] **Pantallas web para password reset y verificación de email** — cuando se implemente Next.js, reemplazar el `deep-link-redirect.blade.php` con formulario web completo. La página actual redirige al deep link `eventos://` — funciona pero no es ideal sin la app instalada.
