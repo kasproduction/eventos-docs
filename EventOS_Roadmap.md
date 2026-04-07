@@ -1723,7 +1723,8 @@ Fixes incluidos:
 - [ ] Rediseño Auth screens (login / registro)
 - [ ] Rediseño Profile screen
 - [ ] Dark mode completo (ya planeado desde Fase 1)
-- [ ] Iconografía consistente (reemplazar emojis del ModuleMenu)
+- [ ] Iconografía consistente (reemplazar emojis del ModuleMenu por icon set real + opción subir ícono custom en Filament)
+- [ ] Selector visual de íconos en Filament (preview + upload custom PNG/SVG)
 - [ ] Splash screen / onboarding visual
 
 ---
