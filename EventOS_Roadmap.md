@@ -1239,7 +1239,7 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 - [x] No envía si sesión no está en favoritos
 
 **Pendiente verificar en dispositivo:**
-- [ ] Push reminders — requieren dev build (expo-notifications no funciona en Expo Go SDK 53+)
+- [ ] Push reminders — ⚠️ requieren dev build (expo-notifications no funciona en Expo Go SDK 53+) — pendiente para sesión de deploy
 
 ---
 
@@ -1542,31 +1542,34 @@ Fixes incluidos:
 
 ---
 
-### Sesión 1.24 — Passport Contest (stamps QR de stands)
+### Sesión 1.21 — Passport Contest ✅ COMPLETADA (2026-04-07)
 
-**Branch:** `feature/s124-passport`
+**Branch:** mergeado a `main`
 **Repos:** `eventos-backend` + `eventos-app`
-**Nuevas dependencias:** ninguna (QR S1.4 + Stands S1.6 ya existen)
 
-**Objetivo:** Asistentes escanean el QR de cada stand para coleccionar stamps. Al completar el circuito, ganan un premio.
+**Objetivo:** Ruta de stands — al escanear el QR del asistente como lead, se registra la visita al stand + stamp en el pasaporte.
 
-**Scope:**
-- Tabla `passport_stamps`: `event_id`, `attendee_id`, `sponsor_id`, `stamped_at` — UNIQUE `(event_id, attendee_id, sponsor_id)`
-- Config por evento: `required_stamps` (cuántos stands hay que visitar para ganar), `prize_description`
-- `POST /api/v1/events/{id}/passport/stamp` — registrar stamp (body: `qr_token` del stand)
-- `GET /api/v1/me/passport` — mis stamps + progreso
-- App: pantalla "Mi Pasaporte" — grid de stands con estado stamped/pending, barra de progreso, animación confetti al completar
-- Filament: activar/desactivar Passport por evento, ver quién completó el circuito, exportar ganadores CSV
+**Lo implementado:**
+- [x] Tabla `passport_stamps`: UNIQUE(`event_id`, `attendee_id`, `sponsor_id`) con `stamped_at`
+- [x] Campos en `events`: `passport_enabled`, `passport_required_stamps`, `passport_prize`
+- [x] Campo en `sponsors`: `passport_enabled` (admin elige qué stands participan)
+- [x] `GET /events/{id}/my-passport` — stands con estado stamped/pending, progreso, completed, prize
+- [x] Hook en `LeadController`: al capturar lead → stamp automático + puntos `visit_stand` (puntos por sponsor)
+- [x] Filament `PassportSettingsResource`: toggle passport, stands requeridos, premio toggle opcional (limpia campo al desactivar)
+- [x] Filament `SponsorResource`: toggle `passport_enabled` por stand
+- [x] App pantalla `/passport`: grid de stands con logo/tier/check verde, barra progreso, mensaje completado, premio
+- [x] Hint: "Visita los stands y pide al vendedor que escanee tu QR para registrar tu visita"
+- [x] Módulo `passport`/`pasaporte` en ModuleMenu + template seeder
 
-**Tests Pest (objetivo: ~6 tests):**
-- [ ] Stamp registrado correctamente para stand válido del evento
-- [ ] Stamp duplicado del mismo stand por el mismo asistente → 409 (UNIQUE)
-- [ ] `GET /me/passport` devuelve lista de stands stamped + progreso (`stamped/required`)
-- [ ] Al alcanzar `required_stamps` → response incluye `completed: true`
-- [ ] Stamp de stand de otro evento → 404 o 422
-- [ ] Endpoint requiere autenticación → 401
+**Tests Pest (6/6 ✅):**
+- [x] Passport muestra stands con estado stamped/pending
+- [x] Stamp duplicado no se crea (UNIQUE firstOrCreate)
+- [x] Al completar required_stamps → completed=true
+- [x] Sponsor sin passport_enabled no aparece en la lista
+- [x] Passport deshabilitado → data null
+- [x] Endpoint requiere autenticación → 401
 
-**Definición de completado:** Asistente escanea QR de N stands requeridos → ve su pasaporte completado → admin ve lista de ganadores.
+**Definición de completado:** ✅ Vendedor escanea QR del asistente → lead + stamp + puntos → asistente ve su pasaporte actualizado.
 
 ---
 
@@ -1639,6 +1642,7 @@ Fixes incluidos:
 - [ ] **Módulos visibles por rol** — verificar que `ModuleSeeder` asigne módulos correctos por rol. Esperado: presencial (agenda/speakers/docs/anuncios/networking/mi-qr/patrocinadores/banners/paginas), virtual (mismo sin mi-qr), vendedor (leads/escaner/mi-stand/patrocinadores/anuncios)
 - [ ] **Reset onboarding** — botón "Ver introducción de nuevo" en perfil: `deleteCached('onboarding_seen')` + `router.replace('/onboarding')`
 - [ ] **Fix z-index controles onboarding** — `AnimatedFlatList` puede quedar encima de botones en Android. Fix: `zIndex: 10` en View de controles
+- [ ] **Refetch automático** — agregar `refetchInterval` a pantallas clave (passport, gamificación, social wall) para que se actualicen sin pull-to-refresh
 
 ### Backend / Filament
 - [ ] **Tracking de aperturas email (pixel 1×1)** — columna `opened_at` en `email_logs`, endpoint `GET /track/email/{token}` devuelve imagen transparente 1×1 y registra apertura, pixel inyectado en layout base `BaseEventosMail`. Tasa apertura en `EmailLogResource`. Nota: Gmail bloquea imágenes por defecto; Apple Mail iOS 15+ pre-carga (falsos positivos). Útil como referencia.
