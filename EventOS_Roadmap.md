@@ -56,7 +56,7 @@ cada sesión más fácil de debuggear.
 | **fix streaming** | **YouTube fix — `react-native-youtube-iframe` + lógica separada por tipo de URL** | ✅ (2026-04-07) |
 | **1.17** | **Photobooth / Memorias** | ✅ (2026-04-07) |
 | **1.18** | **Matchmaking por intereses** | ✅ (2026-04-07) |
-| **1.19** | **Social wall** | ⏳ Pendiente |
+| **1.19** | **Social wall** | ✅ (2026-04-07) |
 | **1.20** | **Gamification + Leaderboard** | ⏳ Pendiente |
 | **1.21** | **Passport Contest (stamps QR de stands)** | ⏳ Pendiente |
 | **1.22** | **Floor plan del venue** | ⏳ Pendiente |
