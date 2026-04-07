@@ -1638,8 +1638,8 @@ Fixes incluidos:
 **Items a resolver:**
 
 ### App
-- [ ] **Tab Inicio del vendedor** — card de resumen del stand encima del ModuleMenu (leads capturados hoy, cupos usados del stand)
-- [ ] **Módulos visibles por rol** — verificar que `ModuleSeeder` asigne módulos correctos por rol. Esperado: presencial (agenda/speakers/docs/anuncios/networking/mi-qr/patrocinadores/banners/paginas), virtual (mismo sin mi-qr), vendedor (leads/escaner/mi-stand/patrocinadores/anuncios)
+- [x] **Tab Inicio del vendedor** — card resumen: leads hoy, total leads, equipo activo
+- [x] **Módulos visibles por rol** — vendedor ahora tiene anuncios, patrocinadores, encuestas + template seeder actualizado
 - [x] **Reset onboarding** — botón "Ver introducción de nuevo" en perfil (3 roles)
 - [ ] **Fix z-index controles onboarding** — `AnimatedFlatList` puede quedar encima de botones en Android (requiere dev build para probar)
 - [x] **Refetch automático** — `refetchInterval` en wall (30s), leaderboard (30s), mis puntos (15s), passport (15s), fotos (30s)
