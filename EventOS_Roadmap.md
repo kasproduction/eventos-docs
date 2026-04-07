@@ -65,8 +65,8 @@ cada sesión más fácil de debuggear.
 | **1.P2** | **Reporte post-evento PDF** | ⏳ Aplazado |
 | **1.P3** | **Analytics avanzado** | ⏳ Aplazado |
 | **1.P4** | **Reports exportables detallados** | ⏳ Aplazado |
-| **1.x Pulido** | **Pulido funcional (mejoras pre-deploy)** | ⏳ Pendiente |
-| **1.x Stress** | **Stress & Load Testing (k6)** | ⏳ Pendiente |
+| **1.x Pulido** | **Pulido funcional (mejoras pre-deploy)** | ✅ (2026-04-07) |
+| **1.x Stress** | **Stress & Load Testing (k6 + artillery)** | ✅ Scripts listos (2026-04-07) — pendiente correr en VPS |
 | **Sesión UI** | **Barrido visual completo** | ⏳ Pendiente (última antes de deploy) |
 | **Deploy** | **Docker + VPS + CI/CD** | ⏳ Pendiente |
 
