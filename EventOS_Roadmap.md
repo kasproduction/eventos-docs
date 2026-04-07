@@ -69,7 +69,15 @@ cada sesión más fácil de debuggear.
 | **1.P4** | **Reports exportables detallados** | ⏳ Aplazado |
 | **1.x Pulido** | **Pulido funcional (mejoras pre-deploy)** | ✅ (2026-04-07) |
 | **1.x Stress** | **Stress & Load Testing (k6 + artillery)** | ✅ Scripts listos (2026-04-07) — test local ejecutado, pendiente VPS Ubuntu |
-| **Sesión UI** | **Barrido visual completo** | ⏳ Pendiente (última antes de deploy) |
+| **— Fase Seguridad (auditoría + hardening pre-deploy)** | | |
+| **SEC-1** | **3 críticos: room auth socket, XSS/HTMLPurifier, token expiration** | ✅ (2026-04-07) — 26 tests |
+| **SEC-2** | **5 altos: security headers, CORS, HTTPS, security:check, .env.prod** | ✅ (2026-04-07) — 10 tests |
+| **SEC-3** | **Medios: account lockout, Redis rate limiting, FormRequests** | ✅ parcial (2026-04-07) — 6 tests. 2FA y device fingerprint pendientes |
+| **SEC-4** | **Infraestructura: Docker, server hardening, Cloudflare, backups** | ⏳ Pendiente (sesión deploy) |
+| **SEC-5** | **Monitoreo: SecurityLogger, Sentry, uptime** | ⏳ Pendiente (sesión deploy) |
+| **— Landing + UI/UX** | | |
+| **Landing** | **Landing web premium (hero video, speakers, agenda, sponsors, registro)** | ⏳ Planificado — docs/ROADMAP-UIUX-LANDING.md |
+| **Sesión UI** | **Barrido visual completo (Lumina Noir/Lux)** | ⏳ Pendiente (última antes de deploy) |
 | **Deploy** | **Docker + VPS + CI/CD** | ⏳ Pendiente |
 
 ---
@@ -2231,6 +2239,134 @@ EXPO_PUBLIC_SOCKET_URL=wss://socket.eventos.com
 
 ---
 
-_EventOS Plan v2.1 — Kasproduction_
+---
+
+## Apéndice A: Fase Seguridad (2026-04-07)
+
+> Documento detallado: `docs/FASE-SEGURIDAD.md`
+
+### Auditoría realizada
+
+Se auditaron los 3 componentes (backend, socket, app). Resultados:
+- 3 críticos, 6 altos, 8 medios, 4 bajos
+
+### Implementado (SEC-1 + SEC-2 + SEC-3 parcial)
+
+| ID | Fix | Componente | Tests |
+|----|-----|-----------|-------|
+| SEC-1.1 | Socket room authorization (join:event valida eventId, join:session via internal endpoint + Redis cache) | socket + backend | 6 |
+| SEC-1.2 | HTMLPurifier trait en 8 modelos (strip_tags user input, whitelist HTML admin) | backend | 13 |
+| SEC-1.3 | Token expiration 7 días + POST /auth/refresh + app interceptor auto-refresh | backend + app | 7 |
+| SEC-2.1 | SecurityHeaders middleware (X-Frame, CSP, HSTS, Referrer-Policy, Permissions-Policy) | backend | 6 |
+| SEC-2.2 | CORS hardening (methods/headers restringidos, socket fallback *→false) | backend + socket | — |
+| SEC-2.3 | HTTPS enforcement en app (throw si no HTTPS en prod) | app | — |
+| SEC-2.4 | `php artisan security:check` (valida debug, placeholders, DB pass, tokens) | backend | 4 |
+| SEC-2.5 | `.env.production.example` + SESSION_SECURE_COOKIE=true | backend | — |
+| SEC-3.3 | Account lockout (5 intentos → 30 min lock, HTTP 423, reset on success) | backend | 6 |
+| SEC-3.4 | Socket rate limiting Redis (INCR/EXPIRE, max 5 conexiones por user) | socket | — |
+| SEC-3.5 | 5 FormRequests user-facing (WallPost, Comment, Question, Photo, Rating) | backend | — |
+
+**Total: 42 security tests, 278 tests backend (719 assertions), 0 TS errors**
+
+### Pendiente
+
+| ID | Fix | Razón aplazamiento |
+|----|-----|--------------------|
+| SEC-3.1 | 2FA OTP (email/WhatsApp) | Requiere WhatsApp Business API + pantalla app |
+| SEC-3.2 | Device fingerprinting | Depende de 2FA |
+| SEC-4 | Docker, server hardening, Cloudflare, backups | Se implementa en sesión de deploy |
+| SEC-5 | SecurityLogger, Sentry, uptime monitoring | Se implementa en sesión de deploy |
+
+### Archivos clave creados
+
+```
+eventos-backend/
+├── app/Traits/HasSanitizedHtml.php
+├── app/Http/Middleware/SecurityHeaders.php
+├── app/Console/Commands/SecurityCheckCommand.php
+├── app/Http/Requests/Api/V1/Store*.php (5 archivos)
+├── .env.production.example
+├── database/migrations/..._add_lockout_fields_to_users_table.php
+├── routes/web.php (+internal/validate-session-access)
+├── routes/api/auth.php (+/auth/refresh)
+└── tests/Feature/Security/ (5 test files)
+
+eventos-socket/
+├── src/rateLimit.ts (NUEVO)
+├── src/index.ts (room auth + max connections)
+└── src/chat.ts (Redis rate limiting + session validation)
+
+eventos-app/
+└── lib/api.ts (HTTPS enforcement + auto-refresh interceptor)
+```
+
+---
+
+## Apéndice B: Landing Web + UI/UX Premium (2026-04-07)
+
+> Documento detallado: `docs/ROADMAP-UIUX-LANDING.md`
+
+### Landing Web
+
+Página pública premium del evento con registro embebido. Login solo en app móvil.
+
+**Secciones planificadas:**
+1. Hero con video ambient + countdown + CTA registro
+2. Speakers con hover/expand
+3. Agenda resumida por tracks
+4. Sponsors/Partners logos
+5. Venue + mapa interactivo
+6. Testimonios ediciones pasadas
+7. FAQ colapsable
+8. Footer con redes sociales
+9. Open Graph meta tags para social sharing
+
+**Stack:** Next.js/Astro + Tailwind CSS + Framer Motion
+
+### Estados del Evento (3 lifecycle states)
+
+| Estado | Registro | App muestra |
+|--------|----------|-------------|
+| `pre_event` | Abierto (landing) | Countdown + teaser + speakers confirmados |
+| `active` | Abierto o cerrado | Acceso completo a todas las features |
+| `post_event` | Cerrado | Modo archivo: grabaciones, fotos, certificados, NPS |
+
+### Flujo Post-Registro
+
+1. Pantalla confirmación web (QR descarga app + botones stores)
+2. Email confirmación (.ics calendar invite + QR check-in)
+3. WhatsApp template (configurable desde admin)
+4. SMS fallback (configurable)
+
+### Seguridad Registro
+
+- CAPTCHA/reCAPTCHA v3 invisible en form web
+- Rate limiting: max 5 registros por IP en 15 min
+- Progressive profiling: datos mínimos en web, completo en app
+- 2FA OTP opcional (configurable por evento)
+- Device fingerprinting (nuevo device → forzar OTP)
+- Account lockout (5 intentos → 30 min)
+
+### Design System
+
+- **Lumina Noir** (dark principal): #0e0e0e + #D1FC00 + Plus Jakarta Sans
+- **Lumina Lux** (light alternativo): #FFFFFF + #D4FF00
+- Definidos en `design/stitch/stitch/lumina_noir/DESIGN.md` y `lumina_lux/DESIGN.md`
+- Prototipos HTML en `design/stitch/` y `design/onboarding/app/`
+
+### Orden de implementación UI/UX
+
+1. Design system tokens en React Native
+2. Landing web (Next.js + secciones + form registro)
+3. Flujos registro + auth (confirmación, 2FA, countdown)
+4. Estados del evento (pre/active/post)
+5. Barrido visual app (Lumina Noir en todas las pantallas)
+6. Admin premium (analytics dashboard, canales comunicación)
+
+---
+
+_EventOS Plan v2.2 — Kasproduction_
 _Documento maestro: EventOS_ClaudeCode_Prompt_v2.md (v2.5)_
 _Dev setup: EventOS_DevSetup.md_
+_Seguridad: docs/FASE-SEGURIDAD.md_
+_UI/UX + Landing: docs/ROADMAP-UIUX-LANDING.md_
