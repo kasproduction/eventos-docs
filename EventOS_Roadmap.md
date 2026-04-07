@@ -1453,30 +1453,28 @@ App:
 
 ---
 
-### Sesión 1.21 — Matchmaking por intereses
+### Sesión 1.18 — Matchmaking por intereses ✅ COMPLETADA (2026-04-07)
 
-**Branch:** `feature/s121-matchmaking`
+**Branch:** mergeado a `main`
 **Repos:** `eventos-backend` + `eventos-app`
-**Nuevas dependencias:** ninguna (tablas de intereses y networking ya en Fase 1)
 
-**Objetivo:** La app sugiere con quién conectar basándose en intereses comunes del onboarding survey.
+**Lo implementado:**
+- `GET /events/{id}/suggested-contacts` — overlap de `attendee_interests`, ordena DESC por cantidad en común, excluye contactos/bloqueados/ocultos, max 20
+- `GET/PUT /events/{id}/my-interests` — ver y editar intereses desde perfil
+- App: sección "Sugeridos para ti" en tab Networking (cards horizontales con tags), componente `MyInterests` en perfil (3 roles)
+- Onboarding survey obligatorio (botón deshabilitado sin selección)
+- 7 tests Pest + 1 test common_tags
 
-**Scope:**
-- `GET /api/v1/events/{id}/suggested-contacts` — asistentes con mayor overlap de `attendee_interests` (excluye ya-contactos y bloqueados)
-- Algoritmo: `COUNT(interests en común)` DESC, paginado, máx 20 sugerencias
-- App: sección "Sugeridos para ti" en tab Networking (encima del directorio)
-- Badge en card: "3 intereses en común" con los tags
-- Si el asistente no completó el survey → sección oculta con CTA "Completa tu perfil para ver sugerencias"
+**Tests Pest (7/7 ✅):**
+- [x] Asistente sin intereses registrados → `suggested_contacts` vacío, no error
+- [x] Asistente con 3 intereses comunes aparece antes que uno con 1 interés en común (ordenado DESC)
+- [x] Ya-contactos mutuos excluidos de sugerencias
+- [x] Asistentes bloqueados excluidos de sugerencias
+- [x] `networking_visible=false` excluye al asistente de sugerencias de otros
+- [x] Endpoint requiere autenticación → 401
+- [x] Incluye common_tags con labels de los intereses compartidos
 
-**Tests Pest (objetivo: ~6 tests):**
-- [ ] Asistente sin intereses registrados → `suggested_contacts` vacío, no error
-- [ ] Asistente con 3 intereses comunes aparece antes que uno con 1 interés en común (ordenado DESC)
-- [ ] Ya-contactos mutuos excluidos de sugerencias
-- [ ] Asistentes bloqueados excluidos de sugerencias
-- [ ] `networking_visible=false` excluye al asistente de sugerencias de otros
-- [ ] Endpoint requiere autenticación → 401
-
-**Definición de completado:** Asistente con intereses ve sugerencias ordenadas por compatibilidad. Sin intereses → CTA para completarlos.
+**Definición de completado:** ✅ Intereses obligatorios en onboarding, editables desde perfil. Sugerencias por compatibilidad en Networking.
 
 ---
 
