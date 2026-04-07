@@ -53,6 +53,7 @@ cada sesión más fácil de debuggear.
 | **1.15** | **Preguntas al speaker (Q&A)** | ✅ (2026-04-06) |
 | **bugs** | **Fix favoritos Mi Agenda + Q&A moderación Filament** | ✅ (2026-04-06) |
 | **1.16** | **Evaluación de sesiones** | ✅ (2026-04-06) |
+| **fix streaming** | **YouTube fix — `react-native-youtube-iframe` + lógica separada por tipo de URL** | ✅ (2026-04-07) |
 | **1.17** | **Photobooth / Memorias** | ⏳ Pendiente |
 | **1.18** | **Certificados PDF** | ⏳ Pendiente |
 | **1.19** | **Reporte post-evento PDF** | ⏳ Pendiente |
