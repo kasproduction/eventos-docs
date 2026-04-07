@@ -1480,66 +1480,67 @@ App:
 
 ---
 
-### Sesión 1.22 — Social wall
+### Sesión 1.19 — Social Wall ✅ COMPLETADA (2026-04-07)
 
-**Branch:** `feature/s122-social-wall`
+**Branch:** mergeado a `main`
 **Repos:** `eventos-backend` + `eventos-app` + `eventos-socket`
-**Nuevas dependencias:** ninguna (Socket.IO + StorageService ya existen)
 
-**Objetivo:** Feed social del evento: asistentes publican fotos/texto, comentan, dan likes. Moderación por admin.
+**Objetivo:** Feed social del evento con posts, comentarios, likes y moderación.
 
-**Scope:**
-- Tabla `wall_posts`: `event_id`, `attendee_id`, `body`, `photo_url` nullable, `status` (published/hidden), `likes_count`
-- Tabla `wall_comments`: `post_id`, `attendee_id`, `body`, `status`
-- `POST /GET /api/v1/events/{id}/wall` — crear post + listar (cursor pagination)
-- `POST /DELETE /api/v1/wall/{id}/like` — like/unlike
-- `POST /GET /api/v1/wall/{id}/comments` — comentar + listar comentarios
-- `DELETE /api/v1/admin/wall/{id}` — moderar (ocultar post/comentario)
-- Socket.IO: `wall:post` nuevo post en room `event:{id}` — feed se actualiza en tiempo real
-- Filament: `WallModerationResource` — lista posts pendientes de revisión, toggle auto-moderación
-- App: tab "Social" con feed infinito, botón + (crear post con foto opcional), comentarios, likes, reporte de contenido
+**Lo implementado:**
+- Tablas: `wall_posts` (body, photo_url, status pending/published/hidden, likes_count, comments_count), `wall_comments`, `wall_post_likes`
+- Campos en `events`: `wall_auto_approve`, `max_wall_posts_per_attendee` (toggleable + límite)
+- `POST/GET /events/{id}/wall` — crear post multipart + feed cursor paginado (solo published)
+- `POST/DELETE /events/{id}/wall/{id}/like` — like idempotente
+- `POST/GET /events/{id}/wall/{id}/comments` — comentar + listar
+- Socket.IO: `/internal/wall/broadcast` → emite `wall:post` y `wall:comment` al event room en tiempo real
+- Filament: `WallPostResource` (moderar individual/bulk, publicar/ocultar, badge pendientes) + `WallSettingsResource`
+- App: pantalla `/social` con feed (PostCards + avatar + likes + comentarios), modal crear post con foto, modal comentarios, socket real-time
+- Mensaje dinámico: auto-approve ON → "¡Publicado!" / OFF → "En revisión"
+- `WallSeeder`: 10 posts, 10 comentarios con emojis, 21 likes
 
-**Tests Pest (objetivo: ~9 tests):**
-- [ ] Post creado aparece en feed público cuando `status=published`
-- [ ] Post `hidden` no aparece en GET feed público
-- [ ] Admin oculta post → `status=hidden`, desaparece del feed
-- [ ] `POST /wall/{id}/like` agrega like, `likes_count` incrementa
-- [ ] Doble like del mismo usuario → idempotente (no duplica)
-- [ ] `DELETE /wall/{id}/like` quita like, `likes_count` decrementa
-- [ ] Comentario en post publicado → registrado en DB
-- [ ] Comentario en post `hidden` → 404 o 422 (no se puede comentar post oculto)
-- [ ] Endpoint requiere autenticación → 401
-
-**Definición de completado:** Asistente publica foto+texto → aparece en el feed de todos en tiempo real. Admin puede ocultar desde Filament.
+**Tests Pest (10/10 ✅)**
 
 ---
 
-### Sesión 1.23 — Gamification + Leaderboard
+### Sesión 1.20 — Gamification + Leaderboard ✅ COMPLETADA (2026-04-07)
 
-**Branch:** `feature/s123-gamification`
+**Branch:** mergeado a `main`
 **Repos:** `eventos-backend` + `eventos-app`
-**Nuevas dependencias:** ninguna
 
-**Objetivo:** Sistema de puntos por actividad del evento. Ranking visible para todos los asistentes.
+**Objetivo:** Sistema de puntos configurable por acción, leaderboard, trivia en stands.
 
-**Scope:**
-- Tabla `points_log`: `event_id`, `attendee_id`, `action`, `points`, `created_at`
-- Config de puntos por evento (JSON en `events.gamification_config`): check-in, evaluación sesión, publicar en social wall, conectar con asistente, visitar stand, responder encuesta, completar perfil
-- `GET /api/v1/events/{id}/leaderboard` — top 50 asistentes por puntos, incluye posición del usuario actual
-- `GET /api/v1/me/points` — mis puntos totales + log de acciones
-- Puntos se otorgan automáticamente en los hooks existentes (check-in, vote, contact accepted, etc.)
-- App: pantalla Leaderboard accesible desde home, posición propia destacada, animación al ganar puntos (Reanimated)
-- Filament: config de puntos por acción por evento, tabla de posiciones
+**Lo implementado:**
 
-**Tests Pest (objetivo: ~6 tests):**
-- [ ] Check-in otorga los puntos configurados en `gamification_config`
-- [ ] Acción sin configuración de puntos → 0 puntos, sin error
-- [ ] `GET /events/{id}/leaderboard` devuelve top 50 ordenado por puntos DESC
-- [ ] Response del leaderboard incluye la posición del usuario autenticado aunque no esté en el top 50
-- [ ] `GET /me/points` devuelve puntos totales y log de acciones del usuario autenticado
-- [ ] Puntos de otro evento no afectan al leaderboard del evento actual
+Backend:
+- `PointsService`: config toggleable por acción + puntos personalizables por evento (JSON `gamification_config`), daily_max, prevención duplicados por reference
+- `points_log`: event_id, attendee_id, action, points, reference_type, reference_id
+- `stand_trivias` + `stand_trivia_answers`: preguntas por stand con respuesta correcta y bonus_points
+- Campos en sponsors: `visit_points` (personalizable por stand), `trivia_enabled`
+- `GamificationController`: leaderboard top 50 + my_position, mis puntos con status de acciones (completada/pendiente), visit-stand con puntos por sponsor, trivia con respuesta correcta/incorrecta
+- `AwardsPoints` trait enganchado en 7 controladores: CheckinController, RatingController, QuestionController, PollController, NetworkingController (ambos ganan), WallController, EventPhotoController
+- `LikesMilestoneService`: milestones a 5/10/20/50/100 likes totales (posts+fotos), enganchado en like de wall y photos
+- Chat: puntos por sesión (1 vez) enganchado en `/internal/chat/message`
+- Puntos al aprobar posts/fotos desde Filament (no solo en auto-approve)
+- Filament: `GamificationSettingsResource` (toggles por acción + puntos), trivia como repeater en `SponsorResource`
 
-**Definición de completado:** Asistente hace check-in → gana X puntos → ve su posición en el leaderboard.
+13 acciones configurables:
+- checkin, visit_stand, stand_trivia, rate_session, ask_question, wall_post, upload_photo, likes_milestone, wall_comment (daily_max), connect, vote_poll, complete_interests, chat_session
+
+App:
+- Pantalla `/leaderboard` con 2 tabs: "Mis puntos" (total + checklist acciones con ✓/pendiente) y "Ranking" (leaderboard top 50 con medallas)
+- Botón "Registrar visita al stand" en sponsor detail → puntos + TriviaModal
+- TriviaModal: preguntas con opciones, feedback correcto/incorrecto, bonus points, navegación multi-pregunta
+- `useGamification.ts`: hooks para leaderboard, my-points, visitStand, answerTrivia
+
+Fixes incluidos:
+- `useSessionRating` reescrito con react-query en vez de MMKV — persiste correctamente en Expo Go
+- Upload foto/post: muestra mensaje real del backend (ej. "Límite alcanzado")
+- Social wall: invalida `my-points` al comentar/publicar para actualización inmediata
+
+**Tests Pest (9/9 ✅)** — 218 total suite verde
+
+**Definición de completado:** ✅ Admin configura acciones/puntos/trivias → asistente participa → gana puntos → ve checklist + ranking.
 
 ---
 
