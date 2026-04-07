@@ -59,7 +59,9 @@ cada sesión más fácil de debuggear.
 | **1.19** | **Social wall** | ✅ (2026-04-07) |
 | **1.20** | **Gamification + Leaderboard** | ✅ (2026-04-07) |
 | **1.21** | **Passport Contest (stamps por lead scan)** | ✅ (2026-04-07) |
-| ~~1.22~~ | ~~Floor plan del venue~~ | Movido a Fase 3 |
+| **1.22** | **Registro personalizable + Import/Export** | ✅ (2026-04-07) |
+| **1.23** | **Permisos granulares Filament (roles admin)** | ⏳ Pendiente |
+| ~~1.22 old~~ | ~~Floor plan del venue~~ | Movido a Fase 3 |
 | **— PDFs & Analytics (aplazados al final, después de todos los features)** | | |
 | **1.P1** | **Certificados PDF** | ⏳ Aplazado |
 | **1.P2** | **Reporte post-evento PDF** | ⏳ Aplazado |
@@ -1570,6 +1572,250 @@ Fixes incluidos:
 - [x] Endpoint requiere autenticación → 401
 
 **Definición de completado:** ✅ Vendedor escanea QR del asistente → lead + stamp + puntos → asistente ve su pasaporte actualizado.
+
+---
+
+### Sesión 1.22 — Registro personalizable + Import/Export ⏳ PENDIENTE
+
+**Branch:** `feature/s122-registro`
+**Repos:** `eventos-backend` + `eventos-app`
+**Nuevas dependencias:** `maatwebsite/excel` (backend, para import/export CSV/Excel)
+
+**Objetivo:** Registro público con campos 100% personalizables por evento, importación masiva de asistentes con link de activación, y exportación con columnas dinámicas.
+
+---
+
+#### Contexto
+
+El spec maestro (v2.5) incluye `registration_fields` y `registration_field_values` en la Sesión 2 (Auth), pero solo se implementó login por QR/email en S1.1. Esta sesión completa lo que faltó: registro público, campos dinámicos, import/export, y edición desde perfil.
+
+---
+
+#### A. Modelo de datos
+
+**Migration: `registration_fields`**
+```
+id, event_id, label, field_type, placeholder, options (JSON), 
+preset (nullable), required, editable_after (bool), sort_order,
+created_at, updated_at
+```
+
+**field_type ENUM:**
+| Tipo | Uso | Componente app |
+|------|-----|---------------|
+| `text` | Empresa, Cargo | TextInput |
+| `email` | Email alternativo | TextInput keyboardType=email |
+| `phone` | Teléfono | TextInput + prefijo país |
+| `number` | Años experiencia | TextInput keyboardType=numeric |
+| `date` | Fecha nacimiento | DatePicker nativo |
+| `url` | LinkedIn, website | TextInput keyboardType=url |
+| `textarea` | Bio, comentarios | TextInput multiline |
+| `select` | Industria (lista corta) | BottomSheet picker |
+| `searchable_select` | País, Ciudad (lista larga) | BottomSheet + buscador |
+| `checkbox` | ¿Requiere certificado? | Switch sí/no |
+| `checkbox_group` | Intereses múltiples | Lista de checkboxes, valor JSON array |
+
+**preset** (para listas largas predefinidas):
+- `null` → opciones manuales (JSON en `options`)
+- `countries` → carga lista de países
+- `cities_co` → ciudades de Colombia
+- Extensible a futuros presets
+
+**Migration: `registration_field_values`**
+```
+id, attendee_id, field_id, value (TEXT), 
+UNIQUE(attendee_id, field_id)
+```
+
+**Campos adicionales en `events`:**
+```
+registration_mode ENUM('invite_only','open','hybrid') DEFAULT 'open'
+```
+(ya existen: `registration_opens_at`, `registration_closes_at`, `registration_requires_approval`)
+
+**Campos adicionales en `users`:**
+```
+invitation_token VARCHAR(64) NULL UNIQUE
+activated_at TIMESTAMP NULL
+```
+
+---
+
+#### B. Tres flujos de ingreso
+
+**Flujo A — Registro público (open/hybrid)**
+1. Asistente abre link del evento o la app
+2. Tap "Crear cuenta" → formulario dinámico (campos fijos + campos del evento)
+3. Submit → `POST /api/v1/auth/register`
+4. Si `requires_approval=false` → auto-aprobado, token Sanctum, va al Home
+5. Si `requires_approval=true` → pantalla "Registro pendiente", email `registration_pending`
+
+**Flujo B — Importación (invite_only/hybrid)**
+1. Admin sube CSV/Excel en Filament con columnas mapeadas a registration_fields
+2. Se crean User (sin contraseña) + Attendee + registration_field_values
+3. Se envía email `InvitationMail` con link: `/join/{invitation_token}`
+4. Asistente abre link → pantalla de activación (solo contraseña + confirmar)
+5. `POST /api/v1/auth/activate` → asigna contraseña, `activated_at=now()`, token Sanctum
+
+**Opción contraseña por teléfono:** al importar, el admin puede elegir "Usar teléfono como contraseña temporal". El email dice "Tu contraseña es tu número de teléfono". Al primer login se sugiere cambiarla.
+
+**Flujo C — Híbrido**
+- `registration_mode='hybrid'`: permite import + registro público simultáneamente
+
+---
+
+#### C. Admin — Filament
+
+**RegistrationFieldResource (CRUD + reorder):**
+- Lista reordenable (drag & drop via `sort_order`)
+- Form: label, field_type (select), placeholder, options (Repeater para select/checkbox_group), preset (select condicional), required (toggle), editable_after (toggle)
+- Preview visual del formulario (opcional, nice-to-have)
+
+**ImportAction en AttendeeResource:**
+- Botón "Importar asistentes" → modal upload CSV/Excel
+- Paso 1: sube archivo
+- Paso 2: mapeo de columnas CSV → campos fijos (nombre, email, teléfono) + registration_fields del evento
+- Paso 3: elige modo contraseña (link de activación / teléfono como contraseña)
+- Paso 4: resumen + confirmar → Job en queue que crea users + attendees + field_values + envía emails
+
+**ExportAction en AttendeeResource:**
+- Botón "Exportar" → modal con opciones:
+  - Formato: CSV / Excel
+  - Columnas fijas: nombre, email, rol, estado, check-in
+  - Columnas dinámicas: cada registration_field del evento como columna
+  - Filtros: solo checked-in, solo aprobados, rango de fechas
+- Descarga directa o job en queue si > 1000 registros
+
+**Config del evento (EventResource):**
+- `registration_mode`: solo invitados / abierto / híbrido
+- `registration_requires_approval`: toggle
+- `registration_opens_at` / `registration_closes_at`: date pickers
+
+**Aprobación manual:**
+- En AttendeeResource: filtro "Pendientes de aprobación"
+- Bulk action "Aprobar seleccionados" → `registration_approved_at = now()` + email `registration_approval`
+
+---
+
+#### D. App — Expo
+
+**RegisterScreen (formulario dinámico):**
+- `GET /api/v1/events/{id}/registration-fields` → lista de campos con tipo, opciones, required, order
+- Campos fijos arriba: nombre, email, contraseña, confirmar contraseña
+- Campos dinámicos abajo: renderizados según field_type
+- Checkbox de consentimiento (privacy policy + terms) siempre al final
+- Validación en tiempo real: campos requeridos, formato email, contraseña min 8 chars
+- Botón deshabilitado hasta que todo lo requerido esté completo
+
+**ActivateAccountScreen (solo para importados):**
+- Llega por deep link `/join/{token}`
+- Muestra "¡Hola {nombre}!" + solo campos de contraseña + confirmar
+- `POST /api/v1/auth/activate`
+
+**PendingApprovalScreen:**
+- Se muestra cuando `registration_approved_at IS NULL`
+- "Tu registro está pendiente de aprobación. Te notificaremos cuando sea aprobado."
+- Pull-to-refresh o check periódico
+
+**Perfil — edición de campos de registro:**
+- `GET /api/v1/me/registration-fields` → campos con valor actual + `editable_after`
+- Campos con `editable_after=true` → editables (ícono lápiz)
+- Campos con `editable_after=false` → solo lectura (ícono candado)
+- Campos opcionales vacíos → placeholder invitando a completar
+- `PUT /api/v1/me/registration-fields` → actualiza solo campos editables
+
+---
+
+#### E. Endpoints API
+
+| Método | Ruta | Descripción | Auth |
+|--------|------|-------------|------|
+| `GET` | `/api/v1/events/{id}/registration-fields` | Campos del formulario (público) | No |
+| `POST` | `/api/v1/auth/register` | Registro público | No |
+| `POST` | `/api/v1/auth/activate` | Activar cuenta importada | No |
+| `GET` | `/api/v1/me/registration-fields` | Mis valores + editabilidad | Sí |
+| `PUT` | `/api/v1/me/registration-fields` | Editar mis campos | Sí |
+
+---
+
+#### F. Emails
+
+| Email | Trigger |
+|-------|---------|
+| `InvitationMail` | Import masivo → link de activación por asistente |
+| `RegistrationPendingMail` | Registro con requires_approval=true |
+| `RegistrationApprovalMail` | Admin aprueba registro manualmente |
+
+---
+
+#### G. Tests Pest (objetivo: ~12 tests)
+
+- [ ] `POST /register` crea user + attendee + field_values + consent_log + qr_token
+- [ ] `POST /register` con requires_approval → `registration_approved_at IS NULL`
+- [ ] `POST /register` auto-aprobado → retorna token Sanctum
+- [ ] `POST /register` valida campos required dinámicamente (falla si falta campo requerido)
+- [ ] `POST /register` rechaza si registration_mode='invite_only'
+- [ ] `POST /register` rechaza fuera de ventana (opens_at / closes_at)
+- [ ] `POST /activate` con token válido → asigna contraseña + activated_at
+- [ ] `POST /activate` con token inválido → 404
+- [ ] `GET /events/{id}/registration-fields` devuelve campos ordenados por sort_order
+- [ ] `PUT /me/registration-fields` actualiza solo campos con editable_after=true
+- [ ] `PUT /me/registration-fields` ignora campos con editable_after=false
+- [ ] Import CSV crea users + attendees + field_values (Feature test)
+
+---
+
+**Definición de completado:**
+1. Admin configura campos de registro por evento (todos los tipos) → asistente ve formulario dinámico y se registra
+2. Admin importa CSV → asistentes reciben email → activan cuenta con contraseña
+3. Admin exporta asistentes con columnas dinámicas en CSV/Excel
+4. Asistente edita sus campos opcionales desde el perfil
+5. Flujo de aprobación manual funciona end-to-end
+
+---
+
+### Sesión 1.23 — Permisos granulares Filament (roles admin) ⏳ PENDIENTE
+
+**Branch:** `feature/s123-filament-permissions`
+**Repos:** `eventos-backend`
+**Nuevas dependencias:** ninguna (Spatie ya instalado)
+
+**Objetivo:** Cada rol de admin en Filament ve y puede hacer solo lo que le corresponde. Staff separado de asistentes.
+
+---
+
+#### Roles y acceso
+
+| Rol | Acceso en Filament |
+|-----|-------------------|
+| `super_admin` | Todo — eventos, orgs, usuarios, config global |
+| `admin` | Todo de su(s) evento(s) — no ve config global ni otros eventos |
+| `admin_content` | Agenda, speakers, docs, anuncios, custom pages, banners, encuestas |
+| `admin_notifs` | Notificaciones push, emails, plantillas email |
+| `admin_analytics` | Reportes, leaderboard, ratings, logs (solo lectura) |
+| `monitor` (nuevo) | Lectura de todo el evento — no crea, no edita, no borra |
+
+#### Implementación
+
+1. **Spatie Permissions**: crear permissions granulares (`view_attendees`, `manage_sessions`, `send_notifications`, etc.) y asignarlos a cada rol
+2. **Filament Policies**: cada Resource tiene una Policy que chequea `$user->can('view_attendees')` etc.
+3. **Scope por evento**: admin/admin_* solo ven datos de eventos donde son attendee con ese rol
+4. **Staff vs Asistentes**: UserResource muestra solo staff (ya implementado), AttendeeAdminResource muestra asistentes del evento
+5. **Navigation groups**: recursos agrupados y ocultos según permisos del usuario logueado
+6. **Monitor**: rol de solo lectura — `can()` retorna true para `view*`, false para `create/update/delete`
+
+#### Tests Pest (objetivo: ~8 tests)
+
+- [ ] super_admin ve todos los recursos
+- [ ] admin_content solo ve sesiones, speakers, docs, anuncios
+- [ ] admin_notifs solo ve notificaciones y emails
+- [ ] admin_analytics solo ve reportes (read-only)
+- [ ] monitor puede ver pero no crear/editar/borrar
+- [ ] admin no ve eventos de otra organización
+- [ ] attendee normal no puede acceder al panel Filament
+- [ ] Permisos se asignan correctamente al crear admin desde Filament
+
+**Definición de completado:** Cada rol ve exactamente lo que debe ver, no puede acceder a lo que no le corresponde, y los tests lo verifican.
 
 ---
 
