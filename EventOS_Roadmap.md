@@ -1641,12 +1641,12 @@ Fixes incluidos:
 - [x] **Tab Inicio del vendedor** — card resumen: leads hoy, total leads, equipo activo
 - [x] **Módulos visibles por rol** — vendedor ahora tiene anuncios, patrocinadores, encuestas + template seeder actualizado
 - [x] **Reset onboarding** — botón "Ver introducción de nuevo" en perfil (3 roles)
-- [ ] **Fix z-index controles onboarding** — `AnimatedFlatList` puede quedar encima de botones en Android (requiere dev build para probar)
+- [ ] **Fix z-index controles onboarding** — requiere dev build para probar → mover a sesión de deploy
 - [x] **Refetch automático** — `refetchInterval` en wall (30s), leaderboard (30s), mis puntos (15s), passport (15s), fotos (30s)
 
 ### Backend / Filament
-- [ ] **Tracking de aperturas email (pixel 1×1)** — columna `opened_at` en `email_logs`, endpoint `GET /track/email/{token}` devuelve imagen transparente 1×1 y registra apertura, pixel inyectado en layout base `BaseEventosMail`. Tasa apertura en `EmailLogResource`. Nota: Gmail bloquea imágenes por defecto; Apple Mail iOS 15+ pre-carga (falsos positivos). Útil como referencia.
-- [ ] **Admin módulos — rediseño form de creación** — Select "Tipo de módulo" → auto-rellena slug/nombre/icono/roles. Si es custom → campos controlados (URL iframe, permisos sandbox). Sin JSON libre.
+- ~~Tracking de aperturas email (pixel 1×1)~~ → movido a Fase 3
+- [x] **Admin módulos — rediseño form de creación** — Select "Tipo de módulo" con presets → auto-rellena slug/nombre/ícono/roles. Custom disponible.
 - [x] **Speaker ↔ Sesión bidireccional en Filament** — SpeakersRelationManager en EventSessionResource (attach/detach)
 
 ### Pendiente para Web (Fase 2)
