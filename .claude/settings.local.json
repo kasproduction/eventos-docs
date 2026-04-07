@@ -184,7 +184,8 @@
       "Bash(winget install:*)",
       "Bash(export PATH=\"$PATH:/c/Program Files/k6\")",
       "Bash(php tests/load/setup-tokens.php)",
-      "Bash(k6 run:*)"
+      "Bash(k6 run:*)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\)['data']; print\\(f\\\\\"mode={d['registration_mode']} enabled={d['registration_enabled']} fields={len\\(d['fields']\\)}\\\\\"\\)\")"
     ]
   }
 }
