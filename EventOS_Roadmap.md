@@ -1280,26 +1280,28 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 
 **Lo implementado:**
 - Migración `session_ratings`: `session_id`, `attendee_id`, `rating` (unsignedTinyInteger 1-5), `comment` nullable
-- UNIQUE `(session_id, attendee_id)` — una evaluación por sesión por asistente
-- `POST /api/v1/events/{eventId}/sessions/{sessionId}/rate` — valida `status=finished`, evita duplicados (409)
+- UNIQUE `(session_id, attendee_id)` — una evaluación por sesión por asistente (backend previene doble voto)
+- `POST /api/v1/events/{eventId}/sessions/{sessionId}/rate` — disponible en cualquier estado de sesión, evita duplicados (409)
 - `GET /api/v1/events/{eventId}/sessions/{sessionId}/ratings` — promedio, distribución 1-5, comentarios (solo organizer/moderador)
-- Filament `SessionRatingResource`: lista con evento/sesión/asistente/rating-estrellas, export CSV, badge con conteo diario
-- App `useSessionRating`: `submitRating` + `hasRated` con persistencia MMKV por evento
-- App `RatingModal`: bottom sheet, 5 estrellas interactivas, etiqueta por valor, comentario opcional
-- `session-stream/[id].tsx`: muestra modal automáticamente si `status=finished` y no evaluada (1.5s delay)
-- `AgendaScreen` (Mi Agenda): botón "Evaluar" en sesiones finalizadas + `RatingModal` integrado
+- Filament `SessionRatingResource`: lista con evento/sesión/asistente/rating-estrellas, export CSV, badge, infolist en vista detalle
+- App `useSessionRating`: `submitRating` + persistencia MMKV `{sessionId: rating}` por evento
+- App `RatingModal`: bottom sheet, 5 estrellas interactivas, reset automático al abrir, etiqueta por valor, comentario opcional
+- `AgendaScreen`: botón "Evaluar" en todas las sesiones; tras calificar muestra `★★★☆☆ Mi nota` bloqueado (re-render con `localRatings` state)
+- `session-stream/[id].tsx`: modal automático si `status=finished` y no evaluada (1.5s delay)
+- Fix: `SelectFilter` con relación anidada removido (Filament no soporta dot notation en filtros)
+- Fix: 409 del backend también marca la sesión como evaluada localmente
 
 **Tests Pest (8/8 ✅):**
 - [x] Asistente envía evaluación → registrada en DB
 - [x] Evaluación sin comentario válida (campo nullable)
-- [x] Solo permitido cuando `status=finished` → sesión activa retorna 422
+- [x] Evaluar sesión en cualquier estado es permitido
 - [x] Segundo rating del mismo asistente → 409
 - [x] Endpoint requiere autenticación → 401
 - [x] Admin obtiene promedio correcto (4,5,3 → avg 4.0)
 - [x] GET ratings filtra por sesión correcta (no mezcla otras sesiones)
 - [x] Asistente no puede ver ratings de admin → 403
 
-**Definición de completado:** ✅ Sesión finalizada → asistente ve modal de evaluación → evalúa → admin ve promedio y distribución en Filament.
+**Definición de completado:** ✅ Asistente evalúa → botón cambia a estrellas read-only → admin ve lista y detalle en Filament → backend previene doble voto con UNIQUE.
 
 ---
 
