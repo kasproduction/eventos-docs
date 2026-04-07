@@ -59,7 +59,7 @@ cada sesión más fácil de debuggear.
 | **1.19** | **Social wall** | ✅ (2026-04-07) |
 | **1.20** | **Gamification + Leaderboard** | ✅ (2026-04-07) |
 | **1.21** | **Passport Contest (stamps por lead scan)** | ✅ (2026-04-07) |
-| **1.22** | **Floor plan del venue** | ⏳ Pendiente |
+| ~~1.22~~ | ~~Floor plan del venue~~ | Movido a Fase 3 |
 | **— PDFs & Analytics (aplazados al final, después de todos los features)** | | |
 | **1.P1** | **Certificados PDF** | ⏳ Aplazado |
 | **1.P2** | **Reporte post-evento PDF** | ⏳ Aplazado |
