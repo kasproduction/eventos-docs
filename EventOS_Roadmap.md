@@ -2365,8 +2365,29 @@ Página pública premium del evento con registro embebido. Login solo en app mó
 
 ---
 
-_EventOS Plan v2.2 — Kasproduction_
+## Apéndice C: Compliance de Seguridad (2026-04-07)
+
+> Documento detallado: `docs/COMPLIANCE-SEGURIDAD.md`
+
+Documento formal de compliance que cubre:
+- Alineación OWASP Top 10 (2021) — los 10 riesgos cubiertos con controles y evidencia
+- Protocolos y certificados digitales (TLS 1.2+, SHA-256, key management)
+- 7 cabeceras de seguridad HTTP implementadas y testeadas
+- Validación de entrada en capas (Cloudflare WAF → middleware → FormRequest → model sanitization)
+- Controles ISO 27001 — Confidencialidad, Integridad, Disponibilidad
+- Cumplimiento Ley 1581 (Habeas Data Colombia) + GDPR
+- 43 tests de seguridad (82 assertions) + 278 tests totales
+- Diagrama de infraestructura completo
+- Plan de mejora continua (audits, pentesting, backups, monitoring)
+- Inventario de gestión de vulnerabilidades con proceso de remediación
+
+**Uso:** Presentar a clientes corporativos, auditorías de seguridad, licitaciones, o como evidencia de compliance.
+
+---
+
+_EventOS Plan v2.3 — Kasproduction_
 _Documento maestro: EventOS_ClaudeCode_Prompt_v2.md (v2.5)_
 _Dev setup: EventOS_DevSetup.md_
 _Seguridad: docs/FASE-SEGURIDAD.md_
+_Compliance: docs/COMPLIANCE-SEGURIDAD.md_
 _UI/UX + Landing: docs/ROADMAP-UIUX-LANDING.md_
