@@ -163,7 +163,28 @@
       "Bash(keytool -list -v -keystore \"/c/Users/Kasproduction/.android/debug.keystore\" -alias androiddebugkey -storepass android -keypass android)",
       "Bash(echo \"sdk.dir=C\\\\:\\\\\\\\Users\\\\\\\\Kasproduction\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Android\\\\\\\\Sdk\")",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d.get\\('project_id',''\\), d.get\\('client_email',''\\)\\)\")",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(php -r 'require '\\\\''vendor/autoload.php'\\\\''; require '\\\\''bootstrap/app.php'\\\\''; $r = new App\\\\Filament\\\\Resources\\\\OrganizationEmailSettingsResource\\(\\); echo '\\\\''OK: '\\\\'' . get_class\\($r\\);')",
+      "Bash(php -r ':*)",
+      "Bash(php -l \"C:/laragon/www/eventos-backend/app/Filament/Resources/SponsorResource.php\")",
+      "Bash(php -l \"C:/laragon/www/eventos-backend/app/Filament/Resources/SpeakerResource.php\")",
+      "Bash(php -l \"C:/laragon/www/eventos-backend/app/Filament/Resources/DocumentResource.php\")",
+      "Bash(php -l \"C:/laragon/www/eventos-backend/app/Filament/Components/ImageUploadField.php\")",
+      "Bash(php -l \"C:/laragon/www/eventos-backend/app/Services/StorageService.php\")",
+      "Bash(git:*)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(cp \"/c/Users/Kasproduction/Projects/eventos-app/app/\\(app\\)/\\(presencial\\)/\\(tabs\\)/agenda.tsx\" \"/c/Users/Kasproduction/Projects/eventos-app/app/\\(app\\)/\\(presencial\\)/\\(tabs\\)/mi-agenda.tsx\")",
+      "Bash(rm \"/c/Users/Kasproduction/Projects/eventos-app/app/\\(app\\)/\\(presencial\\)/\\(tabs\\)/agenda.tsx\")",
+      "Bash(cp \"/c/Users/Kasproduction/Projects/eventos-app/app/\\(app\\)/\\(virtual\\)/\\(tabs\\)/agenda.tsx\" \"/c/Users/Kasproduction/Projects/eventos-app/app/\\(app\\)/\\(virtual\\)/\\(tabs\\)/mi-agenda.tsx\")",
+      "Bash(rm \"/c/Users/Kasproduction/Projects/eventos-app/app/\\(app\\)/\\(virtual\\)/\\(tabs\\)/agenda.tsx\")",
+      "Bash(xargs basename:*)",
+      "Bash(k6 version:*)",
+      "Bash(choco --version)",
+      "Bash(winget --version)",
+      "Bash(winget install:*)",
+      "Bash(export PATH=\"$PATH:/c/Program Files/k6\")",
+      "Bash(php tests/load/setup-tokens.php)",
+      "Bash(k6 run:*)"
     ]
   }
 }
