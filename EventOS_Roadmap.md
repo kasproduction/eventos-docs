@@ -2385,9 +2385,53 @@ Documento formal de compliance que cubre:
 
 ---
 
-_EventOS Plan v2.3 — Kasproduction_
+## Apéndice D: Alta Disponibilidad — 99.99% Uptime (2026-04-07)
+
+> Documento detallado: `docs/DISPONIBILIDAD-HA.md`
+
+### Arquitectura target
+
+- **2 VPS** idénticos (Hetzner CX22, ~$5 c/u) — stateless, intercambiables
+- **PlanetScale** — MySQL managed con réplicas y failover automático (99.99% SLA)
+- **Upstash** — Redis managed con persistencia y TLS (99.99% SLA)
+- **Cloudflare** — Load balancer con health checks cada 30s + failover automático + WAF + DDoS
+- **Cloudflare R2** — Storage distribuido globalmente (ya implementado)
+
+### Garantías
+
+| Métrica | Valor |
+|---------|-------|
+| Uptime | 99.99% (~52 min downtime/año) |
+| RPO (pérdida máxima de datos) | < 12 horas |
+| RTO (tiempo de recuperación) | < 5 minutos |
+| Failover automático | < 30 segundos |
+| DDoS protection | Incluida (Cloudflare Tbps) |
+
+### Por qué funciona
+
+Ningún componente es punto único de falla:
+- VPS muere → Cloudflare redirige al otro en <30s
+- MySQL muere → PlanetScale failover automático en <5s
+- Redis muere → Upstash failover automático en <3s
+- DDoS → Cloudflare absorbe sin tocar los VPS
+
+### Costo
+
+| Escenario | Costo/mes |
+|-----------|-----------|
+| Hasta 3,000 usuarios concurrentes | ~$75/mes |
+| Hasta 10,000 usuarios concurrentes | ~$160/mes |
+
+### Deploy strategy
+
+Blue-green con zero downtime: deploy en VPS-2 mientras VPS-1 sirve, luego swap. Si falla → rollback instantáneo.
+
+---
+
+_EventOS Plan v2.4 — Kasproduction_
 _Documento maestro: EventOS_ClaudeCode_Prompt_v2.md (v2.5)_
 _Dev setup: EventOS_DevSetup.md_
 _Seguridad: docs/FASE-SEGURIDAD.md_
 _Compliance: docs/COMPLIANCE-SEGURIDAD.md_
+_Disponibilidad: docs/DISPONIBILIDAD-HA.md_
 _UI/UX + Landing: docs/ROADMAP-UIUX-LANDING.md_
