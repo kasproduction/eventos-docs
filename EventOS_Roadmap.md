@@ -55,15 +55,16 @@ cada sesión más fácil de debuggear.
 | **1.16** | **Evaluación de sesiones** | ✅ (2026-04-06) |
 | **fix streaming** | **YouTube fix — `react-native-youtube-iframe` + lógica separada por tipo de URL** | ✅ (2026-04-07) |
 | **1.17** | **Photobooth / Memorias** | ✅ (2026-04-07) |
-| **1.18** | **Certificados PDF** | ⏳ Pendiente |
-| **1.19** | **Reporte post-evento PDF** | ⏳ Pendiente |
-| **1.20** | **Analytics avanzado** | ⏳ Pendiente |
-| **1.21** | **Matchmaking por intereses** | ⏳ Pendiente |
-| **1.22** | **Social wall** | ⏳ Pendiente |
-| **1.23** | **Gamification + Leaderboard** | ⏳ Pendiente |
-| **1.24** | **Passport Contest (stamps QR de stands)** | ⏳ Pendiente |
-| **1.25** | **Floor plan del venue** | ⏳ Pendiente |
-| **1.26** | **Reports exportables detallados** | ⏳ Pendiente |
+| **1.18** | **Matchmaking por intereses** | ✅ (2026-04-07) |
+| **1.19** | **Social wall** | ⏳ Pendiente |
+| **1.20** | **Gamification + Leaderboard** | ⏳ Pendiente |
+| **1.21** | **Passport Contest (stamps QR de stands)** | ⏳ Pendiente |
+| **1.22** | **Floor plan del venue** | ⏳ Pendiente |
+| **— PDFs & Analytics (aplazados al final, después de todos los features)** | | |
+| **1.P1** | **Certificados PDF** | ⏳ Aplazado |
+| **1.P2** | **Reporte post-evento PDF** | ⏳ Aplazado |
+| **1.P3** | **Analytics avanzado** | ⏳ Aplazado |
+| **1.P4** | **Reports exportables detallados** | ⏳ Aplazado |
 | **1.x Pulido** | **Pulido funcional (mejoras pre-deploy)** | ⏳ Pendiente |
 | **1.x Stress** | **Stress & Load Testing (k6)** | ⏳ Pendiente |
 | **Sesión UI** | **Barrido visual completo** | ⏳ Pendiente (última antes de deploy) |
