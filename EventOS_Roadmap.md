@@ -1575,7 +1575,7 @@ Fixes incluidos:
 
 ---
 
-### Sesión 1.22 — Registro personalizable + Import/Export ⏳ PENDIENTE
+### Sesión 1.22 — Registro personalizable + Import/Export ✅ COMPLETADA (2026-04-07)
 
 **Branch:** `feature/s122-registro`
 **Repos:** `eventos-backend` + `eventos-app`
@@ -1765,12 +1765,26 @@ activated_at TIMESTAMP NULL
 
 ---
 
-**Definición de completado:**
+**Lo implementado (adicional al plan original):**
+- [x] Toggle `registration_enabled` manual en Filament (independiente de fechas)
+- [x] Plantilla de importación descargable (CSV/Excel con headers dinámicos)
+- [x] Pantalla PendingApproval con botón "Verificar estado" + bloqueo en app layout
+- [x] Deep link `/join/{token}` → web route → `eventos://activate-account?token=`
+- [x] Checkbox de consentimiento visible (Ley 1581) — no hardcoded
+- [x] Validación `max_attendees` antes de permitir registro
+- [x] `AttendeeResource` expone `registration_approved_at` al frontend
+- [x] Link "Regístrate" en el login del onboarding (donde realmente se ve)
+- [x] Staff/Admins separados de Asistentes en Filament (UserResource filtrado)
+- [x] Seeder con 10 campos de ejemplo (todos los tipos)
+
+**Definición de completado:** ✅
 1. Admin configura campos de registro por evento (todos los tipos) → asistente ve formulario dinámico y se registra
 2. Admin importa CSV → asistentes reciben email → activan cuenta con contraseña
 3. Admin exporta asistentes con columnas dinámicas en CSV/Excel
 4. Asistente edita sus campos opcionales desde el perfil
 5. Flujo de aprobación manual funciona end-to-end
+6. Registro se bloquea si disabled, invite_only, fuera de ventana, o evento lleno
+7. Checkbox consentimiento obligatorio (Ley 1581)
 
 ---
 
