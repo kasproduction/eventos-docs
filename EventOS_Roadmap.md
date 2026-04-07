@@ -54,7 +54,7 @@ cada sesión más fácil de debuggear.
 | **bugs** | **Fix favoritos Mi Agenda + Q&A moderación Filament** | ✅ (2026-04-06) |
 | **1.16** | **Evaluación de sesiones** | ✅ (2026-04-06) |
 | **fix streaming** | **YouTube fix — `react-native-youtube-iframe` + lógica separada por tipo de URL** | ✅ (2026-04-07) |
-| **1.17** | **Photobooth / Memorias** | ⏳ Pendiente |
+| **1.17** | **Photobooth / Memorias** | ✅ (2026-04-07) |
 | **1.18** | **Certificados PDF** | ⏳ Pendiente |
 | **1.19** | **Reporte post-evento PDF** | ⏳ Pendiente |
 | **1.20** | **Analytics avanzado** | ⏳ Pendiente |
@@ -1306,32 +1306,61 @@ CLOUDFLARE_R2_PUBLIC_URL=   # https://pub-<hash>.r2.dev
 
 ---
 
-### Sesión 1.17 — Photobooth / Memorias
+### Sesión 1.17 — Photobooth / Memorias ✅ COMPLETADA (2026-04-07)
 
-**Branch:** `feature/s117-photobooth`
+**Branch:** `feature/s117-photobooth` → mergeado a `main`
 **Repos:** `eventos-backend` + `eventos-app`
-**Nuevas dependencias:** `expo-image-picker` (puede ya estar instalado desde uploads)
+**Nuevas dependencias:** `expo-image-picker`
 
 **Objetivo:** Asistentes suben fotos del evento. Galería compartida moderada por admin.
 
-**Scope:**
-- Tabla `event_photos`: `event_id`, `attendee_id`, `photo_url`, `caption`, `status` (pending/approved/rejected), `likes_count`
-- `POST /api/v1/events/{id}/photos` — subir foto (multipart → R2/StorageService)
-- `GET /api/v1/events/{id}/photos` — galería pública (solo aprobadas, paginada)
-- `POST /DELETE /api/v1/photos/{id}/like` — dar/quitar like
-- Filament: moderar fotos (aprobar/rechazar), toggle moderación (auto-aprobar o manual)
-- App: tab "Fotos" en home, camera roll picker, galería grid, likes inline
+**Lo implementado:**
 
-**Tests Pest (objetivo: ~7 tests):**
-- [ ] Foto subida queda en `status=pending` (moderación manual activa)
-- [ ] Foto `pending` no aparece en GET galería pública
-- [ ] Admin aprueba → aparece en galería pública
-- [ ] Admin rechaza → no aparece en galería pública
-- [ ] `POST /photos/{id}/like` agrega like, registra en DB
-- [ ] Doble like del mismo usuario → idempotente (no duplica `likes_count`)
-- [ ] `DELETE /photos/{id}/like` quita like correctamente
+Backend:
+- Migración `event_photos`: `event_id`, `attendee_id`, `photo_url`, `caption`, `status` (pending/approved/rejected), `likes_count`
+- Migración `event_photo_likes`: UNIQUE(`event_photo_id`, `attendee_id`) — like idempotente
+- Migración `events` +2 columnas: `photos_auto_approve` (bool), `max_photos_per_attendee` (int, 0=sin límite)
+- `POST /api/v1/events/{id}/photos` — multipart → StorageService → R2/disco. Respeta auto-aprobación y límite por asistente
+- `GET /api/v1/events/{id}/photos` — galería pública (solo approved, paginada con likes y `liked` boolean)
+- `GET /api/v1/events/{id}/photos/mine` — mis fotos (pending + approved, sin rechazadas)
+- `POST /api/v1/events/{id}/photos/{id}/like` — like idempotente (firstOrCreate + increment)
+- `DELETE /api/v1/events/{id}/photos/{id}/like` — unlike (decrement)
+- Filament `EventPhotoResource` (grupo Interacción): lista con thumbnail, estado badge, moderar individual y bulk (aprobar/rechazar), badge fotos pendientes en nav
+- Filament `EventPhotoSettingsResource` (grupo Interacción): toggle auto-aprobar + límite por asistente por evento
+- `EventPhoto` model + `EventPhotoLike` model + `EventPhotoFactory`
+- `PhotoSeeder`: 8 fotos de prueba (6 approved, 1 pending, 1 rejected) con likes entre asistentes
+- Módulo `fotos` agregado al `ModuleTemplateSeeder` (template congreso, sort_order 12)
 
-**Definición de completado:** Asistente sube foto → admin aprueba → aparece en galería de todos. Likes funcionan en tiempo real.
+App:
+- `expo-image-picker` instalado + permiso iOS en `app.json`
+- `api.upload()` — método multipart/form-data en `lib/api.ts` (timeout 30s)
+- `fixStorageUrl()` — reemplaza hostname local (`eventos-backend.test`) por IP del `.env` para desarrollo
+- `hooks/usePhotos.ts`: `usePhotoGallery` (approved paginadas), `useMyPhotos` (pending+approved propias), `usePhotoActions` (upload + toggleLike optimistic)
+- `app/(app)/fotos.tsx`: pantalla completa con 2 tabs (Galería / Mis fotos)
+  - Galería: grid 3 columnas (FlashList), pull-to-refresh, likes optimísticos
+  - Mis fotos: lista con estado (✓ Publicada / ⏳ En revisión)
+  - Modal subir: `ImagePicker`, preview, caption (max 200), feedback post-subida
+  - Modal visor fullscreen: **swipe horizontal** (FlatList paginado), like, caption+autor, indicador "3/6"
+- `ModuleMenu.tsx`: slugs `fotos`, `photobooth`, `memorias` → `/fotos` + emoji `camera`/`photo`/`image`
+- Fotos rechazadas: simplemente no se muestran (ni al dueño). El dueño puede volver a subir sin penalización.
+
+**Tests Pest (8/8 ✅):**
+- [x] Foto subida queda en `status=pending` (moderación manual activa)
+- [x] Con auto-aprobación activada → `status=approved`
+- [x] Foto `pending` no aparece en GET galería pública
+- [x] Admin aprueba → aparece en galería pública
+- [x] Foto rechazada no aparece en galería pública
+- [x] `POST /photos/{id}/like` agrega like, incrementa `likes_count`
+- [x] Doble like del mismo usuario → idempotente (no duplica)
+- [x] `DELETE /photos/{id}/like` quita like correctamente
+
+**Notas técnicas:**
+- Likes sin Socket.IO — optimistic update en frontend + fetch al refrescar. No vale la complejidad de socket para contadores de likes.
+- URLs de storage en desarrollo: `eventos-backend.test` no es resoluble desde el celular. `fixStorageUrl()` reemplaza por la IP del `EXPO_PUBLIC_API_URL`. En producción con R2 las URLs son absolutas y no necesitan reemplazo.
+- FlashList v2 no tiene `estimatedItemSize` — removido.
+- Límite de fotos: solo cuenta `pending` + `approved` (rechazadas no penalizan al asistente).
+
+**Definición de completado:** ✅ Asistente sube foto → admin aprueba en Filament → aparece en galería de todos → swipe entre fotos → likes optimísticos.
 
 ---
 
