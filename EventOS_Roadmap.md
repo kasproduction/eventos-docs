@@ -1814,9 +1814,10 @@ activated_at TIMESTAMP NULL
 1. **Spatie Permissions**: crear permissions granulares (`view_attendees`, `manage_sessions`, `send_notifications`, etc.) y asignarlos a cada rol
 2. **Filament Policies**: cada Resource tiene una Policy que chequea `$user->can('view_attendees')` etc.
 3. **Scope por evento**: admin/admin_* solo ven datos de eventos donde son attendee con ese rol
-4. **Staff vs Asistentes**: UserResource muestra solo staff (ya implementado), AttendeeAdminResource muestra asistentes del evento
-5. **Navigation groups**: recursos agrupados y ocultos según permisos del usuario logueado
-6. **Monitor**: rol de solo lectura — `can()` retorna true para `view*`, false para `create/update/delete`
+4. **Selector de evento activo**: dropdown en header de Filament → filtra TODOS los Resources al evento seleccionado (session-based)
+5. **Staff vs Asistentes**: UserResource muestra solo staff (ya implementado), AttendeeAdminResource muestra asistentes del evento
+6. **Navigation groups**: recursos agrupados y ocultos según permisos del usuario logueado
+7. **Monitor**: rol de solo lectura — `can()` retorna true para `view*`, false para `create/update/delete`
 
 #### Tests Pest (objetivo: ~8 tests)
 
@@ -2019,10 +2020,27 @@ activated_at TIMESTAMP NULL
 
 | Sesión | Feature                         | Nuevas deps cuando llegue                     |
 | ------ | ------------------------------- | --------------------------------------------- |
-| 3.1    | Multi-tenant + gestión de orgs  | ninguna nueva                                 |
+| 3.1    | Multi-tenant + aislamiento de recursos | ninguna nueva                          |
 | 3.2    | Stripe + facturación            | `laravel/cashier`                             |
 | 3.3    | Data export (Ley 1581/GDPR)     | ninguna nueva                                 |
 | 3.4    | Juegos Unity + Socket.IO bridge | `socket.io-client` Unity, Reanimated gestures |
+
+**S3.1 — Multi-tenant + aislamiento de recursos (detalle):**
+
+El problema: actualmente todos los eventos comparten servidor, BD, Redis, queues. Un evento de 5000 personas que sature la CPU tumba al de 100 personas.
+
+Niveles de aislamiento a implementar:
+1. **Queue isolation**: queues separadas por organización/evento (Horizon supervisors dedicados)
+2. **Rate limiting por evento**: Nginx/Laravel throttle scoped a event_id, no global
+3. **Redis databases**: cache (DB 0), queues (DB 1), sockets (DB 2) — ya parcial, falta por evento
+4. **Database read replicas**: queries pesadas (analytics, exports) van a réplica de lectura
+5. **Container isolation**: Docker Compose con recursos limitados por org (CPU/memory limits)
+6. **Database por organización** (opcional, máximo aislamiento): cada org tiene su propia BD, solo la BD maestra tiene orgs+billing
+
+Estrategia incremental:
+- Deploy inicial: 1 servidor, mitigado con caching + queues + rate limiting (suficiente para < 5 eventos simultáneos)
+- Primer cliente grande: horizontal scaling (2+ workers + load balancer + read replica)
+- SaaS público: container isolation + DB por org
 
 ---
 
