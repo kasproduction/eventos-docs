@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Documento de planificación para la fase UI/UX de EventOS.
-> Fecha: 2026-04-07 | Estado: Planificación
+> Fecha: 2026-04-07 | Actualizado: 2026-04-08 | Estado: En Progreso (Paso 5 — Barrido Visual)
 
 ---
 
@@ -291,11 +291,17 @@ El sistema de diseño ya está definido en `design/stitch/`. Resumen ejecutivo:
 ### Fase UI/UX — Orden sugerido
 
 ```
-PASO 1: Fundamentos
-├── Design system tokens en React Native (colores, tipografía, spacing)
-├── Componentes base: Button, Card, Input, NavBar (Lumina Noir)
-├── Skeleton loading components
-└── Glassmorphism NavBar
+PASO 1: Fundamentos ✅ COMPLETADO (2026-04-07/08)
+├── [x] Design system tokens en React Native (colores, tipografía, spacing)
+├── [x] ThemeProvider + fuentes PlusJakartaSans/Inter cargadas
+├── [x] FloatingTabBar glassmorphism con blur + safe area
+├── [x] Transiciones animadas entre tabs (lift animation, labels, haptic)
+├── [x] LuminaToast system (glass card, spring, auto-dismiss, variantes)
+├── [x] ScreenWrapper para stack screens (sin flash blanco Android)
+├── [x] app.json backgroundColor #0e0e0e (window nativo Android)
+├── [x] Todos los layouts con contentStyle + sceneStyle dark
+├── [ ] Componentes base reutilizables: Button, Card, Input (pendiente extraer)
+└── [ ] Skeleton loading components
 
 PASO 2: Landing Web
 ├── Estructura HTML/CSS (o Next.js)
@@ -322,14 +328,46 @@ PASO 4: Estados del Evento
 ├── Certificados de asistencia
 └── NPS survey post-evento
 
-PASO 5: Barrido Visual App
-├── Aplicar Lumina Noir a TODAS las pantallas existentes
-├── Transiciones y animaciones
-├── Haptic feedback
-├── Empty states ilustrados
-├── Pull-to-refresh custom
-├── Onboarding slides
-└── QA visual completo
+PASO 5: Barrido Visual App — EN PROGRESO
+├── Pantallas completadas (2026-04-07):
+│   ├── [x] Home: Header configurable, Hero text/image, HappeningNow crossfade
+│   ├── [x] Home: GamificationHud con RGB border + carousel integrado
+│   ├── [x] Mi QR tab con diseño premium
+│   └── [x] Módulos fijos (Agenda, Networking, Sponsors, Social, QR)
+├── Pantallas completadas (2026-04-08):
+│   ├── [x] Agenda: Lumina Noir, day strip Fever-style, timeline, glass cards
+│   ├── [x] Agenda: Track filter, session states (live/finished/upcoming)
+│   ├── [x] Agenda: Corazón animado con partículas, toast favoritos
+│   ├── [x] Agenda: Calendario nativo (expo-calendar) + fallback Google Calendar
+│   ├── [x] Agenda: DaySlide direccional al cambiar día
+│   ├── [x] FloatingTabBar: Lift animation, labels siempre visibles, sin círculos
+│   ├── [x] FloatingTabBar: QR icon unificado, 5 tabs uniformes
+│   ├── [x] Highlights: modelo, migration, Filament resource, API, seeder, carousel integrado
+│   ├── [x] Session status unificado: lib/sessionStatus.ts (tiempo real, no hardcoded)
+│   ├── [x] Seeder fechas relativas (hoy/mañana, sesión live automática)
+│   ├── [x] Server time offset (hora del servidor vs dispositivo)
+│   ├── [x] Streaming screen: header premium (titulo, speaker, empresa, separador)
+│   ├── [x] Flash blanco Android: app.json + layouts + ScreenWrapper
+│   ├── [x] buildStreamParams compartido (Agenda + HappeningNow → mismos datos)
+│   ├── [x] Highlights auto-refresh (refetchOnWindowFocus)
+│   ├── [x] Hero: numberOfLines + lineHeight fix (letras cortadas)
+│   ├── [x] HappeningNow: altura fija uniforme entre slides
+│   └── [x] Filament: limites caracteres hero, fix emoji SVG
+├── Pantallas pendientes:
+│   ├── [ ] Networking / Chat ← SIGUIENTE
+│   ├── [ ] Sponsors / Stands
+│   ├── [ ] Social Wall
+│   ├── [ ] Gamificación / Leaderboard
+│   ├── [ ] Perfil / Settings
+│   ├── [ ] Q&A en vivo
+│   ├── [ ] Encuestas
+│   ├── [ ] Photobooth / Galería
+│   ├── [ ] Matchmaking
+│   └── [ ] Registro (onboarding)
+├── [ ] Empty states ilustrados
+├── [ ] Pull-to-refresh custom
+├── [ ] Onboarding slides
+└── [ ] QA visual completo
 
 PASO 6: Admin Premium
 ├── Dashboard analytics
