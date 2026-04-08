@@ -2428,7 +2428,43 @@ Blue-green con zero downtime: deploy en VPS-2 mientras VPS-1 sirve, luego swap. 
 
 ---
 
-_EventOS Plan v2.4 — Kasproduction_
+---
+
+## Apendice C: UI/UX Premium (Dark Theme) — Implementado 2026-04-07
+
+### Fundamentos
+- Plus Jakarta Sans + Inter (expo-google-fonts)
+- Dark palette: #0e0e0e background, tonal surfaces, dynamic accent color
+- ThemeStore (Zustand) + useBranding hook con auto-sync
+- SafeArea (useSafeAreaInsets) en todas las pantallas
+- StatusBar light mode
+
+### Floating Tab Bar
+- Pill flotante con expo-blur, spring animations, haptic feedback
+- MaterialCommunityIcons filled/outline per active state
+- Mi QR como boton central (navega a stack screen)
+- TabScreenWrapper: fade + slide-up entre tabs
+
+### Home Screen Redesign
+- HomeHeader: logo/texto configurable + campana notificaciones (anuncios)
+- HomeHero: modo texto (label + titulo + highlight accent) o imagen
+- HappeningNow: carousel crossfade (6s) de sesiones live/proximas
+- GamificationHud: RGB border animado, rank HUD, barras progreso, breathe text
+- ModuleMenu: 4 modulos fijos (Agenda, Speakers, Social, Sponsors) con cascade animation
+
+### Backend: Branding API
+- GET /events/{id}/branding: primary_color, primary_text_color, header_title, hero_type/label/title/highlight/image/video/overlay
+- Filament EventBrandingResource con color picker + campos condicionales
+- favorites_count en EventSessionResource
+
+### Bugs corregidos
+- start_datetime/end_datetime -> start/end (coincidia con API real)
+- Pressable function style no aplica backgroundColor en Android
+- favoritedBy (no favorites) en withCount
+
+---
+
+_EventOS Plan v2.5 — Kasproduction_
 _Documento maestro: EventOS_ClaudeCode_Prompt_v2.md (v2.5)_
 _Dev setup: EventOS_DevSetup.md_
 _Seguridad: docs/FASE-SEGURIDAD.md_
