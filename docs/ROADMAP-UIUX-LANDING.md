@@ -257,17 +257,17 @@ Nos vemos!
 El sistema de diseño ya está definido en `design/stitch/`. Resumen ejecutivo:
 
 ### Lumina Noir (Dark — Principal)
-- Background: `#0e0e0e` / `#000000`
-- Accent: `#D1FC00` (Neon Lime) / `#F4FFC6` (Pistachio Glow)
-- Fuentes: Plus Jakarta Sans (headlines) + Inter (body)
-- Bordes: NO. Separación por cambio tonal
+- Background: `#0e0e0e` / `#0a0a0a`
+- Accent: `#FFFFFF` por defecto, configurable por evento via `primary_color`
+- Fuentes: Plus Jakarta Sans (headlines) + Urbanist (body) — NO Inter, NO Space Grotesk
+- Bordes: NO visibles. Separación por cambio tonal (rgba white 0.03-0.06)
 - Elevación: Glassmorphism + backdrop blur, no drop shadows
-- Corner radius: 24px cards, 9999px botones (full round)
+- Corner radius: 22px cards, 14px inputs/buttons, 9999px pills
 - Regla clave: "Space is luxury" — si la pantalla se siente llena, agregar más espacio
 
 ### Lumina Lux (Light — Alternativo)
 - Background: `#FFFFFF`
-- Accent: `#D4FF00` / `#516200`
+- Accent: configurable por evento
 - Mismas reglas de "No-Line", glassmorphism adaptado a light
 - Uso: Landing web (toggle), modo accesibilidad
 
