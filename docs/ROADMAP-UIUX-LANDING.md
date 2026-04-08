@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Documento de planificación para la fase UI/UX de EventOS.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-08 | Estado: En Progreso (Paso 5 — Barrido Visual)
+> Fecha: 2026-04-07 | Actualizado: 2026-04-08 (sesion 3) | Estado: En Progreso (Paso 5 — Barrido Visual)
 
 ---
 
@@ -358,7 +358,16 @@ PASO 5: Barrido Visual App — EN PROGRESO
 │   ├── [x] Notificaciones: badge rojo con count, desaparece al leer (MMKV + useFocusEffect)
 │   ├── [x] Campana: shake animation cada 5s cuando hay unread
 │   ├── [x] Agenda cards finished: opacity solo en info, botones siempre visibles
-│   └── [x] Streaming: botón UNIRTE solo en live, Ver grabación solo en finished+recording
+│   ├── [x] Streaming: botón UNIRTE solo en live, Ver grabación solo en finished+recording
+│   ├── [x] Speakers list: carousel Destacados (breathing animation), search, lista Todos
+│   ├── [x] Speaker detail: hero photo, rating cristales, LinkedIn, bio, session cards
+│   ├── [x] Speaker → Agenda: navegación con scroll-to + highlight sutil (didHighlight ref)
+│   ├── [x] Agenda cards: corazón vuelve a cardTopRow (alineado con badges, no absolute)
+│   ├── [x] Breathing carousel: suavizado (sin spring, Easing.out cubic, onTouchStart)
+│   ├── [x] Master seeder: 18 speakers, 5 tracks, 29 sesiones 3 dias, 30 networking
+│   ├── [x] Fotos HD: i.pravatar.cc/400 en vez de randomuser.me (128px)
+│   ├── [x] Speaker ratings: migration, model, controller, API, hook useSpeakerRating
+│   └── [x] Fix: highlight no re-trigger al favoritar (didHighlight ref)
 ├── Pantallas pendientes:
 │   ├── [ ] Networking / Chat ← SIGUIENTE
 │   ├── [ ] Sponsors / Stands
