@@ -352,7 +352,13 @@ PASO 5: Barrido Visual App — EN PROGRESO
 │   ├── [x] Highlights auto-refresh (refetchOnWindowFocus)
 │   ├── [x] Hero: numberOfLines + lineHeight fix (letras cortadas)
 │   ├── [x] HappeningNow: altura fija uniforme entre slides
-│   └── [x] Filament: limites caracteres hero, fix emoji SVG
+│   ├── [x] Filament: limites caracteres hero, fix emoji SVG
+│   ├── [x] Fuente Inter → Urbanist en toda la app (layout, tailwind, 6 componentes)
+│   ├── [x] RatingModal: cristales diamante, bounce animation, haptic, accent button, cerrar overlay/back
+│   ├── [x] Notificaciones: badge rojo con count, desaparece al leer (MMKV + useFocusEffect)
+│   ├── [x] Campana: shake animation cada 5s cuando hay unread
+│   ├── [x] Agenda cards finished: opacity solo en info, botones siempre visibles
+│   └── [x] Streaming: botón UNIRTE solo en live, Ver grabación solo en finished+recording
 ├── Pantallas pendientes:
 │   ├── [ ] Networking / Chat ← SIGUIENTE
 │   ├── [ ] Sponsors / Stands
