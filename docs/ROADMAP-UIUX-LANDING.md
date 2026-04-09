@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Documento de planificación para la fase UI/UX de EventOS.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-08 (sesion 3) | Estado: En Progreso (Paso 5 — Barrido Visual)
+> Fecha: 2026-04-07 | Actualizado: 2026-04-09 (Social unificado) | Estado: En Progreso (Paso 5 — Barrido Visual)
 
 ---
 
@@ -154,6 +154,7 @@ Nos vemos!
 ```
 
 ---
+
 
 ## 4. Seguridad
 
@@ -368,15 +369,30 @@ PASO 5: Barrido Visual App — EN PROGRESO
 │   ├── [x] Fotos HD: i.pravatar.cc/400 en vez de randomuser.me (128px)
 │   ├── [x] Speaker ratings: migration, model, controller, API, hook useSpeakerRating
 │   └── [x] Fix: highlight no re-trigger al favoritar (didHighlight ref)
+├── Pantallas completadas (2026-04-09):
+│   ├── [x] Social unificado: Feed + Memorias + Momentos en una pantalla
+│   ├── [x] Feed: PostCard Lumina Noir, likes animados, comments bottom sheet al 55%
+│   ├── [x] Memorias: grid 3col, fotos oficiales 2col + badge OFICIAL
+│   ├── [x] Momentos: stories simplificados (solo img, 24h, contactos, auto-advance 5s)
+│   ├── [x] BottomSheet reutilizable (gesture solo en handle, scroll libre en contenido)
+│   ├── [x] SegmentedControl glass pill con indicador animado
+│   ├── [x] PhotoViewer fullscreen con heart abajo + author + caption
+│   ├── [x] MomentosViewer fullscreen con dots + tap nav + auto-close
+│   ├── [x] CreatePostModal dark theme + SocialFAB contextual
+│   ├── [x] Backend: AttendeeStory model+controller, fotos oficiales, cleanup command
+│   ├── [x] 15 tests nuevos (12 Story + 3 Photo oficial), 294 total all pass
+│   ├── [x] Headers uniformes: arrow-left + titulo izquierda (Speakers, Agenda, Social)
+│   ├── [x] Polling eliminado → refetchOnWindowFocus + useFocusEffect
+│   ├── [x] Comments optimistic (aparecen inmediato con opacity 0.5 + spinner)
+│   ├── [x] fotos.tsx eliminado, unificado en Social
+│   └── [x] ~30 bugs resueltos (gesture conflict, stale closures, layout, Android)
 ├── Pantallas pendientes:
 │   ├── [ ] Networking / Chat ← SIGUIENTE
 │   ├── [ ] Sponsors / Stands
-│   ├── [ ] Social Wall
-│   ├── [ ] Gamificación / Leaderboard
+│   ├── [ ] Gamificacion / Leaderboard
 │   ├── [ ] Perfil / Settings
 │   ├── [ ] Q&A en vivo
 │   ├── [ ] Encuestas
-│   ├── [ ] Photobooth / Galería
 │   ├── [ ] Matchmaking
 │   └── [ ] Registro (onboarding)
 ├── Items transversales (pendientes — componentes creados, integracion pendiente):
