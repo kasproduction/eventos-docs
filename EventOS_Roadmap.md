@@ -26,7 +26,7 @@ cada sesión más fácil de debuggear.
 
 **Milestone MVP lanzable:** Fase 0 + Fase 1 completa + Stress Test + UI sweep + deploy.
 
-## Estado del proyecto (al 2026-04-06)
+## Estado del proyecto (al 2026-04-09)
 
 | Sesión | Feature | Estado |
 |--------|---------|--------|
@@ -77,6 +77,7 @@ cada sesión más fácil de debuggear.
 | **SEC-5** | **Monitoreo: SecurityLogger, Sentry, uptime** | ⏳ Pendiente (sesión deploy) |
 | **— Landing + UI/UX** | | |
 | **Landing** | **Landing web premium (hero video, speakers, agenda, sponsors, registro)** | ⏳ Planificado — docs/ROADMAP-UIUX-LANDING.md |
+| **UI Sponsors** | **Brand Wall + Brand Profile premium** | ✅ (2026-04-09) — grid por tier, living shuffle, contact form, trivia, 15 tests |
 | **Sesión UI** | **Barrido visual completo (Lumina Noir/Lux)** | ⏳ Pendiente (última antes de deploy) |
 | **Deploy** | **Docker + VPS + CI/CD** | ⏳ Pendiente |
 
@@ -1988,6 +1989,7 @@ activated_at TIMESTAMP NULL
 - [ ] Tema dinámico por evento (primary_color desde API → NativeWind CSS vars)
 - [ ] Rediseño Home screen (ModuleMenu con cards visuales)
 - [ ] Rediseño Agenda (cards por sesión con color de track)
+- [x] Rediseño Sponsors (Brand Wall + Brand Profile) — 2026-04-09
 - [ ] Rediseño Speakers, Documentos, Anuncios
 - [ ] Rediseño Auth screens (login / registro)
 - [ ] Rediseño Profile screen
@@ -2461,6 +2463,46 @@ Blue-green con zero downtime: deploy en VPS-2 mientras VPS-1 sirve, luego swap. 
 - start_datetime/end_datetime -> start/end (coincidia con API real)
 - Pressable function style no aplica backgroundColor en Android
 - favoritedBy (no favorites) en withCount
+
+---
+
+## Apendice D: Sponsors UI/UX Premium — Implementado 2026-04-09
+
+### Brand Wall (sponsors.tsx)
+- Grid adaptativo por tier: Platinum 2col cards, Gold 3col cards, Silver/Bronze/Media 4col circulos
+- Sin labels de tier — jerarquia visual por tamano y forma
+- Living shuffle: cada 7s, spring damping 28 (suave, sin bounce)
+- Compact tiers: logo circular flotante sin card wrapper
+- Premium tiers: glass cards con LinearGradient diagonal por tier
+- Buscador con debounce 350ms
+- Haptic feedback + press scale 0.96
+- StaggerReveal entrada escalonada
+
+### Brand Profile (sponsor/[id].tsx)
+- Logo hero 100px centrado, sin banner (eliminado definitivamente)
+- Floating nav con BlurView tint dark
+- Vista implicita: recordView() + visitStand() al montar
+- Seccion "Charlas": sesiones del sponsor con fecha/hora/ubicacion
+- Servicios seleccionables: chips toggle + formulario contacto (SponsorLead)
+- Trivia: opciones con A/B/C/D, shake/bounce, progress bar, haptic, pts acumulados, summary inline con auto-close 2.5s
+- LuminaToast en favorito (heart rosa)
+
+### Backend
+- Tabla sponsor_leads + SponsorLead model (interested_services JSON, message, unique)
+- POST /sponsors/{id}/contact — leads cualificados con email al sponsor
+- POST /sponsors/{id}/view — ActivityLog para analytics
+- sponsor_id nullable en event_sessions — charlas del sponsor
+- SponsorResource incluye sessions en API
+- SponsorSeeder: 30 sponsors (GitHub avatar logos), 5 tiers, sesiones asignadas
+- 15 tests sponsor (300 total), 0 failures
+
+### Decisiones de diseno
+- Sponsors no entregan banners (90%+ solo logo) — eliminado banner como hero
+- Tier diferenciado por tamano de card, no por labels explicitos
+- Compact tiers = solo logo circular (sin rectangulo = no parece boton)
+- Living shuffle = equidad dentro del mismo tier (nadie es "primero" permanente)
+- Contact form: leads virtual > presencial (10,000 vs 100) — servicios seleccionables
+- Trivia: backend filtra preguntas ya respondidas (no puntos infinitos)
 
 ---
 
