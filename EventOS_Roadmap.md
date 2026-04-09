@@ -60,6 +60,8 @@ cada sesión más fácil de debuggear.
 | **1.20** | **Gamification + Leaderboard** | ✅ (2026-04-07) |
 | **1.21** | **Passport Contest (stamps por lead scan)** | ✅ (2026-04-07) |
 | **1.22** | **Registro personalizable + Import/Export** | ✅ (2026-04-07) |
+| **RT Invalidation** | **Real-time sync Admin→App (socket + focusManager + jitter)** | ✅ (2026-04-09) — 5 entidades, 4 capas, probado en vivo |
+| **Push Invalidation** | **Push notification auto-invalida caches al llegar** | ⏳ Codigo listo, pendiente dev build para probar |
 | **1.23** | **Permisos granulares Filament (roles admin)** | ⏳ Pendiente |
 | ~~1.22 old~~ | ~~Floor plan del venue~~ | Movido a Fase 3 |
 | **— PDFs & Analytics (aplazados al final, después de todos los features)** | | |
