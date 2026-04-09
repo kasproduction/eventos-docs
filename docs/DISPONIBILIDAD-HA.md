@@ -339,6 +339,97 @@ Resultado: 0 downtime. Si v1.1 tiene bug → rollback = meter VPS-1 (v1.0) de vu
 
 ---
 
+## 7.5 Real-Time Data Invalidation Architecture
+
+> Implementado 2026-04-09. Elimina polling, sincroniza Admin→App en 1-3 segundos, optimizado para 10,000+ usuarios.
+
+### Principio
+
+**Cero requests cuando nadie cambia nada.** Solo se refetchea cuando hay un cambio real, notificado via socket.
+
+### Flujo completo
+
+```
+Admin edita sesion en Filament
+  │
+  ├─ Model::save() → Eloquent Observer
+  │    ├─ Cache::forget('event:1:agenda')         ← Warm cache (dato fresco listo)
+  │    └─ InvalidationService::broadcast(1, 'agenda')
+  │         ├─ Redis throttle check (1s TTL)      ← Anti-storm: max 1 evento/seg/entidad
+  │         └─ HTTP POST → Socket Server /internal/data/invalidate
+  │              └─ io.to('event:1').emit('data:invalidate', { entity: 'agenda' })
+  │                   └─ 10,000 clientes reciben
+  │                        └─ setTimeout(Math.random() * 2000)  ← Jitter anti-thundering herd
+  │                             └─ queryClient.invalidateQueries(['agenda', eventId])
+  │                                  └─ React Query refetch (deduplicado)
+  │                                       └─ API responde desde DB (cache ya limpio) ~5ms
+  │                                            └─ UI actualizada
+```
+
+### Capas de defensa (redundancia sin acoplamiento)
+
+| Capa | Mecanismo | Que cubre | Si falla |
+|------|-----------|-----------|----------|
+| 1 | **Socket invalidation** | Admin cambia dato → app se entera en 1-3s | Capa 2 cubre |
+| 2 | **focusManager (AppState)** | App vuelve de background → refetch stale | Independiente del socket |
+| 3 | **Reconnect sync** | Socket reconecta tras micro-corte → invalida criticos | Complementa capa 1 |
+| 4 | **staleTime** | Queries expiran naturalmente (30s-5min) | Red de seguridad final |
+
+Cada capa opera independientemente. Si todas fallan, pull-to-refresh manual sigue funcionando.
+
+> **Nota critica sobre staleTime:** El focusManager solo refetchea queries que React Query considera *stale*. Si `staleTime: Infinity`, nunca refetchea. Los valores actuales (30s anuncios, 5min agenda/sponsors) son el balance ideal: no generan polling pero aseguran que al volver de background (>30s) los datos se consideren expirados y el focusManager los refresque. Nunca usar `staleTime: Infinity` en queries que necesiten actualizarse.
+
+### Entidades con invalidacion real-time
+
+| Entidad | Observer | Query Key | Cache Key Redis |
+|---------|----------|-----------|-----------------|
+| Agenda (sesiones) | `EventSessionObserver` | `['agenda', eventId]` | `event:{id}:agenda` |
+| Anuncios | `AnnouncementObserver` | `['announcements', eventId]` | — |
+| Sponsors | `SponsorObserver` | `['sponsors', eventId]` | — |
+| Speakers | `SpeakerObserver` | `['speakers', eventId]` | — |
+| Highlights | `HighlightObserver` | `['highlights', eventId]` | — |
+
+### Proteccion anti-colapso (10k+ usuarios)
+
+| Mecanismo | Donde | Que previene |
+|-----------|-------|-------------|
+| **Jitter 0-2s** | App (cliente) | 10k requests en 2s, no en 1ms |
+| **Throttle 1s** | Backend (Redis TTL) | Admin edita 5 cosas → 1 evento socket |
+| **React Query dedup** | App (cliente) | 3 eventos seguidos → 1 solo refetch |
+| **Redis cache API** | Backend | Cada request servido en ~5ms |
+| **Warm cache** | Backend (Observer) | Cache::forget ANTES de broadcast → refetch trae datos frescos |
+| **hasConnectedOnce flag** | App (cliente) | Primera conexion no invalida innecesariamente |
+
+### Rendimiento: Antes vs Ahora
+
+| Metrica | Antes (staleTime) | Ahora (socket + focusManager) |
+|---------|-------------------|-------------------------------|
+| Requests con datos sin cambios | 1 cada 30s-5min/query/usuario | **0** |
+| 10k usuarios, 5 queries, 1 hora | ~600,000 requests desperdiciados | **0** |
+| Latencia de actualizacion | 30s a 5 min | **1-3 segundos** |
+| Volver de background | Datos viejos | **Refetch inmediato** |
+| Carga servidor en reposo | Alta (requests constantes) | **Cero** |
+| Conexiones socket extra | 0 | **0** (reutiliza la del chat) |
+
+### Archivos clave
+
+| Archivo | Repo | Proposito |
+|---------|------|-----------|
+| `app/Services/InvalidationService.php` | Backend | Throttle + HTTP POST al socket |
+| `app/Observers/*Observer.php` | Backend | Cache::forget + broadcast por entidad |
+| `src/index.ts` (endpoint `/internal/data/invalidate`) | Socket | Relay evento a room |
+| `hooks/useDataInvalidation.ts` | App | focusManager + socket listener + jitter |
+| `app/_layout.tsx` (DataInvalidationProvider) | App | Monta el hook global |
+
+### Notas de produccion
+
+- El endpoint `/internal/data/invalidate` requiere header `X-Internal-Secret` (mismo patron que los demas endpoints internos)
+- El socket server usa Redis adapter — funciona con multiples instancias (VPS-1 y VPS-2)
+- El Observer usa `saved()` (cubre create + update). `::where()->update()` (query builder) NO dispara observers — usar `$model->save()` siempre
+- El throttle usa `Cache::store('redis')->put($key, true, 1)` — TTL 1 segundo. TTL < 1s se redondea a 0 en Redis
+
+---
+
 ## 8. Configuración VPS (cada uno idéntico)
 
 ### 8.1 Docker Compose (producción)
