@@ -379,10 +379,18 @@ PASO 5: Barrido Visual App — EN PROGRESO
 │   ├── [ ] Photobooth / Galería
 │   ├── [ ] Matchmaking
 │   └── [ ] Registro (onboarding)
-├── [ ] Empty states ilustrados
-├── [ ] Pull-to-refresh custom
-├── [ ] Onboarding slides
-└── [ ] QA visual completo
+├── Items transversales (pendientes — componentes creados, integracion pendiente):
+│   ├── [ ] Skeleton loading — componente Skeleton.tsx creado (SkeletonGroup + Bone con Context),
+│   │       pero integracion en speakers.tsx causo que el contenido no apareciera.
+│   │       REVERTIDO a ActivityIndicator. Reintentar con integracion cuidadosa uno por uno.
+│   │       NOTA: cada Bone NO debe crear su propia animacion (crash 25+ shared values).
+│   │       Usar SkeletonGroup con Context para UNA sola animacion compartida.
+│   ├── [ ] EmptyState — componente EmptyState.tsx creado, integracion revertida junto con skeleton.
+│   ├── [ ] Pull-to-refresh — componente LuminaRefresh.tsx creado, integracion revertida.
+│   │       NOTA: verificar que isRefetching no cause conflictos con el rendering condicional.
+│   ├── [ ] Empty states ilustrados (aplicar EmptyState a todas las pantallas)
+│   ├── [ ] Onboarding slides
+│   └── [ ] QA visual completo
 
 PASO 6: Admin Premium
 ├── Dashboard analytics
