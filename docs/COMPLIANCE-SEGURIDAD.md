@@ -15,7 +15,7 @@ EventOS es una plataforma de gestión de eventos compuesta por tres componentes:
 
 La plataforma implementa controles de seguridad alineados con **OWASP Top 10 (2021)**, **CWE Top 25**, y buenas prácticas de **ISO/IEC 27001** en los pilares de confidencialidad, integridad y disponibilidad.
 
-Se cuenta con **278 tests automatizados** (719 assertions), de los cuales **42 son específicos de seguridad** que validan controles de acceso, sanitización, tokens, lockout, headers y configuración.
+Se cuenta con **300 tests automatizados** (762 assertions), de los cuales **42 son específicos de seguridad** que validan controles de acceso, sanitización, tokens, lockout, headers y configuración. Se incluye un sistema de **sincronización reactiva en tiempo real** con 5 capas de redundancia y protección anti-colapso para 10,000+ usuarios concurrentes.
 
 ---
 
@@ -144,6 +144,7 @@ Se cuenta con **278 tests automatizados** (719 assertions), de los cuales **42 s
 | QR integrity | HMAC-SHA256 | Firmado con secret server-side |
 | Email verification | Signed URLs con hash_equals | Timing-attack safe |
 | Internal endpoints | X-Internal-Secret header | Socket↔Backend communication |
+| Data invalidation endpoint | X-Internal-Secret header | POST /internal/data/invalidate — mismo patron de seguridad |
 | Input sanitization | FormRequests + HTMLPurifier | Validación antes de persistir |
 
 ### A09 — Security Logging and Monitoring Failures
@@ -353,7 +354,7 @@ Canal de logging dedicado `security` con formato JSON structured:
 | Integridad de QR | HMAC-SHA256 firmado server-side |
 | URLs firmadas | hash_equals() para verificación de email |
 | Versionamiento de API | Prefijo /api/v1/ para control de cambios |
-| Tests automatizados | 278 tests (719 assertions) ejecutados en cada build |
+| Tests automatizados | 300 tests (762 assertions) ejecutados en cada build |
 | Pre-deploy checks | `php artisan security:check` bloquea deploy con config insegura |
 
 ### 9.3 Disponibilidad
@@ -368,6 +369,23 @@ Canal de logging dedicado `security` con formato JSON structured:
 | Redis failover | Retry strategy con backoff exponencial |
 | Backups | Planificado: daily encrypted, retención 30 días, test restore mensual |
 | Uptime monitoring | Planificado: BetterStack/UptimeRobot con alertas |
+| Real-time sync | 5 capas: socket + focusManager + reconnect + push + staleTime |
+| Anti-thundering herd | Jitter 0-2s en cliente + throttle 1s en backend |
+| Warm cache | Cache::forget antes de broadcast (dato fresco en refetch) |
+
+### 9.4 Integridad de datos en actividades en vivo
+
+Para features interactivos (sorteos, ruletas, juegos) que involucran premios o puntos:
+
+| Principio | Implementación |
+|-----------|---------------|
+| **MySQL primero, socket después** | Resultado critico (ganador, puntos) se persiste en DB antes de emitir por socket |
+| **Fallback multi-canal** | Si socket falla: push notification + social wall auto-post cubren |
+| **Participación via HTTP** | Boton "Participar" es HTTP POST, no depende del socket |
+| **Redis para datos volatiles** | Conectados en room, inputs de juego — datos que se pueden reconstruir |
+| **Idempotencia** | Operaciones criticas (redencion, sorteo) son idempotentes — no se duplican premios |
+
+Regla: si el socket muere en el peor momento, ningun dato critico se pierde y el usuario recibe la informacion por otro canal en <5 segundos.
 
 ---
 
@@ -436,7 +454,7 @@ Hallazgo → Clasificación (Crítico/Alto/Medio/Bajo)
 | `AccountLockoutTest.php` | 6 | 20 | Lockout en 5 intentos, 423, reset on success, expiration |
 | **Total** | **43** | **82** | |
 
-Además, los 278 tests totales del backend validan funcionalidad que incluye controles de acceso, validación de datos y flujos de autenticación.
+Además, los 300 tests totales del backend (762 assertions) validan funcionalidad que incluye controles de acceso, validación de datos, flujos de autenticación, sponsor contact forms y view tracking.
 
 ---
 
@@ -540,6 +558,7 @@ MOBILE APPS (distribución separada):
 
 ---
 
-_EventOS Compliance de Seguridad v1.0_
-_Documento generado: 2026-04-07_
+_EventOS Compliance de Seguridad v1.1_
+_Documento generado: 2026-04-07 | Actualizado: 2026-04-09_
+_Actualización: real-time invalidation, 300 tests, integridad datos en vivo_
 _Próxima revisión: pre-deploy a producción_
