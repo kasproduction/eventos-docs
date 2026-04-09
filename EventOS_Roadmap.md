@@ -63,6 +63,8 @@ cada sesión más fácil de debuggear.
 | **RT Invalidation** | **Real-time sync Admin→App (socket + focusManager + jitter)** | ✅ (2026-04-09) — 5 entidades, 4 capas, probado en vivo |
 | **Push Invalidation** | **Push notification auto-invalida caches al llegar** | ⏳ Codigo listo, pendiente dev build para probar |
 | **1.23** | **Permisos granulares Filament (roles admin)** | ⏳ Pendiente |
+| **1.x Rewards** | **Redencion de puntos (kiosko de premios)** | ⏳ Catalogo, QR temporal, staff escanea, descuenta puntos. Cierra el loop de gamificacion. |
+| **Nice to have** | **Light mode (tema claro)** | ⏳ Requiere refactor de colores hardcoded a theme provider. Sesion dedicada si cliente lo pide. |
 | ~~1.22 old~~ | ~~Floor plan del venue~~ | Movido a Fase 3 |
 | **— PDFs & Analytics (aplazados al final, después de todos los features)** | | |
 | **1.P1** | **Certificados PDF** | ⏳ Aplazado |
@@ -2016,6 +2018,15 @@ activated_at TIMESTAMP NULL
 | 2.2 | **Photo/Caption Contest** — depende de Social wall (S1.22). Galería de fotos con votos, caption contest. | `expo-image-picker` (ya en S1.x) | Depende de S1.22 completada. |
 | 2.3 | **Video calls 1:1** — videollamada dentro del networking. Sala efímera con LiveKit. Solo app + web. | `livekit-client`, `@livekit/react-native-webrtc` | LiveKit = infraestructura de media server propia, costo mensual, complejidad alta. |
 | 2.4 | **Proximity chat web (spatial audio)** — espacio virtual tipo Gather con audio espacial. Solo Next.js. | `livekit-server-sdk`, `@livekit/components-react` | El más complejo del roadmap. Depende de 2.1 (web) + 2.3 (LiveKit). |
+| 2.5 | **Ruleta en vivo (reward virtuales)** — Presentador gira ruleta, backend detecta conectados en room, asigna puntos solo a presentes. Incentiva quedarse conectado. Animacion en streaming + app. | `socket.io` (ya existe) | Depende de gamificacion completa. |
+| 2.6 | **Sorteo en vivo (jackpot)** — Boton "Participar" con countdown 30s, slot machine con fotos de participantes en pantalla display + streaming, ganador con foto grande + confetti. Presencial + virtual. | `socket.io` + `/display/` (ya existe) | Requiere pantalla display dedicada. |
+| 2.7 | **Juegos interactivos en stands** — Vendedor escanea QR, app del asistente se convierte en control (joystick/botones), conecta via socket a juego Unity WebGL en pantalla del stand. Lead automatico + puntos. | `Unity WebGL`, `socket.io` | Requiere desarrollo Unity aparte. Diferencial de producto. |
+| 2.8 | **Trivia live tipo Kahoot** — Preguntas en tiempo real durante sesion, ranking por velocidad, puntos gamificacion. | Base de encuestas (S1.10) | Requiere refactor de encuestas a modo competitivo. |
+| 2.9 | **Networking speed-dating virtual** — Match aleatorio, timer 3 min, opcion conectar/pasar, puntos por interaccion. | `socket.io` | Depende de networking (S1.7). |
+| 2.10 | **Subasta de puntos** — Premios se subastan en tiempo real (no precio fijo). Timer 60s, bids via socket. Premia a quien mas jugo. | `socket.io` | Depende de rewards (1.x). |
+| 2.11 | **Donde esta el patrocinador** — Juego visual: logo se esconde, todos adivinan (presencial+virtual). Primeros 10 ganan puntos. Sponsor como entretenimiento. | `socket.io` + display | Juego simple pero muy visual. |
+| 2.12 | **Game Bridge (Unity ↔ App)** — Celular como control de juegos Unity en stands. Vendedor escanea QR → app habilita joystick/botones → socket relay → Unity WebGL en TV del stand. DaVinci tiene juegos ya hechos. | `socket.io`, `Unity WebGL` | Solo el bridge, juegos ya existen. |
+| 2.13 | **Momentos en Vivo** — Sistema flexible de momentos branded: admin configura en Filament (sponsor, tipo, titulo, ganador, logo). Publicar → push + socket + social wall + display. Un componente, infinitos usos (sorteos, hackatones, reconocimientos). | `socket.io`, Filament | Reemplaza momentos hardcodeados. |
 
 > **Nota:** El asistente virtual en Fase 1 accede por app móvil (`app/(app)/(virtual)/` ya implementado). La web (2.1) se construye en Fase 2 porque su diferencial es "acceder sin descargar la app" — sin ese diferencial no aporta valor en Fase 1.
 
