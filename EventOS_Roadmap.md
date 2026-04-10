@@ -1,6 +1,55 @@
 # EventOS — Plan de trabajo definitivo
 
-_Fases, sesiones, dependencias progresivas y definición de completado_
+_Fases, sesiones, dependencias progresivas y definicion de completado_
+
+---
+
+## Indice rapido
+
+| Seccion | Linea aprox | Contenido |
+|---------|-------------|-----------|
+| **Estado del proyecto** | ~30 | Tabla resumen de TODAS las sesiones con estado (✅/⏳) |
+| **Fase 0 — Setup** | ~130 | 0.1–0.4: repos, backend, app, socket |
+| **Fase 1 — Funcional** | ~260 | 1.1–1.13: auth, modulos, contenido, QR, leads, sponsors, networking, chat, encuestas, push, tracks, emails |
+| **Onboarding** | ~1100 | 1.x-A/B: slides, animaciones, survey post-login |
+| **Sesiones 1.14–1.22** | ~1250 | Streaming, Q&A, ratings, photobooth, matchmaking, social wall, gamification, passport, registro |
+| **Pulido funcional** | ~1935 | Items pre-deploy: tab vendedor, modulos rol, admin rediseno |
+| **Stress testing** | ~1965 | k6 scripts, escenarios, metricas |
+| **Sesion UI (Lumina Noir)** | ~2005 | Barrido visual: ~80% completado, pantallas hechas vs pendientes |
+| **Fase 2** | ~2040 | Web Next.js, video calls, proximity chat, sorteos, juegos |
+| **Fase 3** | ~2060 | SaaS multi-tenant, monetizacion |
+
+### Repositorios y rutas locales
+
+| Repo | Ruta local | Stack |
+|------|-----------|-------|
+| kasproduction/eventos-backend | `C:\laragon\www\eventos-backend` | Laravel 11 + Filament |
+| kasproduction/eventos-app | `C:\Users\Kasproduction\Projects\eventos-app` | Expo SDK 55 + React Native |
+| kasproduction/eventos-socket | `C:\laragon\www\eventos-socket` | Node.js + Socket.IO |
+| kasproduction/eventos-kiosko | `C:\laragon\www\eventos-kiosko` | Kiosco QR check-in |
+
+### Documentos relacionados
+
+| Documento | Ruta | Contenido |
+|-----------|------|-----------|
+| **UI/UX + Landing** | `docs/ROADMAP-UIUX-LANDING.md` | Plan completo: landing web, estados evento, registro, seguridad, design system, PASO 1-6 con checklist |
+| **Seguridad** | `docs/FASE-SEGURIDAD.md` | Auditoria OWASP, 42 tests, 11 fixes aplicados |
+| **Compliance** | `docs/COMPLIANCE-SEGURIDAD.md` | ISO 27001, Ley 1581, GDPR, cabeceras HTTP |
+| **Alta Disponibilidad** | `docs/DISPONIBILIDAD-HA.md` | 2 VPS, PlanetScale, Upstash, Cloudflare, 99.99% uptime |
+| **Documento maestro** | `EventOS_ClaudeCode_Prompt_v2.md` | Stack, modelos, API contracts, reglas de negocio |
+| **Dev setup** | `EventOS_DevSetup.md` | Instrucciones de desarrollo local |
+
+### Apendices (al final de este archivo)
+
+| Apendice | Contenido |
+|----------|-----------|
+| **C** | UI/UX Premium Dark Theme — fundamentos implementados (2026-04-07) |
+| **D (HA)** | Alta Disponibilidad — arquitectura, costos, deploy strategy |
+| **D (Sponsors)** | Sponsors UI/UX Premium — Brand Wall + Brand Profile (2026-04-09) |
+| **E** | Analisis Competitivo — Cisco $88K vs ICE360 $49M vs EventOS |
+| **F** | Web App — experiencia virtual completa Next.js (W.1–W.12) |
+| **G** | White-Label + Rebranding — app.config.js, clients/, EAS build |
+| **H** | Timeline Cliente Ancla — Eventos Efectivos, septiembre 2026 |
 
 ---
 
@@ -26,7 +75,7 @@ cada sesión más fácil de debuggear.
 
 **Milestone MVP lanzable:** Fase 0 + Fase 1 completa + Stress Test + UI sweep + deploy.
 
-## Estado del proyecto (al 2026-04-09, Roadmap v2.8)
+## Estado del proyecto (al 2026-04-10, Roadmap v3.0)
 
 | Sesión | Feature | Estado |
 |--------|---------|--------|
@@ -94,6 +143,11 @@ cada sesión más fácil de debuggear.
 | **Profile API** | **GET/PUT /me/profile + POST/DELETE /me/photo + social fields** | ✅ (2026-04-09) — ProfileController, migration twitter/instagram/website, beam fallback todos los endpoints |
 | **RT Branding** | **Real-time branding invalidation (EventObserver + socket)** | ✅ (2026-04-09) — cambios de config/branding llegan via socket, refetch on reconnect |
 | **UI Fixes** | **Mi Agenda sin flecha, Home pull to refresh, expo-image SVG social** | ✅ (2026-04-09) |
+| **Responsive** | **Audit completo 360dp — 31 archivos, layout proporcional, SafeArea fix** | ✅ (2026-04-10) — skeletons, leads header, login scroll, ModuleMenu/HappeningNow/HomeHero proporcionales, 12 pantallas SafeArea, day pills centrados |
+| **UX Polish** | **PollSlides Lumina Noir, chat emojis animados+cooldown, Enter=enviar, logout BottomSheet** | ✅ (2026-04-10) — rediseno encuesta, Q&A error handling, console.log cleanup, #1a1919→#141414, tab bar ajustado |
+| **Testing** | **Emuladores ZTE 360dp + Medium Phone 411dp configurados, TestStreamingSeeder** | ✅ (2026-04-10) |
+| **UI Mi QR** | **Badge digital: tab real, RGB wave pastel, evento+QR+identidad, fullscreen tap, wallet ready** | ✅ (2026-04-10) — proporcional 360-411dp, dashed lines, role pill accent |
+| **UI Gamification** | **GamificationHud rediseno: teal/cyan sci-fi, progress segmentada, RGB wave 2px, prioridad carousel** | ✅ (2026-04-10) — rank 36px, puntos 28px, slide 2do posicion, 10s duracion |
 | **— Web App (asistente virtual — Next.js)** | | |
 | **W.1** | **Setup Next.js + Tailwind + shadcn/ui + auth + layout** | ⏳ Pendiente |
 | **W.2** | **Home (hero, happening now, highlights, carousel sponsors)** | ⏳ Pendiente |
@@ -109,7 +163,7 @@ cada sesión más fácil de debuggear.
 | **W.12** | **Responsive polish + Lumina Noir theme + dark mode** | ⏳ Pendiente |
 | **— White-label + Deploy** | | |
 | **WL.1** | **Migrar app.json → app.config.js dinamico + estructura clients/** | ⏳ Pendiente |
-| **Sesión UI** | **Barrido visual completo (Lumina Noir/Lux)** | ⏳ Pendiente (última antes de deploy) |
+| **Sesión UI** | **Barrido visual Lumina Noir (10 pantallas + responsive + transversales)** | 🔶 ~80% (2026-04-10) — quedan Networking/Gamification/Matchmaking/Auth/Onboarding + skeleton/empty states |
 | **Deploy** | **Docker + VPS + CI/CD (backend + web + app)** | ⏳ Pendiente |
 
 ---
@@ -1999,35 +2053,44 @@ activated_at TIMESTAMP NULL
 
 ## ─────────────────────────────────────────
 
-## SESIÓN UI — Diseño visual completo _(post Fase 1, antes de Fase 2)_
+## SESIÓN UI — Barrido Visual Lumina Noir _(~80% completado al 2026-04-10)_
 
 ## ─────────────────────────────────────────
 
-**Cuándo:** Cuando Fase 1 esté funcional completa y antes de lanzar con cliente real.
-**Referencias:** `/design/` — estilo dark mode (Fever), cards vibrantes por sesión, tipografía bold.
+**Estado:** En progreso. Pantallas principales completadas, quedan ~5 pantallas secundarias + items transversales.
+**Documento detallado:** `docs/ROADMAP-UIUX-LANDING.md` (PASO 5 tiene el desglose completo)
 
-**Dirección visual definida:**
+**Design system implementado:**
 
-- Fondo: dark mode (#0D0D0D o similar) como base
-- Accent: `primary_color` del evento (configurable por admin en Filament)
-- Cards redondeadas, sombra sutil, tipografía grande y bold en headers
-- Bottom tab bar minimalista
-- Estilo corporativo-moderno (no festival) — mezcla Fever dark + cards tipo agenda de la segunda ref
+- Fondo: #0e0e0e (Lumina Noir), accent: primary_color dinamico por evento
+- Fonts: Urbanist (body) + Plus Jakarta Sans (headlines)
+- FloatingTabBar glassmorphism, LuminaToast, ScreenWrapper anti-flash
+- ThemeProvider + useBranding hook + real-time branding via socket
 
-**Tareas:**
+**Pantallas completadas (Lumina Noir):**
 
-- [ ] Design tokens: colores, tipografía, espaciado en `tailwind.config.js`
-- [ ] Tema dinámico por evento (primary_color desde API → NativeWind CSS vars)
-- [ ] Rediseño Home screen (ModuleMenu con cards visuales)
-- [ ] Rediseño Agenda (cards por sesión con color de track)
-- [x] Rediseño Sponsors (Brand Wall + Brand Profile) — 2026-04-09
-- [ ] Rediseño Speakers, Documentos, Anuncios
-- [ ] Rediseño Auth screens (login / registro)
-- [ ] Rediseño Profile screen
-- [ ] Dark mode completo (ya planeado desde Fase 1)
-- [ ] Iconografía consistente (reemplazar emojis del ModuleMenu por icon set real + opción subir ícono custom en Filament)
-- [ ] Selector visual de íconos en Filament (preview + upload custom PNG/SVG)
-- [ ] Splash screen / onboarding visual
+- [x] Design tokens + ThemeProvider + fonts — 2026-04-07
+- [x] Home (Hero, HappeningNow, GamificationHud, ModuleMenu, Mi QR) — 2026-04-07
+- [x] Agenda (day strip, glass cards, tracks, heart particles, calendar) — 2026-04-08
+- [x] Speakers (carousel breathing, detail hero, rating crystals, LinkedIn) — 2026-04-08
+- [x] Streaming (split-screen, YouTube embed, session states) — 2026-04-08
+- [x] Social (Feed + Memorias + Momentos unificado, stories, comments) — 2026-04-09
+- [x] Sponsors (Brand Wall grid tiers, Brand Profile, trivia, contact form) — 2026-04-09
+- [x] Profile (beam Ocean, edit modal, social links, stats) — 2026-04-09
+- [x] Encuestas/PollSlides rediseno Lumina Noir — 2026-04-10
+- [x] Chat sesion (emojis animados, cooldown, Enter=enviar) — 2026-04-10
+- [x] Responsive audit 360dp (31 archivos, 12 pantallas SafeArea) — 2026-04-10
+
+**Pendiente:**
+
+- [ ] Networking (directorio + contactos + solicitudes) — UI funcional, falta Lumina Noir polish
+- [ ] Gamificacion / Leaderboard — UI funcional, falta polish visual
+- [ ] Matchmaking — UI funcional, falta polish visual
+- [ ] Auth screens (login / registro) — rediseno visual
+- [ ] Onboarding visual (bugs z-index Android, requiere dev build)
+- [ ] Iconografia consistente (reemplazar emojis ModuleMenu por icon set + custom upload)
+- [ ] Skeleton/EmptyState/Pull-to-refresh (componentes creados, integracion pendiente)
+- [ ] Splash screen
 
 ---
 
@@ -2871,7 +2934,7 @@ Cliente real identificado: **Eventos Efectivos y Producciones S.A.S.** (agencia 
 
 ---
 
-_EventOS Plan v2.8 — Kasproduction_
+_EventOS Plan v3.0 — Kasproduction_
 _Documento maestro: EventOS_ClaudeCode_Prompt_v2.md (v2.5)_
 _Dev setup: EventOS_DevSetup.md_
 _Seguridad: docs/FASE-SEGURIDAD.md_

@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Documento de planificación para la fase UI/UX de EventOS.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-09 (Social unificado) | Estado: En Progreso (Paso 5 — Barrido Visual)
+> Fecha: 2026-04-07 | Actualizado: 2026-04-10 | Estado: En Progreso (Paso 5 — 80% completado)
 
 ---
 
@@ -329,84 +329,74 @@ PASO 4: Estados del Evento
 ├── Certificados de asistencia
 └── NPS survey post-evento
 
-PASO 5: Barrido Visual App — EN PROGRESO
-├── Pantallas completadas (2026-04-07):
-│   ├── [x] Home: Header configurable, Hero text/image, HappeningNow crossfade
-│   ├── [x] Home: GamificationHud con RGB border + carousel integrado
-│   ├── [x] Mi QR tab con diseño premium
-│   └── [x] Módulos fijos (Agenda, Networking, Sponsors, Social, QR)
-├── Pantallas completadas (2026-04-08):
-│   ├── [x] Agenda: Lumina Noir, day strip Fever-style, timeline, glass cards
-│   ├── [x] Agenda: Track filter, session states (live/finished/upcoming)
-│   ├── [x] Agenda: Corazón animado con partículas, toast favoritos
-│   ├── [x] Agenda: Calendario nativo (expo-calendar) + fallback Google Calendar
-│   ├── [x] Agenda: DaySlide direccional al cambiar día
-│   ├── [x] FloatingTabBar: Lift animation, labels siempre visibles, sin círculos
-│   ├── [x] FloatingTabBar: QR icon unificado, 5 tabs uniformes
-│   ├── [x] Highlights: modelo, migration, Filament resource, API, seeder, carousel integrado
-│   ├── [x] Session status unificado: lib/sessionStatus.ts (tiempo real, no hardcoded)
-│   ├── [x] Seeder fechas relativas (hoy/mañana, sesión live automática)
-│   ├── [x] Server time offset (hora del servidor vs dispositivo)
-│   ├── [x] Streaming screen: header premium (titulo, speaker, empresa, separador)
-│   ├── [x] Flash blanco Android: app.json + layouts + ScreenWrapper
-│   ├── [x] buildStreamParams compartido (Agenda + HappeningNow → mismos datos)
-│   ├── [x] Highlights auto-refresh (refetchOnWindowFocus)
-│   ├── [x] Hero: numberOfLines + lineHeight fix (letras cortadas)
-│   ├── [x] HappeningNow: altura fija uniforme entre slides
-│   ├── [x] Filament: limites caracteres hero, fix emoji SVG
-│   ├── [x] Fuente Inter → Urbanist en toda la app (layout, tailwind, 6 componentes)
-│   ├── [x] RatingModal: cristales diamante, bounce animation, haptic, accent button, cerrar overlay/back
-│   ├── [x] Notificaciones: badge rojo con count, desaparece al leer (MMKV + useFocusEffect)
-│   ├── [x] Campana: shake animation cada 5s cuando hay unread
-│   ├── [x] Agenda cards finished: opacity solo en info, botones siempre visibles
-│   ├── [x] Streaming: botón UNIRTE solo en live, Ver grabación solo en finished+recording
-│   ├── [x] Speakers list: carousel Destacados (breathing animation), search, lista Todos
-│   ├── [x] Speaker detail: hero photo, rating cristales, LinkedIn, bio, session cards
-│   ├── [x] Speaker → Agenda: navegación con scroll-to + highlight sutil (didHighlight ref)
-│   ├── [x] Agenda cards: corazón vuelve a cardTopRow (alineado con badges, no absolute)
-│   ├── [x] Breathing carousel: suavizado (sin spring, Easing.out cubic, onTouchStart)
-│   ├── [x] Master seeder: 18 speakers, 5 tracks, 29 sesiones 3 dias, 30 networking
-│   ├── [x] Fotos HD: i.pravatar.cc/400 en vez de randomuser.me (128px)
-│   ├── [x] Speaker ratings: migration, model, controller, API, hook useSpeakerRating
-│   └── [x] Fix: highlight no re-trigger al favoritar (didHighlight ref)
-├── Pantallas completadas (2026-04-09):
-│   ├── [x] Social unificado: Feed + Memorias + Momentos en una pantalla
-│   ├── [x] Feed: PostCard Lumina Noir, likes animados, comments bottom sheet al 55%
-│   ├── [x] Memorias: grid 3col, fotos oficiales 2col + badge OFICIAL
-│   ├── [x] Momentos: stories simplificados (solo img, 24h, contactos, auto-advance 5s)
-│   ├── [x] BottomSheet reutilizable (gesture solo en handle, scroll libre en contenido)
-│   ├── [x] SegmentedControl glass pill con indicador animado
-│   ├── [x] PhotoViewer fullscreen con heart abajo + author + caption
-│   ├── [x] MomentosViewer fullscreen con dots + tap nav + auto-close
-│   ├── [x] CreatePostModal dark theme + SocialFAB contextual
-│   ├── [x] Backend: AttendeeStory model+controller, fotos oficiales, cleanup command
-│   ├── [x] 15 tests nuevos (12 Story + 3 Photo oficial), 294 total all pass
-│   ├── [x] Headers uniformes: arrow-left + titulo izquierda (Speakers, Agenda, Social)
-│   ├── [x] Polling eliminado → refetchOnWindowFocus + useFocusEffect
-│   ├── [x] Comments optimistic (aparecen inmediato con opacity 0.5 + spinner)
-│   ├── [x] fotos.tsx eliminado, unificado en Social
-│   └── [x] ~30 bugs resueltos (gesture conflict, stale closures, layout, Android)
-├── Pantallas pendientes:
-│   ├── [ ] Networking / Chat ← SIGUIENTE
-│   ├── [ ] Sponsors / Stands
-│   ├── [ ] Gamificacion / Leaderboard
-│   ├── [ ] Perfil / Settings
-│   ├── [ ] Q&A en vivo
-│   ├── [ ] Encuestas
-│   ├── [ ] Matchmaking
-│   └── [ ] Registro (onboarding)
-├── Items transversales (pendientes — componentes creados, integracion pendiente):
-│   ├── [ ] Skeleton loading — componente Skeleton.tsx creado (SkeletonGroup + Bone con Context),
-│   │       pero integracion en speakers.tsx causo que el contenido no apareciera.
-│   │       REVERTIDO a ActivityIndicator. Reintentar con integracion cuidadosa uno por uno.
-│   │       NOTA: cada Bone NO debe crear su propia animacion (crash 25+ shared values).
-│   │       Usar SkeletonGroup con Context para UNA sola animacion compartida.
-│   ├── [ ] EmptyState — componente EmptyState.tsx creado, integracion revertida junto con skeleton.
-│   ├── [ ] Pull-to-refresh — componente LuminaRefresh.tsx creado, integracion revertida.
-│   │       NOTA: verificar que isRefetching no cause conflictos con el rendering condicional.
-│   ├── [ ] Empty states ilustrados (aplicar EmptyState a todas las pantallas)
-│   ├── [ ] Onboarding slides
-│   └── [ ] QA visual completo
+PASO 5: Barrido Visual App — ~80% COMPLETADO
+├── ✅ Home (2026-04-07):
+│   ├── [x] Header configurable (logo/text desde branding API)
+│   ├── [x] Hero text/image modes, HappeningNow crossfade 6s
+│   ├── [x] GamificationHud RGB border + carousel integrado
+│   ├── [x] Mi QR tab premium, ModuleMenu 4 fijos con cascade animation
+│   └── [x] Pull-to-refresh
+├── ✅ Agenda (2026-04-08):
+│   ├── [x] Lumina Noir, day strip Fever-style, timeline glass cards
+│   ├── [x] Track filter, session states (live/finished/upcoming)
+│   ├── [x] Corazon animado con particulas, toast favoritos
+│   ├── [x] Calendario nativo (expo-calendar) + fallback Google Calendar
+│   └── [x] DaySlide direccional, finished cards opacity solo info
+├── ✅ Speakers (2026-04-08):
+│   ├── [x] Carousel Destacados (breathing animation), search, lista Todos
+│   ├── [x] Detail: hero photo, rating cristales diamond, LinkedIn, bio, session cards
+│   ├── [x] Speaker → Agenda navegacion scroll-to + highlight sutil
+│   └── [x] Master seeder: 18 speakers HD, 5 tracks, 29 sesiones 3 dias
+├── ✅ Streaming (2026-04-08):
+│   ├── [x] Header premium (titulo, speaker, empresa, separador)
+│   ├── [x] YouTube embed (react-native-youtube-iframe, fix URLs largas)
+│   └── [x] Boton UNIRTE solo live, Ver grabacion solo finished+recording
+├── ✅ Social (2026-04-09):
+│   ├── [x] Unificado: Feed + Memorias + Momentos en una pantalla
+│   ├── [x] PostCard Lumina Noir, likes animados, comments bottom sheet 55%
+│   ├── [x] Memorias grid 3col, fotos oficiales 2col + badge OFICIAL
+│   ├── [x] Momentos: stories simplificados (img, 24h, auto-advance 5s)
+│   ├── [x] BottomSheet reutilizable, SegmentedControl glass pill
+│   ├── [x] PhotoViewer + MomentosViewer fullscreen
+│   ├── [x] CreatePostModal dark + SocialFAB contextual
+│   └── [x] ~30 bugs resueltos (gesture, stale closures, Android)
+├── ✅ Sponsors (2026-04-09):
+│   ├── [x] Brand Wall: grid adaptativo por tier, living shuffle 7s, stagger reveal
+│   ├── [x] Brand Profile: logo hero, floating nav blur, servicios, trivia A/B/C/D
+│   └── [x] 15 tests sponsor, 300 total
+├── ✅ Profile (2026-04-09):
+│   ├── [x] Lumina Noir, beam Ocean avatar, foto editable
+│   ├── [x] Social links, stats, modal editar, pull-to-refresh
+│   └── [x] ProfileController + migration twitter/instagram/website
+├── ✅ Encuestas / PollSlides (2026-04-10):
+│   └── [x] Rediseno completo Lumina Noir (slides por pregunta, MultipleChoice/Star/OpenText)
+├── ✅ Chat sesion (2026-04-10):
+│   └── [x] Emojis animados + cooldown, Enter=enviar, error handling
+├── ✅ Transversales completados:
+│   ├── [x] FloatingTabBar: lift, labels, sin circulos, QR central, 5 tabs uniformes, haptic
+│   ├── [x] Notificaciones: badge rojo, shake 5s, MMKV persistence
+│   ├── [x] RatingModal: cristales diamond, bounce, haptic, accent
+│   ├── [x] Headers uniformes: arrow-left + titulo izquierda
+│   ├── [x] Responsive 360dp: 31 archivos, 12 pantallas SafeArea, proporcional
+│   ├── [x] Logout BottomSheet, tab bar ajustado
+│   ├── [x] Urbanist body + PlusJakartaSans headlines en toda la app
+│   ├── [x] Flash blanco Android eliminado (app.json + layouts + ScreenWrapper)
+│   ├── [x] Breathing carousel (Easing.out cubic), comments optimistic
+│   └── [x] Background #1a1919 → #141414, console.log cleanup
+├── ⏳ Pantallas pendientes:
+│   ├── [ ] Networking (directorio + contactos + solicitudes) ← UI ya funcional, falta Lumina Noir polish
+│   ├── [ ] Gamificacion / Leaderboard ← UI funcional, falta polish visual
+│   ├── [ ] Matchmaking ← UI funcional, falta polish visual
+│   ├── [ ] Auth screens (login / registro) ← rediseno visual
+│   └── [ ] Onboarding visual (bugs z-index Android, requiere dev build)
+├── ⏳ Items transversales pendientes:
+│   ├── [ ] Skeleton loading — componente creado (SkeletonGroup + Bone Context),
+│   │       integracion revertida (crash 25+ shared values). Reintentar uno por uno.
+│   ├── [ ] EmptyState — componente creado, integracion revertida con skeleton.
+│   ├── [ ] Pull-to-refresh custom (LuminaRefresh.tsx) — creado, integracion revertida.
+│   ├── [ ] Empty states ilustrados en todas las pantallas
+│   ├── [ ] Iconografia consistente (reemplazar emojis ModuleMenu por icon set real)
+│   └── [ ] QA visual completo (multi-device)
 
 PASO 6: Admin Premium
 ├── Dashboard analytics
