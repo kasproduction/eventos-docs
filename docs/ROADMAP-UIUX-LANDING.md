@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Documento de planificación para la fase UI/UX de EventOS.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-10 | Estado: En Progreso (Paso 5 — 80% completado)
+> Fecha: 2026-04-07 | Actualizado: 2026-04-10 | Estado: En Progreso (Paso 5 — ~90% completado)
 
 ---
 
@@ -372,29 +372,47 @@ PASO 5: Barrido Visual App — ~80% COMPLETADO
 │   └── [x] Rediseno completo Lumina Noir (slides por pregunta, MultipleChoice/Star/OpenText)
 ├── ✅ Chat sesion (2026-04-10):
 │   └── [x] Emojis animados + cooldown, Enter=enviar, error handling
+├── ✅ Mi QR (2026-04-10):
+│   ├── [x] Tab real (presencial+virtual), no stack push. Sin flecha
+│   ├── [x] Badge digital: evento nombre+fecha, QR con RGB wave pastel 5px, identidad
+│   ├── [x] Tap QR abre fullscreen modal con RGB border
+│   ├── [x] Boton Wallet (coming soon, preparado para 1.C2)
+│   ├── [x] Proporcional 360-411dp, dashed lines, role pill accent
+│   └── [x] FloatingTabBar simplificado: Mi QR es tab real, no fake Pressable
+├── ✅ Gamificacion / Desafio (2026-04-10):
+│   ├── [x] GamificationHud: teal/cyan (#39d2c0), RGB wave pastel 2px, barra segmentada
+│   ├── [x] HUD en carousel: 2da posicion (despues de 1 sesion), 10s duracion
+│   ├── [x] Pantalla Desafio unificada: hero HUD + ranking inline + portal cards
+│   ├── [x] Hero: rank + puntos + barra segmentada con % + mini ranking top 3
+│   ├── [x] RGB wave border en hero cuando top 3, RGB ring en avatar #1
+│   ├── [x] Portal cards verticales: Retos (count+barra+proximo) + Pasaporte (stamps dimmed)
+│   ├── [x] Premios card: catalogo con estados (canjear/ver ticket/canjeado/agotado)
+│   ├── [x] BottomSheets: ranking (podio+confetti), retos (sort completados), pasaporte, premios
+│   ├── [x] QR canje temporal 5min con RGB rect + countdown
+│   ├── [x] Reglas: boton info en header, BottomSheet con reglas + tabla puntos
+│   ├── [x] Frase motivacional contextual (banner teal)
+│   ├── [x] FadeInSection animaciones escalonadas
+│   ├── [x] Toast LuminaToast en vez de Alert (success/error/info)
+│   └── [x] returnKeyType en 14 archivos (search/next/go/send/done)
 ├── ✅ Transversales completados:
-│   ├── [x] FloatingTabBar: lift, labels, sin circulos, QR central, 5 tabs uniformes, haptic
+│   ├── [x] FloatingTabBar: lift, labels, sin circulos, 5 tabs reales, haptic
 │   ├── [x] Notificaciones: badge rojo, shake 5s, MMKV persistence
 │   ├── [x] RatingModal: cristales diamond, bounce, haptic, accent
 │   ├── [x] Headers uniformes: arrow-left + titulo izquierda
 │   ├── [x] Responsive 360dp: 31 archivos, 12 pantallas SafeArea, proporcional
-│   ├── [x] Logout BottomSheet, tab bar ajustado
+│   ├── [x] Logout BottomSheet (36%), tab bar ajustado
 │   ├── [x] Urbanist body + PlusJakartaSans headlines en toda la app
 │   ├── [x] Flash blanco Android eliminado (app.json + layouts + ScreenWrapper)
 │   ├── [x] Breathing carousel (Easing.out cubic), comments optimistic
 │   └── [x] Background #1a1919 → #141414, console.log cleanup
 ├── ⏳ Pantallas pendientes:
-│   ├── [ ] Networking (directorio + contactos + solicitudes) ← UI ya funcional, falta Lumina Noir polish
-│   ├── [ ] Gamificacion / Leaderboard ← UI funcional, falta polish visual
+│   ├── [ ] Networking (directorio + contactos + solicitudes) ← UI funcional, falta Lumina Noir polish
 │   ├── [ ] Matchmaking ← UI funcional, falta polish visual
 │   ├── [ ] Auth screens (login / registro) ← rediseno visual
 │   └── [ ] Onboarding visual (bugs z-index Android, requiere dev build)
 ├── ⏳ Items transversales pendientes:
-│   ├── [ ] Skeleton loading — componente creado (SkeletonGroup + Bone Context),
-│   │       integracion revertida (crash 25+ shared values). Reintentar uno por uno.
-│   ├── [ ] EmptyState — componente creado, integracion revertida con skeleton.
-│   ├── [ ] Pull-to-refresh custom (LuminaRefresh.tsx) — creado, integracion revertida.
-│   ├── [ ] Empty states ilustrados en todas las pantallas
+│   ├── [ ] Skeleton loading — componente creado, integracion revertida. Reintentar uno por uno.
+│   ├── [ ] EmptyState + Pull-to-refresh custom — creados, integracion revertida.
 │   ├── [ ] Iconografia consistente (reemplazar emojis ModuleMenu por icon set real)
 │   └── [ ] QA visual completo (multi-device)
 
