@@ -26,7 +26,7 @@ cada sesión más fácil de debuggear.
 
 **Milestone MVP lanzable:** Fase 0 + Fase 1 completa + Stress Test + UI sweep + deploy.
 
-## Estado del proyecto (al 2026-04-09)
+## Estado del proyecto (al 2026-04-09, Roadmap v2.8)
 
 | Sesión | Feature | Estado |
 |--------|---------|--------|
@@ -62,14 +62,22 @@ cada sesión más fácil de debuggear.
 | **1.22** | **Registro personalizable + Import/Export** | ✅ (2026-04-07) |
 | **RT Invalidation** | **Real-time sync Admin→App (socket + focusManager + jitter)** | ✅ (2026-04-09) — 5 entidades, 4 capas, probado en vivo |
 | **Push Invalidation** | **Push notification auto-invalida caches al llegar** | ⏳ Codigo listo, pendiente dev build para probar |
+| **Competitive** | **Analisis competitivo (Cisco $88K USD vs ICE360 $49M COP vs EventOS)** | ✅ (2026-04-09) — gaps identificados, 6 nuevas sesiones, pricing, escalabilidad validada |
 | **1.23** | **Permisos granulares Filament (roles admin)** | ⏳ Pendiente |
 | **1.x Rewards** | **Redencion de puntos (kiosko de premios)** | ⏳ Catalogo, QR temporal, staff escanea, descuenta puntos. Cierra el loop de gamificacion. |
 | **Nice to have** | **Light mode (tema claro)** | ⏳ Requiere refactor de colores hardcoded a theme provider. Sesion dedicada si cliente lo pide. |
 | ~~1.22 old~~ | ~~Floor plan del venue~~ | Movido a Fase 3 |
+| **— Nuevos features (identificados en analisis competitivo 2026-04-09)** | | |
+| **1.C1** | **Analytics dashboard (Filament + API)** | ⏳ PRIORIDAD MAXIMA — ROI, engagement, asistencia, sponsors, leads. Justifica el precio ante el cliente. Ambos competidores lo tienen. |
+| **1.C2** | **Wallet digital (Apple Wallet + Google Wallet)** | ⏳ Badge digital con QR dinamico. .pkpass (Apple) + JWT (Google Wallet API). Reemplaza badge printing fisico como default. Diferenciador vs competencia. |
+| **1.C3** | **QR dinamico rotativo** | ⏳ QR en app rota cada 30-60s con HMAC-SHA256 + timestamp + user_id. Imposible de clonar. Reemplaza reconocimiento facial ($5M COP en competencia). Base HMAC ya existe. |
+| **1.C4** | **Digital signage (pantallas venue)** | ⏳ Integrar concepto de proyecto checki: pantallas con agenda en vivo, sesion actual/siguiente, override imagen/video, leaderboard gamificacion, social wall. Checki tenia 106 archivos de referencia (commit 5e2f867). |
+| **1.C5** | **Calendar sync (.ics)** | ⏳ Boton "Agregar al calendario" por sesion. Genera archivo .ics con titulo, hora, salon, recordatorio. Compatible Google Calendar, Outlook, Apple Calendar. Sin OAuth. |
+| **1.C6** | **Badge printing fisico (add-on)** | ⏳ Impresora termica (Zebra/Brother) + credencial personalizada. Add-on para clientes que lo pidan. Logica de check-in ya existe. Complementa wallet digital. |
 | **— PDFs & Analytics (aplazados al final, después de todos los features)** | | |
 | **1.P1** | **Certificados PDF** | ⏳ Aplazado |
 | **1.P2** | **Reporte post-evento PDF** | ⏳ Aplazado |
-| **1.P3** | **Analytics avanzado** | ⏳ Aplazado |
+| **1.P3** | **Analytics avanzado** | ⏳ Absorbido por 1.C1 — analytics dashboard es ahora prioridad maxima |
 | **1.P4** | **Reports exportables detallados** | ⏳ Aplazado |
 | **1.x Pulido** | **Pulido funcional (mejoras pre-deploy)** | ✅ (2026-04-07) |
 | **1.x Stress** | **Stress & Load Testing (k6 + artillery)** | ✅ Scripts listos (2026-04-07) — test local ejecutado, pendiente VPS Ubuntu |
@@ -82,8 +90,27 @@ cada sesión más fácil de debuggear.
 | **— Landing + UI/UX** | | |
 | **Landing** | **Landing web premium (hero video, speakers, agenda, sponsors, registro)** | ⏳ Planificado — docs/ROADMAP-UIUX-LANDING.md |
 | **UI Sponsors** | **Brand Wall + Brand Profile premium** | ✅ (2026-04-09) — grid por tier, living shuffle, contact form, trivia, 15 tests |
+| **UI Profile** | **Profile screen Lumina Noir + editar datos + avatar beam** | ✅ (2026-04-09) — beam Ocean, foto editable, redes sociales, stats, modal editar, pull to refresh |
+| **Profile API** | **GET/PUT /me/profile + POST/DELETE /me/photo + social fields** | ✅ (2026-04-09) — ProfileController, migration twitter/instagram/website, beam fallback todos los endpoints |
+| **RT Branding** | **Real-time branding invalidation (EventObserver + socket)** | ✅ (2026-04-09) — cambios de config/branding llegan via socket, refetch on reconnect |
+| **UI Fixes** | **Mi Agenda sin flecha, Home pull to refresh, expo-image SVG social** | ✅ (2026-04-09) |
+| **— Web App (asistente virtual — Next.js)** | | |
+| **W.1** | **Setup Next.js + Tailwind + shadcn/ui + auth + layout** | ⏳ Pendiente |
+| **W.2** | **Home (hero, happening now, highlights, carousel sponsors)** | ⏳ Pendiente |
+| **W.3** | **Agenda (lista, filtros, tracks, favoritos, detalle sesion)** | ⏳ Pendiente |
+| **W.4** | **Streaming + Q&A + Chat (por sesion, experiencia virtual core)** | ⏳ Pendiente |
+| **W.5** | **Speakers (lista, perfil, ratings)** | ⏳ Pendiente |
+| **W.6** | **Social wall (feed, posts, comentarios, likes, fotos)** | ⏳ Pendiente |
+| **W.7** | **Sponsors (brand wall, perfil, lead capture, trivia)** | ⏳ Pendiente |
+| **W.8** | **Networking (perfiles, solicitudes, chat)** | ⏳ Pendiente |
+| **W.9** | **Encuestas + Gamification + Leaderboard** | ⏳ Pendiente |
+| **W.10** | **Notificaciones web + perfil + settings** | ⏳ Pendiente |
+| **W.11** | **Socket.IO integration (real-time en toda la web app)** | ⏳ Pendiente |
+| **W.12** | **Responsive polish + Lumina Noir theme + dark mode** | ⏳ Pendiente |
+| **— White-label + Deploy** | | |
+| **WL.1** | **Migrar app.json → app.config.js dinamico + estructura clients/** | ⏳ Pendiente |
 | **Sesión UI** | **Barrido visual completo (Lumina Noir/Lux)** | ⏳ Pendiente (última antes de deploy) |
-| **Deploy** | **Docker + VPS + CI/CD** | ⏳ Pendiente |
+| **Deploy** | **Docker + VPS + CI/CD (backend + web + app)** | ⏳ Pendiente |
 
 ---
 
@@ -2519,10 +2546,336 @@ Blue-green con zero downtime: deploy en VPS-2 mientras VPS-1 sirve, luego swap. 
 
 ---
 
-_EventOS Plan v2.5 — Kasproduction_
+---
+
+## Apendice E: Analisis Competitivo — 2026-04-09
+
+### Cotizaciones reales analizadas
+
+Se obtuvieron dos cotizaciones dirigidas a **Eventos Efectivos y Producciones S.A.S.** para el evento **Bintec Bancolombia** (~14,000 asistentes):
+
+| Proveedor | Plataforma | Total | Moneda | En USD |
+|---|---|---|---|---|
+| **Axity / Cisco** | Webex Events (ex-Socio) | $88,697 | USD | $88,697 |
+| **IPServices** | ICE360 Premium | $49,340,364 | COP | ~$11,748 |
+| **EventOS** (proyectado) | EventOS SaaS | $200-400/mes infra | USD | $200-400 |
+
+### Por que Cisco cobra $88,697 USD
+- 95%+ es margen, no infraestructura
+- Marca ("nadie pierde su empleo por comprar Cisco")
+- SLA contractual 99.9% con respaldo legal
+- Compliance (SOC2, ISO 27001)
+- Cadena de intermediarios (Bancolombia → Eventos Efectivos → Axity → Cisco)
+- Enterprise sales (abogados, procurement, licitaciones)
+- Soporte dedicado ("War Room" con ingenieros)
+- Webex Events fue una startup (Socio) comprada por Cisco en 2022. Misma arquitectura: servers + DB + WebSockets + CDN + app movil.
+
+### Features donde EventOS YA supera a ambos
+1. Gamificacion (13 acciones + passport stamps + leaderboard) — ni Cisco ni ICE360
+2. Social Wall (feed + memorias + momentos) — Cisco basico, ICE360 nada
+3. Photobooth moderado — ninguno
+4. Ratings de sesiones — ninguno
+5. Matchmaking por intereses con overlap — superior al "Shake & Connect" de Cisco
+6. Push nativo (no WhatsApp $850K extra, no web-only)
+7. Real-time invalidation 4 capas (socket + focusManager + reconnect + staleTime)
+8. Brand Wall/Profile con lead capture cualificado
+
+### Gaps cerrados con nuevas sesiones (1.C1-1.C6)
+- **1.C1 Analytics** — ambos competidores lo tienen, es tablestakes
+- **1.C2 Wallet digital** — reemplaza badge printing como default moderno
+- **1.C3 QR dinamico** — reemplaza reconocimiento facial (mas seguro, $0 hardware)
+- **1.C4 Digital signage** — proyecto checki ya existia, integrar a EventOS
+- **1.C5 Calendar .ics** — ICE360 tenia sync, nosotros archivo .ics universal
+- **1.C6 Badge printing** — add-on para clientes nostalgicos
+
+### Mercado objetivo y pricing
+
+| Segmento | Precio | Por que nos eligen |
+|---|---|---|
+| Eventos corporativos medianos (500-5k) | $3,000-8,000 USD/evento | Mas features que ICE360, 10x mas barato que Cisco |
+| Agencias de eventos (white-label) | $1,500-3,000 USD/mes | Plataforma que venden como propia |
+| Empresas con 3-4 eventos/año | $800-1,500 USD/mes SaaS | Mas barato que contratar por evento |
+
+### Validacion de escalabilidad horizontal
+
+Arquitectura actual (Laravel stateless + Socket.IO/Redis adapter + Cloudflare CDN) escala sin reescribir codigo:
+
+| Escala | Infra | Costo/mes | Equipo |
+|---|---|---|---|
+| 1k-5k | 1 VPS gordo | ~$80-120 | Solo |
+| 5k-10k | 2-3 VPS + LB | ~$200-400 | Solo |
+| 10k-50k | 5-8 VPS + Redis cluster + MySQL replica | ~$800-1,500 | 1 DevOps |
+| 50k-100k | 10-15 VPS + DB cluster | ~$3,000-5,000 | DevOps + backend + soporte |
+| 100k+ | Kubernetes, auto-scaling, multi-region | ~$8,000-15,000 | Equipo completo |
+
+A 100k+ el negocio factura $500k-1M USD/año y el equipo se paga solo.
+
+---
+
+---
+
+## Apendice F: Web App — Experiencia Virtual Completa (2026-04-09)
+
+### Por que web app (no solo landing)
+
+El publico virtual es el target principal del producto. Un asistente remoto esta sentado frente a su computadora — el celular lo usa para otras cosas. La experiencia del evento en el browser es la experiencia primaria para asistentes virtuales. Ambos competidores (Cisco Webex Events, ICE360) son web-first.
+
+**Decision:** La web app NO es un complemento de la app movil. Es la experiencia completa para el publico virtual. La app movil agrega las interacciones presenciales (QR check-in, escaneo de leads, passport stamps).
+
+### Stack tecnico
+
+- **Framework:** Next.js 15 (App Router)
+- **Styling:** Tailwind CSS + shadcn/ui (componentes base)
+- **Theme:** Lumina Noir (dark mode, mismo design system que la app movil)
+- **Fonts:** Urbanist (body) + Plus Jakarta Sans (headlines)
+- **Real-time:** Socket.IO client
+- **State:** React Query (TanStack Query) — misma estrategia que la app movil
+- **Auth:** Token-based, misma API de Laravel
+- **Repo:** Nuevo repo separado (eventos-web)
+
+### Features web (experiencia virtual completa)
+
+| Sesion | Feature | Detalle |
+|--------|---------|---------|
+| W.1 | Setup + Auth + Layout | Next.js + Tailwind + shadcn/ui + login/register + layout shell |
+| W.2 | Home | Hero configurable, happening now, highlights carousel, sponsors |
+| W.3 | Agenda | Lista completa, filtros por dia/track/tipo, favoritos, detalle sesion |
+| W.4 | Streaming + Q&A + Chat | Experiencia virtual core — video embed + preguntas + chat en vivo |
+| W.5 | Speakers | Directorio, perfil detallado, ratings post-sesion |
+| W.6 | Social Wall | Feed, posts con fotos, comentarios, likes, memorias |
+| W.7 | Sponsors | Brand Wall (grid por tier), Brand Profile, lead capture, trivia |
+| W.8 | Networking | Perfiles, solicitudes de contacto, chat 1:1 |
+| W.9 | Encuestas + Gamification | Encuestas en vivo, leaderboard, badges, puntos |
+| W.10 | Notificaciones + Perfil | Web Notifications API, editar perfil, settings |
+| W.11 | Socket.IO | Real-time sync en toda la web (agenda, Q&A, chat, social, encuestas) |
+| W.12 | Polish | Responsive, Lumina Noir completo, transiciones, loading states |
+
+### Features SOLO movil (no aplica en web)
+
+- Kiosco de check-in (hardware dedicado)
+- QR badge fisico (entrada presencial)
+- Escaneo de leads con camara (presencial)
+- Passport stamps con QR (presencial)
+- Push notifications nativas (web usa Web Notifications API)
+
+### Soporte tablets e iPads
+
+No se requiere trabajo adicional. Todos los dispositivos estan cubiertos con las dos plataformas existentes:
+
+| Dispositivo | Experiencia recomendada | Por que |
+|-------------|-------------------------|---------|
+| iPhone / Android phone | App nativa | Interacciones presenciales (QR, check-in, leads, passport) |
+| iPad / tablet Android | Web app en Safari/Chrome o app nativa | Web app responsive aprovecha pantalla completa; app nativa funciona sin cambios |
+| Laptop / desktop | Web app | Experiencia virtual principal |
+
+**App nativa en tablets:** React Native usa Flexbox — los layouts se adaptan automaticamente a pantallas mas grandes. La app ya corre en iPads y tablets Android sin modificaciones. Opcionalmente se pueden optimizar layouts (ej: agenda en dos columnas) pero no es bloqueante.
+
+**Web app en tablets:** Tailwind CSS tiene breakpoints para tablet (`md: 768px`) y desktop (`lg: 1024px`). El diseño responsive cubre tablets nativamente. Un asistente en iPad abre el browser → experiencia perfecta.
+
+**Impacto en timeline:** Cero. No agrega dias de trabajo.
+
+### Ventaja tecnica
+
+El backend no se toca. La API esta 100% lista. Los 300+ tests existentes validan todo. La web app es puramente frontend consumiendo los mismos endpoints. React (Next.js) comparte patrones con React Native — no se parte de cero.
+
+### Estimacion
+
+~22-28 dias de desarrollo. Ver timeline completo en Apendice H.
+
+---
+
+## Apendice G: White-Label + Rebranding (2026-04-09)
+
+### Como funciona
+
+Cada cliente recibe una app con su propia marca: nombre, icono, splash, colores, bundle ID. El codigo es el mismo — solo cambia la configuracion de build.
+
+### Implementacion tecnica
+
+**Paso 1:** Migrar `app.json` estatico → `app.config.js` dinamico
+
+```js
+// app.config.js
+const CLIENT = process.env.CLIENT || 'eventos';
+
+const clients = {
+  eventos: {
+    name: 'EventOS',
+    slug: 'eventos',
+    bundleId: 'com.eventos.app',
+    icon: './assets/clients/eventos/icon.png',
+    splash: './assets/clients/eventos/splash.png',
+  },
+  bintec: {
+    name: 'Bintec 2026',
+    slug: 'bintec-2026',
+    bundleId: 'com.bintec2026.app',
+    icon: './assets/clients/bintec/icon.png',
+    splash: './assets/clients/bintec/splash.png',
+  },
+};
+
+const config = clients[CLIENT];
+module.exports = { expo: { name: config.name, slug: config.slug, ... } };
+```
+
+**Paso 2:** Estructura de assets por cliente
+
+```
+assets/clients/
+  eventos/       # Default (EventOS generico)
+    icon.png
+    splash.png
+  bintec/        # Bancolombia / Bintec
+    icon.png
+    splash.png
+  enel/          # Ejemplo futuro
+    icon.png
+    splash.png
+```
+
+**Paso 3:** Build con un comando
+
+```bash
+CLIENT=bintec eas build --profile production --platform all --auto-submit
+```
+
+### Tiempos de aprobacion en tiendas
+
+| Tienda | Primera vez | Actualizaciones |
+|--------|-------------|-----------------|
+| Apple App Store | 24-48 horas | 12-24 horas |
+| Google Play | 2-7 dias (primera vez) | Horas (a veces minutos) |
+
+### Que se puede cambiar sin rebuild (desde Filament admin)
+
+- Activar/desactivar modulos (networking, photobooth, gamificacion, etc.)
+- Colores del evento (primary_color dinamico)
+- Logo y banner del evento
+- Configurar agenda, speakers, sponsors
+- Contenido completo del evento
+
+### Que requiere rebuild (1 comando + aprobacion tiendas)
+
+- Nombre de la app en las tiendas
+- Icono de la app
+- Splash screen
+- Bundle ID (solo se define una vez, no se cambia despues)
+
+### Flujo para un cliente nuevo
+
+```
+Dia 1: Cliente entrega logo + colores + nombre del evento
+Dia 1: Crear carpeta assets/clients/nombre/ + config (2-3 horas)
+Dia 1: CLIENT=nombre eas build --auto-submit (20 min build en nube)
+Dia 2-3: Apple aprueba (~24-48h)
+Dia 2: Google aprueba (~horas)
+Dia 3: App en las tiendas con la marca del cliente
+```
+
+**Tiempo total por cliente nuevo: 3 dias (la mayoria es espera de aprobacion).**
+
+### Cuentas de developer
+
+| Escenario | Cuenta | Costo |
+|-----------|--------|-------|
+| Clientes pequenos/medianos | Tu cuenta (Kasproduction) | $99/ano Apple + $25 una vez Google |
+| Corporativos grandes | Cuenta del cliente | El cliente paga su cuenta, te invita como developer |
+
+Apple permite hasta 30 apps por cuenta. Google no tiene limite.
+
+### Modelo de negocio white-label
+
+| Opcion | Descripcion | Para quien |
+|--------|-------------|------------|
+| **A. App propia por cliente** | "Bintec 2026" en las tiendas, marca 100% del cliente | Agencias, corporativos ($5K+ USD) |
+| **B. App generica EventOS** | Usuario abre EventOS → selecciona su evento | Clientes pequenos ($800-1.5K/mes SaaS) |
+| **C. Ambas** | White-label premium + app generica para el resto | Escala con multiples segmentos |
+
+### Web app white-label
+
+La web app tambien se rebrandea facilmente:
+- Dominio del cliente: `eventos.bintec.com.co` → apunta al mismo backend
+- CSS variables para colores/logo → cambia por evento automaticamente
+- Mismo concepto: un codebase, multiples marcas
+
+### Setup necesario (una sola vez)
+
+| Tarea | Tiempo |
+|-------|--------|
+| Migrar app.json → app.config.js | ~1 hora |
+| Estructura assets/clients/ | ~30 min |
+| EAS build profiles por cliente | ~30 min |
+| Documentar proceso | ~30 min |
+| **Total** | **~2-3 horas** |
+
+---
+
+## Apendice H: Timeline Cliente Ancla — Septiembre 2026
+
+### Contexto
+
+Cliente real identificado: **Eventos Efectivos y Producciones S.A.S.** (agencia que cotizo Cisco $88K USD e ICE360 $49M COP). Necesitan plataforma para evento en **septiembre 2026**.
+
+### Timeline comprometido
+
+| Mes | Objetivo | Entregable |
+|-----|----------|------------|
+| **Abril** | Desarrollo: analytics + features competitivos (C1-C5) | Backend + app movil completos |
+| **Mayo** | Desarrollo: web app completa + deploy + UI sweep | Producto desplegado en VPS, web app funcional |
+| **Junio** | Pitch + demo en vivo | Video demo 3 min, presentacion a Eventos Efectivos |
+| **Julio** | Onboarding cliente | White-label, personalizacion, datos del evento |
+| **Agosto** | Pruebas + ajustes | Stress test con datos reales, feedback del cliente |
+| **Septiembre** | Evento en vivo | Primer caso de estudio real |
+
+### Estimacion de trabajo (abril-mayo)
+
+| Bloque | Duracion | Acumulado |
+|--------|----------|-----------|
+| Analytics dashboard (1.C1) | 2-3 dias | Semana 1 |
+| Permisos admin (1.23) + Calendar .ics (1.C5) + QR dinamico (1.C3) | 2 dias | Semana 1-2 |
+| Web app W.1-W.4 (setup + home + agenda + streaming) | 6-8 dias | Semana 2-3 |
+| Web app W.5-W.8 (speakers + social + sponsors + networking) | 6-8 dias | Semana 3-5 |
+| Web app W.9-W.12 (encuestas + gamification + sockets + polish) | 5-6 dias | Semana 5-6 |
+| Deploy (backend + web + app) + SEC-4/5 | 2-3 dias | Semana 6-7 |
+| UI sweep app movil + white-label setup | 2-3 dias | Semana 7 |
+| Video demo + materiales de pitch | 1 dia | Semana 7 |
+| **Total** | **~32-38 dias** | **~7 semanas** |
+
+### Prioridad de features para este deal
+
+**Critico (sin esto no hay venta):**
+- Analytics dashboard — justifica el ROI ante el cliente
+- Web app completa — publico virtual es el core
+- Streaming + Q&A + Chat — experiencia virtual minima
+- Deploy funcional — demo en vivo, no screenshots
+
+**Importante (fortalece la venta):**
+- Calendar sync (.ics) — esperado por todos
+- QR dinamico — diferenciador vs competencia
+- Permisos admin — necesario para operacion real
+
+**Puede esperar (agregar post-venta si lo piden):**
+- Wallet digital (C2)
+- Digital signage (C4)
+- Badge printing (C6)
+- Certificados PDF
+- Rewards / redencion de puntos
+- Light mode
+
+### Filtro de decisiones
+
+> "Este feature me acerca al pitch de junio con Eventos Efectivos?"
+>
+> Si → hacerlo. No → posponerlo.
+
+---
+
+_EventOS Plan v2.8 — Kasproduction_
 _Documento maestro: EventOS_ClaudeCode_Prompt_v2.md (v2.5)_
 _Dev setup: EventOS_DevSetup.md_
 _Seguridad: docs/FASE-SEGURIDAD.md_
 _Compliance: docs/COMPLIANCE-SEGURIDAD.md_
 _Disponibilidad: docs/DISPONIBILIDAD-HA.md_
 _UI/UX + Landing: docs/ROADMAP-UIUX-LANDING.md_
+_Analisis competitivo: memoria project_competitive_analysis.md_
