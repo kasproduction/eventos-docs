@@ -148,6 +148,8 @@ cada sesión más fácil de debuggear.
 | **Testing** | **Emuladores ZTE 360dp + Medium Phone 411dp configurados, TestStreamingSeeder** | ✅ (2026-04-10) |
 | **UI Mi QR** | **Badge digital: tab real, RGB wave pastel, evento+QR+identidad, fullscreen tap, wallet ready** | ✅ (2026-04-10) — proporcional 360-411dp, dashed lines, role pill accent |
 | **UI Gamification** | **GamificationHud rediseno: teal/cyan sci-fi, progress segmentada, RGB wave 2px, prioridad carousel** | ✅ (2026-04-10) — rank 36px, puntos 28px, slide 2do posicion, 10s duracion |
+| **UI Desafio** | **Pantalla unificada: hero HUD + ranking + retos + pasaporte + premios, portal cards, BottomSheets** | ✅ (2026-04-10) — confetti, FadeInSection, motivational tip, returnKeyType 14 archivos |
+| **Rewards** | **Sistema de premios canjeables: catalogo, QR temporal HMAC 5min, staff confirma, expire+refund** | ✅ (2026-04-10) — 9 tests, Filament CRUD, addon toggle, RewardSeeder |
 | **— Web App (asistente virtual — Next.js)** | | |
 | **W.1** | **Setup Next.js + Tailwind + shadcn/ui + auth + layout** | ⏳ Pendiente |
 | **W.2** | **Home (hero, happening now, highlights, carousel sponsors)** | ⏳ Pendiente |
