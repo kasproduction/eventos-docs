@@ -75,7 +75,7 @@ cada sesión más fácil de debuggear.
 
 **Milestone MVP lanzable:** Fase 0 + Fase 1 completa + Stress Test + UI sweep + deploy.
 
-## Estado del proyecto (al 2026-04-10, Roadmap v3.0)
+## Estado del proyecto (al 2026-04-10, Roadmap v3.1)
 
 | Sesión | Feature | Estado |
 |--------|---------|--------|
@@ -150,6 +150,8 @@ cada sesión más fácil de debuggear.
 | **UI Gamification** | **GamificationHud rediseno: teal/cyan sci-fi, progress segmentada, RGB wave 2px, prioridad carousel** | ✅ (2026-04-10) — rank 36px, puntos 28px, slide 2do posicion, 10s duracion |
 | **UI Desafio** | **Pantalla unificada: hero HUD + ranking + retos + pasaporte + premios, portal cards, BottomSheets** | ✅ (2026-04-10) — confetti, FadeInSection, motivational tip, returnKeyType 14 archivos |
 | **Rewards** | **Sistema de premios canjeables: catalogo, QR temporal HMAC 5min, staff confirma, expire+refund** | ✅ (2026-04-10) — 9 tests, Filament CRUD, addon toggle, RewardSeeder |
+| **Gamification Config** | **Roles por accion, daily_max, labels editables, rules endpoint, Filament unificado** | ✅ (2026-04-10) — todo bajo grupo Gamificacion, passport_completion_points |
+| **Rewards UX** | **Flujo canje completo: toast, estados boton (canjear/ver ticket/canjeado), QR rect RGB, recovery** | ✅ (2026-04-10) — seguridad SQL fix, points_log signed |
 | **— Web App (asistente virtual — Next.js)** | | |
 | **W.1** | **Setup Next.js + Tailwind + shadcn/ui + auth + layout** | ⏳ Pendiente |
 | **W.2** | **Home (hero, happening now, highlights, carousel sponsors)** | ⏳ Pendiente |
@@ -2936,7 +2938,7 @@ Cliente real identificado: **Eventos Efectivos y Producciones S.A.S.** (agencia 
 
 ---
 
-_EventOS Plan v3.0 — Kasproduction_
+_EventOS Plan v3.1 — Kasproduction_
 _Documento maestro: EventOS_ClaudeCode_Prompt_v2.md (v2.5)_
 _Dev setup: EventOS_DevSetup.md_
 _Seguridad: docs/FASE-SEGURIDAD.md_
