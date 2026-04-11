@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>EventOS Onboarding v3 — Digital Aurora</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#08080a;color:#fffbfe;font-family:'Urbanist',sans-serif;width:375px;height:812px;margin:0 auto;overflow:hidden;position:relative}
+
+/* ═══ COLOR PICKER PANEL ═══ */
+.color-picker{position:fixed;top:10px;right:10px;z-index:999;display:flex;flex-direction:column;gap:4px;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(10px);padding:8px;border-radius:14px;border:1px solid rgba(255,255,255,.08)}
+.color-picker .cp-label{font-size:8px;color:rgba(255,255,255,.3);text-align:center;letter-spacing:1px;text-transform:uppercase}
+.color-picker .cp-row{display:flex;gap:4px}
+.cp-swatch{width:24px;height:24px;border-radius:12px;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.cp-swatch:hover{transform:scale(1.15)}
+.cp-swatch.active{border-color:#fff}
+
+/* ═══ CSS VARIABLES (default white) ═══ */
+:root{
+  --pc: 255,255,255;
+  --pc-hex: #FFFFFF;
+  --pc-dark: #C0C4CC;
+  --pc-text: #08080a;
+}
+
+/* ═══ AMBIENT ═══ */
+.amb{position:absolute;inset:0;z-index:0;overflow:hidden}
+.amb-orb{position:absolute;border-radius:50%;filter:blur(100px);animation:orbDrift 12s ease-in-out infinite alternate}
+.o1{width:280px;height:280px;background:rgba(var(--pc),.08);top:-80px;left:-50px}
+.o2{width:220px;height:220px;background:rgba(var(--pc),.05);bottom:60px;right:-70px;animation-delay:-6s}
+.o3{width:160px;height:160px;background:rgba(var(--pc),.04);top:45%;left:55%;animation-delay:-3s}
+@keyframes orbDrift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(20px,-25px) scale(1.1)}}
+
+/* Particles */
+.particles{position:absolute;inset:0;z-index:1}
+.particle{position:absolute;border-radius:50%;background:rgba(var(--pc),.2);animation:pFloat linear infinite}
+@keyframes pFloat{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-812px) translateX(30px);opacity:0}}
+
+/* ═══ PROGRESS ═══ */
+.prog{position:absolute;top:56px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:200;opacity:0;transition:opacity .4s}
+.prog.vis{opacity:1}
+.pdot{height:3px;border-radius:2px;background:rgba(255,255,255,.08);transition:all .4s cubic-bezier(.25,.1,.25,1);width:14px}
+.pdot.on{width:28px;background:rgba(var(--pc),.6)}
+
+/* Back */
+.back{position:absolute;top:52px;left:20px;z-index:300;width:36px;height:36px;border-radius:18px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:#fffbfe;
+  font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .3s;backdrop-filter:blur(10px)}
+.back.vis{opacity:1}
+
+/* ═══ SLIDES ═══ */
+.slide{position:absolute;inset:0;z-index:10;opacity:0;transform:translateX(60px);
+  transition:all .55s cubic-bezier(.25,.1,.25,1);pointer-events:none;display:flex;flex-direction:column}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}
+.slide.exit{opacity:0;transform:translateX(-60px)}
+
+/* ═══ COMMON ═══ */
+.t-over{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(var(--pc),.5);margin-bottom:10px}
+.t-big{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;letter-spacing:-1.2px;line-height:1.08;margin-bottom:10px}
+.t-big em{font-style:normal;background:linear-gradient(135deg,var(--pc-hex),var(--pc-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.t-sub{font-size:14px;color:rgba(255,255,255,.35);line-height:1.5;margin-bottom:24px}
+
+.btn-main{width:100%;padding:16px;border:none;border-radius:16px;font-family:'Urbanist',sans-serif;font-weight:700;
+  font-size:16px;cursor:pointer;background:var(--pc-hex);color:var(--pc-text);transition:transform .12s;letter-spacing:-.2px}
+.btn-main:active{transform:scale(.97)}
+.btn-glass{width:100%;padding:15px;border-radius:16px;font-family:'Urbanist',sans-serif;font-weight:600;font-size:15px;
+  cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.6);
+  margin-top:10px;backdrop-filter:blur(10px);transition:transform .12s}
+.btn-glass:active{transform:scale(.97)}
+.skip{text-align:center;margin-top:16px;font-size:12px;color:rgba(255,255,255,.2);cursor:pointer}
+.link{text-align:center;margin-top:14px;font-size:13px;color:rgba(255,255,255,.25)}
+.link a{color:rgba(var(--pc),.7);text-decoration:none;font-weight:600}
+
+/* Fields */
+.fld{margin-bottom:14px}
+.fld label{display:block;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:5px}
+.fld input{width:100%;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+  border-radius:14px;color:#fffbfe;font-family:'Urbanist',sans-serif;font-size:15px;outline:none;transition:border-color .2s}
+.fld input:focus{border-color:rgba(var(--pc),.25)}
+.fld input::placeholder{color:rgba(255,255,255,.15)}
+
+/* ═══ S0: WELCOME ═══ */
+#s0{justify-content:flex-end;padding:0 28px 44px}
+
+.constellation{position:absolute;top:80px;left:0;right:0;height:380px;z-index:2}
+.node{position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(var(--pc),.2);
+  box-shadow:0 0 10px rgba(var(--pc),.2);animation:nPulse 3s ease-in-out infinite}
+@keyframes nPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.4);opacity:1}}
+.node-line{position:absolute;height:1px;background:linear-gradient(90deg,rgba(var(--pc),.1),rgba(var(--pc),.02));transform-origin:left center}
+
+/* Glass pills floating */
+.gpill{position:absolute;z-index:3;display:flex;align-items:center;gap:7px;
+  padding:9px 14px;background:rgba(255,255,255,.03);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.05);border-radius:12px;font-size:12px;font-weight:600;
+  color:rgba(255,255,255,.5);animation:pillFloat 6s ease-in-out infinite alternate;
+  box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.gpill .gp-dot{width:6px;height:6px;border-radius:3px;background:rgba(var(--pc),.4)}
+.gp1{top:110px;left:14px;animation-delay:0s}
+.gp2{top:95px;right:16px;animation-delay:-2s}
+.gp3{top:250px;left:30px;animation-delay:-3.5s}
+.gp4{top:235px;right:10px;animation-delay:-1.5s}
+.gp5{top:360px;left:18px;animation-delay:-4s}
+@keyframes pillFloat{0%{transform:translateY(0) rotate(0deg)}100%{transform:translateY(-8px) rotate(1deg)}}
+
+.swipe-hint{text-align:center;margin-top:18px;font-size:11px;color:rgba(255,255,255,.12);
+  animation:hPulse 2.5s ease-in-out infinite}
+@keyframes hPulse{0%,100%{opacity:.12}50%{opacity:.3}}
+
+/* ═══ S1: AUTH BOTTOM SHEET ═══ */
+#s1{justify-content:flex-end;padding:0}
+.auth-top{position:absolute;top:0;left:0;right:0;height:310px;z-index:1;overflow:hidden;padding:80px 24px 0}
+.auth-top-fade{position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(transparent,#08080a)}
+
+.stat-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;
+  background:rgba(var(--pc),.05);border:1px solid rgba(var(--pc),.08);
+  border-radius:14px;margin-right:8px;margin-bottom:10px}
+.stat-pill .sp-val{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:18px;color:rgba(var(--pc),.8)}
+.stat-pill .sp-lab{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px}
+
+.auth-sheet{position:relative;z-index:5;background:rgba(14,14,16,.85);backdrop-filter:blur(40px);
+  border-top:1px solid rgba(255,255,255,.06);border-radius:28px 28px 0 0;padding:28px 28px 44px;min-height:430px}
+.auth-sheet .sh{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.06);margin:0 auto 24px}
+
+/* ═══ S2: PHOTO ORBITAL ═══ */
+#s2{justify-content:center;align-items:center;padding:0 28px}
+
+.orbit-sys{position:relative;width:220px;height:220px;margin-bottom:20px}
+.orbit-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:180px;height:180px;border-radius:90px;
+  background:radial-gradient(circle,rgba(var(--pc),.05) 0%,transparent 70%);
+  animation:oGlow 3s ease-in-out infinite}
+@keyframes oGlow{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.5}50%{transform:translate(-50%,-50%) scale(1.15);opacity:1}}
+
+.orbit-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:140px;height:140px;border-radius:70px;background:rgba(255,255,255,.02);
+  border:2px dashed rgba(var(--pc),.12);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .3s;overflow:hidden;z-index:5}
+.orbit-center:hover{border-color:rgba(var(--pc),.25);background:rgba(var(--pc),.03)}
+.orbit-center.filled{border:2px solid rgba(var(--pc),.25);border-style:solid}
+.orbit-center img{width:100%;height:100%;object-fit:cover;border-radius:70px}
+.orbit-center .oc-i{font-size:28px;opacity:.15}
+
+.orbit-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:200px;height:200px;border-radius:100px;border:1px solid rgba(var(--pc),.05);
+  animation:oSpin 25s linear infinite}
+@keyframes oSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.oi{position:absolute;width:34px;height:34px;border-radius:17px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;justify-content:center;font-size:13px;backdrop-filter:blur(8px)}
+.oi1{top:-17px;left:50%;margin-left:-17px}
+.oi2{bottom:-17px;left:50%;margin-left:-17px}
+.oi3{top:50%;right:-17px;margin-top:-17px}
+
+.badge-ghost{position:absolute;top:50%;left:50%;transform:translate(-42%,-55%) rotate(3deg);
+  width:130px;height:80px;border-radius:14px;border:1px dashed rgba(var(--pc),.06);
+  background:rgba(var(--pc),.01);z-index:1;opacity:.4;padding:8px}
+.badge-ghost-t{font-size:7px;color:rgba(255,255,255,.12);text-transform:uppercase;letter-spacing:1px}
+
+.photo-btns{display:flex;gap:10px;margin-top:8px;margin-bottom:8px}
+.photo-btn{padding:11px 22px;border-radius:14px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.45);
+  font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;backdrop-filter:blur(8px)}
+.photo-btn:hover{background:rgba(var(--pc),.06);border-color:rgba(var(--pc),.12)}
+
+/* ═══ S3: ABOUT YOU ═══ */
+#s3{padding:0 28px;justify-content:flex-end;padding-bottom:44px}
+
+.lp{margin-bottom:18px;padding:16px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.05);border-radius:18px;backdrop-filter:blur(10px);
+  display:flex;align-items:center;gap:14px;position:relative;overflow:hidden}
+.lp-glow{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:40px;
+  background:rgba(var(--pc),.04);filter:blur(20px)}
+.lp-av{width:46px;height:46px;border-radius:15px;background:rgba(var(--pc),.06);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+  border:1px solid rgba(var(--pc),.1)}
+.lp-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;color:rgba(255,255,255,.8)}
+.lp-role{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px}
+.lp-tag{position:absolute;top:10px;right:12px;font-size:8px;padding:3px 8px;
+  background:rgba(var(--pc),.06);border:1px solid rgba(var(--pc),.1);
+  border-radius:7px;color:rgba(var(--pc),.5);font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+
+/* Dropdown */
+.dd-wrap{position:relative}
+.dd-list{position:absolute;top:calc(100% + 4px);left:0;right:0;max-height:140px;overflow-y:auto;
+  background:#141416;border:1px solid rgba(255,255,255,.06);border-radius:12px;z-index:50;display:none}
+.dd-list.open{display:block}
+.dd-item{padding:11px 16px;font-size:13px;color:rgba(255,255,255,.5);cursor:pointer;transition:background .15s}
+.dd-item:hover{background:rgba(var(--pc),.06);color:#fff}
+
+/* ═══ S4: INTERESTS ═══ */
+#s4{padding:80px 24px 44px;justify-content:flex-start}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:16px}
+.chip{padding:11px 18px;border-radius:22px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.05);font-size:14px;font-weight:500;
+  color:rgba(255,255,255,.4);cursor:pointer;transition:all .3s;user-select:none;position:relative;overflow:hidden}
+.chip::after{content:'';position:absolute;inset:0;border-radius:22px;box-shadow:inset 0 0 0 0 rgba(var(--pc),0);transition:box-shadow .3s}
+.chip.on{background:rgba(var(--pc),.08);border-color:rgba(var(--pc),.18);color:rgba(var(--pc),.85)}
+.chip.on::after{box-shadow:inset 0 0 20px rgba(var(--pc),.06)}
+.chip-count{font-size:13px;color:rgba(255,255,255,.2);margin-bottom:14px}
+.chip-count b{color:rgba(var(--pc),.7)}
+
+/* ═══ S5: DONE ═══ */
+#s5{justify-content:center;align-items:center;padding:0 28px}
+.done-ck{width:66px;height:66px;border-radius:33px;background:rgba(34,197,94,.08);
+  border:2px solid rgba(34,197,94,.2);display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275)}
+.done-ck svg{width:28px;height:28px;stroke:#22c55e;stroke-width:3;fill:none;
+  stroke-dasharray:40;stroke-dashoffset:40;animation:drawCk .4s .3s ease forwards}
+@keyframes popIn{0%{transform:scale(0)}100%{transform:scale(1)}}
+@keyframes drawCk{to{stroke-dashoffset:0}}
+
+/* RGB border for badge */
+.rgb-wrap{position:relative;width:240px;margin:16px auto;padding:3px;border-radius:24px;
+  background:conic-gradient(from 0deg,rgba(var(--pc),.3),rgba(56,210,192,.3),rgba(var(--pc),.15),rgba(138,149,255,.3),rgba(var(--pc),.3));
+  animation:rgbSpin 4s linear infinite,fadeUp .6s .4s ease both}
+@keyframes rgbSpin{to{background:conic-gradient(from 360deg,rgba(var(--pc),.3),rgba(56,210,192,.3),rgba(var(--pc),.15),rgba(138,149,255,.3),rgba(var(--pc),.3))}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.badge-card{padding:22px;background:#0e0e10;border-radius:22px;text-align:center;position:relative;overflow:hidden}
+.badge-card .bc-glow{position:absolute;top:-30px;left:50%;transform:translateX(-50%);
+  width:100px;height:50px;background:rgba(var(--pc),.04);border-radius:50%;filter:blur(25px)}
+.badge-card .bc-av{width:50px;height:50px;border-radius:17px;background:rgba(var(--pc),.06);
+  margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:18px;
+  border:1px solid rgba(var(--pc),.1);overflow:hidden;position:relative;z-index:1}
+.badge-card .bc-av img{width:100%;height:100%;object-fit:cover;border-radius:17px}
+.badge-card .bc-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;position:relative;z-index:1}
+.badge-card .bc-role{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;position:relative;z-index:1}
+.badge-card .bc-div{width:36px;height:1px;background:rgba(255,255,255,.06);margin:12px auto}
+.badge-card .bc-meta{display:flex;justify-content:space-around;position:relative;z-index:1}
+.badge-card .bc-ml{font-size:8px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.7px}
+.badge-card .bc-mv{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.65);margin-top:2px}
+.badge-card .bc-qr{width:42px;height:42px;background:rgba(255,255,255,.03);border-radius:10px;
+  margin:12px auto 0;display:flex;align-items:center;justify-content:center;
+  font-size:8px;color:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.04);position:relative;z-index:1}
+
+/* Confetti */
+.confetti{position:absolute;inset:0;pointer-events:none;z-index:0}
+.conf{position:absolute;border-radius:1px;animation:confFall linear forwards}
+@keyframes confFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(812px) rotate(720deg);opacity:0}}
+
+.dbg{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);
+  color:rgba(255,255,255,.3);font:9px monospace;padding:3px 10px;border-radius:10px;z-index:500}
+</style>
+</head>
+<body>
+
+<!-- Color picker -->
+<div class="color-picker">
+  <div class="cp-label">Color</div>
+  <div class="cp-row">
+    <div class="cp-swatch active" style="background:#FFFFFF" onclick="setColor(255,255,255,'#FFFFFF','#C0C4CC','#08080a',this)" title="Blanco"></div>
+    <div class="cp-swatch" style="background:#F5E6D0" onclick="setColor(245,230,208,'#F5E6D0','#D4B896','#08080a',this)" title="Crema"></div>
+    <div class="cp-swatch" style="background:#60A5FA" onclick="setColor(96,165,250,'#60A5FA','#3B82F6','#08080a',this)" title="Azul"></div>
+    <div class="cp-swatch" style="background:#38D2C0" onclick="setColor(56,210,192,'#38D2C0','#14B8A6','#08080a',this)" title="Teal"></div>
+    <div class="cp-swatch" style="background:#F472B6" onclick="setColor(244,114,182,'#F472B6','#EC4899','#08080a',this)" title="Rosa"></div>
+  </div>
+  <div class="cp-row">
+    <div class="cp-swatch" style="background:#FBBF24" onclick="setColor(251,191,36,'#FBBF24','#F59E0B','#08080a',this)" title="Dorado"></div>
+    <div class="cp-swatch" style="background:#EF4444" onclick="setColor(239,68,68,'#EF4444','#DC2626','#FFFFFF',this)" title="Rojo"></div>
+    <div class="cp-swatch" style="background:#A78BFA" onclick="setColor(167,139,250,'#A78BFA','#8B5CF6','#08080a',this)" title="Violeta"></div>
+    <div class="cp-swatch" style="background:#4ADE80" onclick="setColor(74,222,128,'#4ADE80','#22C55E','#08080a',this)" title="Verde"></div>
+    <div class="cp-swatch" style="background:#FB923C" onclick="setColor(251,146,60,'#FB923C','#F97316','#08080a',this)" title="Naranja"></div>
+  </div>
+</div>
+
+<div class="amb"><div class="amb-orb o1"></div><div class="amb-orb o2"></div><div class="amb-orb o3"></div></div>
+<div class="particles" id="ptcl"></div>
+<div class="prog" id="prog"><div class="pdot on"></div><div class="pdot"></div><div class="pdot"></div><div class="pdot"></div><div class="pdot"></div></div>
+<button class="back" id="bk" onclick="goBack()">&#8592;</button>
+
+<!-- ═══ S0: WELCOME ═══ -->
+<div class="slide active" id="s0">
+  <div class="constellation">
+    <div class="node" style="top:50px;left:50px"></div>
+    <div class="node" style="top:25px;left:170px;animation-delay:-1s"></div>
+    <div class="node" style="top:110px;left:270px;animation-delay:-2s"></div>
+    <div class="node" style="top:150px;left:130px;animation-delay:-.5s"></div>
+    <div class="node" style="top:200px;left:55px;animation-delay:-1.5s"></div>
+    <div class="node" style="top:185px;left:230px;animation-delay:-2.5s"></div>
+    <div class="node" style="top:280px;left:160px;animation-delay:-3s"></div>
+    <div class="node-line" style="top:54px;left:54px;width:120px;transform:rotate(-12deg)"></div>
+    <div class="node-line" style="top:29px;left:174px;width:100px;transform:rotate(50deg)"></div>
+    <div class="node-line" style="top:114px;left:134px;width:140px;transform:rotate(15deg)"></div>
+    <div class="node-line" style="top:155px;left:59px;width:85px;transform:rotate(-25deg)"></div>
+    <div class="node-line" style="top:190px;left:59px;width:175px;transform:rotate(-2deg)"></div>
+    <div class="node-line" style="top:190px;left:234px;width:80px;transform:rotate(60deg)"></div>
+  </div>
+
+  <div class="gpill gp1"><span class="gp-dot"></span> Speakers internacionales</div>
+  <div class="gpill gp2"><span class="gp-dot"></span> 3 dias de innovacion</div>
+  <div class="gpill gp3"><span class="gp-dot"></span> Networking inteligente</div>
+  <div class="gpill gp4"><span class="gp-dot"></span> Retos y premios</div>
+  <div class="gpill gp5"><span class="gp-dot"></span> Social y momentos</div>
+
+  <div class="t-over">Septiembre 15 - 17, 2026</div>
+  <div class="t-big" style="font-size:34px">Bienvenido a<br>EventOS <em>Summit</em></div>
+  <div class="t-sub">The Future of Creative Intelligence.<br>Tu experiencia comienza aqui.</div>
+  <button class="btn-main" onclick="goTo(1,'register')">Crear cuenta</button>
+  <button class="btn-glass" onclick="goTo(1,'login')">Ya tengo cuenta</button>
+  <div class="swipe-hint">&#8593; Toca para comenzar</div>
+</div>
+
+<!-- ═══ S1: AUTH ═══ -->
+<div class="slide" id="s1">
+  <div class="auth-top">
+    <div style="margin-bottom:10px">
+      <div class="stat-pill"><span class="sp-val">18</span><span class="sp-lab">Speakers</span></div>
+      <div class="stat-pill"><span class="sp-val">29</span><span class="sp-lab">Sesiones</span></div>
+    </div>
+    <div>
+      <div class="stat-pill"><span class="sp-val">3</span><span class="sp-lab">Dias</span></div>
+      <div class="stat-pill"><span class="sp-val">&#8734;</span><span class="sp-lab">Networking</span></div>
+    </div>
+    <div class="auth-top-fade"></div>
+  </div>
+
+  <div class="auth-sheet">
+    <div class="sh"></div>
+    <div class="t-big" style="font-size:26px" id="a1t">Unete al futuro</div>
+    <div class="t-sub" id="a1s">Crea tu pase digital para el EventOS Summit</div>
+    <div id="nameF" style="display:none"><div class="fld"><label>Nombre completo</label><input placeholder="Como aparecera en tu badge"></div></div>
+    <div class="fld"><label>Correo electronico</label><input type="email" placeholder="tu@email.com"></div>
+    <div class="fld"><label>Contrasena</label><input type="password" placeholder="Min. 8 caracteres"></div>
+    <button class="btn-main" id="a1b" onclick="doAuth()" style="margin-top:4px">Crear cuenta</button>
+    <div class="link" id="a1l">Ya tienes cuenta? <a href="#" onclick="tog(event)">Inicia sesion</a></div>
+  </div>
+</div>
+
+<!-- ═══ S2: PHOTO ═══ -->
+<div class="slide" id="s2">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 28px">
+    <div class="t-over">Tu badge digital</div>
+    <div class="t-big" style="font-size:24px;text-align:center;margin-bottom:20px">Agrega tu foto</div>
+    <div class="orbit-sys">
+      <div class="orbit-glow"></div>
+      <div class="badge-ghost"><div class="badge-ghost-t">Badge preview</div></div>
+      <div class="orbit-ring">
+        <div class="oi oi1">&#128247;</div>
+        <div class="oi oi2">&#11088;</div>
+        <div class="oi oi3">&#127380;</div>
+      </div>
+      <div class="orbit-center" id="oC" onclick="simPhoto()"><div class="oc-i">&#128100;</div></div>
+    </div>
+    <div class="t-sub" style="text-align:center;margin-bottom:10px">Los asistentes te reconoceran en<br>networking y en tu QR badge</div>
+    <div class="photo-btns">
+      <div class="photo-btn" onclick="simPhoto()">Camara</div>
+      <div class="photo-btn" onclick="simPhoto()">Galeria</div>
+    </div>
+  </div>
+  <div style="padding:0 28px 44px">
+    <button class="btn-main" onclick="goTo(3)">Continuar</button>
+    <div class="skip" onclick="goTo(3)">Saltar por ahora</div>
+  </div>
+</div>
+
+<!-- ═══ S3: ABOUT YOU ═══ -->
+<div class="slide" id="s3">
+  <div style="flex:1;padding:80px 28px 0;display:flex;flex-direction:column">
+    <div class="t-big" style="font-size:24px">Sobre ti</div>
+    <div class="t-sub">Esto personaliza tu networking y recomendaciones</div>
+    <div class="lp" id="lpCard">
+      <div class="lp-glow"></div>
+      <div class="lp-av" id="lpAv">K</div>
+      <div><div class="lp-name" id="lpN">Tu nombre</div><div class="lp-role" id="lpR">Cargo &middot; Empresa</div></div>
+      <div class="lp-tag">Preview</div>
+    </div>
+    <div class="fld"><label>Cargo</label><input placeholder="Ej: Product Designer" id="cIn" oninput="updLP()"></div>
+    <div class="fld dd-wrap"><label>Organizacion</label>
+      <input placeholder="Buscar..." id="oIn" onfocus="openDD()" oninput="filterDD()">
+      <div class="dd-list" id="oDD">
+        <div class="dd-item" onclick="pickO(this)">Bancolombia</div>
+        <div class="dd-item" onclick="pickO(this)">Rappi</div>
+        <div class="dd-item" onclick="pickO(this)">Grupo Exito</div>
+        <div class="dd-item" onclick="pickO(this)">Nutresa</div>
+        <div class="dd-item" onclick="pickO(this)">EPM</div>
+        <div class="dd-item" onclick="pickO(this)">Globant</div>
+        <div class="dd-item" onclick="pickO(this)">MercadoLibre</div>
+        <div class="dd-item" onclick="pickO(this)">Otra...</div>
+      </div>
+    </div>
+    <div class="fld"><label>Telefono</label><input type="tel" placeholder="+57 300 123 4567"></div>
+    <div style="flex:1"></div>
+    <div style="padding-bottom:44px"><button class="btn-main" onclick="goTo(4)">Continuar</button></div>
+  </div>
+</div>
+
+<!-- ═══ S4: INTERESTS ═══ -->
+<div class="slide" id="s4">
+  <div class="t-big" style="font-size:26px">Que te<br>interesa?</div>
+  <div class="t-sub">Elige al menos 3 para personalizar tu experiencia</div>
+  <div class="chip-count"><b id="cc">0</b> de 3+ seleccionados</div>
+  <div class="chips" id="cg"></div>
+  <div style="flex:1"></div>
+  <div style="padding-bottom:44px">
+    <button class="btn-main" id="ib" onclick="goTo(5)" style="opacity:.3;pointer-events:none">Continuar</button>
+    <div class="skip" onclick="goTo(5)">Saltar</div>
+  </div>
+</div>
+
+<!-- ═══ S5: DONE ═══ -->
+<div class="slide" id="s5">
+  <div class="confetti" id="confetti"></div>
+  <div class="done-ck"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></div>
+  <div class="t-big" style="font-size:26px;text-align:center">Tu pase esta listo</div>
+  <div class="t-sub" style="text-align:center;margin-bottom:8px">Acreditacion digital para el EventOS Summit</div>
+
+  <div class="rgb-wrap">
+    <div class="badge-card">
+      <div class="bc-glow"></div>
+      <div class="bc-av" id="bcAv">K</div>
+      <div class="bc-name">Kamilo Restrepo</div>
+      <div class="bc-role">Product Designer &middot; Rappi</div>
+      <div class="bc-div"></div>
+      <div class="bc-meta">
+        <div><div class="bc-ml">Acceso</div><div class="bc-mv">All-Access</div></div>
+        <div><div class="bc-ml">Venue</div><div class="bc-mv">Plaza Mayor</div></div>
+      </div>
+      <div class="bc-qr">QR</div>
+    </div>
+  </div>
+
+  <button class="btn-main" style="max-width:260px;margin-top:12px">Explorar evento</button>
+</div>
+
+<div class="dbg" id="dbg">0 — Bienvenida</div>
+
+<script>
+let cur=0,mode='register',sel=0;
+
+// Color switcher
+function setColor(r,g,b,hex,dark,text,el){
+  document.documentElement.style.setProperty('--pc',`${r},${g},${b}`);
+  document.documentElement.style.setProperty('--pc-hex',hex);
+  document.documentElement.style.setProperty('--pc-dark',dark);
+  document.documentElement.style.setProperty('--pc-text',text);
+  document.querySelectorAll('.cp-swatch').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  // Update btn text color for light colors
+  document.querySelectorAll('.btn-main').forEach(b=>{b.style.color=text});
+}
+
+// Particles
+const pc=document.getElementById('ptcl');
+for(let i=0;i<20;i++){const p=document.createElement('div');p.className='particle';
+  p.style.left=Math.random()*375+'px';p.style.top=Math.random()*812+'px';
+  p.style.animationDuration=(10+Math.random()*15)+'s';p.style.animationDelay=(-Math.random()*25)+'s';
+  p.style.width=p.style.height=(2+Math.random()*2)+'px';pc.appendChild(p)}
+
+// Interests
+const TAGS=['Tecnologia','Innovacion','Design','Marketing','IA & ML','Fintech','Liderazgo','Producto','Growth','Data Science','Cloud','UX Research','Sostenibilidad','Networking','Startups','Cultura'];
+const cg=document.getElementById('cg');
+TAGS.forEach(t=>{const c=document.createElement('div');c.className='chip';c.textContent=t;
+  c.onclick=()=>{c.classList.toggle('on');sel=document.querySelectorAll('.chip.on').length;
+    document.getElementById('cc').textContent=sel;const b=document.getElementById('ib');
+    b.style.opacity=sel>=3?'1':'.3';b.style.pointerEvents=sel>=3?'auto':'none'};cg.appendChild(c)});
+
+// Confetti
+function spawnConf(){const c=document.getElementById('confetti');
+  const cols=['rgba(var(--pc),0.6)','#22c55e','#38bdf8','#fbbf24','#f472b6'];
+  for(let i=0;i<35;i++){const d=document.createElement('div');d.className='conf';
+    d.style.left=Math.random()*220+70+'px';d.style.top='-10px';
+    d.style.background=cols[Math.floor(Math.random()*cols.length)].replace('var(--pc)',getComputedStyle(document.documentElement).getPropertyValue('--pc'));
+    d.style.animationDuration=(2+Math.random()*2)+'s';d.style.animationDelay=(Math.random()*.6)+'s';
+    d.style.width=(4+Math.random()*4)+'px';d.style.height=(4+Math.random()*4)+'px';c.appendChild(d)}}
+
+function goTo(s,m){
+  if(m)mode=m;
+  const p=document.getElementById('s'+cur),n=document.getElementById('s'+s);
+  p.classList.remove('active');p.classList.add('exit');
+  setTimeout(()=>p.className='slide',550);n.classList.add('active');cur=s;
+  document.getElementById('prog').classList.toggle('vis',s>0&&s<5);
+  document.querySelectorAll('.pdot').forEach((d,i)=>d.classList.toggle('on',i===s-1));
+  document.getElementById('bk').classList.toggle('vis',s>0&&s<5);
+  if(s===1)updAuth();if(s===5)setTimeout(spawnConf,300);
+  document.getElementById('dbg').textContent=s+' — '+['Bienvenida','Auth','Foto','Sobre ti','Intereses','Listo'][s]}
+
+function goBack(){if(cur===1)goTo(0);else if(cur>1)goTo(cur-1)}
+function tog(e){e.preventDefault();mode=mode==='login'?'register':'login';updAuth()}
+function updAuth(){const r=mode==='register';
+  document.getElementById('a1t').textContent=r?'Unete al futuro':'Bienvenido de vuelta';
+  document.getElementById('a1s').textContent=r?'Crea tu pase digital para el EventOS Summit':'Ingresa para acceder al evento';
+  document.getElementById('nameF').style.display=r?'block':'none';
+  document.getElementById('a1b').textContent=r?'Crear cuenta':'Iniciar sesion';
+  document.getElementById('a1l').innerHTML=r?'Ya tienes cuenta? <a href="#" onclick="tog(event)">Inicia sesion</a>'
+    :'No tienes cuenta? <a href="#" onclick="tog(event)">Registrate</a>'}
+
+function doAuth(){if(mode==='register')goTo(2);else{goTo(5);
+  document.querySelector('#s5 .t-big').textContent='Bienvenido de vuelta!';
+  document.querySelector('.rgb-wrap').style.display='none'}}
+
+function simPhoto(){const c=document.getElementById('oC');c.classList.add('filled');
+  c.innerHTML='<img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face">';
+  document.getElementById('bcAv').innerHTML='<img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face">'}
+
+function updLP(){const c=document.getElementById('cIn').value,o=document.getElementById('oIn').value;
+  document.getElementById('lpR').textContent=(c||'Cargo')+' \u00B7 '+(o||'Empresa')}
+
+function openDD(){document.getElementById('oDD').classList.add('open')}
+function pickO(el){document.getElementById('oIn').value=el.textContent;document.getElementById('oDD').classList.remove('open');updLP()}
+function filterDD(){const v=document.getElementById('oIn').value.toLowerCase();
+  document.querySelectorAll('.dd-item').forEach(i=>i.style.display=i.textContent.toLowerCase().includes(v)?'':'none')}
+document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))document.getElementById('oDD').classList.remove('open')})
+</script>
+</body>
+</html>

@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaker Spotlight — Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #080808;
+    font-family: 'Urbanist', sans-serif;
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+    flex-wrap: wrap;
+  }
+
+  .label {
+    color: #888;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 12px;
+    font-family: 'Urbanist', sans-serif;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* Phone frame */
+  .phone {
+    width: 393px;
+    height: 852px;
+    background: #0e0e0e;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid #1a1a1a;
+    box-shadow: 0 0 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+    flex-shrink: 0;
+  }
+
+  .phone-inner {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .phone-inner::-webkit-scrollbar { display: none; }
+
+  /* Status bar */
+  .status-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(to bottom, #0e0e0e 60%, transparent);
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 20px 16px;
+  }
+  .header-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+    backdrop-filter: blur(8px);
+  }
+  .header-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .header-search {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+
+  /* Featured Speaker Carousel */
+  .featured {
+    margin: 0 20px 20px;
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    height: 260px;
+    cursor: pointer;
+  }
+  .featured img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .featured-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 20px 18px;
+    background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+  }
+  .featured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .featured-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .featured-role {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+  .featured-dots {
+    display: flex;
+    gap: 6px;
+    position: absolute;
+    bottom: 14px;
+    right: 20px;
+  }
+  .featured-dots .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    transition: all 0.3s;
+  }
+  .featured-dots .dot.active {
+    width: 18px;
+    border-radius: 4px;
+    background: #fff;
+  }
+
+  /* Chips */
+  .chips {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.03);
+  }
+  .chip.active {
+    background: #fff;
+    color: #0e0e0e;
+    border-color: #fff;
+  }
+  .chip:hover:not(.active) {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* Speaker Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 20px 40px;
+  }
+
+  .speaker-card {
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #161616;
+  }
+  .speaker-card:hover { transform: scale(0.97); }
+  .speaker-card:active { transform: scale(0.95); }
+
+  .speaker-card .photo-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+  }
+  .speaker-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .speaker-card:hover img { transform: scale(1.04); }
+
+  .speaker-card .card-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(14,14,14,0.95) 0%, rgba(14,14,14,0.5) 50%, transparent 100%);
+  }
+
+  .speaker-card .card-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 14px;
+  }
+  .speaker-card .card-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+  }
+  .speaker-card .card-role {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+
+  .sessions-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* ========== DETAIL SCREEN ========== */
+  .detail-hero {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    overflow: hidden;
+  }
+  .detail-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .detail-hero-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+    background: linear-gradient(to top, #0e0e0e 0%, rgba(14,14,14,0.7) 50%, transparent 100%);
+  }
+  .detail-back {
+    position: absolute;
+    top: 56px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    z-index: 10;
+  }
+  .detail-hero-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 20px 24px;
+    z-index: 5;
+  }
+  .detail-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+  }
+  .detail-role {
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 6px;
+    font-weight: 400;
+  }
+  .detail-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .detail-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .detail-action-btn.primary {
+    background: #fff;
+    color: #0e0e0e;
+  }
+  .detail-action-btn.secondary {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.8);
+    backdrop-filter: blur(8px);
+  }
+  .detail-action-btn:hover { transform: scale(0.97); }
+
+  /* Detail content */
+  .detail-content {
+    padding: 0 20px 40px;
+  }
+
+  .glass-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(8px);
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .bio-text {
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  /* Session cards horizontal */
+  .sessions-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+  .sessions-scroll::-webkit-scrollbar { display: none; }
+
+  .session-card {
+    flex-shrink: 0;
+    width: 220px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .session-card:hover {
+    background: rgba(255,255,255,0.07);
+    transform: scale(0.98);
+  }
+  .session-type-tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .tag-keynote { background: rgba(168,130,255,0.15); color: #a882ff; }
+  .tag-panel { background: rgba(100,200,255,0.15); color: #64c8ff; }
+  .tag-workshop { background: rgba(255,180,100,0.15); color: #ffb464; }
+
+  .session-card .s-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.3;
+    margin-bottom: 8px;
+    letter-spacing: -0.1px;
+  }
+  .session-card .s-meta {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .session-card .s-meta + .s-meta { margin-top: 3px; }
+
+  /* Stagger animation */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .stagger { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.12s; }
+  .stagger-3 { animation-delay: 0.19s; }
+  .stagger-4 { animation-delay: 0.26s; }
+  .stagger-5 { animation-delay: 0.33s; }
+  .stagger-6 { animation-delay: 0.40s; }
+  .stagger-7 { animation-delay: 0.47s; }
+  .stagger-8 { animation-delay: 0.54s; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Crossfade for featured */
+  .featured-slides {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .featured-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  .featured-slide.active { opacity: 1; }
+  .featured-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Scrollbar global */
+  ::-webkit-scrollbar { width: 0; height: 0; }
+
+  /* No-photo placeholder */
+  .no-photo {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: rgba(255,255,255,0.15);
+    font-weight: 800;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== LIST SCREEN ==================== -->
+<div>
+  <div class="label">Speakers List</div>
+  <div class="phone">
+    <div class="phone-inner">
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <div class="status-icons">
+          <svg width="16" height="12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1" opacity=".4"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity=".6"/><rect x="9" y="0" width="3" height="12" rx="1" opacity=".8"/><rect x="13" y="0" width="3" height="12" rx="1"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><path d="M8 2.4C5.6 2.4 3.4 3.3 1.8 4.8L0 3C2 1.1 4.9 0 8 0s6 1.1 8 3l-1.8 1.8C12.6 3.3 10.4 2.4 8 2.4z" opacity=".4"/><path d="M8 5.6c-1.6 0-3 .6-4.2 1.6L2 5.4C3.6 4.1 5.7 3.2 8 3.2s4.4.9 6 2.2l-1.8 1.8C11 6.2 9.6 5.6 8 5.6z" opacity=".7"/><path d="M8 8.8c-.8 0-1.6.3-2.2.8L8 12l2.2-2.4c-.6-.5-1.4-.8-2.2-.8z"/></svg>
+          <svg width="27" height="12" viewBox="0 0 27 12" fill="none"><rect x=".5" y=".5" width="22" height="11" rx="3.5" stroke="white" stroke-opacity=".3"/><rect x="24" y="3.5" width="2" height="5" rx="1" fill="white" fill-opacity=".3"/><rect x="2" y="2" width="17" height="8" rx="2" fill="white"/></svg>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div class="header">
+        <div class="header-back">
+          <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M11 4L5 9l6 5"/></svg>
+        </div>
+        <div class="header-title">Speakers</div>
+        <div class="header-search">
+          <svg width="18" height="18" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"><circle cx="8" cy="8" r="5"/><path d="M12 12l4 4"/></svg>
+        </div>
+      </div>
+
+      <!-- Featured Speaker Carousel -->
+      <div class="featured stagger stagger-1" id="featured">
+        <div class="featured-slides">
+          <div class="featured-slide active" id="slide-0">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop&crop=face" alt="">
+          </div>
+          <div class="featured-slide" id="slide-1">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=600&fit=crop&crop=face" alt="">
+          </div>
+          <div class="featured-slide" id="slide-2">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&h=600&fit=crop&crop=face" alt="">
+          </div>
+        </div>
+        <div class="featured-overlay">
+          <div class="featured-badge">
+            <svg width="10" height="10" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            Keynote
+          </div>
+          <div class="featured-name" id="featured-name">Carlos Mendoza</div>
+          <div class="featured-role" id="featured-role">CTO · TechVentures Latam</div>
+        </div>
+        <div class="featured-dots">
+          <div class="dot active" id="dot-0"></div>
+          <div class="dot" id="dot-1"></div>
+          <div class="dot" id="dot-2"></div>
+        </div>
+      </div>
+
+      <!-- Category Chips -->
+      <div class="chips stagger stagger-2">
+        <div class="chip active">Todos</div>
+        <div class="chip">Keynote</div>
+        <div class="chip">Panel</div>
+        <div class="chip">Workshop</div>
+        <div class="chip">Lightning</div>
+      </div>
+
+      <!-- Speaker Grid -->
+      <div class="grid">
+        <div class="speaker-card stagger stagger-3">
+          <div class="photo-wrap">
+            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=530&fit=crop&crop=face" alt="">
+            <div class="card-gradient"></div>
+            <div class="sessions-badge">
+              <svg width="10" height="10" fill="rgba(255,255,255,0.8)" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>
+              3
+            </div>
+            <div class="card-info">
+              <div class="card-name">Ana Lucia Torres</div>
+              <div class="card-role">VP Product · Rappi</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="speaker-card stagger stagger-4">
+          <div class="photo-wrap">
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=530&fit=crop&crop=face" alt="">
+            <div class="card-gradient"></div>
+            <div class="sessions-badge">
+              <svg width="10" height="10" fill="rgba(255,255,255,0.8)" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>
+              2
+            </div>
+            <div class="card-info">
+              <div class="card-name">Diego Ramirez</div>
+              <div class="card-role">AI Lead · Google</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="speaker-card stagger stagger-5">
+          <div class="photo-wrap">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=530&fit=crop&crop=face" alt="">
+            <div class="card-gradient"></div>
+            <div class="sessions-badge">
+              <svg width="10" height="10" fill="rgba(255,255,255,0.8)" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>
+              1
+            </div>
+            <div class="card-info">
+              <div class="card-name">Valentina Herrera</div>
+              <div class="card-role">Founder · NovaTech</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="speaker-card stagger stagger-6">
+          <div class="photo-wrap">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=530&fit=crop&crop=face" alt="">
+            <div class="card-gradient"></div>
+            <div class="sessions-badge">
+              <svg width="10" height="10" fill="rgba(255,255,255,0.8)" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>
+              4
+            </div>
+            <div class="card-info">
+              <div class="card-name">Mateo Silva</div>
+              <div class="card-role">CIO · Bancolombia</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="speaker-card stagger stagger-7">
+          <div class="photo-wrap">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=530&fit=crop&crop=face" alt="">
+            <div class="card-gradient"></div>
+            <div class="sessions-badge">
+              <svg width="10" height="10" fill="rgba(255,255,255,0.8)" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>
+              2
+            </div>
+            <div class="card-info">
+              <div class="card-name">Isabella Moreno</div>
+              <div class="card-role">Design Dir · Figma</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="speaker-card stagger stagger-8">
+          <div class="photo-wrap">
+            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=530&fit=crop&crop=face" alt="">
+            <div class="card-gradient"></div>
+            <div class="sessions-badge">
+              <svg width="10" height="10" fill="rgba(255,255,255,0.8)" viewBox="0 0 20 20"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>
+              1
+            </div>
+            <div class="card-info">
+              <div class="card-name">Santiago Lopez</div>
+              <div class="card-role">Staff Eng · Spotify</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== DETAIL SCREEN ==================== -->
+<div>
+  <div class="label">Speaker Detail</div>
+  <div class="phone">
+    <div class="phone-inner">
+      <!-- Hero -->
+      <div class="detail-hero">
+        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=900&fit=crop&crop=face" alt="">
+        <div class="detail-hero-gradient"></div>
+        <div class="detail-back">
+          <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M11 4L5 9l6 5"/></svg>
+        </div>
+        <div class="detail-hero-info">
+          <div class="detail-name">Carlos Mendoza</div>
+          <div class="detail-role">CTO · TechVentures Latam</div>
+          <div class="detail-actions">
+            <div class="detail-action-btn primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              LinkedIn
+            </div>
+            <div class="detail-action-btn secondary">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              3 Sesiones
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="detail-content">
+        <!-- Bio -->
+        <div class="glass-card" style="animation: fadeInUp 0.5s 0.2s backwards">
+          <div class="section-label">Acerca de</div>
+          <div class="bio-text">
+            Con mas de 15 anos liderando equipos de tecnologia en Latinoamerica, Carlos ha sido pieza clave en la transformacion digital de empresas como MercadoLibre y Globant. Apasionado por la inteligencia artificial aplicada y el desarrollo de talento tech en la region.
+          </div>
+        </div>
+
+        <!-- Sessions -->
+        <div style="animation: fadeInUp 0.5s 0.35s backwards">
+          <div class="section-label" style="padding-left: 4px;">Sus Sesiones</div>
+          <div class="sessions-scroll">
+            <div class="session-card">
+              <div class="session-type-tag tag-keynote">Keynote</div>
+              <div class="s-title">El Futuro de la IA en Latinoamerica</div>
+              <div class="s-meta">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                10:00 AM — 11:00 AM
+              </div>
+              <div class="s-meta">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+                Salon Principal
+              </div>
+            </div>
+
+            <div class="session-card">
+              <div class="session-type-tag tag-panel">Panel</div>
+              <div class="s-title">Liderazgo Tech: Del Codigo a la Estrategia</div>
+              <div class="s-meta">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                2:30 PM — 3:30 PM
+              </div>
+              <div class="s-meta">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+                Salon B
+              </div>
+            </div>
+
+            <div class="session-card">
+              <div class="session-type-tag tag-workshop">Workshop</div>
+              <div class="s-title">Hands-on: Prompting Avanzado para Equipos</div>
+              <div class="s-meta">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                4:00 PM — 5:30 PM
+              </div>
+              <div class="s-meta">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+                Workshop Room 1
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Featured carousel crossfade
+  const slides = document.querySelectorAll('.featured-slide');
+  const dots = document.querySelectorAll('.featured-dots .dot');
+  const names = ['Carlos Mendoza', 'Valentina Herrera', 'Mateo Silva'];
+  const roles = ['CTO · TechVentures Latam', 'Founder · NovaTech', 'CIO · Bancolombia'];
+  let current = 0;
+
+  setInterval(() => {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    document.getElementById('featured-name').textContent = names[current];
+    document.getElementById('featured-role').textContent = roles[current];
+  }, 4000);
+
+  // Chip selection
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelector('.chip.active')?.classList.remove('active');
+      chip.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

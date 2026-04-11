@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Welcome - EventOS Summit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#fcf8fb",
+                    "secondary-dim": "#8a95ff",
+                    "background": "#0e0e10",
+                    "secondary-fixed-dim": "#babfff",
+                    "on-tertiary": "#690937",
+                    "outline-variant": "#48474a",
+                    "inverse-on-surface": "#565457",
+                    "surface-container": "#19191c",
+                    "surface": "#0e0e10",
+                    "on-tertiary-container": "#59002c",
+                    "tertiary-fixed-dim": "#f57ca6",
+                    "surface-container-highest": "#262529",
+                    "on-surface": "#fffbfe",
+                    "on-primary-fixed": "#000000",
+                    "tertiary": "#ff96b9",
+                    "surface-variant": "#262529",
+                    "on-primary-fixed-variant": "#330b80",
+                    "secondary": "#8a95ff",
+                    "on-secondary-fixed-variant": "#3a45ad",
+                    "surface-container-lowest": "#000000",
+                    "on-error-container": "#ffb2b9",
+                    "primary-container": "#ab8ffe",
+                    "primary-fixed": "#ab8ffe",
+                    "surface-bright": "#2c2c2f",
+                    "tertiary-fixed": "#ff8db3",
+                    "on-secondary-container": "#c9cdff",
+                    "on-secondary-fixed": "#192490",
+                    "on-tertiary-fixed-variant": "#70103c",
+                    "tertiary-container": "#fc81ac",
+                    "primary": "#b79fff",
+                    "on-primary": "#361083",
+                    "error-container": "#a70138",
+                    "surface-container-high": "#1f1f22",
+                    "on-tertiary-fixed": "#380019",
+                    "secondary-fixed": "#cbceff",
+                    "on-background": "#fffbfe",
+                    "tertiary-dim": "#ef77a1",
+                    "surface-container-low": "#131316",
+                    "error-dim": "#d73357",
+                    "surface-dim": "#0e0e10",
+                    "surface-tint": "#b79fff",
+                    "on-primary-container": "#290070",
+                    "on-surface-variant": "#adaaad",
+                    "inverse-primary": "#684cb6",
+                    "error": "#ff6e84",
+                    "secondary-container": "#2f3aa3",
+                    "on-secondary": "#000974",
+                    "primary-dim": "#a88cfb",
+                    "primary-fixed-dim": "#9d81f0",
+                    "on-error": "#490013",
+                    "outline": "#767578"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "1rem",
+                    "3xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0e0e10;
+            color: #fffbfe;
+            font-family: 'Manrope', sans-serif;
+            overflow: hidden;
+        }
+        .headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-card {
+            background: rgba(31, 31, 34, 0.6);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(72, 71, 74, 0.2);
+        }
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+        .aurora-blur {
+            filter: blur(100px);
+            opacity: 0.15;
+            background: linear-gradient(135deg, #b79fff, #8a95ff);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col min-h-screen items-center justify-center relative px-6">
+<div class="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] aurora-blur rounded-full"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] aurora-blur rounded-full"></div>
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<div class="confetti bg-primary top-10 left-[15%] rotate-12"></div>
+<div class="confetti bg-secondary top-40 left-[5%] -rotate-45"></div>
+<div class="confetti bg-tertiary top-20 right-[20%] rotate-90"></div>
+<div class="confetti bg-primary bottom-32 left-[10%] rotate-12"></div>
+<div class="confetti bg-secondary-dim top-[60%] right-[10%] rotate-12"></div>
+<div class="confetti bg-primary-container top-[40%] left-[25%] -rotate-12"></div>
+</div>
+<div class="w-full max-w-md flex flex-col items-center text-center z-10">
+<div class="mb-8 relative flex items-center justify-center">
+<div class="absolute w-24 h-24 bg-primary/20 rounded-full blur-xl"></div>
+<div class="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-2xl relative">
+<span class="material-symbols-outlined text-black text-5xl font-bold" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+<h1 class="headline text-4xl font-extrabold tracking-tight mb-4 bg-gradient-to-r from-on-background to-on-surface-variant bg-clip-text text-transparent">Bienvenido!</h1>
+<p class="text-on-surface-variant text-lg mb-12 max-w-[280px]">Tu acreditación digital ya está lista para el EventOS Summit.</p>
+<div class="w-full glass-card rounded-3xl p-6 mb-12 relative overflow-hidden group">
+<div class="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all duration-700"></div>
+<div class="flex items-center gap-5 relative z-10">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/30 p-0.5">
+<img alt="User Profile" class="w-full h-full object-cover rounded-full" data-alt="Close-up professional portrait of a tech executive with a friendly expression, studio lighting, dark minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqHUWkiqh_nE6Cu8T23yTOiU1yMMYheGmgTcaZfHTzdF_EWNzMkWxZEb8ULcll-fpxaKLgr3q_-hDdHANPSatjznKY9qp9HtjQzf9CTrVLcYdAddbPH6053B03tFOHA2UmfGXQiWRw5sh0h-Q4Js39TfZrFpRylTR-j8gvB8EDRWcp-pXrui_pd17vnEvg83zErZsG7Zyxftf-ih01dDAdWvoY37mKXemVottfABE-W3TwrcWK0XdO4WGqFfYAdfMYF85ACnB0Fg6X"/>
+</div>
+<div class="flex-1 text-left">
+<h3 class="headline text-xl font-bold text-on-surface">Alex Rivers</h3>
+<p class="text-primary text-sm font-semibold tracking-wider uppercase">Senior Architect</p>
+</div>
+<div class="bg-white p-2 rounded-xl">
+<div class="w-10 h-10 bg-slate-100 flex items-center justify-center overflow-hidden">
+<img alt="QR Code" class="w-full h-full" data-alt="Sharp minimalist QR code pattern on white background for event authentication" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXy_jn8OLfT6uW--6Wfu-OyuHinDyhIgiGreV5A0Dj-fuqrYtME1yLT2eBykeAve_P3eIKNhiit0MWp1oDN21tl9aNa--3pnaudZ3YWT7yV4stZG-mevJOALMAkORAH6Y_FFJjnEGiVI3d3yUp6rWxqGpsqFDqEPpE97OyZxBp3o_0ZF8xa7DCCLPN7JghhM7Re5SEkvBRTtDHrx8ymtHrj8N0Weeigxf6xcIRdCHO7mVq2IDebVAZ1BARhi79X7etC2tVviqbvngf"/>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-6 border-t border-outline-variant/30 flex justify-between items-center">
+<div class="flex flex-col text-left">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Access Level</span>
+<span class="text-on-surface font-medium">All-Access Pass</span>
+</div>
+<div class="flex flex-col text-right">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Location</span>
+<span class="text-on-surface font-medium">Hangar 7</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-gradient-to-r from-primary to-secondary text-black font-bold py-5 rounded-3xl text-lg shadow-[0_20px_40px_rgba(183,159,255,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+            Explorar evento
+        </button>
+<div class="mt-12 flex gap-3">
+<div class="w-2 h-2 rounded-full bg-surface-container-highest"></div>
+<div class="w-2 h-2 rounded-full bg-surface-container-highest"></div>
+<div class="w-2 h-2 rounded-full bg-surface-container-highest"></div>
+<div class="w-2 h-2 rounded-full bg-surface-container-highest"></div>
+<div class="w-6 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(183,159,255,0.5)]"></div>
+</div>
+</div>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-8 pb-10">
+<button class="bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-full p-4 hover:bg-white/20 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="west">west</span>
+</button>
+<button class="bg-gradient-to-br from-[#b79fff] to-[#8a95ff] text-black rounded-full p-4 hover:opacity-80 scale-98 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="east">east</span>
+</button>
+</nav>
+</body></html>

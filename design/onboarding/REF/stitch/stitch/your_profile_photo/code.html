@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "inverse-surface": "#fcf8fb",
+                "secondary-dim": "#8a95ff",
+                "background": "#0e0e10",
+                "secondary-fixed-dim": "#babfff",
+                "on-tertiary": "#690937",
+                "outline-variant": "#48474a",
+                "inverse-on-surface": "#565457",
+                "surface-container": "#19191c",
+                "surface": "#0e0e10",
+                "on-tertiary-container": "#59002c",
+                "tertiary-fixed-dim": "#f57ca6",
+                "surface-container-highest": "#262529",
+                "on-surface": "#fffbfe",
+                "on-primary-fixed": "#000000",
+                "tertiary": "#ff96b9",
+                "surface-variant": "#262529",
+                "on-primary-fixed-variant": "#330b80",
+                "secondary": "#8a95ff",
+                "on-secondary-fixed-variant": "#3a45ad",
+                "surface-container-lowest": "#000000",
+                "on-error-container": "#ffb2b9",
+                "primary-container": "#ab8ffe",
+                "primary-fixed": "#ab8ffe",
+                "surface-bright": "#2c2c2f",
+                "tertiary-fixed": "#ff8db3",
+                "on-secondary-container": "#c9cdff",
+                "on-secondary-fixed": "#192490",
+                "on-tertiary-fixed-variant": "#70103c",
+                "tertiary-container": "#fc81ac",
+                "primary": "#b79fff",
+                "on-primary": "#361083",
+                "error-container": "#a70138",
+                "surface-container-high": "#1f1f22",
+                "on-tertiary-fixed": "#380019",
+                "secondary-fixed": "#cbceff",
+                "on-background": "#fffbfe",
+                "tertiary-dim": "#ef77a1",
+                "surface-container-low": "#131316",
+                "error-dim": "#d73357",
+                "surface-dim": "#0e0e10",
+                "surface-tint": "#b79fff",
+                "on-primary-container": "#290070",
+                "on-surface-variant": "#adaaad",
+                "inverse-primary": "#684cb6",
+                "error": "#ff6e84",
+                "secondary-container": "#2f3aa3",
+                "on-secondary": "#000974",
+                "primary-dim": "#a88cfb",
+                "primary-fixed-dim": "#9d81f0",
+                "on-error": "#490013",
+                "outline": "#767578"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Plus Jakarta Sans"],
+                "body": ["Manrope"],
+                "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-border {
+            border: 1px solid rgba(72, 71, 74, 0.2);
+        }
+        .radial-aurora {
+            background: radial-gradient(circle at center, rgba(183, 159, 255, 0.15) 0%, rgba(138, 149, 255, 0.05) 40%, transparent 70%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col overflow-hidden">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-transparent">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#b79fff]" data-icon="close">close</span>
+</div>
+<h1 class="text-xl font-bold bg-gradient-to-r from-[#b79fff] to-[#8a95ff] bg-clip-text text-transparent" style="font-family: 'Plus Jakarta Sans';">EventOS Summit</h1>
+<div class="w-6"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col items-center justify-center px-8 relative">
+<!-- Background Radial Glow -->
+<div class="absolute inset-0 radial-aurora pointer-events-none"></div>
+<!-- Identity Container -->
+<div class="relative w-full max-w-sm flex flex-col items-center">
+<!-- Badge Card Outline (Subtle Background) -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-96 glass-border bg-surface-container-low/30 rounded-[2.5rem] rotate-3 pointer-events-none"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-96 glass-border bg-surface-container-low/50 rounded-[2.5rem] -rotate-2 pointer-events-none"></div>
+<!-- Profile Photo Section -->
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-40 h-40 rounded-full border-2 border-dashed border-primary/40 flex items-center justify-center bg-surface-container-high/40 backdrop-blur-md mb-10">
+<span class="material-symbols-outlined text-primary/30 text-6xl" data-icon="account_circle">account_circle</span>
+</div>
+<div class="text-center mb-12">
+<h2 class="text-3xl font-extrabold tracking-tight text-on-surface mb-3">Tu Foto</h2>
+<p class="text-on-surface-variant text-sm max-w-[240px] leading-relaxed">Personaliza tu perfil de cumbre para que otros asistentes puedan reconocerte.</p>
+</div>
+<!-- Glass Pill Buttons Cluster -->
+<div class="flex flex-col gap-4 w-full">
+<button class="w-full py-4 px-8 rounded-full bg-gradient-to-r from-primary to-secondary text-on-primary-fixed font-bold text-sm tracking-wide flex items-center justify-center gap-3 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="photo_camera">photo_camera</span>
+                        Camara
+                    </button>
+<button class="w-full py-4 px-8 rounded-full bg-surface-variant/40 backdrop-blur-xl glass-border text-on-surface font-semibold text-sm tracking-wide flex items-center justify-center gap-3 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="image">image</span>
+                        Galeria
+                    </button>
+</div>
+</div>
+</div>
+<!-- Bottom Actions -->
+<div class="mt-16 text-center">
+<button class="text-primary text-sm font-medium hover:opacity-80 transition-opacity">Saltar por ahora</button>
+</div>
+</main>
+<!-- Footer Shell -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex flex-col items-center gap-8 pb-10">
+<!-- Progress Dots -->
+<div class="flex gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+<div class="w-6 h-1.5 rounded-full bg-primary shadow-[0_0_10px_rgba(183,159,255,0.4)]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+</div>
+<!-- Navigation Anchors -->
+<div class="w-full flex justify-between items-center px-8">
+<button class="bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-full p-4 hover:bg-white/20 transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined" data-icon="west">west</span>
+</button>
+<button class="bg-gradient-to-br from-[#b79fff] to-[#8a95ff] text-black rounded-full p-4 transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined" data-icon="east">east</span>
+</button>
+</div>
+</footer>
+</body></html>

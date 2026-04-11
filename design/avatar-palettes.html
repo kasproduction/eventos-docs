@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventOS — Avatar Palettes (Boring Avatars Beam)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #fff;
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    padding: 40px 24px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: rgba(255,255,255,0.35);
+    font-size: 14px;
+    margin-bottom: 48px;
+  }
+  .palette-section {
+    margin-bottom: 56px;
+  }
+  .palette-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .palette-name {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .palette-colors {
+    display: flex;
+    gap: 6px;
+  }
+  .palette-colors .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .palette-desc {
+    color: rgba(255,255,255,0.3);
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .avatars-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .avatar-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .avatar-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    border: 2px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.03);
+  }
+  .avatar-card .name {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    max-width: 80px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Profile preview */
+  .profile-preview {
+    margin-top: 64px;
+    padding: 32px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    max-width: 380px;
+  }
+  .profile-preview h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: rgba(255,255,255,0.5);
+  }
+  .profile-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .profile-hero img {
+    width: 96px;
+    height: 96px;
+    border-radius: 48px;
+    border: 2px solid rgba(255,255,255,0.08);
+  }
+  .profile-hero .pname {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .profile-hero .prole {
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+  }
+  .profile-hero .pbadge {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .divider {
+    height: 1px;
+    background: rgba(255,255,255,0.04);
+    margin: 40px 0;
+  }
+
+  /* Variant selector */
+  .variant-section {
+    margin-top: 64px;
+    margin-bottom: 56px;
+  }
+  .variant-section h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .variant-section .subtitle {
+    margin-bottom: 24px;
+  }
+  .variants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .variant-card {
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .variant-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: rgba(255,255,255,0.6);
+  }
+  .variant-card .avatars-row {
+    justify-content: center;
+  }
+  .variant-card .avatars-row img {
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+</style>
+</head>
+<body>
+
+<h1>EventOS — Avatar Palettes</h1>
+<p class="subtitle">Boring Avatars (beam) sobre fondo Lumina Noir. Cada nombre genera un avatar unico y consistente.</p>
+
+<!-- ============================================================ -->
+<!-- PALETTE 1 -->
+<!-- ============================================================ -->
+<div class="palette-section">
+  <div class="palette-header">
+    <span class="palette-name">1. Cosmic</span>
+    <div class="palette-colors">
+      <div class="dot" style="background:#7C3AED"></div>
+      <div class="dot" style="background:#6366F1"></div>
+      <div class="dot" style="background:#06B6D4"></div>
+      <div class="dot" style="background:#8B5CF6"></div>
+      <div class="dot" style="background:#A78BFA"></div>
+    </div>
+  </div>
+  <p class="palette-desc">Violetas y azules — coherente con el accent morado del tema</p>
+  <div class="avatars-row">
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Kamilo%20Sanchez&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      <span class="name">Kamilo S.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Maria%20Lopez&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      <span class="name">Maria L.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Carlos%20Gomez&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      <span class="name">Carlos G.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Ana%20Torres&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      <span class="name">Ana T.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Juan%20Perez&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      <span class="name">Juan P.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Laura%20Diaz&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      <span class="name">Laura D.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=David%20Martinez&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      <span class="name">David M.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Sofia%20Ruiz&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      <span class="name">Sofia R.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PALETTE 2 -->
+<!-- ============================================================ -->
+<div class="palette-section">
+  <div class="palette-header">
+    <span class="palette-name">2. Jewel</span>
+    <div class="palette-colors">
+      <div class="dot" style="background:#7C3AED"></div>
+      <div class="dot" style="background:#EC4899"></div>
+      <div class="dot" style="background:#06B6D4"></div>
+      <div class="dot" style="background:#F59E0B"></div>
+      <div class="dot" style="background:#10B981"></div>
+    </div>
+  </div>
+  <p class="palette-desc">Variada y rica — tipo piedras preciosas, mas personalidad</p>
+  <div class="avatars-row">
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Kamilo%20Sanchez&colors=7C3AED,EC4899,06B6D4,F59E0B,10B981" />
+      <span class="name">Kamilo S.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Maria%20Lopez&colors=7C3AED,EC4899,06B6D4,F59E0B,10B981" />
+      <span class="name">Maria L.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Carlos%20Gomez&colors=7C3AED,EC4899,06B6D4,F59E0B,10B981" />
+      <span class="name">Carlos G.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Ana%20Torres&colors=7C3AED,EC4899,06B6D4,F59E0B,10B981" />
+      <span class="name">Ana T.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Juan%20Perez&colors=7C3AED,EC4899,06B6D4,F59E0B,10B981" />
+      <span class="name">Juan P.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Laura%20Diaz&colors=7C3AED,EC4899,06B6D4,F59E0B,10B981" />
+      <span class="name">Laura D.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=David%20Martinez&colors=7C3AED,EC4899,06B6D4,F59E0B,10B981" />
+      <span class="name">David M.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Sofia%20Ruiz&colors=7C3AED,EC4899,06B6D4,F59E0B,10B981" />
+      <span class="name">Sofia R.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PALETTE 3 -->
+<!-- ============================================================ -->
+<div class="palette-section">
+  <div class="palette-header">
+    <span class="palette-name">3. Aurora</span>
+    <div class="palette-colors">
+      <div class="dot" style="background:#0D9488"></div>
+      <div class="dot" style="background:#06B6D4"></div>
+      <div class="dot" style="background:#3B82F6"></div>
+      <div class="dot" style="background:#8B5CF6"></div>
+      <div class="dot" style="background:#10B981"></div>
+    </div>
+  </div>
+  <p class="palette-desc">Fria, teal/verde/azul — elegante y calmada</p>
+  <div class="avatars-row">
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Kamilo%20Sanchez&colors=0D9488,06B6D4,3B82F6,8B5CF6,10B981" />
+      <span class="name">Kamilo S.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Maria%20Lopez&colors=0D9488,06B6D4,3B82F6,8B5CF6,10B981" />
+      <span class="name">Maria L.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Carlos%20Gomez&colors=0D9488,06B6D4,3B82F6,8B5CF6,10B981" />
+      <span class="name">Carlos G.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Ana%20Torres&colors=0D9488,06B6D4,3B82F6,8B5CF6,10B981" />
+      <span class="name">Ana T.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Juan%20Perez&colors=0D9488,06B6D4,3B82F6,8B5CF6,10B981" />
+      <span class="name">Juan P.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Laura%20Diaz&colors=0D9488,06B6D4,3B82F6,8B5CF6,10B981" />
+      <span class="name">Laura D.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=David%20Martinez&colors=0D9488,06B6D4,3B82F6,8B5CF6,10B981" />
+      <span class="name">David M.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Sofia%20Ruiz&colors=0D9488,06B6D4,3B82F6,8B5CF6,10B981" />
+      <span class="name">Sofia R.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PALETTE 4 -->
+<!-- ============================================================ -->
+<div class="palette-section">
+  <div class="palette-header">
+    <span class="palette-name">4. Ember</span>
+    <div class="palette-colors">
+      <div class="dot" style="background:#F59E0B"></div>
+      <div class="dot" style="background:#EF4444"></div>
+      <div class="dot" style="background:#EC4899"></div>
+      <div class="dot" style="background:#8B5CF6"></div>
+      <div class="dot" style="background:#F97316"></div>
+    </div>
+  </div>
+  <p class="palette-desc">Calida, ambar/rosa/violeta — energetica y vibrante</p>
+  <div class="avatars-row">
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Kamilo%20Sanchez&colors=F59E0B,EF4444,EC4899,8B5CF6,F97316" />
+      <span class="name">Kamilo S.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Maria%20Lopez&colors=F59E0B,EF4444,EC4899,8B5CF6,F97316" />
+      <span class="name">Maria L.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Carlos%20Gomez&colors=F59E0B,EF4444,EC4899,8B5CF6,F97316" />
+      <span class="name">Carlos G.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Ana%20Torres&colors=F59E0B,EF4444,EC4899,8B5CF6,F97316" />
+      <span class="name">Ana T.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Juan%20Perez&colors=F59E0B,EF4444,EC4899,8B5CF6,F97316" />
+      <span class="name">Juan P.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Laura%20Diaz&colors=F59E0B,EF4444,EC4899,8B5CF6,F97316" />
+      <span class="name">Laura D.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=David%20Martinez&colors=F59E0B,EF4444,EC4899,8B5CF6,F97316" />
+      <span class="name">David M.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Sofia%20Ruiz&colors=F59E0B,EF4444,EC4899,8B5CF6,F97316" />
+      <span class="name">Sofia R.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PALETTE 5 -->
+<!-- ============================================================ -->
+<div class="palette-section">
+  <div class="palette-header">
+    <span class="palette-name">5. Neutral Premium</span>
+    <div class="palette-colors">
+      <div class="dot" style="background:#64748B"></div>
+      <div class="dot" style="background:#8B5CF6"></div>
+      <div class="dot" style="background:#94A3B8"></div>
+      <div class="dot" style="background:#A78BFA"></div>
+      <div class="dot" style="background:#CBD5E1"></div>
+    </div>
+  </div>
+  <p class="palette-desc">Tonos suaves grises + violeta — ultra elegante, mas sobrio</p>
+  <div class="avatars-row">
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Kamilo%20Sanchez&colors=64748B,8B5CF6,94A3B8,A78BFA,CBD5E1" />
+      <span class="name">Kamilo S.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Maria%20Lopez&colors=64748B,8B5CF6,94A3B8,A78BFA,CBD5E1" />
+      <span class="name">Maria L.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Carlos%20Gomez&colors=64748B,8B5CF6,94A3B8,A78BFA,CBD5E1" />
+      <span class="name">Carlos G.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Ana%20Torres&colors=64748B,8B5CF6,94A3B8,A78BFA,CBD5E1" />
+      <span class="name">Ana T.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Juan%20Perez&colors=64748B,8B5CF6,94A3B8,A78BFA,CBD5E1" />
+      <span class="name">Juan P.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Laura%20Diaz&colors=64748B,8B5CF6,94A3B8,A78BFA,CBD5E1" />
+      <span class="name">Laura D.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=David%20Martinez&colors=64748B,8B5CF6,94A3B8,A78BFA,CBD5E1" />
+      <span class="name">David M.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Sofia%20Ruiz&colors=64748B,8B5CF6,94A3B8,A78BFA,CBD5E1" />
+      <span class="name">Sofia R.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PALETTE 6 -->
+<!-- ============================================================ -->
+<div class="palette-section">
+  <div class="palette-header">
+    <span class="palette-name">6. Ocean</span>
+    <div class="palette-colors">
+      <div class="dot" style="background:#0EA5E9"></div>
+      <div class="dot" style="background:#6366F1"></div>
+      <div class="dot" style="background:#14B8A6"></div>
+      <div class="dot" style="background:#A855F7"></div>
+      <div class="dot" style="background:#38BDF8"></div>
+    </div>
+  </div>
+  <p class="palette-desc">Azul oceano + violeta — fresca y moderna</p>
+  <div class="avatars-row">
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Kamilo%20Sanchez&colors=0EA5E9,6366F1,14B8A6,A855F7,38BDF8" />
+      <span class="name">Kamilo S.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Maria%20Lopez&colors=0EA5E9,6366F1,14B8A6,A855F7,38BDF8" />
+      <span class="name">Maria L.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Carlos%20Gomez&colors=0EA5E9,6366F1,14B8A6,A855F7,38BDF8" />
+      <span class="name">Carlos G.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Ana%20Torres&colors=0EA5E9,6366F1,14B8A6,A855F7,38BDF8" />
+      <span class="name">Ana T.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Juan%20Perez&colors=0EA5E9,6366F1,14B8A6,A855F7,38BDF8" />
+      <span class="name">Juan P.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Laura%20Diaz&colors=0EA5E9,6366F1,14B8A6,A855F7,38BDF8" />
+      <span class="name">Laura D.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=David%20Martinez&colors=0EA5E9,6366F1,14B8A6,A855F7,38BDF8" />
+      <span class="name">David M.</span>
+    </div>
+    <div class="avatar-card">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Sofia%20Ruiz&colors=0EA5E9,6366F1,14B8A6,A855F7,38BDF8" />
+      <span class="name">Sofia R.</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!-- OTHER BORING AVATAR VARIANTS -->
+<!-- ============================================================ -->
+<div class="variant-section">
+  <h2>Otros estilos de Boring Avatars (no solo beam)</h2>
+  <p class="subtitle">Misma paleta Cosmic para comparar. Todos son abstractos, sin genero, sin cara.</p>
+
+  <div class="variants-grid">
+    <div class="variant-card">
+      <h3>marble</h3>
+      <div class="avatars-row">
+        <img src="https://hostedboringavatars.vercel.app/api/marble?size=56&name=Kamilo&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/marble?size=56&name=Maria&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/marble?size=56&name=Carlos&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/marble?size=56&name=Ana&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/marble?size=56&name=Juan&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      </div>
+    </div>
+    <div class="variant-card">
+      <h3>pixel</h3>
+      <div class="avatars-row">
+        <img src="https://hostedboringavatars.vercel.app/api/pixel?size=56&name=Kamilo&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/pixel?size=56&name=Maria&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/pixel?size=56&name=Carlos&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/pixel?size=56&name=Ana&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/pixel?size=56&name=Juan&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      </div>
+    </div>
+    <div class="variant-card">
+      <h3>sunset</h3>
+      <div class="avatars-row">
+        <img src="https://hostedboringavatars.vercel.app/api/sunset?size=56&name=Kamilo&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/sunset?size=56&name=Maria&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/sunset?size=56&name=Carlos&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/sunset?size=56&name=Ana&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/sunset?size=56&name=Juan&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      </div>
+    </div>
+    <div class="variant-card">
+      <h3>ring</h3>
+      <div class="avatars-row">
+        <img src="https://hostedboringavatars.vercel.app/api/ring?size=56&name=Kamilo&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/ring?size=56&name=Maria&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/ring?size=56&name=Carlos&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/ring?size=56&name=Ana&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/ring?size=56&name=Juan&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      </div>
+    </div>
+    <div class="variant-card">
+      <h3>bauhaus</h3>
+      <div class="avatars-row">
+        <img src="https://hostedboringavatars.vercel.app/api/bauhaus?size=56&name=Kamilo&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/bauhaus?size=56&name=Maria&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/bauhaus?size=56&name=Carlos&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/bauhaus?size=56&name=Ana&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/bauhaus?size=56&name=Juan&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      </div>
+    </div>
+    <div class="variant-card">
+      <h3>beam (referencia)</h3>
+      <div class="avatars-row">
+        <img src="https://hostedboringavatars.vercel.app/api/beam?size=56&name=Kamilo&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/beam?size=56&name=Maria&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/beam?size=56&name=Carlos&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/beam?size=56&name=Ana&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+        <img src="https://hostedboringavatars.vercel.app/api/beam?size=56&name=Juan&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ============================================================ -->
+<!-- PROFILE PREVIEW -->
+<!-- ============================================================ -->
+<div class="profile-preview">
+  <h2>Preview — Perfil con Beam (Cosmic)</h2>
+  <div class="profile-hero">
+    <div style="position: relative; display: inline-block;">
+      <img src="https://hostedboringavatars.vercel.app/api/beam?size=120&name=Kamilo%20Sanchez&colors=7C3AED,6366F1,06B6D4,8B5CF6,A78BFA" />
+      <div style="position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:14px;background:rgba(255,255,255,0.08);border:2px solid #0a0a0a;display:flex;align-items:center;justify-content:center;font-size:12px;">
+        📷
+      </div>
+    </div>
+    <span class="pname">Kamilo Sanchez</span>
+    <span class="prole">Director Creativo · Kasproduction</span>
+    <span class="pbadge">Asistente presencial</span>
+  </div>
+</div>
+
+<div style="height: 80px"></div>
+
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#fcf8fb",
+                        "secondary-dim": "#8a95ff",
+                        "background": "#0e0e10",
+                        "secondary-fixed-dim": "#babfff",
+                        "on-tertiary": "#690937",
+                        "outline-variant": "#48474a",
+                        "inverse-on-surface": "#565457",
+                        "surface-container": "#19191c",
+                        "surface": "#0e0e10",
+                        "on-tertiary-container": "#59002c",
+                        "tertiary-fixed-dim": "#f57ca6",
+                        "surface-container-highest": "#262529",
+                        "on-surface": "#fffbfe",
+                        "on-primary-fixed": "#000000",
+                        "tertiary": "#ff96b9",
+                        "surface-variant": "#262529",
+                        "on-primary-fixed-variant": "#330b80",
+                        "secondary": "#8a95ff",
+                        "on-secondary-fixed-variant": "#3a45ad",
+                        "surface-container-lowest": "#000000",
+                        "on-error-container": "#ffb2b9",
+                        "primary-container": "#ab8ffe",
+                        "primary-fixed": "#ab8ffe",
+                        "surface-bright": "#2c2c2f",
+                        "tertiary-fixed": "#ff8db3",
+                        "on-secondary-container": "#c9cdff",
+                        "on-secondary-fixed": "#192490",
+                        "on-tertiary-fixed-variant": "#70103c",
+                        "tertiary-container": "#fc81ac",
+                        "primary": "#b79fff",
+                        "on-primary": "#361083",
+                        "error-container": "#a70138",
+                        "surface-container-high": "#1f1f22",
+                        "on-tertiary-fixed": "#380019",
+                        "secondary-fixed": "#cbceff",
+                        "on-background": "#fffbfe",
+                        "tertiary-dim": "#ef77a1",
+                        "surface-container-low": "#131316",
+                        "error-dim": "#d73357",
+                        "surface-dim": "#0e0e10",
+                        "surface-tint": "#b79fff",
+                        "on-primary-container": "#290070",
+                        "on-surface-variant": "#adaaad",
+                        "inverse-primary": "#684cb6",
+                        "error": "#ff6e84",
+                        "secondary-container": "#2f3aa3",
+                        "on-secondary": "#000974",
+                        "primary-dim": "#a88cfb",
+                        "primary-fixed-dim": "#9d81f0",
+                        "on-error": "#490013",
+                        "outline": "#767578"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #0e0e10;
+            color: #fffbfe;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .headline-font {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .mesh-gradient {
+            background-color: #0e0e10;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(183, 159, 255, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(138, 149, 255, 0.1) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(183, 159, 255, 0.08) 0px, transparent 50%);
+        }
+        .glass-chip {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+        .glass-chip-active {
+            background: linear-gradient(135deg, #b79fff, #8a95ff);
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(183, 159, 255, 0.4);
+            color: #000000;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="mesh-gradient min-h-screen flex flex-col">
+<!-- Top Navigation Anchor (Suppressing SideNav/BottomNav for focused flow) -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-transparent">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#b79fff]" data-icon="close">close</span>
+<h1 class="text-xl font-bold bg-gradient-to-r from-[#b79fff] to-[#8a95ff] bg-clip-text text-transparent headline-font tracking-tight">EventOS Summit</h1>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center justify-center px-8 pt-24 pb-32">
+<div class="w-full max-w-2xl">
+<!-- Hero Title Section -->
+<div class="mb-12 text-center md:text-left">
+<h2 class="text-4xl md:text-5xl font-extrabold headline-font tracking-tight text-on-surface mb-4">
+                    Que te interesa?
+                </h2>
+<p class="text-on-surface-variant text-lg max-w-md">
+                    Personaliza tu experiencia. Selecciona los temas que más te apasionan para curar tu agenda.
+                </p>
+</div>
+<!-- Interests Grid/Flow -->
+<div class="flex flex-wrap gap-4 justify-center md:justify-start">
+<!-- Active Item -->
+<button class="glass-chip glass-chip-active px-6 py-3 rounded-full text-base font-semibold transition-transform active:scale-95">
+                    Tecnologia
+                </button>
+<button class="glass-chip px-6 py-3 rounded-full text-base font-medium text-on-surface-variant hover:text-on-surface hover:bg-white/10 transition-transform active:scale-95">
+                    Innovacion
+                </button>
+<!-- Active Item -->
+<button class="glass-chip glass-chip-active px-6 py-3 rounded-full text-base font-semibold transition-transform active:scale-95">
+                    Design
+                </button>
+<button class="glass-chip px-6 py-3 rounded-full text-base font-medium text-on-surface-variant hover:text-on-surface hover:bg-white/10 transition-transform active:scale-95">
+                    Marketing
+                </button>
+<!-- Active Item -->
+<button class="glass-chip glass-chip-active px-6 py-3 rounded-full text-base font-semibold transition-transform active:scale-95">
+                    IA &amp; ML
+                </button>
+<button class="glass-chip px-6 py-3 rounded-full text-base font-medium text-on-surface-variant hover:text-on-surface hover:bg-white/10 transition-transform active:scale-95">
+                    Fintech
+                </button>
+<button class="glass-chip px-6 py-3 rounded-full text-base font-medium text-on-surface-variant hover:text-on-surface hover:bg-white/10 transition-transform active:scale-95">
+                    Liderazgo
+                </button>
+<button class="glass-chip px-6 py-3 rounded-full text-base font-medium text-on-surface-variant hover:text-on-surface hover:bg-white/10 transition-transform active:scale-95">
+                    Producto
+                </button>
+<button class="glass-chip px-6 py-3 rounded-full text-base font-medium text-on-surface-variant hover:text-on-surface hover:bg-white/10 transition-transform active:scale-95">
+                    Growth
+                </button>
+</div>
+<!-- Counter and Summary -->
+<div class="mt-12 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-primary uppercase tracking-[0.05em] label-md">
+                        3 seleccionados
+                    </span>
+<div class="h-1 w-12 bg-primary rounded-full mt-1"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Action Area (Mimicking the structural requirement of the shared BottomNavBar style) -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-8 pb-10">
+<!-- Progress Dots (4th Active) -->
+<div class="flex gap-2">
+<div class="w-2 h-2 rounded-full bg-white/20"></div>
+<div class="w-2 h-2 rounded-full bg-white/20"></div>
+<div class="w-2 h-2 rounded-full bg-white/20"></div>
+<div class="w-6 h-2 rounded-full bg-gradient-to-r from-[#b79fff] to-[#8a95ff]"></div>
+</div>
+<!-- Navigation Actions -->
+<div class="flex gap-4">
+<button class="bg-white/10 backdrop-blur-xl border border-white/20 text-white rounded-full p-4 hover:bg-white/20 transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined" data-icon="west">west</span>
+</button>
+<button class="bg-gradient-to-br from-[#b79fff] to-[#8a95ff] text-black rounded-full p-4 flex items-center justify-center shadow-[0_10px_30px_rgba(183,159,255,0.3)] transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined" data-icon="east">east</span>
+</button>
+</div>
+</footer>
+<!-- Decorative Mesh Elements -->
+<div class="fixed top-1/4 -right-20 w-80 h-80 bg-primary/10 blur-[120px] rounded-full -z-10"></div>
+<div class="fixed -bottom-20 -left-20 w-96 h-96 bg-secondary/10 blur-[150px] rounded-full -z-10"></div>
+</body></html>

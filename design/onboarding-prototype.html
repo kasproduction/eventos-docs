@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Onboarding + Auth — EventOS (Lumina Noir)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0a;
+    color: #fff;
+    font-family: 'Urbanist', sans-serif;
+    width: 375px;
+    height: 812px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── Ambient gradient background ──────────────────────── */
+  .ambient {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .ambient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.12;
+    animation: float 8s ease-in-out infinite alternate;
+  }
+  .orb1 { width: 300px; height: 300px; background: #818cf8; top: -80px; left: -60px; }
+  .orb2 { width: 250px; height: 250px; background: #f472b6; bottom: -40px; right: -80px; animation-delay: -4s; }
+  .orb3 { width: 200px; height: 200px; background: #38bdf8; top: 40%; left: 50%; animation-delay: -2s; }
+
+  @keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(20px, -30px) scale(1.1); }
+  }
+
+  /* ── Progress bar ─────────────────────────────────────── */
+  .progress-bar {
+    position: absolute;
+    top: 54px;
+    left: 24px;
+    right: 24px;
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .progress-bar.visible { opacity: 1; }
+  .progress-fill {
+    height: 100%;
+    background: #fff;
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    width: 0%;
+  }
+
+  /* ── Slides container ─────────────────────────────────── */
+  .slides {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0 28px;
+    opacity: 0;
+    transform: translateX(60px);
+    transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    pointer-events: none;
+    overflow-y: auto;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .slide.exit-left {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+
+  /* ── Common elements ──────────────────────────────────── */
+  .slide-header {
+    padding-top: 80px;
+    margin-bottom: 8px;
+  }
+
+  .back-btn {
+    position: absolute;
+    top: 64px;
+    left: 24px;
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 300;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+  }
+  .back-btn.visible { opacity: 1; }
+
+  .slide-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -0.8px;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  .slide-subtitle {
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.5;
+    margin-bottom: 32px;
+  }
+
+  .input-group {
+    margin-bottom: 16px;
+  }
+
+  .input-label {
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    color: #fff;
+    font-family: 'Urbanist', sans-serif;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-field:focus {
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .input-field::placeholder {
+    color: rgba(255,255,255,0.2);
+  }
+
+  .primary-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.12s, opacity 0.2s;
+    margin-top: 8px;
+  }
+
+  .primary-btn:active {
+    transform: scale(0.97);
+  }
+
+  .primary-btn.accent {
+    background: #fff;
+    color: #0a0a0a;
+  }
+
+  .primary-btn.glass {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .link-text {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.35);
+  }
+
+  .link-text a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .skip-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.25);
+    cursor: pointer;
+  }
+
+  .spacer { flex: 1; }
+  .bottom-area { padding-bottom: 48px; }
+
+  /* ── PASO 0: Welcome ──────────────────────────────────── */
+  #slide0 {
+    justify-content: flex-end;
+    padding-bottom: 48px;
+  }
+
+  .welcome-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -65%);
+    text-align: center;
+  }
+
+  .welcome-event-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 38px;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .welcome-event-name span {
+    background: linear-gradient(135deg, #818cf8, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .welcome-date {
+    font-size: 15px;
+    color: rgba(255,255,255,0.4);
+    font-weight: 500;
+  }
+
+  .welcome-tagline {
+    font-size: 13px;
+    color: rgba(255,255,255,0.25);
+    margin-top: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ── PASO 2: Foto ─────────────────────────────────────── */
+  .photo-circle {
+    width: 160px;
+    height: 160px;
+    border-radius: 80px;
+    background: rgba(255,255,255,0.04);
+    border: 2px dashed rgba(255,255,255,0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    cursor: pointer;
+    transition: border-color 0.3s, background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .photo-circle:hover {
+    border-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.06);
+  }
+
+  .photo-circle.has-photo {
+    border: 3px solid rgba(255,255,255,0.15);
+    border-style: solid;
+  }
+
+  .photo-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 80px;
+  }
+
+  .photo-icon {
+    font-size: 36px;
+    margin-bottom: 6px;
+    opacity: 0.3;
+  }
+
+  .photo-hint {
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+  }
+
+  .photo-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .photo-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: background 0.2s;
+  }
+
+  .photo-action-btn:hover {
+    background: rgba(255,255,255,0.08);
+  }
+
+  /* ── PASO 4: Intereses (Spotify style) ────────────────── */
+  .interests-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .interest-chip {
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    transition: all 0.25s;
+    user-select: none;
+  }
+
+  .interest-chip:hover {
+    background: rgba(255,255,255,0.08);
+  }
+
+  .interest-chip.selected {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
+  .interest-counter {
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 16px;
+  }
+
+  .interest-counter span {
+    color: #fff;
+    font-weight: 700;
+  }
+
+  /* ── PASO 5: Celebracion ──────────────────────────────── */
+  #slide5 {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .checkmark-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    background: rgba(34, 197, 94, 0.1);
+    border: 2px solid rgba(34, 197, 94, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .checkmark-circle svg {
+    width: 36px;
+    height: 36px;
+    stroke: #22c55e;
+    stroke-width: 3;
+    fill: none;
+    animation: drawCheck 0.4s 0.3s ease forwards;
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes drawCheck {
+    to { stroke-dashoffset: 0; }
+  }
+
+  .badge-preview {
+    width: 220px;
+    margin: 24px auto;
+    padding: 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .badge-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin-top: 12px;
+  }
+
+  .badge-role {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 2px;
+  }
+
+  .badge-qr {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    margin: 14px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+  }
+
+  /* ── Dropdown searchable ──────────────────────────────── */
+  .dropdown-wrap {
+    position: relative;
+  }
+
+  .dropdown-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 160px;
+    overflow-y: auto;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    z-index: 50;
+    display: none;
+  }
+
+  .dropdown-list.open { display: block; }
+
+  .dropdown-item {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+  }
+
+  /* ── Debug ────────────────────────────────────────────── */
+  .debug {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: rgba(255,255,255,0.5);
+    font-size: 10px;
+    font-family: monospace;
+    padding: 4px 12px;
+    border-radius: 12px;
+    z-index: 500;
+  }
+</style>
+</head>
+<body>
+
+<!-- Ambient background -->
+<div class="ambient">
+  <div class="ambient-orb orb1"></div>
+  <div class="ambient-orb orb2"></div>
+  <div class="ambient-orb orb3"></div>
+</div>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<!-- Back button -->
+<button class="back-btn" id="backBtn" onclick="goBack()">&#8592;</button>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SLIDES                                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="slides">
+
+  <!-- ── PASO 0: Bienvenida ─────────────────────────────── -->
+  <div class="slide active" id="slide0">
+    <div class="welcome-logo">
+      <div class="welcome-event-name">
+        EventOS<br><span>Summit</span>
+      </div>
+      <div class="welcome-date">15 - 17 de Septiembre, 2026</div>
+      <div class="welcome-tagline">The Future of Creative Intelligence</div>
+    </div>
+
+    <button class="primary-btn accent" onclick="goTo(1)">Ya tengo cuenta</button>
+    <button class="primary-btn glass" style="margin-top:10px" onclick="goTo(1, 'register')">Registrarme</button>
+  </div>
+
+  <!-- ── PASO 1: Login / Esenciales ─────────────────────── -->
+  <div class="slide" id="slide1">
+    <div class="slide-header">
+      <div class="slide-title" id="authTitle">Inicia sesion</div>
+      <div class="slide-subtitle" id="authSubtitle">Ingresa tus datos para acceder al evento</div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">Email</div>
+      <input class="input-field" type="email" placeholder="tu@email.com" id="emailInput">
+    </div>
+
+    <div id="registerFields" style="display:none">
+      <div class="input-group">
+        <div class="input-label">Nombre completo</div>
+        <input class="input-field" type="text" placeholder="Como aparecera en tu badge">
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">Contrasena</div>
+      <input class="input-field" type="password" placeholder="********">
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="bottom-area">
+      <button class="primary-btn accent" id="authBtn" onclick="handleAuth()">Iniciar sesion</button>
+      <div class="link-text" id="authToggle">
+        No tienes cuenta? <a href="#" onclick="toggleAuthMode(event)">Registrate</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PASO 2: Tu foto ────────────────────────────────── -->
+  <div class="slide" id="slide2">
+    <div class="slide-header">
+      <div class="slide-title">Tu foto</div>
+      <div class="slide-subtitle">Aparecera en tu badge digital y cuando otros asistentes te busquen</div>
+    </div>
+
+    <div class="photo-circle" id="photoCircle" onclick="simulatePhoto()">
+      <div class="photo-icon" id="photoIcon">&#128247;</div>
+      <div class="photo-hint" id="photoHint">Toca para agregar</div>
+    </div>
+
+    <div class="photo-actions">
+      <div class="photo-action-btn" onclick="simulatePhoto()">
+        &#128248; Camara
+      </div>
+      <div class="photo-action-btn" onclick="simulatePhoto()">
+        &#128444; Galeria
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="bottom-area">
+      <button class="primary-btn accent" onclick="goTo(3)">Continuar</button>
+      <div class="skip-link" onclick="goTo(3)">Saltar por ahora</div>
+    </div>
+  </div>
+
+  <!-- ── PASO 3: Sobre ti (campos dinamicos) ────────────── -->
+  <div class="slide" id="slide3">
+    <div class="slide-header">
+      <div class="slide-title">Sobre ti</div>
+      <div class="slide-subtitle">Ayudanos a personalizar tu experiencia</div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">Cargo</div>
+      <input class="input-field" type="text" placeholder="Ej: Product Manager">
+    </div>
+
+    <div class="input-group dropdown-wrap">
+      <div class="input-label">Organizacion</div>
+      <input class="input-field" type="text" placeholder="Buscar..." id="orgInput" onfocus="openDropdown()" oninput="filterOrgs()">
+      <div class="dropdown-list" id="orgDropdown">
+        <div class="dropdown-item" onclick="selectOrg('Bancolombia')">Bancolombia</div>
+        <div class="dropdown-item" onclick="selectOrg('Rappi')">Rappi</div>
+        <div class="dropdown-item" onclick="selectOrg('Grupo Exito')">Grupo Exito</div>
+        <div class="dropdown-item" onclick="selectOrg('Nutresa')">Nutresa</div>
+        <div class="dropdown-item" onclick="selectOrg('EPM')">EPM</div>
+        <div class="dropdown-item" onclick="selectOrg('Intergrupo')">Intergrupo</div>
+        <div class="dropdown-item" onclick="selectOrg('Globant')">Globant</div>
+        <div class="dropdown-item" onclick="selectOrg('MercadoLibre')">MercadoLibre</div>
+        <div class="dropdown-item" onclick="selectOrg('Otra')">Otra...</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">Telefono</div>
+      <input class="input-field" type="tel" placeholder="+57 300 123 4567">
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="bottom-area">
+      <button class="primary-btn accent" onclick="goTo(4)">Continuar</button>
+    </div>
+  </div>
+
+  <!-- ── PASO 4: Intereses ──────────────────────────────── -->
+  <div class="slide" id="slide4">
+    <div class="slide-header">
+      <div class="slide-title">Que te interesa?</div>
+      <div class="slide-subtitle">Elige al menos 3 para personalizar tu agenda y conectar con personas afines</div>
+    </div>
+
+    <div class="interest-counter"><span id="interestCount">0</span> seleccionados (minimo 3)</div>
+
+    <div class="interests-grid" id="interestsGrid"></div>
+
+    <div class="spacer"></div>
+
+    <div class="bottom-area">
+      <button class="primary-btn accent" id="interestBtn" onclick="goTo(5)" style="opacity:0.4; pointer-events:none">Continuar</button>
+      <div class="skip-link" onclick="goTo(5)">Saltar</div>
+    </div>
+  </div>
+
+  <!-- ── PASO 5: Celebracion ────────────────────────────── -->
+  <div class="slide" id="slide5">
+    <div class="checkmark-circle">
+      <svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg>
+    </div>
+    <div class="slide-title">Bienvenido!</div>
+    <div class="slide-subtitle" style="color:rgba(255,255,255,0.4)">Tu registro esta completo</div>
+
+    <div class="badge-preview">
+      <div style="width:48px;height:48px;border-radius:24px;background:rgba(255,255,255,0.08);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:20px">K</div>
+      <div class="badge-name">Kamilo Restrepo</div>
+      <div class="badge-role">Product Designer &middot; Rappi</div>
+      <div class="badge-qr">QR</div>
+    </div>
+
+    <button class="primary-btn accent" style="max-width:260px;margin:0 auto">Explorar evento</button>
+  </div>
+
+</div>
+
+<!-- Debug -->
+<div class="debug" id="debug">Paso 0 / 5 — Bienvenida</div>
+
+<script>
+let current = 0;
+let mode = 'login'; // 'login' | 'register'
+let selectedInterests = 0;
+const TOTAL_STEPS = 5;
+
+const INTERESTS = [
+  'Tecnologia', 'Innovacion', 'Design', 'Marketing',
+  'Emprendimiento', 'IA & Machine Learning', 'Fintech',
+  'Sostenibilidad', 'Liderazgo', 'Producto',
+  'Data Science', 'Cloud', 'Blockchain', 'UX Research',
+  'Growth', 'Cultura', 'Salud', 'Educacion'
+];
+
+// Build interest chips
+const grid = document.getElementById('interestsGrid');
+INTERESTS.forEach(name => {
+  const chip = document.createElement('div');
+  chip.className = 'interest-chip';
+  chip.textContent = name;
+  chip.onclick = () => {
+    chip.classList.toggle('selected');
+    selectedInterests = document.querySelectorAll('.interest-chip.selected').length;
+    document.getElementById('interestCount').textContent = selectedInterests;
+    const btn = document.getElementById('interestBtn');
+    if (selectedInterests >= 3) {
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    } else {
+      btn.style.opacity = '0.4';
+      btn.style.pointerEvents = 'none';
+    }
+  };
+  grid.appendChild(chip);
+});
+
+function goTo(step, newMode) {
+  if (newMode) mode = newMode;
+
+  const prev = document.getElementById('slide' + current);
+  const next = document.getElementById('slide' + step);
+
+  prev.classList.remove('active');
+  prev.classList.add(step > current ? 'exit-left' : '');
+
+  setTimeout(() => {
+    prev.className = 'slide';
+  }, 500);
+
+  next.classList.add('active');
+  current = step;
+
+  // Progress bar
+  const bar = document.getElementById('progressBar');
+  const fill = document.getElementById('progressFill');
+  if (step === 0) {
+    bar.classList.remove('visible');
+  } else {
+    bar.classList.add('visible');
+    fill.style.width = ((step / TOTAL_STEPS) * 100) + '%';
+  }
+
+  // Back button
+  document.getElementById('backBtn').classList.toggle('visible', step > 0 && step < 5);
+
+  // Update auth mode if going to step 1
+  if (step === 1) {
+    updateAuthMode();
+  }
+
+  // Debug
+  const labels = ['Bienvenida', 'Login/Registro', 'Tu Foto', 'Sobre Ti', 'Intereses', 'Listo!'];
+  document.getElementById('debug').textContent = `Paso ${step} / ${TOTAL_STEPS} — ${labels[step]}`;
+}
+
+function goBack() {
+  if (current === 1) goTo(0);
+  else if (current > 1) goTo(current - 1);
+}
+
+function toggleAuthMode(e) {
+  e.preventDefault();
+  mode = mode === 'login' ? 'register' : 'login';
+  updateAuthMode();
+}
+
+function updateAuthMode() {
+  const isRegister = mode === 'register';
+  document.getElementById('authTitle').textContent = isRegister ? 'Crea tu cuenta' : 'Inicia sesion';
+  document.getElementById('authSubtitle').textContent = isRegister
+    ? 'Solo necesitamos lo esencial'
+    : 'Ingresa tus datos para acceder al evento';
+  document.getElementById('registerFields').style.display = isRegister ? 'block' : 'none';
+  document.getElementById('authBtn').textContent = isRegister ? 'Crear cuenta' : 'Iniciar sesion';
+  document.getElementById('authToggle').innerHTML = isRegister
+    ? 'Ya tienes cuenta? <a href="#" onclick="toggleAuthMode(event)">Inicia sesion</a>'
+    : 'No tienes cuenta? <a href="#" onclick="toggleAuthMode(event)">Registrate</a>';
+}
+
+function handleAuth() {
+  if (mode === 'register') {
+    goTo(2);
+  } else {
+    goTo(5); // Login goes straight to done
+    document.querySelector('#slide5 .slide-title').textContent = 'Bienvenido de vuelta!';
+    document.querySelector('#slide5 .slide-subtitle').textContent = '';
+  }
+}
+
+function simulatePhoto() {
+  const circle = document.getElementById('photoCircle');
+  circle.classList.add('has-photo');
+  circle.innerHTML = '<img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face" alt="photo">';
+}
+
+function openDropdown() {
+  document.getElementById('orgDropdown').classList.add('open');
+}
+
+function selectOrg(name) {
+  document.getElementById('orgInput').value = name;
+  document.getElementById('orgDropdown').classList.remove('open');
+}
+
+function filterOrgs() {
+  const val = document.getElementById('orgInput').value.toLowerCase();
+  document.querySelectorAll('.dropdown-item').forEach(item => {
+    item.style.display = item.textContent.toLowerCase().includes(val) ? 'block' : 'none';
+  });
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.dropdown-wrap')) {
+    document.getElementById('orgDropdown').classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>

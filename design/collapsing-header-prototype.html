@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Collapsing Header — Speaker Detail (Lumina Noir)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Urbanist:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0a;
+    color: #fff;
+    font-family: 'Urbanist', sans-serif;
+    width: 375px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* ── Compact Header (aparece al colapsar) ─────────────── */
+  .compact-header {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 375px;
+    height: 90px;
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 20px 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: none;
+  }
+
+  .compact-header.visible {
+    pointer-events: auto;
+  }
+
+  .compact-bg {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .compact-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .compact-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .compact-back svg { width: 18px; height: 18px; }
+
+  .compact-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    flex: 1;
+    text-align: center;
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .compact-spacer { width: 36px; flex-shrink: 0; }
+
+  /* ── Scrollable area ──────────────────────────────────── */
+  .scroll-container {
+    height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Hero Section ─────────────────────────────────────── */
+  .hero-section {
+    position: relative;
+    height: 340px;
+    overflow: hidden;
+  }
+
+  .hero-image {
+    position: absolute;
+    inset: 0;
+    background: url('https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=800&fit=crop&crop=face') center 20% / cover no-repeat;
+    transform-origin: center center;
+    will-change: transform, opacity;
+  }
+
+  .hero-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 180px;
+    background: linear-gradient(transparent, #0a0a0a);
+  }
+
+  .hero-back {
+    position: absolute;
+    top: 52px;
+    left: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  .hero-back svg { width: 18px; height: 18px; }
+
+  /* ── Speaker Info ─────────────────────────────────────── */
+  .speaker-info {
+    padding: 0 24px;
+    margin-top: -40px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .speaker-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  .speaker-role {
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .speaker-linkedin {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* ── Rating ───────────────────────────────────────────── */
+  .rating-section {
+    margin: 24px 24px 0;
+    padding: 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 16px;
+    text-align: center;
+  }
+
+  .rating-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 8px;
+  }
+
+  .rating-stars {
+    font-size: 24px;
+    letter-spacing: 4px;
+    color: #FBBF24;
+  }
+
+  .rating-count {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    margin-top: 4px;
+  }
+
+  /* ── Bio ───────────────────────────────────────────────── */
+  .bio-section {
+    margin: 24px 24px 0;
+  }
+
+  .section-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 10px;
+    letter-spacing: -0.2px;
+  }
+
+  .bio-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.55);
+  }
+
+  /* ── Sessions ─────────────────────────────────────────── */
+  .sessions-section {
+    margin: 28px 24px 0;
+    padding-bottom: 100px;
+  }
+
+  .session-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+
+  .session-track {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    color: #818cf8;
+    background: rgba(129,140,248,0.1);
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+
+  .session-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.1px;
+    margin-bottom: 6px;
+  }
+
+  .session-meta {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    display: flex;
+    gap: 12px;
+  }
+
+  /* ── Debug overlay ────────────────────────────────────── */
+  .debug {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    color: rgba(255,255,255,0.6);
+    font-size: 11px;
+    font-family: monospace;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+    z-index: 200;
+    white-space: nowrap;
+  }
+
+  /* ── Instruction overlay ──────────────────────────────── */
+  .instruction {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(20px);
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    padding: 20px 28px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    z-index: 300;
+    text-align: center;
+    line-height: 1.6;
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+</style>
+</head>
+<body>
+
+<!-- Compact Header (fixed, aparece al colapsar) -->
+<div class="compact-header" id="compactHeader">
+  <div class="compact-bg"></div>
+  <div class="compact-content">
+    <div class="compact-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </div>
+    <div class="compact-title">Ana Maria Rodriguez</div>
+    <div class="compact-spacer"></div>
+  </div>
+</div>
+
+<!-- Scrollable Content -->
+<div class="scroll-container" id="scrollContainer">
+
+  <!-- Hero Image -->
+  <div class="hero-section">
+    <div class="hero-image" id="heroImage"></div>
+    <div class="hero-gradient"></div>
+    <div class="hero-back" id="heroBack">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </div>
+  </div>
+
+  <!-- Speaker Info -->
+  <div class="speaker-info" id="speakerInfo">
+    <div class="speaker-name">Ana Maria Rodriguez</div>
+    <div class="speaker-role">VP of Product Design &middot; Rappi</div>
+    <a class="speaker-linkedin" href="#">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+      LinkedIn
+    </a>
+  </div>
+
+  <!-- Rating -->
+  <div class="rating-section">
+    <div class="rating-label">Evaluacion promedio</div>
+    <div class="rating-stars">&#9670; &#9670; &#9670; &#9670; &#9671;</div>
+    <div class="rating-count">4.2 / 5 &middot; 48 evaluaciones</div>
+  </div>
+
+  <!-- Bio -->
+  <div class="bio-section">
+    <div class="section-title">Biografia</div>
+    <div class="bio-text">
+      Ana Maria es VP of Product Design en Rappi, donde lidera un equipo de 45 disenadores
+      enfocados en experiencias de usuario para mas de 50 millones de usuarios en Latinoamerica.
+      Anteriormente fue Head of Design en Platzi y Design Lead en MercadoLibre.
+      <br><br>
+      Especialista en design systems, accesibilidad y experiencias dark mode premium.
+      Ponente recurrente en Interaction Latin America y Google Design Summit.
+      <br><br>
+      Su charla en este evento cubre como escalar equipos de diseno sin perder la artesania
+      en cada pixel.
+    </div>
+  </div>
+
+  <!-- Sessions -->
+  <div class="sessions-section">
+    <div class="section-title">Sesiones</div>
+
+    <div class="session-card">
+      <div class="session-track">Design</div>
+      <div class="session-title">Escalando Design Systems en Latam: Lecciones de Rappi</div>
+      <div class="session-meta">
+        <span>10:00 - 11:00</span>
+        <span>Salon Principal</span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-track">Workshop</div>
+      <div class="session-title">Workshop: Dark Mode Done Right</div>
+      <div class="session-meta">
+        <span>14:30 - 16:00</span>
+        <span>Salon B</span>
+      </div>
+    </div>
+
+    <div class="session-card">
+      <div class="session-track">Panel</div>
+      <div class="session-title">Panel: El futuro del diseno en productos de consumo</div>
+      <div class="session-meta">
+        <span>16:30 - 17:30</span>
+        <span>Salon Principal</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Debug -->
+<div class="debug" id="debug">scrollY: 0 | hero: 1.00 | compact: 0.00</div>
+
+<!-- Instruction -->
+<div class="instruction" id="instruction">
+  Scrollea hacia abajo<br>para ver el header colapsar
+</div>
+
+<script>
+const container = document.getElementById('scrollContainer');
+const heroImage = document.getElementById('heroImage');
+const heroBack = document.getElementById('heroBack');
+const speakerInfo = document.getElementById('speakerInfo');
+const compact = document.getElementById('compactHeader');
+const debug = document.getElementById('debug');
+const instruction = document.getElementById('instruction');
+
+const HEADER_MAX = 340;
+const HEADER_MIN = 90;
+const SCROLL_DIST = HEADER_MAX - HEADER_MIN; // 250
+
+let instructionHidden = false;
+
+container.addEventListener('scroll', () => {
+  const y = container.scrollTop;
+
+  // Hide instruction
+  if (!instructionHidden && y > 10) {
+    instruction.style.opacity = '0';
+    instructionHidden = true;
+  }
+
+  // ── Hero Image: parallax + fade + overscroll scale ───
+  const heroOpacity = Math.max(0, Math.min(1, 1 - y / (SCROLL_DIST * 0.5)));
+  const heroTranslateY = Math.min(y * 0.5, SCROLL_DIST * 0.5);
+  // Overscroll (y < 0): scale up
+  const heroScale = y < 0 ? 1 + Math.abs(y) / 500 : 1;
+
+  heroImage.style.opacity = heroOpacity;
+  heroImage.style.transform = `translateY(${-heroTranslateY}px) scale(${heroScale})`;
+
+  // Hero back button fades with hero
+  heroBack.style.opacity = heroOpacity;
+
+  // ── Speaker info: slight parallax ────────────────────
+  const infoParallax = Math.max(0, y * 0.15);
+  speakerInfo.style.transform = `translateY(${-infoParallax}px)`;
+
+  // ── Compact header: fade in at the end ───────────────
+  const compactStart = SCROLL_DIST - 30;
+  const compactProgress = Math.max(0, Math.min(1, (y - compactStart) / 30));
+  compact.style.opacity = compactProgress;
+  compact.style.transform = `translateX(-50%) translateY(${(1 - compactProgress) * -6}px)`;
+  compact.classList.toggle('visible', compactProgress > 0.5);
+
+  // ── Debug ────────────────────────────────────────────
+  debug.textContent = `scrollY: ${Math.round(y)} | hero: ${heroOpacity.toFixed(2)} | compact: ${compactProgress.toFixed(2)}`;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaker Spotlight v2 — Preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #050505;
+    font-family: 'Urbanist', sans-serif;
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+    flex-wrap: wrap;
+  }
+
+  .label {
+    color: #555;
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* ===== PHONE FRAME ===== */
+  .phone {
+    width: 393px;
+    height: 852px;
+    background: #0a0a0a;
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid #1a1a1a;
+    box-shadow: 0 0 80px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.03);
+    flex-shrink: 0;
+  }
+  .phone-inner {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+  .phone-inner::-webkit-scrollbar { display: none; }
+
+  /* ===== DYNAMIC ISLAND ===== */
+  .dynamic-island {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    padding-top: 12px;
+    background: linear-gradient(to bottom, #0a0a0a 70%, transparent);
+    padding-bottom: 8px;
+  }
+  .island-pill {
+    width: 126px;
+    height: 36px;
+    background: #000;
+    border-radius: 20px;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 24px 20px;
+  }
+  .header-back {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .header-back:hover { background: rgba(255,255,255,0.1); }
+  .header-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .header-action {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .header-action:hover { background: rgba(255,255,255,0.1); }
+
+  /* ===== SEARCH BAR ===== */
+  .search-bar {
+    margin: 0 24px 24px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .search-bar span {
+    color: rgba(255,255,255,0.3);
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  /* ===== SECTION TITLE ===== */
+  .section-title {
+    padding: 0 24px 14px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .section-title h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .section-title .count {
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+    font-weight: 500;
+  }
+
+  /* ===== FEATURED HORIZONTAL CAROUSEL ===== */
+  .carousel {
+    display: flex;
+    gap: 14px;
+    padding: 0 24px 28px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .carousel::-webkit-scrollbar { display: none; }
+
+  .featured-card {
+    flex-shrink: 0;
+    width: 220px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 24px;
+    padding: 14px;
+    cursor: pointer;
+    scroll-snap-align: start;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .featured-card:hover { transform: scale(0.97); background: rgba(255,255,255,0.06); }
+  .featured-card:active { transform: scale(0.95); }
+
+  .featured-card .photo-container {
+    width: 100%;
+    aspect-ratio: 4/5;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 14px;
+    position: relative;
+    background: #151515;
+  }
+  .featured-card .photo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .featured-card:hover .photo-container img { transform: scale(1.05); }
+
+  .featured-card .keynote-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .featured-card .f-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+  }
+  .featured-card .f-role {
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 3px;
+    font-weight: 400;
+    line-height: 1.3;
+  }
+  .featured-card .f-sessions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 600;
+  }
+  .featured-card .f-sessions .dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+  }
+
+  /* ===== FULL-WIDTH LIST CARDS ===== */
+  .list-section {
+    padding: 0 24px 40px;
+  }
+
+  .speaker-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  .speaker-item:hover { background: rgba(255,255,255,0.06); transform: scale(0.99); }
+  .speaker-item:active { transform: scale(0.97); }
+
+  .speaker-item .avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #151515;
+  }
+  .speaker-item .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+  }
+
+  .speaker-item .info {
+    flex: 1;
+    min-width: 0;
+  }
+  .speaker-item .info .name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .speaker-item .info .role {
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .speaker-item .info .sessions-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 3px 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 600;
+  }
+
+  .speaker-item .chevron {
+    flex-shrink: 0;
+    color: rgba(255,255,255,0.15);
+  }
+
+  /* ===== DETAIL SCREEN ===== */
+  .detail-hero {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+  .detail-hero .hero-photo {
+    width: 100%;
+    aspect-ratio: 3/4;
+    max-height: 480px;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+  }
+  .detail-hero .hero-gradient {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 65%;
+    background: linear-gradient(to top, #0a0a0a 0%, rgba(10,10,10,0.8) 40%, transparent 100%);
+  }
+  .detail-hero .hero-top-gradient {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.7) 0%, transparent 100%);
+  }
+  .detail-back {
+    position: absolute;
+    top: 58px;
+    left: 20px;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .detail-back:hover { background: rgba(0,0,0,0.6); }
+
+  .detail-hero-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 0 24px 28px;
+    z-index: 5;
+  }
+  .detail-hero-info .tag-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .detail-tag {
+    padding: 5px 12px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.85);
+  }
+  .detail-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+    line-height: 1.05;
+  }
+  .detail-role-line {
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 6px;
+    font-weight: 400;
+  }
+  .detail-role-line .company {
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+  }
+
+  /* Detail actions */
+  .detail-actions {
+    display: flex;
+    gap: 10px;
+    padding: 0 24px 24px;
+  }
+  .action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .action-btn:hover { transform: scale(0.97); }
+  .action-btn.primary {
+    background: #fff;
+    color: #0a0a0a;
+  }
+  .action-btn.ghost {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* Detail content */
+  .detail-content { padding: 0 24px 40px; }
+
+  .glass-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .bio-text {
+    font-size: 14.5px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.7;
+    font-weight: 400;
+  }
+
+  /* Session cards */
+  .session-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .session-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 18px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .session-card:hover { background: rgba(255,255,255,0.06); }
+
+  .session-time-block {
+    flex-shrink: 0;
+    text-align: center;
+    min-width: 48px;
+  }
+  .session-time-block .time {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .session-time-block .ampm {
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .session-divider {
+    width: 2px;
+    align-self: stretch;
+    background: rgba(255,255,255,0.08);
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+
+  .session-info .s-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.3;
+    letter-spacing: -0.1px;
+  }
+  .session-info .s-location {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .session-type-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-keynote { background: #a882ff; }
+  .dot-panel { background: #64c8ff; }
+  .dot-workshop { background: #ffb464; }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .anim-up { animation: fadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+  .anim-right { animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+  .d1 { animation-delay: 0.05s; }
+  .d2 { animation-delay: 0.1s; }
+  .d3 { animation-delay: 0.15s; }
+  .d4 { animation-delay: 0.2s; }
+  .d5 { animation-delay: 0.25s; }
+  .d6 { animation-delay: 0.3s; }
+  .d7 { animation-delay: 0.35s; }
+  .d8 { animation-delay: 0.4s; }
+  .d9 { animation-delay: 0.45s; }
+
+  ::-webkit-scrollbar { width: 0; height: 0; }
+</style>
+</head>
+<body>
+
+<!-- ==================== LIST SCREEN ==================== -->
+<div>
+  <div class="label">Speakers List</div>
+  <div class="phone">
+    <div class="phone-inner">
+      <!-- Dynamic Island -->
+      <div class="dynamic-island">
+        <div class="island-pill"></div>
+      </div>
+
+      <!-- Header -->
+      <div class="header anim-up d1">
+        <div class="header-back">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M11 4L5 9l6 5"/></svg>
+        </div>
+        <div class="header-title">Speakers</div>
+        <div class="header-action">
+          <svg width="18" height="18" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"><circle cx="8" cy="8" r="5"/><path d="M12 12l4 4"/></svg>
+        </div>
+      </div>
+
+      <!-- Destacados — Horizontal Carousel -->
+      <div class="section-title anim-up d2">
+        <h2>Destacados</h2>
+        <span class="count">Ver todos</span>
+      </div>
+
+      <div class="carousel">
+        <!-- Card 1 — photo is LANDSCAPE source, still works -->
+        <div class="featured-card anim-right d2">
+          <div class="photo-container">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=625&fit=crop&crop=face" alt="">
+            <span class="keynote-tag">Keynote</span>
+          </div>
+          <div class="f-name">Carlos Mendoza</div>
+          <div class="f-role">CTO · TechVentures Latam</div>
+          <div class="f-sessions">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            3 sesiones
+          </div>
+        </div>
+
+        <!-- Card 2 — photo is PORTRAIT source -->
+        <div class="featured-card anim-right d3">
+          <div class="photo-container">
+            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500&h=625&fit=crop&crop=face" alt="">
+          </div>
+          <div class="f-name">Ana Lucia Torres</div>
+          <div class="f-role">VP Product · Rappi</div>
+          <div class="f-sessions">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            2 sesiones
+          </div>
+        </div>
+
+        <!-- Card 3 — different face position -->
+        <div class="featured-card anim-right d4">
+          <div class="photo-container">
+            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500&h=625&fit=crop&crop=face" alt="">
+            <span class="keynote-tag">Keynote</span>
+          </div>
+          <div class="f-name">Santiago Lopez</div>
+          <div class="f-role">Staff Eng · Spotify</div>
+          <div class="f-sessions">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            1 sesion
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="featured-card anim-right d5">
+          <div class="photo-container">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&h=625&fit=crop&crop=face" alt="">
+          </div>
+          <div class="f-name">Valentina Herrera</div>
+          <div class="f-role">Founder · NovaTech</div>
+          <div class="f-sessions">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            4 sesiones
+          </div>
+        </div>
+      </div>
+
+      <!-- All Speakers -->
+      <div class="section-title anim-up d4">
+        <h2>Todos</h2>
+        <span class="count">24 speakers</span>
+      </div>
+
+      <div class="list-section">
+        <div class="speaker-item anim-up d5">
+          <div class="avatar">
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face" alt="">
+          </div>
+          <div class="info">
+            <div class="name">Diego Ramirez</div>
+            <div class="role">AI Lead · Google</div>
+            <div class="sessions-count">
+              <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              2 sesiones
+            </div>
+          </div>
+          <div class="chevron">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
+          </div>
+        </div>
+
+        <div class="speaker-item anim-up d6">
+          <div class="avatar">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face" alt="">
+          </div>
+          <div class="info">
+            <div class="name">Mateo Silva</div>
+            <div class="role">CIO · Bancolombia</div>
+            <div class="sessions-count">
+              <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              4 sesiones
+            </div>
+          </div>
+          <div class="chevron">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
+          </div>
+        </div>
+
+        <div class="speaker-item anim-up d7">
+          <div class="avatar">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face" alt="">
+          </div>
+          <div class="info">
+            <div class="name">Isabella Moreno</div>
+            <div class="role">Design Director · Figma</div>
+            <div class="sessions-count">
+              <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              2 sesiones
+            </div>
+          </div>
+          <div class="chevron">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
+          </div>
+        </div>
+
+        <div class="speaker-item anim-up d8">
+          <div class="avatar">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face" alt="">
+          </div>
+          <div class="info">
+            <div class="name">Andres Gutierrez</div>
+            <div class="role">VP Engineering · MercadoLibre</div>
+            <div class="sessions-count">
+              <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              1 sesion
+            </div>
+          </div>
+          <div class="chevron">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
+          </div>
+        </div>
+
+        <div class="speaker-item anim-up d9">
+          <div class="avatar">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face" alt="">
+          </div>
+          <div class="info">
+            <div class="name">Camila Restrepo</div>
+            <div class="role">Data Science Lead · Nubank</div>
+            <div class="sessions-count">
+              <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              3 sesiones
+            </div>
+          </div>
+          <div class="chevron">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
+          </div>
+        </div>
+
+        <div class="speaker-item anim-up d9">
+          <div class="avatar">
+            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face" alt="">
+          </div>
+          <div class="info">
+            <div class="name">Felipe Vargas</div>
+            <div class="role">CEO · CloudLatam</div>
+            <div class="sessions-count">
+              <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              2 sesiones
+            </div>
+          </div>
+          <div class="chevron">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
+          </div>
+        </div>
+
+        <div class="speaker-item anim-up d9">
+          <div class="avatar">
+            <img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=200&h=200&fit=crop&crop=face" alt="">
+          </div>
+          <div class="info">
+            <div class="name">Laura Jimenez</div>
+            <div class="role">Head of UX · Platzi</div>
+            <div class="sessions-count">
+              <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              1 sesion
+            </div>
+          </div>
+          <div class="chevron">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== DETAIL SCREEN ==================== -->
+<div>
+  <div class="label">Speaker Detail</div>
+  <div class="phone">
+    <div class="phone-inner">
+      <!-- Dynamic Island -->
+      <div class="dynamic-island" style="position:absolute; background: transparent;">
+        <div class="island-pill"></div>
+      </div>
+
+      <!-- Hero Photo -->
+      <div class="detail-hero">
+        <img class="hero-photo" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=1000&fit=crop&crop=face" alt="">
+        <div class="hero-top-gradient"></div>
+        <div class="hero-gradient"></div>
+        <div class="detail-back">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M11 4L5 9l6 5"/></svg>
+        </div>
+        <div class="detail-hero-info">
+          <div class="tag-row">
+            <span class="detail-tag">Keynote</span>
+            <span class="detail-tag">3 Sesiones</span>
+          </div>
+          <div class="detail-name">Carlos<br>Mendoza</div>
+          <div class="detail-role-line">CTO en <span class="company">TechVentures Latam</span></div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="detail-actions">
+        <div class="action-btn primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          LinkedIn
+        </div>
+        <div class="action-btn ghost">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Ver sesiones
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="detail-content">
+        <!-- Bio -->
+        <div class="glass-card">
+          <div class="card-label">Acerca de</div>
+          <div class="bio-text">
+            Con mas de 15 anos liderando equipos de tecnologia en Latinoamerica, Carlos ha sido pieza clave en la transformacion digital de empresas como MercadoLibre y Globant. Apasionado por la inteligencia artificial aplicada y el desarrollo de talento tech en la region.
+          </div>
+        </div>
+
+        <!-- Sessions -->
+        <div class="card-label" style="padding: 4px 4px 12px;">Sus sesiones</div>
+        <div class="session-cards">
+          <div class="session-card">
+            <div class="session-time-block">
+              <div class="time">10:00</div>
+              <div class="ampm">AM</div>
+            </div>
+            <div class="session-divider"></div>
+            <div class="session-info" style="flex:1;">
+              <div class="s-title">
+                <span class="session-type-dot dot-keynote" style="display:inline-block;margin-right:6px;vertical-align:middle;"></span>
+                El Futuro de la IA en Latinoamerica
+              </div>
+              <div class="s-location">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+                Salon Principal
+              </div>
+            </div>
+          </div>
+
+          <div class="session-card">
+            <div class="session-time-block">
+              <div class="time">2:30</div>
+              <div class="ampm">PM</div>
+            </div>
+            <div class="session-divider"></div>
+            <div class="session-info" style="flex:1;">
+              <div class="s-title">
+                <span class="session-type-dot dot-panel" style="display:inline-block;margin-right:6px;vertical-align:middle;"></span>
+                Liderazgo Tech: Del Codigo a la Estrategia
+              </div>
+              <div class="s-location">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+                Salon B
+              </div>
+            </div>
+          </div>
+
+          <div class="session-card">
+            <div class="session-time-block">
+              <div class="time">4:00</div>
+              <div class="ampm">PM</div>
+            </div>
+            <div class="session-divider"></div>
+            <div class="session-info" style="flex:1;">
+              <div class="s-title">
+                <span class="session-type-dot dot-workshop" style="display:inline-block;margin-right:6px;vertical-align:middle;"></span>
+                Hands-on: Prompting Avanzado para Equipos
+              </div>
+              <div class="s-location">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+                Workshop Room 1
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

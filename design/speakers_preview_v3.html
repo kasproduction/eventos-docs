@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaker Spotlight v3 — Preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #050505;
+    font-family: 'Urbanist', sans-serif;
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+    flex-wrap: wrap;
+  }
+
+  .label {
+    color: #555;
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* ===== PHONE FRAME ===== */
+  .phone {
+    width: 393px;
+    height: 852px;
+    background: #0a0a0a;
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid #1a1a1a;
+    box-shadow: 0 0 80px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.03);
+    flex-shrink: 0;
+  }
+  .phone-inner {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+  .phone-inner::-webkit-scrollbar { display: none; }
+
+  /* ===== DYNAMIC ISLAND ===== */
+  .dynamic-island {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    padding-top: 12px;
+    background: linear-gradient(to bottom, #0a0a0a 70%, transparent);
+    padding-bottom: 8px;
+  }
+  .island-pill {
+    width: 126px;
+    height: 36px;
+    background: #000;
+    border-radius: 20px;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 24px 16px;
+  }
+  .h-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .h-btn:hover { background: rgba(255,255,255,0.1); }
+  .header-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+
+  /* ===== SEARCH BAR ===== */
+  .search-bar {
+    margin: 0 24px 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .search-bar span {
+    color: rgba(255,255,255,0.25);
+    font-size: 14px;
+  }
+
+  /* ===== SECTION TITLE ===== */
+  .stitle {
+    padding: 0 24px 12px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .stitle h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 19px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.4px;
+  }
+  .stitle .link {
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .stitle .link:hover { color: rgba(255,255,255,0.6); }
+
+  /* ===== FEATURED CAROUSEL ===== */
+  .carousel {
+    display: flex;
+    gap: 12px;
+    padding: 0 24px 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .carousel::-webkit-scrollbar { display: none; }
+
+  .fcard {
+    flex-shrink: 0;
+    width: 200px;
+    background: rgba(255,255,255,0.035);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 22px;
+    padding: 12px;
+    cursor: pointer;
+    scroll-snap-align: start;
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), background 0.25s;
+  }
+  .fcard:hover { transform: scale(0.97); background: rgba(255,255,255,0.06); }
+  .fcard:active { transform: scale(0.95); }
+
+  .fcard .photo {
+    width: 100%;
+    aspect-ratio: 4/5;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background: #151515;
+    position: relative;
+  }
+  .fcard .photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .fcard:hover .photo img { transform: scale(1.05); }
+
+  .fcard .ftag {
+    position: absolute;
+    top: 8px; left: 8px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .fcard .fname {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+  }
+  .fcard .frole {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+  .fcard .fsess {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    font-weight: 600;
+  }
+
+  /* ===== FULL-WIDTH LIST ===== */
+  .list {
+    padding: 0 24px 40px;
+  }
+
+  .sitem {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    margin-bottom: 6px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.035);
+    border-radius: 18px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+  }
+  .sitem:hover { background: rgba(255,255,255,0.055); transform: scale(0.99); }
+  .sitem:active { transform: scale(0.97); }
+
+  .sitem .av {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #151515;
+  }
+  .sitem .av img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+  }
+
+  .sitem .inf { flex: 1; min-width: 0; }
+  .sitem .inf .nm {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sitem .inf .rl {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sitem .inf .sc {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 5px;
+    padding: 2px 7px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 5px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    font-weight: 600;
+  }
+
+  .sitem .chv {
+    flex-shrink: 0;
+    color: rgba(255,255,255,0.12);
+  }
+
+  /* ============================== */
+  /* ===== DETAIL SCREEN ========= */
+  /* ============================== */
+
+  .detail-hero {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+  .detail-hero .hp {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+  }
+  .detail-hero .hg {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60%;
+    background: linear-gradient(to top, #0a0a0a 0%, rgba(10,10,10,0.7) 45%, transparent 100%);
+  }
+  /* htg and dbk removed — back button is now above hero, respecting safe area */
+
+  .dhi {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 0 24px 24px;
+    z-index: 5;
+  }
+  .dhi .dn {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+  }
+  .dhi .dr {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 5px;
+  }
+  .dhi .dr .co { color: rgba(255,255,255,0.7); font-weight: 600; }
+
+  /* Rating display */
+  .rating-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .stars {
+    display: flex;
+    gap: 2px;
+  }
+  .star {
+    width: 16px; height: 16px;
+    color: #FFD700;
+  }
+  .star.empty { color: rgba(255,255,255,0.12); }
+  .rating-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 500;
+  }
+  .rating-text strong {
+    color: rgba(255,255,255,0.8);
+    font-weight: 700;
+  }
+
+  /* Detail actions */
+  .dacts {
+    display: flex;
+    gap: 8px;
+    padding: 0 24px 20px;
+  }
+  .abtn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 13px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+  .abtn:hover { transform: scale(0.97); }
+  .abtn.pri { background: #fff; color: #0a0a0a; }
+  .abtn.sec {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.8);
+  }
+  .abtn.rate {
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.15);
+    color: #FFD700;
+  }
+
+  /* Detail content */
+  .dcont { padding: 0 24px 40px; }
+
+  .gcard {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .clbl {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .btxt {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+  }
+
+  /* ===== SESSION GRID (3 columns) ===== */
+  .sess-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .sess-tile {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 14px 10px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+  .sess-tile:hover {
+    background: rgba(255,255,255,0.07);
+    transform: scale(0.97);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .sess-tile:active { transform: scale(0.94); }
+
+  /* Glow effect simulation on hover */
+  .sess-tile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .sess-tile:hover::before { opacity: 1; }
+  .sess-tile.keynote::before { box-shadow: inset 0 0 20px rgba(168,130,255,0.08); }
+  .sess-tile.panel::before { box-shadow: inset 0 0 20px rgba(100,200,255,0.08); }
+  .sess-tile.workshop::before { box-shadow: inset 0 0 20px rgba(255,180,100,0.08); }
+
+  .sess-tile .tdot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+  .tdot.keynote { background: #a882ff; }
+  .tdot.panel { background: #64c8ff; }
+  .tdot.workshop { background: #ffb464; }
+
+  .sess-tile .ttime {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.3px;
+    line-height: 1;
+  }
+  .sess-tile .tampm {
+    font-size: 9px;
+    color: rgba(255,255,255,0.3);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: -2px;
+  }
+  .sess-tile .ttitle {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .sess-tile .tloc {
+    font-size: 9px;
+    color: rgba(255,255,255,0.25);
+    font-weight: 500;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  /* ===== TOOLTIP: click behavior hint ===== */
+  .click-hint {
+    text-align: center;
+    padding: 6px 0 0;
+    font-size: 10px;
+    color: rgba(255,255,255,0.18);
+    font-weight: 500;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .au { animation: fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) backwards; }
+  .ar { animation: slideInRight 0.5s cubic-bezier(0.16,1,0.3,1) backwards; }
+  .d1{animation-delay:.05s} .d2{animation-delay:.1s} .d3{animation-delay:.15s}
+  .d4{animation-delay:.2s} .d5{animation-delay:.25s} .d6{animation-delay:.3s}
+  .d7{animation-delay:.35s} .d8{animation-delay:.4s} .d9{animation-delay:.45s}
+  .d10{animation-delay:.5s}
+
+  ::-webkit-scrollbar { width: 0; height: 0; }
+
+  /* ===== CAROUSEL: smooth breathing from start ===== */
+  @keyframes carouselBreathing {
+    0%   { transform: translateX(0); }
+    50%  { transform: translateX(-18px); }
+    100% { transform: translateX(0); }
+  }
+  .carousel-nudge-wrap {
+    display: flex;
+    gap: 12px;
+    animation: carouselBreathing 3s ease-in-out 1.5s infinite;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ==================== LIST SCREEN ==================== -->
+<div>
+  <div class="label">Speakers List</div>
+  <div class="phone">
+    <div class="phone-inner">
+      <div class="dynamic-island"><div class="island-pill"></div></div>
+
+      <div class="header au d1">
+        <div class="h-btn">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M11 4L5 9l6 5"/></svg>
+        </div>
+        <div class="header-title">Speakers</div>
+        <div class="h-btn" style="visibility:hidden;"></div>
+      </div>
+
+      <!-- Search: nombre, empresa, cargo -->
+      <div class="search-bar au d2">
+        <svg width="16" height="16" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3.5 3.5"/></svg>
+        <span>Buscar por nombre, empresa o cargo...</span>
+      </div>
+
+      <!-- Destacados: solo keynotes / featured, max 5-8 -->
+      <div class="stitle au d2">
+        <h2>Destacados</h2>
+        <span class="link" onclick="document.getElementById('todos').scrollIntoView({behavior:'smooth'})">Ver todos &darr;</span>
+      </div>
+
+      <div class="carousel" id="carousel">
+        <div class="carousel-nudge-wrap">
+        <div class="fcard ar d2">
+          <div class="photo">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=625&fit=crop&crop=face" alt="">
+            <span class="ftag">Keynote</span>
+          </div>
+          <div class="fname">Carlos Mendoza</div>
+          <div class="frole">CTO · TechVentures Latam</div>
+          <div class="fsess">
+            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            3 sesiones
+          </div>
+        </div>
+
+        <div class="fcard ar d3">
+          <div class="photo">
+            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500&h=625&fit=crop&crop=face" alt="">
+            <span class="ftag">Keynote</span>
+          </div>
+          <div class="fname">Ana Lucia Torres</div>
+          <div class="frole">VP Product · Rappi</div>
+          <div class="fsess">
+            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            2 sesiones
+          </div>
+        </div>
+
+        <div class="fcard ar d4">
+          <div class="photo">
+            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500&h=625&fit=crop&crop=face" alt="">
+          </div>
+          <div class="fname">Santiago Lopez</div>
+          <div class="frole">Staff Eng · Spotify</div>
+          <div class="fsess">
+            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            1 sesion
+          </div>
+        </div>
+
+        <div class="fcard ar d5">
+          <div class="photo">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&h=625&fit=crop&crop=face" alt="">
+          </div>
+          <div class="fname">Valentina Herrera</div>
+          <div class="frole">Founder · NovaTech</div>
+          <div class="fsess">
+            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            4 sesiones
+          </div>
+        </div>
+        </div><!-- /carousel-nudge-wrap -->
+      </div>
+
+      <!-- Todos — scroll target -->
+      <div class="stitle au d4" id="todos">
+        <h2>Todos</h2>
+        <span class="link" style="cursor:default;">24 speakers</span>
+      </div>
+
+      <div class="list">
+        <div class="sitem au d5">
+          <div class="av"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face"></div>
+          <div class="inf">
+            <div class="nm">Carlos Mendoza</div>
+            <div class="rl">CTO · TechVentures Latam</div>
+            <div class="sc"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>3</div>
+          </div>
+          <div class="chv"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+
+        <div class="sitem au d6">
+          <div class="av"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face"></div>
+          <div class="inf">
+            <div class="nm">Diego Ramirez</div>
+            <div class="rl">AI Lead · Google</div>
+            <div class="sc"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>2</div>
+          </div>
+          <div class="chv"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+
+        <div class="sitem au d7">
+          <div class="av"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face"></div>
+          <div class="inf">
+            <div class="nm">Mateo Silva</div>
+            <div class="rl">CIO · Bancolombia</div>
+            <div class="sc"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>4</div>
+          </div>
+          <div class="chv"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+
+        <div class="sitem au d8">
+          <div class="av"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face"></div>
+          <div class="inf">
+            <div class="nm">Isabella Moreno</div>
+            <div class="rl">Design Director · Figma</div>
+            <div class="sc"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>2</div>
+          </div>
+          <div class="chv"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+
+        <div class="sitem au d9">
+          <div class="av"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face"></div>
+          <div class="inf">
+            <div class="nm">Ana Lucia Torres</div>
+            <div class="rl">VP Product · Rappi</div>
+            <div class="sc"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>2</div>
+          </div>
+          <div class="chv"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+
+        <div class="sitem au d9">
+          <div class="av"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face"></div>
+          <div class="inf">
+            <div class="nm">Andres Gutierrez</div>
+            <div class="rl">VP Engineering · MercadoLibre</div>
+            <div class="sc"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>1</div>
+          </div>
+          <div class="chv"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+
+        <div class="sitem au d10">
+          <div class="av"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face"></div>
+          <div class="inf">
+            <div class="nm">Camila Restrepo</div>
+            <div class="rl">Data Science Lead · Nubank</div>
+            <div class="sc"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>3</div>
+          </div>
+          <div class="chv"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+
+        <div class="sitem au d10">
+          <div class="av"><img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face"></div>
+          <div class="inf">
+            <div class="nm">Felipe Vargas</div>
+            <div class="rl">CEO · CloudLatam</div>
+            <div class="sc"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>2</div>
+          </div>
+          <div class="chv"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+
+        <div class="sitem au d10">
+          <div class="av"><img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=200&h=200&fit=crop&crop=face"></div>
+          <div class="inf">
+            <div class="nm">Laura Jimenez</div>
+            <div class="rl">Head of UX · Platzi</div>
+            <div class="sc"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>1</div>
+          </div>
+          <div class="chv"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ==================== DETAIL SCREEN ==================== -->
+<div>
+  <div class="label">Speaker Detail</div>
+  <div class="phone">
+    <div class="phone-inner">
+      <!-- Safe area: Dynamic Island -->
+      <div class="dynamic-island">
+        <div class="island-pill"></div>
+      </div>
+
+      <!-- Header BELOW safe area -->
+      <div class="header">
+        <div class="h-btn">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M11 4L5 9l6 5"/></svg>
+        </div>
+        <div class="header-title">Speaker</div>
+        <div class="h-btn" style="visibility:hidden;"></div>
+      </div>
+
+      <!-- Hero photo starts BELOW safe area -->
+      <div class="detail-hero">
+        <img class="hp" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop&crop=face" alt="">
+        <div class="hg"></div>
+        <div class="dhi">
+          <div class="dn">Carlos Mendoza</div>
+          <div class="dr">CTO en <span class="co">TechVentures Latam</span></div>
+          <!-- Rating -->
+          <div class="rating-display">
+            <div class="stars">
+              <svg class="star" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="star" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="star" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="star" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="star empty" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+            <span class="rating-text"><strong>4.2</strong> · 48 votos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons: LinkedIn + Calificar -->
+      <div class="dacts">
+        <div class="abtn pri">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          LinkedIn
+        </div>
+        <div class="abtn rate">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          Calificar
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="dcont">
+        <!-- Bio -->
+        <div class="gcard">
+          <div class="clbl">Acerca de</div>
+          <div class="btxt">
+            Con mas de 15 anos liderando equipos de tecnologia en Latinoamerica, Carlos ha sido pieza clave en la transformacion digital de empresas como MercadoLibre y Globant. Apasionado por la IA aplicada y el desarrollo de talento tech.
+          </div>
+        </div>
+
+        <!-- Sessions — GRID 3 columns -->
+        <div class="clbl" style="padding: 4px 4px 10px;">Sus sesiones</div>
+        <div class="sess-grid">
+          <div class="sess-tile keynote" title="Toca para ir a la agenda">
+            <div class="tdot keynote"></div>
+            <div class="ttime">10:00</div>
+            <div class="tampm">AM</div>
+            <div class="ttitle">El Futuro de la IA en Latam</div>
+            <div class="tloc">
+              <svg width="8" height="8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+              Salon A
+            </div>
+          </div>
+
+          <div class="sess-tile panel" title="Toca para ir a la agenda">
+            <div class="tdot panel"></div>
+            <div class="ttime">2:30</div>
+            <div class="tampm">PM</div>
+            <div class="ttitle">Liderazgo Tech: Codigo a Estrategia</div>
+            <div class="tloc">
+              <svg width="8" height="8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+              Salon B
+            </div>
+          </div>
+
+          <div class="sess-tile workshop" title="Toca para ir a la agenda">
+            <div class="tdot workshop"></div>
+            <div class="ttime">4:00</div>
+            <div class="tampm">PM</div>
+            <div class="ttitle">Prompting Avanzado para Equipos</div>
+            <div class="tloc">
+              <svg width="8" height="8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+              Room 1
+            </div>
+          </div>
+        </div>
+        <div class="click-hint">Toca una sesion para verla en la agenda</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const wrap = document.querySelector('.carousel-nudge-wrap');
+  const carousel = document.getElementById('carousel');
+
+  if (wrap && carousel) {
+    const stop = () => {
+      wrap.style.animation = 'none';
+      wrap.style.transform = 'translateX(0)';
+      carousel.removeEventListener('scroll', stop);
+      carousel.removeEventListener('touchstart', stop);
+      carousel.removeEventListener('mousedown', stop);
+    };
+    carousel.addEventListener('scroll', stop);
+    carousel.addEventListener('touchstart', stop);
+    carousel.addEventListener('mousedown', stop);
+  }
+</script>
+
+</body>
+</html>

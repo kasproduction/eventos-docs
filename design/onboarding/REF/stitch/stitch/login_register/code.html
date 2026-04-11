@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EventOS Summit - Registro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#fcf8fb",
+                    "secondary-dim": "#8a95ff",
+                    "background": "#0e0e10",
+                    "secondary-fixed-dim": "#babfff",
+                    "on-tertiary": "#690937",
+                    "outline-variant": "#48474a",
+                    "inverse-on-surface": "#565457",
+                    "surface-container": "#19191c",
+                    "surface": "#0e0e10",
+                    "on-tertiary-container": "#59002c",
+                    "tertiary-fixed-dim": "#f57ca6",
+                    "surface-container-highest": "#262529",
+                    "on-surface": "#fffbfe",
+                    "on-primary-fixed": "#000000",
+                    "tertiary": "#ff96b9",
+                    "surface-variant": "#262529",
+                    "on-primary-fixed-variant": "#330b80",
+                    "secondary": "#8a95ff",
+                    "on-secondary-fixed-variant": "#3a45ad",
+                    "surface-container-lowest": "#000000",
+                    "on-error-container": "#ffb2b9",
+                    "primary-container": "#ab8ffe",
+                    "primary-fixed": "#ab8ffe",
+                    "surface-bright": "#2c2c2f",
+                    "tertiary-fixed": "#ff8db3",
+                    "on-secondary-container": "#c9cdff",
+                    "on-secondary-fixed": "#192490",
+                    "on-tertiary-fixed-variant": "#70103c",
+                    "tertiary-container": "#fc81ac",
+                    "primary": "#b79fff",
+                    "on-primary": "#361083",
+                    "error-container": "#a70138",
+                    "surface-container-high": "#1f1f22",
+                    "on-tertiary-fixed": "#380019",
+                    "secondary-fixed": "#cbceff",
+                    "on-background": "#fffbfe",
+                    "tertiary-dim": "#ef77a1",
+                    "surface-container-low": "#131316",
+                    "error-dim": "#d73357",
+                    "surface-dim": "#0e0e10",
+                    "surface-tint": "#b79fff",
+                    "on-primary-container": "#290070",
+                    "on-surface-variant": "#adaaad",
+                    "inverse-primary": "#684cb6",
+                    "error": "#ff6e84",
+                    "secondary-container": "#2f3aa3",
+                    "on-secondary": "#000974",
+                    "primary-dim": "#a88cfb",
+                    "primary-fixed-dim": "#9d81f0",
+                    "on-error": "#490013",
+                    "outline": "#767578"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body": [
+                            "Manrope"
+                    ],
+                    "label": [
+                            "Manrope"
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }
+.glass-edge {
+    border: 1px solid rgba(72, 71, 74, 0.2)
+    }
+.aurora-gradient {
+    background: linear-gradient(135deg, #b79fff 0%, #8a95ff 100%)
+    }
+.noise-texture {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuA_3FItQ9tjhu-Wc89nqInKPmV2LFk0Ukz0xYBZ_tHQYLdMfE5h24WYSxMpr47gOnjimNlgaJFqyj8xnJbKAryAr-TvWtoY4SXkxZ29xRhXV7vZPOVPQTJ2OVO6k1V2QiUGytXlHCZH4ScBIvpfIgj8VKfSBQK1X9w_hJljzvlYnfkjo6YzKtKMClUfIhvmvpX9ZrRGg1v4dc4pRcNOZifNG3W1fzzA3bNDDo75PUmMLWkmZZcNs1ldg0m8IQsCPPDQHlGNQFTdvtC7);
+    opacity: 0.05
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body overflow-hidden h-screen flex flex-col">
+<!-- TopAppBar suppression: Login context -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-6">
+<div class="text-xl font-headline font-bold bg-gradient-to-r from-[#b79fff] to-[#8a95ff] bg-clip-text text-transparent">
+            EventOS Summit
+        </div>
+<button class="text-on-surface-variant hover:opacity-80 duration-200">
+<span class="material-symbols-outlined">close</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="relative flex-grow flex flex-col h-full">
+<!-- Upper 40%: Blurred Event Photo & Stats -->
+<section class="h-[45%] relative w-full overflow-hidden">
+<img alt="vibrant crowd at a tech conference keynote with purple and blue stage lighting" class="absolute inset-0 w-full h-full object-cover blur-sm scale-105" data-alt="cinematic wide shot of a tech summit audience with atmospheric purple and blue stage lighting and blurred bokeh effects" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPBFqADdH54Q9SJ6taCMGIC_9qQYIRlIMN1UYrc6dDhuTMKNlPjp9Z_QCn8-lYFGtInLD2vmI3eyNhPvIDglDeTsfi6zM47rq6qQWxNQygvm29_GF-E8OgdoljuNJr7_awIVaf7zPxLI3WeRRsBWXmumM1RGgADve89Uis4LDacvQ5zInHay1bDWz1XViFunztq9EZ3vaJnXDpGKQ2zF06gS49MyRKm1bil6ELZGCti0EnCfWZMZceIb94nnHVQB4MtTQQ9-LVt62f"/>
+<div class="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background"></div>
+<!-- Floating Glass Stats -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none px-6">
+<div class="grid grid-cols-2 gap-4 w-full max-w-md">
+<div class="bg-surface-container-high/40 backdrop-blur-xl glass-edge rounded-xl p-4 flex flex-col items-center">
+<span class="text-primary font-headline font-extrabold text-2xl tracking-tight">500+</span>
+<span class="text-on-surface-variant text-[10px] uppercase tracking-[0.1em] font-medium">Asistentes</span>
+</div>
+<div class="bg-surface-container-high/40 backdrop-blur-xl glass-edge rounded-xl p-4 flex flex-col items-center">
+<span class="text-secondary font-headline font-extrabold text-2xl tracking-tight">24h</span>
+<span class="text-on-surface-variant text-[10px] uppercase tracking-[0.1em] font-medium">Networking</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Lower 60%: Registration Sheet -->
+<section class="absolute bottom-0 left-0 w-full h-[62%] bg-surface-container-low/90 backdrop-blur-2xl rounded-t-[2.5rem] glass-edge shadow-2xl flex flex-col px-8 pt-10 pb-8 z-20">
+<div class="noise-texture absolute inset-0 pointer-events-none rounded-t-[2.5rem]"></div>
+<header class="mb-8">
+<h1 class="text-3xl font-headline font-extrabold tracking-tight text-on-surface mb-2">Únete al futuro</h1>
+<p class="text-on-surface-variant text-sm">Crea tu pase digital para el EventOS Summit.</p>
+</header>
+<form class="space-y-6 flex-grow">
+<!-- Input Group: Name -->
+<div class="relative">
+<label class="block text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold mb-1 ml-1">Nombre completo</label>
+<input class="w-full bg-surface-container-highest/50 border-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-on-surface placeholder:text-outline transition-all duration-300 py-3 rounded-t-lg" placeholder="Ej. Alex Rivera" type="text"/>
+</div>
+<!-- Input Group: Email -->
+<div class="relative">
+<label class="block text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold mb-1 ml-1">Correo electrónico</label>
+<input class="w-full bg-surface-container-highest/50 border-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-on-surface placeholder:text-outline transition-all duration-300 py-3 rounded-t-lg" placeholder="hola@summit.com" type="email"/>
+</div>
+<!-- Input Group: Password -->
+<div class="relative">
+<label class="block text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold mb-1 ml-1">Contraseña</label>
+<input class="w-full bg-surface-container-highest/50 border-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-on-surface placeholder:text-outline transition-all duration-300 py-3 rounded-t-lg" placeholder="••••••••" type="password"/>
+</div>
+<!-- Primary Action -->
+<div class="pt-4">
+<button class="w-full aurora-gradient py-4 rounded-xl text-on-primary-fixed font-headline font-bold text-lg shadow-lg hover:scale-[0.98] active:scale-[0.95] transition-transform duration-200">
+                        Crear cuenta
+                    </button>
+</div>
+</form>
+<!-- Footer Links & Navigation -->
+<footer class="mt-8 flex flex-col items-center gap-6">
+<a class="text-on-surface-variant text-sm hover:text-primary transition-colors" href="#">
+                    ¿Ya tienes cuenta? <span class="text-primary font-semibold">Inicia sesión</span>
+</a>
+<!-- Progress Dots -->
+<div class="flex gap-2">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<div class="w-8 h-2 rounded-full aurora-gradient"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+</div>
+</footer>
+</section>
+</main>
+<!-- BottomNavBar Suppressed: Focus context -->
+</body></html>

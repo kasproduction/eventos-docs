@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Onboarding v2 — EventOS (Floating Features)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@400;500;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #08080a;
+    color: #fff;
+    font-family: 'Urbanist', sans-serif;
+    width: 375px;
+    height: 812px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── Ambient layer ─────────────────────────────────── */
+  .ambient {
+    position: absolute; inset: 0; z-index: 0; overflow: hidden;
+  }
+  .orb {
+    position: absolute; border-radius: 50%; filter: blur(90px);
+    animation: drift 10s ease-in-out infinite alternate;
+  }
+  .orb1 { width: 280px; height: 280px; background: rgba(99,102,241,0.15); top: -60px; left: -40px; }
+  .orb2 { width: 220px; height: 220px; background: rgba(168,130,255,0.1); bottom: 80px; right: -60px; animation-delay: -5s; }
+  .orb3 { width: 180px; height: 180px; background: rgba(56,189,248,0.08); top: 35%; left: 60%; animation-delay: -3s; }
+  @keyframes drift {
+    0% { transform: translate(0,0) scale(1); }
+    100% { transform: translate(15px,-20px) scale(1.08); }
+  }
+
+  /* ── Floating feature cards ────────────────────────── */
+  .float-cards {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    transition: opacity 0.6s;
+  }
+  .float-card {
+    position: absolute;
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 14px 16px;
+    animation: floatCard 6s ease-in-out infinite alternate;
+    transition: all 0.8s cubic-bezier(0.25,0.1,0.25,1);
+  }
+  .float-card .fc-icon { font-size: 20px; margin-bottom: 6px; }
+  .float-card .fc-label {
+    font-family: 'Urbanist', sans-serif; font-weight: 600;
+    font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.3px;
+  }
+  .float-card .fc-value {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;
+    font-size: 14px; color: rgba(255,255,255,0.85); margin-top: 2px;
+  }
+
+  .fc1 { top: 110px; left: 20px; animation-delay: 0s; }
+  .fc2 { top: 90px; right: 24px; animation-delay: -2s; }
+  .fc3 { top: 240px; left: 40px; animation-delay: -4s; }
+  .fc4 { top: 220px; right: 16px; animation-delay: -1s; }
+  .fc5 { top: 360px; left: 16px; animation-delay: -3s; }
+
+  @keyframes floatCard {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(-8px) rotate(1deg); }
+  }
+
+  /* ── Mini mockup screens ───────────────────────────── */
+  .mini-screen {
+    position: absolute;
+    width: 120px; height: 210px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    overflow: hidden;
+    animation: floatCard 7s ease-in-out infinite alternate;
+  }
+  .mini-screen-inner {
+    padding: 10px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .mini-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08); }
+  .mini-bar.w60 { width: 60%; }
+  .mini-bar.w80 { width: 80%; }
+  .mini-bar.w40 { width: 40%; }
+  .mini-card {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .mini-dot {
+    width: 20px; height: 20px; border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+  }
+  .ms1 { top: 100px; right: -10px; transform: rotate(8deg); animation-delay: -1s; }
+  .ms2 { top: 300px; left: -15px; transform: rotate(-6deg); animation-delay: -4s; }
+
+  /* Card states per slide */
+  .float-cards[data-step="1"] .fc3, .float-cards[data-step="1"] .fc5 { opacity: 0.3; transform: scale(0.9); }
+  .float-cards[data-step="2"] .fc1, .float-cards[data-step="2"] .fc2 { opacity: 0.2; transform: translateY(-20px) scale(0.85); }
+  .float-cards[data-step="3"] .fc1, .float-cards[data-step="3"] .fc4 { opacity: 0.2; }
+  .float-cards[data-step="4"] { opacity: 0.15; }
+  .float-cards[data-step="5"] { opacity: 0; }
+
+  /* ── Progress dots ─────────────────────────────────── */
+  .progress-dots {
+    position: absolute; top: 54px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 6px; z-index: 200;
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .progress-dots.visible { opacity: 1; }
+  .pdot {
+    height: 3px; border-radius: 2px;
+    background: rgba(255,255,255,0.12);
+    transition: all 0.4s cubic-bezier(0.25,0.1,0.25,1);
+    width: 16px;
+  }
+  .pdot.active {
+    width: 32px;
+    background: #fff;
+  }
+
+  /* ── Back button ───────────────────────────────────── */
+  .back-btn {
+    position: absolute; top: 50px; left: 20px; z-index: 300;
+    width: 36px; height: 36px; border-radius: 18px;
+    background: rgba(255,255,255,0.06); border: none; color: #fff;
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .back-btn.visible { opacity: 1; }
+
+  /* ── Slides ────────────────────────────────────────── */
+  .slide {
+    position: absolute; inset: 0; z-index: 10;
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 28px 48px;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: all 0.55s cubic-bezier(0.25, 0.1, 0.25, 1);
+    pointer-events: none;
+  }
+  .slide.active {
+    opacity: 1; transform: translateX(0); pointer-events: auto;
+  }
+  .slide.exit { opacity: 0; transform: translateX(-50px); }
+
+  /* ── Typography ────────────────────────────────────── */
+  .t-overline {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255,255,255,0.3);
+    margin-bottom: 10px;
+  }
+  .t-title {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+    font-size: 32px; letter-spacing: -1px; line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .t-title span {
+    background: linear-gradient(135deg, #a78bfa, #818cf8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .t-sub {
+    font-size: 15px; color: rgba(255,255,255,0.4);
+    line-height: 1.5; margin-bottom: 28px;
+  }
+
+  /* ── Inputs ────────────────────────────────────────── */
+  .field {
+    margin-bottom: 14px;
+  }
+  .field label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: rgba(255,255,255,0.35); margin-bottom: 5px;
+  }
+  .field input, .field select {
+    width: 100%; padding: 13px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; color: #fff;
+    font-family: 'Urbanist', sans-serif; font-size: 15px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .field input:focus { border-color: rgba(255,255,255,0.15); }
+  .field input::placeholder { color: rgba(255,255,255,0.18); }
+
+  /* ── Buttons ───────────────────────────────────────── */
+  .btn-primary {
+    width: 100%; padding: 15px; border: none; border-radius: 14px;
+    font-family: 'Urbanist', sans-serif; font-weight: 700; font-size: 16px;
+    cursor: pointer; transition: transform 0.12s;
+    background: #fff; color: #0a0a0a;
+  }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .btn-glass {
+    width: 100%; padding: 15px; border-radius: 14px;
+    font-family: 'Urbanist', sans-serif; font-weight: 700; font-size: 16px;
+    cursor: pointer; transition: transform 0.12s;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    margin-top: 10px;
+  }
+  .btn-glass:active { transform: scale(0.97); }
+
+  .link { text-align: center; margin-top: 16px; font-size: 13px; color: rgba(255,255,255,0.3); }
+  .link a { color: #fff; text-decoration: none; font-weight: 600; }
+
+  .skip { text-align: center; margin-top: 16px; font-size: 13px; color: rgba(255,255,255,0.2); cursor: pointer; }
+
+  /* ── Photo ─────────────────────────────────────────── */
+  .photo-area {
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 24px;
+  }
+  .photo-ring {
+    width: 140px; height: 140px; border-radius: 70px;
+    background: rgba(255,255,255,0.03);
+    border: 2px dashed rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s; position: relative;
+    margin-bottom: 16px; overflow: hidden;
+  }
+  .photo-ring:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+  .photo-ring.filled { border: 2px solid rgba(255,255,255,0.15); border-style: solid; }
+  .photo-ring img { width: 100%; height: 100%; object-fit: cover; border-radius: 70px; }
+  .photo-ring .cam-icon { font-size: 32px; opacity: 0.25; }
+
+  .photo-badge-preview {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; padding: 12px 20px;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 12px; color: rgba(255,255,255,0.4);
+  }
+  .photo-badge-mini {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; color: rgba(255,255,255,0.2);
+  }
+
+  .photo-btns { display: flex; gap: 10px; margin-top: 12px; }
+  .photo-btn {
+    padding: 10px 20px; border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .photo-btn:hover { background: rgba(255,255,255,0.08); }
+
+  /* ── Interests ─────────────────────────────────────── */
+  .chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 16px;
+    max-height: 280px; overflow-y: auto;
+  }
+  .chip {
+    padding: 10px 16px; border-radius: 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 14px; font-weight: 500;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer; transition: all 0.25s; user-select: none;
+  }
+  .chip.on {
+    background: rgba(129,140,248,0.15);
+    border-color: rgba(129,140,248,0.3);
+    color: #c4b5fd;
+  }
+  .chip-count {
+    font-size: 13px; color: rgba(255,255,255,0.25); margin-bottom: 12px;
+  }
+  .chip-count b { color: #fff; }
+
+  /* ── Done ──────────────────────────────────────────── */
+  #slide5 {
+    justify-content: center; align-items: center; text-align: center;
+    padding-bottom: 80px;
+  }
+  .done-check {
+    width: 72px; height: 72px; border-radius: 36px;
+    background: rgba(34,197,94,0.08);
+    border: 2px solid rgba(34,197,94,0.25);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+  }
+  .done-check svg {
+    width: 32px; height: 32px; stroke: #22c55e; stroke-width: 3; fill: none;
+    stroke-dasharray: 40; stroke-dashoffset: 40;
+    animation: drawCheck 0.4s 0.3s ease forwards;
+  }
+  @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+  @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+
+  .done-badge {
+    width: 200px; margin: 20px auto;
+    padding: 18px; background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 18px;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .done-badge .db-avatar {
+    width: 44px; height: 44px; border-radius: 22px;
+    background: rgba(255,255,255,0.06); margin: 0 auto 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; overflow: hidden;
+  }
+  .done-badge .db-avatar img { width:100%; height:100%; object-fit:cover; border-radius:22px; }
+  .done-badge .db-name {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;
+    font-size: 15px;
+  }
+  .done-badge .db-role { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .done-badge .db-qr {
+    width: 50px; height: 50px; margin: 10px auto 0;
+    background: rgba(255,255,255,0.05); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: rgba(255,255,255,0.15);
+  }
+
+  /* ── Dropdown ──────────────────────────────────────── */
+  .dd-wrap { position: relative; }
+  .dd-list {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    max-height: 140px; overflow-y: auto;
+    background: #161618; border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; z-index: 50; display: none;
+  }
+  .dd-list.open { display: block; }
+  .dd-item {
+    padding: 11px 16px; font-size: 14px; color: rgba(255,255,255,0.6);
+    cursor: pointer; transition: background 0.15s;
+  }
+  .dd-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+
+  /* debug */
+  .debug {
+    position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.8); color: rgba(255,255,255,0.4);
+    font: 10px monospace; padding: 3px 10px; border-radius: 10px; z-index: 500;
+  }
+</style>
+</head>
+<body>
+
+<!-- Ambient -->
+<div class="ambient">
+  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+</div>
+
+<!-- Floating feature cards -->
+<div class="float-cards" id="floats" data-step="0">
+  <div class="float-card fc1">
+    <div class="fc-icon">&#128197;</div>
+    <div class="fc-label">Agenda</div>
+    <div class="fc-value">3 dias, 29 sesiones</div>
+  </div>
+  <div class="float-card fc2">
+    <div class="fc-icon">&#127908;</div>
+    <div class="fc-label">Speakers</div>
+    <div class="fc-value">18 expertos</div>
+  </div>
+  <div class="float-card fc3">
+    <div class="fc-icon">&#129309;</div>
+    <div class="fc-label">Networking</div>
+    <div class="fc-value">Conecta con afines</div>
+  </div>
+  <div class="float-card fc4">
+    <div class="fc-icon">&#127942;</div>
+    <div class="fc-label">Gamificacion</div>
+    <div class="fc-value">Retos y premios</div>
+  </div>
+  <div class="float-card fc5">
+    <div class="fc-icon">&#128247;</div>
+    <div class="fc-label">Social</div>
+    <div class="fc-value">Feed + Momentos</div>
+  </div>
+
+  <div class="mini-screen ms1">
+    <div class="mini-screen-inner">
+      <div class="mini-bar w60"></div>
+      <div class="mini-bar w80"></div>
+      <div class="mini-card"></div>
+      <div class="mini-card" style="flex:0.5"></div>
+    </div>
+  </div>
+  <div class="mini-screen ms2">
+    <div class="mini-screen-inner">
+      <div style="display:flex;gap:4px;align-items:center">
+        <div class="mini-dot"></div>
+        <div class="mini-bar w60" style="flex:1"></div>
+      </div>
+      <div class="mini-card"></div>
+      <div class="mini-card"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Progress dots -->
+<div class="progress-dots" id="dots">
+  <div class="pdot active" data-i="0"></div>
+  <div class="pdot" data-i="1"></div>
+  <div class="pdot" data-i="2"></div>
+  <div class="pdot" data-i="3"></div>
+  <div class="pdot" data-i="4"></div>
+</div>
+
+<button class="back-btn" id="backBtn" onclick="goBack()">&#8592;</button>
+
+<!-- ═══ SLIDES ═══ -->
+
+<!-- 0: Welcome -->
+<div class="slide active" id="slide0">
+  <div class="t-overline">Septiembre 15-17, 2026</div>
+  <div class="t-title">Bienvenido a<br>EventOS <span>Summit</span></div>
+  <div class="t-sub">The Future of Creative Intelligence.<br>Tu experiencia comienza aqui.</div>
+  <button class="btn-primary" onclick="goTo(1,'login')">Ya tengo cuenta</button>
+  <button class="btn-glass" onclick="goTo(1,'register')">Crear cuenta</button>
+</div>
+
+<!-- 1: Auth -->
+<div class="slide" id="slide1">
+  <div class="t-title" id="s1Title">Inicia sesion</div>
+  <div class="t-sub" id="s1Sub">Ingresa tus datos para acceder</div>
+
+  <div class="field">
+    <label>Email</label>
+    <input type="email" placeholder="tu@email.com">
+  </div>
+  <div id="nameField" style="display:none">
+    <div class="field">
+      <label>Nombre completo</label>
+      <input type="text" placeholder="Como aparecera en tu badge">
+    </div>
+  </div>
+  <div class="field">
+    <label>Contrasena</label>
+    <input type="password" placeholder="********">
+  </div>
+
+  <button class="btn-primary" id="s1Btn" onclick="handleAuth()" style="margin-top:8px">Iniciar sesion</button>
+  <div class="link" id="s1Toggle">
+    No tienes cuenta? <a href="#" onclick="toggleMode(event)">Registrate</a>
+  </div>
+</div>
+
+<!-- 2: Photo -->
+<div class="slide" id="slide2" style="justify-content:center">
+  <div class="photo-area">
+    <div class="photo-ring" id="photoRing" onclick="simPhoto()">
+      <div class="cam-icon" id="camIcon">&#128247;</div>
+    </div>
+
+    <div class="photo-badge-preview">
+      <div class="photo-badge-mini">QR</div>
+      <div>Asi se vera en tu<br><b style="color:rgba(255,255,255,0.7)">badge digital</b></div>
+    </div>
+
+    <div class="photo-btns">
+      <div class="photo-btn" onclick="simPhoto()">&#128248; Camara</div>
+      <div class="photo-btn" onclick="simPhoto()">&#128444; Galeria</div>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="goTo(3)">Continuar</button>
+  <div class="skip" onclick="goTo(3)">Saltar por ahora</div>
+</div>
+
+<!-- 3: About you -->
+<div class="slide" id="slide3">
+  <div class="t-title">Sobre ti</div>
+  <div class="t-sub">Ayudanos a personalizar tu experiencia</div>
+
+  <div class="field">
+    <label>Cargo</label>
+    <input type="text" placeholder="Ej: Product Designer">
+  </div>
+
+  <div class="field dd-wrap">
+    <label>Organizacion</label>
+    <input type="text" placeholder="Buscar..." id="orgIn" onfocus="openDD()" oninput="filterDD()">
+    <div class="dd-list" id="orgDD">
+      <div class="dd-item" onclick="pickOrg(this)">Bancolombia</div>
+      <div class="dd-item" onclick="pickOrg(this)">Rappi</div>
+      <div class="dd-item" onclick="pickOrg(this)">Grupo Exito</div>
+      <div class="dd-item" onclick="pickOrg(this)">Nutresa</div>
+      <div class="dd-item" onclick="pickOrg(this)">Globant</div>
+      <div class="dd-item" onclick="pickOrg(this)">MercadoLibre</div>
+      <div class="dd-item" onclick="pickOrg(this)">Otra...</div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Telefono</label>
+    <input type="tel" placeholder="+57 300 123 4567">
+  </div>
+
+  <button class="btn-primary" onclick="goTo(4)" style="margin-top:8px">Continuar</button>
+</div>
+
+<!-- 4: Interests -->
+<div class="slide" id="slide4">
+  <div class="t-title">Que te interesa?</div>
+  <div class="t-sub">Elige al menos 3 para personalizar agenda y networking</div>
+
+  <div class="chip-count"><b id="cCount">0</b> seleccionados</div>
+  <div class="chips" id="chipsGrid"></div>
+
+  <button class="btn-primary" id="intBtn" onclick="goTo(5)" style="opacity:0.3;pointer-events:none;margin-top:8px">Continuar</button>
+  <div class="skip" onclick="goTo(5)">Saltar</div>
+</div>
+
+<!-- 5: Done -->
+<div class="slide" id="slide5">
+  <div class="done-check">
+    <svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg>
+  </div>
+  <div class="t-title" style="font-size:26px">Bienvenido!</div>
+  <div class="t-sub" style="margin-bottom:0">Tu registro esta completo</div>
+
+  <div class="done-badge">
+    <div class="db-avatar" id="dbAvatar">K</div>
+    <div class="db-name">Kamilo Restrepo</div>
+    <div class="db-role">Product Designer</div>
+    <div class="db-qr">QR</div>
+  </div>
+
+  <button class="btn-primary" style="max-width:260px;margin:16px auto 0">Explorar evento</button>
+</div>
+
+<div class="debug" id="dbg">Paso 0 — Bienvenida</div>
+
+<script>
+let cur = 0, mode = 'login', selCount = 0;
+const TAGS = [
+  'Tecnologia','Innovacion','Design','Marketing','Emprendimiento',
+  'IA & ML','Fintech','Sostenibilidad','Liderazgo','Producto',
+  'Data Science','Cloud','UX Research','Growth','Cultura','Educacion'
+];
+const grid = document.getElementById('chipsGrid');
+TAGS.forEach(t => {
+  const c = document.createElement('div');
+  c.className = 'chip'; c.textContent = t;
+  c.onclick = () => {
+    c.classList.toggle('on');
+    selCount = document.querySelectorAll('.chip.on').length;
+    document.getElementById('cCount').textContent = selCount;
+    const b = document.getElementById('intBtn');
+    b.style.opacity = selCount >= 3 ? '1' : '0.3';
+    b.style.pointerEvents = selCount >= 3 ? 'auto' : 'none';
+  };
+  grid.appendChild(c);
+});
+
+function goTo(step, m) {
+  if (m) mode = m;
+  const prev = document.getElementById('slide'+cur);
+  const next = document.getElementById('slide'+step);
+  prev.classList.remove('active'); prev.classList.add('exit');
+  setTimeout(() => prev.className = 'slide', 550);
+  next.classList.add('active');
+  cur = step;
+
+  // Floating cards respond to step
+  document.getElementById('floats').dataset.step = step;
+
+  // Dots
+  const dots = document.getElementById('dots');
+  dots.classList.toggle('visible', step > 0 && step < 5);
+  dots.querySelectorAll('.pdot').forEach((d,i) => {
+    d.classList.toggle('active', i === step - 1);
+  });
+
+  // Back
+  document.getElementById('backBtn').classList.toggle('visible', step > 0 && step < 5);
+
+  // Auth mode
+  if (step === 1) updateAuth();
+
+  const labels = ['Bienvenida','Auth','Tu Foto','Sobre Ti','Intereses','Listo!'];
+  document.getElementById('dbg').textContent = `Paso ${step} — ${labels[step]}`;
+}
+
+function goBack() { if (cur === 1) goTo(0); else if (cur > 1) goTo(cur-1); }
+
+function toggleMode(e) { e.preventDefault(); mode = mode === 'login' ? 'register' : 'login'; updateAuth(); }
+
+function updateAuth() {
+  const r = mode === 'register';
+  document.getElementById('s1Title').textContent = r ? 'Crea tu cuenta' : 'Inicia sesion';
+  document.getElementById('s1Sub').textContent = r ? 'Solo necesitamos lo esencial' : 'Ingresa tus datos para acceder';
+  document.getElementById('nameField').style.display = r ? 'block' : 'none';
+  document.getElementById('s1Btn').textContent = r ? 'Crear cuenta' : 'Iniciar sesion';
+  document.getElementById('s1Toggle').innerHTML = r
+    ? 'Ya tienes cuenta? <a href="#" onclick="toggleMode(event)">Inicia sesion</a>'
+    : 'No tienes cuenta? <a href="#" onclick="toggleMode(event)">Registrate</a>';
+}
+
+function handleAuth() {
+  if (mode === 'register') goTo(2);
+  else {
+    goTo(5);
+    document.querySelector('#slide5 .t-title').textContent = 'Bienvenido de vuelta!';
+    document.querySelector('#slide5 .t-sub').textContent = '';
+    document.querySelector('.done-badge').style.display = 'none';
+  }
+}
+
+function simPhoto() {
+  const r = document.getElementById('photoRing');
+  r.classList.add('filled');
+  r.innerHTML = '<img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face">';
+  document.getElementById('dbAvatar').innerHTML = '<img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face">';
+}
+
+function openDD() { document.getElementById('orgDD').classList.add('open'); }
+function pickOrg(el) { document.getElementById('orgIn').value = el.textContent; document.getElementById('orgDD').classList.remove('open'); }
+function filterDD() {
+  const v = document.getElementById('orgIn').value.toLowerCase();
+  document.querySelectorAll('.dd-item').forEach(i => i.style.display = i.textContent.toLowerCase().includes(v) ? '' : 'none');
+}
+document.addEventListener('click', e => { if (!e.target.closest('.dd-wrap')) document.getElementById('orgDD').classList.remove('open'); });
+</script>
+</body>
+</html>
