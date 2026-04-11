@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Documento de planificación para la fase UI/UX de EventOS.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-10 | Estado: En Progreso (Paso 5 — ~95% completado, Vendedor+MiStand+LiquidGlass done)
+> Fecha: 2026-04-07 | Actualizado: 2026-04-11 | Estado: En Progreso (Paso 5 — ~98% completado, micro-interacciones+social+transversales done)
 
 ---
 
@@ -302,7 +302,7 @@ PASO 1: Fundamentos ✅ COMPLETADO (2026-04-07/08)
 ├── [x] app.json backgroundColor #0e0e0e (window nativo Android)
 ├── [x] Todos los layouts con contentStyle + sceneStyle dark
 ├── [ ] Componentes base reutilizables: Button, Card, Input (pendiente extraer)
-└── [ ] Skeleton loading components
+└── [x] Skeleton loading components (HomeSkeleton, AgendaSkeleton, SpeakerDetailSkeleton, SponsorsSkeleton, NetworkingSkeleton, ContentListSkeleton)
 
 PASO 2: Landing Web
 ├── Estructura HTML/CSS (o Next.js)
@@ -329,7 +329,7 @@ PASO 4: Estados del Evento
 ├── Certificados de asistencia
 └── NPS survey post-evento
 
-PASO 5: Barrido Visual App — ~95% COMPLETADO
+PASO 5: Barrido Visual App — ~98% COMPLETADO
 ├── ✅ Home (2026-04-07):
 │   ├── [x] Header configurable (logo/text desde branding API)
 │   ├── [x] Hero text/image modes, HappeningNow crossfade 6s
@@ -351,7 +351,7 @@ PASO 5: Barrido Visual App — ~95% COMPLETADO
 │   ├── [x] Header premium (titulo, speaker, empresa, separador)
 │   ├── [x] YouTube embed (react-native-youtube-iframe, fix URLs largas)
 │   └── [x] Boton UNIRTE solo live, Ver grabacion solo finished+recording
-├── ✅ Social (2026-04-09):
+├── ✅ Social (2026-04-09 + 2026-04-11):
 │   ├── [x] Unificado: Feed + Memorias + Momentos en una pantalla
 │   ├── [x] PostCard Lumina Noir, likes animados, comments bottom sheet 55%
 │   ├── [x] Memorias grid 3col, fotos oficiales 2col + badge OFICIAL
@@ -359,7 +359,10 @@ PASO 5: Barrido Visual App — ~95% COMPLETADO
 │   ├── [x] BottomSheet reutilizable, SegmentedControl glass pill
 │   ├── [x] PhotoViewer + MomentosViewer fullscreen
 │   ├── [x] CreatePostModal dark + SocialFAB contextual
-│   └── [x] ~30 bugs resueltos (gesture, stale closures, Android)
+│   ├── [x] ~30 bugs resueltos (gesture, stale closures, Android)
+│   ├── [x] Header anclado con blur + Momentos sticky + orden Social>Momentos>Tabs
+│   ├── [x] LuminaToast reemplaza Alert.alert en todo Social
+│   └── [x] Momentos siempre visible (boton + sin guard stories.length)
 ├── ✅ Sponsors (2026-04-09):
 │   ├── [x] Brand Wall: grid adaptativo por tier, living shuffle 7s, stagger reveal
 │   ├── [x] Brand Profile: logo hero, floating nav blur, servicios, trivia A/B/C/D
@@ -442,10 +445,33 @@ PASO 5: Barrido Visual App — ~95% COMPLETADO
 │   ├── [x] Matchmaking (sugeridos carousel + conectar + intereses comunes)
 │   ├── [ ] Auth screens (login / registro) ← rediseno visual
 │   └── [ ] Onboarding visual (bugs z-index Android, requiere dev build)
-├── ⏳ Items transversales pendientes:
-│   ├── [ ] Skeleton loading — componente creado, integracion revertida. Reintentar uno por uno.
-│   ├── [ ] EmptyState + Pull-to-refresh custom — creados, integracion revertida.
-│   ├── [ ] Iconografia consistente (reemplazar emojis ModuleMenu por icon set real)
+├── ✅ Micro-interacciones (2026-04-11):
+│   ├── [x] ScalePress: tap feedback scale 0.96 + haptic light (ModuleMenu, Speakers, Agenda, Networking)
+│   ├── [x] Image reveal: transition={300} en 17 archivos expo-image (fade suave al cargar)
+│   ├── [x] ContentFade: opacity 0→1 (400ms) cuando skeleton→contenido (sponsors, anuncios, speaker detail)
+│   ├── [x] FadeInItem: stagger wave top→bottom para entradas coordinadas
+│   ├── [x] AnimatedBadge: scale pop suave (damping 14) en HomeHeader + Networking badges
+│   ├── [x] Haptics audit: leaderboard portal cards, profile edit/logout, social back, bell press
+│   ├── [x] Screen transitions: slide_from_right en Stack (session-stream mantiene slide_from_bottom)
+│   ├── [x] Gamification FadeInSection: stagger secuencial top→bottom, withTiming sin bounce
+│   └── [x] Home wave entrance: HomeSkeleton → FadeInItem coordinado (Hero/HappeningNow/Modules)
+├── ✅ Social overhaul (2026-04-11):
+│   ├── [x] Header anclado con blur (titulo + Momentos + SegmentedControl fijos)
+│   ├── [x] Momentos siempre visible (boton + disponible sin stories)
+│   ├── [x] Orden: Social > Momentos > Feed/Memorias
+│   ├── [x] Alert.alert → LuminaToast (post creado, foto subida, errores)
+│   ├── [x] CreatePostModal: sin crop forzado, estado se limpia al publicar
+│   ├── [x] EmptyState premium en feed y memorias vacios
+│   └── [x] ContentFade en feed y memorias
+├── ✅ Transversales resueltos (2026-04-11):
+│   ├── [x] Skeleton loading: activo en 5+ pantallas (sponsors, anuncios, speaker, networking, home)
+│   ├── [x] EmptyState: integrado en social feed, social memorias, speaker detail
+│   ├── [x] Iconografia: ModuleMenu usa MaterialCommunityIcons (no emojis)
+│   ├── [x] useNotifications: conditional require() — no crashea en Expo Go
+│   └── [x] onboarding: useEffect antes de early returns — Rules of Hooks fix
+├── ⏳ Items pendientes:
+│   ├── [ ] Auth screens (login / registro) ← rediseno visual
+│   ├── [ ] Onboarding visual (bugs z-index Android, requiere dev build)
 │   └── [ ] QA visual completo (multi-device)
 
 PASO 6: Admin Premium
