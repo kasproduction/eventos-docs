@@ -5,6 +5,25 @@
 
 ---
 
+## 2026-04-10 — Sesion Vendedor + Mi Stand + Liquid Glass
+
+### BUG-054: Rules of hooks en VendorHappeningNow
+- **Severidad:** ALTA (crash)
+- **Causa:** Hooks despues de early return violaba reglas de React.
+- **Fix:** `e04b62e` — mover todos los hooks antes del early return.
+
+### BUG-055: VendorHappeningNow ratio roto en flex
+- **Severidad:** MEDIA
+- **Causa:** flex porcentual no daba anchos correctos para carousel + Mi Stand card.
+- **Fix:** `e04b62e` — anchos fijos en pixeles (65%/32%/3% gap) en vez de flex.
+
+### BUG-056: Teal color en Mi Stand card (solo gamification usa teal)
+- **Severidad:** BAJA
+- **Causa:** Mi Stand card usaba colores teal que estan reservados para gamification.
+- **Fix:** `e04b62e` — colores unificados blancos, teal solo en GamificationHud.
+
+---
+
 ## 2026-04-10 — Sesion UI + Rewards
 
 ### BUG-001: SQL query expuesto al usuario en error de canje
@@ -264,10 +283,10 @@
 | Severidad | Count | Resueltos |
 |-----------|-------|-----------|
 | CRITICA | 13 | 13 |
-| ALTA | 18 | 18 |
-| MEDIA | 35+ | 35+ |
-| BAJA | 15+ | 15+ |
-| **Total** | **80+** | **80+** |
+| ALTA | 19 | 19 |
+| MEDIA | 36+ | 36+ |
+| BAJA | 16+ | 16+ |
+| **Total** | **84+** | **84+** |
 
 Todos los bugs listados estan corregidos. Zero bugs abiertos.
 

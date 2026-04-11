@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Documento de planificación para la fase UI/UX de EventOS.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-10 | Estado: En Progreso (Paso 5 — ~90% completado)
+> Fecha: 2026-04-07 | Actualizado: 2026-04-10 | Estado: En Progreso (Paso 5 — ~95% completado, Vendedor+MiStand+LiquidGlass done)
 
 ---
 
@@ -329,7 +329,7 @@ PASO 4: Estados del Evento
 ├── Certificados de asistencia
 └── NPS survey post-evento
 
-PASO 5: Barrido Visual App — ~80% COMPLETADO
+PASO 5: Barrido Visual App — ~95% COMPLETADO
 ├── ✅ Home (2026-04-07):
 │   ├── [x] Header configurable (logo/text desde branding API)
 │   ├── [x] Hero text/image modes, HappeningNow crossfade 6s
@@ -405,9 +405,41 @@ PASO 5: Barrido Visual App — ~80% COMPLETADO
 │   ├── [x] Flash blanco Android eliminado (app.json + layouts + ScreenWrapper)
 │   ├── [x] Breathing carousel (Easing.out cubic), comments optimistic
 │   └── [x] Background #1a1919 → #141414, console.log cleanup
+├── ✅ Vendedor unificado (2026-04-10):
+│   ├── [x] Vendedor usa tabs presencial (5 tabs iguales, directorio vendedor eliminado)
+│   ├── [x] VendorHappeningNow: carousel 65% + Mi Stand card 28% + 3% gap (anchos fijos px)
+│   ├── [x] Mi Stand card: breathing QR, leads pill, centrado, skeleton loading
+│   ├── [x] VendorGamificationHud: HUD compacto con RGB border para espacio reducido
+│   ├── [x] Routing: 6 archivos cambiados, vendedor → presencial
+│   ├── [x] Backend: role vendedor agregado a todos los modulos presencial
+│   └── [x] Backend: /me/stand devuelve logo_url, description, tier, website_url
+├── ✅ Mi Stand premium (2026-04-10):
+│   ├── [x] Hero card: logo sponsor squircle + nombre + descripcion completa + tier pill + role pill
+│   ├── [x] Stats centrados: Total leads (tappable), Hoy (barra progreso), Equipo (slots/cupos + gestionar)
+│   ├── [x] Export card + Ver todos: 2 cards glass simetricas con iconos 48px
+│   ├── [x] Export BottomSheet: grid 1x4 (correo, WhatsApp, guardar, compartir) con confirmacion
+│   ├── [x] Equipo BottomSheet 85%: add member input, activos con menu [...], pendientes amber
+│   ├── [x] FAB scanner 72px: scan line animation + breathing + shadow
+│   ├── [x] Leads recientes: solo nombre + cargo + tier pill + time-ago, dashed separators
+│   ├── [x] Empty state: icono + texto + flecha al FAB
+│   └── [x] Toasts LuminaToast en vez de Alert.alert
+├── ✅ Lead detail + Leads list Lumina Noir (2026-04-10):
+│   ├── [x] Lead detail: profile glass, tier icons (fire/sun/snow), notas glass, historial
+│   ├── [x] Leads list: agrupados por fecha (Hoy/Ayer/fecha), glass cards, dashed separators
+│   └── [x] Time-ago, pull-to-refresh, toasts, ScreenWrapper
+├── ✅ FloatingTabBar Liquid Glass (2026-04-10):
+│   ├── [x] Sliding bubble glass que se desliza entre tabs con spring (damping 22, stiffness 340)
+│   ├── [x] Bounce on tap: scale 1.03 + translateY -2 (overshoot→settle, ref: iOS 26 AppStore)
+│   ├── [x] Bubble medida con onLayout real, no calculos manuales
+│   ├── [x] Bar transparente (bg 0.55), bubble sutil (bg 0.07, border 0.15), highlight superior
+│   └── [x] Referencia: github.com/veersr9/AppStore-Tabbar (iOS 26 Liquid Glass)
+├── ✅ Networking contactos (2026-04-10):
+│   ├── [x] presentContactForm: Intent Android (sin permisos) + presentFormAsync iOS
+│   ├── [x] Boton individual "Guardar en telefono" por contacto + toast
+│   └── [x] Export masivo .vcf como opcion secundaria
 ├── ⏳ Pantallas pendientes:
-│   ├── [ ] Networking (directorio + contactos + solicitudes) ← UI funcional, falta Lumina Noir polish
-│   ├── [ ] Matchmaking ← UI funcional, falta polish visual
+│   ├── [x] Networking (directorio + contactos + solicitudes + guardar en telefono)
+│   ├── [x] Matchmaking (sugeridos carousel + conectar + intereses comunes)
 │   ├── [ ] Auth screens (login / registro) ← rediseno visual
 │   └── [ ] Onboarding visual (bugs z-index Android, requiere dev build)
 ├── ⏳ Items transversales pendientes:
