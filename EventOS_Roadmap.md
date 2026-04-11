@@ -114,6 +114,9 @@ cada sesión más fácil de debuggear.
 | **Competitive** | **Analisis competitivo (Cisco $88K USD vs ICE360 $49M COP vs EventOS)** | ✅ (2026-04-09) — gaps identificados, 6 nuevas sesiones, pricing, escalabilidad validada |
 | **1.23** | **Permisos granulares Filament (roles admin)** | ⏳ Pendiente |
 | **1.x Rewards** | **Redencion de puntos (kiosko de premios)** | ⏳ Catalogo, QR temporal, staff escanea, descuenta puntos. Cierra el loop de gamificacion. |
+| **1.x-C** | **Roles asistente (presencial/virtual/hibrido)** | ⏳ Selector de rol en onboarding si evento hibrido. DoneStep: presencial/hibrido=QR, virtual=directo home sin QR. Virtual tabs=todo menos Mi QR. |
+| **1.x-D** | **Estados del evento (lifecycle)** | ⏳ registration_only/published/live/ended. Pantalla espera DaVinci con countdown. Push "evento disponible". Modo lectura post-evento. Config en Filament. |
+| **1.x-E** | **Campos dinamicos onboarding (Camino B)** | ⏳ AboutStep renderiza registration_fields del admin. Progreso/puntos proporcionales a campos. |
 | **Nice to have** | **Light mode (tema claro)** | ⏳ Requiere refactor de colores hardcoded a theme provider. Sesion dedicada si cliente lo pide. |
 | ~~1.22 old~~ | ~~Floor plan del venue~~ | Movido a Fase 3 |
 | **— Nuevos features (identificados en analisis competitivo 2026-04-09)** | | |
@@ -134,6 +137,7 @@ cada sesión más fácil de debuggear.
 | **SEC-1** | **3 críticos: room auth socket, XSS/HTMLPurifier, token expiration** | ✅ (2026-04-07) — 26 tests |
 | **SEC-2** | **5 altos: security headers, CORS, HTTPS, security:check, .env.prod** | ✅ (2026-04-07) — 10 tests |
 | **SEC-3** | **Medios: account lockout, Redis rate limiting, FormRequests** | ✅ parcial (2026-04-07) — 6 tests. 2FA y device fingerprint pendientes |
+| **SEC-3b** | **Token register 30d→config, validar token al startup (GET /me), middleware ban+approval server-side** | ⏳ Pendiente — encontrado en auditoría 2026-04-11 |
 | **SEC-4** | **Infraestructura: Docker, server hardening, Cloudflare, backups** | ⏳ Pendiente (sesión deploy) |
 | **SEC-5** | **Monitoreo: SecurityLogger, Sentry, uptime** | ⏳ Pendiente (sesión deploy) |
 | **— Landing + UI/UX** | | |
@@ -305,6 +309,10 @@ git push origin develop
 - [x] TypeScript strict mode sin errores (`npx tsc --noEmit` pasa limpio)
 - [ ] ESLint + Prettier ← pendiente (no bloqueante para siguiente sesión)
 - [ ] Development build con EAS en dispositivo físico ← pendiente (requiere cuenta EAS configurada)
+  - [ ] `react-native-image-crop-picker` — crop circular dark theme para foto de perfil (instalado, requiere native build)
+  - [ ] Push reminders — expo-notifications no funciona en Expo Go
+  - [ ] Animaciones Reanimated avanzadas — algunas requieren dev build para verse
+  - [ ] Onboarding z-index controles Android — verificar en dev build
 
 **Notas técnicas:**
 
