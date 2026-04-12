@@ -117,6 +117,10 @@ cada sesión más fácil de debuggear.
 | **1.x-C** | **Roles asistente (presencial/virtual/hibrido)** | ⏳ Selector de rol en onboarding si evento hibrido. DoneStep: presencial/hibrido=QR, virtual=directo home sin QR. Virtual tabs=todo menos Mi QR. |
 | **1.x-D** | **Estados del evento (lifecycle)** | ⏳ registration_only/published/live/ended. Pantalla espera DaVinci con countdown. Push "evento disponible". Modo lectura post-evento. Config en Filament. |
 | **1.x-E** | **Campos dinamicos onboarding (Camino B)** | ⏳ AboutStep renderiza registration_fields del admin. Progreso/puntos proporcionales a campos. |
+| **1.x-F** | **Registro cerrado (lista invitados)** | ⏳ Admin sube CSV/lista emails en Filament. Solo esos emails pueden registrarse. Onboarding valida email contra lista. Si no esta → "No estas en la lista de invitados". |
+| **1.x-G** | **Registro por codigo de acceso** | ⏳ Admin genera codigos en Filament (unicos o grupales). Onboarding tiene campo "Codigo de acceso" antes del registro. Valida contra backend. |
+| **1.x-H** | **Staff invite push + cambio de rol en vivo** | ⏳ Admin invita staff desde Filament → push notification "Eres parte del equipo" → boton abre app → layout cambia a vendedor automaticamente. Requiere socket evento o push. |
+| **1.x-I** | **Pantallas auth Lumina Noir** | ⏳ Reescribir: banned, pending-approval, activate-account en Lumina Noir. Eliminar NativeWind de auth. |
 | **Nice to have** | **Light mode (tema claro)** | ⏳ Requiere refactor de colores hardcoded a theme provider. Sesion dedicada si cliente lo pide. |
 | ~~1.22 old~~ | ~~Floor plan del venue~~ | Movido a Fase 3 |
 | **— Nuevos features (identificados en analisis competitivo 2026-04-09)** | | |
