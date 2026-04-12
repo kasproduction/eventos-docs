@@ -1,7 +1,7 @@
 # Pendientes Consolidados — EventOS
 
 > Indice unico de TODO lo pendiente. Cada item apunta al documento donde esta el detalle.
-> Actualizado: 2026-04-12
+> Actualizado: 2026-04-12 (final de sesion)
 
 ---
 
@@ -17,8 +17,9 @@
 | ✅ | Activate-account → Lumina Noir | sesion 2026-04-12 |
 | ✅ | Login inteligente 2 pasos (check-email → password) | sesion 2026-04-12 |
 | ✅ | Activate-account redirige a onboarding photo step | sesion 2026-04-12 |
-| ⏳ | Onboarding admin Filament: steps, textos, puntos (1.x-B3) | `EventOS_Roadmap.md` Apendice I |
-| ⏳ | Campos dinamicos AboutStep (1.x-E) | `EventOS_Roadmap.md` Apendice I |
+| ✅ | Onboarding admin Filament (1.x-B3): steps config JSON, Filament UI 7 secciones, FormStep generico, steps dinamicos, colores master/slave, real-time polling 30s + socket | sesion 2026-04-12 |
+| ✅ | Campos dinamicos onboarding (1.x-E parcial): FormStep con campos del config, tipos text/tel/email/number/url/select, puntos por campo, guardado en registration_field_values | sesion 2026-04-12 |
+| ⏳ | Campos dinamicos AboutStep completo (1.x-E): select con BottomSheet, validacion required | pendiente |
 
 ## Registro — Flujos futuros
 
@@ -51,24 +52,14 @@
 
 | Estado | Item | Detalle en |
 |--------|------|-----------|
-| ✅ | Palabras bloqueadas chat + Q&A (silent drop) | sesion 2026-04-12 |
-| ✅ | Chat delete admin (app long press + monitor) | sesion 2026-04-12 |
-| ✅ | Ban desde chat (app long press + monitor) | sesion 2026-04-12 |
-| ✅ | Chat monitor real-time por sesion (HTML standalone) | sesion 2026-04-12 |
-| ✅ | Velocidad monitor (cola mensajes para moderador) | sesion 2026-04-12 |
-| ✅ | Slow mode + pause/resume configurable | sesion 2026-04-12 |
-| ✅ | Filament Config Chat (palabras, slow mode, pause) | sesion 2026-04-12 |
-| ✅ | Invalidar cache config al guardar en Filament | sesion 2026-04-12 |
-| ✅ | Cache auth tokens 15min (rendimiento socket) | sesion 2026-04-12 |
-| ✅ | Connection pooling + message batching (rendimiento) | sesion 2026-04-12 |
+| ✅ | Sistema completo: ban RT, palabras bloqueadas, chat delete, monitor, slow mode, pause, config Filament, rendimiento (cache+pooling+batch) | sesion 2026-04-12 |
 | ⏳ | Mensaje anclado tipo Twitch (nice to have) | `ROADMAP-UIUX-LANDING.md` sec 4.2 |
 
 ## UI/UX App
 
 | Estado | Item | Detalle en |
 |--------|------|-----------|
-| ✅ | Paso 0-4: Fundamentos, TabBar, Home, Agenda, Speakers, Social | `ROADMAP-UIUX-LANDING.md` |
-| ✅ ~99% | Paso 5: Barrido visual completo | `ROADMAP-UIUX-LANDING.md` Paso 5 |
+| ✅ | Paso 0-5: Fundamentos → Barrido visual completo | `ROADMAP-UIUX-LANDING.md` |
 | ⏳ | QA visual multi-device | `ROADMAP-UIUX-LANDING.md` Paso 5 |
 | ⏳ | Paso 6: Admin Premium (Filament dashboard) | `ROADMAP-UIUX-LANDING.md` Paso 6 |
 
@@ -106,34 +97,25 @@
 |--------|------|-----------|
 | ⏳ | Dev build EAS (push, crop, animaciones) | `EventOS_Roadmap.md` checklist setup |
 | ⏳ | Deploy VPS (backend + web + socket) | `DISPONIBILIDAD-HA.md` |
-| ⏳ | Cloudflare R2 (storage produccion) | `DISPONIBILIDAD-HA.md` — **IMPORTANTE:** Al migrar, revisar `resolveStepsConfigUrls()` en OnboardingController y `fixStorageUrl()` en app. Con R2 las URLs seran absolutas y estos workarounds de dev no aplican. Ver BUG-078. |
+| ⏳ | Cloudflare R2 (storage produccion) | `DISPONIBILIDAD-HA.md` — **IMPORTANTE:** Al migrar, revisar `resolveStepsConfigUrls()` en OnboardingController y `fixStorageUrl()` en app. Con R2 las URLs seran absolutas. Ver BUG-078. |
 
 ## Error Handling
 
 | Estado | Item | Detalle en |
 |--------|------|-----------|
-| ✅ | ConnectionError component reutilizable (wifi-off, reintentar) | sesion 2026-04-12 |
-| ✅ | Onboarding: error screen si servidor caido (6s timeout) | sesion 2026-04-12 |
-| ✅ | Home presencial/virtual: error screen si API falla | sesion 2026-04-12 |
-| ✅ | Onboarding fetch con AbortController 6s | sesion 2026-04-12 |
-| ✅ | Spinner "Cargando evento..." durante loading | sesion 2026-04-12 |
+| ✅ | ConnectionError component + onboarding + Home error handling | sesion 2026-04-12 |
 
 ## Auditoria Auth (2026-04-12)
 
 | Estado | Item | Detalle en |
 |--------|------|-----------|
 | ✅ | 39 escenarios + 10 edge cases verificados | `BUG-LOG.md` 2026-04-12 |
-| ✅ | 9 bugs encontrados y corregidos (BUG-065 a BUG-073) | `BUG-LOG.md` 2026-04-12 |
-| ⚠️ | CS-001: Race condition token refresh (no critico) | `BUG-LOG.md` code smells |
-| ⚠️ | CS-002: post_activation flag fragil (no critico) | `BUG-LOG.md` code smells |
-| ⚠️ | CS-003: Email verified reset en mode switch (no critico) | `BUG-LOG.md` code smells |
+| ✅ | 14 bugs encontrados y corregidos (BUG-065 a BUG-078) | `BUG-LOG.md` 2026-04-12 |
+| ⚠️ | CS-001/002/003: code smells no criticos | `BUG-LOG.md` code smells |
 
 ## Bugs abiertos
 
-| Bug | Severidad | Detalle en |
-|-----|-----------|-----------|
-| ~~BUG-063 a BUG-073~~ | ~~Varios~~ | Todos resueltos 2026-04-12 |
-| CS-001/002/003 | BAJA (code smells) | No requieren accion inmediata |
+Ninguno critico. 3 code smells documentados (CS-001/002/003).
 
 ---
 
@@ -144,6 +126,6 @@
 | `EventOS_Roadmap.md` | Roadmap maestro + apendices A-J |
 | `docs/ROADMAP-UIUX-LANDING.md` | UI/UX pasos 0-6 + landing + estados evento |
 | `docs/FASE-SEGURIDAD.md` | Auditoria OWASP + SEC-1 a SEC-5 + SEC-3b |
-| `docs/BUG-LOG.md` | Bugs historicos BUG-001 a BUG-064 |
+| `docs/BUG-LOG.md` | Bugs historicos BUG-001 a BUG-078 |
 | `docs/COMPLIANCE-SEGURIDAD.md` | Compliance legal/GDPR |
 | `docs/DISPONIBILIDAD-HA.md` | Alta disponibilidad + deploy strategy |

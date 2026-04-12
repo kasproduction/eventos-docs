@@ -522,8 +522,24 @@ PASO 5: Barrido Visual App — ~98% COMPLETADO
 │   ├── [x] Slow mode + pause/resume configurable
 │   ├── [x] Cache auth tokens 15min + connection pooling + message batching
 │   └── [x] Filament: ChatSettingsResource + boton Chat en sesiones
+├── ✅ Onboarding configurable Filament (2026-04-12):
+│   ├── [x] JSON onboarding_steps_config en events (migration + model + API)
+│   ├── [x] Filament UI: 7 secciones (Welcome, Auth, Photo, Forms, Survey, Done, Orden)
+│   ├── [x] Welcome: pills dinamicas, hero image, show_text, title_prefix, textos botones
+│   ├── [x] Auth: show_title/subtitle/stats, titulos, stats dinamicas, hide register link
+│   ├── [x] Photo: titulo, subtitulo, puntos desde config
+│   ├── [x] FormStep generico: campos dinamicos, tipos text/tel/email/number/url/select
+│   ├── [x] InterestsStep: puntos + min_selections desde config
+│   ├── [x] DoneStep: show_qr (virtual sin QR), show_hints, titulos, cta_text
+│   ├── [x] Colores master/slave (ColorPicker en Filament, useStepColors helper)
+│   ├── [x] Steps dinamicos en OnboardingContext (step_order, forms multiples)
+│   ├── [x] Real-time: polling 30s pre-login + socket invalidation post-login
+│   ├── [x] Seeder con config completa
+│   ├── [x] Retrocompatibilidad: si config null, fallback a hardcoded
+│   ├── [x] URLs imagenes: resolveStepsConfigUrls + fixStorageUrl
+│   └── [x] Eliminados: OnboardingPreview, OnboardingBackground, OnboardingSlideResource
 ├── ⏳ Items pendientes:
-│   ├── [ ] Onboarding admin Filament: steps, textos, puntos (1.x-B3) — DaVinci aprobado
+│   ├── [ ] Select field con BottomSheet en FormStep (tipo select solo tiene options, falta UI)
 │   ├── [ ] react-native-image-crop-picker: crop circular dark (requiere dev build)
 │   └── [ ] QA visual completo (multi-device)
 
