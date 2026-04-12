@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Documento de planificación para la fase UI/UX de EventOS.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-11 | Estado: En Progreso (Paso 5 — ~98% completado, micro-interacciones+social+transversales done)
+> Fecha: 2026-04-07 | Actualizado: 2026-04-11 | Estado: En Progreso (Paso 5 — ~99% completado, onboarding completo, micro-interacciones+social+transversales done)
 
 ---
 
@@ -443,8 +443,8 @@ PASO 5: Barrido Visual App — ~98% COMPLETADO
 ├── ⏳ Pantallas pendientes:
 │   ├── [x] Networking (directorio + contactos + solicitudes + guardar en telefono)
 │   ├── [x] Matchmaking (sugeridos carousel + conectar + intereses comunes)
-│   ├── [ ] Auth screens (login / registro) ← rediseno visual
-│   └── [ ] Onboarding visual (bugs z-index Android, requiere dev build)
+│   ├── [x] Auth screens → reemplazados por onboarding (login.tsx, register.tsx eliminados)
+│   └── [x] Onboarding visual → completado (layout fix, badge MiQR, gamificacion)
 ├── ✅ Micro-interacciones (2026-04-11):
 │   ├── [x] ScalePress: tap feedback scale 0.96 + haptic light (ModuleMenu, Speakers, Agenda, Networking)
 │   ├── [x] Image reveal: transition={300} en 17 archivos expo-image (fade suave al cargar)
@@ -469,9 +469,27 @@ PASO 5: Barrido Visual App — ~98% COMPLETADO
 │   ├── [x] Iconografia: ModuleMenu usa MaterialCommunityIcons (no emojis)
 │   ├── [x] useNotifications: conditional require() — no crashea en Expo Go
 │   └── [x] onboarding: useEffect antes de early returns — Rules of Hooks fix
+├── ✅ Onboarding completo (2026-04-11):
+│   ├── [x] Welcome DaVinci (5 pills, 5 backgrounds, primaryColor)
+│   ├── [x] Auth (login/register animado, ForgotSheet BottomSheet, validacion español)
+│   ├── [x] PhotoStep (avatar 180px, camara/galeria, upload + authStore update)
+│   ├── [x] AboutStep (preview card live, cargo/empresa, foto del context)
+│   ├── [x] InterestsStep (chips wrap, min 3, haptic, survey MMKV)
+│   ├── [x] DoneStep (badge identico MiQR, QR real, tap fullscreen, confetti registro)
+│   ├── [x] Gamificacion (AnimatedPts scale+particulas, SkipModal BottomSheet, 80pts max)
+│   ├── [x] Banned screen Lumina Noir (motivo + expiracion + boton → onboarding)
+│   ├── [x] Auth legacy eliminado (login.tsx, register.tsx, forgot-password.tsx borrados)
+│   ├── [x] Password inputs corregidos (autoCapitalize none, 7 inputs)
+│   ├── [x] Back arrow consistente (arrow-left, no chevron-left)
+│   ├── [x] primary_text_color configurable desde Filament
+│   ├── [x] contrastTextColor auto para botones
+│   ├── [x] Foto persiste en context + invalida cache qr-token/my-profile
+│   └── [x] Logout → onboarding auth directo (no login viejo)
 ├── ⏳ Items pendientes:
-│   ├── [ ] Auth screens (login / registro) ← rediseno visual
-│   ├── [ ] Onboarding visual (bugs z-index Android, requiere dev build)
+│   ├── [ ] Pending-approval screen → Lumina Noir (1.x-B2)
+│   ├── [ ] Activate-account screen → Lumina Noir (1.x-B2)
+│   ├── [ ] Onboarding admin Filament: steps, textos, puntos (1.x-B3)
+│   ├── [ ] react-native-image-crop-picker: crop circular dark (requiere dev build)
 │   └── [ ] QA visual completo (multi-device)
 
 PASO 6: Admin Premium

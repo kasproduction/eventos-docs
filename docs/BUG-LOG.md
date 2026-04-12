@@ -5,6 +5,45 @@
 
 ---
 
+## 2026-04-11 — Sesion Onboarding Steps + Auth + Seguridad
+
+### BUG-058: Password input autoCapitalize mayuscula en Android
+- **Severidad:** MEDIA
+- **Causa:** Campos password sin `autoCapitalize="none"` ni `autoCorrect={false}`. Android pone primera letra mayuscula.
+- **Fix:** `585c8c4` — agregado en 7 inputs (AuthStep, login, register, activate-account).
+
+### BUG-059: Foto upload no actualizaba authStore
+- **Severidad:** ALTA (feature roto)
+- **Causa:** `api.upload('/me/photo')` en PhotoStep no capturaba la respuesta. El store quedaba con `photoUrl: null`. Mi QR y Perfil mostraban beam avatar.
+- **Fix:** `9e47000` — captura `photo_url` de respuesta y actualiza authStore.
+
+### BUG-060: Cambiar foto perfil no actualizaba MiQR
+- **Severidad:** MEDIA
+- **Causa:** `useQrToken` tiene `staleTime: Infinity`. Al cambiar foto en perfil, MiQR seguia con la vieja.
+- **Fix:** `9965312` — `invalidateQueries(['qr-token'])` al subir/eliminar foto.
+
+### BUG-061: Logout redirige a login viejo NativeWind
+- **Severidad:** MEDIA
+- **Causa:** `index.tsx` y `_layout.tsx` redirigian a `/(auth)/login` que fue eliminado.
+- **Fix:** `9e47000` + `1bfc6c6` — redirige a `/onboarding`. Si `onboarding_seen=true`, empieza en auth step directo.
+
+### BUG-062: Back arrow inconsistente (chevron-left vs arrow-left)
+- **Severidad:** BAJA
+- **Causa:** Onboarding usaba `chevron-left`, resto del app usa `arrow-left`.
+- **Fix:** `77a85a4` — unificado a `arrow-left`.
+
+### BUG-063: Token registro 30d hardcoded (inconsistencia con login 7d)
+- **Severidad:** MEDIA (seguridad)
+- **Causa:** `AuthService.php:113` usa `addDays(30)` hardcoded. Login usa `config('sanctum.expiration')` = 7d.
+- **Fix:** Pendiente (SEC-3b.1).
+
+### BUG-064: Ban no se valida server-side por request
+- **Severidad:** ALTA (seguridad)
+- **Causa:** No hay middleware que chequee ban en cada API call. Usuario baneado sigue usando la app hasta 7 dias.
+- **Fix:** Pendiente (SEC-3b.3).
+
+---
+
 ## 2026-04-10 — Sesion Vendedor + Mi Stand + Liquid Glass
 
 ### BUG-054: Rules of hooks en VendorHappeningNow

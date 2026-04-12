@@ -1090,6 +1090,67 @@ io.on('connection', (socket) => {
 
 ---
 
+## SESION SEC-3b: Auth Token Lifecycle (encontrado 2026-04-11)
+
+> Hallazgos durante investigacion del ciclo de vida del token y onboarding.
+
+### SEC-3b.1 Token register 30d → config
+
+**Estado:** 🔲 Pendiente
+**Severidad:** MEDIO
+**Componente:** eventos-backend
+
+**Problema:** `AuthService.php:113` tiene `now()->addDays(30)` hardcoded para tokens de registro. Login usa `config('sanctum.expiration')` = 7 dias (10080 min). Inconsistencia: un usuario registrado tiene token 4x mas largo que uno que hace login.
+
+**Fix:** Cambiar linea 113 a `now()->addMinutes(config('sanctum.expiration') ?? 10080)`.
+
+### SEC-3b.2 Validar token al startup
+
+**Estado:** 🔲 Pendiente
+**Severidad:** MEDIO
+**Componente:** eventos-app
+
+**Problema:** `app/index.tsx` solo chequea si el token existe en SecureStore. No valida contra el backend. Si el admin revoca el token o banea al usuario, la app no lo sabe hasta la primera API call.
+
+**Fix:** Llamar `GET /me` al abrir la app. Si 401 → clearAuth → onboarding. Si user.ban → banned. Si approval null → pending.
+
+### SEC-3b.3 Middleware ban server-side
+
+**Estado:** 🔲 Pendiente
+**Severidad:** ALTO
+**Componente:** eventos-backend
+
+**Problema:** Ban solo se chequea al login (AuthController). Un usuario baneado puede seguir haciendo API calls con un token valido hasta que expire (7 dias).
+
+**Fix:** Crear middleware `CheckBan` → `app/Http/Middleware/CheckBan.php`. Chequea `Attendee.activeBan()` en cada request protegido. Si baneado → 403 `{ message: 'Account suspended', ban: { reason, expires_at } }`. Agregar al grupo middleware de rutas API.
+
+### SEC-3b.4 Middleware approval server-side
+
+**Estado:** 🔲 Pendiente
+**Severidad:** MEDIO
+**Componente:** eventos-backend
+
+**Problema:** Approval gate solo en frontend (`app/(app)/_layout.tsx:19`). Un usuario no aprobado podria llamar APIs si bypasea el redirect.
+
+**Fix:** Crear middleware `CheckApproval` → `app/Http/Middleware/CheckApproval.php`. Chequea `registration_approved_at` != null. Si null → 403.
+
+### SEC-3b.5 Ban en tiempo real via socket
+
+**Estado:** 🔲 Pendiente
+**Severidad:** MEDIO
+**Componente:** eventos-socket + eventos-app + eventos-backend
+
+**Problema:** Si admin banea a un usuario que esta usando la app, el usuario sigue navegando hasta que el token expire (hasta 7 dias).
+
+**Fix:**
+1. Backend: observer en `AttendeeBan` model → POST `/internal/ban/notify` al socket server
+2. Socket: endpoint `/internal/ban/notify` → emite `user:banned` al attendee via attendeeConnections
+3. App: hook `useBanListener` global en `_layout.tsx` → escucha `user:banned` → muestra banned screen
+
+**Dependencia:** Requiere SEC-3b.3 implementado primero.
+
+---
+
 ## SESION SEC-4: Infraestructura (día 8-9)
 
 ### SEC-4.1 Docker Security — `docker-compose.prod.yml`
