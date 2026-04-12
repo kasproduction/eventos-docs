@@ -62,6 +62,32 @@
 - **Causa:** Componente ConnectionError no tenia layout split (content center + boton bottom).
 - **Fix:** Reestructurado identico a banned.tsx: content centrado + boton full-width abajo con SafeArea.
 
+### BUG-074: "No tienes cuenta? Registrate" visible sin registro habilitado
+- **Severidad:** MEDIA (UX)
+- **Causa:** AuthStep mostraba link toggle login/register sin verificar `show_register_button`.
+- **Fix:** Condicional `(isRegister || showRegisterOption)` oculta el link si registro desactivado.
+
+### BUG-075: Titulo welcome "Bienvenido a" no editable
+- **Severidad:** MEDIA (config)
+- **Causa:** `title_prefix` hardcoded en WelcomeStep. No habia campo en Filament.
+- **Fix:** Campo `title_prefix` en Filament + lectura desde config con fallback.
+
+### BUG-076: Textos de botones welcome no editables
+- **Severidad:** MEDIA (config)
+- **Causa:** "Crear cuenta" y "Ya tengo cuenta" hardcoded en WelcomeStep.
+- **Fix:** Campos `register_button_text` y `login_button_text` en Filament.
+
+### BUG-077: Titulo/subtitulo visible cuando hero image cubre todo
+- **Severidad:** MEDIA (UX/diseño)
+- **Causa:** No habia forma de ocultar textos cuando el key visual hero ya comunicaba todo.
+- **Fix:** Toggle `show_text` en Filament. Si false, solo muestra botones.
+
+### BUG-078: Imagenes Filament no se muestran en app
+- **Severidad:** ALTA (feature roto)
+- **Causa:** Filament guarda path relativo (`onboarding/archivo.png`), app necesita URL completa. Ademas hostname `eventos-backend.test` no resuelve desde dispositivo.
+- **Fix:** `resolveStepsConfigUrls()` en API convierte a URL con `asset()`. App aplica `fixStorageUrl()` para reemplazar hostname por IP.
+- **Nota:** En produccion con Cloudflare R2, las URLs seran absolutas y este fix no sera necesario. Documentar en DISPONIBILIDAD-HA.md al migrar a R2.
+
 ### Bugs no criticos detectados (no corregidos — code smells)
 - **CS-001:** Race condition en token refresh deduplication — multiples 401 pueden llamar clearAuth() dos veces. Sin impacto real.
 - **CS-002:** Flag `post_activation_onboarding` se consume al montar provider — fragil si re-monta, pero no re-monta en flujo normal.

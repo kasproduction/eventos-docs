@@ -106,7 +106,7 @@
 |--------|------|-----------|
 | ⏳ | Dev build EAS (push, crop, animaciones) | `EventOS_Roadmap.md` checklist setup |
 | ⏳ | Deploy VPS (backend + web + socket) | `DISPONIBILIDAD-HA.md` |
-| ⏳ | Cloudflare R2 (storage produccion) | `DISPONIBILIDAD-HA.md` |
+| ⏳ | Cloudflare R2 (storage produccion) | `DISPONIBILIDAD-HA.md` — **IMPORTANTE:** Al migrar, revisar `resolveStepsConfigUrls()` en OnboardingController y `fixStorageUrl()` en app. Con R2 las URLs seran absolutas y estos workarounds de dev no aplican. Ver BUG-078. |
 
 ## Error Handling
 
