@@ -87,6 +87,9 @@
 | Estado | Item | Detalle en |
 |--------|------|-----------|
 | ⏳ | Landing premium (hero, speakers, agenda, registro) | `ROADMAP-UIUX-LANDING.md` seccion 1 |
+| ⏳ | FAQ asistente: orbe animado + preguntas curadas por organizador | `ROADMAP-UIUX-LANDING.md` seccion 7 (FAQ Asistente) |
+| ⏳ | FAQ backend: tabla event_faqs + CRUD Filament + API publica | `ROADMAP-UIUX-LANDING.md` seccion 7 (FAQ Asistente) |
+| ⏳ | FAQ app: FAB flotante + BottomSheet + categorias contextuales | `ROADMAP-UIUX-LANDING.md` seccion 7 (FAQ Asistente) |
 
 ## Infraestructura & Deploy
 

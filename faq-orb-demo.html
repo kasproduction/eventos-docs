@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>FAQ Assistant — EventOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #000000;
+    --text: #FAFAFA;
+    --text2: rgba(250,250,250,0.50);
+    --text3: rgba(250,250,250,0.30);
+    --surface: rgba(255,255,255,0.05);
+    --surface-hover: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.15);
+  }
+
+  html, body {
+    width: 100%; min-height: 100vh; min-height: 100dvh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body {
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .shell {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 420px;
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 0 24px;
+    overflow: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    padding: 56px 0 0;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-label {
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 800; font-size: 17px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .header-close {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .header-close:hover { background: rgba(255,255,255,0.1); }
+  .header-close svg { color: var(--text2); }
+
+  /* ─── ORB ─── */
+  .orb-section {
+    flex: 0 0 auto;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 40px 0 8px;
+    position: relative;
+  }
+
+  .orb-stage {
+    position: relative;
+    width: 180px; height: 180px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* The blob itself — multiple layers composited */
+  .blob-wrap {
+    position: relative;
+    width: 120px; height: 120px;
+    filter: blur(28px);
+    transition: filter 0.8s ease, transform 0.8s ease;
+  }
+
+  .blob-wrap.active {
+    filter: blur(24px);
+    transform: scale(1.2);
+  }
+  .blob-wrap.settled {
+    filter: blur(32px);
+    transform: scale(1.05);
+  }
+
+  .blob-layer {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+
+  /* Teal / Cyan layer */
+  .blob-cyan {
+    background: radial-gradient(circle at 30% 40%, #5DE4D4 0%, transparent 70%);
+    animation: morph-a 8s infinite alternate;
+  }
+
+  /* Pink / Magenta layer */
+  .blob-pink {
+    background: radial-gradient(circle at 70% 70%, #E87EBE 0%, transparent 70%);
+    animation: morph-b 10s infinite alternate;
+  }
+
+  /* Purple layer */
+  .blob-purple {
+    background: radial-gradient(circle at 60% 30%, #A78BFA 0%, transparent 70%);
+    animation: morph-c 9s infinite alternate;
+  }
+
+  /* White/blue highlight core */
+  .blob-core {
+    background: radial-gradient(circle at 45% 45%, rgba(200, 230, 255, 0.9) 0%, rgba(180, 220, 255, 0.4) 35%, transparent 65%);
+    animation: morph-d 7s infinite alternate;
+  }
+
+  @keyframes morph-a {
+    0%   { border-radius: 42% 58% 55% 45% / 50% 45% 55% 50%; transform: translate(0, 0) scale(1); }
+    25%  { border-radius: 55% 45% 48% 52% / 45% 55% 50% 50%; transform: translate(8px, -6px) scale(1.05); }
+    50%  { border-radius: 48% 52% 58% 42% / 52% 48% 45% 55%; transform: translate(-4px, 8px) scale(0.98); }
+    75%  { border-radius: 52% 48% 45% 55% / 58% 42% 52% 48%; transform: translate(6px, 4px) scale(1.08); }
+    100% { border-radius: 45% 55% 52% 48% / 48% 52% 58% 42%; transform: translate(-6px, -4px) scale(1.02); }
+  }
+
+  @keyframes morph-b {
+    0%   { border-radius: 50% 50% 45% 55% / 55% 45% 50% 50%; transform: translate(0, 0) scale(1.05); }
+    25%  { border-radius: 45% 55% 52% 48% / 48% 52% 55% 45%; transform: translate(-10px, 6px) scale(1); }
+    50%  { border-radius: 55% 45% 48% 52% / 52% 48% 42% 58%; transform: translate(6px, -8px) scale(1.1); }
+    75%  { border-radius: 48% 52% 55% 45% / 45% 55% 48% 52%; transform: translate(-5px, -3px) scale(0.95); }
+    100% { border-radius: 52% 48% 42% 58% / 55% 45% 52% 48%; transform: translate(8px, 5px) scale(1.03); }
+  }
+
+  @keyframes morph-c {
+    0%   { border-radius: 55% 45% 50% 50% / 48% 52% 55% 45%; transform: translate(4px, -4px) scale(1); }
+    25%  { border-radius: 48% 52% 55% 45% / 55% 45% 48% 52%; transform: translate(-6px, 8px) scale(1.06); }
+    50%  { border-radius: 52% 48% 42% 58% / 42% 58% 52% 48%; transform: translate(8px, 2px) scale(0.96); }
+    75%  { border-radius: 45% 55% 58% 42% / 50% 50% 45% 55%; transform: translate(-3px, -6px) scale(1.04); }
+    100% { border-radius: 58% 42% 48% 52% / 45% 55% 50% 50%; transform: translate(5px, 6px) scale(1.08); }
+  }
+
+  @keyframes morph-d {
+    0%   { border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; transform: scale(0.8); }
+    33%  { border-radius: 45% 55% 52% 48% / 55% 45% 48% 52%; transform: scale(0.85); }
+    66%  { border-radius: 52% 48% 48% 52% / 48% 52% 55% 45%; transform: scale(0.78); }
+    100% { border-radius: 48% 52% 55% 45% / 52% 48% 45% 55%; transform: scale(0.83); }
+  }
+
+  /* Active state — faster, more intense */
+  .blob-wrap.active .blob-cyan  { animation-duration: 2s; }
+  .blob-wrap.active .blob-pink  { animation-duration: 2.5s; }
+  .blob-wrap.active .blob-purple { animation-duration: 2.2s; }
+  .blob-wrap.active .blob-core  { animation-duration: 1.8s; }
+
+  /* Settled state — slow and calm */
+  .blob-wrap.settled .blob-cyan  { animation-duration: 12s; }
+  .blob-wrap.settled .blob-pink  { animation-duration: 14s; }
+  .blob-wrap.settled .blob-purple { animation-duration: 13s; }
+  .blob-wrap.settled .blob-core  { animation-duration: 10s; }
+
+  /* Outer glow halo */
+  .orb-halo {
+    position: absolute;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+      rgba(93, 228, 212, 0.06) 0%,
+      rgba(167, 139, 250, 0.04) 30%,
+      rgba(232, 126, 190, 0.03) 50%,
+      transparent 70%
+    );
+    filter: blur(20px);
+    animation: halo-breathe 6s ease-in-out infinite;
+    transition: opacity 0.8s, transform 0.8s;
+  }
+  @keyframes halo-breathe {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.12); opacity: 1; }
+  }
+  .blob-wrap.active ~ .orb-halo,
+  .orb-stage:has(.blob-wrap.active) .orb-halo {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+
+  /* ─── ORB PHRASE ─── */
+  .orb-phrase {
+    margin-top: 20px;
+    font-size: 14px; font-weight: 500;
+    color: var(--text3);
+    text-align: center;
+    transition: opacity 0.4s, color 0.4s;
+    min-height: 21px;
+    letter-spacing: 0.2px;
+  }
+  .orb-phrase.bright { color: var(--text2); }
+
+  /* ─── CATEGORIES ─── */
+  .categories {
+    display: flex; gap: 8px;
+    padding: 28px 0 18px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .categories::-webkit-scrollbar { display: none; }
+
+  .cat-chip {
+    flex-shrink: 0;
+    padding: 8px 18px;
+    border-radius: 100px;
+    background: transparent;
+    border: 1px solid var(--border);
+    font-size: 13px; font-weight: 600;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cat-chip:hover { border-color: var(--border-hover); color: var(--text2); }
+  .cat-chip.active {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.18);
+    color: var(--text);
+  }
+
+  /* ─── QUESTIONS ─── */
+  .questions-area {
+    flex: 1;
+    display: flex; flex-direction: column;
+    padding-bottom: 48px;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .questions-area::-webkit-scrollbar { display: none; }
+
+  .q-list {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+
+  .q-item {
+    width: 100%;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    font-size: 14px; font-weight: 600; line-height: 1.45;
+    color: rgba(250,250,250,0.78);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(16px);
+    opacity: 0;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .q-item::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(135deg,
+      rgba(93, 228, 212, 0.0) 0%,
+      rgba(167, 139, 250, 0.0) 50%,
+      rgba(232, 126, 190, 0.0) 100%
+    );
+    transition: background 0.3s;
+  }
+  .q-item:hover::before {
+    background: linear-gradient(135deg,
+      rgba(93, 228, 212, 0.04) 0%,
+      rgba(167, 139, 250, 0.03) 50%,
+      rgba(232, 126, 190, 0.04) 100%
+    );
+  }
+  .q-item:hover {
+    border-color: rgba(255,255,255,0.12);
+    color: var(--text);
+  }
+  .q-item.visible { transform: translateY(0); opacity: 1; }
+  .q-item:active { transform: scale(0.985); }
+
+  .q-item.selected {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.14);
+    color: var(--text);
+    pointer-events: none;
+  }
+  .q-item.hidden {
+    opacity: 0; transform: translateY(-10px) scale(0.95);
+    height: 0; padding: 0; margin: 0; border-width: 0;
+    pointer-events: none; overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ─── RESPONSE ─── */
+  .response {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    margin-top: 14px;
+    pointer-events: none;
+  }
+  .response.show { opacity: 1; transform: translateY(0); pointer-events: all; }
+
+  .response-card {
+    padding: 20px 22px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px 18px 18px 18px;
+    font-size: 14px; font-weight: 500; line-height: 1.75;
+    color: rgba(250,250,250,0.72);
+    position: relative;
+  }
+  .response-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 14px; bottom: 14px; width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(to bottom, #5DE4D4, #A78BFA, #E87EBE);
+    opacity: 0.5;
+  }
+
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 18px;
+    padding: 11px 20px;
+    border-radius: 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    font-size: 13px; font-weight: 600;
+    color: var(--text3);
+    cursor: pointer;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: all 0.25s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .back-btn:hover {
+    background: var(--surface);
+    border-color: var(--border-hover);
+    color: var(--text2);
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="header">
+    <span class="header-label">Asistente</span>
+    <div class="header-close">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </div>
+  </div>
+
+  <div class="orb-section">
+    <div class="orb-stage">
+      <div class="blob-wrap" id="blob">
+        <div class="blob-layer blob-cyan"></div>
+        <div class="blob-layer blob-pink"></div>
+        <div class="blob-layer blob-purple"></div>
+        <div class="blob-layer blob-core"></div>
+      </div>
+      <div class="orb-halo"></div>
+    </div>
+    <div class="orb-phrase" id="orbPhrase">Toca una pregunta</div>
+  </div>
+
+  <div class="categories" id="categories"></div>
+
+  <div class="questions-area">
+    <div class="q-list" id="qList"></div>
+    <div class="response" id="response">
+      <div class="response-card" id="responseText"></div>
+      <button class="back-btn" id="backBtn" onclick="goBack()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Mas preguntas
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const data = {
+  "General": [
+    { q: "Cual es el horario del evento?", a: "Las puertas abren a las 7:30 AM. La primera conferencia inicia a las 9:00 AM y cerramos a las 6:00 PM. El networking cocktail es de 6:30 a 8:00 PM." },
+    { q: "Hay estacionamiento disponible?", a: "El venue cuenta con estacionamiento subterraneo. La entrada es por la Calle 72. Las primeras 4 horas son cortesia con tu acreditacion." },
+    { q: "Como contacto al organizador?", a: "Desde tu perfil en la app, toca Soporte. El equipo responde en menos de 15 minutos durante el evento." },
+    { q: "Se puede re-ingresar al venue?", a: "Tu acreditacion permite entrada y salida libre durante todo el dia. Conserva tu QR activo en la app." }
+  ],
+  "Lugar": [
+    { q: "Donde es el registro presencial?", a: "En el lobby principal, Piso 1. Busca el counter con pantallas LED. Muestra tu QR desde la app y listo." },
+    { q: "Donde queda la Sala Principal?", a: "Piso 2, Ala Norte. Desde el lobby toma el elevador central, gira a la izquierda al salir. Capacidad: 800 personas." },
+    { q: "Hay zona de carga para dispositivos?", a: "Estaciones de carga en el Lounge del Piso 1 y junto a la zona de cafe del Piso 2. Cables USB-C y Lightning disponibles." }
+  ],
+  "Mi cuenta": [
+    { q: "Como descargo mi certificado?", a: "Tu certificado estara disponible 24 horas despues del cierre del evento, en la seccion Post-Evento de tu perfil. Se genera en PDF." },
+    { q: "Puedo cambiar mis datos de perfil?", a: "Desde tu perfil toca el boton editar. Puedes actualizar foto, cargo, empresa e intereses en cualquier momento." },
+    { q: "Donde veo mi codigo QR?", a: "En la pestana Mi QR de la barra inferior. Es tu acreditacion digital para registro, sesiones y sorteos." }
+  ],
+  "Agenda": [
+    { q: "Como agrego sesiones a mi agenda?", a: "En cualquier sesion toca el icono de corazon. La sesion aparecera en tu agenda personal con recordatorios automaticos." },
+    { q: "Puedo ver las charlas en streaming?", a: "Las sesiones marcadas con el icono de play tienen streaming en vivo. Toca la sesion y veras el boton para unirte." },
+    { q: "Las charlas se graban?", a: "El organizador decide que sesiones se graban. Las grabaciones disponibles apareceran en la seccion Post-Evento dentro de 48 horas." }
+  ]
+};
+
+let currentCat = Object.keys(data)[0];
+let isAnswering = false;
+
+function renderCategories() {
+  const c = document.getElementById('categories');
+  c.innerHTML = '';
+  Object.keys(data).forEach(cat => {
+    const chip = document.createElement('div');
+    chip.className = 'cat-chip' + (cat === currentCat ? ' active' : '');
+    chip.textContent = cat;
+    chip.onclick = () => {
+      if (isAnswering) return;
+      currentCat = cat;
+      renderCategories();
+      renderQuestions();
+      setBlob('idle');
+      setPhrase('Toca una pregunta', false);
+      document.getElementById('response').classList.remove('show');
+    };
+    c.appendChild(chip);
+  });
+}
+
+function renderQuestions() {
+  const list = document.getElementById('qList');
+  list.innerHTML = '';
+  data[currentCat].forEach((item, i) => {
+    const q = document.createElement('div');
+    q.className = 'q-item';
+    q.textContent = item.q;
+    q.onclick = () => pickQuestion(item, q);
+    list.appendChild(q);
+    requestAnimationFrame(() => {
+      setTimeout(() => q.classList.add('visible'), 50 * i);
+    });
+  });
+}
+
+function pickQuestion(item, el) {
+  if (isAnswering) return;
+  isAnswering = true;
+
+  document.querySelectorAll('.q-item').forEach(q => {
+    if (q !== el) q.classList.add('hidden');
+    else q.classList.add('selected');
+  });
+
+  setBlob('active');
+  setPhrase('Buscando...', true);
+
+  setTimeout(() => {
+    setBlob('settled');
+    setPhrase('Algo mas?', false);
+    document.getElementById('responseText').textContent = item.a;
+    document.getElementById('response').classList.add('show');
+  }, 1100);
+}
+
+function goBack() {
+  isAnswering = false;
+  document.getElementById('response').classList.remove('show');
+  setBlob('idle');
+  setPhrase('Toca una pregunta', false);
+  setTimeout(() => renderQuestions(), 120);
+}
+
+function setBlob(state) {
+  const b = document.getElementById('blob');
+  b.classList.remove('active', 'settled');
+  if (state !== 'idle') b.classList.add(state);
+}
+
+function setPhrase(text, bright) {
+  const p = document.getElementById('orbPhrase');
+  p.textContent = text;
+  p.classList.toggle('bright', bright);
+}
+
+renderCategories();
+renderQuestions();
+</script>
+</body>
+</html>

@@ -21,7 +21,7 @@ La landing es la primera impresión del evento. No es un simple formulario — e
 | **Venue + Mapa** | Foto del venue, mapa interactivo (Google Maps embed), indicaciones | SHOULD |
 | **Testimonios** | Quotes de ediciones pasadas o de speakers confirmados | SHOULD |
 | **Galería** | Fotos/videos de ediciones anteriores | SHOULD |
-| **FAQ** | Preguntas frecuentes colapsables (accordion) | SHOULD |
+| **FAQ** | Asistente FAQ con orbe animado (blob organico multicolor tipo Siri). Nucleo luminoso que muta + ondas concentricas. Preguntas curadas por el organizador agrupadas por categoria, NO es AI. Demo: `faq-orb-demo.html`. Ref visual: `design/onboarding/faq/1.gif` | SHOULD |
 | **Footer** | Redes sociales del evento, links legales, contacto | MUST |
 
 ### 1.2 Form de Registro (embebido en landing)
@@ -271,6 +271,20 @@ El sistema de diseño ya está definido en `design/stitch/`. Resumen ejecutivo:
 - Accent: configurable por evento
 - Mismas reglas de "No-Line", glassmorphism adaptado a light
 - Uso: Landing web (toggle), modo accesibilidad
+
+### FAQ Asistente — Concepto aprobado
+
+Orbe animado hibrido (nucleo solido que muta + ondas concentricas) como interfaz para FAQ curadas por el organizador.
+
+- **Visual**: Blob organico multicolor (cyan, pink, purple, core blanco) con blur pesado, fondo negro puro. Referencia: Siri orb iOS 18 / HomePod visualizer
+- **3 estados**: idle (respira lento), active (acelera + crece al seleccionar pregunta), settled (calmo al mostrar respuesta)
+- **Interaccion**: Categorias en chips horizontales + preguntas tappables, sin input de texto
+- **NO es AI**: Respuestas curadas por el organizador desde Filament, cero latencia, cero alucinaciones
+- **Integracion app**: FAB flotante con icono del orbe → BottomSheet ~70% con el asistente. FAQ contextual por pantalla (Agenda, Networking, General, etc.)
+- **Backend**: Tabla `event_faqs` (event_id, section, question, answer_text, answer_action_url, answer_image_url, sort_order, is_active)
+- **Demo HTML**: `faq-orb-demo.html`
+- **Referencia visual**: `design/onboarding/faq/1.gif`
+- **Estado**: Concepto aprobado, pendiente implementacion
 
 ### Referencias de diseño recopiladas
 - `design/stitch/` — Prototipos HTML de home, agenda, intro (Lumina Noir)
