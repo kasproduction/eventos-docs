@@ -50,6 +50,8 @@ _Fases, sesiones, dependencias progresivas y definicion de completado_
 | **F** | Web App — experiencia virtual completa Next.js (W.1–W.12) |
 | **G** | White-Label + Rebranding — app.config.js, clients/, EAS build |
 | **H** | Timeline Cliente Ancla — Eventos Efectivos, septiembre 2026 |
+| **I** | Onboarding & Auth — pendientes detallados, escenarios, arquitectura (2026-04-11) |
+| **J** | Seguridad Auth SEC-3b — token, middleware, ban realtime (2026-04-11) |
 
 ---
 
@@ -2966,3 +2968,177 @@ _Compliance: docs/COMPLIANCE-SEGURIDAD.md_
 _Disponibilidad: docs/DISPONIBILIDAD-HA.md_
 _UI/UX + Landing: docs/ROADMAP-UIUX-LANDING.md_
 _Analisis competitivo: memoria project_competitive_analysis.md_
+
+---
+
+## Apendice I: Onboarding & Auth — Pendientes Detallados (2026-04-11)
+
+### Estado completado
+
+| Componente | Estado | Notas |
+|------------|--------|-------|
+| Welcome (pills DaVinci) | ✅ | 5 backgrounds configurables desde Filament |
+| Auth (login/register) | ✅ | Animacion transicion, ForgotSheet BottomSheet, validacion español |
+| Photo (avatar + upload) | ✅ | 180px, camara/galeria, upload actualiza authStore, foto en context |
+| About (cargo/empresa) | ✅ | Preview card live, foto del context, campos con iconos |
+| Interests (chips survey) | ✅ | Min 3, haptic, pending_survey en MMKV |
+| Done (badge + QR) | ✅ | Identico a MiQR, QR real funcional, tap fullscreen, confetti |
+| Gamificacion | ✅ | AnimatedPts (scale+particulas+color flash), SkipModal BottomSheet, 80pts max |
+| Banned screen | ✅ | Lumina Noir, motivo + expiracion |
+| Auth legacy eliminado | ✅ | login.tsx, register.tsx, forgot-password.tsx, PlaceholderSteps.tsx borrados |
+
+### 1.x-B2: Onboarding pulido final
+
+**Pending-approval screen** (actualmente NativeWind):
+- Reescribir en Lumina Noir con StyleSheet
+- Icono de reloj o similar (no emoji)
+- Nombre del evento, mensaje de espera
+- Boton "Verificar estado" que llama GET /me
+- Si aprobado → actualiza store → navega al home
+
+**Activate-account screen** (actualmente NativeWind):
+- Reescribir en Lumina Noir
+- Campo contrasena + confirmar contrasena
+- Validacion min 8 chars, match, toasts español
+- Deep link: `eventos://activate?token=xxx`
+- Flujo: staff invitado por admin → email → deep link → pone contrasena → entra como vendedor
+
+### 1.x-B3: Onboarding admin Filament
+
+El admin debe poder configurar desde Filament:
+- [ ] Activar/desactivar steps individuales (foto, about, interests)
+- [ ] Editar textos de cada step (titulo, subtitulo)
+- [ ] Configurar puntos por step (cuantos puntos vale foto, about, interests)
+- [ ] Preview en vivo del onboarding completo
+- [ ] Decidir si survey (interests) esta activo o no
+
+### 1.x-C: Roles asistente
+
+**Escenarios:**
+
+| Tipo evento | Que ve el usuario al registrarse |
+|-------------|----------------------------------|
+| Solo presencial | Rol = presencial automatico, no pregunta |
+| Solo virtual | Rol = virtual automatico, no pregunta |
+| Hibrido | Step nuevo entre Auth y Photo: "¿Como participaras?" |
+
+**DoneStep por rol:**
+- Presencial/Hibrido → badge con QR
+- Virtual → directo al home sin QR, sin badge
+
+**Filament:** Config en evento → tipo_participacion (presencial/virtual/hibrido)
+
+### 1.x-D: Estados del evento (lifecycle)
+
+| Estado | Que ve el asistente |
+|--------|---------------------|
+| `registration_only` | Se registra → pantalla espera DaVinci con countdown |
+| `published` | App completa con contenido |
+| `live` | App + streaming + polls en vivo |
+| `ended` | Modo lectura (fotos, memorias, ratings) |
+
+Pantalla espera DaVinci para `registration_only`:
+- "Tu registro esta confirmado"
+- Nombre + fechas del evento
+- Countdown animado si hay fecha de inicio
+- Push notification cuando estado cambia a `published`
+
+### 1.x-E: Campos dinamicos onboarding
+
+AboutStep renderiza campos que el admin configuro en Filament:
+- Admin agrega campos con: label, tipo (text, select, tel, etc), obligatorio si/no, orden
+- Si hay 5 campos, cada uno vale 20% del progreso. Si hay 10, cada uno vale 10%
+- Puntos proporcionales: 50 puntos de "about" / N campos
+- Cargo + empresa siempre fijos, campos custom debajo
+
+### 1.x-F: Registro cerrado (lista invitados)
+
+- Admin sube CSV/lista de emails en Filament
+- Onboarding AuthStep valida email contra la lista
+- Si no esta: toast "No estas en la lista de invitados del evento"
+- Si esta: registra normalmente
+
+### 1.x-G: Registro por codigo de acceso
+
+- Admin genera codigos en Filament (unicos o grupales, con limite de usos)
+- Onboarding tiene campo "Codigo de acceso" ANTES del registro
+- Valida contra backend
+- Si valido: procede al registro
+- Si invalido: toast "Codigo no valido o ya utilizado"
+
+### 1.x-H: Staff invite push + cambio de rol
+
+1. Admin invita a Pedro como staff/vendedor desde Filament
+2. Backend envia push notification: "Fuiste invitado al equipo de EventOS Summit"
+3. Pedro abre la notificacion → app muestra pantalla "Eres parte del equipo"
+4. Boton "Actualizar perfil" → el layout cambia automaticamente al de vendedor
+5. Tabs cambian: Mi Stand, Leads, etc.
+6. Requiere: socket evento o push notification + cambio de rol en authStore
+
+### Escenarios de usuario completos
+
+| # | Escenario | Llega a DoneStep? | Que ve? |
+|---|-----------|-------------------|---------|
+| A | Registro libre, aprobado | Si | Badge + QR + confetti + puntos + "Ir al evento" |
+| B | Registro con aprobacion, pendiente | No | Pending-approval screen |
+| C | Admin aprueba despues | No | Push → abre app → pending → verifica → home |
+| D | Login normal | Si | Badge + QR + "Bienvenido de vuelta" (sin confetti) |
+| E | Login baneado | No | Banned screen Lumina Noir |
+| F | Token expirado, reabre | No | 401 → refresh → si falla → login (transparente) |
+| G | Evento lleno | No | Toast error en AuthStep |
+
+---
+
+## Apendice J: Seguridad Auth SEC-3b — Detalle Tecnico (2026-04-11)
+
+### Hallazgos de auditoria
+
+Descubiertos durante investigacion del ciclo de vida del token (sesion 2026-04-11).
+
+### SEC-3b.1: Token register 30d → config
+
+**Problema:** `AuthService.php` linea 113 tiene `now()->addDays(30)` hardcodeado para registro. Login usa `config('sanctum.expiration')` = 7 dias. Inconsistencia.
+
+**Fix:** Cambiar linea 113 a `now()->addMinutes(config('sanctum.expiration') ?? 10080)`.
+
+**Archivo:** `app/Services/AuthService.php:113`
+
+### SEC-3b.2: Validar token al startup
+
+**Problema:** `index.tsx` solo chequea si el token existe en SecureStore. Si el backend revoco el token (ban, delete, expiry), la app no lo sabe hasta la primera API call.
+
+**Fix:** Llamar `GET /me` al abrir la app. Si 401 → clearAuth → onboarding. Si user.ban → banned. Si approval null → pending.
+
+**Archivos:** `app/index.tsx`, `stores/authStore.ts`
+
+### SEC-3b.3: Middleware ban server-side
+
+**Problema:** Ban solo se chequea al login. Un usuario baneado puede seguir haciendo API calls con un token valido.
+
+**Fix:** Crear middleware `CheckBan` que chequee `Attendee.activeBan()` en cada request protegido. Si baneado → 403 con `{ message: 'Account suspended', ban: { reason, expires_at } }`.
+
+**Archivos:** Crear `app/Http/Middleware/CheckBan.php`, agregar a grupo middleware de rutas API.
+
+### SEC-3b.4: Middleware approval server-side
+
+**Problema:** Approval gate solo en frontend (AppLayout redirect). Un usuario no aprobado podria llamar APIs si bypasea el redirect.
+
+**Fix:** Crear middleware `CheckApproval` que chequee `registration_approved_at` != null. Si null → 403.
+
+**Archivos:** Crear `app/Http/Middleware/CheckApproval.php`
+
+### SEC-3b.5: Ban en tiempo real via socket
+
+**Problema:** Si admin banea a un usuario que esta usando la app, el usuario sigue navegando hasta 7 dias.
+
+**Fix:**
+1. Cuando admin banea en Filament → backend emite evento socket `user:banned` al attendee via `/internal/ban/notify`
+2. App escucha `user:banned` en hook global → muestra banned screen inmediatamente
+3. Fallback: push notification "Tu acceso ha sido suspendido"
+
+**Dependencia:** Requiere SEC-3b.3 (middleware ban) implementado primero.
+
+**Archivos:** 
+- Socket: agregar endpoint `/internal/ban/notify` en `eventos-socket/src/index.ts`
+- App: hook `useBanListener` global en `_layout.tsx`
+- Backend: observer en `AttendeeBan` model que emite al socket
