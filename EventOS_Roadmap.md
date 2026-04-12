@@ -114,13 +114,21 @@ cada sesión más fácil de debuggear.
 | **Competitive** | **Analisis competitivo (Cisco $88K USD vs ICE360 $49M COP vs EventOS)** | ✅ (2026-04-09) — gaps identificados, 6 nuevas sesiones, pricing, escalabilidad validada |
 | **1.23** | **Permisos granulares Filament (roles admin)** | ⏳ Pendiente |
 | **1.x Rewards** | **Redencion de puntos (kiosko de premios)** | ⏳ Catalogo, QR temporal, staff escanea, descuenta puntos. Cierra el loop de gamificacion. |
-| **1.x-C** | **Roles asistente (presencial/virtual/hibrido)** | ⏳ Selector de rol en onboarding si evento hibrido. DoneStep: presencial/hibrido=QR, virtual=directo home sin QR. Virtual tabs=todo menos Mi QR. |
-| **1.x-D** | **Estados del evento (lifecycle)** | ⏳ registration_only/published/live/ended. Pantalla espera DaVinci con countdown. Push "evento disponible". Modo lectura post-evento. Config en Filament. |
-| **1.x-E** | **Campos dinamicos onboarding (Camino B)** | ⏳ AboutStep renderiza registration_fields del admin. Progreso/puntos proporcionales a campos. |
-| **1.x-F** | **Registro cerrado (lista invitados)** | ⏳ Admin sube CSV/lista emails en Filament. Solo esos emails pueden registrarse. Onboarding valida email contra lista. Si no esta → "No estas en la lista de invitados". |
-| **1.x-G** | **Registro por codigo de acceso** | ⏳ Admin genera codigos en Filament (unicos o grupales). Onboarding tiene campo "Codigo de acceso" antes del registro. Valida contra backend. |
-| **1.x-H** | **Staff invite push + cambio de rol en vivo** | ⏳ Admin invita staff desde Filament → push notification "Eres parte del equipo" → boton abre app → layout cambia a vendedor automaticamente. Requiere socket evento o push. |
-| **1.x-I** | **Pantallas auth Lumina Noir** | ⏳ Reescribir: banned, pending-approval, activate-account en Lumina Noir. Eliminar NativeWind de auth. |
+| **— Onboarding & Auth (pendientes organizados 2026-04-11)** | | |
+| **1.x-B2** | **Onboarding pulido final** | ⏳ Pending-approval Lumina Noir, activate-account Lumina Noir |
+| **1.x-B3** | **Onboarding admin Filament** | ⏳ Activar/desactivar steps, editar textos, configurar puntos por step, preview |
+| **1.x-C** | **Roles asistente (presencial/virtual/hibrido)** | ⏳ Selector de rol en onboarding si hibrido. Virtual=sin QR, directo al home. Config evento en Filament. |
+| **1.x-D** | **Estados del evento (lifecycle)** | ⏳ registration_only/published/live/ended. Pantalla espera DaVinci con countdown. Config en Filament. |
+| **1.x-E** | **Campos dinamicos onboarding** | ⏳ AboutStep renderiza registration_fields del admin. Progreso/puntos proporcionales. |
+| **1.x-F** | **Registro cerrado (lista invitados)** | ⏳ Admin sube CSV/lista emails en Filament. Onboarding valida contra lista. |
+| **1.x-G** | **Registro por codigo de acceso** | ⏳ Admin genera codigos en Filament. Onboarding valida codigo. |
+| **1.x-H** | **Staff invite push + cambio de rol** | ⏳ Push "Eres parte del equipo" → layout cambia a vendedor. Requiere socket o push. |
+| **— Seguridad auth (SEC-3b, encontrado 2026-04-11)** | | |
+| **SEC-3b.1** | **Token register 30d → config** | ⏳ AuthService.php linea 113 hardcoded. Usar config('sanctum.expiration'). |
+| **SEC-3b.2** | **Validar token al startup (GET /me)** | ⏳ index.tsx solo chequea SecureStore. Debe validar contra backend. |
+| **SEC-3b.3** | **Middleware ban server-side** | ⏳ Cada request protegido valida ban. Usuario baneado no puede hacer API calls. |
+| **SEC-3b.4** | **Middleware approval server-side** | ⏳ Cada request protegido valida approval. Usuario no aprobado no puede hacer API calls. |
+| **SEC-3b.5** | **Ban en tiempo real via socket** | ⏳ Admin banea → socket user:banned → app muestra banned screen. Depende de SEC-3b.3. |
 | **Nice to have** | **Light mode (tema claro)** | ⏳ Requiere refactor de colores hardcoded a theme provider. Sesion dedicada si cliente lo pide. |
 | ~~1.22 old~~ | ~~Floor plan del venue~~ | Movido a Fase 3 |
 | **— Nuevos features (identificados en analisis competitivo 2026-04-09)** | | |
