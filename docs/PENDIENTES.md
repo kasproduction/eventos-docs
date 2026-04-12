@@ -1,16 +1,7 @@
 # Pendientes Consolidados — EventOS
 
 > Indice unico de TODO lo pendiente. Cada item apunta al documento donde esta el detalle.
-> Actualizado: 2026-04-11 | Proxima sesion: empezar por lo marcado NEXT
-
----
-
-## NEXT — Proxima sesion
-
-- [ ] Pending-approval screen → Lumina Noir — `ROADMAP-UIUX-LANDING.md` Paso 5
-- [ ] Activate-account screen → Lumina Noir — `ROADMAP-UIUX-LANDING.md` Paso 5
-- [ ] SEC-3b.1: Token register 30d → config — `FASE-SEGURIDAD.md` SEC-3b
-- [ ] SEC-3b.3: Middleware ban server-side — `FASE-SEGURIDAD.md` SEC-3b
+> Actualizado: 2026-04-12
 
 ---
 
@@ -22,8 +13,10 @@
 | ✅ | Gamificacion (AnimatedPts, SkipModal, 80pts) | `EventOS_Roadmap.md` Apendice I |
 | ✅ | Banned screen Lumina Noir | `EventOS_Roadmap.md` Apendice I |
 | ✅ | Auth legacy eliminado (login, register, forgot) | `ROADMAP-UIUX-LANDING.md` Paso 5 |
-| ⏳ | Pending-approval → Lumina Noir (1.x-B2) | `EventOS_Roadmap.md` Apendice I |
-| ⏳ | Activate-account → Lumina Noir (1.x-B2) | `EventOS_Roadmap.md` Apendice I |
+| ✅ | Pending-approval → Lumina Noir | sesion 2026-04-12 |
+| ✅ | Activate-account → Lumina Noir | sesion 2026-04-12 |
+| ✅ | Login inteligente 2 pasos (check-email → password) | sesion 2026-04-12 |
+| ✅ | Activate-account redirige a onboarding photo step | sesion 2026-04-12 |
 | ⏳ | Onboarding admin Filament: steps, textos, puntos (1.x-B3) | `EventOS_Roadmap.md` Apendice I |
 | ⏳ | Campos dinamicos AboutStep (1.x-E) | `EventOS_Roadmap.md` Apendice I |
 
@@ -43,16 +36,32 @@
 |--------|------|-----------|
 | ✅ | SEC-1: Room auth socket, XSS, token expiration | `FASE-SEGURIDAD.md` SEC-1 |
 | ✅ | SEC-2: Headers, CORS, HTTPS, security:check | `FASE-SEGURIDAD.md` SEC-2 |
-| ✅ parcial | SEC-3: Lockout, rate limiting, FormRequests | `FASE-SEGURIDAD.md` SEC-3 |
+| ✅ | SEC-3: Lockout, rate limiting, FormRequests | `FASE-SEGURIDAD.md` SEC-3 |
+| ✅ | SEC-3b.1: Token register → configurable (sanctum.expiration) | sesion 2026-04-12 |
+| ✅ | SEC-3b.3: Middleware CheckBan server-side | sesion 2026-04-12 |
+| ✅ | SEC-3b.5: Ban en tiempo real via socket | sesion 2026-04-12 |
+| ⏳ | SEC-3b.2: Validar token al startup (GET /me) | `FASE-SEGURIDAD.md` SEC-3b |
+| ⏳ | SEC-3b.4: Middleware approval server-side | `FASE-SEGURIDAD.md` SEC-3b |
 | ⏳ | SEC-3.1: 2FA (OTP por email/WhatsApp) | `FASE-SEGURIDAD.md` SEC-3 |
 | ⏳ | SEC-3.2: Device fingerprinting | `FASE-SEGURIDAD.md` SEC-3 |
-| ⏳ | SEC-3b.1: Token register 30d → config | `FASE-SEGURIDAD.md` SEC-3b |
-| ⏳ | SEC-3b.2: Validar token al startup (GET /me) | `FASE-SEGURIDAD.md` SEC-3b |
-| ⏳ | SEC-3b.3: Middleware ban server-side | `FASE-SEGURIDAD.md` SEC-3b |
-| ⏳ | SEC-3b.4: Middleware approval server-side | `FASE-SEGURIDAD.md` SEC-3b |
-| ⏳ | SEC-3b.5: Ban en tiempo real via socket | `FASE-SEGURIDAD.md` SEC-3b |
 | ⏳ | SEC-4: Docker, server hardening, Cloudflare, backups | `FASE-SEGURIDAD.md` SEC-4 |
 | ⏳ | SEC-5: SecurityLogger, Sentry, uptime | `FASE-SEGURIDAD.md` SEC-5 |
+
+## Moderacion & Chat
+
+| Estado | Item | Detalle en |
+|--------|------|-----------|
+| ✅ | Palabras bloqueadas chat + Q&A (silent drop) | sesion 2026-04-12 |
+| ✅ | Chat delete admin (app long press + monitor) | sesion 2026-04-12 |
+| ✅ | Ban desde chat (app long press + monitor) | sesion 2026-04-12 |
+| ✅ | Chat monitor real-time por sesion (HTML standalone) | sesion 2026-04-12 |
+| ✅ | Velocidad monitor (cola mensajes para moderador) | sesion 2026-04-12 |
+| ✅ | Slow mode + pause/resume configurable | sesion 2026-04-12 |
+| ✅ | Filament Config Chat (palabras, slow mode, pause) | sesion 2026-04-12 |
+| ✅ | Invalidar cache config al guardar en Filament | sesion 2026-04-12 |
+| ✅ | Cache auth tokens 15min (rendimiento socket) | sesion 2026-04-12 |
+| ✅ | Connection pooling + message batching (rendimiento) | sesion 2026-04-12 |
+| ⏳ | Mensaje anclado tipo Twitch (nice to have) | `ROADMAP-UIUX-LANDING.md` sec 4.2 |
 
 ## UI/UX App
 
@@ -87,9 +96,9 @@
 | Estado | Item | Detalle en |
 |--------|------|-----------|
 | ⏳ | Landing premium (hero, speakers, agenda, registro) | `ROADMAP-UIUX-LANDING.md` seccion 1 |
-| ⏳ | FAQ asistente: orbe animado + preguntas curadas por organizador | `ROADMAP-UIUX-LANDING.md` seccion 7 (FAQ Asistente) |
-| ⏳ | FAQ backend: tabla event_faqs + CRUD Filament + API publica | `ROADMAP-UIUX-LANDING.md` seccion 7 (FAQ Asistente) |
-| ⏳ | FAQ app: FAB flotante + BottomSheet + categorias contextuales | `ROADMAP-UIUX-LANDING.md` seccion 7 (FAQ Asistente) |
+| ⏳ | FAQ asistente: orbe animado + preguntas curadas | `ROADMAP-UIUX-LANDING.md` seccion 7 |
+| ⏳ | FAQ backend: tabla event_faqs + CRUD Filament + API | `ROADMAP-UIUX-LANDING.md` seccion 7 |
+| ⏳ | FAQ app: FAB flotante + BottomSheet + categorias | `ROADMAP-UIUX-LANDING.md` seccion 7 |
 
 ## Infraestructura & Deploy
 
@@ -99,12 +108,32 @@
 | ⏳ | Deploy VPS (backend + web + socket) | `DISPONIBILIDAD-HA.md` |
 | ⏳ | Cloudflare R2 (storage produccion) | `DISPONIBILIDAD-HA.md` |
 
+## Error Handling
+
+| Estado | Item | Detalle en |
+|--------|------|-----------|
+| ✅ | ConnectionError component reutilizable (wifi-off, reintentar) | sesion 2026-04-12 |
+| ✅ | Onboarding: error screen si servidor caido (6s timeout) | sesion 2026-04-12 |
+| ✅ | Home presencial/virtual: error screen si API falla | sesion 2026-04-12 |
+| ✅ | Onboarding fetch con AbortController 6s | sesion 2026-04-12 |
+| ✅ | Spinner "Cargando evento..." durante loading | sesion 2026-04-12 |
+
+## Auditoria Auth (2026-04-12)
+
+| Estado | Item | Detalle en |
+|--------|------|-----------|
+| ✅ | 39 escenarios + 10 edge cases verificados | `BUG-LOG.md` 2026-04-12 |
+| ✅ | 9 bugs encontrados y corregidos (BUG-065 a BUG-073) | `BUG-LOG.md` 2026-04-12 |
+| ⚠️ | CS-001: Race condition token refresh (no critico) | `BUG-LOG.md` code smells |
+| ⚠️ | CS-002: post_activation flag fragil (no critico) | `BUG-LOG.md` code smells |
+| ⚠️ | CS-003: Email verified reset en mode switch (no critico) | `BUG-LOG.md` code smells |
+
 ## Bugs abiertos
 
 | Bug | Severidad | Detalle en |
 |-----|-----------|-----------|
-| BUG-063: Token register 30d hardcoded | MEDIA (seguridad) | `BUG-LOG.md` 2026-04-11 |
-| BUG-064: Ban no valida server-side | ALTA (seguridad) | `BUG-LOG.md` 2026-04-11 |
+| ~~BUG-063 a BUG-073~~ | ~~Varios~~ | Todos resueltos 2026-04-12 |
+| CS-001/002/003 | BAJA (code smells) | No requieren accion inmediata |
 
 ---
 

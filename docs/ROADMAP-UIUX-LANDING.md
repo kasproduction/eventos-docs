@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Documento de planificación para la fase UI/UX de EventOS.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-11 | Estado: En Progreso (Paso 5 — ~99% completado, onboarding completo, micro-interacciones+social+transversales done)
+> Fecha: 2026-04-07 | Actualizado: 2026-04-12 | Estado: Paso 5 100%, moderacion chat completa, login inteligente, error handling, auditoria 39 escenarios
 
 ---
 
@@ -177,6 +177,7 @@ Nos vemos!
 | **QR dinámico (TOTP)** | El QR de check-in rota cada 30 segundos (como Google Authenticator). Imposible compartir screenshots |
 | **Session management** | El usuario ve desde qué dispositivos está logueado. Puede cerrar sesiones remotas desde su perfil |
 | **Anomaly detection** | Alertar al admin si detecta patrones inusuales: múltiples logins desde diferentes países, registros masivos desde misma IP |
+| **Mensaje anclado chat (tipo Twitch)** | Admin ancla un mensaje importante arriba del chat de sesion. Evento socket `chat:pinned`, banner fijo en app, auto-expira o se quita manual. Util para anuncios puntuales del moderador |
 
 ---
 
@@ -499,10 +500,30 @@ PASO 5: Barrido Visual App — ~98% COMPLETADO
 │   ├── [x] contrastTextColor auto para botones
 │   ├── [x] Foto persiste en context + invalida cache qr-token/my-profile
 │   └── [x] Logout → onboarding auth directo (no login viejo)
+├── ✅ Sesion 2026-04-12:
+│   ├── [x] Pending-approval screen → Lumina Noir (clock icon, info blocks, ScalePress, LuminaToast)
+│   ├── [x] Activate-account screen → Lumina Noir (StyleSheet puro, inputs glass, estados boton)
+│   ├── [x] Login inteligente 2 pasos (check-email → password animado)
+│   ├── [x] Activate-account redirige a onboarding photo step (flag post_activation)
+│   ├── [x] ConnectionError screen reutilizable (wifi-off, reintentar, layout banned)
+│   ├── [x] Error handling onboarding (6s timeout, spinner, ConnectionError)
+│   ├── [x] Error handling Home presencial + virtual
+│   ├── [x] Auditoria completa 39 escenarios + 10 edge cases
+│   ├── [x] 9 bugs corregidos (BUG-065 a BUG-073)
+│   └── [x] Fix registrationApprovedAt: 'auto' cuando evento no requiere approval
+├── ✅ Moderacion chat completa (2026-04-12):
+│   ├── [x] Ban real-time via socket (endpoint + listener + interceptor 403)
+│   ├── [x] Middleware CheckBan server-side en todas las rutas
+│   ├── [x] Palabras bloqueadas chat + Q&A (silent drop, config Filament)
+│   ├── [x] Chat delete admin (app long press + chat monitor)
+│   ├── [x] Ban desde chat (app long press → API ban → socket kick)
+│   ├── [x] Chat monitor real-time por sesion (HTML standalone desde Filament)
+│   ├── [x] Velocidad monitor (cola mensajes, directo/0.5s/1s/2s)
+│   ├── [x] Slow mode + pause/resume configurable
+│   ├── [x] Cache auth tokens 15min + connection pooling + message batching
+│   └── [x] Filament: ChatSettingsResource + boton Chat en sesiones
 ├── ⏳ Items pendientes:
-│   ├── [ ] Pending-approval screen → Lumina Noir (1.x-B2)
-│   ├── [ ] Activate-account screen → Lumina Noir (1.x-B2)
-│   ├── [ ] Onboarding admin Filament: steps, textos, puntos (1.x-B3)
+│   ├── [ ] Onboarding admin Filament: steps, textos, puntos (1.x-B3) — DaVinci aprobado
 │   ├── [ ] react-native-image-crop-picker: crop circular dark (requiere dev build)
 │   └── [ ] QA visual completo (multi-device)
 

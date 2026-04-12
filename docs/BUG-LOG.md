@@ -5,6 +5,86 @@
 
 ---
 
+## 2026-04-12 — Sesion Moderacion + Auth + Error Handling
+
+### BUG-063: Token registro 30d hardcoded (RESUELTO)
+- **Severidad:** MEDIA (seguridad)
+- **Causa:** `AuthService.php` register y activate usaban `addDays(30)` hardcoded.
+- **Fix:** Reemplazado por `config('sanctum.expiration')` en ambos metodos.
+
+### BUG-064: Ban no se valida server-side (RESUELTO)
+- **Severidad:** ALTA (seguridad)
+- **Causa:** No habia middleware que chequeara ban en cada API call.
+- **Fix:** Middleware `CheckBan` aplicado a todas las rutas autenticadas (excepto auth/me, auth/logout).
+
+### BUG-065: Toast vacio en pending-approval
+- **Severidad:** MEDIA (UX)
+- **Causa:** `toast.show('texto', 'variant')` — firma incorrecta, espera objeto `{ message, variant }`.
+- **Fix:** Corregido en pending-approval.tsx y activate-account.tsx.
+
+### BUG-066: Login no verifica approval antes de mostrar QR
+- **Severidad:** ALTA (flujo roto)
+- **Causa:** AuthStep login iba directo a `goTo('done')` sin verificar `registrationApprovedAt`. Usuario no aprobado veia QR.
+- **Fix:** Agregado check `registrationApprovedAt === null` en login flow + index.tsx.
+
+### BUG-067: registrationApprovedAt null bloquea usuarios sin approval
+- **Severidad:** CRITICA (flujo roto)
+- **Causa:** `AttendeeResource` devuelve `registration_approved_at: null` cuando el evento NO requiere approval. App interpreta null como "no aprobado" y manda a pending-approval.
+- **Fix:** Backend devuelve `'auto'` cuando `registration_requires_approval = false`.
+
+### BUG-068: Onboarding fetch sin timeout
+- **Severidad:** ALTA (UX)
+- **Causa:** `onboardingApi.get()` usaba `fetch()` sin AbortController. Si Laravel esta caido, pantalla negra 30-120s.
+- **Fix:** AbortController con timeout 6s + ConnectionError screen con boton reintentar.
+
+### BUG-069: onboarding_seen no se limpia al logout
+- **Severidad:** CRITICA (multi-usuario)
+- **Causa:** `clearAuth()` no borraba el flag `onboarding_seen`. Segundo usuario en mismo dispositivo saltaba welcome.
+- **Fix:** `clearAuth()` ahora limpia `onboarding_seen` y `post_activation_onboarding`.
+
+### BUG-070: Attendee null causa loop pending-approval
+- **Severidad:** ALTA (edge case)
+- **Causa:** Si backend devuelve `attendee: null`, `registrationApprovedAt` queda `null` y usuario queda atrapado.
+- **Fix:** Si no hay attendee, `registrationApprovedAt = 'no_attendee'` (no bloquea).
+
+### BUG-071: Activate-account sin token deja pantalla sin salida
+- **Severidad:** MEDIA (edge case)
+- **Causa:** Deep link sin parametro `token` mostraba pantalla con campos pero sin poder enviar.
+- **Fix:** Redirige a `/onboarding` inmediatamente si no hay token.
+
+### BUG-072: Post-activation onboarding detecta token viejo
+- **Severidad:** ALTA (flujo roto)
+- **Causa:** OnboardingContext usaba `hasToken` para detectar post-activacion. Cualquier token viejo activaba el salto a photo.
+- **Fix:** Flag especifico `post_activation_onboarding` que solo activate-account setea, se consume una vez.
+
+### BUG-073: ConnectionError boton se estira verticalmente
+- **Severidad:** MEDIA (visual)
+- **Causa:** Componente ConnectionError no tenia layout split (content center + boton bottom).
+- **Fix:** Reestructurado identico a banned.tsx: content centrado + boton full-width abajo con SafeArea.
+
+### Bugs no criticos detectados (no corregidos — code smells)
+- **CS-001:** Race condition en token refresh deduplication — multiples 401 pueden llamar clearAuth() dos veces. Sin impacto real.
+- **CS-002:** Flag `post_activation_onboarding` se consume al montar provider — fragil si re-monta, pero no re-monta en flujo normal.
+- **CS-003:** Email verified state se resetea al cambiar login/register — UX minor, email queda escrito.
+
+---
+
+## 2026-04-12 — Auditoria de Flujos Auth (39 escenarios + 10 edge cases)
+
+### Escenarios verificados
+
+**Flujo normal (10):** Primera vez UP/DOWN/retry, usuario regresa, token guardado, token expirado refresh/fail, logout.
+**Login inteligente (7):** checkEmail not_found/pending_activation/active, password correcto/incorrecto, cuenta bloqueada, error red.
+**Registro (5):** Exitoso sin/con approval, email existente, error red, logout+re-registro.
+**Activate account (4):** Token valido, sin token, token usado, activacion completa.
+**Ban (6):** Socket RT, HTTP 403, reabrir baneado, ban temporal expira, desbanear, ban desde chat.
+**Pending approval (4):** Pantalla, verificar pendiente, verificar aprobado, reabrir pendiente.
+**Edge cases (3):** Evento sin approval, attendee null, servidor cae mid-onboarding.
+
+**Resultado:** 39/39 escenarios cubiertos. 9 bugs encontrados y corregidos (BUG-065 a BUG-073). 3 code smells documentados.
+
+---
+
 ## 2026-04-11 — Sesion Onboarding Steps + Auth + Seguridad
 
 ### BUG-058: Password input autoCapitalize mayuscula en Android

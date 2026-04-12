@@ -257,7 +257,13 @@
       "Read(//c/laragon/bin/redis//**)",
       "Read(//c/laragon/bin/**)",
       "Bash(/c/laragon/bin/redis/redis-x64-5.0.14.1/redis-cli.exe ping:*)",
-      "Bash(ipconfig.exe)"
+      "Bash(ipconfig.exe)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx uri-scheme:*)",
+      "Bash(rm -f \"C:/laragon/www/eventos-backend/app/Filament/Pages/OnboardingPreview.php\")",
+      "Bash(rm -f \"C:/laragon/www/eventos-backend/app/Filament/Pages/OnboardingBackground.php\")",
+      "Bash(rm -f \"C:/laragon/www/eventos-backend/resources/views/filament/pages/onboarding-preview.blade.php\")",
+      "Bash(rm -f \"C:/laragon/www/eventos-backend/resources/views/filament/pages/onboarding-background.blade.php\")"
     ]
   }
 }
