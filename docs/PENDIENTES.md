@@ -35,8 +35,8 @@
 ## PRIORIDAD MEDIA — fortalece la venta
 
 ### Seguridad Auth (SEC-3b pendientes)
-- [ ] SEC-3b.2: Validar token al startup — app/index.tsx solo chequea SecureStore. Debe llamar GET /me al abrir. Si 401→clearAuth→onboarding. Si ban→banned screen. Si approval null→pending. Archivos: app/index.tsx, stores/authStore.ts
-- [ ] SEC-3b.4: Middleware approval server-side — crear app/Http/Middleware/CheckApproval.php. Valida registration_approved_at != null en cada request protegido. Si null → 403. Agregar a grupo middleware API.
+- [x] ~~SEC-3b.2: Validar token al startup~~ — COMPLETADO 2026-04-13. GET /me al abrir, 401→clearAuth, ban→banned, approval→pending. Fallback red.
+- [x] ~~SEC-3b.4: Middleware approval server-side~~ — COMPLETADO 2026-04-13. CheckApproval.php, excluido de auth/profile/onboarding. 403 si no aprobado.
 
 ### Features competitivos
 - [ ] 1.C5: Calendar sync (.ics) — boton "Agregar al calendario" por sesion. Genera .ics con titulo, hora, salon, recordatorio 15min. Compatible Google Calendar, Outlook, Apple. Sin OAuth, solo archivo. QA-MASTER confirma que el endpoint ya genera VCALENDAR valido.
