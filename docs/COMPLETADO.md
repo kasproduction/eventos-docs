@@ -177,6 +177,42 @@ Total: 42 security tests, 309 tests backend.
 - [x] OnboardingSeeder: ejemplos de los 3 tipos nuevos
 - [x] QA: 7 tests presets + 11 tipos verificados, 309 backend tests passing
 
+## Seguridad SEC-3b completado (2026-04-13)
+
+- [x] SEC-3b.2: index.tsx valida GET /me al startup. 401→clearAuth, 403→banned/pending. Fallback red graceful.
+- [x] SEC-3b.4: CheckApproval.php middleware server-side. 403 si no aprobado. Excluido de auth/profile/onboarding.
+- [x] Fix: index.tsx maneja 403 (antes solo 401, app podia quedar colgada)
+- [x] Fix: lockout counter se resetea cuando lock expira (antes acumulaba intentos para siempre)
+
+## QR dinamico rotativo 1.C3 (2026-04-13)
+
+- [x] Formato d.{attendee_id}.{window}.{signature_32hex} — O(1) validacion, no O(n)
+- [x] Ventana 60s, tolerancia 5 ventanas (~180s), clock skew +-1
+- [x] GET /me/qr devuelve token dinamico + expires_in (TTL real)
+- [x] Checkin valida: estatico primero (backward compat), luego dinamico
+- [x] LeadController tambien valida dinamico (fix posterior al QA)
+- [x] App: useQrToken refetch 50s, MiQrScreen countdown "QR dinamico · 45s"
+- [x] DoneStep: preview actualizado al formato nuevo
+- [x] Validacion qr_token relajada min:20 max:100 (formato variable)
+
+## Scanner Lumina Noir (2026-04-13)
+
+- [x] Reescritura completa scanner-stand.tsx (NativeWind → StyleSheet)
+- [x] Resultados en BottomSheet (55% success/duplicate, 38% error)
+- [x] Lead card con foto, nombre, cargo, empresa, email
+- [x] Tier selector inline (hot/warm/cold) en resultado success
+- [x] Scan line animada Reanimated, haptic feedback en todos los estados
+- [x] ScalePress en todos los botones, SafeArea top+bottom
+
+## Docs reestructurados (2026-04-13)
+
+- [x] EventOS_Roadmap.md: 3217 → 419 lineas (v4.0 slim)
+- [x] Original archivado: docs/ROADMAP-HISTORICO-v3.1.md (3144 lineas intactas)
+- [x] docs/PENDIENTES.md: reescrito auto-contenido, organizado por area de trabajo
+- [x] docs/COMPLETADO.md: nuevo, historial por area
+- [x] 3 apendices extraidos: ANALISIS-COMPETITIVO.md, WEB-APP-PLAN.md, WHITE-LABEL.md
+- [x] PLAN-TAGS-MODULOS.md: plan arquitectura tags + visibilidad modulos (aprobado, pendiente implementar)
+
 ## Moderacion chat completa (2026-04-12)
 
 - [x] Ban real-time via socket (/internal/ban/enforce → ban:enforced → app /banned)
