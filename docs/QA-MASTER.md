@@ -1,7 +1,7 @@
 # QA Master — Barrido Completo de Plataforma
 
 > Auditoria endpoint por endpoint de todos los modulos.
-> Actualizado: 2026-04-12 | Metodo: curl real contra backend corriendo
+> Actualizado: 2026-04-13 | Metodo: curl real contra backend corriendo
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Modulos probados | Endpoints testados | OK | Bugs | Notas |
 |-----------------|-------------------|-----|------|-------|
-| 20 | 50+ | 48 | 1 corregido | Escritura + 3 roles verificados |
+| 21 | 70+ | 70 | 1 corregido | Escritura + 3 roles + presets + 11 field types |
 
 **Bug corregido en esta sesion:**
 - `/me`, `/refresh`, `/verify-email`, `/expo-token` no tenian `check.ban` middleware — usuario baneado podia llamar `/me` y recibir 200. Fix: `eeb6ebc`
@@ -295,13 +295,52 @@
 
 ---
 
+## 21. Presets API (2026-04-13 — tarea 1.x-E-B)
+
+| Endpoint | Metodo | Auth | Resultado | HTTP | Notas |
+|----------|--------|------|-----------|------|-------|
+| `/presets/countries` | GET | No | OK | 200 | 53 paises, formato [{value, label}] |
+| `/presets/industries` | GET | No | OK | 200 | 20 industrias |
+| `/presets/cities/CO` | GET | No | OK | 200 | 20 ciudades colombianas |
+| `/presets/cities/ZZ` | GET | No | OK | 200 | [] (pais inexistente, array vacio) |
+| `/presets/invalid` | GET | No | OK | 404 | "Preset not found" |
+| `/events/1/onboarding` | GET | No | OK | 200 | preset_options inyectadas: industry=20, country=53 |
+| `/me/registration-fields` | PUT | Si | OK | 200 | Guarda searchable_select/checkbox_group/date correctamente |
+
+### Tipos de campo onboarding verificados
+
+| Tipo | Config | Render app | Almacenamiento | Estado |
+|------|--------|------------|----------------|--------|
+| `text` | OK | TextInput | profile/fields | OK |
+| `tel` | OK | phone-pad | fields | OK |
+| `email` | OK | email-address | fields | OK |
+| `number` | OK | numeric | fields | OK |
+| `url` | OK | url keyboard | fields | OK |
+| `select` | OK | SelectSheet (radio) | fields | OK |
+| `searchable_select` | OK + preset | SearchableSheet (busqueda+radio) | fields | OK |
+| `checkbox` | OK | Switch toggle | fields | OK |
+| `checkbox_group` | OK | CheckboxGroupSheet (multi-select) | fields como CSV | OK |
+| `textarea` | OK | multiline 4 lineas | fields | OK |
+| `date` | OK | DateTimePicker nativo | fields como ISO | OK |
+
+### Filament admin verificado
+
+- 11 tipos disponibles en selector (3 nuevos: searchable_select, checkbox_group, date)
+- Campo `preset` visible solo para searchable_select
+- Campo `options` visible para select, searchable_select, checkbox_group
+- Seeder actualizado con ejemplos de los 3 tipos
+
+---
+
 ## Estado final QA
 
 | Categoria | Total | OK | Bugs | Notas |
 |-----------|-------|-----|------|-------|
-| GET endpoints | 35+ | 35 | 0 | Todos responden |
+| GET endpoints | 40+ | 40 | 0 | Todos responden |
 | POST/PUT/DELETE | 15+ | 15 | 0 | Escritura funciona |
 | Auth/Ban/Approval | 11 | 11 | 1 corregido | check.ban en auth routes |
+| Presets API | 7 | 7 | 0 | countries, industries, cities, onboarding |
+| Field types | 11 | 11 | 0 | 8 existentes + 3 nuevos |
 | Roles (3) | 3 | 3 | 0 | presencial/virtual/vendedor |
 | Middleware | 5 | 5 | 0 | auth, ban, throttle, security headers |
-| **TOTAL** | **60+** | **59** | **1 corregido** | Plataforma solida |
+| **TOTAL** | **70+** | **70** | **1 corregido** | Plataforma solida |

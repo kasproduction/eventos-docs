@@ -163,6 +163,20 @@ Total: 42 security tests, 309 tests backend.
 - [x] Validacion required: borde rojo + toast + skip oculto si required
 - [x] PreviewCard live cuando form tiene job_title/company
 
+## Campos dinamicos 1.x-E-B (2026-04-13)
+
+- [x] SearchableSheet: BottomSheet 65% con TextInput busqueda, filtro local, radio select
+- [x] CheckboxGroupSheet: BottomSheet multi-select con checkboxes, boton "Confirmar (N)"
+- [x] DateTimePicker: @react-native-community/datetimepicker, picker nativo, guarda ISO, muestra formateado es-CO
+- [x] FormStep: 3 render cases nuevos (searchable_select, checkbox_group, date)
+- [x] onboardingApi.ts: tipos actualizados (3 tipos + preset + preset_options)
+- [x] PresetController: GET /presets/{type}, GET /presets/cities/{code}
+- [x] config/presets.php: 53 paises, ciudades (9 paises), 20 industrias
+- [x] Filament: 11 tipos en selector + campo preset para searchable_select
+- [x] OnboardingController: resuelve preset → preset_options al servir config
+- [x] OnboardingSeeder: ejemplos de los 3 tipos nuevos
+- [x] QA: 7 tests presets + 11 tipos verificados, 309 backend tests passing
+
 ## Moderacion chat completa (2026-04-12)
 
 - [x] Ban real-time via socket (/internal/ban/enforce → ban:enforced → app /banned)

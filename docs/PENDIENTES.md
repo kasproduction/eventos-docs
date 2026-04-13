@@ -2,7 +2,7 @@
 
 > La UNICA fuente de verdad de lo que falta por hacer.
 > Cada item es auto-contenido — no necesitas abrir otro archivo para entender que hacer.
-> Actualizado: 2026-04-13
+> Actualizado: 2026-04-13 (1.x-E-B completado)
 
 ---
 
@@ -44,7 +44,9 @@
 - [ ] 1.23: Permisos granulares Filament — roles admin diferenciados (org_admin, event_admin, moderator). Spatie permissions ya instalado, falta wiring en Filament resources.
 
 ### Onboarding pendientes
-- [ ] 1.x-E-B: FormStep tipos avanzados — searchable_select con preset (paises, ciudades): BottomSheet con buscador. checkbox_group: BottomSheet multi-select. date: DatePicker nativo. Requiere: Filament agregar tipos al config + API endpoint presets + app BottomSheets.
+- [x] ~~1.x-E-B: FormStep tipos avanzados~~ — COMPLETADO 2026-04-13. SearchableSheet, CheckboxGroupSheet, DateTimePicker, Presets API, Filament 11 tipos.
+- [x] ~~1.x-E-C: DateSheet custom Lumina Noir~~ — COMPLETADO 2026-04-13. BottomSheet 3 columnas scroll, haptic, preview, accent color. Desinstalado @react-native-community/datetimepicker.
+- [ ] 1.x-E-D: Campos condicionales — depends_on en config JSON. Ej: pais=Colombia → mostrar ciudades CO. Requiere: depends_on en Filament, FormStep evalua condiciones, fetch dinamico opciones. Endpoint cities/{code} ya existe. Campos NO hardcodeados — admin define dependencias.
 - [ ] 1.x-C: Roles asistente — si evento hibrido, step nuevo entre Auth y Photo: "Como participaras?" (presencial/virtual). Virtual=sin QR, directo al home. Config en Filament: tipo_participacion (presencial/virtual/hibrido).
 - [ ] 1.x-D: Estados evento lifecycle — 4 estados: registration_only → published → live → ended. Pantalla espera DaVinci con countdown (calculado desde event.starts_at). Push notification al cambiar estado. Config en Filament.
 
