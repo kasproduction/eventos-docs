@@ -1,7 +1,7 @@
 # Pendientes Consolidados — EventOS
 
 > Indice unico de TODO lo pendiente. Cada item apunta al documento donde esta el detalle.
-> Actualizado: 2026-04-12 (final de sesion)
+> Actualizado: 2026-04-12 (sesion 2 — FormStep tipos + 13 bugs auth)
 
 ---
 
@@ -19,7 +19,8 @@
 | ✅ | Activate-account redirige a onboarding photo step | sesion 2026-04-12 |
 | ✅ | Onboarding admin Filament (1.x-B3): steps config JSON, Filament UI 7 secciones, FormStep generico, steps dinamicos, colores master/slave, real-time polling 30s + socket | sesion 2026-04-12 |
 | ✅ | Campos dinamicos onboarding (1.x-E parcial): FormStep con campos del config, tipos text/tel/email/number/url/select, puntos por campo, guardado en registration_field_values | sesion 2026-04-12 |
-| ⏳ | **1.x-E-A**: Campos FormStep tipos basicos: select BottomSheet, checkbox toggle, textarea multiline, validacion required | pendiente |
+| ✅ | **1.x-E-A**: Campos FormStep tipos basicos: select BottomSheet, checkbox toggle, textarea multiline, validacion required, PreviewCard live, skip oculto si required | sesion 2026-04-12b |
+| ✅ | 13 bugs auth corregidos: approval flow, ban guards, == null, 401 handling, InterestsStep fix, registrationApprovedAt en activate/pending | sesion 2026-04-12b + `QA-AUTH-ONBOARDING.md` |
 | ⏳ | **1.x-E-B**: Campos FormStep tipos avanzados: searchable_select + preset (paises/ciudades), checkbox_group multi-select, date picker. Requiere cambios Filament + API presets + app | pendiente (hacer con landing o antes) |
 
 ## Registro — Flujos futuros
@@ -128,5 +129,6 @@ Ninguno critico. 3 code smells documentados (CS-001/002/003).
 | `docs/ROADMAP-UIUX-LANDING.md` | UI/UX pasos 0-6 + landing + estados evento |
 | `docs/FASE-SEGURIDAD.md` | Auditoria OWASP + SEC-1 a SEC-5 + SEC-3b |
 | `docs/BUG-LOG.md` | Bugs historicos BUG-001 a BUG-078 |
+| `docs/QA-AUTH-ONBOARDING.md` | QA checklist auth/onboarding — 30+ escenarios, flags, bugs |
 | `docs/COMPLIANCE-SEGURIDAD.md` | Compliance legal/GDPR |
 | `docs/DISPONIBILIDAD-HA.md` | Alta disponibilidad + deploy strategy |

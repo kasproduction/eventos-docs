@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Documento de planificación para la fase UI/UX de EventOS.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-12 | Estado: Paso 5 100%, moderacion chat completa, login inteligente, error handling, auditoria 39 escenarios
+> Fecha: 2026-04-07 | Actualizado: 2026-04-12b | Estado: Paso 5 ~99%, 1.x-E-A completa (select/checkbox/textarea), 13 bugs auth fixed, QA doc creado
 
 ---
 
@@ -538,11 +538,16 @@ PASO 5: Barrido Visual App — ~98% COMPLETADO
 │   ├── [x] Retrocompatibilidad: si config null, fallback a hardcoded
 │   ├── [x] URLs imagenes: resolveStepsConfigUrls + fixStorageUrl
 │   └── [x] Eliminados: OnboardingPreview, OnboardingBackground, OnboardingSlideResource
-├── ⏳ Tarea 1.x-E-A (cierra la app):
-│   ├── [ ] select: BottomSheet radio con opciones (lo que Filament ya configura)
-│   ├── [ ] checkbox: toggle switch inline
-│   ├── [ ] textarea: TextInput multiline (4 lineas)
-│   ├── [ ] validacion required (borde rojo si campo obligatorio vacio)
+├── ✅ Tarea 1.x-E-A COMPLETADA (2026-04-12b):
+│   ├── [x] select: SelectSheet BottomSheet radio con opciones, accent color, haptic
+│   ├── [x] checkbox: Switch toggle inline, glass row, haptic
+│   ├── [x] textarea: TextInput multiline 4 lineas, textAlignVertical top
+│   ├── [x] validacion required: borde rojo + toast + skip oculto si required
+│   ├── [x] PreviewCard live cuando form tiene job_title/company
+│   ├── [x] opacidades subidas (labels 0.45, placeholders 0.3, subtitle 0.5)
+│   ├── [x] Filament: checkbox + textarea en selector tipo, maxItems 4
+│   ├── [x] Seeder: 2 forms (about 3 campos + extra 2 campos)
+│   ├── [x] 13 bugs auth corregidos (ver QA-AUTH-ONBOARDING.md)
 │   └── [ ] QA visual completo (multi-device)
 ├── ⏳ Tarea 1.x-E-B (hacer con landing o antes):
 │   ├── [ ] searchable_select + preset (paises, ciudades) — BottomSheet con buscador
