@@ -119,7 +119,7 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`. Resumen:
 - [ ] Photo/Caption Contest — galeria con votos. Depende de social wall.
 - [ ] Trivia live tipo Kahoot — preguntas en tiempo real, ranking por velocidad.
 - [ ] Ruleta en vivo — backend detecta conectados, asigna puntos solo a presentes.
-- [ ] Sorteo en vivo (jackpot) — slot machine, ganador + confetti. Requiere display.
+- [ ] Sorteo en vivo (jackpot) — participantes automaticos: presenciales (checked_in_at) + virtuales (socket conectados). Zero botones. Slot machine con fotos, ganador + confetti en display + app.
 - [ ] Momentos en Vivo branded — admin configura, publicar → push + socket + social + display.
 
 ### Comunicacion avanzada
