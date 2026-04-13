@@ -24,6 +24,13 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`. Resumen:
 ### Onboarding
 - [ ] 1.x-E-D: Campos condicionales — depends_on en config JSON. Ej: pais=Colombia → ciudades CO. Endpoint cities/{code} ya existe.
 
+### FAQ asistente
+- [ ] Backend: tabla event_faqs (event_id, section, question, answer_text, answer_action_url, answer_image_url, sort_order, is_active)
+- [ ] Backend: CRUD Filament + API GET /events/{id}/faqs (publica, agrupada por seccion)
+- [ ] App: FAB flotante con icono orbe → BottomSheet ~70% → categorias + preguntas tappables. FAQ contextual por pantalla.
+- [ ] Orbe animado: blob organico 3 estados (idle/active/settled). Concepto aprobado, demo: faq-orb-demo.html
+- Ref: docs/ROADMAP-UIUX-LANDING.md seccion 7
+
 ### Registro avanzado
 - [ ] 1.x-G: Registro por codigo de acceso — admin genera codigos en Filament, campo validacion.
 - [ ] 1.x-H: Staff invite push + cambio de rol — push + socket + layout vendedor.
@@ -81,8 +88,8 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`. Resumen:
 ## Landing Web
 
 - [ ] Landing premium: hero video, speakers, agenda, sponsors, registro embebido
-- [ ] FAQ asistente: orbe animado + preguntas curadas (concepto aprobado)
-- [ ] Endpoints publicos: /api/public/event/{slug}/speakers, agenda, sponsors, register
+- [ ] FAQ landing: seccion con orbe animado + acordeon preguntas (misma tabla event_faqs)
+- [ ] Endpoints publicos: /api/public/event/{slug}/speakers, agenda, sponsors, register, faqs
 - Ref: docs/ROADMAP-UIUX-LANDING.md
 
 ---
