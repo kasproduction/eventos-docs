@@ -538,10 +538,20 @@ PASO 5: Barrido Visual App — ~98% COMPLETADO
 │   ├── [x] Retrocompatibilidad: si config null, fallback a hardcoded
 │   ├── [x] URLs imagenes: resolveStepsConfigUrls + fixStorageUrl
 │   └── [x] Eliminados: OnboardingPreview, OnboardingBackground, OnboardingSlideResource
-├── ⏳ Items pendientes:
-│   ├── [ ] Select field con BottomSheet en FormStep (tipo select solo tiene options, falta UI)
-│   ├── [ ] react-native-image-crop-picker: crop circular dark (requiere dev build)
+├── ⏳ Tarea 1.x-E-A (cierra la app):
+│   ├── [ ] select: BottomSheet radio con opciones (lo que Filament ya configura)
+│   ├── [ ] checkbox: toggle switch inline
+│   ├── [ ] textarea: TextInput multiline (4 lineas)
+│   ├── [ ] validacion required (borde rojo si campo obligatorio vacio)
 │   └── [ ] QA visual completo (multi-device)
+├── ⏳ Tarea 1.x-E-B (hacer con landing o antes):
+│   ├── [ ] searchable_select + preset (paises, ciudades) — BottomSheet con buscador
+│   ├── [ ] checkbox_group — BottomSheet multi-select
+│   ├── [ ] date — DatePicker nativo
+│   ├── [ ] Filament: agregar tipos avanzados al config onboarding
+│   └── [ ] API endpoint para servir presets al app
+├── 💤 Nice to have (no bloquea):
+│   └── [ ] react-native-image-crop-picker: crop circular dark (requiere dev build, no Expo Go)
 
 PASO 6: Admin Premium
 ├── Dashboard analytics

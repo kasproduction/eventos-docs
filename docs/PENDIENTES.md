@@ -19,7 +19,8 @@
 | ✅ | Activate-account redirige a onboarding photo step | sesion 2026-04-12 |
 | ✅ | Onboarding admin Filament (1.x-B3): steps config JSON, Filament UI 7 secciones, FormStep generico, steps dinamicos, colores master/slave, real-time polling 30s + socket | sesion 2026-04-12 |
 | ✅ | Campos dinamicos onboarding (1.x-E parcial): FormStep con campos del config, tipos text/tel/email/number/url/select, puntos por campo, guardado en registration_field_values | sesion 2026-04-12 |
-| ⏳ | Campos dinamicos AboutStep completo (1.x-E): select con BottomSheet, validacion required | pendiente |
+| ⏳ | **1.x-E-A**: Campos FormStep tipos basicos: select BottomSheet, checkbox toggle, textarea multiline, validacion required | pendiente |
+| ⏳ | **1.x-E-B**: Campos FormStep tipos avanzados: searchable_select + preset (paises/ciudades), checkbox_group multi-select, date picker. Requiere cambios Filament + API presets + app | pendiente (hacer con landing o antes) |
 
 ## Registro — Flujos futuros
 
