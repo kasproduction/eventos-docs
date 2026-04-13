@@ -1,135 +1,103 @@
-# Pendientes Consolidados — EventOS
+# Pendientes — EventOS
 
-> Indice unico de TODO lo pendiente. Cada item apunta al documento donde esta el detalle.
-> Actualizado: 2026-04-12 (sesion 2 — FormStep tipos + 13 bugs auth)
+> La UNICA fuente de verdad de lo que falta por hacer.
+> Cada item es auto-contenido — no necesitas abrir otro archivo para entender que hacer.
+> Actualizado: 2026-04-13
 
 ---
 
-## Onboarding & Auth
+## PRIORIDAD ALTA — bloquea pitch junio 2026
 
-| Estado | Item | Detalle en |
-|--------|------|-----------|
-| ✅ | Welcome, Auth, Photo, About, Interests, Done | `EventOS_Roadmap.md` Apendice I |
-| ✅ | Gamificacion (AnimatedPts, SkipModal, 80pts) | `EventOS_Roadmap.md` Apendice I |
-| ✅ | Banned screen Lumina Noir | `EventOS_Roadmap.md` Apendice I |
-| ✅ | Auth legacy eliminado (login, register, forgot) | `ROADMAP-UIUX-LANDING.md` Paso 5 |
-| ✅ | Pending-approval → Lumina Noir | sesion 2026-04-12 |
-| ✅ | Activate-account → Lumina Noir | sesion 2026-04-12 |
-| ✅ | Login inteligente 2 pasos (check-email → password) | sesion 2026-04-12 |
-| ✅ | Activate-account redirige a onboarding photo step | sesion 2026-04-12 |
-| ✅ | Onboarding admin Filament (1.x-B3): steps config JSON, Filament UI 7 secciones, FormStep generico, steps dinamicos, colores master/slave, real-time polling 30s + socket | sesion 2026-04-12 |
-| ✅ | Campos dinamicos onboarding (1.x-E parcial): FormStep con campos del config, tipos text/tel/email/number/url/select, puntos por campo, guardado en registration_field_values | sesion 2026-04-12 |
-| ✅ | **1.x-E-A**: Campos FormStep tipos basicos: select BottomSheet, checkbox toggle, textarea multiline, validacion required, PreviewCard live, skip oculto si required | sesion 2026-04-12b |
-| ✅ | 13 bugs auth corregidos: approval flow, ban guards, == null, 401 handling, InterestsStep fix, registrationApprovedAt en activate/pending | sesion 2026-04-12b + `QA-AUTH-ONBOARDING.md` |
-| ⏳ | **1.x-E-B**: Campos FormStep tipos avanzados: searchable_select + preset (paises/ciudades), checkbox_group multi-select, date picker. Requiere cambios Filament + API presets + app | pendiente (hacer con landing o antes) |
+### Analytics Dashboard (1.C1)
+- Filament dashboard: ROI, engagement, asistencia por sesion, sponsors performance, leads por stand
+- API endpoints para alimentar web app
+- Ambos competidores (Cisco $88K, ICE360 $49M COP) lo tienen. Justifica el precio ante el cliente.
+- Ref: docs/ANALISIS-COMPETITIVO.md
 
-## Registro — Flujos futuros
+### Web App completa (W.0–W.12)
+- Next.js 15 + Tailwind + shadcn/ui + Socket.IO client
+- Spatial UI (paneles flotantes, pill bar, presets layout — NO sidebar)
+- 13 sesiones: setup, home, agenda, streaming+Q&A+chat, speakers, social, sponsors, networking, encuestas+gamification, notificaciones, sockets, polish
+- Es la experiencia core para asistentes virtuales. Sin esto no hay venta.
+- Ref: docs/WEB-APP-PLAN.md
 
-| Estado | Item | Detalle en |
-|--------|------|-----------|
-| ⏳ | Roles presencial/virtual/hibrido (1.x-C) | `EventOS_Roadmap.md` Apendice I |
-| ⏳ | Estados evento lifecycle (1.x-D) | `EventOS_Roadmap.md` Apendice I |
-| ⏳ | Registro cerrado por lista emails (1.x-F) | `EventOS_Roadmap.md` tabla principal |
-| ⏳ | Registro por codigo de acceso (1.x-G) | `EventOS_Roadmap.md` tabla principal |
-| ⏳ | Staff invite push + cambio rol (1.x-H) | `EventOS_Roadmap.md` tabla principal |
+### Deploy produccion (SEC-4 + SEC-5)
+- Docker Compose 6 servicios (app, queue, scheduler, socket, mysql, redis)
+- VPS Hetzner CX22 (~$5/mes), Cloudflare LB + R2 storage
+- Sentry, SecurityLogger, uptime monitoring
+- GitHub Actions CI/CD: push a main → build → deploy
+- EAS Build production profile (Android + iOS)
+- IMPORTANTE: al migrar a R2, revisar resolveStepsConfigUrls() y fixStorageUrl() — URLs seran absolutas
+- Ref: docs/DISPONIBILIDAD-HA.md, EventOS_Roadmap.md seccion Deploy
 
-## Seguridad
+---
 
-| Estado | Item | Detalle en |
-|--------|------|-----------|
-| ✅ | SEC-1: Room auth socket, XSS, token expiration | `FASE-SEGURIDAD.md` SEC-1 |
-| ✅ | SEC-2: Headers, CORS, HTTPS, security:check | `FASE-SEGURIDAD.md` SEC-2 |
-| ✅ | SEC-3: Lockout, rate limiting, FormRequests | `FASE-SEGURIDAD.md` SEC-3 |
-| ✅ | SEC-3b.1: Token register → configurable (sanctum.expiration) | sesion 2026-04-12 |
-| ✅ | SEC-3b.3: Middleware CheckBan server-side | sesion 2026-04-12 |
-| ✅ | SEC-3b.5: Ban en tiempo real via socket | sesion 2026-04-12 |
-| ⏳ | SEC-3b.2: Validar token al startup (GET /me) | `FASE-SEGURIDAD.md` SEC-3b |
-| ⏳ | SEC-3b.4: Middleware approval server-side | `FASE-SEGURIDAD.md` SEC-3b |
-| ⏳ | SEC-3.1: 2FA (OTP por email/WhatsApp) | `FASE-SEGURIDAD.md` SEC-3 |
-| ⏳ | SEC-3.2: Device fingerprinting | `FASE-SEGURIDAD.md` SEC-3 |
-| ⏳ | SEC-4: Docker, server hardening, Cloudflare, backups | `FASE-SEGURIDAD.md` SEC-4 |
-| ⏳ | SEC-5: SecurityLogger, Sentry, uptime | `FASE-SEGURIDAD.md` SEC-5 |
+## PRIORIDAD MEDIA — fortalece la venta
 
-## Moderacion & Chat
+### Seguridad Auth (SEC-3b pendientes)
+- [ ] SEC-3b.2: Validar token al startup — app/index.tsx solo chequea SecureStore. Debe llamar GET /me al abrir. Si 401→clearAuth→onboarding. Si ban→banned screen. Si approval null→pending. Archivos: app/index.tsx, stores/authStore.ts
+- [ ] SEC-3b.4: Middleware approval server-side — crear app/Http/Middleware/CheckApproval.php. Valida registration_approved_at != null en cada request protegido. Si null → 403. Agregar a grupo middleware API.
 
-| Estado | Item | Detalle en |
-|--------|------|-----------|
-| ✅ | Sistema completo: ban RT, palabras bloqueadas, chat delete, monitor, slow mode, pause, config Filament, rendimiento (cache+pooling+batch) | sesion 2026-04-12 |
-| ⏳ | Mensaje anclado tipo Twitch (nice to have) | `ROADMAP-UIUX-LANDING.md` sec 4.2 |
+### Features competitivos
+- [ ] 1.C5: Calendar sync (.ics) — boton "Agregar al calendario" por sesion. Genera .ics con titulo, hora, salon, recordatorio 15min. Compatible Google Calendar, Outlook, Apple. Sin OAuth, solo archivo. QA-MASTER confirma que el endpoint ya genera VCALENDAR valido.
+- [ ] 1.C3: QR dinamico rotativo — QR en app rota cada 30-60s con HMAC-SHA256 + timestamp + user_id. Imposible de clonar. Base HMAC ya existe en qr_tokens. Reemplaza reconocimiento facial ($5M COP en competencia).
+- [ ] 1.23: Permisos granulares Filament — roles admin diferenciados (org_admin, event_admin, moderator). Spatie permissions ya instalado, falta wiring en Filament resources.
 
-## UI/UX App
+### Onboarding pendientes
+- [ ] 1.x-E-B: FormStep tipos avanzados — searchable_select con preset (paises, ciudades): BottomSheet con buscador. checkbox_group: BottomSheet multi-select. date: DatePicker nativo. Requiere: Filament agregar tipos al config + API endpoint presets + app BottomSheets.
+- [ ] 1.x-C: Roles asistente — si evento hibrido, step nuevo entre Auth y Photo: "Como participaras?" (presencial/virtual). Virtual=sin QR, directo al home. Config en Filament: tipo_participacion (presencial/virtual/hibrido).
+- [ ] 1.x-D: Estados evento lifecycle — 4 estados: registration_only → published → live → ended. Pantalla espera DaVinci con countdown (calculado desde event.starts_at). Push notification al cambiar estado. Config en Filament.
 
-| Estado | Item | Detalle en |
-|--------|------|-----------|
-| ✅ | Paso 0-5: Fundamentos → Barrido visual completo | `ROADMAP-UIUX-LANDING.md` |
-| ⏳ | QA visual multi-device | `ROADMAP-UIUX-LANDING.md` Paso 5 |
-| ⏳ | Paso 6: Admin Premium (Filament dashboard) | `ROADMAP-UIUX-LANDING.md` Paso 6 |
+---
 
-## Features competitivos
+## PRIORIDAD BAJA — post-venta o si lo piden
 
-| Estado | Item | Detalle en |
-|--------|------|-----------|
-| ⏳ | 1.C1: Analytics dashboard (PRIORIDAD MAXIMA) | `EventOS_Roadmap.md` tabla principal |
-| ⏳ | 1.C2: Wallet digital (Apple/Google) | `EventOS_Roadmap.md` tabla principal |
-| ⏳ | 1.C3: QR dinamico rotativo | `EventOS_Roadmap.md` tabla principal |
-| ⏳ | 1.C4: Digital signage (pantallas venue) | `EventOS_Roadmap.md` tabla principal |
-| ⏳ | 1.C5: Calendar sync (.ics) | `EventOS_Roadmap.md` tabla principal |
-| ⏳ | 1.C6: Badge printing fisico | `EventOS_Roadmap.md` tabla principal |
-| ⏳ | 1.23: Permisos granulares Filament | `EventOS_Roadmap.md` tabla principal |
-| ⏳ | Rewards: Redencion de puntos | `EventOS_Roadmap.md` tabla principal |
+### Registro avanzado
+- [ ] 1.x-F: Registro cerrado (lista invitados) — admin sube CSV/emails en Filament. Onboarding AuthStep valida email contra lista. Si no esta: toast "No estas en la lista".
+- [ ] 1.x-G: Registro por codigo de acceso — admin genera codigos en Filament (unicos o grupales, con limite de usos). Campo "Codigo de acceso" antes del registro. Valida contra backend.
+- [ ] 1.x-H: Staff invite push + cambio de rol — admin invita desde Filament → push "Fuiste invitado al equipo" → app cambia layout a vendedor (tabs: Mi Stand, Leads, etc.). Requiere socket o push + cambio rol en authStore.
 
-## Web App
+### Features opcionales
+- [ ] 1.C2: Wallet digital — badge en Apple Wallet (.pkpass) + Google Wallet (JWT). Reemplaza badge printing fisico como default.
+- [ ] 1.C4: Digital signage — pantallas venue con agenda en vivo, sesion actual/siguiente, leaderboard, social wall. Base: proyecto checki (106 archivos ref, commit 5e2f867).
+- [ ] 1.C6: Badge printing fisico — impresora termica (Zebra/Brother) + credencial personalizada. Add-on. Logica check-in ya existe.
+- [ ] SEC-3.1: 2FA OTP (email/WhatsApp) — requiere WhatsApp Business API + pantalla app
+- [ ] SEC-3.2: Device fingerprinting — depende de 2FA
+- [ ] Light mode — refactor colores hardcoded a theme provider. Sesion dedicada si cliente lo pide.
+- [ ] PDFs: certificados asistencia + reporte post-evento + reports exportables detallados
 
-| Estado | Item | Detalle en |
-|--------|------|-----------|
-| ⏳ | W.1-W.12: Web app completa Next.js | `EventOS_Roadmap.md` Apendice F |
+### Cleanup app
+- [ ] QA visual multi-device (1.x-E-A completado, falta QA en dispositivos)
+- [ ] Crop circular dark (react-native-image-crop-picker, requiere dev build)
+- [ ] Push reminders probar en dev build (codigo listo, expo-notifications no funciona en Expo Go)
+- [ ] Push invalidation probar en dev build (codigo listo)
+- [ ] Login duplicado: extraer LoginForm compartido o confirmar que login.tsx ya fue eliminado
+- [ ] Debug logs en onboardingApi.ts quitar antes de produccion
+- [ ] Mensaje anclado chat tipo Twitch (nice to have)
+- [ ] White-label: migrar app.json → app.config.js + estructura clients/ (ref: docs/WHITE-LABEL.md)
 
-## Landing Web
-
-| Estado | Item | Detalle en |
-|--------|------|-----------|
-| ⏳ | Landing premium (hero, speakers, agenda, registro) | `ROADMAP-UIUX-LANDING.md` seccion 1 |
-| ⏳ | FAQ asistente: orbe animado + preguntas curadas | `ROADMAP-UIUX-LANDING.md` seccion 7 |
-| ⏳ | FAQ backend: tabla event_faqs + CRUD Filament + API | `ROADMAP-UIUX-LANDING.md` seccion 7 |
-| ⏳ | FAQ app: FAB flotante + BottomSheet + categorias | `ROADMAP-UIUX-LANDING.md` seccion 7 |
-
-## Infraestructura & Deploy
-
-| Estado | Item | Detalle en |
-|--------|------|-----------|
-| ⏳ | Dev build EAS (push, crop, animaciones) | `EventOS_Roadmap.md` checklist setup |
-| ⏳ | Deploy VPS (backend + web + socket) | `DISPONIBILIDAD-HA.md` |
-| ⏳ | Cloudflare R2 (storage produccion) | `DISPONIBILIDAD-HA.md` — **IMPORTANTE:** Al migrar, revisar `resolveStepsConfigUrls()` en OnboardingController y `fixStorageUrl()` en app. Con R2 las URLs seran absolutas. Ver BUG-078. |
-
-## Error Handling
-
-| Estado | Item | Detalle en |
-|--------|------|-----------|
-| ✅ | ConnectionError component + onboarding + Home error handling | sesion 2026-04-12 |
-
-## Auditoria Auth (2026-04-12)
-
-| Estado | Item | Detalle en |
-|--------|------|-----------|
-| ✅ | 39 escenarios + 10 edge cases verificados | `BUG-LOG.md` 2026-04-12 |
-| ✅ | 14 bugs encontrados y corregidos (BUG-065 a BUG-078) | `BUG-LOG.md` 2026-04-12 |
-| ⚠️ | CS-001/002/003: code smells no criticos | `BUG-LOG.md` code smells |
-
-## Bugs abiertos
-
-Ninguno critico. 3 code smells documentados (CS-001/002/003).
+### Showcase / Demo inversor
+- [ ] Panels finales clickeables (z-index blocking, click no llega)
+- [ ] Responsive (disenar a 1920x1080 base, actualmente 1200x720 fijo)
+- [ ] Audio/sonido (cinematic riser + impacts)
+- [ ] Hints/labels solapados
+- [ ] Social wall mejor explicacion visual
+- [ ] CSS box-shadow parsing error linea ~250
 
 ---
 
 ## Documentos de referencia
 
-| Documento | Que contiene |
-|-----------|-------------|
-| `EventOS_Roadmap.md` | Roadmap maestro + apendices A-J |
-| `docs/ROADMAP-UIUX-LANDING.md` | UI/UX pasos 0-6 + landing + estados evento |
-| `docs/FASE-SEGURIDAD.md` | Auditoria OWASP + SEC-1 a SEC-5 + SEC-3b |
+| Doc | Contenido |
+|-----|-----------|
+| `EventOS_Roadmap.md` | Fases, sesiones, timeline, dependencias |
+| `docs/COMPLETADO.md` | Historial completo de todo lo hecho |
+| `docs/ROADMAP-UIUX-LANDING.md` | Spec diseno: landing, estados evento, design system |
+| `docs/WEB-APP-PLAN.md` | Spec web app: spatial UI, W.0-W.12, stack tecnico |
+| `docs/ANALISIS-COMPETITIVO.md` | Cotizaciones reales, gaps, pricing, escala |
+| `docs/WHITE-LABEL.md` | App config dinamico, clients/, EAS build |
+| `docs/FASE-SEGURIDAD.md` | Auditoria OWASP, SEC-1 a SEC-5 |
+| `docs/DISPONIBILIDAD-HA.md` | Arquitectura HA, deploy, costos |
 | `docs/BUG-LOG.md` | Bugs historicos BUG-001 a BUG-078 |
-| `docs/QA-AUTH-ONBOARDING.md` | QA checklist auth/onboarding — 30+ escenarios, flags, bugs |
-| `docs/QA-MASTER.md` | Barrido completo plataforma — 20 modulos, 35+ endpoints, middleware check |
-| `docs/COMPLIANCE-SEGURIDAD.md` | Compliance legal/GDPR |
-| `docs/DISPONIBILIDAD-HA.md` | Alta disponibilidad + deploy strategy |
+| `docs/QA-MASTER.md` | Barrido 60+ endpoints, 20 modulos, 3 roles |
+| `docs/QA-AUTH-ONBOARDING.md` | QA auth/onboarding, 30+ escenarios |

@@ -1,7 +1,9 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
-> Documento de planificación para la fase UI/UX de EventOS.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-12b | Estado: Paso 5 ~99%, 1.x-E-A completa (select/checkbox/textarea), 13 bugs auth fixed, QA doc creado
+> Spec de diseno UI/UX de EventOS — landing, estados evento, design system, pasos.
+> Fecha: 2026-04-07 | Actualizado: 2026-04-13 | Estado: Paso 5 ~98% completado
+>
+> **Status tracking:** `docs/PENDIENTES.md` (lo que falta) + `docs/COMPLETADO.md` (lo que se hizo)
 
 ---
 
@@ -594,6 +596,89 @@ PASO 6: Admin Premium
 | `GET /api/public/event/{slug}/registration-count` | GET | No | Contador de registrados (social proof) |
 | `POST /api/auth/verify-otp` | POST | No | Verificar código 2FA |
 | `POST /api/auth/request-magic-link` | POST | No | Solicitar magic link login |
+
+---
+
+---
+
+## 11. Web App — Spatial UI System (visionOS-inspired)
+
+> Documentacion completa en `EventOS_Roadmap.md` → Apendice F → seccion W.0
+
+La web app del asistente virtual NO usa sidebar corporativa. Usa un **sistema de paneles spatial** inspirado en visionOS, adaptado a Lumina Noir:
+
+- **Pill bar flotante** arriba (no sidebar)
+- **Max 3 paneles simultaneos** con jerarquia (primario + 2 secundarios)
+- **Paneles arrastrables** + presets de layout (conferencia, networking, explorar)
+- **Command palette** (Cmd+K) para power users
+- **Memoria de layout** por usuario
+- **Transiciones spring/damping**, nunca lineales
+- En mobile (< 768px) colapsa a navegacion stack tradicional
+
+Este sistema es la base sobre la que corren todos los features W.1–W.12. Se implementa en W.0 + W.1 (setup).
+
+Referencias visuales: `design/LANDING/`
+
+---
+
+## 12. Showcase Onboarding (Web App — Demo Guiado)
+
+> Prototipo HTML: `design/showcase-onboarding-v6.html` (version actual)
+> Versiones anteriores: v1–v5 en `design/`
+
+### Concepto
+
+NO es un wizard paso-a-paso. Es un **demo guiado cinematico** que muestra las features del evento antes de entrar al home. Cada feature se demuestra con micro-interacciones (cursor fantasma, favoritos, match, typing) y al terminar se **minimiza hacia el pill bar**, activando su icono.
+
+### Secuencia (8 beats + opening + finale)
+
+| Beat | Feature | Que muestra | Micro-interaccion |
+|------|---------|-------------|-------------------|
+| Opening | Tech Summit 2026 | Texto cinematico (letras caen con peso, accent, parallax) | Stage shake al impactar |
+| 1 | Speakers | 3 cards con fotos reales (pravatar), 3D entrance Eduard Bodak | Cursor toca estrella → "Agrega tus favoritos" |
+| 2 | Agenda | Ventana con tabs Dia 1/2 + Mi Agenda. Sessions slide por dia | Cursor favorita sesion → cambia a Mi Agenda → boton streaming |
+| 3 | Streaming | Player con wipe + chat con typing indicator + poll en vivo | Connected desde agenda (pill portal) |
+| 4 | Networking + Social | Match cards 87% + connect + toast + social wall en un frame | Cursor toca "Conectar" → toast "Solicitud enviada" |
+| 5 | Gamificacion | Leaderboard TEAL + puntos volando + stamp coin flip | Tu fila resaltada |
+| 6 | Sponsors | Brand Wall: Platinum glass / Gold border / Silver circulos | Tiers animados escalonados |
+| TNT | Finale | Pill bar tiembla (3 fases) → explota → flash → particulas | BIENVENIDO (nombre) impacto + pill bar renace |
+
+### Efecto minimize-to-pill
+
+Cada feature al terminar se encoge hacia su icono del pill bar usando `transformOrigin` apuntando al pill. El contenido converge visualmente en el icono. Al llegar: ring pulse + "+1" badge + elastic bounce. El pill queda "lit" (iluminado).
+
+### Pill bar como progreso
+
+- 6 iconos ghost (stroke tenue) al inicio
+- Cada feature completa enciende su icono (stroke blanco + glow + dot)
+- 6 progress dots debajo del bar
+- Al llenar todos → TNT (temblor → explosion)
+
+### Feature title (top-right)
+
+Cada beat muestra categoria + nombre grande arriba-derecha (ej: "DISCOVER / Speakers"). Se va cuando la feature se minimiza.
+
+### Tecnologia
+
+- **GSAP 3** (core + CustomEase)
+- **Canvas 2D** para particulas
+- **CSS clip-path** para reveals
+- **Fotos reales** via pravatar API (speakers, networking)
+- **Estilos del app real**: cards rgba(38,38,38,.4), border-radius 14/18/20, Urbanist + Plus Jakarta Sans
+
+### Pendientes del prototipo
+
+- [ ] Panels interactivos al final (click para abrir/cerrar) — z-index blocking no resuelto
+- [ ] Audio/sonido (requiere boton de inicio para desbloquear autoplay)
+- [ ] Responsive (1200x720 fijo, no escala sin blur en pantallas grandes)
+- [ ] Labels/hints posicionamiento fino
+- [ ] Social wall mejor explicado visualmente
+
+### Referencias tecnicas
+
+- Eduard Bodak portfolio (Codrops julio 2025): 3D card flips, keyframes multi-step, elastic.out(1,0.75)
+- GSAP Skills repo: `design/gsap-skills/` (core, timeline, plugins, performance)
+- FIFA Ultimate Team card reveals (entrada dramatica)
 
 ---
 
