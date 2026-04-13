@@ -39,8 +39,8 @@
 - [x] ~~SEC-3b.4: Middleware approval server-side~~ — COMPLETADO 2026-04-13. CheckApproval.php, excluido de auth/profile/onboarding. 403 si no aprobado.
 
 ### Features competitivos
-- [ ] 1.C5: Calendar sync (.ics) — boton "Agregar al calendario" por sesion. Genera .ics con titulo, hora, salon, recordatorio 15min. Compatible Google Calendar, Outlook, Apple. Sin OAuth, solo archivo. QA-MASTER confirma que el endpoint ya genera VCALENDAR valido.
-- [ ] 1.C3: QR dinamico rotativo — QR en app rota cada 30-60s con HMAC-SHA256 + timestamp + user_id. Imposible de clonar. Base HMAC ya existe en qr_tokens. Reemplaza reconocimiento facial ($5M COP en competencia).
+- [x] ~~1.C5: Calendar sync~~ — YA EXISTIA. addSessionToCalendar con expo-calendar nativo + fallback Google Calendar. Endpoint .ics para landing/email.
+- [x] ~~1.C3: QR dinamico rotativo~~ — COMPLETADO 2026-04-13. HMAC-SHA256 cada 30s, refetch 25s app, checkin valida estatico+dinamico, 309 tests.
 - [ ] 1.23: Permisos granulares Filament — roles admin diferenciados (org_admin, event_admin, moderator). Spatie permissions ya instalado, falta wiring en Filament resources.
 
 ### Onboarding pendientes
