@@ -346,7 +346,7 @@ PASO 4: Estados del Evento
 ├── Certificados de asistencia
 └── NPS survey post-evento
 
-PASO 5: Barrido Visual App — ~98% COMPLETADO
+PASO 5: Barrido Visual App — ~99% COMPLETADO (1.x-E-B done 2026-04-13)
 ├── ✅ Home (2026-04-07):
 │   ├── [x] Header configurable (logo/text desde branding API)
 │   ├── [x] Hero text/image modes, HappeningNow crossfade 6s
@@ -551,12 +551,16 @@ PASO 5: Barrido Visual App — ~98% COMPLETADO
 │   ├── [x] Seeder: 2 forms (about 3 campos + extra 2 campos)
 │   ├── [x] 13 bugs auth corregidos (ver QA-AUTH-ONBOARDING.md)
 │   └── [ ] QA visual completo (multi-device)
-├── ⏳ Tarea 1.x-E-B (hacer con landing o antes):
-│   ├── [ ] searchable_select + preset (paises, ciudades) — BottomSheet con buscador
-│   ├── [ ] checkbox_group — BottomSheet multi-select
-│   ├── [ ] date — DatePicker nativo
-│   ├── [ ] Filament: agregar tipos avanzados al config onboarding
-│   └── [ ] API endpoint para servir presets al app
+├── ✅ Tarea 1.x-E-B COMPLETADA (2026-04-13):
+│   ├── [x] searchable_select: SearchableSheet BottomSheet con busqueda + filtro local
+│   ├── [x] checkbox_group: CheckboxGroupSheet multi-select con checkboxes + "Confirmar (N)"
+│   ├── [x] date: DateSheet custom Lumina Noir (3 columnas scroll dia/mes/ano, no nativo)
+│   ├── [x] Filament: 11 tipos en selector + campo preset para searchable_select
+│   ├── [x] API presets: GET /presets/{type} (53 paises, 20 industrias, ciudades 9 paises)
+│   ├── [x] OnboardingController: preset → preset_options inyectadas al servir config
+│   └── [x] Seeder actualizado con ejemplos de los 3 tipos
+├── ⏳ Tarea 1.x-E-D (pendiente):
+│   └── [ ] Campos condicionales (depends_on) — admin define dependencias, no hardcoded
 ├── 💤 Nice to have (no bloquea):
 │   └── [ ] react-native-image-crop-picker: crop circular dark (requiere dev build, no Expo Go)
 
