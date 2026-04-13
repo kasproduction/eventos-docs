@@ -2,7 +2,7 @@
 
 > La UNICA fuente de verdad de lo que falta por hacer.
 > Cada item es auto-contenido — no necesitas abrir otro archivo para entender que hacer.
-> Actualizado: 2026-04-13 (1.x-E-B completado)
+> Actualizado: 2026-04-13 (sesion masiva: E-B, SEC-3b, QR dinamico, scanner, tags plan)
 
 ---
 
@@ -43,21 +43,27 @@
 - [x] ~~1.C3: QR dinamico rotativo~~ — COMPLETADO 2026-04-13. HMAC-SHA256 cada 30s, refetch 25s app, checkin valida estatico+dinamico, 309 tests.
 - [ ] 1.23: Permisos granulares Filament — roles admin diferenciados (org_admin, event_admin, moderator). Spatie permissions ya instalado, falta wiring en Filament resources.
 
-### Onboarding pendientes
-- [x] ~~1.x-E-B: FormStep tipos avanzados~~ — COMPLETADO 2026-04-13. SearchableSheet, CheckboxGroupSheet, DateTimePicker, Presets API, Filament 11 tipos.
-- [x] ~~1.x-E-C: DateSheet custom Lumina Noir~~ — COMPLETADO 2026-04-13. BottomSheet 3 columnas scroll, haptic, preview, accent color. Desinstalado @react-native-community/datetimepicker.
-- [ ] 1.x-E-D: Campos condicionales — depends_on en config JSON. Ej: pais=Colombia → mostrar ciudades CO. Requiere: depends_on en Filament, FormStep evalua condiciones, fetch dinamico opciones. Endpoint cities/{code} ya existe. Campos NO hardcodeados — admin define dependencias.
-- [ ] 1.x-C: Roles asistente — si evento hibrido, step nuevo entre Auth y Photo: "Como participaras?" (presencial/virtual). Virtual=sin QR, directo al home. Config en Filament: tipo_participacion (presencial/virtual/hibrido).
-- [ ] 1.x-D: Estados evento lifecycle — 4 estados: registration_only → published → live → ended. Pantalla espera DaVinci con countdown (calculado desde event.starts_at). Push notification al cambiar estado. Config en Filament.
+### Tags + Modulos + Layout unificado (SESION DEDICADA ~6-8h)
+- [ ] **PLAN-TAGS-MODULOS** — Reemplaza 1.x-C (roles) + 1.x-F (pre-registro). Plan completo en `docs/PLAN-TAGS-MODULOS.md`. Resumen:
+  - Eliminar roles presencial/virtual, todos son "attendee"
+  - Tags JSON en attendee (vip, prensa, etc.) — admin por CSV
+  - Modulos con visibility_presence (all/checked_in/not_checked_in) + visibility_tags
+  - Check-in QR = trigger automatico, modulos aparecen via socket
+  - Pre-registro CSV: nombre+email+tags → invitacion → crear password → onboarding
+  - Layout app unificado (eliminar presencial/virtual tabs separados)
+  - QR para todos (identidad, no solo ticket)
+
+### Otros pendientes app
+- [ ] 1.x-E-D: Campos condicionales — depends_on en config JSON. Endpoint cities/{code} ya existe.
+- [ ] 1.x-D: Estados evento lifecycle — registration_only/published/live/ended + countdown DaVinci.
 
 ---
 
 ## PRIORIDAD BAJA — post-venta o si lo piden
 
 ### Registro avanzado
-- [ ] 1.x-F: Registro cerrado (lista invitados) — admin sube CSV/emails en Filament. Onboarding AuthStep valida email contra lista. Si no esta: toast "No estas en la lista".
-- [ ] 1.x-G: Registro por codigo de acceso — admin genera codigos en Filament (unicos o grupales, con limite de usos). Campo "Codigo de acceso" antes del registro. Valida contra backend.
-- [ ] 1.x-H: Staff invite push + cambio de rol — admin invita desde Filament → push "Fuiste invitado al equipo" → app cambia layout a vendedor (tabs: Mi Stand, Leads, etc.). Requiere socket o push + cambio rol en authStore.
+- [ ] 1.x-G: Registro por codigo de acceso — admin genera codigos en Filament, campo validacion.
+- [ ] 1.x-H: Staff invite push + cambio de rol — push + socket + layout vendedor.
 
 ### Features opcionales
 - [ ] 1.C2: Wallet digital — badge en Apple Wallet (.pkpass) + Google Wallet (JWT). Reemplaza badge printing fisico como default.
