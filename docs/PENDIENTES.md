@@ -160,12 +160,15 @@ Estos features son los que nos separan de Cisco/ICE360. Sin ellos somos iguales.
 - [ ] Configurable desde Filament: sponsor, imagen, duracion, puntos
 
 ### 7. Juegos Unity en stands + Sponsor Game API
-- [ ] Vendedor escanea QR del asistente → celular del asistente se convierte en control (joystick/botones)
+Flujo completo:
+- [ ] Vendedor escanea QR del asistente → socket a Unity "jugador listo" + socket a app "modo joystick ON"
+- [ ] App: nuevo slide contextual en gamification carousel "Estas jugando en [Stand]" → tap abre joystick overlay
+- [ ] Joystick envia inputs (X/Y, botones) via socket → Unity en TV del stand los recibe
+- [ ] Unity termina → socket "game:finished {score: 850}" → backend guarda score + puntos gamificacion
+- [ ] App: slide desaparece, toast "Ganaste 50pts", lead capturado automatico
 - [ ] Stand con feature "juego" activado en Filament → aparece opcion en Mi Stand
-- [ ] Socket relay: app (control) ↔ Socket.IO ↔ Unity WebGL (TV del stand)
-- [ ] Lead capturado automaticamente + puntos gamificacion
-- [ ] Game Bridge: pieza tecnica celular ↔ Unity via Socket.IO (juegos DaVinci ya existen)
-- [ ] **Sponsor Game API**: si el sponsor ya tiene su propio juego (web, Unity, etc.), le ofrecemos endpoint POST /api/v1/games/{game_id}/score con API key. El juego externo envia score → se suma a gamificacion + leaderboard + aparece en actividad del asistente. El sponsor integra una linea de codigo y su juego ya forma parte del ecosistema EventOS.
+- [ ] Game Bridge: solo un relay socket — nosotros somos el cable, Unity maneja el estado del juego
+- [ ] **Sponsor Game API**: sponsor con juego propio integra POST /api/v1/games/{game_id}/score con API key → score se suma a gamificacion + leaderboard. Una linea de codigo, su juego ya es parte del ecosistema EventOS.
 
 ---
 
