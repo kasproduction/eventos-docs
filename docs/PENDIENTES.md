@@ -113,27 +113,77 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`. Resumen:
 
 ---
 
-## Fase 2 — Features complejos (cuando haya cliente)
+## MVP — Diferenciadores (implementar ANTES del pitch)
 
-### Experiencias interactivas
-- [ ] Photo/Caption Contest — galeria con votos. Depende de social wall.
-- [ ] Trivia live tipo Kahoot — preguntas en tiempo real, ranking por velocidad.
-- [ ] Ruleta en vivo — backend detecta conectados, asigna puntos solo a presentes.
-- [ ] Sorteo en vivo (jackpot) — participantes automaticos: presenciales (checked_in_at) + virtuales (socket conectados). Zero botones. Slot machine con fotos, ganador + confetti en display + app.
-- [ ] Momentos en Vivo branded — admin configura, publicar → push + socket + social + display.
+Estos features son los que nos separan de Cisco/ICE360. Sin ellos somos iguales.
 
-### Comunicacion avanzada
-- [ ] Video calls 1:1 (LiveKit) — sala efimera dentro del networking.
-- [ ] Proximity chat (spatial audio) — tipo Gather. Solo web. Depende de web + LiveKit.
-- [ ] Networking speed-dating virtual — match aleatorio, timer 3 min.
+### 1. Ruleta en vivo
+- [ ] Presentador activa desde Filament → app muestra ruleta girando a todos los conectados
+- [ ] Participantes automaticos: presenciales (checked_in_at) + virtuales (socket room). Zero botones.
+- [ ] Cae en premio → asigna puntos/premio automaticamente → push al ganador
+- [ ] Display venue: ruleta grande en pantalla. App: ruleta en el celular de cada asistente.
+- [ ] Incentiva que la gente este atenta al celular durante el evento
 
-### Gamificacion avanzada
-- [ ] Subasta de puntos — premios en tiempo real, timer 60s, bids via socket.
-- [ ] Donde esta el patrocinador — juego visual, primeros 10 ganan puntos.
+### 2. Foto mas votada (gamificacion social)
+- [ ] La foto con mas likes en el social wall genera puntos bonus de gamificacion
+- [ ] Ranking de fotos por likes (periodo configurable: por dia, por evento)
+- [ ] Top 3 fotos premiadas automaticamente (puntos o premio configurable)
+- [ ] Se integra con social wall existente (wall_post_likes ya existe) + gamificacion existente
+- [ ] NO es caption contest — es engagement organico con contenido real del evento
 
-### Juegos / Integraciones
-- [ ] Juegos Unity en stands — app como control (joystick). Lead automatico + puntos.
-- [ ] Game Bridge (Unity <> App) — bridge socket, juegos ya existen.
+### 3. Sorteo en vivo (jackpot)
+- [ ] Participantes automaticos: presenciales (checked_in_at) + virtuales (socket conectados). Zero botones.
+- [ ] Admin activa desde Filament → countdown en app + display
+- [ ] Slot machine con fotos de participantes girando en display venue + app
+- [ ] Ganador: foto grande + confetti + push notification
+- [ ] Puede filtrar por tags (ej: sorteo solo para VIP)
+
+### 4. Trivia live tipo Kahoot
+- [ ] Speaker/admin lanza pregunta desde Filament → aparece en app de todos los conectados
+- [ ] Timer por pregunta (10-30s configurable). Respuesta correcta + rapidez = mas puntos.
+- [ ] Ranking en tiempo real visible en display venue + app
+- [ ] Base: sistema de encuestas S1.10 ya existe, refactor a modo competitivo
+- [ ] RENDIMIENTO: evaluar cuidadosamente — 5000 respuestas simultaneas via socket. Posible solucion: batch responses, Redis counter, resultado calculado server-side.
+
+### 5. Networking Tinder-style
+- [ ] Dentro de networking, vista deslizable con sugeridos (matchmaking por intereses ya existe)
+- [ ] Home networking muestra 2 cards sugeridos. "Ver todos" abre interfaz tipo Tinder.
+- [ ] Swipe derecha = conectar, swipe izquierda = pasar. Sin timer (no es speed-dating forzado).
+- [ ] Match mutuo → toast + puntos gamificacion + chat habilitado
+- [ ] Reutiliza: suggested-contacts API, matchmaking por intereses, networking requests
+
+### 6. Donde esta el patrocinador
+- [ ] Juego visual: logo de un sponsor se "esconde" en una imagen del evento
+- [ ] Aparece en app (push/modal) + display venue
+- [ ] Timer: primeros 10 en encontrarlo ganan puntos
+- [ ] Sponsor paga por la visibilidad — monetizacion directa
+- [ ] Configurable desde Filament: sponsor, imagen, duracion, puntos
+
+### 7. Juegos Unity en stands + Sponsor Game API
+- [ ] Vendedor escanea QR del asistente → celular del asistente se convierte en control (joystick/botones)
+- [ ] Stand con feature "juego" activado en Filament → aparece opcion en Mi Stand
+- [ ] Socket relay: app (control) ↔ Socket.IO ↔ Unity WebGL (TV del stand)
+- [ ] Lead capturado automaticamente + puntos gamificacion
+- [ ] Game Bridge: pieza tecnica celular ↔ Unity via Socket.IO (juegos DaVinci ya existen)
+- [ ] **Sponsor Game API**: si el sponsor ya tiene su propio juego (web, Unity, etc.), le ofrecemos endpoint POST /api/v1/games/{game_id}/score con API key. El juego externo envia score → se suma a gamificacion + leaderboard + aparece en actividad del asistente. El sponsor integra una linea de codigo y su juego ya forma parte del ecosistema EventOS.
+
+---
+
+## Nice to have (post-MVP)
+
+### Momentos en Vivo branded
+- [ ] Admin configura desde Filament: sponsor, tipo, titulo, ganador, logo
+- [ ] Publicar → push + socket + social wall + display venue
+- [ ] Un componente, infinitos usos: sorteos, reconocimientos, anuncios, hackatones
+
+### Video calls 1:1 (LiveKit)
+- [ ] Sala efimera dentro del networking. Requiere infra media server.
+
+### Proximity chat (spatial audio)
+- [ ] Tipo Gather. Solo web app. Depende de web + LiveKit.
+
+### Subasta de puntos
+- [ ] Premios en tiempo real, timer 60s, bids via socket.
 
 ---
 
