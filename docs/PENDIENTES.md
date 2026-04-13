@@ -130,5 +130,6 @@ Ninguno critico. 3 code smells documentados (CS-001/002/003).
 | `docs/FASE-SEGURIDAD.md` | Auditoria OWASP + SEC-1 a SEC-5 + SEC-3b |
 | `docs/BUG-LOG.md` | Bugs historicos BUG-001 a BUG-078 |
 | `docs/QA-AUTH-ONBOARDING.md` | QA checklist auth/onboarding — 30+ escenarios, flags, bugs |
+| `docs/QA-MASTER.md` | Barrido completo plataforma — 20 modulos, 35+ endpoints, middleware check |
 | `docs/COMPLIANCE-SEGURIDAD.md` | Compliance legal/GDPR |
 | `docs/DISPONIBILIDAD-HA.md` | Alta disponibilidad + deploy strategy |

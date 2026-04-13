@@ -9,7 +9,7 @@
 
 | Modulos probados | Endpoints testados | OK | Bugs | Notas |
 |-----------------|-------------------|-----|------|-------|
-| 20 | 35+ | 33 | 1 corregido | 1 requiere data de prueba |
+| 20 | 50+ | 48 | 1 corregido | Escritura + 3 roles verificados |
 
 **Bug corregido en esta sesion:**
 - `/me`, `/refresh`, `/verify-email`, `/expo-token` no tenian `check.ban` middleware — usuario baneado podia llamar `/me` y recibir 200. Fix: `eeb6ebc`
@@ -232,12 +232,52 @@
 
 ---
 
+---
+
+## Endpoints de escritura (POST/PUT/DELETE)
+
+| Endpoint | Metodo | Resultado | HTTP | Notas |
+|----------|--------|-----------|------|-------|
+| `/events/{id}/wall` | POST | OK | 200 | Crea post, devuelve id + body |
+| `/events/{id}/wall/{pid}/like` | POST | OK | 200 | Devuelve likes_count |
+| `/events/{id}/wall/{pid}/comments` | POST | OK | 200 | Crea comentario |
+| `/events/{id}/sessions/{sid}/questions` | POST | OK | 200 | Crea pregunta con status: pending |
+| `/events/{id}/agenda/{sid}/favorite` | POST | OK | 200 | Toggle: is_favorite true/false |
+| `/contacts/request` | POST | OK | 200 | Requiere receiver_attendee_id + event_id |
+| `/contacts/block/{id}` | POST | OK | 204 | Requiere event_id en body |
+| `/contacts/block/{id}` | DELETE | OK | 204 | Desbloquear |
+| `/me/profile` | PUT | OK | 200 | Actualiza company, job_title, etc |
+| `/me/registration-fields` | PUT | OK | 200 | Guarda campos custom |
+| `/events/{id}/onboarding/survey` | POST | OK | 200 | Guarda intereses |
+| `/auth/expo-token` | POST | OK | 204 | Requiere token + event_id |
+| `/events/{id}/photos` | POST | Validacion | 422 | "photo field required" (correcto sin archivo) |
+| `/events/{id}/sessions/{sid}/rate` | POST | OK | 409 | "Ya evaluaste" (correcto, duplicado) |
+
+---
+
+## Pruebas por rol
+
+### Presencial (14 modulos)
+- Agenda, speakers, sponsors, social, networking, gamification, QR, chat, Q&A: OK
+- Modulos: agenda, speakers, documentos, anuncios, chat, encuestas, banners, patrocinadores, fotos, social, leaderboard, networking, checkin, leads
+
+### Virtual (11 modulos)
+- Ve: agenda, speakers, documentos, anuncios, chat, encuestas, banners, patrocinadores, fotos, social, leaderboard
+- NO ve: checkin, leads, networking presencial
+- QR token: null (correcto — badge sin QR en la app)
+
+### Vendedor
+- Mi Stand: OK (responde, name puede estar vacio si no tiene sponsor asignado)
+- Leads: OK (0 leads, correcto para prueba)
+- Export leads: OK (200, genera CSV)
+
+---
+
 ## Proximos pasos QA
 
-- [ ] Probar endpoints de escritura (crear post, enviar pregunta, votar poll)
-- [ ] Probar con usuario vendedor (leads, mi stand)
-- [ ] Probar con usuario virtual (verificar que ve solo lo permitido)
-- [ ] Probar rate limiting en todos los endpoints criticos
+- [ ] Probar rate limiting en endpoints criticos (registro, login ya verificados)
 - [ ] Verificar que modulos desactivados devuelven 403/404
-- [ ] Probar upload de fotos (profile, social wall, photobooth)
+- [ ] Probar upload de fotos real (profile, social wall, photobooth)
 - [ ] Probar calendar .ics download
+- [ ] Q&A: aprobar pregunta desde admin y probar upvote
+- [ ] Crear poll desde Filament y probar vote
