@@ -94,6 +94,41 @@
 
 ---
 
+## FASE 2 — Features complejos (cuando haya cliente con requerimiento)
+
+### Web App (W.0–W.12) — ya en prioridad alta arriba
+
+### Experiencias interactivas
+- [ ] Photo/Caption Contest — galeria con votos, caption contest. Depende de social wall (ya existe).
+- [ ] Trivia live tipo Kahoot — preguntas en tiempo real, ranking por velocidad, puntos. Base encuestas S1.10.
+- [ ] Ruleta en vivo — presentador gira, backend detecta conectados, asigna puntos solo a presentes.
+- [ ] Sorteo en vivo (jackpot) — boton "Participar" 30s, slot machine fotos, ganador + confetti. Requiere pantalla display.
+- [ ] Momentos en Vivo branded — admin configura (sponsor, tipo, titulo, ganador, logo). Publicar → push + socket + social + display. Un componente, infinitos usos.
+
+### Comunicacion avanzada
+- [ ] Video calls 1:1 (LiveKit) — videollamada dentro del networking. Sala efimera. Requiere infra media server.
+- [ ] Proximity chat (spatial audio) — espacio virtual tipo Gather. Solo web. El mas complejo. Depende de web + LiveKit.
+- [ ] Networking speed-dating virtual — match aleatorio, timer 3 min, opcion conectar/pasar.
+
+### Gamificacion avanzada
+- [ ] Subasta de puntos — premios se subastan en tiempo real (no precio fijo). Timer 60s, bids via socket.
+- [ ] Donde esta el patrocinador — juego visual: logo se esconde, todos adivinan. Primeros 10 ganan puntos.
+
+### Juegos / Integraciones
+- [ ] Juegos Unity en stands — vendedor escanea QR, app del asistente se convierte en control (joystick). Lead automatico + puntos.
+- [ ] Game Bridge (Unity <> App) — celular como control de juegos Unity en stands. Solo el bridge, juegos existen.
+
+---
+
+## FASE 3 — SaaS + Monetizacion (cuando haya segundo cliente)
+
+- [ ] 3.1: Multi-tenant + aislamiento de recursos — queue isolation, rate limiting por evento, Redis DBs, read replicas, container isolation.
+- [ ] 3.2: Stripe + facturacion — laravel/cashier, planes, billing.
+- [ ] 3.3: Data export (Ley 1581/GDPR) — exportar datos personales, derecho al olvido.
+- [ ] 3.4: Juegos Unity + Socket.IO bridge — bridge completo con Unity WebGL.
+
+---
+
 ## Documentos de referencia
 
 | Doc | Contenido |
