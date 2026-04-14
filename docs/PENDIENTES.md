@@ -46,6 +46,11 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`.
 - [x] Admins ven todos los modulos (skip role filter)
 - [x] Migration roles en modules JSON (presencial→attendee)
 
+### Agenda overview
+- [ ] Vista resumen del programa antes de las sesiones individuales. No "charla X a las 10am" sino vista general del dia/programa.
+- [ ] Posible: cards por dia con resumen (3 keynotes, 5 workshops, 2 paneles), tracks destacados, speakers principales.
+- [ ] Se muestra arriba de la lista de sesiones o como tab/toggle (Overview | Sesiones).
+
 ### Onboarding
 - [ ] 1.x-E-D: Campos condicionales — depends_on en config JSON. Ej: pais=Colombia → ciudades CO. Endpoint cities/{code} ya existe.
 
@@ -59,6 +64,9 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`.
 ### Registro avanzado
 - [ ] 1.x-G: Registro por codigo de acceso — admin genera codigos en Filament, campo validacion.
 - [ ] 1.x-H: Staff invite push + cambio de rol — push + socket + layout vendedor.
+
+### Documentacion tecnica
+- [ ] Documentar arquitectura socket: una conexion, eventos, rendimiento, escalabilidad. Ref: project_socket_architecture.md
 
 ### Cleanup / Dev build
 - [ ] QA visual multi-device (ZTE 360dp + Medium 411dp)
