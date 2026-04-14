@@ -1,7 +1,7 @@
 # EventOS — Roadmap
 
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
-_Actualizado: 2026-04-13 | v4.0_
+_Actualizado: 2026-04-14 | v4.2_
 
 ---
 
@@ -10,12 +10,12 @@ _Actualizado: 2026-04-13 | v4.0_
 | Fase | Estado | Detalle |
 |------|--------|---------|
 | **Fase 0** — Setup | ✅ Completa | 4 sesiones, 2026-03-28 |
-| **Fase 1** — MVP funcional | ✅ ~98% | 22+ sesiones, 2026-03-29 → 2026-04-07 |
+| **Fase 1** — MVP funcional | ✅ ~98% | 22+ sesiones, 2026-03-29 → 2026-04-07. Tags+visibility backend 04-14 |
 | **UI/UX Lumina Noir** | ✅ ~98% | Barrido visual completo, 2026-04-07 → 2026-04-12 |
 | **Seguridad** | ✅ 80% | SEC-1/2/3 + 3b parcial. 42 tests. Pendiente: SEC-3b.2, 3b.4, 4, 5 |
 | **Onboarding DaVinci** | ✅ | 6 steps, configurable Filament, gamificacion, 5 backgrounds |
 | **Moderacion** | ✅ | Ban RT, palabras bloqueadas, chat monitor, slow mode |
-| **QA** | ✅ | 60+ endpoints, 20 modulos, 3 roles, 309 tests backend |
+| **QA** | ✅ | 60+ endpoints, 20 modulos, 314 tests backend |
 | **Deploy** | ⏳ | Docker + VPS + CI/CD |
 | **Fase 2** — Web app | ⏳ | Next.js, W.0–W.12 |
 | **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion |
@@ -53,6 +53,100 @@ _Actualizado: 2026-04-13 | v4.0_
 | **Documento maestro** | `EventOS_ClaudeCode_Prompt_v2.md` | Stack, modelos, API contracts, reglas de negocio |
 | **Dev setup** | `EventOS_DevSetup.md` | Instrucciones de desarrollo local |
 | **Roadmap historico** | `docs/ROADMAP-HISTORICO-v3.1.md` | Roadmap v3.1 completo (3,144 lineas) — checklists detallados de cada sesion, notas tecnicas, apendices A-J |
+
+---
+
+## Motor de modulos — como funciona (v4.1)
+
+El motor de modulos es el corazon de EventOS. Determina que ve cada asistente en la app
+segun **3 criterios que se evaluan en cascada**:
+
+### Los 3 filtros
+
+```
+GET /api/v1/events/{id}/modules
+
+Para cada modulo habilitado:
+  1. ROLE        → ¿el rol del attendee esta en module.roles[]?
+  2. PRESENCIA   → ¿cumple module.visibility_presence?
+  3. TAGS        → ¿el attendee tiene algun tag de module.visibility_tags[]?
+
+Si pasa los 3 → el modulo aparece en la app.
+Si falla cualquiera → oculto.
+```
+
+### Modelo de datos
+
+**Attendee** (campos relevantes):
+- `role` — enum: `attendee`, `vendedor`, `admin`, `admin_*`
+- `tags` — JSON array: `["vip", "prensa"]` o `[]`
+- `checked_in_at` — null (remoto) o datetime (llego al venue)
+
+**Module** (campos relevantes):
+- `roles` — JSON array: `["attendee"]`, `["vendedor"]`, `["attendee", "vendedor"]`
+- `visibility_presence` — enum: `all` | `checked_in` | `not_checked_in`
+- `visibility_tags` — JSON array o null: `["vip"]`, `null` (todos)
+
+### Casos de uso reales
+
+| Modulo | roles | visibility_presence | visibility_tags | Quien lo ve |
+|--------|-------|--------------------|-----------------| ------------|
+| Agenda | attendee, vendedor | all | null | Todos |
+| Streaming | attendee | all | null | Todos los asistentes |
+| Mapa Venue | attendee | checked_in | null | Solo los que llegaron al venue |
+| Zona VIP | attendee | all | ["vip"] | VIP siempre (incluso remoto) |
+| Dress Code | attendee | checked_in | ["vip"] | VIP que llegaron al venue |
+| Sala Prensa | attendee | all | ["prensa"] | Solo prensa |
+| Info Stands | attendee | checked_in | null | Presentes en el venue |
+| Mis Leads | vendedor | all | null | Solo vendedores |
+| Mi QR | attendee | all | null | Todos (QR = identidad) |
+
+### Flujo automatico: virtual → presencial
+
+```
+1. Maria se registra → role: attendee, tags: [], checked_in_at: null
+2. Ve: Agenda, Streaming, Mi QR, Social, Networking (modules con presence=all)
+3. NO ve: Mapa Venue (requiere checked_in)
+
+4. Maria llega al evento → staff escanea su QR
+5. Backend: checked_in_at = now()
+6. Socket broadcast: attendee:checkin { attendee_id: 42 }
+7. App de Maria: escucha, invalida query 'modules'
+8. Mapa Venue aparece en 1-2 segundos — zero intervencion admin
+```
+
+### Flujo VIP pre-registrado
+
+```
+1. Admin sube CSV: nombre, email, tags: ["vip"]
+2. Backend crea User + Attendee con tags ["vip"]
+3. VIP abre app → ve Zona VIP (tag match), NO ve Dress Code (no checked_in)
+4. VIP llega al venue → check-in → Dress Code aparece automaticamente
+```
+
+### Decision de diseno
+
+> **No hay tipos de evento. No hay roles presencial/virtual.**
+> Solo existe `attendee` con `tags` + `checked_in_at`.
+> Los modulos son inteligentes: el admin los configura una vez
+> y el sistema adapta la experiencia de cada persona automaticamente.
+
+### Donde se configura
+
+- **Filament > Modulos**: cada modulo tiene campos `Visibilidad por presencia` (Select) y `Visibilidad por tags` (TagsInput)
+- **Filament > Asistentes**: campo `Tags` editable por asistente
+- **CSV Import**: columna tags en import masivo
+- **API**: `GET /events/{id}/modules` ya devuelve solo los modulos visibles para ese usuario
+
+### Estado de implementacion — TODO COMPLETADO (2026-04-14)
+
+- [x] Backend: migrations, modelos, API, Filament, 314 tests
+- [x] App: layout unificado (merge presencial/virtual → tabs unico)
+- [x] App: socket checkin:update → invalidar modules
+- [x] Backend: CSV import con columna tags
+- [x] Event lifecycle: 4 estados (registration/published/live/ended)
+- [x] Countdown, InfoCard, Archive, About pre-evento
+- [x] Modalidad badge (presencial/virtual/hibrido)
 
 ---
 
@@ -151,7 +245,7 @@ git push origin develop
 | SEC-4: Docker, server hardening, Cloudflare, backups | ⏳ | — | sesion deploy |
 | SEC-5: SecurityLogger, Sentry, uptime | ⏳ | — | sesion deploy |
 
-Total: 42 security tests, 309 tests backend, 0 TS errors.
+Total: 42 security tests, 314 tests backend, 0 TS errors.
 
 ---
 
@@ -175,7 +269,7 @@ Home, Agenda, Speakers, Streaming, Social, Sponsors, Profile, Encuestas, Chat, M
 | ID | Feature | Detalle |
 |----|---------|---------|
 | 1.x-E-B | FormStep tipos avanzados | searchable_select (paises), checkbox_group, date picker |
-| 1.x-C | Roles asistente | presencial/virtual/hibrido — step nuevo si hibrido |
+| ~~1.x-C~~ | ~~Roles asistente~~ | **ELIMINADO** — ya no existen roles presencial/virtual, reemplazado por tags+visibility |
 | 1.x-D | Estados evento lifecycle | registration_only/published/live/ended + countdown DaVinci |
 | 1.x-F | Registro cerrado | CSV/emails admin, onboarding valida contra lista |
 | 1.x-G | Registro por codigo | Admin genera codigos en Filament, campo validacion |
@@ -188,7 +282,7 @@ Home, Agenda, Speakers, Streaming, Social, Sponsors, Profile, Encuestas, Chat, M
 | ID | Feature | Prioridad | Detalle |
 |----|---------|-----------|---------|
 | 1.C1 | Analytics dashboard | MAXIMA | ROI, engagement, asistencia. Justifica precio. Ambos competidores lo tienen. |
-| 1.C3 | QR dinamico rotativo | Media | HMAC-SHA256 cada 30-60s. Reemplaza reconocimiento facial. |
+| 1.C3 | ~~QR dinamico rotativo~~ | ✅ | HMAC-SHA256 60s, O(1). Completado 04-13. |
 | 1.C5 | Calendar sync (.ics) | Media | Archivo .ics universal por sesion. QA-MASTER confirma endpoint funcional. |
 | 1.23 | Permisos granulares Filament | Media | Spatie ya instalado, falta wiring. |
 | 1.C2 | Wallet digital | Baja | Apple Wallet + Google Wallet. Post-venta. |
@@ -415,5 +509,5 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 
 ---
 
-_EventOS Roadmap v4.0 — Kasproduction_
-_13 abril 2026_
+_EventOS Roadmap v4.2 — Kasproduction_
+_14 abril 2026_

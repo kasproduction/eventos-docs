@@ -2,24 +2,49 @@
 
 > La UNICA fuente de verdad de lo que falta por hacer.
 > Organizado por area de trabajo, no por prioridad.
-> Actualizado: 2026-04-13
+> Actualizado: 2026-04-14
 
 ---
 
 ## App movil
 
-### Tags + Modulos + Layout unificado (SESION DEDICADA ~6-8h)
-Plan completo en `docs/PLAN-TAGS-MODULOS.md`. Resumen:
-- [ ] Eliminar roles presencial/virtual, todos son "attendee"
-- [ ] Tags JSON en attendee (vip, prensa, etc.) — admin por CSV
-- [ ] Modulos con visibility_presence (all/checked_in/not_checked_in) + visibility_tags
-- [ ] Check-in QR = trigger automatico, modulos aparecen via socket
-- [ ] Pre-registro CSV: nombre+email+tags → invitacion → crear password → onboarding
-- [ ] Layout app unificado (eliminar presencial/virtual tabs separados)
-- [ ] QR para todos (identidad, no solo ticket)
+### Tags + Modulos + Layout unificado
+Plan completo en `docs/PLAN-TAGS-MODULOS.md`.
 
-### Estados del evento
-- [ ] 1.x-D: Lifecycle — registration_only/published/live/ended + countdown DaVinci + modo archivo post-evento. Config en Filament.
+**Backend COMPLETADO** (commit 30ce854, 2026-04-14):
+- [x] Eliminar roles presencial/virtual, todos son "attendee"
+- [x] Tags JSON en attendee (vip, prensa, etc.) — admin editable en Filament
+- [x] Modulos con visibility_presence (all/checked_in/not_checked_in) + visibility_tags
+- [x] QR para todos (identidad, no solo ticket)
+- [x] API ModuleController filtra por role + presencia + tags
+- [x] 48 archivos, 314 tests passing
+
+**App COMPLETADO** (commit 810cc89, 2026-04-14):
+- [x] Layout app unificado (merge presencial/virtual tabs → tabs unico)
+- [x] Cleanup app: authStore types, homeRouteForRole, eliminar (presencial)/(virtual)
+- [x] 14 archivos eliminados, 6 creados, 9 actualizados. TS ok, bundle ok.
+
+**CSV con tags COMPLETADO** (commit 4165130):
+- [x] CSV import soporta columna tags (auto-detect: tags/etiquetas/grupos)
+
+**Socket checkin COMPLETADO** (commit 267ec45):
+- [x] App escucha checkin:update → invalida modules del propio usuario
+- [x] Debounce 800ms para invalidaciones socket (commit 167c72c)
+
+**Pendiente:**
+- [ ] Pre-registro CSV: email invitacion con deep link + flujo "Crea tu contrasena" (backend ya crea User+Attendee con tags, falta UX de activacion mejorada)
+
+### Estados del evento — COMPLETADO (2026-04-14)
+- [x] 1.x-D: Lifecycle — 4 estados: draft/registration/published/live/ended
+- [x] Countdown DaVinci (normal + compact) + "El evento comienza hoy" cuando expira
+- [x] Modo archivo post-evento: banner + stats + links a agenda/social/gamification/speakers
+- [x] Modalidad badge: presencial/virtual/hibrido en InfoCard
+- [x] EventInfoCard: modalidad, venue, registrados, cierre registro
+- [x] About pre-evento: modulo opcional, toggle habilitado, imagen+texto+links, pantalla dedicada
+- [x] ModuleMenu compact en published (cards 56px)
+- [x] Config en Filament: status, modality, fechas, venue, capacidad, about condicional
+- [x] Admins ven todos los modulos (skip role filter)
+- [x] Migration roles en modules JSON (presencial→attendee)
 
 ### Onboarding
 - [ ] 1.x-E-D: Campos condicionales — depends_on en config JSON. Ej: pais=Colombia → ciudades CO. Endpoint cities/{code} ya existe.

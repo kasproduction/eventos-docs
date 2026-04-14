@@ -2,7 +2,7 @@
 
 > Historial de todo lo implementado, organizado por area.
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
-> Actualizado: 2026-04-13
+> Actualizado: 2026-04-14
 
 ---
 
@@ -274,3 +274,58 @@ Total: 42 security tests, 309 tests backend.
 - [x] Cursor fantasma, minimize-to-pill, TNT finale, progress dots, play gate
 - [x] GSAP skills repo clonado (design/gsap-skills/)
 - [x] Spatial UI documentado en roadmap (Apendice F → docs/WEB-APP-PLAN.md)
+
+## Tags + Visibilidad modulos — Backend (2026-04-14)
+
+- [x] Migration: campo `tags` JSON en attendees (default [])
+- [x] Migration: `visibility_presence` enum + `visibility_tags` JSON en modules
+- [x] Roles simplificados: presencial/virtual eliminados → `attendee` unico
+- [x] Attendee model: cast tags array, helper `hasAnyTag()`
+- [x] Module model: cast visibility_tags array
+- [x] ModuleController: filtrado triple (role + checked_in_at + tags)
+- [x] QR disponible para todos los attendees (identidad, no solo ticket)
+- [x] CheckinService: attendance count usa attendee (no presencial)
+- [x] API resources: AttendeeResource expone tags, ModuleResource expone visibility
+- [x] Filament: 9 resources actualizados (roles attendee/vendedor, TagsInput, visibility selectors)
+- [x] Validation rules: NotificationController, AttendeeController actualizados
+- [x] Observers: ModuleObserver + ContentObserver con nuevas cache keys
+- [x] AuthService + AttendeesImport: default role attendee
+- [x] AttendeeFactory: +withTags() state, default attendee
+- [x] 48 archivos modificados, 314 tests passing (797 assertions), 0 fallos
+- [x] Commit: 30ce854
+
+## Layout unificado — App (2026-04-14)
+
+- [x] Merge (presencial)/(tabs) + (virtual)/(tabs) → (tabs)/ unico
+- [x] Home unificado con logica vendor condicional (isVendor)
+- [x] UserRole simplificado: 'attendee' | 'vendedor' | 'admin'
+- [x] Ruta unica homeRoute() → /(app)/(tabs) para todos
+- [x] authStore, authApi, DoneStep, MiQrScreen, ProfileScreen, activate-account, pending-approval actualizados
+- [x] 14 archivos eliminados (layouts duplicados), 6 creados, 9 actualizados
+- [x] TypeScript 0 errores nuevos, Expo bundle compila OK (4.6MB)
+- [x] Commit: 810cc89
+
+## Event Lifecycle — Backend + App (2026-04-14)
+
+- [x] Migration: status enum (draft/registration/published/live/ended) + modality enum en events
+- [x] Migration: about_enabled, about_image_url, about_text, about_links en events
+- [x] Migration: roles en modules JSON (presencial/virtual → attendee)
+- [x] Admins ven todos los modulos (skip role filter en ModuleController)
+- [x] Branding API: status, modality, venue, max_attendees, registered_count, session_count, photo_count, about_*
+- [x] Filament: estado+modalidad+fechas+venue+capacidad+about condicional con toggle
+- [x] EventObserver → InvalidationService → socket data:invalidate → app refetch
+- [x] App: 4 estados de Home (registration, published, live, ended)
+- [x] CountdownTimer: normal (registration) + compact (published) + "comienza hoy" (expired)
+- [x] EventInfoCard: modalidad badge, venue, registrados/capacidad, cierre registro
+- [x] EventArchive: banner finalizado + stats + links a agenda/social/gamification/speakers
+- [x] About pre-evento: pantalla /(app)/about con imagen+texto+links, card en Home registration
+- [x] ModuleMenu compact en published (cards 56px, iconos 16px)
+- [x] Socket debounce 800ms por entidad (7 invalidaciones = 1 refetch)
+- [x] useBranding staleTime 30min → 5min + refetchQueries
+- [x] Role pill eliminado de Mi QR, Perfil, DoneStep
+- [x] Fix: branding API crasheaba por columna 'approved' inexistente
+- [x] Fix: Stack.Screen mi-qr fantasma causaba socket reconnect loop
+- [x] Seeders actualizados (7 archivos presencial→attendee)
+- [x] 314 tests backend, TS 0 errores app
+- [x] Commits backend: d970983, e4a3981, 7a61a87, 878a0b3, d375e26, d48b559, 7bda761, b25518b
+- [x] Commits app: 810cc89, 59f49f7, 267ec45, 90edd7f, 7f6f6cd, c26eb06, 0e5ff8b, f30c9fd, 167c72c, 95b8aa5, b81e22a, bcc7649, 142d039, daf8411, 877a851, 85ee6f3
