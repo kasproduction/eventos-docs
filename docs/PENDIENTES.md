@@ -93,6 +93,88 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`.
 
 ---
 
+## Bancolombia — Requerimientos específicos
+
+> Contexto: reunión 2026-04-14. Competencia mostró webapp (fea, 60 días).
+> Bancolombia necesita flujo completo webapp + landing + experiencia.
+> Formato especial: "sonido silencioso" (silent disco) — un salón, audífonos, dos charlas simultáneas.
+> Eventos multi-país (Colombia + Panamá) y multi-ciudad (Bogotá + Medellín).
+
+### Silent Disco — Toggle por evento
+Feature toggle: solo se activa cuando el evento usa sistema de audífonos con canales.
+
+- [ ] Backend: `silent_disco_enabled` en config del evento (Filament toggle)
+- [ ] Backend: tabla `session_attendances` (event_session_id, attendee_id, token UUID, joined_at, left_at)
+- [ ] Backend: API `POST /sessions/{id}/join` → genera token único, registra asistencia
+- [ ] Backend: API `DELETE /sessions/{id}/leave` → cierra asistencia (left_at = now)
+- [ ] Backend: Scoping — Q&A, polls, ratings filtran por attendees que hicieron join a ESA sesión
+- [ ] Socket: `session:joined` / `session:left` → actualizar contadores en tiempo real
+- [ ] App: Agenda detecta sesiones simultáneas (mismo room + mismo horario) → agrupar visualmente
+- [ ] App: Botón "Asistir" en cada sesión simultánea → llama join API → estado activo
+- [ ] App: Puede cambiar de sesión en cualquier momento (leave + join)
+- [ ] App: Indicador visual "Estás en esta charla" con token visible
+- [ ] Filament: Vista asistencia por sesión (quién estuvo en cuál, duración)
+- [ ] Métricas: engagement por charla (polls respondidos, Q&A, ratings) cruzado con asistencia
+
+### Multi-location con tracks
+Tracks ya implementados (S1.12). Solo requiere uso correcto:
+
+- [ ] Crear tracks por ciudad/país: "Bogotá", "Medellín", "Panamá"
+- [ ] Agenda filtra por track → asistente ve solo charlas de su ubicación
+- [ ] Sesiones simultáneas sin filtro: aparecen stacked con TrackBadge diferenciando
+
+### Webhooks — Integración con partners de registro/badges
+Empresas especializadas en registro presencial (impresoras de escarapelas, hardware propio).
+EventOS les entrega data, ellos devuelven el check-in.
+
+**Outbound (EventOS → Partner):**
+- [ ] Webhook configurable por evento en Filament (URL destino + secret key)
+- [ ] Eventos: `attendee.registered`, `attendee.updated`, `attendee.approved`
+- [ ] Payload: id, name, email, company, role, tags, photo_url, qr_identifier
+- [ ] Retry con backoff (3 intentos) via queue job
+- [ ] Alternativa pull: API key para partner → `GET /api/v1/events/{id}/attendees` (paginado, filtrable)
+
+**Inbound (Partner → EventOS):**
+- [ ] `POST /api/v1/webhooks/checkin` autenticado con API key por partner
+- [ ] Payload: `{ identifier: "email o qr_code", event_id, checked_in_at? }`
+- [ ] Backend: actualiza `checked_in_at` → dispara socket `attendee:checkin` → módulos se actualizan
+- [ ] Reutiliza: misma lógica que el kiosco (S1.4), solo cambia el origen
+- [ ] Log: registrar quién hizo el check-in (source: "partner:badge_company_name")
+
+**Seguridad:**
+- [ ] API keys por partner (generadas en Filament, hash en BD)
+- [ ] Rate limiting por API key
+- [ ] Validar que el attendee pertenece al evento del partner
+
+### Mission Control — Display en vivo (evento + pitch)
+Vista "mission control" web para pantalla grande o demo. Solo escucha socket — CERO carga extra al server.
+Se activa cuando el evento está en estado `live`.
+
+- [ ] Web page standalone (HTML + Socket.IO client + GSAP/CSS animations)
+- [ ] Contador en vivo: presenciales (checked_in_at) + virtuales (socket room.size) + total
+- [ ] Feed de actividad: "Pedro Pérez ingresó" con avatar difuminado, "María se conectó", "Juan salió"
+- [ ] Feed gamificación: "Kamilo redimió 50 puntos" con animación partículas
+- [ ] Sesión activa actual + cuántos asistentes en ella ahora mismo
+- [ ] Encuesta/trivia: barras que crecen en tiempo real (consume poll:vote)
+- [ ] Ruleta: animación pantalla grande cuando se activa (consume roulette:spin)
+- [ ] Leaderboard: posiciones moviéndose con transiciones suaves
+- [ ] Auth: token admin o URL con secret para acceder
+- [ ] Responsive: optimizado para 1920x1080 (display venue) + 1280x720 (laptop pitch)
+- [ ] Konva.js candidato para canvas animado (ref: https://konvajs.org/docs/sandbox.html)
+- Reutiliza: TODOS los eventos socket existentes. No requiere endpoints nuevos.
+- Doble uso: display durante el evento EN VIVO + herramienta de demo para pitch a clientes.
+
+### Login — mostrar intentos restantes
+- [ ] App: en error de contraseña, mostrar "X intentos restantes" (rate limiting SEC-3 ya existe en backend, falta UX)
+- [ ] Backend: devolver `remaining_attempts` en response 422 del login
+
+### Encuesta post-evento automática
+- [ ] Backend: trigger cuando event.status cambia a `ended` → activar módulo encuesta
+- [ ] App: al detectar estado `ended`, mostrar modal/redirect a encuesta de satisfacción
+- [ ] Reutiliza: live_poll_questions (S1.10) con tipo "post_event_survey"
+
+---
+
 ## Backend / Admin
 
 ### Analytics Dashboard (1.C1)

@@ -490,20 +490,46 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 
 ---
 
-## Timeline cliente ancla — Eventos Efectivos, septiembre 2026
+## Clientes en pipeline
+
+### Bancolombia (enterprise, alta prioridad)
+- **Contexto:** Reunión 2026-04-14. Competencia presentó webapp (UI pobre, promete 60 días).
+- **Requerimiento:** Flujo completo webapp + landing + experiencia asistente.
+- **Formato especial:** Silent Disco (un salón, audífonos, charlas simultáneas).
+- **Escala:** Multi-país (Colombia + Panamá), multi-ciudad (Bogotá + Medellín).
+- **Ventaja nuestra:** App nativa + real-time + gamificación + Lumina Noir. Backend 100% listo.
+- **Riesgo:** Web app no existe aún. Es el blocker principal.
+- **Acción:** Web app es ahora prioridad máxima. Silent Disco como diferenciador.
+
+### Eventos Efectivos (cliente ancla original)
+- **Evento:** Septiembre 2026.
+- **Estado:** Producto listo, falta pitch.
+
+---
+
+## Timeline — ajustada con Bancolombia
 
 | Mes | Objetivo | Entregable |
 |-----|----------|------------|
-| **Abril** | Features competitivos (C1-C5) | Backend + app completos |
-| **Mayo** | Web app + deploy + UI sweep | Producto desplegado, web funcional |
-| **Junio** | Pitch + demo en vivo | Video demo 3 min a Eventos Efectivos |
-| **Julio** | Onboarding cliente | White-label, personalizacion, datos |
-| **Agosto** | Pruebas + ajustes | Stress test datos reales, feedback |
-| **Septiembre** | Evento en vivo | Primer caso de estudio real |
+| **Abril** | Silent Disco spec + web app setup + features competitivos | Backend silent disco + Next.js base |
+| **Mayo** | Web app core (landing + registro + agenda + streaming) | Demo web funcional |
+| **Junio** | Web app completa + deploy + demo Bancolombia | Producto desplegado, web + app |
+| **Julio** | Pitch Eventos Efectivos + onboarding Bancolombia | White-label, datos reales |
+| **Agosto** | Pruebas + ajustes ambos clientes | Stress test, feedback |
+| **Septiembre** | Eventos en vivo | Casos de estudio reales |
 
-### Filtro de decisiones
+### Estrategia competitiva
 
-> "Este feature me acerca al pitch de junio con Eventos Efectivos?"
+> La competencia tiene track record (ya hicieron eventos). Nosotros no.
+> Pero su producto es feo y genérico. El nuestro es 10x mejor — aún nadie lo vio.
+> Si el cliente vive una experiencia mediocre con ellos, la próxima vez busca algo mejor.
+> Mejor llegar después con algo impecable que llegar a medias y dar mala primera impresión.
+> El Mission Control + Silent Disco + Lumina Noir + real-time es el knockout.
+> Construir para ganar cualquier deal, no solo este.
+
+### Filtro de decisiones (actualizado)
+
+> "¿Este feature me acerca a cerrar Bancolombia o al pitch de Eventos Efectivos?"
 >
 > Si → hacerlo. No → posponerlo.
 
