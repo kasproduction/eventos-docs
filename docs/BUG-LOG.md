@@ -64,6 +64,36 @@
 - **Fix:** Nueva columna `onboarding_data` JSON en attendees + endpoints `GET/PUT /me/onboarding-data`
 - **Archivos:** Migration, `Attendee.php`, `ProfileController.php`, `api.php`, `FormStep.tsx`
 
+### BUG-090: PhotoStep replay — foto aparece sin animacion (RESUELTO)
+- **Severidad:** BAJA — cosmetic, foto aparece de golpe sin fade-in
+- **Causa:** `photoOpacity` se inicializaba a 1 si photoUri existia, pero en replay se seteaba despues del init
+- **Fix:** Inicializar opacity a 0, animar a 1 cuando se pre-carga la foto en replay
+- **Archivo:** `PhotoStep.tsx`
+
+### BUG-091: InterestsStep replay — IDs huerfanos no validados (RESUELTO)
+- **Severidad:** MEDIA — IDs de opciones eliminadas quedaban seleccionados invisiblemente
+- **Causa:** `selected_ids` del API se cargaban sin verificar que existieran en opciones actuales
+- **Fix:** Filtrar selected_ids contra IDs validos de options. Esperar a que options carguen antes de fetch.
+- **Archivo:** `InterestsStep.tsx`
+
+### BUG-092: FormStep pre-fill falla silenciosamente (RESUELTO)
+- **Severidad:** BAJA — usuario no sabe por que campos estan vacios en replay
+- **Causa:** `.catch(() => {})` sin feedback al usuario
+- **Fix:** Toast de error "No se pudieron cargar tus datos previos"
+- **Archivo:** `FormStep.tsx`
+
+### BUG-093: Session Detail favorite sin error handling (RESUELTO)
+- **Severidad:** BAJA — toggle falla sin informar al usuario
+- **Causa:** `toggleFavorite.mutate()` sin onError callback
+- **Fix:** Agregar `onError` con toast de error
+- **Archivo:** `session/[id].tsx`
+
+### BUG-094: invitation_token reutilizable tras intercepcion (RESUELTO)
+- **Severidad:** MEDIA — token interceptado podia usarse despues
+- **Causa:** check-email devolvia el mismo token siempre, tokens viejos seguian siendo validos
+- **Fix:** Regenerar token en cada check-email request. Token anterior se invalida automaticamente.
+- **Archivo:** `AuthController.php`
+
 ### BUG-088: dynamicOptions stale al cambiar pais en FormStep (RESUELTO)
 - **Severidad:** MEDIA — ciudades del pais anterior persisten si API falla
 - **Causa:** Al cambiar parent field, se reseteaba el valor del child pero no se limpiaban las opciones dinamicas en `dynamicOptions` state
