@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Spec de diseno UI/UX de EventOS — landing, estados evento, design system, pasos.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-13 | Estado: Paso 5 ~98% completado
+> Fecha: 2026-04-07 | Actualizado: 2026-04-14 | Estado: Paso 5 ~98% + Lifecycle COMPLETADO
 >
 > **Status tracking:** `docs/PENDIENTES.md` (lo que falta) + `docs/COMPLETADO.md` (lo que se hizo)
 
@@ -54,44 +54,77 @@ La landing es la primera impresión del evento. No es un simple formulario — e
 
 ---
 
-## 2. Estados del Evento (Lifecycle)
+## 2. Estados del Evento (Lifecycle) — IMPLEMENTADO 2026-04-14
 
-El evento tiene 3 estados que controlan qué ve el usuario. El admin cambia el estado desde Filament.
+El evento tiene 4 estados que controlan qué ve el usuario. El admin cambia el estado desde Filament (Evento > Branding & Hero > Estado del evento).
 
 ### 2.1 Definición de estados
 
 ```
-┌─────────────┐     ┌──────────┐     ┌─────────────┐
-│  pre_event  │ ──> │  active   │ ──> │ post_event  │
-└─────────────┘     └──────────┘     └─────────────┘
+┌──────────────┐     ┌───────────┐     ┌──────┐     ┌────────┐
+│ registration │ ──> │ published │ ──> │ live │ ──> │ ended  │
+└──────────────┘     └───────────┘     └──────┘     └────────┘
+       (+ draft como estado admin interno)
 ```
 
-| Estado | Registro | Login App | Qué ve en la app |
-|--------|----------|-----------|-------------------|
-| `pre_event` | Abierto (landing) | Permitido | Countdown + teaser (nombre, fecha, venue, speakers confirmados). Sin agenda completa, sin features interactivas |
-| `active` | Abierto o cerrado | Permitido | Acceso completo: agenda, networking, Q&A, social wall, gamificación, etc. |
-| `post_event` | Cerrado | Permitido (read-only) | Modo archivo: grabaciones, fotos, contactos hechos, certificados, encuesta NPS |
+| Estado | Home muestra | Tabs | Diferencia con Live |
+|--------|-------------|------|---------------------|
+| `draft` | Hero + Countdown + InfoCard | Solo Home | Admin configurando |
+| `registration` | Hero + Countdown + InfoCard + About (opcional) | Solo Home | Registro abierto, sin modulos |
+| `published` | Hero + Countdown compact + HappeningNow + ModuleMenu compact | Todos | App completa, countdown visible |
+| `live` | Hero + HappeningNow + ModuleMenu | Todos | Identico a la app actual |
+| `ended` | Hero + Banner finalizado + Stats + Archive links | Solo Home | Read-only, links a contenido |
 
-### 2.2 Pantalla Countdown (pre_event)
+### 2.2 Componentes implementados
 
-Cuando el usuario hace login pero el evento no está activo:
+| Componente | Archivo | Donde se usa |
+|-----------|---------|-------------|
+| `CountdownTimer` | `components/ui/CountdownTimer.tsx` | registration (normal), published (compact) |
+| `EventInfoCard` | `components/ui/EventInfoCard.tsx` | registration — modalidad, venue, registrados, cierre |
+| `EventArchive` | `components/ui/EventArchive.tsx` | ended — stats + links a agenda/memorias/gamification/speakers |
+| `About` | `app/(app)/about.tsx` | registration — pantalla dedicada, imagen+texto+links |
+| `ModuleMenu compact` | prop `compact` en ModuleMenu | published — cards 56px |
 
-- **Countdown animado** calculado desde `event.starts_at` (días, horas, minutos, segundos)
-- **Teaser content**: Logo del evento, nombre, fecha, venue
-- **Speakers confirmados**: Grid/carrusel de speakers ya publicados
-- **"Completa tu perfil"**: CTA para que llene intereses, foto, datos extras (progressive profiling)
-- **Notificaciones habilitadas**: Prompt para activar push notifications
-- **NO muestra**: Agenda vacía, salas vacías, features sin contenido
+### 2.3 Modalidad del evento
 
-### 2.3 Pantalla Post-Event (post_event)
+Campo `modality` en events: `presencial`, `virtual`, `hibrido`. Se muestra como badge en la EventInfoCard (registration).
 
-- Galería del photobooth + social wall
-- Grabaciones de sesiones (si streaming estuvo habilitado)
-- Lista de contactos realizados (networking/matchmaking)
-- Certificado de asistencia descargable
-- Encuesta NPS automática (si no la completó)
-- Resumen de gamificación (posición final, puntos, badges)
-- Mensaje de agradecimiento personalizado del organizador
+| Modalidad | Color | Icono |
+|-----------|-------|-------|
+| Presencial | #34d399 (verde) | map-marker |
+| Virtual | #60a5fa (azul) | monitor |
+| Hibrido | #c084fc (violeta) | swap-horizontal |
+
+### 2.4 About pre-evento
+
+Modulo opcional habilitado por toggle en Filament. Visible solo en draft/registration.
+- Imagen banner 16:9 (opcional — si no hay, se adapta)
+- Texto descriptivo
+- Links externos (web, redes, mapa) que abren browser
+- Card en Home registration → tap abre pantalla /(app)/about
+
+### 2.5 Countdown
+
+- **Normal** (registration): boxes 62x70px, 4 unidades (dias/horas/min/seg)
+- **Compact** (published): boxes 50x50px, padding reducido
+- **Expired**: badge "El evento comienza hoy" con dot pulsante
+- Tick cada 1 segundo, detiene interval al expirar
+
+### 2.6 Pantalla Ended (archivo)
+
+- Banner "Evento finalizado" con fechas
+- Stats: asistentes, sesiones, fotos (datos reales de la API)
+- Archive links: Agenda+Grabaciones, Memorias (social), Gamification, Speakers
+- Cada link navega a la pantalla existente
+
+### 2.7 Configuracion Filament
+
+Seccion "Estado del evento" en Evento > Branding & Hero:
+- Select status (5 opciones)
+- Select modalidad (3 opciones)
+- DateTimePicker fecha inicio/fin
+- Venue, capacidad maxima
+- Seccion "About" condicional (solo draft/registration) con toggle + imagen + texto + repeater links
 
 ---
 
