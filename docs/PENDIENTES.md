@@ -46,13 +46,19 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`.
 - [x] Admins ven todos los modulos (skip role filter)
 - [x] Migration roles en modules JSON (presencial→attendee)
 
-### Agenda overview
-- [ ] Vista resumen del programa antes de las sesiones individuales. No "charla X a las 10am" sino vista general del dia/programa.
-- [ ] Posible: cards por dia con resumen (3 keynotes, 5 workshops, 2 paneles), tracks destacados, speakers principales.
-- [ ] Se muestra arriba de la lista de sesiones o como tab/toggle (Overview | Sesiones).
+### Session Detail — COMPLETADO (2026-04-14)
+- [x] Pantalla detalle de sesion (espejo de speaker detail)
+- [x] Badges (EN VIVO, tipo, track), titulo, rating, time/location, capacidad
+- [x] Botones: Favorita, Calendario, Evaluar, UNIRTE / Ver grabacion
+- [x] Speakers tappables → /speaker/[id]
+- [x] Navegacion circular: Agenda → Session → Speaker → Session
+- [x] Agenda card tap → session detail (antes iba directo a stream)
 
-### Onboarding
-- [ ] 1.x-E-D: Campos condicionales — depends_on en config JSON. Ej: pais=Colombia → ciudades CO. Endpoint cities/{code} ya existe.
+### Onboarding — COMPLETADO (2026-04-14)
+- [x] 1.x-E-D: Campos condicionales — depends_on en config JSON. Pais→ciudades dinamicas
+- [x] Replay diferenciado: pre-fill foto/profile/custom/intereses, sin confetti, sin puntos dobles
+- [x] onboarding_data JSON en attendees para campos custom (country, city, etc.)
+- [x] 9 bugs resueltos (BUG-079 a BUG-087)
 
 ### FAQ asistente
 - [ ] Backend: tabla event_faqs (event_id, section, question, answer_text, answer_action_url, answer_image_url, sort_order, is_active)

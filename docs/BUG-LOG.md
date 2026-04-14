@@ -5,6 +5,73 @@
 
 ---
 
+## 2026-04-14 — Sesion Onboarding Replay + Session Detail + Bancolombia
+
+### BUG-079: API onboarding crashea con array_flip en preset cities (RESUELTO)
+- **Severidad:** CRITICA — API devuelve 500, onboarding no carga
+- **Causa:** `array_flip()` en `resolveStepsConfigUrls()` falla con preset `cities` que es array anidado (country→array de ciudades)
+- **Fix:** Skip campos con `depends_on` en la resolucion + verificar `is_string` antes de `array_flip`
+- **Archivo:** `OnboardingController.php:170`
+
+### BUG-080: Login no pasa event_slug al backend (RESUELTO)
+- **Severidad:** ALTA — eventId queda null, home carga vacia
+- **Causa:** `authApi.login()` no incluia `event_slug`, backend adivinaba el evento por `is_active` fallback
+- **Fix:** Agregar `event_slug: DEFAULT_EVENT_SLUG` al payload de login en AuthStep
+- **Archivo:** `AuthStep.tsx:213`
+
+### BUG-081: index.tsx fetch sin timeout (RESUELTO)
+- **Severidad:** ALTA — pantalla negra indefinida si backend no responde
+- **Causa:** `fetch('/auth/me')` sin AbortController, emulador con red lenta cuelga forever
+- **Fix:** Agregar AbortController con timeout 6s + clearTimeout en finally
+- **Archivo:** `app/index.tsx:34`
+
+### BUG-082: index.tsx registrationApprovedAt null sin fallback (RESUELTO)
+- **Severidad:** ALTA — redirige a pending-approval incorrectamente
+- **Causa:** Si `/auth/me` retorna attendee null, `registrationApprovedAt` queda null y redirige a pending-approval
+- **Fix:** Fallback a `user?.registrationApprovedAt` del cache cuando attendee es null
+- **Archivo:** `app/index.tsx:80`
+
+### BUG-083: Fetch cities en cada keystroke de FormStep (RESUELTO)
+- **Severidad:** MEDIA — llamadas API innecesarias, rendimiento
+- **Causa:** useEffect para cities dependia de `[values]` completo, se ejecutaba en cada cambio de cualquier campo
+- **Fix:** Unificar effects, solo ejecutar cuando parent value realmente cambia via prevParentValues ref
+- **Archivo:** `FormStep.tsx`
+
+### BUG-084: Skip button cuenta campos ocultos (depends_on) (RESUELTO)
+- **Severidad:** MEDIA — UX confusa, boton skip desaparece incorrectamente
+- **Causa:** `config.fields.some(f => f.required)` incluia campos hidden por depends_on
+- **Fix:** Usar `visibleFields` en vez de `config.fields`
+- **Archivo:** `FormStep.tsx`
+
+### BUG-085: Onboarding replay — campos vacios, confetti, puntos dobles (RESUELTO)
+- **Severidad:** ALTA — 8 sub-bugs en flujo "Ver introduccion de nuevo"
+- **Causa:** No habia distincion entre primera vez y replay. Mismo flag `post_activation_onboarding` para ambos flujos
+- **Sub-bugs:**
+  1. FormStep campos siempre vacios (no pre-fill de profile)
+  2. InterestsStep selecciones vacias (no carga my-interests)
+  3. PhotoStep no muestra foto actual del usuario
+  4. Confetti aparece siempre (sin sentido en replay)
+  5. Puntos se otorgan de nuevo (gamificacion inflada)
+  6. Titulo dice "Bienvenido" en vez de "Datos actualizados"
+  7. Hints repiten info obvia
+  8. "Saltar" enganoso (campos vacios sugieren datos perdidos)
+- **Fix:** Flag separado `replay_onboarding`, `isReplay` en contexto, pre-fill desde APIs existentes
+- **Archivos:** `ProfileScreen.tsx`, `OnboardingContext.tsx`, `PhotoStep.tsx`, `FormStep.tsx`, `InterestsStep.tsx`, `DoneStep.tsx`
+
+### BUG-086: Onboarding custom fields (country/city) no se guardan (RESUELTO)
+- **Severidad:** MEDIA — datos de ubicacion se perdian
+- **Causa:** FormStep enviaba string keys ("country") a `PUT /me/registration-fields`, pero backend esperaba numeric field IDs
+- **Fix:** Nueva columna `onboarding_data` JSON en attendees + endpoints `GET/PUT /me/onboarding-data`
+- **Archivos:** Migration, `Attendee.php`, `ProfileController.php`, `api.php`, `FormStep.tsx`
+
+### BUG-087: isReplay/postActivation se pierden en re-renders (RESUELTO)
+- **Severidad:** ALTA — replay no funciona (confetti, campos vacios)
+- **Causa:** Flags leidos con `getCached()` en cuerpo del componente y borrados inmediatamente. En re-renders, valor era false.
+- **Fix:** Usar `useState(() => ...)` con lazy initializer para persistir valor inicial
+- **Archivo:** `OnboardingContext.tsx`
+
+---
+
 ## 2026-04-12 — Sesion Moderacion + Auth + Error Handling
 
 ### BUG-063: Token registro 30d hardcoded (RESUELTO)
