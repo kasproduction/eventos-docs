@@ -64,6 +64,18 @@
 - **Fix:** Nueva columna `onboarding_data` JSON en attendees + endpoints `GET/PUT /me/onboarding-data`
 - **Archivos:** Migration, `Attendee.php`, `ProfileController.php`, `api.php`, `FormStep.tsx`
 
+### BUG-088: dynamicOptions stale al cambiar pais en FormStep (RESUELTO)
+- **Severidad:** MEDIA — ciudades del pais anterior persisten si API falla
+- **Causa:** Al cambiar parent field, se reseteaba el valor del child pero no se limpiaban las opciones dinamicas en `dynamicOptions` state
+- **Fix:** Clear `dynamicOptions[field.key]` junto con el reset del child value
+- **Archivo:** `FormStep.tsx`
+
+### BUG-089: registrationApprovedAt fallback sobreescribe dato fresco (RESUELTO)
+- **Severidad:** ALTA — usuario con aprobacion revocada podia entrar con cache viejo
+- **Causa:** `att?.registration_approved_at ?? user?.registrationApprovedAt` — si servidor devuelve null (pendiente), `??` salta al cache que podia tener 'auto'
+- **Fix:** Priorizar dato del attendee fresco; fallback al cache solo cuando no hay attendee
+- **Archivo:** `app/index.tsx`
+
 ### BUG-087: isReplay/postActivation se pierden en re-renders (RESUELTO)
 - **Severidad:** ALTA — replay no funciona (confetti, campos vacios)
 - **Causa:** Flags leidos con `getCached()` en cuerpo del componente y borrados inmediatamente. En re-renders, valor era false.
