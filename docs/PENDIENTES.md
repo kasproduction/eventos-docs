@@ -31,8 +31,14 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`.
 - [x] App escucha checkin:update → invalida modules del propio usuario
 - [x] Debounce 800ms para invalidaciones socket (commit 167c72c)
 
-**Pendiente:**
-- [ ] Pre-registro CSV: email invitacion con deep link + flujo "Crea tu contrasena" (backend ya crea User+Attendee con tags, falta UX de activacion mejorada)
+**Pre-registro CSV — COMPLETADO (2026-04-14):**
+- [x] CSV import crea User+Attendee+QR con invitation_token
+- [x] InvitationMail con deep link /join/{token}
+- [x] Deep link redirect → app activate-account (produccion)
+- [x] Fallback sin deep link: check-email devuelve token → app redirige directo a activacion
+- [x] Pantalla activate-account Lumina Noir (crear contrasena)
+- [x] Post-activacion → onboarding (foto, forms, intereses)
+- [x] Feature toggle: password_mode configurable (invitation_link | phone_as_password)
 
 ### Estados del evento — COMPLETADO (2026-04-14)
 - [x] 1.x-D: Lifecycle — 4 estados: draft/registration/published/live/ended
