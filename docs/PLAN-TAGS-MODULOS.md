@@ -1,7 +1,7 @@
 # Plan: Tags + Visibilidad Modulos + Layout Unificado
 
 > Arquitectura nueva para reemplazar roles presencial/virtual por tags + check-in.
-> Fecha: 2026-04-13 | Estado: Aprobado, pendiente implementar
+> Fecha: 2026-04-13 | Estado: Pasos 1, 4, 5 COMPLETADOS (2026-04-14). Pendientes: Paso 2 (CSV pre-registro) y Paso 3 (socket checkin trigger).
 
 ---
 
@@ -131,16 +131,18 @@ Todo derivado de datos existentes (checked_in_at + activity_log + tags).
 
 ## Implementacion (orden)
 
-### Paso 1: Backend — Tags + Visibilidad (1-2h)
+### Paso 1: Backend — Tags + Visibilidad (COMPLETADO 2026-04-14)
 
-- [ ] Migration: agregar `tags` JSON a attendees (default '[]')
-- [ ] Migration: agregar `visibility_presence` y `visibility_tags` a event_modules
-- [ ] Model Attendee: cast tags como array, helper hasTags()
-- [ ] Model EventModule: cast visibility_tags como array
-- [ ] API modules: filtrar por checked_in_at + tags del attendee
-- [ ] Filament EventModuleResource: selectores de visibility
-- [ ] Filament AttendeeResource: campo tags editable
-- [ ] Tests: modulo visible/oculto segun presencia + tags
+- [x] Migration: agregar `tags` JSON a attendees (default '[]')
+- [x] Migration: agregar `visibility_presence` y `visibility_tags` a modules
+- [x] Model Attendee: cast tags como array, helper hasAnyTag()
+- [x] Model Module: cast visibility_tags como array
+- [x] API modules: filtrar por role + checked_in_at + tags del attendee
+- [x] Filament ModuleResource: selectores de visibility_presence + TagsInput visibility_tags
+- [x] Filament AttendeeResource: campo tags editable (TagsInput)
+- [x] Tests: 14 tests modulo visible/oculto segun presencia + tags
+- [x] Roles simplificados: presencial/virtual → attendee en 48 archivos
+- [x] QR para todos, validation rules, observers, 314 tests passing
 
 ### Paso 2: Backend — Pre-registro CSV (1h)
 
@@ -156,24 +158,24 @@ Todo derivado de datos existentes (checked_in_at + activity_log + tags).
 - [ ] App: useDataInvalidation escucha attendee:checkin para el propio usuario
 - [ ] Al match: invalidar modules + actualizar authStore.checkedInAt
 
-### Paso 4: App — Layout unificado (2-3h)
+### Paso 4: App — Layout unificado (COMPLETADO 2026-04-14)
 
-- [ ] Crear /(app)/(tabs)/ unificado (merge presencial + virtual)
-- [ ] Home: ModuleMenu dinamico segun modulos visibles del API
-- [ ] Mi QR: visible para todos (QR = identidad)
-- [ ] Eliminar /(app)/(presencial)/(tabs)/ y /(app)/(virtual)/(tabs)/
-- [ ] index.tsx: rutar a /(app)/(tabs)/ para todos los attendees
-- [ ] Vendedor mantiene su layout separado
+- [x] Crear /(app)/(tabs)/ unificado (merge presencial + virtual)
+- [x] Home unificado con logica vendor condicional
+- [x] Mi QR: visible para todos (QR = identidad)
+- [x] Eliminar /(app)/(presencial)/(tabs)/ y /(app)/(virtual)/(tabs)/
+- [x] index.tsx: ruta unica /(app)/(tabs)/ para todos los attendees
+- [x] Vendedor mantiene su layout separado (no tocado)
 
-### Paso 5: Cleanup (30min)
+### Paso 5: Cleanup (COMPLETADO — incluido en Pasos 1 y 4)
 
-- [ ] Eliminar role 'presencial' y 'virtual' del enum (migration)
-- [ ] Actualizar AuthService: role default = 'attendee'
-- [ ] Actualizar authApi.ts y authStore types
-- [ ] Actualizar check.approval si filtra por role
-- [ ] Quitar restriccion de role en GET /me/qr (todos tienen QR)
+- [x] Eliminar role 'presencial' y 'virtual' del enum (migration en Paso 1)
+- [x] Actualizar AuthService: role default = 'attendee' (Paso 1)
+- [x] Actualizar authApi.ts y authStore types (Paso 4)
+- [x] check.approval no filtra por role — ya estaba OK
+- [x] Quitar restriccion de role en GET /me/qr (Paso 1)
 
-## Estimacion total: ~6-8 horas (1 sesion completa)
+## Estimacion total: ~6-8 horas → completado en ~3 horas (Pasos 1+4+5)
 
 ## Riesgos
 

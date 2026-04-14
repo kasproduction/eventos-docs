@@ -65,6 +65,21 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`.
 - [ ] 1.x-G: Registro por codigo de acceso — admin genera codigos en Filament, campo validacion.
 - [ ] 1.x-H: Staff invite push + cambio de rol — push + socket + layout vendedor.
 
+### Setup wizard evento (Filament)
+- [ ] Al crear evento nuevo: wizard por pasos (slides) — nombre, fecha/hora, lugar, logo, modalidad, template modulos
+- [ ] Paso 1: Nombre + slug + descripcion
+- [ ] Paso 2: Fechas (inicio, fin, registro abre/cierra)
+- [ ] Paso 3: Lugar + modalidad (presencial/virtual/hibrido) + capacidad
+- [ ] Paso 4: Logo + colores + hero
+- [ ] Paso 5: Template de modulos (congreso/feria/lanzamiento) → crea modulos automatico
+- [ ] Resultado: evento listo con toda la config basica en 2 minutos
+
+### Filament cleanup — COMPLETADO (2026-04-14, commit d2a9e86)
+- [x] Reorganizar grupos de navegacion (11→7 grupos coherentes)
+- [x] Unificar tildes inconsistentes (Comunicacion vs Comunicaciones, etc.)
+- [x] Sort order secuencial sin duplicados
+- [x] 26 archivos actualizados
+
 ### Documentacion tecnica
 - [ ] Documentar arquitectura socket: una conexion, eventos, rendimiento, escalabilidad. Ref: project_socket_architecture.md
 

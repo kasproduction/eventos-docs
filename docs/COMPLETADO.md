@@ -328,4 +328,19 @@ Total: 42 security tests, 309 tests backend.
 - [x] Seeders actualizados (7 archivos presencial→attendee)
 - [x] 314 tests backend, TS 0 errores app
 - [x] Commits backend: d970983, e4a3981, 7a61a87, 878a0b3, d375e26, d48b559, 7bda761, b25518b
-- [x] Commits app: 810cc89, 59f49f7, 267ec45, 90edd7f, 7f6f6cd, c26eb06, 0e5ff8b, f30c9fd, 167c72c, 95b8aa5, b81e22a, bcc7649, 142d039, daf8411, 877a851, 85ee6f3
+- [x] Commits app: 810cc89, 59f49f7, 267ec45, 90edd7f, 7f6f6cd, c26eb06, 0e5ff8b, f30c9fd, 167c72c, 95b8aa5, b81e22a, bcc7649, 142d039, daf8411, 877a851, 85ee6f3, 5834769
+
+## Filament cleanup (2026-04-14)
+
+- [x] Reorganizar navegacion: 11 grupos inconsistentes → 7 limpios
+- [x] Grupos: Evento(6), Contenido(7), Interaccion(7), Comunicacion(5), Registro(4), Gamificacion(3), Sistema(1)
+- [x] Tildes unificadas, sort secuencial sin duplicados
+- [x] 26 archivos actualizados
+- [x] Commit: d2a9e86
+
+## Optimizacion onboarding cache (2026-04-14)
+
+- [x] useOnboarding: cache-first desde MMKV (initialData + initialDataUpdatedAt=0)
+- [x] Primera vez: loading → fetch → cache. Segunda vez en adelante: instantaneo
+- [x] Eliminado refetchInterval 30s (innecesario con socket invalidation)
+- [x] Commit app: 5834769

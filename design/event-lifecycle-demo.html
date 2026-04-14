@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventOS — Event Lifecycle States v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #080808;
+    color: #fff;
+    font-family: 'Urbanist', sans-serif;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 32px;
+    padding: 40px 24px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    width: 100%;
+    text-align: center;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 16px;
+  }
+
+  /* Phone frame */
+  .phone {
+    width: 375px;
+    height: 740px;
+    background: #0e0e0e;
+    border-radius: 40px;
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .phone-label {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .state-num {
+    display: inline-block;
+    width: 20px; height: 20px;
+    border-radius: 10px;
+    background: rgba(167,139,250,0.15);
+    color: rgba(167,139,250,0.8);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+    margin-right: 4px;
+  }
+  .phone-desc {
+    text-align: center;
+    margin-top: 4px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    max-width: 375px;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 54px;
+    padding: 0 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 8px;
+  }
+  .status-bar span { font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 600; }
+
+  /* Header */
+  .header {
+    height: 52px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+  }
+  .header-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    flex: 1;
+    margin-left: 10px;
+  }
+  .bell {
+    width: 36px; height: 36px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.04);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .content { padding: 0 20px; }
+
+  /* Hero */
+  .hero-section { margin-top: 16px; }
+  .hero-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .hero-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.2;
+  }
+  .hero-highlight { color: var(--accent, #a78bfa); }
+
+  /* ─── MODALITY BADGE ─── */
+  .modality-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.55);
+  }
+  .modality-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 3px;
+  }
+  .modality-badge.presencial .dot { background: #34d399; }
+  .modality-badge.virtual .dot { background: #60a5fa; }
+  .modality-badge.hibrido .dot {
+    width: 10px;
+    background: linear-gradient(90deg, #34d399 50%, #60a5fa 50%);
+  }
+
+  /* ─── COUNTDOWN ─── */
+  .countdown-section {
+    margin-top: 24px;
+    text-align: center;
+  }
+  .countdown-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+  }
+  .countdown-grid {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  .countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .countdown-box {
+    width: 64px;
+    height: 72px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .countdown-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  }
+  .countdown-num {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.85);
+  }
+  .countdown-num.accent { color: var(--accent, #a78bfa); }
+  .countdown-num.muted { opacity: 0.35; }
+  .countdown-text {
+    font-size: 9px;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+  .countdown-sep {
+    font-size: 24px;
+    color: rgba(255,255,255,0.12);
+    align-self: flex-start;
+    margin-top: 20px;
+  }
+
+  /* ─── EVENT INFO CARD ─── */
+  .info-card {
+    margin-top: 24px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+  }
+  .info-row + .info-row {
+    border-top: 1px solid rgba(255,255,255,0.035);
+  }
+  .info-icon { font-size: 15px; opacity: 0.35; }
+  .info-label { font-size: 12px; color: rgba(255,255,255,0.3); }
+  .info-value { font-size: 12px; color: rgba(255,255,255,0.65); font-weight: 600; margin-left: auto; }
+
+  /* ─── HAPPENING NOW ─── */
+  .happening-card {
+    margin-top: 20px;
+    padding: 14px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .happening-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+  .session-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+  }
+  .session-time {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    font-weight: 600;
+    min-width: 42px;
+  }
+  .session-name {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+  }
+
+  /* ─── MODULE GRID ─── */
+  .module-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .module-card {
+    height: 80px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px;
+  }
+  .module-icon { font-size: 18px; opacity: 0.4; }
+  .module-label { font-size: 13px; color: rgba(255,255,255,0.65); font-weight: 500; }
+
+  /* ─── ENDED ─── */
+  .ended-banner {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .ended-icon { font-size: 28px; opacity: 0.5; }
+  .ended-text h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+  }
+  .ended-text p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+    margin-top: 2px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .stat-card {
+    flex: 1;
+    padding: 14px 8px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.7);
+  }
+  .stat-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-top: 2px;
+  }
+
+  .archive-section { margin-top: 16px; }
+  .archive-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+  .archive-card {
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .archive-card-icon { font-size: 18px; opacity: 0.35; }
+  .archive-card-info { flex: 1; }
+  .archive-card-title { font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500; }
+  .archive-card-sub { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 1px; }
+  .archive-card-arrow {
+    font-size: 14px;
+    opacity: 0.15;
+  }
+
+  /* ─── TAB BAR ─── */
+  .tab-bar {
+    position: absolute;
+    bottom: 16px;
+    left: 16px; right: 16px;
+    height: 56px;
+    border-radius: 28px;
+    background: rgba(28,28,30,0.65);
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+  }
+  .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    opacity: 0.4;
+  }
+  .tab-item.active { opacity: 1; }
+  .tab-icon { font-size: 20px; }
+  .tab-label { font-size: 9px; font-weight: 600; }
+  .tab-bar.muted { opacity: 0.35; }
+
+  /* ─── FLOW ARROW between phones ─── */
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    align-self: center;
+    font-size: 24px;
+    color: rgba(255,255,255,0.1);
+    margin: 0 -8px;
+  }
+
+  @media (max-width: 1700px) {
+    .flow-arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Event Lifecycle States v2</h1>
+<p class="subtitle">4 estados -- como cambia la experiencia del usuario en cada fase del evento</p>
+
+<!-- ═══ 1. REGISTRATION ═══ -->
+<div>
+  <div class="phone" style="--accent: #a78bfa">
+    <div class="status-bar"><span>9:41</span><span>100%</span></div>
+    <div class="header">
+      <div class="logo">E</div>
+      <div class="header-title">Bintec 2026</div>
+      <div class="bell">&#128276;</div>
+    </div>
+    <div class="content">
+      <div class="hero-section">
+        <div class="hero-label">15 - 17 Septiembre</div>
+        <div class="hero-title">Bintec<br><span class="hero-highlight">Bancolombia</span></div>
+      </div>
+
+      <div class="countdown-section">
+        <div class="countdown-label">El evento comienza en</div>
+        <div class="countdown-grid">
+          <div class="countdown-unit">
+            <div class="countdown-box"><span class="countdown-num">42</span></div>
+            <span class="countdown-text">Dias</span>
+          </div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit">
+            <div class="countdown-box"><span class="countdown-num accent">08</span></div>
+            <span class="countdown-text">Horas</span>
+          </div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit">
+            <div class="countdown-box"><span class="countdown-num">33</span></div>
+            <span class="countdown-text">Min</span>
+          </div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit">
+            <div class="countdown-box"><span class="countdown-num muted">17</span></div>
+            <span class="countdown-text">Seg</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-row">
+          <span class="info-icon">&#127760;</span>
+          <span class="info-label">Modalidad</span>
+          <span class="info-value"><span class="modality-badge hibrido"><span class="dot"></span> Hibrido</span></span>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">&#128205;</span>
+          <span class="info-label">Lugar</span>
+          <span class="info-value">Centro de Convenciones</span>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">&#128101;</span>
+          <span class="info-label">Registrados</span>
+          <span class="info-value">1,247 / 3,000</span>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">&#128197;</span>
+          <span class="info-label">Registro cierra</span>
+          <span class="info-value">10 Sep 2026</span>
+        </div>
+      </div>
+    </div>
+    <div class="tab-bar muted">
+      <div class="tab-item active"><span class="tab-icon">&#127968;</span><span class="tab-label">Inicio</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128197;</span><span class="tab-label">Agenda</span></div>
+      <div class="tab-item"><span class="tab-icon">&#9634;</span><span class="tab-label">Mi QR</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128101;</span><span class="tab-label">Network</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128100;</span><span class="tab-label">Perfil</span></div>
+    </div>
+  </div>
+  <p class="phone-label"><span class="state-num">1</span> Registration</p>
+  <p class="phone-desc">Solo Home. Countdown + info basica. Tabs deshabilitados.</p>
+</div>
+
+<div class="flow-arrow">&#10132;</div>
+
+<!-- ═══ 2. PUBLISHED ═══ -->
+<div>
+  <div class="phone" style="--accent: #a78bfa">
+    <div class="status-bar"><span>9:41</span><span>100%</span></div>
+    <div class="header">
+      <div class="logo">E</div>
+      <div class="header-title">Bintec 2026</div>
+      <div class="bell">&#128276;</div>
+    </div>
+    <div class="content">
+      <div class="hero-section">
+        <div class="hero-label">15 - 17 Septiembre</div>
+        <div class="hero-title">Bintec<br><span class="hero-highlight">Bancolombia</span></div>
+      </div>
+
+      <!-- Countdown REPLACES HappeningNow -->
+      <div class="countdown-section">
+        <div class="countdown-label">Comienza en</div>
+        <div class="countdown-grid">
+          <div class="countdown-unit">
+            <div class="countdown-box"><span class="countdown-num">03</span></div>
+            <span class="countdown-text">Dias</span>
+          </div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit">
+            <div class="countdown-box"><span class="countdown-num accent">14</span></div>
+            <span class="countdown-text">Horas</span>
+          </div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit">
+            <div class="countdown-box"><span class="countdown-num">22</span></div>
+            <span class="countdown-text">Min</span>
+          </div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit">
+            <div class="countdown-box"><span class="countdown-num muted">05</span></div>
+            <span class="countdown-text">Seg</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module menu — full app navigable -->
+      <div class="module-grid">
+        <div class="module-card"><span class="module-icon">&#128197;</span><span class="module-label">Agenda</span></div>
+        <div class="module-card"><span class="module-icon">&#127908;</span><span class="module-label">Speakers</span></div>
+        <div class="module-card"><span class="module-icon">&#128247;</span><span class="module-label">Social</span></div>
+        <div class="module-card"><span class="module-icon">&#127970;</span><span class="module-label">Sponsors</span></div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab-item active"><span class="tab-icon">&#127968;</span><span class="tab-label">Inicio</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128197;</span><span class="tab-label">Agenda</span></div>
+      <div class="tab-item"><span class="tab-icon">&#9634;</span><span class="tab-label">Mi QR</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128101;</span><span class="tab-label">Network</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128100;</span><span class="tab-label">Perfil</span></div>
+    </div>
+  </div>
+  <p class="phone-label"><span class="state-num">2</span> Published</p>
+  <p class="phone-desc">App completa. Countdown en vez de HappeningNow. Puede navegar todo.</p>
+</div>
+
+<div class="flow-arrow">&#10132;</div>
+
+<!-- ═══ 3. LIVE ═══ -->
+<div>
+  <div class="phone" style="--accent: #a78bfa">
+    <div class="status-bar"><span>9:41</span><span>100%</span></div>
+    <div class="header">
+      <div class="logo">E</div>
+      <div class="header-title">Bintec 2026</div>
+      <div class="bell">&#128276;</div>
+    </div>
+    <div class="content">
+      <div class="hero-section">
+        <div class="hero-label">Dia 1 de 3</div>
+        <div class="hero-title">Bintec<br><span class="hero-highlight">Bancolombia</span></div>
+      </div>
+
+      <!-- HappeningNow — as it works today -->
+      <div class="happening-card">
+        <div class="happening-label">Sucediendo ahora</div>
+        <div class="session-row">
+          <span class="session-time">10:00</span>
+          <span class="session-name">Keynote: El futuro digital</span>
+        </div>
+        <div class="session-row">
+          <span class="session-time">10:00</span>
+          <span class="session-name">Workshop: IA Generativa</span>
+        </div>
+      </div>
+
+      <div class="module-grid">
+        <div class="module-card"><span class="module-icon">&#128197;</span><span class="module-label">Agenda</span></div>
+        <div class="module-card"><span class="module-icon">&#127908;</span><span class="module-label">Speakers</span></div>
+        <div class="module-card"><span class="module-icon">&#128247;</span><span class="module-label">Social</span></div>
+        <div class="module-card"><span class="module-icon">&#127970;</span><span class="module-label">Sponsors</span></div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab-item active"><span class="tab-icon">&#127968;</span><span class="tab-label">Inicio</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128197;</span><span class="tab-label">Agenda</span></div>
+      <div class="tab-item"><span class="tab-icon">&#9634;</span><span class="tab-label">Mi QR</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128101;</span><span class="tab-label">Network</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128100;</span><span class="tab-label">Perfil</span></div>
+    </div>
+  </div>
+  <p class="phone-label"><span class="state-num">3</span> Live</p>
+  <p class="phone-desc">Identico a hoy. HappeningNow con sesiones en curso. Sin labels extra.</p>
+</div>
+
+<div class="flow-arrow">&#10132;</div>
+
+<!-- ═══ 4. ENDED ═══ -->
+<div>
+  <div class="phone" style="--accent: #a78bfa">
+    <div class="status-bar"><span>9:41</span><span>100%</span></div>
+    <div class="header">
+      <div class="logo">E</div>
+      <div class="header-title">Bintec 2026</div>
+      <div class="bell">&#128276;</div>
+    </div>
+    <div class="content">
+      <div class="ended-banner">
+        <span class="ended-icon">&#127942;</span>
+        <div class="ended-text">
+          <h3>Evento finalizado</h3>
+          <p>15 - 17 Sep 2026 -- Gracias por participar</p>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num">2,841</div>
+          <div class="stat-label">Asistentes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">48</div>
+          <div class="stat-label">Sesiones</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">1.2K</div>
+          <div class="stat-label">Fotos</div>
+        </div>
+      </div>
+
+      <div class="archive-section">
+        <div class="archive-label">Archivo del evento</div>
+        <div class="archive-card">
+          <span class="archive-card-icon">&#128197;</span>
+          <div class="archive-card-info">
+            <div class="archive-card-title">Agenda + Grabaciones</div>
+            <div class="archive-card-sub">48 sesiones, 12 con replay</div>
+          </div>
+          <span class="archive-card-arrow">&#8250;</span>
+        </div>
+        <div class="archive-card">
+          <span class="archive-card-icon">&#128247;</span>
+          <div class="archive-card-info">
+            <div class="archive-card-title">Social Wall</div>
+            <div class="archive-card-sub">1,247 fotos y publicaciones</div>
+          </div>
+          <span class="archive-card-arrow">&#8250;</span>
+        </div>
+        <div class="archive-card">
+          <span class="archive-card-icon">&#127942;</span>
+          <div class="archive-card-info">
+            <div class="archive-card-title">Gamification</div>
+            <div class="archive-card-sub">Leaderboard final + premios</div>
+          </div>
+          <span class="archive-card-arrow">&#8250;</span>
+        </div>
+        <div class="archive-card">
+          <span class="archive-card-icon">&#127908;</span>
+          <div class="archive-card-info">
+            <div class="archive-card-title">Speakers</div>
+            <div class="archive-card-sub">24 ponentes</div>
+          </div>
+          <span class="archive-card-arrow">&#8250;</span>
+        </div>
+      </div>
+    </div>
+    <div class="tab-bar muted">
+      <div class="tab-item active"><span class="tab-icon">&#127968;</span><span class="tab-label">Inicio</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128197;</span><span class="tab-label">Agenda</span></div>
+      <div class="tab-item"><span class="tab-icon">&#9634;</span><span class="tab-label">Mi QR</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128101;</span><span class="tab-label">Network</span></div>
+      <div class="tab-item"><span class="tab-icon">&#128100;</span><span class="tab-label">Perfil</span></div>
+    </div>
+  </div>
+  <p class="phone-label"><span class="state-num">4</span> Ended</p>
+  <p class="phone-desc">Modo archivo. Links a agenda, social wall, gamification, speakers.</p>
+</div>
+
+</body>
+</html>
