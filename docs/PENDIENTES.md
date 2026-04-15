@@ -202,6 +202,13 @@ Se activa cuando el evento está en estado `live`.
 - [ ] SEC-3.1: 2FA OTP (email/WhatsApp) — requiere WhatsApp Business API + pantalla app
 - [ ] SEC-3.2: Device fingerprinting — depende de 2FA
 
+### Backup/Restore de evento (tipo Minecraft world save)
+- [ ] Snapshot completo del evento: onboarding, registration_fields, modules, sponsors, agenda, gamification
+- [ ] Exportar como JSON descargable
+- [ ] Importar/restaurar desde JSON
+- [ ] Versionado con label y descripcion (v1, v2, v3...)
+- [ ] Modulo Filament dedicado (no parche en onboarding)
+
 ### PDFs
 - [ ] Certificados asistencia
 - [ ] Reporte post-evento
