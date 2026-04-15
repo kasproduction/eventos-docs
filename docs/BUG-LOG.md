@@ -64,6 +64,17 @@
 - **Fix:** Nueva columna `onboarding_data` JSON en attendees + endpoints `GET/PUT /me/onboarding-data`
 - **Archivos:** Migration, `Attendee.php`, `ProfileController.php`, `api.php`, `FormStep.tsx`
 
+### BUG-096: Access code no sanitiza espacios al pegar (RESUELTO)
+- **Severidad:** MEDIA — usuario pega codigo con espacio, falla validacion
+- **Causa:** Ni el backend ni la app eliminaban whitespace del codigo pegado
+- **Fix:** Backend: `preg_replace('/\s+/', '', $value)` + merge limpio. App: `.replace(/\s/g, '')` antes de enviar.
+- **Archivos:** `RegisterRequest.php`, `AuthStep.tsx`
+
+### BUG-097: Mensajes API en ingles (RESUELTO)
+- **Severidad:** BAJA — "Profile updated" y "Photo removed" aparecian en ingles
+- **Fix:** Traducir a "Perfil actualizado." y "Foto eliminada."
+- **Archivo:** `ProfileController.php`
+
 ### BUG-095: AccessCode race condition en registerUse (RESUELTO)
 - **Severidad:** MEDIA — dos registros simultaneos podian exceder max_uses
 - **Causa:** `increment('uses_count')` no verificaba max_uses atomicamente
