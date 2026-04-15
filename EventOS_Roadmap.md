@@ -271,9 +271,9 @@ Home, Agenda, Speakers, Streaming, Social, Sponsors, Profile, Encuestas, Chat, M
 | 1.x-E-B | FormStep tipos avanzados | searchable_select (paises), checkbox_group, date picker |
 | ~~1.x-C~~ | ~~Roles asistente~~ | **ELIMINADO** — ya no existen roles presencial/virtual, reemplazado por tags+visibility |
 | 1.x-D | Estados evento lifecycle | registration_only/published/live/ended + countdown DaVinci |
-| 1.x-F | Registro cerrado | CSV/emails admin, onboarding valida contra lista |
+| ~~1.x-F~~ | ~~Registro cerrado~~ | **COMPLETADO** — whitelist emails, dominios corporativos, ambos. Toggle master + approval + access_code + invite_only compatible. 21 tests, 38 assertions. |
 | 1.x-G | Registro por codigo | Admin genera codigos en Filament, campo validacion |
-| 1.x-H | Staff invite push | Push "Eres del equipo" → layout vendedor |
+| ~~1.x-H~~ | ~~Staff invite~~ | **COMPLETADO** — QR + busqueda + email + link compartible, aceptacion, socket RT, landing web, mi-equipo pantalla, deep link |
 
 ---
 

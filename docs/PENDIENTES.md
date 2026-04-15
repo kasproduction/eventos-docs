@@ -76,7 +76,8 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`.
 ### Registro avanzado
 - [x] 1.x-G: Registro por codigo de acceso — AccessCode model, Filament CRUD + lote, toggle por evento, campo en AuthStep, validacion atomica, tracking usos.
 - [x] 1.x-G.1: Verificacion identidad CSV — campo personalizable (telefono/etc), verify-identity endpoint, fallback si deep link no funciona.
-- [ ] 1.x-H: Staff invite push + cambio de rol — push + socket + layout vendedor.
+- [x] 1.x-H: Staff invite — invitacion equipos con aceptacion, QR scan, busqueda nombre, email, link compartible. Landing web Lumina Noir. Socket RT (invited/accepted/rejected/removed). Config multi-stand + expiracion. Pantalla mi-equipo dedicada. Deep link join-team/[token]. 23 tests backend.
+- [x] 1.x-F: Registro cerrado — restriccion por email whitelist, dominios corporativos, o ambos. Toggle master, compatible con approval + access_code + invite_only. Mensaje custom. Sanitizacion automatica. 21 tests, 38 assertions. QA: 21 escenarios verificados (dominio con @, listas vacias, disabled priority, invite_only bypass, case insensitive).
 
 ### Setup wizard evento (Filament)
 - [ ] Al crear evento nuevo: wizard por pasos (slides) — nombre, fecha/hora, lugar, logo, modalidad, template modulos
@@ -177,14 +178,20 @@ Se activa cuando el evento está en estado `live`.
 - Reutiliza: TODOS los eventos socket existentes. No requiere endpoints nuevos.
 - Doble uso: display durante el evento EN VIVO + herramienta de demo para pitch a clientes.
 
-### Login — mostrar intentos restantes
-- [ ] App: en error de contraseña, mostrar "X intentos restantes" (rate limiting SEC-3 ya existe en backend, falta UX)
-- [ ] Backend: devolver `remaining_attempts` en response 422 del login
+### Login — intentos restantes — COMPLETADO (2026-04-15)
+- [x] Backend: "Credenciales incorrectas. X intentos restantes." en 422
+- [x] Backend: 5to intento devuelve 423 directo con lockout
+- [x] App: toast muestra primer error de cualquier campo (no solo email/password/name)
+- [x] App: fallback mejorado "No se pudo conectar al servidor"
+- [x] QA audit: 25+ casos de error auth verificados
 
-### Encuesta post-evento automática
-- [ ] Backend: trigger cuando event.status cambia a `ended` → activar módulo encuesta
-- [ ] App: al detectar estado `ended`, mostrar modal/redirect a encuesta de satisfacción
-- [ ] Reutiliza: live_poll_questions (S1.10) con tipo "post_event_survey"
+### Encuesta post-evento — COMPLETADO (2026-04-15)
+- [x] Backend: scope post_event en live_polls, auto-activacion via EventObserver al ended
+- [x] Endpoint GET /events/{id}/post-event-survey
+- [x] Filament: PostEventSurveyResource dedicado (CRUD, activar/cerrar manual)
+- [x] App: card en EventArchive (modo ended), hook usePostEventSurvey
+- [x] Reutiliza: live_poll_questions, vote API, encuestas.tsx (zero duplicacion)
+- [x] 9 tests, 27 assertions. Seeder: 5 preguntas, 35 encuestados, 201 votos. Export CSV funcional.
 
 ---
 

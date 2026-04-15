@@ -1,7 +1,7 @@
 # QA Master — Barrido Completo de Plataforma
 
 > Auditoria endpoint por endpoint de todos los modulos.
-> Actualizado: 2026-04-13 | Metodo: curl real contra backend corriendo
+> Actualizado: 2026-04-15 | Metodo: curl real + tests automatizados (381 tests, 959 assertions)
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Modulos probados | Endpoints testados | OK | Bugs | Notas |
 |-----------------|-------------------|-----|------|-------|
-| 21 | 70+ | 70 | 1 corregido | Escritura + 3 roles + presets + 11 field types |
+| 24 | 90+ | 90 | 1 corregido | + auth toasts + staff invite + restriction + encuesta post-evento |
 
 **Bug corregido en esta sesion:**
 - `/me`, `/refresh`, `/verify-email`, `/expo-token` no tenian `check.ban` middleware — usuario baneado podia llamar `/me` y recibir 200. Fix: `eeb6ebc`
@@ -23,14 +23,78 @@
 | `/auth/check-email` | POST | No | OK | 200 | Devuelve status: not_found/pending_activation/active |
 | `/auth/register` | POST | No | OK | 201 | Devuelve token + user + attendee. registration_approved_at=null si approval ON |
 | `/auth/login` | POST | No | OK | 200 | Devuelve token + user + attendee + ban info |
-| `/auth/login` (wrong pw) | POST | No | OK | 422 | "Las credenciales son incorrectas" |
-| `/auth/login` (5 intentos) | POST | No | OK | 429 | Rate limiter activo (throttle:login) |
+| `/auth/login` (wrong pw) | POST | No | OK | 422 | "Credenciales incorrectas. X intentos restantes." |
+| `/auth/login` (5to intento) | POST | No | OK | 423 | "Cuenta bloqueada temporalmente" + locked_until + remaining_attempts=0 |
+| `/auth/login` (bloqueado) | POST | No | OK | 423 | "Intenta en X minutos" (incluso con password correcta) |
+| `/auth/login` (desactivado) | POST | No | OK | 403 | "Cuenta desactivada." |
 | `/auth/me` | GET | Si | OK | 200 | User + attendee + role + event_slug. Ban check activo (403 si baneado) |
 | `/auth/me` (baneado) | GET | Si | OK | 403 | "Acceso suspendido" + ban reason + expires_at |
 | `/auth/me` (token invalido) | GET | No | OK | 401 | "Unauthenticated" |
 | `/auth/logout` | POST | Si | OK | 200 | Funciona incluso si baneado |
-| `/auth/logout` (baneado) | POST | Si | OK | 200 | Correcto — usuario baneado puede cerrar sesion |
 | `/auth/expo-token` | POST | Si | OK | 204 | Requiere event_id en body |
+
+### 1b. Auth Toast Messages — 24 tests automatizados (AuthToastMessagesTest.php)
+
+Verifica el mensaje EXACTO que el usuario ve en el toast de la app para cada error:
+
+**Login (8 tests):**
+
+| Caso | HTTP | Mensaje que ve el usuario |
+|------|------|--------------------------|
+| 1er intento fallido | 422 | "Credenciales incorrectas. 4 intentos restantes." |
+| 2do intento | 422 | "Credenciales incorrectas. 3 intentos restantes." |
+| 4to intento | 422 | "Credenciales incorrectas. 1 intento restante." (singular) |
+| 5to intento | 423 | "Cuenta bloqueada temporalmente. Intenta en 30 minutos." |
+| Cuenta bloqueada | 423 | "Cuenta bloqueada temporalmente. Intenta en X minutos." |
+| Cuenta desactivada | 403 | "Cuenta desactivada." |
+| Email no existente | 422 | "Credenciales incorrectas." (no revela si email existe — seguridad) |
+| Login exitoso | 200 | token + user + attendee (no toast) |
+
+**Registro (16 tests):**
+
+| Caso | HTTP | Mensaje que ve el usuario |
+|------|------|--------------------------|
+| Registro exitoso | 201 | token + user + attendee (no toast, navega) |
+| Email duplicado | 422 | "The email has already been taken." |
+| Evento no existe | 422 | "El evento no existe o no esta disponible." |
+| Registro deshabilitado | 422 | "El registro para este evento esta cerrado." |
+| Solo invitados (sin restriction) | 422 | "Este evento solo acepta invitaciones." |
+| Capacidad maxima | 422 | "Este evento ha alcanzado su capacidad maxima." |
+| Ventana no abre | 422 | "El registro aun no esta abierto para este evento." |
+| Ventana ya cerro | 422 | "El registro para este evento ya cerro." |
+| Consent no aceptado | 422 | "Debes aceptar los terminos y condiciones." |
+| Access code requerido | 422 | errors.access_code |
+| Access code invalido | 422 | "El codigo de acceso no es valido." |
+| Restriction dominio (custom) | 422 | Mensaje configurable del admin |
+| Restriction + approval | 201 | Registro OK pero approved_at=null |
+| Nombre vacio | 422 | errors.name |
+| Password corta | 422 | errors.password |
+| Password no coincide | 422 | errors.password |
+
+### 1c. Registration Restriction — 21 tests (RegistrationRestrictionTest.php)
+
+| Caso | HTTP | Resultado |
+|------|------|-----------|
+| Restriction OFF | 201 | Cualquiera entra |
+| email_list — email en lista | 201 | Pasa |
+| email_list — email NO en lista | 422 | Rechazado |
+| email_list — case insensitive | 201 | PEDRO@EMPRESA.COM matchea pedro@empresa.com |
+| domain — dominio correcto | 201 | Pasa |
+| domain — dominio incorrecto | 422 | Rechazado |
+| domain — multiples dominios | 201 | Cualquier dominio de la lista |
+| domain — dominio con @ (error admin) | 201 | Sanitiza automatico |
+| both — email en lista, dominio no | 201 | OR logic |
+| both — dominio OK, email no | 201 | OR logic |
+| both — ni email ni dominio | 422 | Rechazado |
+| restriction + approval | 201 | Pasa pero approved_at=null |
+| mensaje custom | 422 | Devuelve texto configurado por admin |
+| mensaje default | 422 | "No estas autorizado para registrarte en este evento." |
+| lista con espacios/lineas vacias | 201 | Trim funciona |
+| listas vacias bloquea todo | 422 | Nadie entra |
+| registration_disabled prioridad | 422 | "registro cerrado" (gana sobre restriction) |
+| access_code + restriction | 422 | Ambos validan |
+| invite_only + restriction | 201 | Restriction habilita registro filtrado |
+| invite_only sin restriction | 422 | Bloqueo total (comportamiento original) |
 
 **QA detallado auth/onboarding:** ver `QA-AUTH-ONBOARDING.md`
 
@@ -101,7 +165,39 @@
 | Endpoint | Metodo | Auth | Resultado | HTTP | Notas |
 |----------|--------|------|-----------|------|-------|
 | `/events/sessions/{sid}/poll/active` | GET | Si | OK | 200 | `{}` cuando no hay poll activa |
-| `/polls/{id}/vote` | POST | Si | No probado | — | Requiere poll activa |
+| `/events/{id}/surveys` | GET | Si | OK | 200 | Incluye scope event + post_event |
+| `/polls/{id}/vote` | POST | Si | OK | 200 | Star rating, multiple choice, open text |
+| `/events/{id}/post-event-survey` | GET | Si | OK | 200 | null si no hay, o encuesta activa con preguntas + my_answers |
+
+### 9b. Encuesta Post-Evento — 9 tests (PostEventSurveyTest.php) + simulacion curl
+
+**Tests automatizados:**
+
+| Caso | Resultado |
+|------|-----------|
+| No hay encuesta → null | OK |
+| Encuesta draft → null | OK |
+| Encuesta activa → 3 preguntas, 3 tipos | OK |
+| Auto-activacion al cambiar evento a ended | OK (draft → active) |
+| Encuesta ya activa no se duplica al ended | OK |
+| Encuesta scope=event no se activa al ended | OK |
+| Votar star rating + multiple choice | OK |
+| Aparece en /surveys endpoint | OK |
+| Draft no aparece en /surveys | OK |
+
+**Simulacion curl (7 tests manuales):**
+
+| # | Test | Resultado |
+|---|------|-----------|
+| 1 | GET post-event-survey activa | 5 preguntas, 0 respuestas |
+| 2 | Votar star rating (5 estrellas) | voted: true |
+| 3 | Votar multiple choice (Networking) | voted: true |
+| 4 | Votar texto libre | voted: true |
+| 5 | Respuestas en BD | 3 votos correctos con contenido |
+| 6 | Aparece en /surveys endpoint | 1 encuesta post-evento |
+| 7 | my_answers = 3/3 despues de votar | OK |
+
+**Seeder:** PostEventSurveySeeder — 5 preguntas (star, mc single, mc multi, mc single, text), 35 encuestados, 201 votos. Export CSV funcional desde Filament.
 
 ---
 
@@ -202,6 +298,62 @@
 | `/events/{id}/pages` | GET | Si | OK | 200 | 1 pagina custom |
 | `/events/{id}/trivia/{id}/answer` | POST | Si | No probado | — | Requiere trivia activa |
 | `/me/leads?event_id={id}` | GET | Si | OK | 200 | 0 leads (usuario no es vendedor) |
+
+---
+
+## 21. Staff Invite — Gestion de equipos (1.x-H)
+
+| Endpoint | Metodo | Auth | Resultado | HTTP | Notas |
+|----------|--------|------|-----------|------|-------|
+| `/me/stand` | GET | Si | OK | 200 | Info stand + miembros + cupos |
+| `/me/stand/members` | POST | Si | OK | 201 | Invitar por email o attendee_id. Devuelve share_link + token |
+| `/me/stand/members/{id}` | DELETE | Si | OK | 204 | Remover miembro. Socket staff:removed al target |
+| `/me/stand/transfer` | POST | Si | OK | 200 | Transferir liderazgo |
+| `/me/stand/search-attendees` | GET | Si | OK | 200 | Buscar por nombre, excluye miembros actuales |
+| `/me/stand/resolve-qr` | POST | Si | OK | 200 | QR token → attendee info para invitar |
+| `/me/stand/share-link` | POST | Si | OK | 201 | Genera link generico sin email |
+| `/staff-invitations/{token}/info` | GET | Si | OK | 200 | Preview invitacion (para deep link) |
+| `/staff-invitations/{token}/accept` | POST | Si | OK | 200 | Acepta, activa vendor access |
+| `/staff-invitations/{token}/reject` | POST | Si | OK | 204 | Rechaza |
+| `/me/pending-invitations` | GET | Si | OK | 200 | Lista invitaciones pendientes del usuario |
+| `/join-team/{token}` (web) | GET | No | OK | 200 | Landing Lumina Noir con store badges |
+
+### 21b. Staff Invite — 23 tests (StandTeamTest.php)
+
+| Caso | Resultado |
+|------|-----------|
+| Owner ve su stand | OK |
+| Non-owner no puede ver | 403 |
+| Invitar por email queda pendiente (no auto-activa) | Pendiente |
+| Invitar usuario registrado queda pendiente | Pendiente |
+| Invitar por attendee_id (QR) | Pendiente |
+| Limite de cupos | STAND_FULL |
+| Email duplicado | ALREADY_IN_STAND |
+| No invitarse a si mismo | CANNOT_ADD_SELF |
+| Accept — activa vendor access | has_vendor_access=true |
+| Reject | status=removed |
+| Invitacion expirada → 410 | INVITATION_EXPIRED |
+| Usuario no target no puede aceptar | 403 |
+| Multi-stand OFF bloquea | ALREADY_IN_OTHER_STAND |
+| Multi-stand ON permite | OK |
+| Target ve pendientes | 1 invitacion |
+| Expiradas no aparecen en pendientes | 0 |
+| Buscar asistentes | Resultados correctos |
+| Busqueda excluye miembros | 0 resultados |
+| Owner remueve miembro | vendor_access revocado |
+| Transferir ownership | owner_attendee_id cambia |
+| Landing valida | Muestra stand + "Abrir en la app" |
+| Landing expirada | Muestra "expirada" |
+| Landing token invalido | Muestra "no encontrada" |
+
+### Socket events staff:
+
+| Evento | Direccion | Payload |
+|--------|-----------|---------|
+| `staff:invited` | server → target | invitationId, token, sponsorName, sponsorLogo, inviterName |
+| `staff:accepted` | server → inviter | attendeeName, attendeeId, sponsorId |
+| `staff:rejected` | server → inviter | attendeeName, attendeeId, sponsorId |
+| `staff:removed` | server → target | sponsorName, sponsorId |
 
 ---
 
