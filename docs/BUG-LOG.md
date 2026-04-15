@@ -64,6 +64,12 @@
 - **Fix:** Nueva columna `onboarding_data` JSON en attendees + endpoints `GET/PUT /me/onboarding-data`
 - **Archivos:** Migration, `Attendee.php`, `ProfileController.php`, `api.php`, `FormStep.tsx`
 
+### BUG-095: AccessCode race condition en registerUse (RESUELTO)
+- **Severidad:** MEDIA — dos registros simultaneos podian exceder max_uses
+- **Causa:** `increment('uses_count')` no verificaba max_uses atomicamente
+- **Fix:** WHERE atomico con `uses_count < max_uses` en el UPDATE, retorna bool
+- **Archivo:** `AccessCode.php:registerUse()`
+
 ### BUG-090: PhotoStep replay — foto aparece sin animacion (RESUELTO)
 - **Severidad:** BAJA — cosmetic, foto aparece de golpe sin fade-in
 - **Causa:** `photoOpacity` se inicializaba a 1 si photoUri existia, pero en replay se seteaba despues del init

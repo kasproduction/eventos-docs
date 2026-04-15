@@ -74,7 +74,7 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`.
 - Ref: docs/ROADMAP-UIUX-LANDING.md seccion 7
 
 ### Registro avanzado
-- [ ] 1.x-G: Registro por codigo de acceso — admin genera codigos en Filament, campo validacion.
+- [x] 1.x-G: Registro por codigo de acceso — AccessCode model, Filament CRUD + lote, toggle por evento, campo en AuthStep, validacion atomica.
 - [ ] 1.x-H: Staff invite push + cambio de rol — push + socket + layout vendedor.
 
 ### Setup wizard evento (Filament)
