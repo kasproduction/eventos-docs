@@ -74,7 +74,8 @@ Plan completo en `docs/PLAN-TAGS-MODULOS.md`.
 - Ref: docs/ROADMAP-UIUX-LANDING.md seccion 7
 
 ### Registro avanzado
-- [x] 1.x-G: Registro por codigo de acceso — AccessCode model, Filament CRUD + lote, toggle por evento, campo en AuthStep, validacion atomica.
+- [x] 1.x-G: Registro por codigo de acceso — AccessCode model, Filament CRUD + lote, toggle por evento, campo en AuthStep, validacion atomica, tracking usos.
+- [x] 1.x-G.1: Verificacion identidad CSV — campo personalizable (telefono/etc), verify-identity endpoint, fallback si deep link no funciona.
 - [ ] 1.x-H: Staff invite push + cambio de rol — push + socket + layout vendedor.
 
 ### Setup wizard evento (Filament)

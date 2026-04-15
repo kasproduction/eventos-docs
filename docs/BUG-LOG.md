@@ -64,6 +64,12 @@
 - **Fix:** Nueva columna `onboarding_data` JSON en attendees + endpoints `GET/PUT /me/onboarding-data`
 - **Archivos:** Migration, `Attendee.php`, `ProfileController.php`, `api.php`, `FormStep.tsx`
 
+### BUG-098: invitation_token expuesto sin verificacion (RESUELTO)
+- **Severidad:** MEDIA — token entregado a cualquiera que conozca el email
+- **Causa:** check-email devolvia token directo sin verificar identidad
+- **Fix:** Si evento tiene `activation_verify_field`, check-email no devuelve token. Nuevo endpoint `POST /auth/verify-identity` valida dato personal antes de entregar token.
+- **Archivos:** `AuthController.php`, `AuthStep.tsx`, `authApi.ts`, `RegistrationSettingsResource.php`
+
 ### BUG-096: Access code no sanitiza espacios al pegar (RESUELTO)
 - **Severidad:** MEDIA — usuario pega codigo con espacio, falla validacion
 - **Causa:** Ni el backend ni la app eliminaban whitespace del codigo pegado
