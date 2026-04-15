@@ -64,6 +64,12 @@
 - **Fix:** Nueva columna `onboarding_data` JSON en attendees + endpoints `GET/PUT /me/onboarding-data`
 - **Archivos:** Migration, `Attendee.php`, `ProfileController.php`, `api.php`, `FormStep.tsx`
 
+### BUG-099: activate endpoint 500 con token ya usado (RESUELTO)
+- **Severidad:** MEDIA — excepcion 500 en vez de error limpio 422
+- **Causa:** `firstOrFail()` lanza ModelNotFoundException cuando token ya consumido
+- **Fix:** Usar `first()` + ValidationException con mensaje claro
+- **Archivo:** `AuthService.php:activateAccount()`
+
 ### BUG-098: invitation_token expuesto sin verificacion (RESUELTO)
 - **Severidad:** MEDIA — token entregado a cualquiera que conozca el email
 - **Causa:** check-email devolvia token directo sin verificar identidad
