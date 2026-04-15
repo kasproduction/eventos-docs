@@ -592,8 +592,12 @@ PASO 5: Barrido Visual App — ~99% COMPLETADO (1.x-E-B done 2026-04-13)
 │   ├── [x] API presets: GET /presets/{type} (53 paises, 20 industrias, ciudades 9 paises)
 │   ├── [x] OnboardingController: preset → preset_options inyectadas al servir config
 │   └── [x] Seeder actualizado con ejemplos de los 3 tipos
-├── ⏳ Tarea 1.x-E-D (pendiente):
-│   └── [ ] Campos condicionales (depends_on) — admin define dependencias, no hardcoded
+├── ✅ Tarea 1.x-E-D COMPLETADA (2026-04-14):
+│   ├── [x] Campos condicionales: depends_on en config JSON (pais → ciudades dinamicas)
+│   ├── [x] preset_value_map para resolver codigos pais en campos asociativos
+│   ├── [x] Fetch dinamico cities via /presets/cities/{code}
+│   ├── [x] Reset child al cambiar parent + clear dynamicOptions
+│   └── [x] Replay pre-fill: foto, profile, custom fields, intereses
 ├── 💤 Nice to have (no bloquea):
 │   └── [ ] react-native-image-crop-picker: crop circular dark (requiere dev build, no Expo Go)
 
