@@ -1,7 +1,7 @@
 # EventOS — Roadmap
 
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
-_Actualizado: 2026-04-14 | v4.2_
+_Actualizado: 2026-04-15 | v4.3_
 
 ---
 
@@ -10,14 +10,14 @@ _Actualizado: 2026-04-14 | v4.2_
 | Fase | Estado | Detalle |
 |------|--------|---------|
 | **Fase 0** — Setup | ✅ Completa | 4 sesiones, 2026-03-28 |
-| **Fase 1** — MVP funcional | ✅ ~98% | 22+ sesiones, 2026-03-29 → 2026-04-07. Tags+visibility backend 04-14 |
-| **UI/UX Lumina Noir** | ✅ ~98% | Barrido visual completo, 2026-04-07 → 2026-04-12 |
-| **Seguridad** | ✅ 80% | SEC-1/2/3 + 3b parcial. 42 tests. Pendiente: SEC-3b.2, 3b.4, 4, 5 |
-| **Onboarding DaVinci** | ✅ | 6 steps, configurable Filament, gamificacion, 5 backgrounds |
+| **Fase 1** — MVP funcional | ✅ 100% | 22+ sesiones + extras. Tags, lifecycle, FAQ, soporte, registro avanzado |
+| **UI/UX Lumina Noir** | ✅ ~99% | Barrido completo + FAQ + soporte + onboarding. Falta: light mode |
+| **Seguridad** | ✅ 85% | SEC-1/2/3 + 3b completo. Pendiente: 2FA, device, infra (SEC-4/5) |
+| **Onboarding DaVinci** | ✅ | 6 steps, configurable, campos unificados, depends_on avanzado |
 | **Moderacion** | ✅ | Ban RT, palabras bloqueadas, chat monitor, slow mode |
-| **QA** | ✅ | 60+ endpoints, 20 modulos, 314 tests backend |
+| **QA** | ✅ | 70+ endpoints, 20 modulos, 397 tests backend, 1009 assertions |
 | **Deploy** | ⏳ | Docker + VPS + CI/CD |
-| **Fase 2** — Web app | ⏳ | Next.js, W.0–W.12 |
+| **Fase 2** — Web app | ⏳ | Next.js, W.0-W.12 |
 | **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion |
 
 **Que falta:** ver `docs/PENDIENTES.md`
@@ -225,6 +225,13 @@ git push origin develop
 | 1.22 | Registro personalizable + import/export + approval + deep link + consent | 04-07 |
 | pulido | Tab vendedor unificado, modulos por rol, admin rediseno | 04-07 |
 | stress | k6 + artillery scripts (ejecutado local, pendiente VPS Ubuntu) | 04-07 |
+| 1.x-D | Event lifecycle: 4 estados, countdown, archivo, about, modalidad | 04-14 |
+| 1.x-E | Campos unificados registration_fields, depends_on avanzado | 04-15 |
+| 1.x-F | Registro cerrado: email whitelist, dominios, both. 21 tests | 04-15 |
+| 1.x-G | Registro por codigo de acceso + verificacion identidad CSV | 04-14 |
+| 1.x-H | Staff invite: QR+email+link, aceptacion, socket RT, landing | 04-15 |
+| 1.x-I | FAQ asistente: orbe, categorias, accordion, soporte, push | 04-15 |
+| post | Encuesta post-evento: scope post_event, auto-activacion, CSV | 04-15 |
 
 ---
 
@@ -238,14 +245,16 @@ git push origin develop
 | SEC-3b.1: Token register → configurable | ✅ | — | 04-12 |
 | SEC-3b.3: Middleware CheckBan server-side | ✅ | — | 04-12 |
 | SEC-3b.5: Ban real-time via socket | ✅ | — | 04-12 |
-| SEC-3b.2: Validar token al startup (GET /me) | ⏳ | — | — |
-| SEC-3b.4: Middleware approval server-side | ⏳ | — | — |
+| SEC-3b.2: Validar token al startup (GET /me) | ✅ | — | 04-13 |
+| SEC-3b.4: Middleware approval server-side (CheckApproval) | ✅ | — | 04-13 |
+| SEC-6.1: Rate limit networking (100/evento, 30/dia) | ✅ | 3 | 04-15 |
+| SEC-6.2: Rate limit escritura (posts, comments, Q&A, support, photos) | ⏳ CRITICO | — | pre-deploy |
 | SEC-3.1: 2FA OTP | ⏳ | — | — |
 | SEC-3.2: Device fingerprinting | ⏳ | — | — |
 | SEC-4: Docker, server hardening, Cloudflare, backups | ⏳ | — | sesion deploy |
 | SEC-5: SecurityLogger, Sentry, uptime | ⏳ | — | sesion deploy |
 
-Total: 42 security tests, 314 tests backend, 0 TS errors.
+Total: 45+ security tests, 415 tests backend, 1045 assertions, 0 TS errors.
 
 ---
 
@@ -271,9 +280,9 @@ Home, Agenda, Speakers, Streaming, Social, Sponsors, Profile, Encuestas, Chat, M
 | 1.x-E-B | FormStep tipos avanzados | searchable_select (paises), checkbox_group, date picker |
 | ~~1.x-C~~ | ~~Roles asistente~~ | **ELIMINADO** — ya no existen roles presencial/virtual, reemplazado por tags+visibility |
 | 1.x-D | Estados evento lifecycle | registration_only/published/live/ended + countdown DaVinci |
-| ~~1.x-F~~ | ~~Registro cerrado~~ | **COMPLETADO** — whitelist emails, dominios corporativos, ambos. Toggle master + approval + access_code + invite_only compatible. 21 tests, 38 assertions. |
-| 1.x-G | Registro por codigo | Admin genera codigos en Filament, campo validacion |
-| ~~1.x-H~~ | ~~Staff invite~~ | **COMPLETADO** — QR + busqueda + email + link compartible, aceptacion, socket RT, landing web, mi-equipo pantalla, deep link |
+| ~~1.x-F~~ | ~~Registro cerrado~~ | **COMPLETADO 04-15** — whitelist emails, dominios corporativos, ambos. Toggle master + approval + access_code + invite_only compatible. 21 tests, 38 assertions. |
+| ~~1.x-G~~ | ~~Registro por codigo~~ | **COMPLETADO 04-14** — AccessCode model, Filament CRUD + lote, toggle, campo AuthStep, tracking usos, verificacion identidad CSV. |
+| ~~1.x-H~~ | ~~Staff invite~~ | **COMPLETADO 04-15** — QR + busqueda + email + link compartible, aceptacion, socket RT, landing web, mi-equipo pantalla, deep link. 23 tests. |
 
 ---
 
@@ -461,9 +470,15 @@ SEGURIDAD: SEC-1/2/3 + 3b parcial                             ✅ 80%
 UI/UX:    Barrido visual Lumina Noir + onboarding DaVinci      ✅ ~98%
           + Moderacion + QA Master                             ✅
 
+COMPLETADO 04-15:
+  → Campos unificados, FAQ+soporte, staff invite, registro cerrado
+  → Login lockout, encuesta post-evento, push navigation, dev build
+  → 397 tests, 1009 assertions
+
 PENDIENTE:
-  → Features competitivos (1.C1 analytics, 1.C3 QR, 1.C5 .ics, 1.23 permisos)
-  → Web app (W.0–W.12)
+  → Setup wizard Filament, light mode/theming
+  → Features competitivos (1.C1 analytics, 1.C5 .ics, 1.23 permisos)
+  → Web app (W.0-W.12)
   → Deploy (Docker + VPS + CI/CD + EAS Build)
   → Fase 2 (cuando haya cliente con requerimiento web/video)
   → Fase 3 (cuando haya segundo cliente o monetizacion)
@@ -535,5 +550,5 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 
 ---
 
-_EventOS Roadmap v4.2 — Kasproduction_
-_14 abril 2026_
+_EventOS Roadmap v4.3 — Kasproduction_
+_15 abril 2026_

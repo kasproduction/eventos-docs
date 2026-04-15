@@ -2,7 +2,7 @@
 
 > Historial de todo lo implementado, organizado por area.
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
-> Actualizado: 2026-04-14
+> Actualizado: 2026-04-15
 
 ---
 
@@ -394,3 +394,87 @@ Total: 42 security tests, 309 tests backend.
 - [x] Timeline y estrategia competitiva actualizados en roadmap
 
 Commits: ~20 commits en 3 repos (app, backend, docs)
+
+---
+
+## Sesion 2026-04-15 — Campos unificados + Registro avanzado + FAQ + Soporte
+
+### Campos unificados registration_fields (2026-04-15 manana)
+- [x] registration_fields como fuente unica (elimina campos inline en onboarding_steps_config)
+- [x] Nuevas columnas: `depends_on` (varchar 60), `show_in` (registration/onboarding/both)
+- [x] Onboarding config solo tiene `field_ids` (resuelve a campos reales via API)
+- [x] Endpoint nuevo: GET /events/{id}/onboarding-fields
+- [x] PUT /me/registration-fields acepta campos onboarding/both
+- [x] Export CSV incluye todo automaticamente (una sola tabla)
+- [x] depends_on avanzado: `"campo"` (cualquier valor), `"campo:val1,val2"` (especificos), `"campo:!val"` (negacion)
+- [x] Deep merge Filament: mutateFormDataBeforeSave evita que secciones colapsadas null sobreescriban config
+- [x] Legacy backward compat: configs con fields inline siguen funcionando
+
+### Validacion DaVinci — 4 bugs (2026-04-15 manana)
+- [x] BUG-100: Nombre acepta @# → regex solo letras+tildes+espacios
+- [x] BUG-101: InterestsStep sin toasts → toast error + exito
+- [x] BUG-102: Botones disabled sin feedback → eliminado disabled, validacion con toast
+- [x] BUG-103: Inputs sin borde rojo → hasError en FocusInput (AuthStep)
+- [x] FormStep: toast especifico por campo ("El campo X es obligatorio")
+
+### Staff invite 1.x-H — COMPLETADO (2026-04-15 tarde)
+- [x] Backend: StaffInvitationController, StaffNotificationService, join-team.blade.php, 2 migrations, 23 tests
+- [x] App: mi-equipo.tsx, scanner-invite.tsx, join-team/[token].tsx, StaffInvitationModal.tsx, useStaffInvitations.ts
+- [x] Socket: StaffInvitePayload, StaffResponsePayload, StaffRemovedPayload (4 event types)
+- [x] Flujo: QR scan + busqueda nombre + email + link compartible + deep link aceptacion
+- [x] Landing web Lumina Noir join-team.blade.php
+- [x] Config: multi-stand + expiracion tokens
+
+### Registro cerrado 1.x-F — COMPLETADO (2026-04-15 tarde)
+- [x] 3 modos: email_list, domain, both (OR logic)
+- [x] Toggle master, compatible con approval + access_code + invite_only
+- [x] Sanitizacion: lowercase, trim, strip @ de dominios
+- [x] Mensaje rechazo custom o default
+- [x] 21 tests, 38 assertions. QA: 21 escenarios verificados
+
+### Login intentos + lockout (2026-04-15 tarde)
+- [x] Backend: "Credenciales incorrectas. X intentos restantes." en 422
+- [x] Backend: 5to intento devuelve 423 directo con lockout
+- [x] App: Object.values(errors).flat()[0] para cualquier campo
+- [x] QA audit: 25+ casos de error auth verificados
+
+### Encuesta post-evento (2026-04-15 tarde)
+- [x] Backend: scope post_event en live_polls, auto-activacion EventObserver al ended
+- [x] Filament: PostEventSurveyResource dedicado (CRUD, activar/cerrar manual)
+- [x] App: card EventArchive, usePostEventSurvey hook
+- [x] Reutiliza 100% del sistema de encuestas existente (zero duplicacion)
+- [x] Seeder: 5 preguntas, 35 encuestados, 201 votos. Export CSV funcional.
+- [x] 9 tests, 27 assertions
+
+### FAQ asistente — COMPLETADO (2026-04-15 noche)
+- [x] Backend: tabla event_faqs (event_id, section, question, answer_text, answer_action_url, answer_image_url, sort_order, is_active)
+- [x] Backend: FaqController API GET /events/{id}/faqs (publica, agrupada por seccion) + 6 tests
+- [x] Backend: CRUD Filament FaqResource
+- [x] Backend: FaqSeeder (4 categorias, 12 preguntas)
+- [x] App: Pantalla FAQ con orbe animado (OrbBlob 3 estados), categorias stagger, accordion con Reanimated
+- [x] App: Icono Ayuda en perfil → ruta /(app)/faq
+- [x] App: Filtro por categoria (chips horizontales), busqueda visual
+
+### Soporte asistente — COMPLETADO (2026-04-15 noche)
+- [x] Backend: migration admin_response + responded_at + resolved_at en support_requests
+- [x] Backend: SupportController (store + mine), ordena por id DESC
+- [x] Backend: Filament SupportRequestResource con badge rojo pendientes + textarea respuesta + auto-resolve
+- [x] Backend: 10 tests, 34 assertions (SupportRequestTest.php)
+- [x] App: support-contact.tsx — formulario asunto+mensaje, toast + router.back() (no pantalla sent vacia)
+- [x] App: my-support.tsx — lista consultas con status badge (pendiente amber / resuelto green)
+- [x] App: faq.tsx — boton "Mis consultas (N)" solo si tiene consultas
+- [x] Push: SendPushToAttendeeJob al responder soporte ("Tu consulta fue resuelta: Re: {subject}")
+- [x] Push tap navigation: PUSH_ROUTES map (support_resolved→my-support, announcement→anuncios, agenda_reminder→agenda)
+- [x] INVALIDATION_MAP: support_resolved invalida ['my-support']
+
+### Dev build Android (2026-04-15 noche)
+- [x] Wireless debugging: adb pair + connect (puerto pairing != puerto conexion)
+- [x] npx expo run:android — dev build nativo en dispositivo fisico
+- [x] Push notifications verificadas en dispositivo real
+- [x] Push tap navigation verificada
+
+### Totales 2026-04-15
+- Backend: 397 tests, 1009 assertions, 0 fallos
+- ~20 commits backend, ~20 commits app, 1 commit socket, 3 commits docs
+- Features completados: campos unificados, staff invite, registro cerrado, login lockout, encuesta post-evento, FAQ, soporte completo, push navigation
+- Bugs: BUG-100 a BUG-103 resueltos

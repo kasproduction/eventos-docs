@@ -1411,5 +1411,72 @@ SESION SEC-5: MONITOREO (pendiente — se implementa en sesión de deploy)
 
 ---
 
+---
+
+## SEC-6: Rate Limiting por endpoint (Auditoria 2026-04-15)
+
+> Auditoria completa de todos los endpoints de escritura. Cloudflare protege contra DDoS a nivel red,
+> pero un bot autenticado con token valido puede abusar endpoints internos sin limite.
+
+### SEC-6.1 — Networking rate limits ✅ IMPLEMENTADO (2026-04-15)
+
+- Hard cap: 100 solicitudes por evento por usuario
+- Daily cap: 30 solicitudes por dia por usuario
+- HTTP 429 con codigos `EVENT_LIMIT` / `DAILY_LIMIT`
+- Socket timeout reducido (connectTimeout 0.5s, timeout 1s)
+- 3 tests verifican ambos limites + reset diario
+- 415 tests, 1045 assertions
+
+### SEC-6.2 — Endpoints que NECESITAN rate limiting (PENDIENTE)
+
+| Endpoint | Riesgo | Limite sugerido | Proteccion actual |
+|----------|--------|-----------------|-------------------|
+| `POST /events/{id}/wall` (post) | ALTO | 10 posts/dia, 50/evento | Solo max_wall_posts_per_attendee (puede ser 0=ilimitado) |
+| `POST /wall/{id}/comments` (comment) | MEDIO | 30 comments/dia | NINGUNA |
+| `POST /sessions/{id}/questions` (Q&A) | MEDIO | 10 preguntas/dia por sesion | Solo blocked_words |
+| `POST /events/support` (soporte) | MEDIO | 5 consultas/dia | NINGUNA |
+| `POST /events/{id}/photos` (foto) | ALTO | 20 fotos/dia, max_photos_per_attendee | Solo max_photos_per_attendee (puede ser 0) |
+| `POST /leads` (scan QR) | MEDIO | 60 scans/min (throttle) | Idempotency-Key pero sin rate/min |
+| `PUT /me/profile` (perfil) | BAJO | 10 updates/hora | Idempotente pero puede generar carga |
+| `POST /me/photo` (foto perfil) | BAJO | 5 uploads/hora | Idempotente (reemplaza) |
+
+### SEC-6.3 — Endpoints que NO necesitan rate limiting (idempotentes/protegidos)
+
+| Endpoint | Por que es seguro |
+|----------|-------------------|
+| Likes (wall, photos) | UNIQUE constraint + firstOrCreate. Toggle idempotente. |
+| Q&A upvotes | UNIQUE constraint + toggle. No crea data nueva. |
+| Poll votes | UNIQUE per question. Reemplaza voto anterior. |
+| Session ratings | UNIQUE(session_id, attendee_id). 409 si ya rated. |
+| Trivia answers | UNIQUE(trivia_id, attendee_id). Return early si ya answered. |
+| Gamification visits | PointsService dedup + daily_max. |
+| Favorites | Toggle idempotente. |
+| Contact respond | Solo receiver puede responder. 409 si ya respondido. |
+| Expo token | Idempotente (actualiza campo). |
+
+### SEC-6.4 — Plan de implementacion
+
+**Patron recomendado:** Check count al inicio del controller (mismo patron que networking):
+
+```php
+$dailyCount = Model::where('user_condition')
+    ->where('created_at', '>=', now()->startOfDay())
+    ->count();
+
+if ($dailyCount >= LIMIT) {
+    return response()->json(['code' => 'DAILY_LIMIT', 'message' => '...'], 429);
+}
+```
+
+**Para produccion (QUEUE_CONNECTION=redis):**
+- Push, email, socket van a la cola Redis → response instantaneo (~10ms)
+- Sin queue worker corriendo (dev local con sync), el socket timeout es el cuello de botella
+- Solucion produccion: `php artisan queue:work` corriendo con Supervisor
+
+**Prioridad:** Implementar SEC-6.2 ANTES del deploy a produccion. Es 2-3 horas de trabajo (copiar patron de networking a 5 controllers).
+
+---
+
 *Documento vivo — se actualiza con ✅ conforme se implementa cada item.*
-*Próxima revisión de seguridad: pre-deploy y cada 3 meses.*
+*Proxima revision de seguridad: pre-deploy y cada 3 meses.*
+*Ultima actualizacion: 2026-04-15 — SEC-6 rate limiting auditoria completa.*
