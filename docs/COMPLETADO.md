@@ -344,3 +344,53 @@ Total: 42 security tests, 309 tests backend.
 - [x] Primera vez: loading → fetch → cache. Segunda vez en adelante: instantaneo
 - [x] Eliminado refetchInterval 30s (innecesario con socket invalidation)
 - [x] Commit app: 5834769
+
+---
+
+## Sesion 2026-04-14 (tarde) — Session Detail + Onboarding + CSV + Codigos + Seguridad
+
+### Session Detail Screen
+- [x] Pantalla detalle de sesion: badges, titulo, rating, time/location, speakers tappables
+- [x] Botones: Favorita, Calendario, Evaluar, UNIRTE / Ver grabacion
+- [x] Navegacion circular: Agenda → Session → Speaker → Session
+- [x] Agenda card tap → session detail (antes iba directo a stream)
+
+### Onboarding — depends_on + replay
+- [x] Campos condicionales: depends_on en config JSON (pais → ciudades dinamicas)
+- [x] preset_value_map para resolver codigos pais
+- [x] Onboarding replay diferenciado: pre-fill foto/profile/custom/intereses
+- [x] Sin confetti, sin puntos dobles, titulo "Datos actualizados"
+- [x] onboarding_data JSON en attendees para campos custom
+- [x] GET/PUT /me/onboarding-data endpoints
+- [x] isReplay flag persistente (useState lazy initializer)
+
+### Pre-registro CSV
+- [x] Flujo completo: CSV → User+Attendee+QR → InvitationMail → deep link → activacion
+- [x] Fallback sin deep link: check-email → token directo → activate-account
+- [x] Deep link redirect page Lumina Noir
+- [x] Verificacion identidad: campo configurable (telefono), POST /auth/verify-identity
+- [x] Token rotado en cada check-email (seguridad)
+- [x] Tracking deep link: invitation_clicked_at + badges Enviado/Click/Activado
+- [x] Login pasa event_slug (fix bug recurrente)
+
+### Registro por Codigo de Acceso
+- [x] Modelo AccessCode con isValid(), registerUse() atomico
+- [x] Filament AccessCodeResource: CRUD + generar lote + ver usos
+- [x] Toggle requires_access_code en RegistrationSettings
+- [x] Campo condicional en AuthStep (uppercase, sanitiza espacios)
+- [x] Validacion en RegisterRequest + AuthService
+- [x] Tracking: access_code_used en attendee, filtro en asistentes
+- [x] registerUse() con WHERE atomico (race condition safe)
+
+### Bugs resueltos: 21 (BUG-079 a BUG-099)
+- [x] BUG-079: API crash array_flip cities (CRITICA)
+- [x] BUG-080: Login sin event_slug (ALTA)
+- [x] BUG-081: Fetch sin timeout en index (ALTA)
+- [x] BUG-082: registrationApprovedAt fallback (ALTA)
+- [x] BUG-083-099: 17 bugs adicionales (onboarding, seguridad, UX)
+
+### Bancolombia — documentacion
+- [x] Requerimientos: silent disco, multi-location, webhooks badges, mission control
+- [x] Timeline y estrategia competitiva actualizados en roadmap
+
+Commits: ~20 commits en 3 repos (app, backend, docs)
