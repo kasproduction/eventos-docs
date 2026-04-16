@@ -3,22 +3,85 @@
 > La UNICA fuente de verdad de lo que falta por hacer.
 > Organizado por area de trabajo, no por prioridad.
 > Actualizado: 2026-04-15
-> Backend: 397 tests, 1009 assertions
+> Backend: 465 tests, 1168 assertions
 > Fuentes cruzadas: ROADMAP-UIUX-LANDING.md, WEB-APP-PLAN.md, EventOS_Roadmap.md
 
 ---
 
-## App movil
+## App movil — ordenado por prioridad (facil+critico primero)
+
+### 1. SEC-6.2 Rate limit endpoints escritura — COMPLETADO (2026-04-15)
+- [x] Trait reutilizable `ChecksRateLimit` con defaults + config custom por evento
+- [x] Wall posts (10/dia), Comments (30/dia), Q&A questions (10/dia/sesion)
+- [x] Support (5/dia), Photos (20/dia), Stories (10/dia), Leads (200/dia)
+- [x] JSON `rate_limits` en events (configurable por evento desde Filament)
+- [x] Filament: pagina "Limites de uso" con toggles + inputs por categoria
+- [x] 10 unit tests (trait aislado) + 13 feature tests (endpoints reales)
+- [x] Todos los limites desactivables por toggle (enabled: false = ilimitado)
+
+### 2. Calendar sync boton visible — Facil | 1-2h
+- [ ] Boton ".ics por sesion" visible en session detail (backend ICS ya existe en AgendaController)
+- [ ] 1.C5 en roadmap historico
+
+### 3. Fix Reanimated warning — COMPLETADO (2026-04-16)
+- [x] StatCard: separar entering (layout animation) en wrapper + floatStyle (transform) en inner Animated.View
+
+### 4. Mensaje anclado chat (tipo Twitch) — COMPLETADO (2026-04-16)
+- [x] Socket: chat:pin/unpin, Redis TTL 24h, broadcast, join envia pinned actual
+- [x] Chat monitor: texto libre + pin en hover + banner + desanclar
+- [x] App: PinnedBanner dentro panel interactivo, visible en chat/Q&A/poll
+
+### 5. QA visual multi-device — Media | 3-4h
+- [ ] ZTE 360dp + Medium 411dp — barrido completo pantallas
+- [ ] Verificar responsive, SafeArea, proporciones
+
+### 6. Extraer componentes base reutilizables — Media | 4-6h
+- [ ] Button, Card, Input — paso 1 ROADMAP-UIUX pendiente
+- [ ] Deuda tecnica, no bloquea features
+
+### 7. Upgrade orbe FAQ a Skia shader — Media-Alta | 4-6h
+- [ ] Reemplazar Reanimated+BlurView por @shopify/react-native-skia (solo componente OrbBlob cambia)
+- [ ] Ref visual: design/faq-orb-demo.html
+
+### 8. Light Mode / Theming — CRITICO para clientes enterprise | Alta | 2-3 dias
+Hay marcas que no son afines al negro. Bancolombia, salud, educacion necesitan fondo claro. Tambien accesibilidad.
+
+- [ ] **Refactor ThemeProvider**: extraer TODOS los colores hardcodeados a tokens semanticos (background, surface, text-primary, text-secondary, border, etc.)
+- [ ] **573 archivos** tienen `rgba(255,255,255,0.x)`, `#0e0e0e`, `#0a0a0f` directo. Migrar a `theme.colors.x`
+- [ ] **Lumina Noir** (dark, actual) como tema default
+- [ ] **Lumina Lux** (light) como segundo tema
+- [ ] **Toggle** en config del evento (Filament): tema default del evento. El asistente puede overridear desde perfil.
+- [ ] **High contrast mode**: opacidades minimas 0.5+ para texto secundario
+- [ ] **Font scaling**: respetar Dynamic Type / preferencias del sistema
+
+### --- Prioridad baja ---
+
+### Venue + Mapa — Prioridad baja | Media | 4-6h
+- [ ] Modulo app: pantalla mapa del venue (plano del recinto, stands, escenarios). Imagen estatica + zonas tappables o Google Maps embed
+- [ ] Visibility: `checked_in` only (solo presenciales). Ya soportado por motor de modulos
+- [ ] Landing web: seccion venue con Google Maps embed + indicaciones
+- [ ] Admin Filament: subir imagen plano venue, configurar zonas/labels
+
+### --- Nice to have ---
+
+### Crop circular dark — Nice to have
+- [ ] react-native-image-crop-picker: crop circular dark (ya tiene dev build)
+- [ ] Mejora cosmetica, no bloquea nada
+
+### White-label — Nice to have (post-MVP)
+- [ ] Migrar app.json → app.config.js + estructura clients/ (ref: docs/WHITE-LABEL.md)
+
+### --- Completado ---
 
 ### Setup wizard evento (Filament) — COMPLETADO (2026-04-15)
-- [x] Wizard 5 pasos: basicos, fechas, registro, apariencia, modulos seleccionables + confirmar
-- [x] Modulos con checkboxes (pre-seleccion por template, toggle individual)
-- [x] Auto-crea modulos con roles correctos (attendee, no presencial/virtual)
-- [x] Accesible desde boton "Nuevo evento" en Branding (no nav separado)
-- [x] Fix: ModuleTemplate roles legacy presencial/virtual → attendee (27 templates corregidos)
+- [x] Wizard 5 pasos, modulos con checkboxes, auto-crea con roles correctos
+
+### Dev build + Push — COMPLETADO (2026-04-15)
+- [x] Push notifications probadas en dev build fisico (wireless debugging)
+- [x] Push tap navigation probada (support_resolved, announcement, agenda_reminder)
 
 ### Filament UI Enterprise — Pulido completo admin
-El panel Filament actual es funcional pero generico. Campos numericos full-width, sin jerarquia visual, helpers con jerga dev, idioma mezclado. Necesita pulido para presentar a clientes.
+El panel Filament actual es funcional pero generico. Necesita pulido para presentar a clientes.
 
 **Nivel 1 — Barrido layout (1 dia):**
 - [ ] Todas las secciones `->columns(2)` o `->columns(3)` — NUNCA campos full-width
@@ -44,37 +107,8 @@ El panel Filament actual es funcional pero generico. Campos numericos full-width
 - [ ] Estado del evento visible, cards de acceso rapido a config
 - [ ] Contexto inmediato al entrar (que evento es, cuantos registrados)
 
-### Venue + Mapa
-- [ ] Modulo app: pantalla mapa del venue (plano del recinto, stands, escenarios). Imagen estatica + zonas tappables o Google Maps embed
-- [ ] Visibility: `checked_in` only (solo presenciales). Ya soportado por motor de modulos
-- [ ] Landing web: seccion venue con Google Maps embed + indicaciones
-- [ ] Admin Filament: subir imagen plano venue, configurar zonas/labels
-
-### Light Mode / Theming — CRITICO para clientes
-Hay marcas que no son afines al negro. Un evento de Bancolombia, una marca de salud, educacion, etc. necesita fondo claro. Tambien accesibilidad (dificultad visual).
-
-- [ ] **Refactor ThemeProvider**: extraer TODOS los colores hardcodeados a tokens semanticos (background, surface, text-primary, text-secondary, border, etc.)
-- [ ] **573 archivos** tienen `rgba(255,255,255,0.x)`, `#0e0e0e`, `#0a0a0f` directo. Migrar a `theme.colors.x`
-- [ ] **Lumina Noir** (dark, actual) como tema default
-- [ ] **Lumina Lux** (light) como segundo tema
-- [ ] **Toggle** en config del evento (Filament): tema default del evento. El asistente puede overridear desde perfil.
-- [ ] **High contrast mode**: opacidades minimas 0.5+ para texto secundario
-- [ ] **Font scaling**: respetar Dynamic Type / preferencias del sistema
-- Estimacion: 2-3 dias refactor completo (573 archivos)
-
 ### Documentacion tecnica
 - [ ] Documentar arquitectura socket: una conexion, eventos, rendimiento, escalabilidad. Ref: project_socket_architecture.md
-
-### Cleanup / Dev build
-- [ ] **Upgrade orbe FAQ a Skia shader** — reemplazar Reanimated+BlurView por @shopify/react-native-skia (solo componente OrbBlob cambia). Ref visual: design/faq-orb-demo.html
-- [ ] QA visual multi-device (ZTE 360dp + Medium 411dp)
-- [ ] Crop circular dark (react-native-image-crop-picker, requiere dev build)
-- [x] Push notifications probadas en dev build fisico (wireless debugging, 2026-04-15)
-- [x] Push tap navigation probada (support_resolved, announcement, agenda_reminder)
-- [ ] Mensaje anclado chat tipo Twitch — admin ancla mensaje, socket `chat:pinned`, banner fijo app, auto-expira
-- [ ] White-label: migrar app.json → app.config.js + estructura clients/ (ref: docs/WHITE-LABEL.md)
-- [ ] Fix Reanimated warning: StatCard transform + layout animation overlap (cosmetic, no funcional)
-- [ ] Extraer componentes base reutilizables (Button, Card, Input) — paso 1 ROADMAP-UIUX pendiente
 
 ---
 
@@ -170,8 +204,8 @@ Solo escucha socket — CERO carga extra al server. Doble uso: venue + demo pitc
 - [ ] WhatsApp Business API — templates configurables, envio masivo (confirmacion, recordatorios)
 - [ ] SMS fallback — mensaje corto con link descarga app
 - [ ] Email builder visual Filament — editor templates sin codigo. (Fase 2+)
-- [ ] Push reminders configurables — "Tu sesion empieza en 15 min". Admin configura en Filament. (codigo base listo S1.14)
-- [ ] Calendar invite .ics en email confirmacion — adjunto automatico. Backend ICS ya existe en AgendaController.
+- [x] Push reminders configurables — COMPLETADO. Windows dinamicos (default 15+5 min), toggle on/off, Filament "Recordatorios". Push cambio de hora. 19 tests.
+- [x] Calendar invite .ics en email confirmacion — COMPLETADO. WelcomeMail adjunta .ics evento (METHOD:REQUEST, UID unico). Verificado Mailpit.
 
 ### Branded QR codes
 - [ ] QR codes con logo del evento embebido en el centro. Generacion server-side.

@@ -473,8 +473,47 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - [x] Push notifications verificadas en dispositivo real
 - [x] Push tap navigation verificada
 
-### Totales 2026-04-15
-- Backend: 397 tests, 1009 assertions, 0 fallos
+### SEC-6.2 Rate limit endpoints escritura (2026-04-15 noche)
+- [x] Trait `ChecksRateLimit` reutilizable con defaults + config custom por evento
+- [x] JSON `rate_limits` en events (migration + cast + fillable)
+- [x] 7 endpoints protegidos: wall posts (10/dia), comments (30/dia), Q&A (10/dia/sesion), support (5/dia), photos (20/dia), stories (10/dia), leads (200/dia)
+- [x] Filament: pagina "Limites de uso" con toggles + inputs por categoria (grupo Evento)
+- [x] Toggle OFF = ilimitado, toggle ON = limite editable con default pre-llenado
+- [x] 10 unit tests (trait aislado) + 13 feature tests (endpoints) + 8 spam simulation tests
+- [x] App: fix toasts para 429 en CommentsSheet, support-contact, scanner-stand (DAILY_LIMIT)
+- [x] 0 errores TypeScript nuevos en app
+
+### Push reminders configurables + Agregar todas al calendario (2026-04-15 noche)
+- [x] `SendAgendaRemindersJob` refactorizado: lee `reminder_config` JSON por evento, windows dinamicos
+- [x] Defaults: enabled=true, windows=[15,5], notify_on_change=true
+- [x] Filament: pagina "Recordatorios" (grupo Comunicacion) — toggle enabled, TagsInput minutos, toggle notify_on_change
+- [x] `SendSessionChangedNotificationJob` — push a favoritos cuando admin cambia hora de sesion
+- [x] `EventSessionObserver` — detecta cambio start_datetime/end_datetime → dispatch push (si notify_on_change=true)
+- [x] App: boton "Todas" en header Mi Agenda — agrega todas las favoritas al calendario nativo de una vez
+- [x] App: `session_changed` en INVALIDATION_MAP + PUSH_ROUTES (invalida agenda + mi-agenda, navega a agenda)
+- [x] 5 unit tests (config defaults/merge/disabled) + 14 feature tests (push, dedup, spam 5x10=50, multi-evento)
+- [x] 0 errores TypeScript nuevos
+
+### Mensaje anclado chat — tipo Twitch (2026-04-16)
+- [x] Socket server: chat:pin/chat:unpin handlers, Redis storage (TTL 24h), broadcast a room
+- [x] Socket types: ChatPinnedPayload, ClientToServerEvents pin/unpin, ServerToClientEvents pinned/unpinned
+- [x] join:session envia pinned actual (si existe) junto con history
+- [x] Chat monitor: campo texto libre + icono pin en hover mensajes + banner azul activo + desanclar
+- [x] App: PinnedBanner component (pin icon + message + author + X close)
+- [x] PinnedBanner dentro del contenedor interactivo (no reduce player)
+- [x] Visible en todos los modes (chat, Q&A, poll)
+- [x] useChat: pinnedMessage state + listeners chat:pinned/chat:unpinned
+- [x] Solo admin puede pin/unpin (role check server-side)
+- [x] TypeScript 0 errores nuevos en socket + app
+
+### Calendar .ics en email de bienvenida (2026-04-16)
+- [x] WelcomeMail adjunta .ics con fechas del evento (METHOD:REQUEST, UID unico, SEQUENCE:0)
+- [x] Datos del .ics: nombre, fechas, venue, descripcion — todo de event model
+- [x] Sin fechas → sin adjunto (graceful)
+- [x] Verificado en Mailpit: adjunto correcto, 562 bytes, text/calendar, contenido ICS valido
+
+### Totales 2026-04-16
+- Backend: 465 tests, 1168 assertions, 0 fallos
 - ~20 commits backend, ~20 commits app, 1 commit socket, 3 commits docs
-- Features completados: campos unificados, staff invite, registro cerrado, login lockout, encuesta post-evento, FAQ, soporte completo, push navigation
+- Features completados: campos unificados, staff invite, registro cerrado, login lockout, encuesta post-evento, FAQ, soporte completo, push navigation, SEC-6.2 rate limits, push reminders configurables, agregar todas al calendario, .ics en email bienvenida
 - Bugs: BUG-100 a BUG-103 resueltos

@@ -1,7 +1,7 @@
 # QA Master — Barrido Completo de Plataforma
 
 > Auditoria endpoint por endpoint de todos los modulos.
-> Actualizado: 2026-04-15 | Metodo: curl real + tests automatizados (381 tests, 959 assertions)
+> Actualizado: 2026-04-16 | Metodo: curl real + tests automatizados (465 tests, 1168 assertions)
 
 ---
 
@@ -9,7 +9,7 @@
 
 | Modulos probados | Endpoints testados | OK | Bugs | Notas |
 |-----------------|-------------------|-----|------|-------|
-| 24 | 90+ | 90 | 1 corregido | + auth toasts + staff invite + restriction + encuesta post-evento |
+| 26 | 100+ | 100 | 1 corregido | + rate limits + reminders + calendar bulk + session changed |
 
 **Bug corregido en esta sesion:**
 - `/me`, `/refresh`, `/verify-email`, `/expo-token` no tenian `check.ban` middleware — usuario baneado podia llamar `/me` y recibir 200. Fix: `eeb6ebc`
@@ -484,6 +484,224 @@ Verifica el mensaje EXACTO que el usuario ve en el toast de la app para cada err
 
 ---
 
+## 22. Rate Limits — SEC-6.2 (2026-04-15)
+
+### Unit tests — ChecksRateLimit trait (10 tests)
+
+| Caso | Resultado |
+|------|-----------|
+| Bajo el limite → null | OK |
+| En el limite → 429 DAILY_LIMIT | OK |
+| No cuenta registros de ayer | OK |
+| Scope: otro evento no cuenta | OK |
+| Config custom del evento (limit=3) | OK |
+| Config disabled → sin limite | OK |
+| Defaults cuando rate_limits=null | OK |
+| Key inexistente → no aplica | OK |
+| getDefault retorna valores correctos | OK |
+| allDefaults retorna 7 keys | OK |
+
+### Feature tests — Endpoints reales (13 tests)
+
+| Caso | Endpoint | HTTP | Resultado |
+|------|----------|------|-----------|
+| Wall post limite 10 | POST /wall | 429 | DAILY_LIMIT |
+| Wall post bajo limite | POST /wall | 201 | OK |
+| Wall post ayer no cuenta | POST /wall | 201 | Reset diario |
+| Wall post otro evento | POST /wall | 201 | Scope correcto |
+| Comment limite 30 | POST /wall/{id}/comments | 429 | DAILY_LIMIT |
+| Q&A limite 10/sesion | POST /sessions/{id}/questions | 429 | DAILY_LIMIT |
+| Q&A otra sesion libre | POST /sessions/{id2}/questions | 201 | Scope por sesion |
+| Support limite 5 | POST /support | 429 | DAILY_LIMIT |
+| Photos limite 20 | POST /photos | 429 | DAILY_LIMIT |
+| Stories limite 10 | POST /stories | 429 | DAILY_LIMIT |
+| Leads limite 200 | POST /leads | 429 | DAILY_LIMIT |
+| Config custom limit=2 | POST /wall | 429 | Respeta config |
+| Config disabled | POST /wall | 201 | Ilimitado |
+
+### Spam simulation (8 tests)
+
+| Caso | Resultado |
+|------|-----------|
+| 15 posts rapidos: 10 OK, 11-15 bloqueados | Todos 429 con code+message |
+| Formato respuesta 429 para toast | code + message presentes |
+| Q&A por sesion: 10 en A + 10 en B independientes | Scope correcto |
+| Respuesta 429 matchea regex limite | "limite.*\d+.*dia" |
+| Evento grande limit=50 | Bloquea en 51 |
+| Evento sin limites (disabled) | 101 posts OK |
+| Dos usuarios independientes | Cada uno su contador |
+| Reset diario: bloqueado hoy, libre mañana | Reset OK |
+
+### Filament config verificada
+
+| Campo | Tipo | Default | Funciona |
+|-------|------|---------|----------|
+| wall_posts enabled/limit | Toggle + Number | true / 10 | OK |
+| wall_comments enabled/limit | Toggle + Number | true / 30 | OK |
+| qna_questions enabled/limit | Toggle + Number | true / 10 | OK |
+| support enabled/limit | Toggle + Number | true / 5 | OK |
+| photos enabled/limit | Toggle + Number | true / 20 | OK |
+| stories enabled/limit | Toggle + Number | true / 10 | OK |
+| leads enabled/limit | Toggle + Number | true / 200 | OK |
+
+### App toasts 429
+
+| Pantalla | Antes | Despues |
+|----------|-------|---------|
+| Social (posts/photos/stories) | Ya mostraba err.message | OK |
+| CommentsSheet | Sin toast | Agregado catch + toast |
+| Q&A (QnAPanel) | Ya mostraba err.message | OK |
+| Support | Mensaje generico fijo | Ahora usa err.message |
+| Scanner leads | err.message (no code) | Ahora usa err.code + DAILY_LIMIT en mapa |
+
+---
+
+## 23. Push Reminders Configurables (2026-04-15)
+
+### Unit tests — ReminderConfig (5 tests)
+
+| Caso | Resultado |
+|------|-----------|
+| Defaults sin config | enabled=true, windows=[15,5], notify_on_change=true |
+| Config custom respetada | windows=[30,10,5] |
+| Desactivado | enabled=false |
+| Merge parcial conserva defaults | Solo windows custom, resto default |
+| DEFAULTS tiene 3 keys | enabled, windows, notify_on_change |
+
+### Feature tests — SendAgendaRemindersJob (14 tests)
+
+| Caso | Resultado |
+|------|-----------|
+| Push 15 min antes de favorita | Dispatched |
+| Sin favorita → no push | Not dispatched |
+| Reminder desactivado → no push | Not dispatched |
+| Sin expo_push_token → no push | Not dispatched |
+| Windows custom [30] → solo 30 min | 1 push (no 15 min) |
+| Deduplicacion cache (2 runs) | Solo 1 push |
+| 4 attendees con favorita → 4 push | Correcto |
+| Sesion cancelada → no push | Not dispatched |
+| Cambio hora → push session_changed | Dispatched |
+| Cambio titulo → no push | Not dispatched |
+| notify_on_change=false → no push | Not dispatched |
+| Spam 5x10=50 push | 50 jobs despachados |
+| 10 runs seguidos deduped | Solo 1 ronda |
+| 2 eventos configs diferentes | Solo evento enabled envia |
+
+### Filament config verificada
+
+| Campo | Tipo | Default | Funciona |
+|-------|------|---------|----------|
+| enabled | Toggle | true | OK |
+| windows | TagsInput | [15, 5] | OK — acepta cualquier minuto 1-60 |
+| notify_on_change | Toggle | true | OK |
+
+### App
+
+| Feature | Estado |
+|---------|--------|
+| Boton "Todas" en Mi Agenda header | OK — agrega favoritas del dia al calendario nativo |
+| Push session_changed → invalida agenda+mi-agenda | OK |
+| Push session_changed → navega a /(app)/agenda | OK |
+
+---
+
+## 24. Mensaje Anclado Chat — tipo Twitch (2026-04-16)
+
+### Arquitectura
+
+Todo via Socket.IO — zero endpoints backend, zero DB. Redis almacena 1 pinned por sesion (TTL 24h).
+
+| Evento socket | Direccion | Quien | Payload |
+|---------------|-----------|-------|---------|
+| `chat:pin` | client → server | Admin/moderador | `{ sessionId, message, author? }` |
+| `chat:unpin` | client → server | Admin/moderador | `{ sessionId }` |
+| `chat:pinned` | server → room | Broadcast | `{ sessionId, message, author, pinnedAt }` |
+| `chat:unpinned` | server → room | Broadcast | `{ sessionId }` |
+
+### Flujo
+
+1. Moderador abre chat monitor → ve mensajes en vivo
+2. Opcion A: hover mensaje → icono pin → ancla ESE mensaje con su autor
+3. Opcion B: escribe texto libre en campo superior → click "Anclar"
+4. Socket `chat:pin` → server valida admin → guarda en Redis → broadcast `chat:pinned`
+5. App: `PinnedBanner` aparece arriba del panel interactivo (no reduce player)
+6. Visible en todos los modes (chat, Q&A, poll) — vive en session-stream, no dentro del panel
+7. Al unirse a sesion: server envia pinned actual (si existe) junto con history
+8. Usuario puede ocultar con X (solo local, no para todos)
+9. Moderador puede desanclar → socket `chat:unpin` → broadcast `chat:unpinned`
+
+### Chat Monitor UI
+
+| Elemento | Ubicacion | Funcion |
+|----------|-----------|---------|
+| Campo texto + boton "Anclar" | Debajo de controles | Texto libre custom |
+| Icono pin en cada mensaje | Hover acciones (junto a delete/ban) | Ancla mensaje existente |
+| Banner azul activo | Arriba del feed | Muestra pinned actual + boton desanclar |
+
+### App UI
+
+| Componente | Archivo | Ubicacion |
+|-----------|---------|-----------|
+| `PinnedBanner` | `components/ui/PinnedBanner.tsx` | Dentro de flex:1 del panel interactivo |
+| Pin icon + message + author + X close | Inline | Arriba del ChatPanel/QnAPanel/PollPanel |
+
+### Verificaciones
+
+| Test | Resultado |
+|------|-----------|
+| Socket server compila (tsc --noEmit) | 0 errores |
+| App compila (tsc --noEmit) | 0 errores nuevos |
+| Types: ChatPinnedPayload en types.ts | OK |
+| ClientToServerEvents: chat:pin, chat:unpin | OK |
+| ServerToClientEvents: chat:pinned, chat:unpinned | OK |
+| Redis key: chat:pinned:session:{id} TTL 24h | OK |
+| Solo admin puede pin/unpin | OK (role check) |
+| join:session envia pinned actual | OK |
+| PinnedBanner no reduce player (dentro del flex:1) | OK |
+| X dismiss es local (no broadcast) | OK |
+| Nuevo pin resetea dismiss | OK |
+
+---
+
+## 25. Calendar .ics en Email de Bienvenida (2026-04-16)
+
+### Implementacion
+
+WelcomeMail ahora adjunta archivo `.ics` con las fechas del evento al email de confirmacion de registro.
+
+| Campo ICS | Valor | Fuente |
+|-----------|-------|--------|
+| SUMMARY | EventOS Summit 2026 | event.name |
+| DTSTART | 20260915T130000Z | event.start_date (UTC) |
+| DTEND | 20270917T000000Z | event.end_date (UTC) |
+| LOCATION | Centro de Convenciones Agora, Bogota | event.venue |
+| DESCRIPTION | Descripcion del evento | event.description |
+| UID | event-1@eventos.app | event.id (unico, permite updates futuros) |
+| METHOD | REQUEST | Auto-agrega al calendario del usuario |
+| SEQUENCE | 0 | Version original |
+| Filename | eventos-summit-2026.ics | Slug del nombre |
+
+### Prueba Mailpit
+
+| Test | Resultado |
+|------|-----------|
+| Email llega a Mailpit | OK — Asunto: "Bienvenido a EventOS Summit 2026" |
+| Adjunto presente | OK — 1 attachment, 562 bytes |
+| Tipo MIME | text/calendar |
+| Contenido ICS valido | BEGIN:VCALENDAR, VEVENT, UID, DTSTART, DTEND, SUMMARY, LOCATION |
+| METHOD:REQUEST | OK — calendario auto-agrega la cita |
+| Caracteres especiales escapados | OK — comas, punto y coma |
+| Sin fechas → sin adjunto | OK — attachments() retorna [] |
+
+### Decision arquitectura
+
+- .ics solo en email de bienvenida (1 email, 1 vez por usuario)
+- NO .ics por cada favorita ni por cambio de hora (10K x 5 = 50K emails absurdo)
+- Cambios de hora → push notification (ya implementado en seccion 23)
+- Sesiones individuales → boton "Calendario" en app (expo-calendar nativo)
+
+---
+
 ## Estado final QA
 
 | Categoria | Total | OK | Bugs | Notas |
@@ -495,4 +713,8 @@ Verifica el mensaje EXACTO que el usuario ve en el toast de la app para cada err
 | Field types | 11 | 11 | 0 | 8 existentes + 3 nuevos |
 | Roles (3) | 3 | 3 | 0 | presencial/virtual/vendedor |
 | Middleware | 5 | 5 | 0 | auth, ban, throttle, security headers |
-| **TOTAL** | **70+** | **70** | **1 corregido** | Plataforma solida |
+| Rate Limits SEC-6.2 | 31 | 31 | 0 | 10 unit + 13 feature + 8 spam |
+| Push Reminders | 19 | 19 | 0 | 5 unit + 14 feature (dedup, spam, multi-evento) |
+| Mensaje anclado chat | 11 | 11 | 0 | Socket flow verificado, TypeScript 0 errores |
+| Calendar .ics email | 7 | 7 | 0 | Mailpit verificado, adjunto valido |
+| **TOTAL** | **118+** | **118** | **1 corregido** | Plataforma solida — 465 tests automatizados |

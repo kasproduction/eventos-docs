@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Spec de diseno UI/UX de EventOS — landing, estados evento, design system, pasos.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-14 | Estado: Paso 5 ~98% + Lifecycle COMPLETADO
+> Fecha: 2026-04-07 | Actualizado: 2026-04-15 | Estado: Paso 5 COMPLETADO + Lifecycle COMPLETADO + FAQ COMPLETADO
 >
 > **Status tracking:** `docs/PENDIENTES.md` (lo que falta) + `docs/COMPLETADO.md` (lo que se hizo)
 
@@ -197,11 +197,11 @@ Nos vemos!
 
 | Feature | Descripción | Implementación |
 |---------|-------------|----------------|
-| **Rate limiting** | Max 5 intentos login en 15 min. Max 5 registros por IP en 15 min | Laravel throttle middleware |
+| **Rate limiting** | Max 5 intentos login en 15 min. Max 5 registros por IP en 15 min. Networking 100/evento 30/dia. | ✅ Laravel throttle middleware. SEC-6.1 completado 2026-04-15 |
 | **CAPTCHA** | reCAPTCHA v3 invisible en form de registro web | Google reCAPTCHA |
 | **2FA (OTP)** | Código de 6 dígitos por email o WhatsApp al hacer login. Configurable por evento desde admin | Tabla `otp_codes`, expiración 5 min |
-| **Account lockout** | Después de 5 intentos fallidos, bloquear 30 min + notificar por email al usuario | Campo `locked_until` en users |
-| **Device fingerprinting** | Login desde dispositivo nuevo → fuerza 2FA automáticamente sin importar config del admin | Tabla `user_devices`, hash de device info |
+| **Account lockout** | Después de 5 intentos fallidos, bloquear 30 min + mensaje "X intentos restantes" | ✅ SEC-3.3 completado. Backend 423 + app muestra intentos restantes (2026-04-15) |
+| **Device fingerprinting** | Login desde dispositivo nuevo → fuerza 2FA automáticamente sin importar config del admin | Tabla `user_devices`, hash de device info. Depende de 2FA |
 | **HTTPS obligatorio** | Landing y API solo por HTTPS | Nginx/Caddy config |
 
 ### 4.2 NICE TO HAVE (diferenciadores)
@@ -253,7 +253,7 @@ Nos vemos!
 
 | Feature | Descripción | Prioridad |
 |---------|-------------|-----------|
-| **Invitation codes** | Modo "solo invitados": solo emails/códigos pre-aprobados pueden registrarse. Diferente a approval (que es post-registro) | SHOULD |
+| **Invitation codes** | Modo "solo invitados": emails/códigos pre-aprobados. Diferente a approval (post-registro) | ✅ COMPLETADO: registro cerrado (email_list/domain/both) + access codes + invite_only (2026-04-15) |
 | **Waitlist** | Cuando `max_attendees` se llena → opción de lista de espera con notificación automática cuando haya cupo | SHOULD |
 | **Referral tracking** | "Comparte tu link personal" → trackear quién invitó a quién. Integración con gamificación (S1.20) | COULD |
 | **Apple/Google Wallet** | El pase de acceso como tarjeta en el wallet del teléfono. QR incluido. | COULD |
@@ -264,9 +264,9 @@ Nos vemos!
 | Feature | Descripción | Prioridad |
 |---------|-------------|-----------|
 | **WhatsApp Business API** | Templates configurables desde admin. Envío masivo para: confirmación, recordatorios, cambios de última hora | MUST |
-| **Push reminders configurables** | "Tu sesión empieza en 15 min", "Nuevo speaker confirmado", "Encuesta disponible" — todo configurable desde admin | MUST (S1.14 parcial) |
+| **Push reminders configurables** | "Tu sesión empieza en 15 min". Windows dinamicos, toggle on/off, push cambio de hora. | ✅ COMPLETADO: Filament "Recordatorios" (Comunicacion), config por evento, 19 tests (2026-04-15) |
 | **Email builder** | Editor visual en Filament para personalizar templates de email sin tocar código | COULD |
-| **Calendar invite (.ics)** | Adjunto en email de confirmación. Un click → evento en Google Calendar/Outlook | MUST |
+| **Calendar invite (.ics)** | Adjunto en email de confirmación. Un click → evento en Google Calendar/Outlook | ✅ COMPLETADO: WelcomeMail adjunta .ics evento (METHOD:REQUEST). Verificado Mailpit (2026-04-16) |
 
 ### 6.3 Post-Evento
 
@@ -275,7 +275,7 @@ Nos vemos!
 | **Certificado de asistencia** | PDF con branding del evento + nombre + horas. Descargable y compartible | SHOULD |
 | **Networking follow-up** | Resumen "Conectaste con X personas" + botón follow-up (email/LinkedIn) | SHOULD |
 | **Highlight reel** | Collage automático de fotos del photobooth + social wall | COULD |
-| **NPS survey** | Encuesta de satisfacción automática post-evento (1-10 + comentario) | SHOULD |
+| **Encuesta post-evento** | Encuesta de satisfacción post-evento, auto-activada al pasar a `ended` | ✅ COMPLETADO: scope post_event, PostEventSurveyResource Filament, card EventArchive, 9 tests (2026-04-15) |
 | **Event replay** | Grabaciones de sesiones disponibles en modo `post_event` | COULD |
 
 ### 6.4 Admin (Filament)
@@ -296,7 +296,7 @@ El sistema de diseño ya está definido en `design/stitch/`. Resumen ejecutivo:
 ### Lumina Noir (Dark — Principal)
 - Background: `#0e0e0e` / `#0a0a0a`
 - Accent: `#FFFFFF` por defecto, configurable por evento via `primary_color`
-- Fuentes: Plus Jakarta Sans (headlines) + Urbanist (body) — NO Inter, NO Space Grotesk
+- Fuentes: Plus Jakarta Sans (headlines) + Urbanist (body). NUNCA Inter ni Space Grotesk.
 - Bordes: NO visibles. Separación por cambio tonal (rgba white 0.03-0.06)
 - Elevación: Glassmorphism + backdrop blur, no drop shadows
 - Corner radius: 22px cards, 14px inputs/buttons, 9999px pills
@@ -308,7 +308,7 @@ El sistema de diseño ya está definido en `design/stitch/`. Resumen ejecutivo:
 - Mismas reglas de "No-Line", glassmorphism adaptado a light
 - Uso: Landing web (toggle), modo accesibilidad
 
-### FAQ Asistente — Concepto aprobado
+### FAQ Asistente — ✅ IMPLEMENTADO (2026-04-15)
 
 Orbe animado hibrido (nucleo solido que muta + ondas concentricas) como interfaz para FAQ curadas por el organizador.
 
@@ -316,11 +316,13 @@ Orbe animado hibrido (nucleo solido que muta + ondas concentricas) como interfaz
 - **3 estados**: idle (respira lento), active (acelera + crece al seleccionar pregunta), settled (calmo al mostrar respuesta)
 - **Interaccion**: Categorias en chips horizontales + preguntas tappables, sin input de texto
 - **NO es AI**: Respuestas curadas por el organizador desde Filament, cero latencia, cero alucinaciones
-- **Integracion app**: FAB flotante con icono del orbe → BottomSheet ~70% con el asistente. FAQ contextual por pantalla (Agenda, Networking, General, etc.)
+- **Integracion app**: Acceso desde Perfil → icono Ayuda → ruta /(app)/faq
 - **Backend**: Tabla `event_faqs` (event_id, section, question, answer_text, answer_action_url, answer_image_url, sort_order, is_active)
+- **Backend**: FaqController GET /events/{id}/faqs (publica, agrupada por seccion) + FaqResource Filament CRUD + FaqSeeder (4 categorias, 12 preguntas) + 6 tests
+- **App**: Pantalla FAQ con OrbBlob (3 estados animados), categorias stagger, accordion Reanimated, busqueda visual
 - **Demo HTML**: `faq-orb-demo.html`
 - **Referencia visual**: `design/onboarding/faq/1.gif`
-- **Estado**: Concepto aprobado, pendiente implementacion
+- **Pendiente**: Upgrade orbe a Skia shader (reemplazar Reanimated+BlurView por @shopify/react-native-skia)
 
 ### Referencias de diseño recopiladas
 - `design/stitch/` — Prototipos HTML de home, agenda, intro (Lumina Noir)
@@ -343,9 +345,9 @@ Orbe animado hibrido (nucleo solido que muta + ondas concentricas) como interfaz
 
 ```
 PASO 1: Fundamentos ✅ COMPLETADO (2026-04-07/08)
-├── [x] Design system tokens en React Native (colores, tipografía, spacing)
-├── [x] ThemeProvider + fuentes PlusJakartaSans/Inter cargadas
-├── [x] FloatingTabBar glassmorphism con blur + safe area
+├── [x] Design system tokens en React Native (colores, tipografia, spacing)
+├── [x] ThemeProvider + fuentes PlusJakartaSans/Urbanist cargadas
+├── [x] FloatingTabBar liquid glass: sliding bubble spring, bounce on tap, 5 tabs reales
 ├── [x] Transiciones animadas entre tabs (lift animation, labels, haptic)
 ├── [x] LuminaToast system (glass card, spring, auto-dismiss, variantes)
 ├── [x] ScreenWrapper para stack screens (sin flash blanco Android)
@@ -363,23 +365,29 @@ PASO 2: Landing Web
 ├── Parallax + scroll animations
 └── Responsive + performance
 
-PASO 3: Flujos de Registro & Auth
-├── Pantalla confirmación post-registro
-├── Email de confirmación (con .ics + QR)
-├── WhatsApp template de confirmación
-├── 2FA (OTP por email/WhatsApp)
-├── Rate limiting + account lockout
-├── Device fingerprinting
-└── Progressive profiling en app
+PASO 3: Flujos de Registro & Auth — ⏳ PARCIAL
+├── [ ] Pantalla confirmación post-registro (landing web)
+├── [ ] Email de confirmación (con .ics adjunto + QR)
+├── [ ] WhatsApp template de confirmación
+├── [ ] 2FA (OTP por email/WhatsApp)
+├── [x] Rate limiting login (throttle 5 intentos) + networking (100/evento, 30/dia) — SEC-6.1
+├── [x] Account lockout (5 intentos → 30 min + mensaje "X intentos restantes") — SEC-3.3
+├── [ ] Device fingerprinting (depende de 2FA)
+├── [x] Progressive profiling: onboarding configurable con campos show_in (registration/onboarding/both)
+├── [x] Registro cerrado: email_list/domain/both + access codes + invite_only — 1.x-F
+├── [x] Pre-registro CSV: import → InvitationMail → deep link → activacion
+├── [x] Staff invite: QR+busqueda+email+link, socket RT — 1.x-H
+└── [x] Verificacion identidad: campo configurable, POST /auth/verify-identity
 
-PASO 4: Estados del Evento
-├── Pantalla countdown (pre_event)
-├── Transición pre_event → active
-├── Modo archivo (post_event)
-├── Certificados de asistencia
-└── NPS survey post-evento
+PASO 4: Estados del Evento — ✅ COMPLETADO (2026-04-14/15)
+├── [x] Pantalla countdown (registration + published compact + "comienza hoy")
+├── [x] Transiciones entre 5 estados (draft/registration/published/live/ended)
+├── [x] Modo archivo (ended): banner + stats + archive links
+├── [x] About pre-evento: imagen+texto+links, toggle Filament
+├── [x] Encuesta post-evento: auto-activada al ended, PostEventSurveyResource Filament, 9 tests
+├── [ ] Certificados de asistencia (PDF branding + nombre + horas)
 
-PASO 5: Barrido Visual App — ~99% COMPLETADO (1.x-E-B done 2026-04-13)
+PASO 5: Barrido Visual App — ✅ COMPLETADO (2026-04-15)
 ├── ✅ Home (2026-04-07):
 │   ├── [x] Header configurable (logo/text desde branding API)
 │   ├── [x] Hero text/image modes, HappeningNow crossfade 6s
@@ -490,11 +498,15 @@ PASO 5: Barrido Visual App — ~99% COMPLETADO (1.x-E-B done 2026-04-13)
 │   ├── [x] presentContactForm: Intent Android (sin permisos) + presentFormAsync iOS
 │   ├── [x] Boton individual "Guardar en telefono" por contacto + toast
 │   └── [x] Export masivo .vcf como opcion secundaria
-├── ⏳ Pantallas pendientes:
+├── ✅ Pantallas adicionales completadas:
 │   ├── [x] Networking (directorio + contactos + solicitudes + guardar en telefono)
 │   ├── [x] Matchmaking (sugeridos carousel + conectar + intereses comunes)
 │   ├── [x] Auth screens → reemplazados por onboarding (login.tsx, register.tsx eliminados)
-│   └── [x] Onboarding visual → completado (layout fix, badge MiQR, gamificacion)
+│   ├── [x] Onboarding visual → completado (layout fix, badge MiQR, gamificacion)
+│   ├── [x] Session Detail: badges, titulo, rating, time/location, speakers tappables, botones accion (2026-04-14)
+│   ├── [x] FAQ Asistente: orbe animado OrbBlob, categorias stagger, accordion Reanimated (2026-04-15)
+│   ├── [x] Soporte: formulario asunto+mensaje, mis consultas con status badges (2026-04-15)
+│   └── [x] Staff invite: mi-equipo, scanner-invite, join-team, StaffInvitationModal (2026-04-15)
 ├── ✅ Micro-interacciones (2026-04-11):
 │   ├── [x] ScalePress: tap feedback scale 0.96 + haptic light (ModuleMenu, Speakers, Agenda, Networking)
 │   ├── [x] Image reveal: transition={300} en 17 archivos expo-image (fade suave al cargar)
@@ -598,6 +610,15 @@ PASO 5: Barrido Visual App — ~99% COMPLETADO (1.x-E-B done 2026-04-13)
 │   ├── [x] Fetch dinamico cities via /presets/cities/{code}
 │   ├── [x] Reset child al cambiar parent + clear dynamicOptions
 │   └── [x] Replay pre-fill: foto, profile, custom fields, intereses
+├── ✅ Campos unificados registration_fields (2026-04-15):
+│   ├── [x] registration_fields como fuente unica (elimina campos inline en onboarding_steps_config)
+│   ├── [x] show_in (registration/onboarding/both) + depends_on avanzado (campo, campo:val, campo:!val)
+│   ├── [x] field_ids en onboarding config, GET /events/{id}/onboarding-fields
+│   └── [x] Deep merge Filament + legacy backward compat
+├── ✅ Dev build + Push (2026-04-15):
+│   ├── [x] Dev build Android nativo (wireless debugging adb)
+│   ├── [x] Push notifications verificadas en dispositivo real
+│   └── [x] Push tap navigation: support_resolved, announcement, agenda_reminder
 ├── 💤 Nice to have (no bloquea):
 │   └── [ ] react-native-image-crop-picker: crop circular dark (requiere dev build, no Expo Go)
 
@@ -722,5 +743,25 @@ Cada beat muestra categoria + nombre grande arriba-derecha (ej: "DISCOVER / Spea
 - FIFA Ultimate Team card reveals (entrada dramatica)
 
 ---
+
+---
+
+## Estado actual (2026-04-15)
+
+| Metrica | Valor |
+|---------|-------|
+| Backend tests | 465 tests, 1168 assertions |
+| Bugs resueltos | BUG-001 a BUG-103 |
+| Pantallas app completadas | 25+ (todas Lumina Noir) |
+| Paso 1 (Fundamentos) | ✅ Completado |
+| Paso 2 (Landing Web) | Pendiente |
+| Paso 3 (Registro & Auth) | ⏳ Parcial (rate limit, lockout, registro cerrado, staff invite, CSV) |
+| Paso 4 (Estados Evento) | ✅ Completado |
+| Paso 5 (Barrido Visual) | ✅ Completado |
+| Paso 6 (Admin Premium) | Pendiente |
+| FAQ Asistente | ✅ Implementado |
+| Lifecycle 5 estados | ✅ Implementado |
+| Onboarding configurable | ✅ Implementado |
+| Dev build Android | ✅ Push probado |
 
 *Documento vivo — se actualiza conforme avanza la implementación.*
