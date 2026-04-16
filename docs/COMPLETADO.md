@@ -512,8 +512,19 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - [x] Sin fechas → sin adjunto (graceful)
 - [x] Verificado en Mailpit: adjunto correcto, 562 bytes, text/calendar, contenido ICS valido
 
+### Componentes base + Theme tokens (2026-04-16)
+- [x] `lib/theme.ts`: tokens surface (low/medium/high/border), text (primary/secondary/muted/label/placeholder), radius, spacing, fonts
+- [x] `GlassCard`: variantes low/medium/high, radius md/lg/xl, padding, bordered
+- [x] `GlassButton`: variantes primary/glass/outline/icon, ScalePress+haptic integrado, accent dinamico
+- [x] `GlassInput`: label, focus state accent, error state rojo, leftIcon
+- [x] `SectionLabel`: uppercase, letterSpacing, variantes sm/md
+- [x] Session Detail migrada: Calendar/UNIRTE/Ver grabacion → GlassButton, Description/Speakers → GlassCard+SectionLabel
+- [x] Fix TS error pre-existente: AuthStep RefObject<TextInput | null>
+- [x] 0 errores TypeScript en toda la app
+- [x] Decision: migrar resto de archivos junto con Light Mode (tokens dinamicos, no doble pasada)
+
 ### Totales 2026-04-16
 - Backend: 465 tests, 1168 assertions, 0 fallos
 - ~20 commits backend, ~20 commits app, 1 commit socket, 3 commits docs
-- Features completados: campos unificados, staff invite, registro cerrado, login lockout, encuesta post-evento, FAQ, soporte completo, push navigation, SEC-6.2 rate limits, push reminders configurables, agregar todas al calendario, .ics en email bienvenida
+- Features completados: campos unificados, staff invite, registro cerrado, login lockout, encuesta post-evento, FAQ, soporte completo, push navigation, SEC-6.2 rate limits, push reminders configurables, agregar todas al calendario, .ics en email bienvenida, mensaje anclado chat, componentes base
 - Bugs: BUG-100 a BUG-103 resueltos

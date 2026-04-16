@@ -353,7 +353,7 @@ PASO 1: Fundamentos ✅ COMPLETADO (2026-04-07/08)
 ├── [x] ScreenWrapper para stack screens (sin flash blanco Android)
 ├── [x] app.json backgroundColor #0e0e0e (window nativo Android)
 ├── [x] Todos los layouts con contentStyle + sceneStyle dark
-├── [ ] Componentes base reutilizables: Button, Card, Input (pendiente extraer)
+├── [x] Componentes base: GlassCard, GlassButton, GlassInput, SectionLabel + theme tokens (2026-04-16)
 └── [x] Skeleton loading components (HomeSkeleton, AgendaSkeleton, SpeakerDetailSkeleton, SponsorsSkeleton, NetworkingSkeleton, ContentListSkeleton)
 
 PASO 2: Landing Web

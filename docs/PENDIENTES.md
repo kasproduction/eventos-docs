@@ -35,9 +35,32 @@
 - [ ] ZTE 360dp + Medium 411dp — barrido completo pantallas
 - [ ] Verificar responsive, SafeArea, proporciones
 
-### 6. Extraer componentes base reutilizables — Media | 4-6h
-- [ ] Button, Card, Input — paso 1 ROADMAP-UIUX pendiente
-- [ ] Deuda tecnica, no bloquea features
+### 6. Extraer componentes base reutilizables — Media | 5h total (dividido en pasos)
+Prerequisito para Light Mode. Cada paso es independiente — si paramos, lo migrado funciona y el resto sigue con inline.
+
+**Paso 0 — Theme tokens — COMPLETADO (2026-04-16)**
+- [x] `lib/theme.ts`: surface, text, radius, spacing, fonts
+
+**Paso 1 — 4 componentes base — COMPLETADO (2026-04-16)**
+- [x] `GlassCard`: variantes low/medium/high, radius, padding, bordered
+- [x] `GlassButton`: variantes primary/glass/outline/icon, ScalePress+haptic
+- [x] `GlassInput`: label, focus accent, error state, leftIcon
+- [x] `SectionLabel`: uppercase, letterSpacing sm/md
+
+**Paso 2 — Migrar Session Detail — COMPLETADO (2026-04-16)**
+- [x] Botones: Calendar, UNIRTE, Ver grabacion → GlassButton
+- [x] Description card → GlassCard + SectionLabel
+- [x] Speaker cards → GlassCard + SectionLabel
+- [x] Fix TS error pre-existente AuthStep RefObject
+- [ ] Home, Agenda, Profile → pendiente (estilos sutilmente distintos, requiere QA visual con emulador)
+
+**Pasos 3-5 — Se hacen junto con Light Mode**
+Migrar los 45 archivos restantes tiene mas sentido hacerlo junto con Light Mode:
+tokens pasan a ser dinamicos (Noir/Lux) y la migracion se hace con find/replace masivo rgba → tokens.
+Hacerlo en dos pasadas (migrar a tokens fijos + despues hacerlos dinamicos) es doble trabajo.
+- [ ] Onboarding (AuthStep, FormStep, AboutStep, DoneStep)
+- [ ] Social, Networking, Sponsors
+- [ ] Gamification, Leads, Settings, Streaming, MiQR, FAQ, Support
 
 ### 7. Upgrade orbe FAQ a Skia shader — Media-Alta | 4-6h
 - [ ] Reemplazar Reanimated+BlurView por @shopify/react-native-skia (solo componente OrbBlob cambia)
