@@ -523,6 +523,80 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - [x] 0 errores TypeScript en toda la app
 - [x] Decision: migrar resto de archivos junto con Light Mode (tokens dinamicos, no doble pasada)
 
+---
+
+## Lumina Lux v2 "The Gallery" — Sesion 2026-04-17
+
+### Tokens y fundamentos (Fases 0-2)
+- [x] theme-lux.ts reescrito: Cool gray #F6F8FA, ink #1A1A1A, sombras 4 niveles, WCAG AA
+- [x] theme-noir.ts paridad completa de interfaces
+- [x] theme.ts expandido: IconTokens, ShadowTokens, CategoryTokens, StateTokens, GlassTokens, SkeletonTokens, StatusBarTokens, SemanticTokens, OverrideTokens, isDark
+- [x] themeStore: accent dinamico por tema (Noir=#FFFFFF, Lux=#1A1A1A)
+- [x] FloatingTabBar: Liquid Glass emulation (blur 35, tint, specular highlights)
+- [x] Onboarding: pills binarias ink, primaryColor por tema, AuthStep cards visibles
+- [x] Gold adaptativo: semantic.gold Noir=#FFD700, Lux=#B8860B
+
+### Home (Fase 3)
+- [x] HappeningNow: dark island fondo #0a0a0a solido (NO transparente)
+- [x] VendorHappeningNow: dark island identico, MiStandCard negro
+- [x] GamificationHud + VendorGamificationHud: dark islands con shadow.lg en Lux
+- [x] ModuleMenu: cards blancas + shadow.md
+- [x] HomeHeader: bell blanca + shadow
+- [x] HomeHero: kicker text.muted (no accent)
+
+### Agenda (Fase 4)
+- [x] Day pills: #FFFFFF + shadow.md (misma elevacion que modulos)
+- [x] Session cards: #FFFFFF + shadow.sm, borde live neutro en Lux
+- [x] Track filter: bordes #D1D3D8, "Todos" activo = ink solido
+- [x] Timeline: connector #C8C9CE opacity 0.6, dots #4A4B50 upcoming
+- [x] Action buttons: fondo #F0F2F5
+- [x] Perf: useTheme() extraido de SessionCard/AnimatedHeart/TimelineDot (props)
+
+### Session Detail (Fase 5)
+- [x] Titulo, metadata, speakers: textTokens.primary
+- [x] Metadata card: #FFFFFF + shadow.sm, iconos icon.tertiary
+- [x] GlassCard: #FFFFFF + shadow.sm en Lux (aplica globalmente)
+- [x] GlassButton: fondo #F0F2F5 + borde #E5E7EB en Lux
+- [x] Favorita button: #FFF0F3 rosa cuando guardada
+
+### Speakers (Fase 6)
+- [x] Featured cards: glass (BlurView + sombra exterior + borde luminoso)
+- [x] Speaker list items: #FFFFFF + shadow.sm
+- [x] Speaker detail: back button, LinkedIn azul brand, Calificar gold visible, cards blancas
+
+### Mi QR (Fase 7)
+- [x] Badge card: dark island #0a0a0a solido + shadow.lg en Lux
+- [x] DashedLine: colores Noir hardcodeados (independiente del tema)
+- [x] Hint/wallet cards: #FFFFFF + shadow.sm
+
+### Social (Fase 8)
+- [x] PostCard: #FFFFFF + shadow.sm, autor textTokens.primary
+- [x] CommentsSheet: titulo + input adaptados
+
+### Sponsors (Fase 9)
+- [x] Brand wall: cards blancas + shadow.sm (sin BlurView/gradient en Lux)
+- [x] Sponsor detail: back button solido, textos ink, links visibles
+- [x] Session cards unificadas: hora + type badge + titulo + location + chevron
+
+### Networking (Fase 10)
+- [x] Suggestion cards: glass effect (igual que speakers featured)
+- [x] Directory/contact/request cards: #FFFFFF + shadow.sm
+- [x] Attendee detail: back button, sesiones unificadas, cards blancas
+- [x] "Ignorar" en solicitudes: textTokens.secondary (visible)
+
+### Session Types configurables
+- [x] Backend: tabla session_types (event_id, name, slug, color, order)
+- [x] Backend: FK session_type_id en event_sessions, migracion datos existentes
+- [x] Filament: SessionTypeResource con ColorPicker
+- [x] API: session_type como {name, color} en agenda, speakers, sponsors, attendee
+- [x] App: badges leen color de API, zero TYPE_COLORS hardcodeado
+- [x] 5 tipos default creados, 32 sesiones migradas
+
+### Commits sesion 2026-04-17
+- Backend: ~8 commits (tokens, session_types, API updates)
+- App: ~15 commits (Fases 0-10, perf, session_types)
+- Docs: roadmap Lux v2, completado, pendientes
+
 ### Totales 2026-04-16
 - Backend: 465 tests, 1168 assertions, 0 fallos
 - ~20 commits backend, ~20 commits app, 1 commit socket, 3 commits docs

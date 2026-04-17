@@ -18,23 +18,17 @@
 - [ ] ZTE 360dp + Medium 411dp — barrido completo pantallas
 - [ ] Verificar responsive, SafeArea, proporciones
 
-### 3. Light Mode — COMPLETADO (Fases 1-3, 2026-04-16/17)
-Migracion completa de toda la app a tokens dinamicos useTheme().
-- [x] Fase 1: 46 pantallas migradas a tokens + fix transparencias — 2026-04-16
-- [x] Fase 2: theme-noir.ts + theme-lux.ts + useTheme() hook + themeStore con MMKV — 2026-04-16
-- [x] Fase 3: ~85 archivos migrados a useTheme() dinamico (UI, screens, social, app pages, onboarding, sheets) — 2026-04-17
-- [x] BlurView tint dinamico (ModuleMenu, FloatingTabBar, speakers, sponsors, social, networking, toast) — 2026-04-17
-- [x] Toggle Noir/Lux en Profile — 2026-04-17
-- [x] Fix: Home bg-background NativeWind → surface.background inline — 2026-04-17
-- [x] Fix: TabScreenWrapper con fondo dinamico — 2026-04-17
-- [x] Onboarding completo: FormStep, DoneStep, PhotoStep, AuthStep, WelcomeStep, OnboardingContext — 2026-04-17
+### 3. Light Mode — COMPLETADO (2026-04-16/17)
+- [x] Migracion tokens dinamicos: ~85 archivos a useTheme()
+- [x] Lux v2 "The Gallery": 10 fases de rediseno visual completadas
+- [x] Session Types configurables desde Filament (nombre, color)
+- Ver detalle en docs/COMPLETADO.md y docs/ROADMAP-LUX-V2.md
 
-### 4. Light Mode — pendientes finales
-- [ ] **Backend Filament**: migration default_theme + primary_color_light, toggle en admin, API branding
-- [ ] **QA visual Lux**: ajustar valores en theme-lux.ts (colores, contrastes, sombras)
+### 4. Light Mode — pendientes menores
+- [ ] Back buttons en 7 pantallas (FAQ, Support, Anuncios, Mi Stand, Leads, Lead Detail, Scanner)
+- [ ] Perfil screen — migrar cards y textos a Lux
 - [ ] **NativeWind residuales**: ~13 archivos con className bg- (chat, polls, documentos, passport, banners, encuestas, pages, DynamicField, SplashLoader)
-- [ ] **MyInterests + MyRegistrationFields**: migrar a useTheme()
-- [ ] **SegmentedControl**: migrar a useTheme()
+- [ ] **Backend Filament**: migration default_theme + primary_color_light, toggle en admin, API branding
 
 ### 5. Upgrade orbe FAQ a Skia shader — Media-Alta | 4-6h
 - [ ] Reemplazar Reanimated+BlurView por @shopify/react-native-skia (solo componente OrbBlob cambia)
