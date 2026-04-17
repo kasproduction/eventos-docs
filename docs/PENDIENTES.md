@@ -2,7 +2,7 @@
 
 > La UNICA fuente de verdad de lo que falta por hacer.
 > Organizado por area de trabajo, no por prioridad.
-> Actualizado: 2026-04-15
+> Actualizado: 2026-04-16
 > Backend: 465 tests, 1168 assertions
 > Fuentes cruzadas: ROADMAP-UIUX-LANDING.md, WEB-APP-PLAN.md, EventOS_Roadmap.md
 
@@ -10,72 +10,141 @@
 
 ## App movil — ordenado por prioridad (facil+critico primero)
 
-### 1. SEC-6.2 Rate limit endpoints escritura — COMPLETADO (2026-04-15)
-- [x] Trait reutilizable `ChecksRateLimit` con defaults + config custom por evento
-- [x] Wall posts (10/dia), Comments (30/dia), Q&A questions (10/dia/sesion)
-- [x] Support (5/dia), Photos (20/dia), Stories (10/dia), Leads (200/dia)
-- [x] JSON `rate_limits` en events (configurable por evento desde Filament)
-- [x] Filament: pagina "Limites de uso" con toggles + inputs por categoria
-- [x] 10 unit tests (trait aislado) + 13 feature tests (endpoints reales)
-- [x] Todos los limites desactivables por toggle (enabled: false = ilimitado)
+### 1. Calendar sync boton visible — COMPLETADO (2026-04-16)
+- [x] Boton ".ics por sesion" visible en session detail (backend ICS ya existe en AgendaController)
+- [x] 1.C5 en roadmap historico
 
-### 2. Calendar sync boton visible — Facil | 1-2h
-- [ ] Boton ".ics por sesion" visible en session detail (backend ICS ya existe en AgendaController)
-- [ ] 1.C5 en roadmap historico
-
-### 3. Fix Reanimated warning — COMPLETADO (2026-04-16)
-- [x] StatCard: separar entering (layout animation) en wrapper + floatStyle (transform) en inner Animated.View
-
-### 4. Mensaje anclado chat (tipo Twitch) — COMPLETADO (2026-04-16)
-- [x] Socket: chat:pin/unpin, Redis TTL 24h, broadcast, join envia pinned actual
-- [x] Chat monitor: texto libre + pin en hover + banner + desanclar
-- [x] App: PinnedBanner dentro panel interactivo, visible en chat/Q&A/poll
-
-### 5. QA visual multi-device — Media | 3-4h
+### 2. QA visual multi-device — Media | 3-4h
 - [ ] ZTE 360dp + Medium 411dp — barrido completo pantallas
 - [ ] Verificar responsive, SafeArea, proporciones
 
-### 6. Extraer componentes base reutilizables — Media | 5h total (dividido en pasos)
-Prerequisito para Light Mode. Cada paso es independiente — si paramos, lo migrado funciona y el resto sigue con inline.
+### 3. Migrar componentes base — Media | 3-4h
+Tokens y componentes base ya creados (GlassCard, GlassButton, GlassInput, SectionLabel). Session Detail ya migrado.
+- [ ] Home, Agenda, Profile → migrar a componentes base (requiere QA visual con emulador)
+- [ ] Onboarding, Social, Networking, Sponsors, Gamification, Leads, Settings, Streaming, MiQR, FAQ, Support → se hace junto con Light Mode (tokens dinamicos Noir/Lux, find/replace masivo rgba → tokens)
 
-**Paso 0 — Theme tokens — COMPLETADO (2026-04-16)**
-- [x] `lib/theme.ts`: surface, text, radius, spacing, fonts
-
-**Paso 1 — 4 componentes base — COMPLETADO (2026-04-16)**
-- [x] `GlassCard`: variantes low/medium/high, radius, padding, bordered
-- [x] `GlassButton`: variantes primary/glass/outline/icon, ScalePress+haptic
-- [x] `GlassInput`: label, focus accent, error state, leftIcon
-- [x] `SectionLabel`: uppercase, letterSpacing sm/md
-
-**Paso 2 — Migrar Session Detail — COMPLETADO (2026-04-16)**
-- [x] Botones: Calendar, UNIRTE, Ver grabacion → GlassButton
-- [x] Description card → GlassCard + SectionLabel
-- [x] Speaker cards → GlassCard + SectionLabel
-- [x] Fix TS error pre-existente AuthStep RefObject
-- [ ] Home, Agenda, Profile → pendiente (estilos sutilmente distintos, requiere QA visual con emulador)
-
-**Pasos 3-5 — Se hacen junto con Light Mode**
-Migrar los 45 archivos restantes tiene mas sentido hacerlo junto con Light Mode:
-tokens pasan a ser dinamicos (Noir/Lux) y la migracion se hace con find/replace masivo rgba → tokens.
-Hacerlo en dos pasadas (migrar a tokens fijos + despues hacerlos dinamicos) es doble trabajo.
-- [ ] Onboarding (AuthStep, FormStep, AboutStep, DoneStep)
-- [ ] Social, Networking, Sponsors
-- [ ] Gamification, Leads, Settings, Streaming, MiQR, FAQ, Support
-
-### 7. Upgrade orbe FAQ a Skia shader — Media-Alta | 4-6h
+### 4. Upgrade orbe FAQ a Skia shader — Media-Alta | 4-6h
 - [ ] Reemplazar Reanimated+BlurView por @shopify/react-native-skia (solo componente OrbBlob cambia)
 - [ ] Ref visual: design/faq-orb-demo.html
 
-### 8. Light Mode / Theming — CRITICO para clientes enterprise | Alta | 2-3 dias
-Hay marcas que no son afines al negro. Bancolombia, salud, educacion necesitan fondo claro. Tambien accesibilidad.
+### 5. Light Mode + Migracion Componentes Base — Alta | 16-20h | CRITICO Bancolombia
 
-- [ ] **Refactor ThemeProvider**: extraer TODOS los colores hardcodeados a tokens semanticos (background, surface, text-primary, text-secondary, border, etc.)
-- [ ] **573 archivos** tienen `rgba(255,255,255,0.x)`, `#0e0e0e`, `#0a0a0f` directo. Migrar a `theme.colors.x`
-- [ ] **Lumina Noir** (dark, actual) como tema default
-- [ ] **Lumina Lux** (light) como segundo tema
-- [ ] **Toggle** en config del evento (Filament): tema default del evento. El asistente puede overridear desde perfil.
-- [ ] **High contrast mode**: opacidades minimas 0.5+ para texto secundario
-- [ ] **Font scaling**: respetar Dynamic Type / preferencias del sistema
+> **Contexto:** Componentes base ya creados (GlassCard, GlassButton, GlassInput, SectionLabel)
+> con tokens en `lib/theme.ts`. Solo Session Detail los usa. Faltan ~45 archivos por migrar.
+> Decision tomada 2026-04-16: NO migrar a tokens fijos Noir + despues hacerlos dinamicos
+> (doble trabajo). Mejor: hacer tokens dinamicos AHORA y migrar todo en una sola pasada.
+
+**Modo DaVinci — pasos en orden estricto, cada uno verificable independiente:**
+
+#### TAREA A: Tokens dinamicos Noir + Lux (~2h)
+Convertir `lib/theme.ts` de constantes fijas a sistema dinamico que cambia segun tema activo.
+
+1. Crear `lib/theme-noir.ts` con los valores actuales (rgba(255,255,255,0.0X), #0a0a0a, etc.)
+2. Crear `lib/theme-lux.ts` con valores invertidos:
+   - surface: rgba(0,0,0,0.0X) en vez de rgba(255,255,255,0.0X)
+   - text.primary: rgba(0,0,0,0.85) en vez de rgba(255,255,255,0.85)
+   - background: #FFFFFF en vez de #0a0a0a
+   - radius/spacing/fonts iguales (no dependen del tema)
+3. Refactor `lib/theme.ts`: exportar `useTheme()` hook que devuelve tokens segun `themeMode`
+4. Agregar `themeMode: 'noir' | 'lux'` al `themeStore.ts` con `setTheme()` action
+5. Persistir en MMKV (`@app/theme-mode`)
+6. Default desde branding API → fallback 'noir'
+
+#### TAREA B: Refactor 4 componentes a hook (~1h)
+Cambiar componentes base para que lean del hook, no del import directo.
+
+- `GlassCard.tsx`: `const { surface, radius } = useTheme()`
+- `GlassButton.tsx`: `const { surface, text, radius, fonts } = useTheme()`
+- `GlassInput.tsx`: `const { surface, text, radius, fonts } = useTheme()`
+- `SectionLabel.tsx`: `const { text, fonts } = useTheme()`
+- Verificar Session Detail sigue funcionando en Noir
+- Toggle manual temporal para probar Lux visualmente
+
+#### TAREA C: Migrar Onboarding (~2h)
+Reemplazar inline rgba/colores en orden:
+1. `AuthStep.tsx` — inputs, buttons, stat cards (mas grande, mas patrones)
+2. `FormStep.tsx` — DynamicField, render por tipo
+3. `AboutStep.tsx` — preview card, inputs
+4. `DoneStep.tsx` — badge, hints
+5. `OnboardingShared.tsx` — btnPrimary, btnGlass
+
+QA visual al terminar onboarding completo (welcome → done) en Noir y Lux.
+
+#### TAREA D: Migrar Home + Agenda (~2h)
+1. `HomeHeader.tsx` — bell, badge, logo wrap
+2. `ModuleMenu.tsx` — cards con BlurView (cuidado: BlurView no funciona igual en Lux)
+3. `HappeningNow.tsx` — carousel cards
+4. `AgendaScreen.tsx` — session cards, day strip, track filters
+5. `AgendaCard.tsx` (si existe) — card individual sesion
+
+QA visual: tab Home + tab Agenda en ambos temas.
+
+#### TAREA E: Migrar Profile + Settings (~1.5h)
+1. `ProfileScreen.tsx` — stat cards (0.025 → tokens), data rows, menu items, secondary buttons
+2. `MyInterests.tsx` — chips
+3. Modal editar perfil — inputs, botones
+
+QA visual: pantalla Profile completa + edicion perfil.
+
+#### TAREA F: Migrar Social (~2h)
+1. `PostCard.tsx` — card, header, like/comment buttons
+2. `CommentsSheet.tsx` — input, comments, send button
+3. `CreatePostModal.tsx` — textarea, photo picker, publish button
+4. `MomentosViewer.tsx` — overlay, navigation
+5. `social.tsx` (pantalla) — header sticky, segmented control
+
+QA visual: feed, momentos, comentarios, crear post.
+
+#### TAREA G: Migrar Networking + Sponsors (~2h)
+1. `NetworkingScreen.tsx` — search, contact cards, request cards
+2. `MatchmakingScreen.tsx` — sugeridos carousel, intereses
+3. `SponsorScreen.tsx` (Brand Wall) — grid, tier badges
+4. `BrandProfile.tsx` — hero, contact form, trivia
+5. Lead detail modal
+
+QA visual: directorio, matches, brand wall, brand profile.
+
+#### TAREA H: Migrar Gamification + Leads (~1.5h)
+1. `GamificationScreen.tsx` (Desafio) — hero, ranking, portal cards, premios
+2. `MiStand.tsx` — hero card, stats, FAB scanner
+3. `LeadDetail.tsx` — profile glass, notas, historial
+4. `ScannerStand.tsx` — overlay, BottomSheet resultado
+
+QA visual: leaderboard, desafio, mi stand, scanner.
+
+#### TAREA I: Migrar Streaming + Polls + Chat + Q&A (~1.5h)
+1. `session-stream/[id].tsx` — header, panels, PinnedBanner
+2. `ChatPanel.tsx` — messages, input, emojis
+3. `PollPanel.tsx` + `PollSlides.tsx` — slides por pregunta
+4. `QnAPanel.tsx` — preguntas list, input
+
+QA visual: streaming + 3 modos interactivos.
+
+#### TAREA J: Migrar pantallas restantes (~1h)
+1. `MiQrScreen.tsx` — badge digital, QR fullscreen
+2. `faq.tsx` — categorias, accordion
+3. `support-contact.tsx` + `my-support.tsx`
+4. `mi-equipo.tsx` + invitations
+5. `documentos.tsx`, `anuncios.tsx`, `pages.tsx`
+
+QA visual final completo.
+
+#### TAREA K: Backend + Filament toggle tema (~1h)
+1. Migration: agregar `default_theme` enum('noir','lux') default 'noir' en events
+2. Filament EventBranding: select Noir/Lux en seccion Apariencia
+3. API branding: incluir `default_theme` en respuesta
+4. App: leer `branding.default_theme` y aplicar al cargar evento
+5. Profile: toggle "Tema claro/oscuro" para override personal
+
+#### TAREA L: QA visual completo (~3-4h)
+1. Recorrer toda la app en Noir → screenshot diff con baseline
+2. Recorrer toda la app en Lux → identificar fixes (contrastes, BlurView, sombras)
+3. Probar toggle dinamico (cambiar en perfil → app cambia sin reiniciar)
+4. ZTE 360dp + Medium 411dp en ambos temas
+5. Documentar bugs visuales encontrados
+
+**Estimacion total:** 16-20h. Posible en un fin de semana intenso (sabado 10h + domingo 8h).
+**Bloquea deploy Bancolombia.** Una vez listo, app esta production-ready para enterprise.
 
 ### --- Prioridad baja ---
 
@@ -95,6 +164,24 @@ Hay marcas que no son afines al negro. Bancolombia, salud, educacion necesitan f
 - [ ] Migrar app.json → app.config.js + estructura clients/ (ref: docs/WHITE-LABEL.md)
 
 ### --- Completado ---
+
+### SEC-6.2 Rate limit endpoints escritura — COMPLETADO (2026-04-15)
+- [x] Trait ChecksRateLimit, wall/comments/Q&A/support/photos/stories/leads, 23 tests
+- [x] JSON rate_limits por evento, Filament "Limites de uso", toggles on/off
+
+### Fix Reanimated warning — COMPLETADO (2026-04-16)
+- [x] StatCard: separar entering (layout animation) en wrapper + floatStyle (transform) en inner Animated.View
+
+### Mensaje anclado chat (tipo Twitch) — COMPLETADO (2026-04-16)
+- [x] Socket: chat:pin/unpin, Redis TTL 24h, broadcast, join envia pinned actual
+- [x] Chat monitor: texto libre + pin en hover + banner + desanclar
+- [x] App: PinnedBanner dentro panel interactivo, visible en chat/Q&A/poll
+
+### Componentes base + Theme tokens — COMPLETADO (2026-04-16)
+- [x] lib/theme.ts: surface, text, radius, spacing, fonts
+- [x] GlassCard, GlassButton, GlassInput, SectionLabel
+- [x] Session Detail migrado a componentes base
+- [x] Fix TS error AuthStep RefObject
 
 ### Setup wizard evento (Filament) — COMPLETADO (2026-04-15)
 - [x] Wizard 5 pasos, modulos con checkboxes, auto-crea con roles correctos
@@ -204,7 +291,7 @@ Solo escucha socket — CERO carga extra al server. Doble uso: venue + demo pitc
 
 ### Seguridad
 - [x] SEC-6.1: Rate limit networking — 100/evento, 30/dia. 3 tests. COMPLETADO 2026-04-15.
-- [ ] **SEC-6.2: Rate limit endpoints de escritura — CRITICO pre-deploy.** Copiar patron networking a: wall posts (10/dia), comments (30/dia), Q&A questions (10/dia/sesion), support (5/dia), photos (20/dia), leads (60/min throttle). ~2-3 horas. Ref: docs/FASE-SEGURIDAD.md SEC-6.
+- [x] SEC-6.2: Rate limit endpoints escritura — Trait ChecksRateLimit, 23 tests. COMPLETADO 2026-04-15.
 - [ ] SEC-3.1: 2FA OTP — codigo 6 digitos por email (5 min TTL). WhatsApp Business API opcional.
 - [ ] SEC-3.2: Device fingerprinting — login desde dispositivo nuevo fuerza 2FA. Tabla `user_devices`. Depende de 2FA.
 - [ ] Magic link login — click enlace email, token un solo uso 15 min. Alternativa a contrasena.
