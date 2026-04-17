@@ -2,7 +2,7 @@
 
 > La UNICA fuente de verdad de lo que falta por hacer.
 > Organizado por area de trabajo, no por prioridad.
-> Actualizado: 2026-04-16
+> Actualizado: 2026-04-17
 > Backend: 465 tests, 1168 assertions
 > Fuentes cruzadas: ROADMAP-UIUX-LANDING.md, WEB-APP-PLAN.md, EventOS_Roadmap.md
 
@@ -18,144 +18,32 @@
 - [ ] ZTE 360dp + Medium 411dp — barrido completo pantallas
 - [ ] Verificar responsive, SafeArea, proporciones
 
-### 3. Migrar componentes base — EN PROGRESO (Fase 1 Light Mode)
-Tokens y componentes base ya creados. Migrando pantalla por pantalla a tokens.
-- [x] Home (8 archivos): HomeHeader, HomeHero, ModuleMenu, ModuleMenuCompact, CountdownTimer, EventInfoCard, EventArchive, tabs/index — 2026-04-16
-- [x] Agenda (AgendaScreen) — ~50 colores migrados — 2026-04-16
-- [x] Profile (ProfileScreen) — ~60 colores migrados — 2026-04-16
-- [x] Networking (NetworkingScreen) — ~70 colores migrados + fix BUG-104 — 2026-04-16
-- [x] Social (social.tsx, PostCard, CommentsSheet, CreatePostModal, MomentosRow, PhotoGrid) — ~80 colores + fix BUG-105 — 2026-04-16
-- [x] Speakers + Speaker detail — ~75 colores — 2026-04-16
-- [x] Sponsors + Brand Profile + sponsor-contact.tsx (nueva pantalla) — ~70 colores + fix BUG-106 — 2026-04-16
-- [x] Leaderboard/Gamification — ~74 colores — 2026-04-16
-- [x] Mi QR — ~31 colores — 2026-04-16
-- [x] FAQ — ~40 colores — 2026-04-16
-- [x] Back buttons unificados (8 pantallas) — BUG-107 — 2026-04-16
-- [ ] **13 menores pendientes**: about, anuncios, my-support, support-contact, leads, lead-detail, mi-stand, mi-equipo, attendee, join-team, banned, pending-approval, activate-account
-- [ ] Onboarding (7 steps + shared)
+### 3. Light Mode — COMPLETADO (Fases 1-3, 2026-04-16/17)
+Migracion completa de toda la app a tokens dinamicos useTheme().
+- [x] Fase 1: 46 pantallas migradas a tokens + fix transparencias — 2026-04-16
+- [x] Fase 2: theme-noir.ts + theme-lux.ts + useTheme() hook + themeStore con MMKV — 2026-04-16
+- [x] Fase 3: ~85 archivos migrados a useTheme() dinamico (UI, screens, social, app pages, onboarding, sheets) — 2026-04-17
+- [x] BlurView tint dinamico (ModuleMenu, FloatingTabBar, speakers, sponsors, social, networking, toast) — 2026-04-17
+- [x] Toggle Noir/Lux en Profile — 2026-04-17
+- [x] Fix: Home bg-background NativeWind → surface.background inline — 2026-04-17
+- [x] Fix: TabScreenWrapper con fondo dinamico — 2026-04-17
+- [x] Onboarding completo: FormStep, DoneStep, PhotoStep, AuthStep, WelcomeStep, OnboardingContext — 2026-04-17
 
-### 4. Upgrade orbe FAQ a Skia shader — Media-Alta | 4-6h
+### 4. Light Mode — pendientes finales
+- [ ] **Backend Filament**: migration default_theme + primary_color_light, toggle en admin, API branding
+- [ ] **QA visual Lux**: ajustar valores en theme-lux.ts (colores, contrastes, sombras)
+- [ ] **NativeWind residuales**: ~13 archivos con className bg- (chat, polls, documentos, passport, banners, encuestas, pages, DynamicField, SplashLoader)
+- [ ] **MyInterests + MyRegistrationFields**: migrar a useTheme()
+- [ ] **SegmentedControl**: migrar a useTheme()
+
+### 5. Upgrade orbe FAQ a Skia shader — Media-Alta | 4-6h
 - [ ] Reemplazar Reanimated+BlurView por @shopify/react-native-skia (solo componente OrbBlob cambia)
 - [ ] Ref visual: design/faq-orb-demo.html
 
-### 5. Light Mode + Migracion Componentes Base — Alta | 16-20h | CRITICO Bancolombia
-
-> **Contexto:** Componentes base ya creados (GlassCard, GlassButton, GlassInput, SectionLabel)
-> con tokens en `lib/theme.ts`. Solo Session Detail los usa. Faltan ~45 archivos por migrar.
-> Decision tomada 2026-04-16: NO migrar a tokens fijos Noir + despues hacerlos dinamicos
-> (doble trabajo). Mejor: hacer tokens dinamicos AHORA y migrar todo en una sola pasada.
-
-**Modo DaVinci — pasos en orden estricto, cada uno verificable independiente:**
-
-#### TAREA A: Tokens dinamicos Noir + Lux (~2h)
-Convertir `lib/theme.ts` de constantes fijas a sistema dinamico que cambia segun tema activo.
-
-1. Crear `lib/theme-noir.ts` con los valores actuales (rgba(255,255,255,0.0X), #0a0a0a, etc.)
-2. Crear `lib/theme-lux.ts` con valores invertidos:
-   - surface: rgba(0,0,0,0.0X) en vez de rgba(255,255,255,0.0X)
-   - text.primary: rgba(0,0,0,0.85) en vez de rgba(255,255,255,0.85)
-   - background: #FFFFFF en vez de #0a0a0a
-   - radius/spacing/fonts iguales (no dependen del tema)
-3. Refactor `lib/theme.ts`: exportar `useTheme()` hook que devuelve tokens segun `themeMode`
-4. Agregar `themeMode: 'noir' | 'lux'` al `themeStore.ts` con `setTheme()` action
-5. Persistir en MMKV (`@app/theme-mode`)
-6. Default desde branding API → fallback 'noir'
-
-#### TAREA B: Refactor 4 componentes a hook (~1h)
-Cambiar componentes base para que lean del hook, no del import directo.
-
-- `GlassCard.tsx`: `const { surface, radius } = useTheme()`
-- `GlassButton.tsx`: `const { surface, text, radius, fonts } = useTheme()`
-- `GlassInput.tsx`: `const { surface, text, radius, fonts } = useTheme()`
-- `SectionLabel.tsx`: `const { text, fonts } = useTheme()`
-- Verificar Session Detail sigue funcionando en Noir
-- Toggle manual temporal para probar Lux visualmente
-
-#### TAREA C: Migrar Onboarding (~2h)
-Reemplazar inline rgba/colores en orden:
-1. `AuthStep.tsx` — inputs, buttons, stat cards (mas grande, mas patrones)
-2. `FormStep.tsx` — DynamicField, render por tipo
-3. `AboutStep.tsx` — preview card, inputs
-4. `DoneStep.tsx` — badge, hints
-5. `OnboardingShared.tsx` — btnPrimary, btnGlass
-
-QA visual al terminar onboarding completo (welcome → done) en Noir y Lux.
-
-#### TAREA D: Migrar Home + Agenda (~2h)
-1. `HomeHeader.tsx` — bell, badge, logo wrap
-2. `ModuleMenu.tsx` — cards con BlurView (cuidado: BlurView no funciona igual en Lux)
-3. `HappeningNow.tsx` — carousel cards
-4. `AgendaScreen.tsx` — session cards, day strip, track filters
-5. `AgendaCard.tsx` (si existe) — card individual sesion
-
-QA visual: tab Home + tab Agenda en ambos temas.
-
-#### TAREA E: Migrar Profile + Settings (~1.5h)
-1. `ProfileScreen.tsx` — stat cards (0.025 → tokens), data rows, menu items, secondary buttons
-2. `MyInterests.tsx` — chips
-3. Modal editar perfil — inputs, botones
-
-QA visual: pantalla Profile completa + edicion perfil.
-
-#### TAREA F: Migrar Social (~2h)
-1. `PostCard.tsx` — card, header, like/comment buttons
-2. `CommentsSheet.tsx` — input, comments, send button
-3. `CreatePostModal.tsx` — textarea, photo picker, publish button
-4. `MomentosViewer.tsx` — overlay, navigation
-5. `social.tsx` (pantalla) — header sticky, segmented control
-
-QA visual: feed, momentos, comentarios, crear post.
-
-#### TAREA G: Migrar Networking + Sponsors (~2h)
-1. `NetworkingScreen.tsx` — search, contact cards, request cards
-2. `MatchmakingScreen.tsx` — sugeridos carousel, intereses
-3. `SponsorScreen.tsx` (Brand Wall) — grid, tier badges
-4. `BrandProfile.tsx` — hero, contact form, trivia
-5. Lead detail modal
-
-QA visual: directorio, matches, brand wall, brand profile.
-
-#### TAREA H: Migrar Gamification + Leads (~1.5h)
-1. `GamificationScreen.tsx` (Desafio) — hero, ranking, portal cards, premios
-2. `MiStand.tsx` — hero card, stats, FAB scanner
-3. `LeadDetail.tsx` — profile glass, notas, historial
-4. `ScannerStand.tsx` — overlay, BottomSheet resultado
-
-QA visual: leaderboard, desafio, mi stand, scanner.
-
-#### TAREA I: Migrar Streaming + Polls + Chat + Q&A (~1.5h)
-1. `session-stream/[id].tsx` — header, panels, PinnedBanner
-2. `ChatPanel.tsx` — messages, input, emojis
-3. `PollPanel.tsx` + `PollSlides.tsx` — slides por pregunta
-4. `QnAPanel.tsx` — preguntas list, input
-
-QA visual: streaming + 3 modos interactivos.
-
-#### TAREA J: Migrar pantallas restantes (~1h)
-1. `MiQrScreen.tsx` — badge digital, QR fullscreen
-2. `faq.tsx` — categorias, accordion
-3. `support-contact.tsx` + `my-support.tsx`
-4. `mi-equipo.tsx` + invitations
-5. `documentos.tsx`, `anuncios.tsx`, `pages.tsx`
-
-QA visual final completo.
-
-#### TAREA K: Backend + Filament toggle tema (~1h)
-1. Migration: agregar `default_theme` enum('noir','lux') default 'noir' en events
-2. Filament EventBranding: select Noir/Lux en seccion Apariencia
-3. API branding: incluir `default_theme` en respuesta
-4. App: leer `branding.default_theme` y aplicar al cargar evento
-5. Profile: toggle "Tema claro/oscuro" para override personal
-
-#### TAREA L: QA visual completo (~3-4h)
-1. Recorrer toda la app en Noir → screenshot diff con baseline
-2. Recorrer toda la app en Lux → identificar fixes (contrastes, BlurView, sombras)
-3. Probar toggle dinamico (cambiar en perfil → app cambia sin reiniciar)
-4. ZTE 360dp + Medium 411dp en ambos temas
-5. Documentar bugs visuales encontrados
-
-**Estimacion total:** 16-20h. Posible en un fin de semana intenso (sabado 10h + domingo 8h).
-**Bloquea deploy Bancolombia.** Una vez listo, app esta production-ready para enterprise.
+### Limpiar push token al banear — Prioridad baja | Facil | 30min
+- [ ] Backend: al crear AttendeeBan, limpiar `expo_push_token` del attendee (asi no recibe mas push)
+- [ ] Relacionado con SEC-3b.2 pendiente (validar `/me` al iniciar app)
+- [ ] Detectado: push de ban llega al dispositivo aunque la app no tenga sesion activa
 
 ### --- Prioridad baja ---
 

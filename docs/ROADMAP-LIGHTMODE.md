@@ -2,7 +2,10 @@
 
 > Plan de ejecucion paso a paso. Cada fase es independiente y verificable.
 > Basado en auditoria de 113 archivos (docs/ANALISIS-LIGHTMODE.md)
-> Fecha: 2026-04-16 | Aprobado visualmente: HTML v2 con 7 pantallas
+> Fecha: 2026-04-16 | Actualizado: 2026-04-17
+> Aprobado visualmente: HTML v2 con 7 pantallas
+>
+> **ESTADO: Fases 1-6 COMPLETADAS (2026-04-16/17). Pendiente: Fase 7 (backend) + Fase 8 (QA).**
 >
 > **Decisiones aprobadas:**
 > - Accent dual: `primary_color` (Noir) + `primary_color_light` (Lux) desde Filament
