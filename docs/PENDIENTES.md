@@ -18,10 +18,20 @@
 - [ ] ZTE 360dp + Medium 411dp — barrido completo pantallas
 - [ ] Verificar responsive, SafeArea, proporciones
 
-### 3. Migrar componentes base — Media | 3-4h
-Tokens y componentes base ya creados (GlassCard, GlassButton, GlassInput, SectionLabel). Session Detail ya migrado.
-- [ ] Home, Agenda, Profile → migrar a componentes base (requiere QA visual con emulador)
-- [ ] Onboarding, Social, Networking, Sponsors, Gamification, Leads, Settings, Streaming, MiQR, FAQ, Support → se hace junto con Light Mode (tokens dinamicos Noir/Lux, find/replace masivo rgba → tokens)
+### 3. Migrar componentes base — EN PROGRESO (Fase 1 Light Mode)
+Tokens y componentes base ya creados. Migrando pantalla por pantalla a tokens.
+- [x] Home (8 archivos): HomeHeader, HomeHero, ModuleMenu, ModuleMenuCompact, CountdownTimer, EventInfoCard, EventArchive, tabs/index — 2026-04-16
+- [x] Agenda (AgendaScreen) — ~50 colores migrados — 2026-04-16
+- [x] Profile (ProfileScreen) — ~60 colores migrados — 2026-04-16
+- [x] Networking (NetworkingScreen) — ~70 colores migrados + fix BUG-104 — 2026-04-16
+- [x] Social (social.tsx, PostCard, CommentsSheet, CreatePostModal, MomentosRow, PhotoGrid) — ~80 colores + fix BUG-105 — 2026-04-16
+- [x] Speakers + Speaker detail — ~75 colores — 2026-04-16
+- [x] Sponsors + Brand Profile + sponsor-contact.tsx (nueva pantalla) — ~70 colores + fix BUG-106 — 2026-04-16
+- [ ] Gamification + Leaderboard
+- [ ] Mi QR, Mi Stand, Leads
+- [ ] FAQ, Soporte, About, Anuncios, Mi Equipo
+- [ ] Auth (activate, pending-approval, banned)
+- [ ] Onboarding (7 steps + shared)
 
 ### 4. Upgrade orbe FAQ a Skia shader — Media-Alta | 4-6h
 - [ ] Reemplazar Reanimated+BlurView por @shopify/react-native-skia (solo componente OrbBlob cambia)
