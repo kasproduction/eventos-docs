@@ -27,10 +27,11 @@ Tokens y componentes base ya creados. Migrando pantalla por pantalla a tokens.
 - [x] Social (social.tsx, PostCard, CommentsSheet, CreatePostModal, MomentosRow, PhotoGrid) — ~80 colores + fix BUG-105 — 2026-04-16
 - [x] Speakers + Speaker detail — ~75 colores — 2026-04-16
 - [x] Sponsors + Brand Profile + sponsor-contact.tsx (nueva pantalla) — ~70 colores + fix BUG-106 — 2026-04-16
-- [ ] Gamification + Leaderboard
-- [ ] Mi QR, Mi Stand, Leads
-- [ ] FAQ, Soporte, About, Anuncios, Mi Equipo
-- [ ] Auth (activate, pending-approval, banned)
+- [x] Leaderboard/Gamification — ~74 colores — 2026-04-16
+- [x] Mi QR — ~31 colores — 2026-04-16
+- [x] FAQ — ~40 colores — 2026-04-16
+- [x] Back buttons unificados (8 pantallas) — BUG-107 — 2026-04-16
+- [ ] **13 menores pendientes**: about, anuncios, my-support, support-contact, leads, lead-detail, mi-stand, mi-equipo, attendee, join-team, banned, pending-approval, activate-account
 - [ ] Onboarding (7 steps + shared)
 
 ### 4. Upgrade orbe FAQ a Skia shader — Media-Alta | 4-6h
