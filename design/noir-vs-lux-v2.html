@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventOS — Noir vs Lux v2 (Full Audit)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"/>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Urbanist:wght@400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111;color:#fff;font-family:'Urbanist',sans-serif;padding:32px 16px;min-height:100vh}
+  h1{text-align:center;font-family:'Plus Jakarta Sans';font-size:24px;font-weight:800;margin-bottom:6px}
+  .sub{text-align:center;color:rgba(255,255,255,0.4);font-size:12px;margin-bottom:12px}
+
+  /* accent picker */
+  .accent-bar{display:flex;justify-content:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  .accent-btn{width:28px;height:28px;border-radius:14px;border:2px solid rgba(255,255,255,0.15);cursor:pointer;transition:border-color .2s}
+  .accent-btn.active{border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,0.3)}
+  .accent-label{text-align:center;font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:20px}
+
+  /* tabs */
+  .tab-bar{display:flex;justify-content:center;gap:6px;margin-bottom:24px;flex-wrap:wrap}
+  .tab-btn{padding:8px 16px;border-radius:9999px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:rgba(255,255,255,0.5);font-family:'Urbanist';font-weight:600;font-size:11px;cursor:pointer;transition:all .2s}
+  .tab-btn.active{background:#fff;color:#000;border-color:#fff}
+
+  /* phones */
+  .phones{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
+  .phone-wrap{text-align:center}
+  .phone-wrap h3{font-family:'Plus Jakarta Sans';font-weight:700;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;color:rgba(255,255,255,0.6)}
+  .phone{width:360px;height:780px;border-radius:40px;overflow:hidden;position:relative;border:2.5px solid rgba(255,255,255,0.08)}
+  .screen{display:none;height:100%;overflow-y:auto;flex-direction:column}
+  .screen::-webkit-scrollbar{display:none}
+  .screen.active{display:flex}
+  .ms{font-family:'Material Symbols Outlined';font-size:20px;vertical-align:middle}
+  .ms.sm{font-size:16px}
+  .ms.lg{font-size:24px}
+  .jks{font-family:'Plus Jakarta Sans',sans-serif}
+
+  /* ═══ NOIR ═══ */
+  .noir{background:#0a0a0a;height:100%}
+
+  /* header */
+  .n-header{display:flex;align-items:center;justify-content:space-between;padding:52px 20px 10px}
+  .n-logo{font-family:'Plus Jakarta Sans';font-weight:800;font-size:20px;color:#fff;letter-spacing:-0.5px}
+  .n-bell{width:36px;height:36px;border-radius:18px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;position:relative}
+  .n-bell .ms{color:rgba(255,255,255,0.7);font-size:19px}
+  .n-badge{position:absolute;top:-3px;right:-5px;min-width:14px;height:14px;border-radius:7px;background:#EF4444;border:1.5px solid #0a0a0a;font-size:8px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 2px}
+
+  /* hero */
+  .n-hero{padding:6px 20px 16px}
+  .n-hero .kicker{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+  .n-hero h2{font-family:'Plus Jakarta Sans';font-weight:800;font-size:28px;color:#fff;letter-spacing:-1px;line-height:1.05}
+
+  /* happening */
+  .n-card{margin:0 20px 12px;border-radius:16px;padding:14px;backdrop-filter:blur(20px)}
+  .noir .n-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)}
+  .n-tag{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+  .n-tag .dot{width:5px;height:5px;border-radius:2.5px}
+  .n-card h3{font-family:'Plus Jakarta Sans';font-weight:700;font-size:14px;margin-bottom:3px}
+  .n-card .meta{font-size:11px;margin-bottom:10px}
+  .n-pill-btn{display:inline-block;padding:7px 16px;border-radius:9999px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+
+  /* modules */
+  .n-modules{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 20px 20px}
+  .n-mod{border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:10px;min-height:88px;backdrop-filter:blur(20px)}
+  .noir .n-mod{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)}
+  .n-mod .ms{font-size:20px}
+  .n-mod .name{font-family:'Plus Jakarta Sans';font-weight:700;font-size:13px}
+
+  /* agenda */
+  .n-ag-header{padding:52px 20px 8px;display:flex;align-items:center;gap:10px}
+  .n-back{width:32px;height:32px;border-radius:16px;display:flex;align-items:center;justify-content:center}
+  .noir .n-back{background:rgba(255,255,255,0.06)}
+  .n-ag-sub{padding:0 20px;font-size:11px;margin-bottom:12px}
+  .n-days{display:flex;gap:8px;padding:6px 16px 12px;overflow-x:auto}
+  .n-days::-webkit-scrollbar{display:none}
+  .n-day{min-width:46px;height:68px;border-radius:23px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;flex-shrink:0}
+  .noir .n-day{background:#141414}
+  .n-day .wd{font-size:8px;font-weight:700;letter-spacing:0.8px}
+  .n-day .num{font-family:'Plus Jakarta Sans';font-weight:800;font-size:20px}
+  .n-day .pip{width:3px;height:3px;border-radius:1.5px;margin-top:1px}
+
+  /* session */
+  .n-trow{display:flex;padding-left:14px;padding-right:14px}
+  .n-tleft{width:52px;display:flex;flex-direction:column;align-items:center;padding-top:12px}
+  .n-tleft .time{font-family:'Plus Jakarta Sans';font-weight:700;font-size:9px;margin-bottom:6px}
+  .n-tdot{border-radius:50%}
+  .n-tconn{width:1.5px;flex:1;margin-top:3px;opacity:0.3}
+  .n-sess{flex:1;border-radius:14px;padding:10px;margin-bottom:8px}
+  .noir .n-sess{background:rgba(38,38,38,0.4);border:0.5px solid rgba(255,255,255,0.06)}
+  .n-sess .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+  .n-sess h4{font-family:'Plus Jakarta Sans';font-weight:700;font-size:13px;line-height:1.3;margin-bottom:3px}
+  .n-sess .loc{font-size:10px;margin-bottom:6px;display:flex;align-items:center;gap:3px}
+  .n-sess .acts{display:flex;gap:6px;padding-top:8px}
+  .n-act{padding:5px 9px;border-radius:9999px;font-size:9px;font-weight:600;display:flex;align-items:center;gap:3px}
+  .n-live-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:9999px;font-size:7px;font-weight:800;letter-spacing:1px}
+
+  /* profile */
+  .n-prof-header{display:flex;align-items:center;justify-content:space-between;padding:52px 20px 6px}
+  .n-prof-header h2{font-family:'Plus Jakarta Sans';font-weight:800;font-size:22px;letter-spacing:-0.5px}
+  .n-help{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:10px;font-size:11px;font-weight:600}
+  .noir .n-help{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.45)}
+  .n-avatar-area{display:flex;flex-direction:column;align-items:center;padding:16px 20px 20px}
+  .n-avatar{width:80px;height:80px;border-radius:40px}
+  .noir .n-avatar{background:linear-gradient(135deg,#2a2a4a,#1a3a2a,#3a2a1a);border:2px solid rgba(255,255,255,0.08)}
+  .n-name{font-family:'Plus Jakarta Sans';font-weight:800;font-size:18px;letter-spacing:-0.3px;margin-top:12px}
+  .n-role{font-size:12px;margin-top:3px}
+  .n-socials{display:flex;gap:10px;margin-top:12px}
+  .n-soc{width:34px;height:34px;border-radius:17px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+  .noir .n-soc{background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08)}
+  .n-stats{display:flex;gap:8px;padding:0 20px;margin-bottom:16px}
+  .n-stat{flex:1;text-align:center;padding:12px 0;border-radius:14px}
+  .noir .n-stat{background:rgba(255,255,255,0.025);border:0.5px solid rgba(255,255,255,0.04)}
+  .n-stat .v{font-family:'Plus Jakarta Sans';font-weight:700;font-size:16px;letter-spacing:-0.3px}
+  .n-stat .l{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;margin-top:3px}
+  .n-data{margin:0 20px;border-radius:14px;padding:0 14px}
+  .noir .n-data{background:rgba(255,255,255,0.025);border:0.5px solid rgba(255,255,255,0.04)}
+  .n-drow{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+  .n-drow+.n-drow{border-top:0.5px solid rgba(255,255,255,0.04)}
+  .lux .n-drow+.n-drow{border-top:1px solid rgba(0,0,0,0.06)}
+  .n-sec-head{display:flex;align-items:center;justify-content:space-between;padding:0 20px;margin-bottom:10px;margin-top:4px}
+
+  /* tab dock */
+  .n-dock{position:absolute;bottom:16px;left:14px;right:14px;height:56px;border-radius:28px;display:flex;align-items:center;justify-content:space-around;padding:0 6px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+  .noir .n-dock{background:rgba(20,20,22,0.55);border:0.5px solid rgba(255,255,255,0.08)}
+  .n-dock .tab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;font-weight:600}
+  .n-dock .tab .ms{font-size:19px}
+
+  /* ═══ LUX ═══ */
+  .lux{background:var(--lux-bg,#F0F0ED);height:100%}
+  .lux .n-header{padding:52px 20px 10px}
+  .lux .n-logo{color:#1A1A1A}
+  .lux .n-bell{background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 8px rgba(0,0,0,0.06)}
+  .lux .n-bell .ms{color:#2C2F30}
+  .lux .n-badge{border-color:var(--lux-bg,#F0F0ED)}
+  .lux .n-hero h2{color:#1A1A1A}
+  .lux .n-card{background:#FFFFFF;border:none;box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.08)}
+  .lux .n-card h3{color:#1A1A1A}
+  .lux .n-card .meta{color:rgba(44,47,48,0.45)}
+  .lux .n-mod{background:#FFFFFF;border:none;box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.08)}
+  .lux .n-mod .ms{color:rgba(44,47,48,0.5)}
+  .lux .n-mod .name{color:#1A1A1A}
+  .lux .n-ag-header h2{color:#1A1A1A}
+  .lux .n-back{background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 8px rgba(0,0,0,0.06)}
+  .lux .n-back .ms{color:#2C2F30}
+  .lux .n-ag-sub{color:rgba(44,47,48,0.5)}
+  .lux .n-day{background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+  .lux .n-day .wd{color:rgba(44,47,48,0.5)}
+  .lux .n-day .num{color:#1A1A1A}
+  .lux .n-sess{background:#FFFFFF;border:none;box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.08)}
+  .lux .n-sess h4{color:#1A1A1A}
+  .lux .n-sess .loc{color:rgba(44,47,48,0.5)}
+  .lux .n-act{background:rgba(0,0,0,0.04);color:rgba(44,47,48,0.6)}
+  .lux .n-tconn{background:rgba(0,0,0,0.08)}
+  .lux .n-tleft .time{color:#1A1A1A}
+  .lux .n-prof-header h2{color:#1A1A1A}
+  .lux .n-help{background:#FFFFFF;border:none;color:rgba(44,47,48,0.5);box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+  .lux .n-avatar{background:linear-gradient(135deg,#e0d0f0,#d0e8e0,#f0e0d0);border:2px solid rgba(0,0,0,0.06);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+  .lux .n-name{color:#1A1A1A}
+  .lux .n-role{color:rgba(44,47,48,0.5)}
+  .lux .n-soc{background:#FFFFFF;border:none;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+  .lux .n-stat{background:#FFFFFF;border:none;box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 8px rgba(0,0,0,0.06)}
+  .lux .n-stat .v{color:#1A1A1A}
+  .lux .n-stat .l{color:rgba(44,47,48,0.45)}
+  .lux .n-data{background:#FFFFFF;border:none;box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.08)}
+  .lux .n-dock{background:rgba(255,255,255,0.92);border:none;box-shadow:0 2px 8px rgba(0,0,0,0.06),0 8px 24px rgba(0,0,0,0.1)}
+  .lux .n-dock .tab{color:rgba(44,47,48,0.35)}
+
+  /* accent-driven in both */
+  .accent-c{color:var(--ac)}
+  .accent-bg{background:var(--ac)}
+  .accent-bg-soft{background:color-mix(in srgb,var(--ac) 10%,transparent)}
+  .accent-border{border-color:color-mix(in srgb,var(--ac) 25%,transparent)}
+  .accent-shadow{box-shadow:0 4px 12px color-mix(in srgb,var(--ac) 25%,transparent)}
+  @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<h1>Lumina Noir vs Lumina Lux — v2</h1>
+<p class="sub">Accent dinamico desde Filament. Click un color para probar.</p>
+
+<div class="accent-bar">
+  <div class="accent-btn active" style="background:#FFFFFF" data-accent="#FFFFFF" title="Blanco (default)"></div>
+  <div class="accent-btn" style="background:#7C5CFC" data-accent="#7C5CFC" title="Violeta"></div>
+  <div class="accent-btn" style="background:#3B82F6" data-accent="#3B82F6" title="Azul"></div>
+  <div class="accent-btn" style="background:#EF4444" data-accent="#EF4444" title="Rojo"></div>
+  <div class="accent-btn" style="background:#F59E0B" data-accent="#F59E0B" title="Amber"></div>
+  <div class="accent-btn" style="background:#10B981" data-accent="#10B981" title="Verde"></div>
+  <div class="accent-btn" style="background:#EC4899" data-accent="#EC4899" title="Pink"></div>
+</div>
+<p class="accent-label">Accent configurable por evento desde admin Filament</p>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="show('home')">Home</button>
+  <button class="tab-btn" onclick="show('agenda')">Agenda</button>
+  <button class="tab-btn" onclick="show('profile')">Profile</button>
+  <button class="tab-btn" onclick="show('welcome')">Welcome</button>
+  <button class="tab-btn" onclick="show('auth')">Auth</button>
+  <button class="tab-btn" onclick="show('interests')">Interests</button>
+  <button class="tab-btn" onclick="show('done')">Done</button>
+</div>
+
+<div class="phones">
+
+<!-- ══════ NOIR ══════ -->
+<div class="phone-wrap">
+<h3>Lumina Noir</h3>
+<div class="phone"><div class="noir">
+
+  <!-- HOME -->
+  <div class="screen active" data-screen="home">
+    <div class="n-header">
+      <span class="n-logo">EventOS</span>
+      <div class="n-bell"><span class="ms">notifications</span><div class="n-badge">3</div></div>
+    </div>
+    <div class="n-hero">
+      <div class="kicker accent-c">Exclusive Access</div>
+      <h2>The Future<br>of Creative<br><span class="accent-c">Intelligence.</span></h2>
+    </div>
+    <div class="n-card">
+      <div class="n-tag"><span class="dot" style="background:#4ade80"></span><span style="color:rgba(255,255,255,0.45)">Happening Now</span></div>
+      <h3 style="color:#fff">Designing for Autonomous Systems</h3>
+      <div class="meta" style="color:rgba(255,255,255,0.4)">Main Auditorium &bull; Level 04</div>
+      <span class="n-pill-btn" style="border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6)">Join Now</span>
+    </div>
+    <div class="n-modules">
+      <div class="n-mod"><span class="ms" style="color:rgba(255,255,255,0.5)">calendar_month</span><span class="name" style="color:rgba(255,255,255,0.8)">Agenda</span></div>
+      <div class="n-mod"><span class="ms" style="color:rgba(255,255,255,0.5)">record_voice_over</span><span class="name" style="color:rgba(255,255,255,0.8)">Speakers</span></div>
+      <div class="n-mod"><span class="ms" style="color:rgba(255,255,255,0.5)">photo_library</span><span class="name" style="color:rgba(255,255,255,0.8)">Social</span></div>
+      <div class="n-mod"><span class="ms" style="color:rgba(255,255,255,0.5)">domain</span><span class="name" style="color:rgba(255,255,255,0.8)">Sponsors</span></div>
+    </div>
+    <div class="n-dock">
+      <div class="tab active" style="color:var(--ac)"><span class="ms" style="font-variation-settings:'FILL' 1">home</span>Home</div>
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">calendar_today</span>Agenda</div>
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">people</span>Red</div>
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="screen" data-screen="agenda">
+    <div class="n-ag-header">
+      <div class="n-back"><span class="ms" style="color:#fff">arrow_back</span></div>
+      <h2 class="jks" style="font-weight:800;font-size:24px;color:#fff">Agenda</h2>
+    </div>
+    <div class="n-ag-sub" style="color:#adaaaa">Lunes 14 de octubre</div>
+    <div class="n-days">
+      <div class="n-day"><span class="wd" style="color:#adaaaa">DOM</span><span class="num" style="color:#fff">13</span><span class="pip"></span></div>
+      <div class="n-day accent-bg accent-shadow" style="border-radius:23px"><span class="wd" style="color:rgba(255,255,255,0.85)">LUN</span><span class="num" style="color:#fff">14</span><span class="pip"></span></div>
+      <div class="n-day"><span class="wd" style="color:#adaaaa">MAR</span><span class="num" style="color:#fff">15</span><span class="pip accent-bg" style="width:3px;height:3px;border-radius:1.5px"></span></div>
+      <div class="n-day"><span class="wd" style="color:#adaaaa">MIE</span><span class="num" style="color:#fff">16</span><span class="pip accent-bg" style="width:3px;height:3px;border-radius:1.5px"></span></div>
+      <div class="n-day" style="opacity:0.3"><span class="wd" style="color:#adaaaa">JUE</span><span class="num" style="color:#fff">17</span><span class="pip"></span></div>
+    </div>
+    <div class="n-trow">
+      <div class="n-tleft"><span class="time" style="color:rgba(255,255,255,0.4)">09:00</span><div class="n-tdot" style="width:6px;height:6px;background:#494847"></div><div class="n-tconn" style="background:#494847"></div></div>
+      <div class="n-sess" style="opacity:0.45"><div class="top"><span class="ms sm" style="color:#494847">check_circle</span><span class="ms sm" style="color:rgba(255,255,255,0.3)">favorite_border</span></div><h4 style="text-decoration:line-through;color:#777">Opening Keynote</h4><div class="loc" style="color:#adaaaa"><span class="ms sm">location_on</span>Main Auditorium</div></div>
+    </div>
+    <div class="n-trow">
+      <div class="n-tleft"><span class="time accent-c">10:30</span><div class="n-tdot accent-bg" style="width:8px;height:8px"></div><div class="n-tconn" style="background:#494847"></div></div>
+      <div class="n-sess accent-border" style="border-width:1px"><div class="top"><div class="n-live-badge accent-bg-soft accent-c">EN VIVO</div><span class="ms sm accent-c" style="font-variation-settings:'FILL' 1">favorite</span></div><h4 style="color:#fff">Generative Aesthetics in Luxury Branding</h4><div class="loc" style="color:#adaaaa"><span class="ms sm">location_on</span>Interactive Lab B</div><div class="acts" style="border-top:0.5px solid rgba(255,255,255,0.06)"><span class="n-act" style="background:rgba(255,255,255,0.06);color:#adaaaa"><span class="ms sm">calendar_add_on</span>Calendario</span><span class="n-act accent-bg" style="margin-left:auto;color:#fff;font-weight:800;letter-spacing:0.5px">UNIRTE</span></div></div>
+    </div>
+    <div class="n-trow">
+      <div class="n-tleft"><span class="time" style="color:#fff">01:00</span><div class="n-tdot" style="width:6px;height:6px;background:#777575"></div></div>
+      <div class="n-sess"><div class="top"><span></span><span class="ms sm" style="color:rgba(255,255,255,0.3)">favorite_border</span></div><h4 style="color:#fff">The Sensory Web: Beyond Visuals</h4><div class="loc" style="color:#adaaaa"><span class="ms sm">location_on</span>Interactive Lab B</div><div class="acts" style="border-top:0.5px solid rgba(255,255,255,0.06)"><span class="n-act" style="background:rgba(255,255,255,0.06);color:#adaaaa"><span class="ms sm">calendar_add_on</span>Calendario</span></div></div>
+    </div>
+    <div class="n-dock">
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">home</span>Home</div>
+      <div class="tab active" style="color:var(--ac)"><span class="ms" style="font-variation-settings:'FILL' 1">calendar_today</span>Agenda</div>
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">people</span>Red</div>
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="screen" data-screen="profile">
+    <div class="n-prof-header">
+      <h2 style="color:#fff">Perfil</h2>
+      <div class="n-help"><span class="ms sm" style="color:rgba(255,255,255,0.45)">help</span>Ayuda</div>
+    </div>
+    <div class="n-avatar-area">
+      <div class="n-avatar"></div>
+      <div class="n-name" style="color:#fff">Kamilo Sanchez</div>
+      <div class="n-role" style="color:rgba(255,255,255,0.55)">Director Creativo &bull; EventOS</div>
+      <div class="n-socials">
+        <div class="n-soc" style="color:#0A66C2">in</div>
+        <div class="n-soc" style="color:#1DA1F2">X</div>
+        <div class="n-soc" style="color:#E4405F">ig</div>
+      </div>
+    </div>
+    <div class="n-stats">
+      <div class="n-stat"><div class="v" style="color:#fff">1,250</div><div class="l" style="color:rgba(255,255,255,0.4)">Puntos</div></div>
+      <div class="n-stat"><div class="v" style="color:#fff">8/12</div><div class="l" style="color:rgba(255,255,255,0.4)">Retos</div></div>
+      <div class="n-stat"><div class="v" style="color:#fff">8</div><div class="l" style="color:rgba(255,255,255,0.4)">Logros</div></div>
+    </div>
+    <div class="n-sec-head"><span class="jks" style="font-weight:700;font-size:14px;color:#fff">Mis datos</span><span class="accent-c" style="font-size:12px;font-weight:600">Editar</span></div>
+    <div class="n-data">
+      <div class="n-drow"><span style="font-size:12px;color:rgba(255,255,255,0.45)">Telefono</span><span style="font-size:13px;color:rgba(255,255,255,0.85)">+57 300 123 4567</span></div>
+      <div class="n-drow"><span style="font-size:12px;color:rgba(255,255,255,0.45)">Email</span><span style="font-size:13px;color:rgba(255,255,255,0.85)">kamilo@eventos.app</span></div>
+      <div class="n-drow"><span style="font-size:12px;color:rgba(255,255,255,0.45)">Cargo</span><span style="font-size:13px;color:rgba(255,255,255,0.85)">Director Creativo</span></div>
+      <div class="n-drow"><span style="font-size:12px;color:rgba(255,255,255,0.45)">Empresa</span><span style="font-size:13px;color:rgba(255,255,255,0.85)">EventOS</span></div>
+    </div>
+    <div class="n-dock">
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">home</span>Home</div>
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">calendar_today</span>Agenda</div>
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab" style="color:rgba(255,255,255,0.35)"><span class="ms">people</span>Red</div>
+      <div class="tab active" style="color:var(--ac)"><span class="ms" style="font-variation-settings:'FILL' 1">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- WELCOME -->
+  <div class="screen" data-screen="welcome" style="background:#08080a;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden">
+    <div style="position:absolute;top:25%;left:12%;opacity:0.7">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06)">
+        <div class="accent-bg" style="width:7px;height:7px;border-radius:3.5px"></div>
+        <span style="font-family:'Urbanist';font-weight:700;font-size:12px;color:rgba(255,255,255,0.55)">Networking</span>
+      </div>
+    </div>
+    <div style="position:absolute;top:18%;right:10%;opacity:0.6">
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);text-align:center">
+        <div class="accent-c jks" style="font-weight:800;font-size:22px">42</div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px">Speakers</div>
+      </div>
+    </div>
+    <div style="position:absolute;top:38%;left:30%;opacity:0.5">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06)">
+        <div style="width:7px;height:7px;border-radius:3.5px;background:#4ade80"></div>
+        <span style="font-family:'Urbanist';font-weight:700;font-size:12px;color:rgba(255,255,255,0.55)">Gamification</span>
+      </div>
+    </div>
+    <div style="background:linear-gradient(transparent,rgba(8,8,10,0.6) 30%,rgba(8,8,10,0.95) 70%,#08080a);padding:0 28px 40px;position:relative;z-index:2">
+      <div class="accent-c" style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Tech Summit 2026</div>
+      <div class="jks" style="font-weight:800;font-size:34px;color:#fffbfe;letter-spacing:-1px;line-height:1.05;margin-bottom:6px">Welcome to<br>the <span class="accent-c">Future</span></div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:32px">Tu experiencia comienza aqui</div>
+      <div class="accent-bg" style="padding:16px;border-radius:14px;text-align:center;margin-bottom:12px">
+        <span class="jks" style="font-weight:700;font-size:14px;color:#08080a">Comenzar</span>
+      </div>
+      <div style="padding:14px;border-radius:14px;text-align:center;background:rgba(255,255,255,0.04)">
+        <span style="font-weight:600;font-size:13px;color:rgba(255,255,255,0.6)">Ya tengo cuenta</span>
+      </div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-top:20px">
+        <div class="accent-bg" style="width:6px;height:6px;border-radius:3px"></div>
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,0.08)"></div>
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,0.08)"></div>
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,0.08)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH -->
+  <div class="screen" data-screen="auth" style="background:#08080a;flex-direction:column;justify-content:flex-end">
+    <div style="padding:60px 28px 20px;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
+      <div class="jks" style="font-weight:800;font-size:24px;color:#fffbfe;text-align:center;margin-bottom:6px">Inicia sesion</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:24px">Ingresa tu correo para comenzar</div>
+      <div style="display:flex;gap:6px;background:rgba(255,255,255,0.04);border-radius:9999px;padding:3px;margin-bottom:24px;width:100%">
+        <div class="accent-bg" style="flex:1;padding:10px;border-radius:9999px;text-align:center;font-size:12px;font-weight:600;color:#08080a">Ingresar</div>
+        <div style="flex:1;padding:10px;border-radius:9999px;text-align:center;font-size:12px;font-weight:600;color:rgba(255,255,255,0.4)">Registrarse</div>
+      </div>
+    </div>
+    <div style="background:rgba(14,14,16,0.92);border-top-left-radius:24px;border-top-right-radius:24px;padding:24px 24px 40px;border-top:1px solid rgba(255,255,255,0.06)">
+      <div style="margin-bottom:16px">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.25);margin-bottom:6px">Email</div>
+        <div style="padding:14px 16px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
+          <span style="font-size:14px;color:rgba(255,255,255,0.15)">correo@ejemplo.com</span>
+        </div>
+      </div>
+      <div style="margin-bottom:20px">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.25);margin-bottom:6px">Contrasena</div>
+        <div style="padding:14px 16px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between">
+          <span style="font-size:14px;color:rgba(255,255,255,0.15)">********</span>
+          <span class="ms sm" style="color:rgba(255,255,255,0.2)">visibility_off</span>
+        </div>
+      </div>
+      <div class="accent-bg" style="padding:16px;border-radius:14px;text-align:center">
+        <span class="jks" style="font-weight:700;font-size:14px;color:#08080a">Continuar</span>
+      </div>
+      <div style="text-align:center;margin-top:14px">
+        <span class="accent-c" style="font-size:12px;font-weight:600">Olvide mi contrasena</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERESTS -->
+  <div class="screen" data-screen="interests" style="background:#08080a">
+    <div style="padding:60px 24px 24px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+        <div style="width:32px;height:32px;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center"><span class="ms sm" style="color:#fff">arrow_back</span></div>
+      </div>
+      <div class="jks" style="font-weight:800;font-size:22px;color:#fffbfe;margin-bottom:4px">Tus intereses</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:24px">Selecciona al menos 3 para personalizar tu experiencia</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <div class="accent-bg-soft" style="padding:10px 16px;border-radius:9999px;border:1px solid;border-color:color-mix(in srgb,var(--ac) 30%,transparent)"><span class="accent-c" style="font-size:12px;font-weight:600">AI & Machine Learning</span></div>
+        <div class="accent-bg-soft" style="padding:10px 16px;border-radius:9999px;border:1px solid;border-color:color-mix(in srgb,var(--ac) 30%,transparent)"><span class="accent-c" style="font-size:12px;font-weight:600">UX Design</span></div>
+        <div style="padding:10px 16px;border-radius:9999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)"><span style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5)">Blockchain</span></div>
+        <div class="accent-bg-soft" style="padding:10px 16px;border-radius:9999px;border:1px solid;border-color:color-mix(in srgb,var(--ac) 30%,transparent)"><span class="accent-c" style="font-size:12px;font-weight:600">Cloud</span></div>
+        <div style="padding:10px 16px;border-radius:9999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)"><span style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5)">Cybersecurity</span></div>
+        <div style="padding:10px 16px;border-radius:9999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)"><span style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5)">DevOps</span></div>
+        <div style="padding:10px 16px;border-radius:9999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)"><span style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5)">Leadership</span></div>
+        <div style="padding:10px 16px;border-radius:9999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)"><span style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5)">Marketing</span></div>
+      </div>
+    </div>
+    <div style="padding:0 24px 40px;margin-top:auto">
+      <div style="display:flex;justify-content:center;gap:6px;margin-bottom:20px">
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,0.08)"></div>
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,0.08)"></div>
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,0.08)"></div>
+        <div class="accent-bg" style="width:6px;height:6px;border-radius:3px"></div>
+      </div>
+      <div class="accent-bg" style="padding:16px;border-radius:14px;text-align:center">
+        <span class="jks" style="font-weight:700;font-size:14px;color:#08080a">Continuar (3)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DONE -->
+  <div class="screen" data-screen="done" style="background:#08080a">
+    <div style="padding:60px 24px 40px;display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center">
+      <div style="font-size:13px;font-weight:700;color:#FFD700;margin-bottom:16px;letter-spacing:0.5px">+80 pts</div>
+      <div style="width:160px;height:160px;border-radius:14px;overflow:hidden;position:relative;margin-bottom:24px">
+        <div style="position:absolute;inset:-4px;background:linear-gradient(135deg,#a8edea,#fed6e3,#d4a5ff,#a8c0ff,#b8f0c0,#ffd6aa);animation:spin 6s linear infinite"></div>
+        <div style="position:absolute;inset:5px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center">
+          <div style="width:80px;height:80px;background:repeating-conic-gradient(#0a0a0a 0% 25%,#fff 0% 50%) 50%/12px 12px;border-radius:4px"></div>
+        </div>
+      </div>
+      <div class="jks" style="font-weight:800;font-size:22px;color:#fffbfe;margin-bottom:4px;text-align:center">Estas listo!</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:8px">Tu pase digital esta activo</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center">Toca el QR para verlo en pantalla completa</div>
+    </div>
+    <div style="padding:0 24px 40px">
+      <div class="accent-bg" style="padding:16px;border-radius:14px;text-align:center">
+        <span class="jks" style="font-weight:700;font-size:14px;color:#08080a">Entrar al evento</span>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+</div>
+
+<!-- ══════ LUX ══════ -->
+<div class="phone-wrap">
+<h3>Lumina Lux</h3>
+<div class="phone" style="border-color:rgba(0,0,0,0.1)"><div class="lux">
+
+  <!-- HOME -->
+  <div class="screen active" data-screen="home">
+    <div class="n-header">
+      <span class="n-logo">EventOS</span>
+      <div class="n-bell"><span class="ms">notifications</span><div class="n-badge">3</div></div>
+    </div>
+    <div class="n-hero">
+      <div class="kicker accent-c">Exclusive Access</div>
+      <h2 style="color:#1A1A1A">The Future<br>of Creative<br><span class="accent-c">Intelligence.</span></h2>
+    </div>
+    <div class="n-card">
+      <div class="n-tag"><span class="dot accent-bg"></span><span class="accent-c">Happening Now</span></div>
+      <h3>Designing for Autonomous Systems</h3>
+      <div class="meta">Main Auditorium &bull; Level 04</div>
+      <span class="n-pill-btn accent-bg" style="color:#fff">Join Now</span>
+    </div>
+    <div class="n-modules">
+      <div class="n-mod"><span class="ms">calendar_month</span><span class="name">Agenda</span></div>
+      <div class="n-mod"><span class="ms">record_voice_over</span><span class="name">Speakers</span></div>
+      <div class="n-mod"><span class="ms">photo_library</span><span class="name">Social</span></div>
+      <div class="n-mod"><span class="ms">domain</span><span class="name">Sponsors</span></div>
+    </div>
+    <div class="n-dock">
+      <div class="tab active" style="color:var(--ac)"><span class="ms" style="font-variation-settings:'FILL' 1">home</span>Home</div>
+      <div class="tab"><span class="ms">calendar_today</span>Agenda</div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab"><span class="ms">people</span>Red</div>
+      <div class="tab"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="screen" data-screen="agenda">
+    <div class="n-ag-header">
+      <div class="n-back"><span class="ms">arrow_back</span></div>
+      <h2 class="jks" style="font-weight:800;font-size:24px">Agenda</h2>
+    </div>
+    <div class="n-ag-sub">Lunes 14 de octubre</div>
+    <div class="n-days">
+      <div class="n-day"><span class="wd">DOM</span><span class="num">13</span><span class="pip"></span></div>
+      <div class="n-day accent-bg accent-shadow" style="border-radius:23px"><span class="wd" style="color:rgba(255,255,255,0.85)">LUN</span><span class="num" style="color:#fff">14</span><span class="pip"></span></div>
+      <div class="n-day"><span class="wd">MAR</span><span class="num">15</span><span class="pip accent-bg" style="width:3px;height:3px;border-radius:1.5px"></span></div>
+      <div class="n-day"><span class="wd">MIE</span><span class="num">16</span><span class="pip accent-bg" style="width:3px;height:3px;border-radius:1.5px"></span></div>
+      <div class="n-day" style="opacity:0.3"><span class="wd">JUE</span><span class="num">17</span><span class="pip"></span></div>
+    </div>
+    <div class="n-trow">
+      <div class="n-tleft"><span class="time" style="color:rgba(44,47,48,0.4)">09:00</span><div class="n-tdot" style="width:6px;height:6px;background:#DADDDF"></div><div class="n-tconn"></div></div>
+      <div class="n-sess" style="opacity:0.45"><div class="top"><span class="ms sm" style="color:#DADDDF">check_circle</span><span class="ms sm" style="color:rgba(44,47,48,0.25)">favorite_border</span></div><h4 style="text-decoration:line-through;color:rgba(44,47,48,0.4)">Opening Keynote</h4><div class="loc"><span class="ms sm">location_on</span>Main Auditorium</div></div>
+    </div>
+    <div class="n-trow">
+      <div class="n-tleft"><span class="time accent-c">10:30</span><div class="n-tdot accent-bg" style="width:8px;height:8px;box-shadow:0 0 8px color-mix(in srgb,var(--ac) 40%,transparent)"></div><div class="n-tconn"></div></div>
+      <div class="n-sess"><div class="top"><div class="n-live-badge accent-bg-soft accent-c">EN VIVO</div><span class="ms sm accent-c" style="font-variation-settings:'FILL' 1">favorite</span></div><h4>Generative Aesthetics in Luxury Branding</h4><div class="loc"><span class="ms sm">location_on</span>Interactive Lab B</div><div class="acts"><span class="n-act"><span class="ms sm">calendar_add_on</span>Calendario</span><span class="n-act accent-bg" style="margin-left:auto;color:#fff;font-weight:800;letter-spacing:0.5px">UNIRTE</span></div></div>
+    </div>
+    <div class="n-trow">
+      <div class="n-tleft"><span class="time">01:00</span><div class="n-tdot" style="width:6px;height:6px;background:#DADDDF"></div></div>
+      <div class="n-sess"><div class="top"><span></span><span class="ms sm" style="color:rgba(44,47,48,0.25)">favorite_border</span></div><h4>The Sensory Web: Beyond Visuals</h4><div class="loc"><span class="ms sm">location_on</span>Interactive Lab B</div><div class="acts"><span class="n-act"><span class="ms sm">calendar_add_on</span>Calendario</span></div></div>
+    </div>
+    <div class="n-dock">
+      <div class="tab"><span class="ms">home</span>Home</div>
+      <div class="tab active" style="color:var(--ac)"><span class="ms" style="font-variation-settings:'FILL' 1">calendar_today</span>Agenda</div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab"><span class="ms">people</span>Red</div>
+      <div class="tab"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="screen" data-screen="profile">
+    <div class="n-prof-header">
+      <h2>Perfil</h2>
+      <div class="n-help"><span class="ms sm">help</span>Ayuda</div>
+    </div>
+    <div class="n-avatar-area">
+      <div class="n-avatar"></div>
+      <div class="n-name">Kamilo Sanchez</div>
+      <div class="n-role">Director Creativo &bull; EventOS</div>
+      <div class="n-socials">
+        <div class="n-soc" style="color:#0A66C2">in</div>
+        <div class="n-soc" style="color:#1DA1F2">X</div>
+        <div class="n-soc" style="color:#E4405F">ig</div>
+      </div>
+    </div>
+    <div class="n-stats">
+      <div class="n-stat"><div class="v">1,250</div><div class="l">Puntos</div></div>
+      <div class="n-stat"><div class="v">8/12</div><div class="l">Retos</div></div>
+      <div class="n-stat"><div class="v">8</div><div class="l">Logros</div></div>
+    </div>
+    <div class="n-sec-head"><span class="jks" style="font-weight:700;font-size:14px;color:#1A1A1A">Mis datos</span><span class="accent-c" style="font-size:12px;font-weight:600">Editar</span></div>
+    <div class="n-data">
+      <div class="n-drow"><span style="font-size:12px;color:rgba(44,47,48,0.45)">Telefono</span><span style="font-size:13px;color:#1A1A1A">+57 300 123 4567</span></div>
+      <div class="n-drow"><span style="font-size:12px;color:rgba(44,47,48,0.45)">Email</span><span style="font-size:13px;color:#1A1A1A">kamilo@eventos.app</span></div>
+      <div class="n-drow"><span style="font-size:12px;color:rgba(44,47,48,0.45)">Cargo</span><span style="font-size:13px;color:#1A1A1A">Director Creativo</span></div>
+      <div class="n-drow"><span style="font-size:12px;color:rgba(44,47,48,0.45)">Empresa</span><span style="font-size:13px;color:#1A1A1A">EventOS</span></div>
+    </div>
+    <div class="n-dock">
+      <div class="tab"><span class="ms">home</span>Home</div>
+      <div class="tab"><span class="ms">calendar_today</span>Agenda</div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab"><span class="ms">people</span>Red</div>
+      <div class="tab active" style="color:var(--ac)"><span class="ms" style="font-variation-settings:'FILL' 1">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- LUX WELCOME -->
+  <div class="screen" data-screen="welcome" style="background:var(--lux-bg,#F0F0ED);flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden">
+    <div style="position:absolute;top:25%;left:12%;opacity:0.7">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-radius:16px;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.08)">
+        <div class="accent-bg" style="width:7px;height:7px;border-radius:3.5px"></div>
+        <span style="font-family:'Urbanist';font-weight:700;font-size:12px;color:rgba(44,47,48,0.6)">Networking</span>
+      </div>
+    </div>
+    <div style="position:absolute;top:18%;right:10%;opacity:0.6">
+      <div style="padding:14px;border-radius:14px;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.08);text-align:center">
+        <div class="accent-c jks" style="font-weight:800;font-size:22px">42</div>
+        <div style="font-size:9px;color:rgba(44,47,48,0.45);text-transform:uppercase;letter-spacing:1px">Speakers</div>
+      </div>
+    </div>
+    <div style="position:absolute;top:38%;left:30%;opacity:0.5">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-radius:16px;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.08)">
+        <div style="width:7px;height:7px;border-radius:3.5px;background:#22c55e"></div>
+        <span style="font-family:'Urbanist';font-weight:700;font-size:12px;color:rgba(44,47,48,0.6)">Gamification</span>
+      </div>
+    </div>
+    <div style="background:linear-gradient(transparent,rgba(240,240,237,0.6) 30%,rgba(240,240,237,0.95) 70%,#F0F0ED);padding:0 28px 40px;position:relative;z-index:2">
+      <div class="accent-c" style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Tech Summit 2026</div>
+      <div class="jks" style="font-weight:800;font-size:34px;color:#1A1A1A;letter-spacing:-1px;line-height:1.05;margin-bottom:6px">Welcome to<br>the <span class="accent-c">Future</span></div>
+      <div style="font-size:13px;color:rgba(44,47,48,0.45);margin-bottom:32px">Tu experiencia comienza aqui</div>
+      <div class="accent-bg" style="padding:16px;border-radius:14px;text-align:center;margin-bottom:12px">
+        <span class="jks" style="font-weight:700;font-size:14px;color:#fff">Comenzar</span>
+      </div>
+      <div style="padding:14px;border-radius:14px;text-align:center;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+        <span style="font-weight:600;font-size:13px;color:rgba(44,47,48,0.6)">Ya tengo cuenta</span>
+      </div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-top:20px">
+        <div class="accent-bg" style="width:6px;height:6px;border-radius:3px"></div>
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(0,0,0,0.06)"></div>
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(0,0,0,0.06)"></div>
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(0,0,0,0.06)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LUX AUTH -->
+  <div class="screen" data-screen="auth" style="background:var(--lux-bg,#F0F0ED);flex-direction:column;justify-content:flex-end">
+    <div style="padding:60px 28px 20px;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center">
+      <div class="jks" style="font-weight:800;font-size:24px;color:#1A1A1A;text-align:center;margin-bottom:6px">Inicia sesion</div>
+      <div style="font-size:13px;color:rgba(44,47,48,0.45);text-align:center;margin-bottom:24px">Ingresa tu correo para comenzar</div>
+      <div style="display:flex;gap:6px;background:rgba(0,0,0,0.04);border-radius:9999px;padding:3px;margin-bottom:24px;width:100%">
+        <div class="accent-bg" style="flex:1;padding:10px;border-radius:9999px;text-align:center;font-size:12px;font-weight:600;color:#fff">Ingresar</div>
+        <div style="flex:1;padding:10px;border-radius:9999px;text-align:center;font-size:12px;font-weight:600;color:rgba(44,47,48,0.4)">Registrarse</div>
+      </div>
+    </div>
+    <div style="background:#FFFFFF;border-top-left-radius:24px;border-top-right-radius:24px;padding:24px 24px 40px;box-shadow:0 -4px 24px rgba(0,0,0,0.06)">
+      <div style="margin-bottom:16px">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(44,47,48,0.35);margin-bottom:6px">Email</div>
+        <div style="padding:14px 16px;border-radius:14px;background:var(--lux-bg,#F0F0ED)">
+          <span style="font-size:14px;color:rgba(44,47,48,0.3)">correo@ejemplo.com</span>
+        </div>
+      </div>
+      <div style="margin-bottom:20px">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(44,47,48,0.35);margin-bottom:6px">Contrasena</div>
+        <div style="padding:14px 16px;border-radius:14px;background:var(--lux-bg,#F0F0ED);display:flex;justify-content:space-between">
+          <span style="font-size:14px;color:rgba(44,47,48,0.3)">********</span>
+          <span class="ms sm" style="color:rgba(44,47,48,0.3)">visibility_off</span>
+        </div>
+      </div>
+      <div class="accent-bg" style="padding:16px;border-radius:14px;text-align:center">
+        <span class="jks" style="font-weight:700;font-size:14px;color:#fff">Continuar</span>
+      </div>
+      <div style="text-align:center;margin-top:14px">
+        <span class="accent-c" style="font-size:12px;font-weight:600">Olvide mi contrasena</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LUX INTERESTS -->
+  <div class="screen" data-screen="interests" style="background:var(--lux-bg,#F0F0ED)">
+    <div style="padding:60px 24px 24px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+        <div style="width:32px;height:32px;border-radius:16px;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04);display:flex;align-items:center;justify-content:center"><span class="ms sm" style="color:#1A1A1A">arrow_back</span></div>
+      </div>
+      <div class="jks" style="font-weight:800;font-size:22px;color:#1A1A1A;margin-bottom:4px">Tus intereses</div>
+      <div style="font-size:13px;color:rgba(44,47,48,0.45);margin-bottom:24px">Selecciona al menos 3 para personalizar tu experiencia</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <div class="accent-bg-soft" style="padding:10px 16px;border-radius:9999px;border:1px solid;border-color:color-mix(in srgb,var(--ac) 30%,transparent)"><span class="accent-c" style="font-size:12px;font-weight:600">AI & Machine Learning</span></div>
+        <div class="accent-bg-soft" style="padding:10px 16px;border-radius:9999px;border:1px solid;border-color:color-mix(in srgb,var(--ac) 30%,transparent)"><span class="accent-c" style="font-size:12px;font-weight:600">UX Design</span></div>
+        <div style="padding:10px 16px;border-radius:9999px;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04)"><span style="font-size:12px;font-weight:600;color:rgba(44,47,48,0.5)">Blockchain</span></div>
+        <div class="accent-bg-soft" style="padding:10px 16px;border-radius:9999px;border:1px solid;border-color:color-mix(in srgb,var(--ac) 30%,transparent)"><span class="accent-c" style="font-size:12px;font-weight:600">Cloud</span></div>
+        <div style="padding:10px 16px;border-radius:9999px;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04)"><span style="font-size:12px;font-weight:600;color:rgba(44,47,48,0.5)">Cybersecurity</span></div>
+        <div style="padding:10px 16px;border-radius:9999px;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04)"><span style="font-size:12px;font-weight:600;color:rgba(44,47,48,0.5)">DevOps</span></div>
+        <div style="padding:10px 16px;border-radius:9999px;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04)"><span style="font-size:12px;font-weight:600;color:rgba(44,47,48,0.5)">Leadership</span></div>
+        <div style="padding:10px 16px;border-radius:9999px;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.04)"><span style="font-size:12px;font-weight:600;color:rgba(44,47,48,0.5)">Marketing</span></div>
+      </div>
+    </div>
+    <div style="padding:0 24px 40px;margin-top:auto">
+      <div style="display:flex;justify-content:center;gap:6px;margin-bottom:20px">
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(0,0,0,0.06)"></div>
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(0,0,0,0.06)"></div>
+        <div style="width:6px;height:6px;border-radius:3px;background:rgba(0,0,0,0.06)"></div>
+        <div class="accent-bg" style="width:6px;height:6px;border-radius:3px"></div>
+      </div>
+      <div class="accent-bg" style="padding:16px;border-radius:14px;text-align:center">
+        <span class="jks" style="font-weight:700;font-size:14px;color:#fff">Continuar (3)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LUX DONE -->
+  <div class="screen" data-screen="done" style="background:var(--lux-bg,#F0F0ED)">
+    <div style="padding:60px 24px 40px;display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center">
+      <div style="font-size:13px;font-weight:700;color:#FFD700;margin-bottom:16px;letter-spacing:0.5px">+80 pts</div>
+      <div style="width:160px;height:160px;border-radius:14px;overflow:hidden;position:relative;margin-bottom:24px;box-shadow:0 4px 24px rgba(0,0,0,0.1)">
+        <div style="position:absolute;inset:-4px;background:linear-gradient(135deg,#a8edea,#fed6e3,#d4a5ff,#a8c0ff,#b8f0c0,#ffd6aa);animation:spin 6s linear infinite"></div>
+        <div style="position:absolute;inset:5px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center">
+          <div style="width:80px;height:80px;background:repeating-conic-gradient(#0a0a0a 0% 25%,#fff 0% 50%) 50%/12px 12px;border-radius:4px"></div>
+        </div>
+      </div>
+      <div class="jks" style="font-weight:800;font-size:22px;color:#1A1A1A;margin-bottom:4px;text-align:center">Estas listo!</div>
+      <div style="font-size:13px;color:rgba(44,47,48,0.5);text-align:center;margin-bottom:8px">Tu pase digital esta activo</div>
+      <div style="font-size:11px;color:rgba(44,47,48,0.35);text-align:center">Toca el QR para verlo en pantalla completa</div>
+    </div>
+    <div style="padding:0 24px 40px">
+      <div class="accent-bg" style="padding:16px;border-radius:14px;text-align:center">
+        <span class="jks" style="font-weight:700;font-size:14px;color:#fff">Entrar al evento</span>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+</div>
+
+</div>
+
+<script>
+// Screen switching
+function show(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===name));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===name));
+}
+
+// Accent switching
+function setAccent(color){
+  document.documentElement.style.setProperty('--ac',color);
+  document.querySelectorAll('.accent-btn').forEach(b=>b.classList.toggle('active',b.dataset.accent===color));
+}
+document.querySelectorAll('.accent-btn').forEach(b=>b.addEventListener('click',()=>setAccent(b.dataset.accent)));
+setAccent('#FFFFFF');
+</script>
+</body>
+</html>

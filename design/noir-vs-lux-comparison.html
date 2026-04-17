@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventOS — Lumina Noir vs Lumina Lux</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Urbanist:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1a1a;
+    color: #fff;
+    font-family: 'Urbanist', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  h1 {
+    text-align: center;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .subtitle {
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  /* ── Tab selector ─────────────────────────────────────── */
+  .tab-bar {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .tab-btn {
+    padding: 10px 24px;
+    border-radius: 9999px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+  }
+
+  /* ── Phones container ─────────────────────────────────── */
+  .phones {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .phone-wrap {
+    text-align: center;
+  }
+  .phone-wrap h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .phone {
+    width: 375px;
+    height: 812px;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    border: 3px solid rgba(255,255,255,0.1);
+  }
+
+  /* ── Screen sections (hidden by default, shown via JS) ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ═══════════════════════════════════════════════════════
+     NOIR THEME
+     ═══════════════════════════════════════════════════════ */
+  .noir {
+    background: #0a0a0a;
+    height: 100%;
+    overflow-y: auto;
+    padding: 0;
+  }
+  .noir::-webkit-scrollbar { display: none; }
+
+  /* ── Noir: Header ── */
+  .noir .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 24px 12px;
+  }
+  .noir .header .logo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .noir .header .bell {
+    width: 40px; height: 40px; border-radius: 20px;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.8);
+    font-size: 18px;
+    position: relative;
+  }
+  .noir .header .bell .badge {
+    position: absolute; top: -4px; right: -6px;
+    min-width: 16px; height: 16px; border-radius: 8px;
+    background: #EF4444; border: 1.5px solid #0e0e0e;
+    font-size: 9px; font-weight: 800; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 3px;
+  }
+
+  /* ── Noir: Hero ── */
+  .noir .hero-text {
+    padding: 8px 24px 20px;
+  }
+  .noir .hero-text .label {
+    font-size: 10px; font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .noir .hero-text h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    color: #fff;
+    letter-spacing: -1px;
+    line-height: 1.05;
+  }
+
+  /* ── Noir: HappeningNow ── */
+  .noir .happening {
+    margin: 0 24px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .noir .happening .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .noir .happening .tag .dot {
+    width: 6px; height: 6px; border-radius: 3px;
+    background: #4ade80;
+  }
+  .noir .happening h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 16px;
+    color: #fff; margin-bottom: 4px;
+  }
+  .noir .happening .meta {
+    font-size: 12px; color: rgba(255,255,255,0.4);
+    margin-bottom: 12px;
+  }
+  .noir .happening .join-btn {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    border: 1px solid rgba(255,255,255,0.15);
+    font-size: 10px; font-weight: 700;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Noir: ModuleMenu ── */
+  .noir .modules {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0 24px 24px;
+  }
+  .noir .module-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 100px;
+  }
+  .noir .module-card .icon {
+    font-size: 22px;
+    color: rgba(255,255,255,0.5);
+  }
+  .noir .module-card .name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 15px;
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* ── Noir: Agenda ── */
+  .noir .agenda-header {
+    padding: 60px 24px 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .noir .back-btn {
+    width: 36px; height: 36px; border-radius: 18px;
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 18px;
+  }
+  .noir .agenda-header h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 28px;
+    color: #fff; letter-spacing: -0.5px;
+  }
+  .noir .agenda-subtitle {
+    padding: 0 24px;
+    font-size: 12px;
+    color: #adaaaa;
+    margin-bottom: 16px;
+  }
+
+  /* Day strip */
+  .noir .day-strip {
+    display: flex; gap: 10px;
+    padding: 8px 20px 16px;
+    overflow-x: auto;
+  }
+  .noir .day-strip::-webkit-scrollbar { display: none; }
+  .noir .day-pill {
+    min-width: 52px; height: 76px;
+    border-radius: 26px;
+    background: #141414;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .noir .day-pill.active {
+    background: #fff;
+  }
+  .noir .day-pill .wd {
+    font-size: 9px; font-weight: 700;
+    color: #adaaaa; letter-spacing: 0.8px;
+  }
+  .noir .day-pill.active .wd { color: #000; }
+  .noir .day-pill .num {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 22px;
+    color: #fff;
+  }
+  .noir .day-pill.active .num { color: #000; }
+  .noir .day-pill .pip {
+    width: 4px; height: 4px; border-radius: 2px;
+    background: transparent; margin-top: 2px;
+  }
+  .noir .day-pill:not(.active) .pip.has { background: #fff; }
+
+  /* Session card */
+  .noir .session-card {
+    margin: 0 16px 10px 74px;
+    background: rgba(38,38,38,0.4);
+    border: 0.5px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 12px;
+  }
+  .noir .session-card .card-top {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .noir .session-card .live-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 9999px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 8px; font-weight: 800;
+    color: #fff; letter-spacing: 1px;
+  }
+  .noir .session-card .live-badge .d {
+    width: 5px; height: 5px; border-radius: 2.5px;
+    background: #fff;
+  }
+  .noir .session-card .heart {
+    color: rgba(255,255,255,0.4); font-size: 18px;
+  }
+  .noir .session-card h4 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 14px;
+    color: #fff; line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .noir .session-card .loc {
+    font-size: 11px; color: #adaaaa;
+    margin-bottom: 8px;
+  }
+  .noir .session-card .actions {
+    display: flex; gap: 8px;
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+    padding-top: 10px;
+  }
+  .noir .session-card .action-pill {
+    padding: 6px 10px; border-radius: 9999px;
+    background: rgba(255,255,255,0.06);
+    font-size: 10px; font-weight: 600;
+    color: #adaaaa;
+  }
+
+  /* Timeline left */
+  .noir .timeline-row {
+    display: flex; padding-left: 16px;
+  }
+  .noir .timeline-left {
+    width: 58px; display: flex;
+    flex-direction: column; align-items: center;
+    padding-top: 14px;
+  }
+  .noir .timeline-left .time {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 10px;
+    color: #fff; margin-bottom: 8px;
+  }
+  .noir .timeline-left .tdot {
+    width: 7px; height: 7px; border-radius: 3.5px;
+    background: #777575;
+  }
+  .noir .timeline-left .tdot.live {
+    width: 10px; height: 10px; border-radius: 5px;
+    background: #fff;
+  }
+  .noir .timeline-left .connector {
+    width: 1.5px; flex: 1;
+    background: #494847; opacity: 0.3;
+    margin-top: 4px;
+  }
+
+  /* ── Noir: Profile ── */
+  .noir .profile-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 60px 24px 8px;
+  }
+  .noir .profile-header h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 26px;
+    color: #fff; letter-spacing: -0.5px;
+  }
+  .noir .help-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 12px; font-weight: 600;
+    color: rgba(255,255,255,0.45);
+  }
+  .noir .profile-hero {
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 20px 24px 24px;
+  }
+  .noir .avatar-circle {
+    width: 96px; height: 96px; border-radius: 48px;
+    background: linear-gradient(135deg, #2a2a4a, #1a3a2a, #3a2a1a);
+    border: 2px solid rgba(255,255,255,0.08);
+  }
+  .noir .profile-hero .name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 22px;
+    color: #fff; letter-spacing: -0.5px;
+    margin-top: 16px;
+  }
+  .noir .profile-hero .role {
+    font-size: 14px; color: rgba(255,255,255,0.55);
+    margin-top: 4px;
+  }
+  .noir .profile-hero .social-row {
+    display: flex; gap: 12px; margin-top: 16px;
+  }
+  .noir .social-icon {
+    width: 40px; height: 40px; border-radius: 20px;
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  /* Stats */
+  .noir .stats-row {
+    display: flex; gap: 10px;
+    padding: 0 24px; margin-bottom: 20px;
+  }
+  .noir .stat-card {
+    flex: 1; text-align: center;
+    padding: 14px 0; border-radius: 16px;
+    background: rgba(255,255,255,0.025);
+    border: 0.5px solid rgba(255,255,255,0.04);
+  }
+  .noir .stat-card .val {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 18px;
+    color: #fff; letter-spacing: -0.3px;
+  }
+  .noir .stat-card .lbl {
+    font-size: 10px; font-weight: 500;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  /* Data card */
+  .noir .data-section {
+    padding: 0 24px; margin-top: 4px;
+  }
+  .noir .data-section .sec-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .noir .data-section .sec-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 16px;
+    color: #fff;
+  }
+  .noir .data-section .edit-link {
+    font-size: 13px; font-weight: 600;
+    color: rgba(139,92,246,0.8);
+  }
+  .noir .data-card {
+    border-radius: 16px;
+    background: rgba(255,255,255,0.025);
+    border: 0.5px solid rgba(255,255,255,0.04);
+    padding: 0 16px;
+  }
+  .noir .data-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.04);
+  }
+  .noir .data-row:last-child { border-bottom: none; }
+  .noir .data-row .dl {
+    font-size: 13px; font-weight: 500;
+    color: rgba(255,255,255,0.45);
+  }
+  .noir .data-row .dv {
+    font-size: 14px; font-weight: 500;
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     LUX THEME — Based on DESIGN.md
+     ═══════════════════════════════════════════════════════ */
+  .lux {
+    --accent: #7C5CFC; /* configurable from admin — demo purple */
+    --accent-soft: rgba(124,92,252,0.08);
+    --accent-muted: rgba(124,92,252,0.15);
+    background: #F0F0ED;
+    height: 100%;
+    overflow-y: auto;
+    padding: 0;
+  }
+  .lux::-webkit-scrollbar { display: none; }
+
+  /* ── Lux: Header ── */
+  .lux .header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 60px 24px 12px;
+  }
+  .lux .header .logo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 22px;
+    color: #1A1A1A;
+    letter-spacing: -0.5px;
+  }
+  .lux .header .bell {
+    width: 40px; height: 40px; border-radius: 20px;
+    background: #FFFFFF;
+    display: flex; align-items: center; justify-content: center;
+    color: #2C2F30;
+    font-size: 18px;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.06);
+  }
+  .lux .header .bell .badge {
+    position: absolute; top: -4px; right: -6px;
+    min-width: 16px; height: 16px; border-radius: 8px;
+    background: #EF4444; border: 1.5px solid #EAECEF;
+    font-size: 9px; font-weight: 800; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 3px;
+  }
+
+  /* ── Lux: Hero ── */
+  .lux .hero-text {
+    padding: 8px 24px 20px;
+  }
+  .lux .hero-text .label {
+    font-size: 10px; font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .lux .hero-text h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    color: #1A1A1A;
+    letter-spacing: -1px;
+    line-height: 1.05;
+  }
+  .lux .hero-text h2 .accent-word {
+    color: var(--accent);
+  }
+
+  /* ── Lux: HappeningNow ── */
+  .lux .happening {
+    margin: 0 24px 16px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .lux .happening .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 600;
+    color: rgba(44,47,48,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .lux .happening .tag .dot {
+    width: 6px; height: 6px; border-radius: 3px;
+    background: var(--accent);
+  }
+  .lux .happening .tag {
+    color: var(--accent);
+  }
+  .lux .happening h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 16px;
+    color: #1A1A1A; margin-bottom: 4px;
+  }
+  .lux .happening .meta {
+    font-size: 12px; color: rgba(44,47,48,0.45);
+    margin-bottom: 12px;
+  }
+  .lux .happening .join-btn {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    background: var(--accent);
+    font-size: 10px; font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Lux: ModuleMenu ── */
+  .lux .modules {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0 24px 24px;
+  }
+  .lux .module-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 20px 16px;
+    display: flex; flex-direction: column;
+    gap: 12px;
+    min-height: 100px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .lux .module-card .icon {
+    font-size: 22px;
+    color: rgba(44,47,48,0.5);
+  }
+  .lux .module-card .name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 15px;
+    color: #2C2F30;
+  }
+
+  /* ── Lux: Agenda ── */
+  .lux .agenda-header {
+    padding: 60px 24px 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .lux .back-btn {
+    width: 36px; height: 36px; border-radius: 18px;
+    background: #FFFFFF;
+    display: flex; align-items: center; justify-content: center;
+    color: #2C2F30; font-size: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.06);
+  }
+  .lux .agenda-header h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 28px;
+    color: #2C2F30; letter-spacing: -0.5px;
+  }
+  .lux .agenda-subtitle {
+    padding: 0 24px;
+    font-size: 12px;
+    color: rgba(44,47,48,0.5);
+    margin-bottom: 16px;
+  }
+
+  /* Day strip */
+  .lux .day-strip {
+    display: flex; gap: 10px;
+    padding: 8px 20px 16px;
+    overflow-x: auto;
+  }
+  .lux .day-strip::-webkit-scrollbar { display: none; }
+  .lux .day-pill {
+    min-width: 52px; height: 76px;
+    border-radius: 26px;
+    background: #FFFFFF;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 2px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .lux .day-pill.active {
+    background: var(--accent);
+    box-shadow: 0 4px 12px rgba(124,92,252,0.25);
+  }
+  .lux .day-pill .wd {
+    font-size: 9px; font-weight: 700;
+    color: rgba(44,47,48,0.5);
+    letter-spacing: 0.8px;
+  }
+  .lux .day-pill.active .wd { color: rgba(255,255,255,0.85); }
+  .lux .day-pill .num {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 22px;
+    color: #2C2F30;
+  }
+  .lux .day-pill.active .num { color: #FFFFFF; }
+  .lux .day-pill .pip {
+    width: 4px; height: 4px; border-radius: 2px;
+    background: transparent; margin-top: 2px;
+  }
+  .lux .day-pill:not(.active) .pip.has { background: var(--accent); }
+
+  /* Session card */
+  .lux .timeline-row {
+    display: flex; padding-left: 16px;
+  }
+  .lux .timeline-left {
+    width: 58px; display: flex;
+    flex-direction: column; align-items: center;
+    padding-top: 14px;
+  }
+  .lux .timeline-left .time {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 10px;
+    color: #2C2F30; margin-bottom: 8px;
+  }
+  .lux .timeline-left .tdot {
+    width: 7px; height: 7px; border-radius: 3.5px;
+    background: #DADDDF;
+  }
+  .lux .timeline-left .tdot.live {
+    width: 10px; height: 10px; border-radius: 5px;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(124,92,252,0.4);
+  }
+  .lux .timeline-left .connector {
+    width: 1.5px; flex: 1;
+    background: #EFF1F2;
+    margin-top: 4px;
+  }
+
+  .lux .session-card {
+    margin: 0 16px 10px 0;
+    flex: 1;
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .lux .session-card .card-top {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .lux .session-card .live-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 9999px;
+    background: var(--accent-soft);
+    font-size: 8px; font-weight: 800;
+    color: var(--accent); letter-spacing: 1px;
+  }
+  .lux .session-card .live-badge .d {
+    width: 5px; height: 5px; border-radius: 2.5px;
+    background: var(--accent);
+  }
+  .lux .session-card .heart {
+    color: rgba(44,47,48,0.3); font-size: 18px;
+  }
+  .lux .session-card h4 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 14px;
+    color: #2C2F30; line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .lux .session-card .loc {
+    font-size: 11px; color: rgba(44,47,48,0.5);
+    margin-bottom: 8px;
+  }
+  .lux .session-card .actions {
+    display: flex; gap: 8px;
+    padding-top: 10px;
+  }
+  .lux .session-card .action-pill {
+    padding: 6px 10px; border-radius: 9999px;
+    background: #EAECEF;
+    font-size: 10px; font-weight: 600;
+    color: rgba(44,47,48,0.6);
+  }
+
+  /* ── Lux: Profile ── */
+  .lux .profile-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 60px 24px 8px;
+  }
+  .lux .profile-header h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 26px;
+    color: #1A1A1A; letter-spacing: -0.5px;
+  }
+  .lux .help-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 12px;
+    background: #FFFFFF;
+    font-size: 12px; font-weight: 600;
+    color: rgba(44,47,48,0.5);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .lux .profile-hero {
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 20px 24px 24px;
+  }
+  .lux .avatar-circle {
+    width: 96px; height: 96px; border-radius: 48px;
+    background: linear-gradient(135deg, #e0d0f0, #d0e8e0, #f0e0d0);
+    border: 2px solid rgba(44,47,48,0.06);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .lux .profile-hero .name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 22px;
+    color: #2C2F30; letter-spacing: -0.5px;
+    margin-top: 16px;
+  }
+  .lux .profile-hero .role {
+    font-size: 14px; color: rgba(44,47,48,0.5);
+    margin-top: 4px;
+  }
+  .lux .profile-hero .social-row {
+    display: flex; gap: 12px; margin-top: 16px;
+  }
+  .lux .social-icon {
+    width: 40px; height: 40px; border-radius: 20px;
+    background: #FFFFFF;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  /* Stats */
+  .lux .stats-row {
+    display: flex; gap: 10px;
+    padding: 0 24px; margin-bottom: 20px;
+  }
+  .lux .stat-card {
+    flex: 1; text-align: center;
+    padding: 14px 0; border-radius: 16px;
+    background: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.06);
+  }
+  .lux .stat-card .val {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 18px;
+    color: #2C2F30; letter-spacing: -0.3px;
+  }
+  .lux .stat-card .lbl {
+    font-size: 10px; font-weight: 500;
+    color: rgba(44,47,48,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  /* Data card */
+  .lux .data-section {
+    padding: 0 24px; margin-top: 4px;
+  }
+  .lux .data-section .sec-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .lux .data-section .sec-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: 16px;
+    color: #2C2F30;
+  }
+  .lux .data-section .edit-link {
+    font-size: 13px; font-weight: 600;
+    color: var(--accent);
+  }
+  .lux .data-card {
+    border-radius: 16px;
+    background: #FFFFFF;
+    padding: 0 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .lux .data-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(44,47,48,0.08);
+  }
+  .lux .data-row:last-child { border-bottom: none; }
+  .lux .data-row .dl {
+    font-size: 13px; font-weight: 500;
+    color: rgba(44,47,48,0.5);
+  }
+  .lux .data-row .dv {
+    font-size: 14px; font-weight: 500;
+    color: #2C2F30;
+  }
+
+  /* ── Bottom tab bar (both themes) ── */
+  .tab-dock {
+    position: absolute;
+    bottom: 20px; left: 16px; right: 16px;
+    height: 62px;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+  }
+  .noir .tab-dock {
+    background: rgba(20,20,20,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 0.5px solid rgba(255,255,255,0.08);
+  }
+  .lux .tab-dock {
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .tab-dock .tab-item {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 600;
+    opacity: 0.5;
+  }
+  .noir .tab-dock .tab-item { color: #fff; }
+  .lux .tab-dock .tab-item { color: #2C2F30; }
+  .tab-dock .tab-item.active { opacity: 1; }
+  .lux .tab-dock .tab-item.active { color: var(--accent); }
+  .tab-dock .tab-item .ico { font-size: 20px; }
+</style>
+</head>
+<body>
+
+<h1>Lumina Noir vs Lumina Lux</h1>
+<p class="subtitle">Comparacion lado a lado — layout real de la app EventOS</p>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showScreen('home')">Home</button>
+  <button class="tab-btn" onclick="showScreen('agenda')">Agenda</button>
+  <button class="tab-btn" onclick="showScreen('profile')">Profile</button>
+</div>
+
+<div class="phones">
+
+  <!-- ═══════════ NOIR ═══════════ -->
+  <div class="phone-wrap">
+    <h3>Lumina Noir</h3>
+    <div class="phone">
+      <div class="noir">
+
+        <!-- HOME -->
+        <div class="screen active" data-screen="home">
+          <div class="header">
+            <span class="logo">EventOS</span>
+            <div class="bell">&#x1F514;<div class="badge">3</div></div>
+          </div>
+          <div class="hero-text">
+            <div class="label">Exclusive Access</div>
+            <h2>The Future<br>of Creative<br>Intelligence.</h2>
+          </div>
+          <div class="happening">
+            <div class="tag"><span class="dot"></span> Happening Now</div>
+            <h3>Designing for Autonomous Systems</h3>
+            <div class="meta">Main Auditorium &bull; Level 04</div>
+            <span class="join-btn">Join Now</span>
+          </div>
+          <div class="modules">
+            <div class="module-card"><span class="icon">&#x1F4C5;</span><span class="name">Agenda</span></div>
+            <div class="module-card"><span class="icon">&#x1F399;</span><span class="name">Speakers</span></div>
+            <div class="module-card"><span class="icon">&#x1F465;</span><span class="name">Networking</span></div>
+            <div class="module-card"><span class="icon">&#x1F3E2;</span><span class="name">Sponsors</span></div>
+          </div>
+          <div class="tab-dock">
+            <div class="tab-item active"><span class="ico">&#x1F3E0;</span>Home</div>
+            <div class="tab-item"><span class="ico">&#x1F4C5;</span>Agenda</div>
+            <div class="tab-item"><span class="ico">&#x1F4F1;</span>Mi QR</div>
+            <div class="tab-item"><span class="ico">&#x1F91D;</span>Red</div>
+            <div class="tab-item"><span class="ico">&#x1F464;</span>Perfil</div>
+          </div>
+        </div>
+
+        <!-- AGENDA -->
+        <div class="screen" data-screen="agenda">
+          <div class="agenda-header">
+            <div class="back-btn">&larr;</div>
+            <h2>Agenda</h2>
+          </div>
+          <div class="agenda-subtitle">Lunes 14 de octubre</div>
+          <div class="day-strip">
+            <div class="day-pill"><span class="wd">DOM</span><span class="num">13</span><span class="pip"></span></div>
+            <div class="day-pill active"><span class="wd">LUN</span><span class="num">14</span><span class="pip"></span></div>
+            <div class="day-pill"><span class="wd">MAR</span><span class="num">15</span><span class="pip has"></span></div>
+            <div class="day-pill"><span class="wd">MIE</span><span class="num">16</span><span class="pip has"></span></div>
+            <div class="day-pill" style="opacity:0.3"><span class="wd">JUE</span><span class="num">17</span><span class="pip"></span></div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-left">
+              <span class="time">09:00 AM</span>
+              <div class="tdot"></div>
+              <div class="connector"></div>
+            </div>
+            <div style="flex:1;padding-bottom:10px">
+              <div class="session-card" style="opacity:0.45">
+                <div class="card-top">
+                  <span style="font-size:14px;color:#494847">&#x2713;</span>
+                  <span class="heart">&#x2661;</span>
+                </div>
+                <h4 style="text-decoration:line-through;color:#777575">Opening Keynote: Future of Noir</h4>
+                <div class="loc">&#x1F4CD; Main Auditorium</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-left">
+              <span class="time" style="color:#fff">10:30 AM</span>
+              <div class="tdot live"></div>
+              <div class="connector"></div>
+            </div>
+            <div style="flex:1;padding-bottom:10px">
+              <div class="session-card" style="border-color:rgba(255,255,255,0.2)">
+                <div class="card-top">
+                  <div class="live-badge"><span class="d"></span>EN VIVO</div>
+                  <span class="heart">&#x2665;</span>
+                </div>
+                <h4>Generative Aesthetics in Luxury Branding</h4>
+                <div class="loc">&#x1F4CD; Interactive Lab B</div>
+                <div class="actions">
+                  <span class="action-pill">&#x1F4C5; Calendario</span>
+                  <span class="action-pill" style="margin-left:auto;background:#fff;color:#000;font-weight:800">UNIRTE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-left">
+              <span class="time">01:00 PM</span>
+              <div class="tdot"></div>
+            </div>
+            <div style="flex:1;padding-bottom:10px">
+              <div class="session-card">
+                <div class="card-top">
+                  <span></span>
+                  <span class="heart">&#x2661;</span>
+                </div>
+                <h4>The Sensory Web: Beyond Visuals</h4>
+                <div class="loc">&#x1F4CD; Interactive Lab B</div>
+                <div class="actions">
+                  <span class="action-pill">&#x1F4C5; Calendario</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-dock">
+            <div class="tab-item"><span class="ico">&#x1F3E0;</span>Home</div>
+            <div class="tab-item active"><span class="ico">&#x1F4C5;</span>Agenda</div>
+            <div class="tab-item"><span class="ico">&#x1F4F1;</span>Mi QR</div>
+            <div class="tab-item"><span class="ico">&#x1F91D;</span>Red</div>
+            <div class="tab-item"><span class="ico">&#x1F464;</span>Perfil</div>
+          </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="screen" data-screen="profile">
+          <div class="profile-header">
+            <h2>Perfil</h2>
+            <div class="help-btn">? Ayuda</div>
+          </div>
+          <div class="profile-hero">
+            <div class="avatar-circle"></div>
+            <div class="name">Kamilo Sanchez</div>
+            <div class="role">Director Creativo &bull; EventOS</div>
+            <div class="social-row">
+              <div class="social-icon" style="color:#0A66C2">in</div>
+              <div class="social-icon" style="color:#1DA1F2">X</div>
+              <div class="social-icon" style="color:#E4405F">ig</div>
+            </div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-card"><div class="val">1,250</div><div class="lbl">Puntos</div></div>
+            <div class="stat-card"><div class="val">8/12</div><div class="lbl">Retos</div></div>
+            <div class="stat-card"><div class="val">8</div><div class="lbl">Logros</div></div>
+          </div>
+          <div class="data-section">
+            <div class="sec-header">
+              <span class="sec-title">Mis datos</span>
+              <span class="edit-link">Editar</span>
+            </div>
+            <div class="data-card">
+              <div class="data-row"><span class="dl">Telefono</span><span class="dv">+57 300 123 4567</span></div>
+              <div class="data-row"><span class="dl">Email</span><span class="dv">kamilo@eventos.app</span></div>
+              <div class="data-row"><span class="dl">Cargo</span><span class="dv">Director Creativo</span></div>
+              <div class="data-row"><span class="dl">Empresa</span><span class="dv">EventOS</span></div>
+            </div>
+          </div>
+          <div class="tab-dock">
+            <div class="tab-item"><span class="ico">&#x1F3E0;</span>Home</div>
+            <div class="tab-item"><span class="ico">&#x1F4C5;</span>Agenda</div>
+            <div class="tab-item"><span class="ico">&#x1F4F1;</span>Mi QR</div>
+            <div class="tab-item"><span class="ico">&#x1F91D;</span>Red</div>
+            <div class="tab-item active"><span class="ico">&#x1F464;</span>Perfil</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ LUX ═══════════ -->
+  <div class="phone-wrap">
+    <h3>Lumina Lux</h3>
+    <div class="phone" style="border-color: rgba(0,0,0,0.1);">
+      <div class="lux">
+
+        <!-- HOME -->
+        <div class="screen active" data-screen="home">
+          <div class="header">
+            <span class="logo">EventOS</span>
+            <div class="bell">&#x1F514;<div class="badge">3</div></div>
+          </div>
+          <div class="hero-text">
+            <div class="label">Exclusive Access</div>
+            <h2>The Future<br>of Creative<br><span class="accent-word">Intelligence.</span></h2>
+          </div>
+          <div class="happening">
+            <div class="tag"><span class="dot"></span> Happening Now</div>
+            <h3>Designing for Autonomous Systems</h3>
+            <div class="meta">Main Auditorium &bull; Level 04</div>
+            <span class="join-btn">Join Now</span>
+          </div>
+          <div class="modules">
+            <div class="module-card"><span class="icon">&#x1F4C5;</span><span class="name">Agenda</span></div>
+            <div class="module-card"><span class="icon">&#x1F399;</span><span class="name">Speakers</span></div>
+            <div class="module-card"><span class="icon">&#x1F465;</span><span class="name">Networking</span></div>
+            <div class="module-card"><span class="icon">&#x1F3E2;</span><span class="name">Sponsors</span></div>
+          </div>
+          <div class="tab-dock">
+            <div class="tab-item active"><span class="ico">&#x1F3E0;</span>Home</div>
+            <div class="tab-item"><span class="ico">&#x1F4C5;</span>Agenda</div>
+            <div class="tab-item"><span class="ico">&#x1F4F1;</span>Mi QR</div>
+            <div class="tab-item"><span class="ico">&#x1F91D;</span>Red</div>
+            <div class="tab-item"><span class="ico">&#x1F464;</span>Perfil</div>
+          </div>
+        </div>
+
+        <!-- AGENDA -->
+        <div class="screen" data-screen="agenda">
+          <div class="agenda-header">
+            <div class="back-btn">&larr;</div>
+            <h2>Agenda</h2>
+          </div>
+          <div class="agenda-subtitle">Lunes 14 de octubre</div>
+          <div class="day-strip">
+            <div class="day-pill"><span class="wd">DOM</span><span class="num">13</span><span class="pip"></span></div>
+            <div class="day-pill active"><span class="wd">LUN</span><span class="num">14</span><span class="pip"></span></div>
+            <div class="day-pill"><span class="wd">MAR</span><span class="num">15</span><span class="pip has"></span></div>
+            <div class="day-pill"><span class="wd">MIE</span><span class="num">16</span><span class="pip has"></span></div>
+            <div class="day-pill" style="opacity:0.3"><span class="wd">JUE</span><span class="num">17</span><span class="pip"></span></div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-left">
+              <span class="time" style="color:rgba(44,47,48,0.4)">09:00 AM</span>
+              <div class="tdot"></div>
+              <div class="connector"></div>
+            </div>
+            <div style="flex:1;padding-bottom:10px">
+              <div class="session-card" style="opacity:0.45">
+                <div class="card-top">
+                  <span style="font-size:14px;color:#DADDDF">&#x2713;</span>
+                  <span class="heart">&#x2661;</span>
+                </div>
+                <h4 style="text-decoration:line-through;color:rgba(44,47,48,0.4)">Opening Keynote: Future of Noir</h4>
+                <div class="loc">&#x1F4CD; Main Auditorium</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-left">
+              <span class="time">10:30 AM</span>
+              <div class="tdot live"></div>
+              <div class="connector"></div>
+            </div>
+            <div style="flex:1;padding-bottom:10px">
+              <div class="session-card">
+                <div class="card-top">
+                  <div class="live-badge"><span class="d"></span>EN VIVO</div>
+                  <span class="heart" style="color:#EF4444">&#x2665;</span>
+                </div>
+                <h4>Generative Aesthetics in Luxury Branding</h4>
+                <div class="loc">&#x1F4CD; Interactive Lab B</div>
+                <div class="actions">
+                  <span class="action-pill">&#x1F4C5; Calendario</span>
+                  <span class="action-pill" style="margin-left:auto;background:var(--accent);color:#fff;font-weight:800">UNIRTE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-row">
+            <div class="timeline-left">
+              <span class="time">01:00 PM</span>
+              <div class="tdot"></div>
+            </div>
+            <div style="flex:1;padding-bottom:10px">
+              <div class="session-card">
+                <div class="card-top">
+                  <span></span>
+                  <span class="heart">&#x2661;</span>
+                </div>
+                <h4>The Sensory Web: Beyond Visuals</h4>
+                <div class="loc">&#x1F4CD; Interactive Lab B</div>
+                <div class="actions">
+                  <span class="action-pill">&#x1F4C5; Calendario</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-dock">
+            <div class="tab-item"><span class="ico">&#x1F3E0;</span>Home</div>
+            <div class="tab-item active"><span class="ico">&#x1F4C5;</span>Agenda</div>
+            <div class="tab-item"><span class="ico">&#x1F4F1;</span>Mi QR</div>
+            <div class="tab-item"><span class="ico">&#x1F91D;</span>Red</div>
+            <div class="tab-item"><span class="ico">&#x1F464;</span>Perfil</div>
+          </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="screen" data-screen="profile">
+          <div class="profile-header">
+            <h2>Perfil</h2>
+            <div class="help-btn">? Ayuda</div>
+          </div>
+          <div class="profile-hero">
+            <div class="avatar-circle"></div>
+            <div class="name">Kamilo Sanchez</div>
+            <div class="role">Director Creativo &bull; EventOS</div>
+            <div class="social-row">
+              <div class="social-icon" style="color:#0A66C2">in</div>
+              <div class="social-icon" style="color:#1DA1F2">X</div>
+              <div class="social-icon" style="color:#E4405F">ig</div>
+            </div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-card"><div class="val">1,250</div><div class="lbl">Puntos</div></div>
+            <div class="stat-card"><div class="val">8/12</div><div class="lbl">Retos</div></div>
+            <div class="stat-card"><div class="val">8</div><div class="lbl">Logros</div></div>
+          </div>
+          <div class="data-section">
+            <div class="sec-header">
+              <span class="sec-title">Mis datos</span>
+              <span class="edit-link">Editar</span>
+            </div>
+            <div class="data-card">
+              <div class="data-row"><span class="dl">Telefono</span><span class="dv">+57 300 123 4567</span></div>
+              <div class="data-row"><span class="dl">Email</span><span class="dv">kamilo@eventos.app</span></div>
+              <div class="data-row"><span class="dl">Cargo</span><span class="dv">Director Creativo</span></div>
+              <div class="data-row"><span class="dl">Empresa</span><span class="dv">EventOS</span></div>
+            </div>
+          </div>
+          <div class="tab-dock">
+            <div class="tab-item"><span class="ico">&#x1F3E0;</span>Home</div>
+            <div class="tab-item"><span class="ico">&#x1F4C5;</span>Agenda</div>
+            <div class="tab-item"><span class="ico">&#x1F4F1;</span>Mi QR</div>
+            <div class="tab-item"><span class="ico">&#x1F91D;</span>Red</div>
+            <div class="tab-item active"><span class="ico">&#x1F464;</span>Perfil</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showScreen(name) {
+  // Update tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase() === name);
+  });
+  // Show/hide screens
+  document.querySelectorAll('.screen').forEach(el => {
+    el.classList.toggle('active', el.dataset.screen === name);
+  });
+}
+</script>
+
+</body>
+</html>

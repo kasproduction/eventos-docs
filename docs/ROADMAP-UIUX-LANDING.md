@@ -354,7 +354,16 @@ PASO 1: Fundamentos ✅ COMPLETADO (2026-04-07/08)
 ├── [x] app.json backgroundColor #0e0e0e (window nativo Android)
 ├── [x] Todos los layouts con contentStyle + sceneStyle dark
 ├── [x] Componentes base: GlassCard, GlassButton, GlassInput, SectionLabel + theme tokens (2026-04-16)
+├── [x] Migrado: Session Detail → GlassButton + GlassCard + SectionLabel (2026-04-16)
+├── [ ] Migrar Home, Agenda, Profile → componentes base (pendiente, requiere QA visual emulador)
+├── [ ] Migrar Onboarding (AuthStep, FormStep, AboutStep, DoneStep) → junto con Light Mode
+├── [ ] Migrar Social, Networking, Sponsors → junto con Light Mode
+├── [ ] Migrar Gamification, Leads, Settings, Streaming, MiQR, FAQ, Support → junto con Light Mode
 └── [x] Skeleton loading components (HomeSkeleton, AgendaSkeleton, SpeakerDetailSkeleton, SponsorsSkeleton, NetworkingSkeleton, ContentListSkeleton)
+
+Nota: migrar los 45 archivos restantes se hara junto con Light Mode (seccion 8 PENDIENTES.md).
+Tokens pasaran a ser dinamicos (Noir/Lux) y la migracion sera find/replace masivo rgba → tokens.
+Hacerlo en dos pasadas (tokens fijos + despues dinamicos) es doble trabajo.
 
 PASO 2: Landing Web
 ├── Estructura HTML/CSS (o Next.js)
