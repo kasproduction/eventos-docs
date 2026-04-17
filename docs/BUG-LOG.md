@@ -5,6 +5,18 @@
 
 ---
 
+## 2026-04-16 — Sesion Light Mode + Migracion Tokens
+
+### BUG-104: Networking sendRequest crashea "Cannot read property map of undefined" (RESUELTO)
+- **Severidad:** ALTA — feature completamente roto, no se podia enviar solicitud de contacto
+- **Causa:** `useSendContactRequest` onMutate optimistic update asumia estructura plana (`old.data.map()`) pero `useDirectory` usa `useInfiniteQuery` con estructura `{ pages: [{ data: [...] }] }`. Al acceder `old.data` en infinite query, era `undefined` → `.map()` crasheaba
+- **Origen:** Bug pre-existente desde el revert del swipe networking (2026-04-15). Al implementar infinite query en directorio, el onMutate no se actualizo
+- **Fix:** Cambiar `old.data.map(...)` por `old.pages.map(page => ({ ...page, data: page.data.map(...) }))`
+- **Archivo:** `hooks/useNetworking.ts` linea 73-84
+- **Commit:** 6124f0f
+
+---
+
 ## 2026-04-14 — Sesion Onboarding Replay + Session Detail + Bancolombia
 
 ### BUG-079: API onboarding crashea con array_flip en preset cities (RESUELTO)
