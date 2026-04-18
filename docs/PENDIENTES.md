@@ -15,9 +15,6 @@
 - [ ] Reemplazar Reanimated+BlurView por @shopify/react-native-skia (solo componente OrbBlob cambia)
 - [ ] Ref visual: design/faq-orb-demo.html
 
-### Limpiar push token al banear — Facil | 30min
-- [ ] Backend: al crear AttendeeBan, limpiar `expo_push_token` del attendee
-- [ ] Relacionado con SEC-3b.2 pendiente
 
 ### Venue + Mapa — Media | 4-6h
 - [ ] Modulo app: pantalla mapa del venue (plano del recinto, stands, escenarios)
