@@ -5,6 +5,101 @@
 
 ---
 
+## 2026-04-18 — Sesion Mission Control QA Live
+
+### BUG-105: role 'admin' no reconocido en requireModerator Q&A (RESUELTO)
+- **Severidad:** ALTA — admin no podia moderar preguntas Q&A
+- **Causa:** `requireModerator` en QuestionController solo aceptaba `organizer` y `moderator`, no `admin`
+- **Fix:** Agregar `admin` al array de roles permitidos
+- **Archivo:** `QuestionController.php:194`, `RatingController.php:117`
+- **Commit:** c18fcc5
+
+### BUG-106: HMAC route usaba whereHas('roles') inexistente (RESUELTO)
+- **Severidad:** ALTA — ruta /monitor/{id} siempre daba 500 "No hay administrador"
+- **Causa:** La query usaba `whereHas('roles', ...)` pero Attendee no tiene relacion `roles`, usa campo `role` directo
+- **Fix:** Cambiar a `whereIn('role', ['admin', 'organizer', 'moderator'])`
+- **Archivo:** `routes/web.php` ruta /monitor
+- **Commit:** c18fcc5
+
+### BUG-107: conflicto interactive_mode vs chat_enabled/qna_enabled (RESUELTO)
+- **Severidad:** CRITICA — dos sistemas paralelos controlaban lo mismo, app no cambiaba panel
+- **Causa:** Mission Control usaba campos boolean (chat_enabled, qna_enabled, polls_enabled) mientras Filament usaba interactive_mode. Ambos emitian eventos socket diferentes. App confundida.
+- **Fix:** Eliminar booleans del config. Monitor usa interactive_mode (mismo que Filament). Observer emite session:mode_changed automaticamente.
+- **Archivo:** SessionConfigController.php, session-stream/[id].tsx, useSessionMode.ts
+- **Commit:** 97d968e
+
+### BUG-108: CSRF 419 en PATCH desde Mission Control monitor (RESUELTO)
+- **Severidad:** ALTA — no se podia guardar cambios desde el monitor
+- **Causa:** HTML servido por ruta web Laravel seteaba cookies de sesion. fetch enviaba cookies (same-origin). Laravel statefulApi aplicaba CSRF verification al detectar cookie.
+- **Fix:** `credentials: 'omit'` en fetch + `validateCsrfTokens(except: ['api/*'])`
+- **Archivo:** mission-control/app.js, bootstrap/app.php
+- **Commit:** 87427a6
+
+### BUG-109: panel switching no funcionaba en monitor HTML (RESUELTO)
+- **Severidad:** ALTA — click en tabs Q&A/Polls/Custom no cambiaba el panel visible
+- **Causa:** CSS clase `.panel` era demasiado generica (conflicto con panel-header del sidebar). Luego display:none/flex peleaba con clase .visible.
+- **Fix:** Usar IDs directos con style.display + setTimeout para clase .active
+- **Archivo:** chat-monitor.html (luego mission-control/app.js)
+- **Commit:** varios
+
+### BUG-110: XSS en onclick inline del chat monitor (RESUELTO)
+- **Severidad:** CRITICA — inyeccion de codigo via mensajes de chat con comillas
+- **Causa:** `escAttr()` con comillas simples en onclick inline no era seguro. HTML entities se decodifican dentro de atributos.
+- **Fix:** Event delegation con data attributes + msgDataMap (no mas onclick inline)
+- **Archivo:** chat-monitor.html
+- **Commit:** 4e8caaf
+
+### BUG-111: abort(422) retornaba HTML en API JSON (RESUELTO)
+- **Severidad:** MEDIA — clientes recibían HTML en vez de JSON al enviar URL no permitida
+- **Causa:** `abort(422, 'mensaje')` genera respuesta HTML por defecto en Laravel
+- **Fix:** Usar `ValidationException::withMessages()` que retorna JSON
+- **Archivo:** SessionConfigController.php
+- **Commit:** 4e8caaf
+
+### BUG-112: emitConfigUpdate usaba secret incorrecto (RESUELTO)
+- **Severidad:** ALTA — socket server rechazaba config updates del backend (401)
+- **Causa:** Controller usaba `config('services.socket.secret')` que era vacio. El correcto es `config('services.socket.internal_secret')`
+- **Fix:** Cambiar a `internal_secret`
+- **Archivo:** SessionConfigController.php
+- **Commit:** bfeccf1
+
+### BUG-113: poll sync — PollSlides mantenia state del poll anterior (RESUELTO)
+- **Severidad:** ALTA — al lanzar nueva encuesta, app mostraba "Gracias por responder" del poll cerrado
+- **Causa:** React reutilizaba el componente PollSlides sin reiniciar `useState(currentIdx)`. El currentIdx quedaba en totalQ del poll anterior.
+- **Fix:** Agregar `key={activePoll.id}` en PollPanel para forzar remount
+- **Archivo:** PollPanel.tsx, useChat.ts
+- **Commit:** ca590f9
+
+### BUG-114: '' literal not terminated — script tag roto por HTML en string JS (RESUELTO)
+- **Severidad:** CRITICA — monitor no cargaba, todo el JS fallaba
+- **Causa:** HTML embebido en strings JS (srcdoc con `</style></head>`) rompia el parser HTML del browser
+- **Fix:** Separar en archivos: mission-control/index.html + styles.css + app.js
+- **Archivo:** public/mission-control/*
+- **Commit:** 201aeb1
+
+### BUG-115: cookies same-origin causaban 403 en fetch (RESUELTO)
+- **Severidad:** CRITICA — PATCH/GET desde monitor daba 403 siempre en browser
+- **Causa:** Browser envia cookies automaticamente en same-origin fetch (default). Laravel statefulApi priorizaba cookie sesion web (usuario anonimo) sobre Bearer token.
+- **Fix:** `credentials: 'omit'` explicito en fetch — Bearer token only
+- **Archivo:** mission-control/app.js
+- **Commit:** 87427a6
+
+### BUG-116: PollSlides colores hardcoded no coinciden con tema (PENDIENTE PARCIAL)
+- **Severidad:** MEDIA — encuesta se ve con accent rojo, fondo blanco inconsistente
+- **Causa:** PollSlides usaba rgba dark hardcoded. Migrado a useTheme() pero el accent del evento estaba en #ff0000.
+- **Fix parcial:** Migrar a useTheme(). Accent cambiado a #1A1A1A. Falta pulido visual.
+- **Archivo:** PollSlides.tsx, PollPanel.tsx, QnAPanel.tsx
+
+### BUG-117: reload en Expo manda al onboarding (PENDIENTE)
+- **Severidad:** MEDIA — por investigar si es solo hot reload dev o afecta produccion
+- **Causa:** Desconocida. Posible que el token/session se pierda en reload.
+
+### BUG-118: push de ban llega aunque usuario no inicio sesion (PENDIENTE)
+- **Severidad:** MEDIA — usuario en onboarding recibe notificacion de ban
+- **Causa:** Desconocida. Push se envia antes de limpiar token? O llega delayed?
+
+---
+
 ## 2026-04-16 — Sesion Light Mode + Migracion Tokens
 
 ### BUG-104: Networking sendRequest crashea "Cannot read property map of undefined" (RESUELTO)
