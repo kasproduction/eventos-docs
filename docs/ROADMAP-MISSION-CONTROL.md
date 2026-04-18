@@ -6,6 +6,32 @@
 
 ---
 
+## Contexto
+
+### Que existe hoy
+- **chat-monitor.html** (475 lineas): panel standalone para moderar chat de una sesion. Muestra mensajes RT, eliminar, banear usuario, anclar mensaje, slow mode, velocidad de cola. Sidebar con lista de baneados. Conecta via Socket.IO con auth por token admin.
+- **Filament**: gestionar polls (crear, lanzar, cerrar), Q&A (aprobar/rechazar preguntas), chat config (palabras bloqueadas, slow mode global). Todo disperso en diferentes recursos.
+- **App**: chat, Q&A y polls como tabs en pantalla streaming. Cada uno tiene su panel (ChatPanel, QnAPanel, PollPanel). Slow mode global por evento (`chat_slow_mode_seconds`).
+- **Socket**: endpoints internos para chat delete, ban, pin/unpin, poll broadcast, Q&A broadcast, data invalidation, networking notify, staff notify.
+
+### El problema
+El moderador tiene que usar 3 herramientas diferentes para controlar una sesion en vivo:
+1. Chat monitor (HTML) para chat
+2. Filament para lanzar/cerrar polls
+3. Filament para aprobar preguntas Q&A
+
+No puede apagar/prender features en tiempo real. Si el chat se descontrola, no hay boton "apagar chat" — tiene que banear uno por uno o pausar desde config del evento (afecta TODAS las sesiones).
+
+### La solucion
+Un solo panel "Mission Control" por sesion con:
+- Todo lo del chat monitor actual
+- Q&A: aprobar/rechazar en RT (sin abrir Filament)
+- Polls: lanzar/cerrar desde ahi
+- Toggles: apagar/prender chat, Q&A, polls, emoji-only, slow mode — por sesion, en RT
+- Acceso con token HMAC — moderador abre desde cualquier browser sin login
+
+---
+
 ## Arquitectura
 
 ```
