@@ -10,14 +10,8 @@
 
 ## App movil
 
-### QA visual multi-device — Media | 3-4h
-- [ ] ZTE 360dp + Medium 411dp — barrido completo pantallas
-- [ ] Verificar responsive, SafeArea, proporciones
 
-### Backend Filament Light Mode
-- [ ] Migration default_theme + primary_color_light, toggle en admin, API branding
-
-### Upgrade orbe FAQ a Skia shader — Media-Alta | 4-6h
+### Orbe FAQ a Skia shader — Media-Alta | 4-6h
 - [ ] Reemplazar Reanimated+BlurView por @shopify/react-native-skia (solo componente OrbBlob cambia)
 - [ ] Ref visual: design/faq-orb-demo.html
 

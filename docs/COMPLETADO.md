@@ -655,6 +655,9 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - [x] ModuleMenu: elevation removida en Lux, borde sutil (evita frame negro en transiciones) (2026-04-17)
 - [x] TabScreenWrapper/ScreenWrapper: opacity removida (evita flash elevation Android) (2026-04-17)
 - [x] BottomSheet: prop forceNoir para gamificacion (2026-04-17)
+- [x] Backend Filament Light Mode: migration default_theme + primary_color_light, Select tema + ColorPicker, API branding + onboarding (2026-04-17)
+- [x] Tema pre-auth: default_theme aplicado en queryFn de useOnboarding antes del render (2026-04-17)
+- [x] primary_color_light: accent adaptativo por tema en themeStore (2026-04-17)
 
 ### Totales 2026-04-16
 - Backend: 465 tests, 1168 assertions, 0 fallos
