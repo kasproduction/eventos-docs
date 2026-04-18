@@ -174,6 +174,21 @@ Filament (admin)
 
 ---
 
+### Fase 4 — Diseño Lumina Noir (~2-3h)
+
+#### 4.1 Identidad visual
+- [ ] Fuentes: PlusJakartaSans (titulos) + Urbanist (body) — via Google Fonts CDN
+- [ ] Fondo: #0a0a0c base, cards con rgba(255,255,255,0.03), bordes rgba(255,255,255,0.06)
+- [ ] Accent TEAL #39d2c0 para elementos activos, badges, toggles ON
+- [ ] Tipografia: sin titulos genericos, labels uppercase 10px tracking-wide
+- [ ] Iconos: Material Icons o emojis inline, NO texto plano para acciones
+- [ ] Tabs: estilo pill con active glow, no tabs de browser
+- [ ] Toggles: switch visual con animacion, no checkboxes HTML
+- [ ] Cards Q&A/Polls: mismo border-radius 14px, gap 6px, hover sutil
+- [ ] Responsive: funcional en tablet (moderador en venue) + laptop
+
+---
+
 ## Notas tecnicas
 
 - El monitor es HTML standalone — no React, no build. Socket.IO client + fetch API + CSS puro.
