@@ -1,7 +1,7 @@
 # QA Master — Barrido Completo de Plataforma
 
 > Auditoria endpoint por endpoint de todos los modulos.
-> Actualizado: 2026-04-17 | Metodo: curl real + tests automatizados (468 tests, 1177 assertions)
+> Actualizado: 2026-04-17 | Metodo: curl real + tests automatizados (490 tests, 1219 assertions)
 > IMPORTANTE: Socket server debe estar corriendo para real-time (agenda, chat, pinned, branding). Iniciar con: cd eventos-socket && npx ts-node src/index.ts
 
 ---
@@ -737,6 +737,44 @@ WelcomeMail ahora adjunta archivo `.ics` con las fechas del evento al email de c
 
 ---
 
+## 27. Auditoria Seguridad Codigo (2026-04-17)
+
+**Metodo:** Revision automatizada + manual de controllers, rutas, modelos.
+
+### Issues encontrados y corregidos
+
+| # | Severidad | Issue | Fix |
+|---|---|---|---|
+| SEC-7.1 | Media | LinkedIn/website aceptaban `javascript:` URLs | Validacion `url:http,https` en ProfileController |
+| SEC-7.2 | Baja | Photo delete parseaba URL sin verificar formato | Guard `str_contains('/storage/')` antes de delete |
+| SEC-7.3 | Baja | ChatController.destroy podia tener eventId null | Fallback a `$message->event_id` + null guard 400 |
+
+### Tests (9 tests, 18 assertions)
+
+| Test | Que verifica |
+|------|-------------|
+| linkedin rechaza URL sin http/https | `javascript:alert(1)` → 422 |
+| linkedin acepta URL con https | URL valida → 200 |
+| website rechaza URL sin http/https | `ftp://` → 422 |
+| website acepta URL con https | URL valida → 200 |
+| twitter acepta handle sin URL | `@usuario` → 200 (no es URL) |
+| instagram acepta handle sin URL | `@mi_cuenta` → 200 |
+| linkedin y website aceptan null | Limpiar campos → 200 |
+| update perfil cambia nombre y empresa | Datos se guardan correctamente |
+| profile requiere auth | Sin token → 401 |
+
+### Fortalezas confirmadas (sin issues)
+
+- Zero SQL injection (sin raw queries en toda la app)
+- Zero mass assignment (todos usan validated arrays)
+- Authorization en todos los controllers (cross-check user + event)
+- Rate limiting en rutas publicas (throttle:api)
+- File uploads con validacion de tipo y tamano
+- IDOR prevenido (attendee.event_id siempre validado)
+- TypeScript app: 0 errores de compilacion
+
+---
+
 ## Estado final QA
 
 | Categoria | Total | OK | Bugs | Notas |
@@ -753,4 +791,6 @@ WelcomeMail ahora adjunta archivo `.ics` con las fechas del evento al email de c
 | Mensaje anclado chat | 11 | 11 | 0 | Socket flow verificado, TypeScript 0 errores |
 | Calendar .ics email | 7 | 7 | 0 | Mailpit verificado, adjunto valido |
 | Push token ban cleanup | 3 | 3 | 0 | Token limpiado, orden push→cleanup, sin token no falla |
-| **TOTAL** | **121+** | **121** | **1 corregido** | Plataforma solida — 468 tests automatizados |
+| Auditoria seguridad SEC-7 | 9 | 9 | 0 | URL injection, photo path, chat null guard |
+| Theme fields | 13 | 13 | 0 | Branding API, onboarding API, model defaults |
+| **TOTAL** | **143+** | **143** | **1 corregido** | Plataforma solida — 490 tests automatizados |
