@@ -140,6 +140,41 @@
 - **Fix:** useEffect con dependencia slowModeSeconds, clearInterval si <= 0
 - **Archivo:** ChatPanel.tsx
 
+### BUG-129: PollSlides estrellas rojas en Lux — accent del evento como color estrella (RESUELTO)
+- **Severidad:** MEDIA — estrellas se ven rojas/feas cuando accent del evento es rojo
+- **Causa:** StarRating usaba `accent` del evento como color de estrellas. Si accent=#ff0000, estrellas rojas. Ademas sombras `theme.shadow.sm` en Lux creaban cuadrados blancos feos.
+- **Fix:** Color gold fijo `#F5B740` para estrellas (no depende de accent). Sombras eliminadas de options y container. Blur Lux reducido de 60 a 10, fondo 95% opaco.
+- **Archivo:** `components/screens/PollSlides.tsx`
+
+### BUG-130: PinnedBanner invisible en ambos temas (RESUELTO)
+- **Severidad:** ALTA — mensaje anclado no se ve, feature roto visualmente
+- **Causa:** `surface.medium` es `rgba(255,255,255,0.04)` en Noir y `rgba(0,0,0,0.04)` en Lux — ambos invisibles. Ademas PinnedBanner creaba su PROPIO socket (conexion duplicada innecesaria).
+- **Fix:** Reescrito: recibe message/author como props (sin socket propio). Usa `surface.backgroundElevated` (visible). Integrado dentro de ChatPanel.tsx y session-chat/[id].tsx. Eliminado de session-stream/[id].tsx.
+- **Archivos:** `components/ui/PinnedBanner.tsx`, `components/screens/ChatPanel.tsx`, `app/(app)/session-chat/[id].tsx`, `app/(app)/session-stream/[id].tsx`
+
+### BUG-131: App crash RangeError status 0 cuando backend/socket cae (RESUELTO)
+- **Severidad:** CRITICA — app crashea con `RangeError: Failed to construct 'Response': status 0`
+- **Causa:** `fetch()` lanza error crudo cuando servidor no responde (network error, timeout). React Native intenta construir `Response` con status 0 (fuera del rango 200-599). React Query reintentaba el error crudo.
+- **Fix:** api.ts: catch en fetch → `ApiError(0, null, msg, 'NETWORK_ERROR')` tanto en `request()` como `upload()`. React Query retry inteligente: no reintenta 401/403/404/422, si reintenta network errors y 5xx hasta 2 veces.
+- **Archivos:** `lib/api.ts`, `app/_layout.tsx`
+
+### BUG-132: Mission Control poll form muestra opciones en star_rating/open_text (RESUELTO)
+- **Severidad:** MEDIA — UX confusa, inputs de opciones visibles cuando no aplican
+- **Causa:** Al cambiar tipo de encuesta en el selector, los inputs de "Opcion 1/2" no se ocultaban
+- **Fix:** `updatePollFormType()` oculta `#pollOptsContainer` y `#pollAddOpt` cuando tipo no es multiple_choice
+- **Archivo:** `public/mission-control/app.js`
+
+### BUG-133: Toast emoji engana — dice "activado" sin guardar (RESUELTO)
+- **Severidad:** MEDIA — moderador cree que emoji only esta activo pero no se guardo
+- **Causa:** Toggle mostraba toast inmediato pero el cambio solo se aplicaba al dar "Guardar" manualmente
+- **Fix:** Auto-save al togglear emoji only y slow mode (llama `saveConfig()` directamente)
+- **Archivo:** `public/mission-control/app.js`
+
+### BUG-134: Mission Control metricas se pierden al refrescar (PENDIENTE)
+- **Severidad:** MEDIA — msgCount vuelve a 0 al recargar pagina
+- **Causa:** Counter es variable JS client-side. Redis guarda ultimos 20 mensajes pero no el count total.
+- **Fix pendiente:** Redis INCR `chat:count:session:{id}` por mensaje. Leer al cargar MC.
+
 ### BUG-117: reload en Expo manda al onboarding (PENDIENTE)
 - **Severidad:** MEDIA — por investigar si es solo hot reload dev o afecta produccion
 - **Causa:** Desconocida. Posible que el token/session se pierda en reload.
@@ -720,15 +755,15 @@
 
 ## Resumen acumulado
 
-| Severidad | Count | Resueltos |
-|-----------|-------|-----------|
-| CRITICA | 13 | 13 |
-| ALTA | 19 | 19 |
-| MEDIA | 36+ | 36+ |
-| BAJA | 16+ | 16+ |
-| **Total** | **84+** | **84+** |
+| Severidad | Count | Resueltos | Pendientes |
+|-----------|-------|-----------|------------|
+| CRITICA | 14 | 14 | 0 |
+| ALTA | 20 | 20 | 0 |
+| MEDIA | 42+ | 41+ | 1 (BUG-134) |
+| BAJA | 16+ | 16+ | 0 |
+| **Total** | **92+** | **91+** | **1** |
 
-Todos los bugs listados estan corregidos. Zero bugs abiertos.
+Bugs pendientes: BUG-117 (reload onboarding), BUG-118 (push ban en onboarding), BUG-134 (metricas MC persist).
 
 ---
 

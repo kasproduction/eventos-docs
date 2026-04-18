@@ -14,6 +14,9 @@
 - [ ] Bug: reload en Expo manda al onboarding — verificar si es hot reload dev o flujo roto en produccion
 - [ ] Bug: notificacion de ban llega aunque usuario no inicio sesion / esta en onboarding — verificar push lifecycle
 - [ ] Session detail no tiene el aspecto visual de las otras pantallas (inconsistencia UI)
+- [x] Bug: PollSlides estrellas rojas en Lux — fix: color gold fijo #F5B740, sombras eliminadas (2026-04-18)
+- [x] Bug: PinnedBanner invisible (surface.medium = transparent) — fix: backgroundElevated + sin socket extra (2026-04-18)
+- [x] Bug: app crash RangeError status 0 cuando socket/backend cae — fix: ApiError NETWORK_ERROR + retry inteligente (2026-04-18)
 
 ### Features app pendientes
 - [ ] Speakers destacados deben rotar (carrusel o random en home)
@@ -55,12 +58,40 @@
 - [ ] Inbound: POST /api/v1/webhooks/checkin con API key
 - [ ] API keys por partner, rate limiting
 
-### Mission Control — Pulido visual
+### Mission Control v3 — Rediseno completo (2026-04-18)
 - [x] Backend + monitor + app + Filament — funcional completo
 - [x] Archivos separados (mission-control/index.html + styles.css + app.js)
 - [x] Streaming side-by-side, tabs Material Icons, Q&A/Polls/Chat/Custom
-- [ ] Pulido premium: muy blanco, sin depth. Necesita contraste, gradientes, micro-interacciones. Ref: Linear
-- [ ] Migrar toda interaccion publica a mission-control — crear enlaces con token por feature
+- [x] Rediseno Lumina Noir real (#0A0A0A), accent blanco, sin neons/glows
+- [x] About section debajo del stream (speaker, horario, escenario, descripcion)
+- [x] Stream 16:9 con YouTube iframe real
+- [x] Metrics con color (azul/verde/amber/teal), borde izquierdo
+- [x] Chat: nombres con 8 colores hash, badges MOD/SPEAKER, zebra, timestamps visibles
+- [x] Polls: 3 tipos (multiple_choice, star_rating, open_text) con crear/lanzar/cerrar
+- [x] Crear encuesta: modal overlay con selector de tipo, oculta opciones en star/text
+- [x] Emoji only + slow mode dentro del tab Chat (no universal)
+- [x] Auto-save al togglear emoji/slow (sin engano de toast)
+- [x] Proyeccion: boton Proyectar en polls, indicador bar, mini LED preview en sidebar
+- [x] Timeline client-side (log acciones moderador)
+- [x] Toast esquina superior derecha, ban confirm modal, pin modal con textarea + contador 500
+- [x] EN VIVO solo cuando socket conecta, OFFLINE por defecto
+- [x] Disconnect banner, save button estados, empty states
+- [x] MC_CONFIG expandido: speakers, description, room, type, starts_at, ends_at, event_name
+- [x] Socket: role en ChatMessagePayload (MOD/SPEAKER badges en chat RT)
+- [x] App: PinnedBanner reescrito (sin socket extra, usa useChat, visible en Noir+Lux)
+- [x] App: PollSlides estrellas gold fijo #F5B740, sin sombras Lux, blur reducido
+- [x] App: api.ts network error → ApiError(0, 'NETWORK_ERROR'), no crash en status 0
+- [x] App: React Query retry inteligente (no reintenta 401/403/404/422)
+
+#### Pendientes Mission Control
+- [ ] **Display LED session-level** — Ruta `/display/session/{id}?token=HMAC` + pagina HTML con socket listener. El moderador copia el enlace desde el preview LED y lo envia a produccion. Reemplaza el `/display/polls/{id}` actual (por poll individual). Necesita: ruta web.php + HTML/JS + socket events `display:project` / `display:stop` en socket server. ~4h
+- [ ] **Boton "Copiar enlace" en LED preview** — En el sidebar del MC, debajo del mini preview, boton que genera y copia la URL HMAC del display. El operador de la pantalla LED abre ese enlace en el browser de la pantalla.
+- [ ] **Persistencia metricas** — Redis counter `INCR chat:count:session:{id}` por mensaje. Al cargar MC, leer counter de Redis. Fallback: `SELECT COUNT` de MySQL. No usar AOF Redis (overkill para metricas informativas). ~30min
+- [ ] **Audiencia en vivo** — Socket broadcast count de conexiones al room al join/leave. `io.in(room).fetchSockets().length` → emit `session:audience`. ~30min
+- [ ] **Engagement real** — Definir formula: (mensajes + votos + preguntas) / audiencia * 100. Calcular client-side desde las otras metricas. ~15min
+- [ ] **Games tab** — 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity. Misma arquitectura que Polls pero con logica de juego. Depende de que exista el backend de juegos.
+- [ ] **Responsive tablet 1024px** — Pulir iPad landscape (backstage). Stream full width + control panel abajo en <1024px.
+- [ ] **Prototipo design/Monitor** — Ya esta desincronizado del production. No mantener, solo referencia historica.
 
 ---
 
