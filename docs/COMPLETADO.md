@@ -640,6 +640,22 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - App: ~15 commits (Fases 0-10, perf, session_types)
 - Docs: roadmap Lux v2, completado, pendientes
 
+## Tareas completadas previas (movidas de PENDIENTES 2026-04-17)
+
+- [x] Calendar sync boton visible — boton .ics en session detail (2026-04-16)
+- [x] SEC-6.1: Rate limit networking — 100/evento, 30/dia. 3 tests (2026-04-15)
+- [x] SEC-6.2: Rate limit endpoints escritura — Trait ChecksRateLimit, 23 tests (2026-04-15)
+- [x] Fix Reanimated warning — StatCard entering separado (2026-04-16)
+- [x] Mensaje anclado chat Twitch — socket pin/unpin, Redis TTL, chat monitor (2026-04-16)
+- [x] Componentes base + Theme tokens — GlassCard, GlassButton, etc (2026-04-16)
+- [x] Setup wizard evento Filament — 5 pasos, modulos, auto-crea (2026-04-15)
+- [x] Dev build + Push — probadas en dev build fisico (2026-04-15)
+- [x] Push reminders configurables — windows dinamicos, toggle, 19 tests (2026-04-15)
+- [x] Calendar invite .ics en email — WelcomeMail adjunta .ics (2026-04-16)
+- [x] ModuleMenu: elevation removida en Lux, borde sutil (evita frame negro en transiciones) (2026-04-17)
+- [x] TabScreenWrapper/ScreenWrapper: opacity removida (evita flash elevation Android) (2026-04-17)
+- [x] BottomSheet: prop forceNoir para gamificacion (2026-04-17)
+
 ### Totales 2026-04-16
 - Backend: 465 tests, 1168 assertions, 0 fallos
 - ~20 commits backend, ~20 commits app, 1 commit socket, 3 commits docs
