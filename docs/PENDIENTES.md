@@ -24,10 +24,17 @@
 - [x] Session Types configurables desde Filament (nombre, color)
 - Ver detalle en docs/COMPLETADO.md y docs/ROADMAP-LUX-V2.md
 
-### 4. Light Mode — pendientes menores
-- [ ] Back buttons en 7 pantallas (FAQ, Support, Anuncios, Mi Stand, Leads, Lead Detail, Scanner)
-- [ ] Perfil screen — migrar cards y textos a Lux
-- [ ] **NativeWind residuales**: ~13 archivos con className bg- (chat, polls, documentos, passport, banners, encuestas, pages, DynamicField, SplashLoader)
+### 4. Light Mode — pendientes menores — COMPLETADO (2026-04-17)
+- [x] Back buttons en 6 pantallas con shadow.md en Lux
+- [x] Perfil screen — cards, stats, avatar badge, inputs, sheet icons migrados
+- [x] NativeWind migrado: 12 archivos (173 className → StyleSheet)
+- [x] FormStep: accent removido de bordes/labels, solo rojo oscuro para errores
+- [x] DynamicField: reescrito completo sin accent
+- [x] Toast: texto adaptativo (era #fff invisible en Lux)
+- [x] Skeleton: contenedores backgroundSunken en Lux
+- [x] FAQ: cards, chips, contact buttons migrados
+- [x] Gamificacion: pantalla forzada Noir (dark island completa)
+- [x] HappeningNow/GamificationHud: sin shadow.lg (evita flash en crossfade)
 - [ ] **Backend Filament**: migration default_theme + primary_color_light, toggle en admin, API branding
 
 ### 5. Upgrade orbe FAQ a Skia shader — Media-Alta | 4-6h

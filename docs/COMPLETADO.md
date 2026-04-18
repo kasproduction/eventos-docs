@@ -213,6 +213,49 @@ Total: 42 security tests, 309 tests backend.
 - [x] 3 apendices extraidos: ANALISIS-COMPETITIVO.md, WEB-APP-PLAN.md, WHITE-LABEL.md
 - [x] PLAN-TAGS-MODULOS.md: plan arquitectura tags + visibilidad modulos (aprobado, pendiente implementar)
 
+## Lux v2 "The Gallery" — Light Mode completo (2026-04-17)
+
+### Tokens y sistema
+- [x] theme-lux.ts: tokens completos (surface, text, icon, shadow, categories, states, glass, skeleton, statusBar, overrides, semantic)
+- [x] useTheme() dinamico en ~85 archivos
+- [x] Session Types configurables desde Filament (nombre, color, sin hardcoded TYPE_COLORS)
+
+### Pantallas migradas Lux (12 fases)
+- [x] Tokens, Tab Bar, StatusBar, Onboarding, Home, Agenda, Session Detail, Speakers, Mi QR, Social, Sponsors, Networking, Leaderboard, About
+
+### Perfil Lux
+- [x] StatCard, DataCard, avatar badge, social icons, edit fields, bottom sheet icons — card pattern (#FFFFFF + shadow.sm)
+
+### Back buttons Lux (6 pantallas)
+- [x] FAQ, Support, Anuncios, Mi Stand, Leads, Lead Detail — shadow.md flotante
+
+### Cards Lux (5 pantallas)
+- [x] Anuncios, Mi Stand (7 cards), Lead Detail (5 cards), My Support — card pattern
+
+### NativeWind → StyleSheet (12 archivos, 173 className)
+- [x] ChatPanel, session-chat, QnAPanel, PollPanel, DynamicField, SplashLoader, banners, documentos, encuestas, passport, pages, BannerCarousel
+- [x] Pantallas siempre claras (opcion B), solo migracion sintaxis
+- [x] session-stream: no tocado (siempre dark)
+
+### Formularios sin accent
+- [x] FormStep: accent removido de bordes/labels/checkboxes, solo rojo oscuro (#B91C1C) para errores
+- [x] DynamicField: reescrito completo, labels neutros, checkboxes verdes, sin accent
+- [x] Switch trackColor: verde semantico (#22C55E) en vez de primaryColor
+
+### Componentes criticos
+- [x] LuminaToast: texto textTokens.white (era #FFFFFF invisible en Lux)
+- [x] Skeleton: contenedores backgroundSunken en Lux (era surface.low invisible)
+- [x] FAQ: chips ink activos, cards/contact/response con shadow.sm
+- [x] MyInterests: chips no seleccionados con shadow.sm + borderStrong
+- [x] DaySlide agenda: opacity removida (evita flash shadow Android)
+
+### Dark Islands (siempre Noir)
+- [x] Gamificacion/Desafio: pantalla completa forzada Noir (noirSurface/noirText importados)
+- [x] RGB_BORDER: 4px → 6px
+- [x] HappeningNow SessionCard: sin shadow.lg (evita flash en crossfade)
+- [x] GamificationHud: sin shadow.lg (idem)
+- [x] Componentes dark island documentados: HappeningNow, VendorHappeningNow, GamificationHud, VendorGamificationHud, Mi QR badge, MomentosViewer, PhotoViewer, QR modal, Scanner, Streaming
+
 ## Moderacion chat completa (2026-04-12)
 
 - [x] Ban real-time via socket (/internal/ban/enforce → ban:enforced → app /banned)

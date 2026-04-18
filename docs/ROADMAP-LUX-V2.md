@@ -105,9 +105,17 @@ shadowOpacity: 0.10
 | 12 | About (back button) | COMPLETADO (parcial) |
 
 ### Pendientes menores
-- [ ] Back buttons en 7 pantallas restantes (FAQ, Support, Anuncios, Mi Stand, Leads, Lead Detail, Scanner)
-- [ ] Perfil screen — migrar cards y textos
-- [ ] NativeWind residuales (~13 archivos con className bg-)
+- [x] Back buttons en 6 pantallas (FAQ, Support, Anuncios, Mi Stand, Leads, Lead Detail) — shadow.md en Lux (2026-04-17)
+- [x] Perfil screen — cards, stats, avatar badge, social icons, edit fields, sheet icons (2026-04-17)
+- [x] Cards Lux en Anuncios, Mi Stand, Leads, Lead Detail, My Support — shadow.sm (2026-04-17)
+- [x] MyInterests chips — shadow.sm + borderStrong en Lux (2026-04-17)
+- [x] FAQ completo — chips ink, question/response/contact cards shadow.sm (2026-04-17)
+- [x] Skeleton contenedores — backgroundSunken en Lux (2026-04-17)
+- [x] LuminaToast texto — textTokens.white (era #FFFFFF invisible en Lux) (2026-04-17)
+- [x] NativeWind migrado: 12 archivos (173 className → StyleSheet). Solo session-stream queda (siempre dark) (2026-04-17)
+- [x] FormStep: accent removido de bordes/labels/checkboxes, solo rojo para errores (2026-04-17)
+- [x] DynamicField: reescrito completo, accent removido, tokens neutros (2026-04-17)
+- [x] BannerCarousel: dots migrados a StyleSheet (2026-04-17)
 - [ ] Tab Bar polish con @callstack/liquid-glass cuando soporte Expo
 
 ---
