@@ -1,7 +1,7 @@
 # ROADMAP — Mission Control (Moderador)
 
 **Fecha:** 2026-04-17
-**Estado:** Backend + Monitor Web + HMAC COMPLETOS. App toggles pendiente.
+**Estado:** Backend + Monitor Web + HMAC + App toggles COMPLETOS. Filament pendiente.
 **Objetivo:** Panel web donde el moderador controla toda la interaccion en vivo de una sesion
 
 ---
@@ -93,38 +93,17 @@ Filament (admin)
 
 ---
 
+### Fase 2 — App reacciona a toggles (2026-04-17) COMPLETADO
+
+- [x] `useSessionConfig` hook: fetch GET /live-config + socket `session:config_updated`
+- [x] Panel activo derivado del config RT (chat/Q&A/polls/custom/none)
+- [x] `chat_enabled=false` → DisabledBanner "Interaccion desactivada por el moderador"
+- [x] `emoji_only=true` → ChatPanel muestra solo strip emojis, oculta TextInput
+- [x] `custom_enabled=true` → CustomPanel WebView con URL embebida
+- [x] PinnedBanner solo visible cuando chat activo
+- [x] Fallback a initial `interactive_mode` si config no ha cargado
+
 ## Pendiente
-
-### Fase 2 — App reacciona a toggles (~2-3h)
-
-#### 2.1 Socket listener
-- [ ] `useChat` hook: escuchar `session:config_updated`
-- [ ] Guardar config en estado local del hook
-- [ ] Fetch inicial: `GET /events/{id}/sessions/{id}/live-config` al montar
-
-#### 2.2 Chat toggle
-- [ ] `chat_enabled=false` → ocultar TextInput, mostrar banner "Chat desactivado por el moderador"
-- [ ] `chat_enabled=true` → restaurar input normal
-
-#### 2.3 Emoji only
-- [ ] `emoji_only=true` → input desaparece, solo strip de emojis visible
-- [ ] `emoji_only=false` → input + emojis normal
-
-#### 2.4 Q&A toggle
-- [ ] `qna_enabled=false` → ocultar tab Q&A en streaming, mostrar "Preguntas cerradas"
-- [ ] `qna_enabled=true` → tab Q&A visible
-
-#### 2.5 Polls toggle
-- [ ] `polls_enabled=false` → ocultar tab Polls, no mostrar encuestas
-- [ ] `polls_enabled=true` → tab Polls visible
-
-#### 2.6 Custom toggle
-- [ ] `custom_enabled=true` → mostrar WebView/iframe con custom_url
-- [ ] `custom_enabled=false` → ocultar WebView
-
-#### 2.7 Slow mode
-- [ ] Leer `slow_mode_seconds` del config en vez del config global del evento
-- [ ] Mostrar countdown en input si slow mode activo
 
 ### Fase 3 — Filament integration (~1h)
 
@@ -136,6 +115,10 @@ Filament (admin)
 - [ ] Accion "Abrir monitor" en tabla de sesiones
 - [ ] Genera URL con token HMAC y abre en nueva ventana
 
+#### 3.3 Slow mode countdown en app
+- [ ] Leer `slow_mode_seconds` del config en vez del config global del evento
+- [ ] Mostrar countdown en input si slow mode activo
+
 ---
 
 ## Estimacion total
@@ -145,7 +128,7 @@ Filament (admin)
 | Backend | COMPLETADO | 20 tests, 46 assertions |
 | Monitor Web | COMPLETADO | ~600 lineas HTML/CSS/JS |
 | HMAC Access | COMPLETADO | Ruta publica con token temporal |
-| Fase 2 — App toggles | 2-3h | Pendiente |
+| Fase 2 — App toggles | COMPLETADO | useSessionConfig + panels RT |
 | Fase 3 — Filament | 1h | Pendiente |
 | **Total restante** | **3-4h** | — |
 
