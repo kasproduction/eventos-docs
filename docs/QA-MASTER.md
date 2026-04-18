@@ -1,7 +1,8 @@
 # QA Master — Barrido Completo de Plataforma
 
 > Auditoria endpoint por endpoint de todos los modulos.
-> Actualizado: 2026-04-16 | Metodo: curl real + tests automatizados (465 tests, 1168 assertions)
+> Actualizado: 2026-04-17 | Metodo: curl real + tests automatizados (468 tests, 1177 assertions)
+> IMPORTANTE: Socket server debe estar corriendo para real-time (agenda, chat, pinned, branding). Iniciar con: cd eventos-socket && npx ts-node src/index.ts
 
 ---
 
@@ -660,6 +661,7 @@ Todo via Socket.IO — zero endpoints backend, zero DB. Redis almacena 1 pinned 
 | PinnedBanner no reduce player (dentro del flex:1) | OK |
 | X dismiss es local (no broadcast) | OK |
 | Nuevo pin resetea dismiss | OK |
+| **Prueba manual usuario (2026-04-16)** | **OK — agenda RT funciona con socket, pinned visible, Lumina Noir** |
 
 ---
 
@@ -702,6 +704,39 @@ WelcomeMail ahora adjunta archivo `.ics` con las fechas del evento al email de c
 
 ---
 
+## 26. Push Token Cleanup al Banear (2026-04-17)
+
+**Bug original:** usuario baneado seguia recibiendo push notifications porque `expo_push_token` no se limpiaba.
+
+**Fix:** al crear ban (API + Filament), se envia push de notificacion "Acceso suspendido" y luego se limpia el token.
+
+### Flujo
+
+1. Admin banea usuario (API `POST /admin/attendees/{id}/ban` o Filament)
+2. Se crea `AttendeeBan` en BD
+3. Se envia push "Acceso suspendido" con el token actual
+4. Se limpia `expo_push_token = null` en attendee
+5. Se envia email `BannedMail` + socket `ban:enforced`
+6. Usuario no recibe mas push despues del ban
+
+### Tests automatizados (3 tests, 9 assertions)
+
+| Test | Que verifica |
+|------|-------------|
+| `ban limpia expo_push_token` | Token es null despues del ban |
+| `ban envia push ANTES de limpiar token` | Push se despacha con token original, luego se limpia |
+| `ban sin push token no falla` | Si usuario no tenia token, no crashea ni despacha push |
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `BanController.php` | `$attendee->update(['expo_push_token' => null])` despues del push |
+| `AttendeeAdminResource.php` | Mismo cleanup en accion ban de Filament |
+| `BanTest.php` | 3 tests nuevos (15 totales, 53 assertions) |
+
+---
+
 ## Estado final QA
 
 | Categoria | Total | OK | Bugs | Notas |
@@ -717,4 +752,5 @@ WelcomeMail ahora adjunta archivo `.ics` con las fechas del evento al email de c
 | Push Reminders | 19 | 19 | 0 | 5 unit + 14 feature (dedup, spam, multi-evento) |
 | Mensaje anclado chat | 11 | 11 | 0 | Socket flow verificado, TypeScript 0 errores |
 | Calendar .ics email | 7 | 7 | 0 | Mailpit verificado, adjunto valido |
-| **TOTAL** | **118+** | **118** | **1 corregido** | Plataforma solida — 465 tests automatizados |
+| Push token ban cleanup | 3 | 3 | 0 | Token limpiado, orden push→cleanup, sin token no falla |
+| **TOTAL** | **121+** | **121** | **1 corregido** | Plataforma solida — 468 tests automatizados |
