@@ -1,7 +1,7 @@
 # ROADMAP — Mission Control (Moderador)
 
 **Fecha:** 2026-04-17
-**Estado:** Backend + Monitor Web + HMAC + App toggles COMPLETOS. Filament pendiente.
+**Estado:** TODAS LAS FASES COMPLETAS. Pendiente: pulido visual monitor.
 **Objetivo:** Panel web donde el moderador controla toda la interaccion en vivo de una sesion
 
 ---
@@ -103,21 +103,11 @@ Filament (admin)
 - [x] PinnedBanner solo visible cuando chat activo
 - [x] Fallback a initial `interactive_mode` si config no ha cargado
 
-## Pendiente
+### Fase 3 — Filament integration (2026-04-17) COMPLETADO
 
-### Fase 3 — Filament integration (~1h)
-
-#### 3.1 SessionResource
-- [ ] Campos live config en edit page (toggles)
-- [ ] Solo visible cuando sesion tiene streaming
-
-#### 3.2 Boton monitor
-- [ ] Accion "Abrir monitor" en tabla de sesiones
-- [ ] Genera URL con token HMAC y abre en nueva ventana
-
-#### 3.3 Slow mode countdown en app
-- [ ] Leer `slow_mode_seconds` del config en vez del config global del evento
-- [ ] Mostrar countdown en input si slow mode activo
+- [x] Seccion "Mission Control — Config en vivo" en edit page: toggles chat/Q&A/polls/custom, emoji_only, slow_mode, custom_url
+- [x] Boton "Monitor" en tabla con URL HMAC (reemplaza antiguo boton "Chat")
+- [x] Abre Mission Control en nueva ventana sin crear tokens innecesarios
 
 ---
 
@@ -129,7 +119,13 @@ Filament (admin)
 | Monitor Web | COMPLETADO | ~600 lineas HTML/CSS/JS |
 | HMAC Access | COMPLETADO | Ruta publica con token temporal |
 | Fase 2 — App toggles | COMPLETADO | useSessionConfig + panels RT |
-| Fase 3 — Filament | 1h | Pendiente |
+| Fase 3 — Filament | COMPLETADO | Boton HMAC + live config section |
+| Bug fixes | COMPLETADO | 7 bugs corregidos (XSS, race, socket) |
+
+## Pendiente menor
+
+- [ ] Pulido visual monitor: iconos en vez de emojis, responsive tablet, colores sin neon
+- [ ] Slow mode countdown en app (leer slow_mode_seconds del config por sesion)
 | **Total restante** | **3-4h** | — |
 
 ---
