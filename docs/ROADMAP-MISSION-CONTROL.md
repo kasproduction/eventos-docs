@@ -122,17 +122,25 @@ Filament (admin)
 | Fase 3 — Filament | COMPLETADO | Boton HMAC + live config section |
 | Bug fixes | COMPLETADO | 7 bugs corregidos (XSS, race, socket) |
 
-## Pendiente menor
+## Pendiente
 
-- [ ] Pulido visual monitor: iconos en vez de emojis, responsive tablet, colores sin neon
-- [ ] Slow mode countdown en app (leer slow_mode_seconds del config por sesion)
+### Pulido visual premium
+- [ ] Muy blanco, sin depth — necesita contraste, gradientes sutiles, sombras mas pronunciadas
+- [ ] Micro-interacciones hover, mejor jerarquia visual. Referencia: Linear dashboard
+- [ ] Q&A cards centradas 720px max-width (ya en CSS, verificar render)
+- [ ] Polls barras necesitan mas feedback visual animado
+
+### Migracion a Mission Control unificado
+- [ ] Migrar toda interaccion publica a mission-control — crear enlaces con token por feature
+- [ ] Display publico proyectable (pantalla venue) como modulo separado
 | **Total restante** | **3-4h** | — |
 
 ---
 
 ## Notas tecnicas
 
-- El monitor es HTML standalone — no React, no build. Socket.IO client + fetch API + CSS variables.
+- El monitor son 3 archivos separados: mission-control/index.html + styles.css + app.js
+- La ruta /monitor/{sessionId} inyecta __MC_CONFIG__ con token Sanctum en el HTML
 - Los toggles radio afectan SOLO la sesion especifica, no todo el evento.
 - Si el socket esta offline, la config se guarda en BD y la app la lee en el siguiente fetch.
 - `slow_mode_seconds` por sesion sobreescribe `chat_slow_mode_seconds` del evento.

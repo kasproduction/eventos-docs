@@ -2,14 +2,22 @@
 
 > La UNICA fuente de verdad de lo que falta por hacer.
 > Organizado por area de trabajo, no por prioridad.
-> Actualizado: 2026-04-17
-> Backend: 465 tests, 1168 assertions
+> Actualizado: 2026-04-18
+> Backend: 488+ tests
 > Fuentes cruzadas: ROADMAP-UIUX-LANDING.md, WEB-APP-PLAN.md, EventOS_Roadmap.md
 
 ---
 
 ## App movil
 
+### Bugs reportados (2026-04-18)
+- [ ] Bug: reload en Expo manda al onboarding — verificar si es hot reload dev o flujo roto en produccion
+- [ ] Bug: notificacion de ban llega aunque usuario no inicio sesion / esta en onboarding — verificar push lifecycle
+- [ ] Session detail no tiene el aspecto visual de las otras pantallas (inconsistencia UI)
+
+### Features app pendientes
+- [ ] Speakers destacados deben rotar (carrusel o random en home)
+- [ ] Racha de visitas a la app (streak gamification — dia consecutivo = bonus puntos)
 
 ### Orbe FAQ a Skia shader — Media-Alta | 4-6h
 - [ ] Reemplazar Reanimated+BlurView por @shopify/react-native-skia (solo componente OrbBlob cambia)
@@ -47,13 +55,31 @@
 - [ ] Inbound: POST /api/v1/webhooks/checkin con API key
 - [ ] API keys por partner, rate limiting
 
-### Mission Control — Display en vivo
-- [ ] Web standalone (HTML + Socket.IO + GSAP), contador RT, feed actividad
-- [ ] Auth: token admin o URL con secret. Responsive 1920x1080 + 1280x720
+### Mission Control — Pulido visual
+- [x] Backend + monitor + app + Filament — funcional completo
+- [x] Archivos separados (mission-control/index.html + styles.css + app.js)
+- [x] Streaming side-by-side, tabs Material Icons, Q&A/Polls/Chat/Custom
+- [ ] Pulido premium: muy blanco, sin depth. Necesita contraste, gradientes, micro-interacciones. Ref: Linear
+- [ ] Migrar toda interaccion publica a mission-control — crear enlaces con token por feature
 
 ---
 
 ## Backend / Admin
+
+### Sponsors — Log de actividad + estadisticas
+- [ ] Log por sponsor: quien escaneo lead, quien exporto, cuando, desde donde
+- [ ] Leads estadisticas diarias (no solo totales) — grafico por dia
+- [ ] Dashboard al hacer click en un sponsor — metricas engagement
+
+### Sesiones — Estadisticas post-sesion
+- [ ] Cuantos ingresaron al streaming, duracion promedio, engagement (chat/Q&A/polls)
+- [ ] Vista resumen al finalizar sesion (Filament + posible API)
+
+### Uptime / Monitoreo
+- [ ] Health check endpoint, uptime monitoring, alertas cuando cae
+
+### Rendimiento — Verificar carga encuestas
+- [ ] Verificar que Q&A + polls no generen polling oculto que afecte rendimiento servidor
 
 ### Analytics Dashboard (1.C1)
 - [ ] Filament dashboard: ROI, engagement, asistencia, sponsors, leads
