@@ -1,7 +1,7 @@
 # ROADMAP — Mission Control (Moderador)
 
 **Fecha:** 2026-04-17
-**Estado:** Backend completo, monitor + app pendientes
+**Estado:** Backend + Monitor Web + HMAC COMPLETOS. App toggles pendiente.
 **Objetivo:** Panel web donde el moderador controla toda la interaccion en vivo de una sesion
 
 ---
@@ -9,26 +9,18 @@
 ## Contexto
 
 ### Que existe hoy
-- **chat-monitor.html** (475 lineas): panel standalone para moderar chat de una sesion. Muestra mensajes RT, eliminar, banear usuario, anclar mensaje, slow mode, velocidad de cola. Sidebar con lista de baneados. Conecta via Socket.IO con auth por token admin.
-- **Filament**: gestionar polls (crear, lanzar, cerrar), Q&A (aprobar/rechazar preguntas), chat config (palabras bloqueadas, slow mode global). Todo disperso en diferentes recursos.
-- **App**: chat, Q&A y polls como tabs en pantalla streaming. Cada uno tiene su panel (ChatPanel, QnAPanel, PollPanel). Slow mode global por evento (`chat_slow_mode_seconds`).
-- **Socket**: endpoints internos para chat delete, ban, pin/unpin, poll broadcast, Q&A broadcast, data invalidation, networking notify, staff notify.
+- **Mission Control HTML** (chat-monitor.html): panel unificado con control bar (Chat/Q&A/Polls/Custom), toggles independientes (Emoji Only, Slow Mode), boton GUARDAR. Diseno Lumina Noir con PlusJakartaSans + Urbanist, accent TEAL #39d2c0.
+- **Backend**: SessionConfigController con 7 campos live config (chat_enabled, qna_enabled, polls_enabled, emoji_only, slow_mode_seconds, custom_enabled, custom_url). Socket broadcast RT.
+- **HMAC access**: `/monitor/{sessionId}?token={hmac}` genera token temporal y redirige al monitor. Sin login Filament.
 
-### El problema
-El moderador tiene que usar 3 herramientas diferentes para controlar una sesion en vivo:
-1. Chat monitor (HTML) para chat
-2. Filament para lanzar/cerrar polls
-3. Filament para aprobar preguntas Q&A
+### El problema resuelto
+El moderador tenia que usar 3 herramientas diferentes. Ahora Mission Control unifica todo en un solo panel con toggles radio (Chat OR Q&A OR Polls OR Custom) + boton GUARDAR que persiste y emite socket RT.
 
-No puede apagar/prender features en tiempo real. Si el chat se descontrola, no hay boton "apagar chat" — tiene que banear uno por uno o pausar desde config del evento (afecta TODAS las sesiones).
-
-### La solucion
-Un solo panel "Mission Control" por sesion con:
-- Todo lo del chat monitor actual
-- Q&A: aprobar/rechazar en RT (sin abrir Filament)
-- Polls: lanzar/cerrar desde ahi
-- Toggles: apagar/prender chat, Q&A, polls, emoji-only, slow mode — por sesion, en RT
-- Acceso con token HMAC — moderador abre desde cualquier browser sin login
+### Seguridad Custom Embed
+- Solo HTTPS
+- Whitelist de dominios por defecto (slides.com, docs.google.com, miro.com, mentimeter.com, slido.com, youtube.com, vimeo.com, figma.com, canva.com, pitch.com, prezi.com, kahoot.it, ahaslides.com)
+- Dominios custom por evento (allowed_embed_domains en events table)
+- iframe con sandbox="allow-scripts allow-popups allow-forms" + referrerpolicy="no-referrer"
 
 ---
 
@@ -44,10 +36,15 @@ Filament (admin)
                     ┌─────────────────────────┐
                     │    MISSION CONTROL       │
                     │                         │
-                    │  [Chat] [Q&A] [Polls]   │
-                    │  [Config toggles]       │
-                    │  [Asistentes: 234]      │
+                    │  Control Bar:            │
+                    │  [Chat][Q&A][Polls]      │
+                    │  [Custom][Emoji][Slow]   │
+                    │         [GUARDAR]        │
+                    │                         │
+                    │  Panel activo abajo      │
                     └──────────┬──────────────┘
+                               |
+                    PATCH /admin/sessions/{id}/live-config
                                |
                     Socket.IO (session:config_updated)
                                |
@@ -56,9 +53,8 @@ Filament (admin)
                     │                         │
                     │  chat_enabled=false →    │
                     │  oculta input            │
-                    │                         │
-                    │  emoji_only=true →       │
-                    │  solo emojis             │
+                    │  custom_enabled=true →   │
+                    │  muestra iframe          │
                     └─────────────────────────┘
 ```
 
@@ -68,57 +64,36 @@ Filament (admin)
 
 ### Backend (2026-04-17)
 - [x] Migration: `chat_enabled`, `qna_enabled`, `polls_enabled`, `emoji_only`, `slow_mode_seconds` en `event_sessions`
+- [x] Migration: `custom_enabled`, `custom_url` en `event_sessions` + `allowed_embed_domains` en `events`
 - [x] Model: fillable + casts boolean/integer
-- [x] `SessionConfigController`: GET/PATCH admin + GET public
+- [x] `SessionConfigController`: GET/PATCH admin + GET public + custom_url validation + domain whitelist
 - [x] Rutas: `PATCH /admin/sessions/{id}/live-config` + `GET /events/{id}/sessions/{id}/live-config`
-- [x] Socket: `/internal/session-config` → broadcast `session:config_updated` a todo el event room
-- [x] 12 tests (defaults, toggles, validation, auth, public read) — 31 assertions
+- [x] Socket: `/internal/session-config` → broadcast `session:config_updated` (spread generico, propaga todos los campos)
+- [x] 20 tests (defaults, toggles, validation, auth, public read, custom URL, domain whitelist) — 46 assertions
+
+### Monitor Web (2026-04-17)
+- [x] Restructurado como Mission Control con control bar + panels
+- [x] Toggle radio: Chat / Q&A / Polls / Custom (uno activo a la vez)
+- [x] Toggles independientes: Emoji Only (switch) + Slow Mode (select)
+- [x] Boton GUARDAR → PATCH live-config → socket broadcast
+- [x] Panel Chat: mensajes RT, ban, delete, pin/unpin, velocidad cola, sidebar baneados
+- [x] Panel Q&A: fetch pending, socket RT (question:submitted/approved/answered), filtros pending/approved/answered, botones aprobar/descartar/respondida
+- [x] Panel Polls: fetch por evento, filtro session_id, barras porcentaje RT (poll:updated), lanzar draft, cerrar activa, ver resultados, soporta multiple_choice + star_rating + open_text
+- [x] Panel Custom: input URL HTTPS, preview iframe con sandbox, validacion visual
+- [x] Header Lumina Noir: MISSION CONTROL brand, session name, stats, pill conexion
+- [x] Diseno: PlusJakartaSans + Urbanist, accent TEAL, dark mode, CSS variables
+- [x] Fetch inicial config al cargar (restaura estado actual)
+
+### HMAC Access (2026-04-17)
+- [x] Ruta: `GET /monitor/{sessionId}?token={hmac}` en web.php
+- [x] HMAC: `hash_hmac('sha256', sessionId|eventId, APP_QR_SECRET)`
+- [x] Genera token Sanctum temporal (12h) para API calls
+- [x] Redirige a chat-monitor.html con todos los params
+- [x] Sin login Filament necesario
 
 ---
 
 ## Pendiente
-
-### Fase 1 — Monitor Web (~4-6h)
-
-#### 1.1 Tab system
-- [ ] Agregar tabs al chat-monitor.html: Chat | Q&A | Polls | Config
-- [ ] Chat existente se mueve al tab Chat (ya funciona)
-- [ ] Estado activo visual en tab seleccionado
-
-#### 1.2 Tab Q&A
-- [ ] Socket: escuchar `question:new`, `question:approved`, `question:answered`
-- [ ] Lista de preguntas con estado (pendiente/aprobada/respondida)
-- [ ] Botones: aprobar, rechazar, marcar respondida
-- [ ] API calls: `POST /admin/questions/{id}/approve`, `POST /admin/questions/{id}/dismiss`
-- [ ] Contador preguntas pendientes en tab badge
-
-#### 1.3 Tab Polls
-- [ ] Mostrar encuesta activa con barras de resultados RT
-- [ ] Boton lanzar encuesta (lista de polls disponibles)
-- [ ] Boton cerrar encuesta activa
-- [ ] API calls: `POST /admin/polls/{id}/start`, `POST /admin/polls/{id}/close`
-
-#### 1.4 Tab Config (toggles)
-- [ ] Toggle Chat ON/OFF → `PATCH /admin/sessions/{id}/live-config { chat_enabled }`
-- [ ] Toggle Q&A ON/OFF → `PATCH { qna_enabled }`
-- [ ] Toggle Polls ON/OFF → `PATCH { polls_enabled }`
-- [ ] Toggle Emoji Only → `PATCH { emoji_only }`
-- [ ] Slider/buttons Slow Mode (0/5/10/30s) → `PATCH { slow_mode_seconds }`
-- [ ] Estado visual: toggle verde=ON, rojo=OFF
-- [ ] Cada toggle emite socket → app reacciona en RT
-
-#### 1.5 Header mejorado
-- [ ] Contador asistentes conectados (socket room count)
-- [ ] Nombre sesion + estado (live/upcoming/ended)
-- [ ] Indicador conexion socket (dot verde/rojo)
-
-#### 1.6 Acceso con token HMAC
-- [ ] Generar token: `hmac_sha256(sessionId + eventId, APP_QR_SECRET)`
-- [ ] Ruta publica: `GET /monitor/{sessionId}?token={hmac}` → sirve HTML si valido
-- [ ] Sin login Filament necesario — moderador abre desde cualquier browser
-- [ ] Token valido solo para esa sesion
-
----
 
 ### Fase 2 — App reacciona a toggles (~2-3h)
 
@@ -143,11 +118,13 @@ Filament (admin)
 - [ ] `polls_enabled=false` → ocultar tab Polls, no mostrar encuestas
 - [ ] `polls_enabled=true` → tab Polls visible
 
-#### 2.6 Slow mode
+#### 2.6 Custom toggle
+- [ ] `custom_enabled=true` → mostrar WebView/iframe con custom_url
+- [ ] `custom_enabled=false` → ocultar WebView
+
+#### 2.7 Slow mode
 - [ ] Leer `slow_mode_seconds` del config en vez del config global del evento
 - [ ] Mostrar countdown en input si slow mode activo
-
----
 
 ### Fase 3 — Filament integration (~1h)
 
@@ -158,41 +135,27 @@ Filament (admin)
 #### 3.2 Boton monitor
 - [ ] Accion "Abrir monitor" en tabla de sesiones
 - [ ] Genera URL con token HMAC y abre en nueva ventana
-- [ ] Tooltip: "Abre el panel de control en vivo para esta sesion"
 
 ---
 
 ## Estimacion total
 
-| Fase | Esfuerzo | Dependencia |
-|------|----------|-------------|
-| Backend | COMPLETADO | — |
-| Fase 1 — Monitor Web | 4-6h | Backend (listo) |
-| Fase 2 — App toggles | 2-3h | Backend + Socket (listos) |
-| Fase 3 — Filament | 1h | Backend (listo) |
-| **Total restante** | **7-10h** | — |
-
----
-
-### Fase 4 — Diseño Lumina Noir (~2-3h)
-
-#### 4.1 Identidad visual
-- [ ] Fuentes: PlusJakartaSans (titulos) + Urbanist (body) — via Google Fonts CDN
-- [ ] Fondo: #0a0a0c base, cards con rgba(255,255,255,0.03), bordes rgba(255,255,255,0.06)
-- [ ] Accent TEAL #39d2c0 para elementos activos, badges, toggles ON
-- [ ] Tipografia: sin titulos genericos, labels uppercase 10px tracking-wide
-- [ ] Iconos: Material Icons o emojis inline, NO texto plano para acciones
-- [ ] Tabs: estilo pill con active glow, no tabs de browser
-- [ ] Toggles: switch visual con animacion, no checkboxes HTML
-- [ ] Cards Q&A/Polls: mismo border-radius 14px, gap 6px, hover sutil
-- [ ] Responsive: funcional en tablet (moderador en venue) + laptop
+| Fase | Esfuerzo | Estado |
+|------|----------|--------|
+| Backend | COMPLETADO | 20 tests, 46 assertions |
+| Monitor Web | COMPLETADO | ~600 lineas HTML/CSS/JS |
+| HMAC Access | COMPLETADO | Ruta publica con token temporal |
+| Fase 2 — App toggles | 2-3h | Pendiente |
+| Fase 3 — Filament | 1h | Pendiente |
+| **Total restante** | **3-4h** | — |
 
 ---
 
 ## Notas tecnicas
 
-- El monitor es HTML standalone — no React, no build. Socket.IO client + fetch API + CSS puro.
-- Los toggles afectan SOLO la sesion especifica, no todo el evento.
+- El monitor es HTML standalone — no React, no build. Socket.IO client + fetch API + CSS variables.
+- Los toggles radio afectan SOLO la sesion especifica, no todo el evento.
 - Si el socket esta offline, la config se guarda en BD y la app la lee en el siguiente fetch.
-- El chat monitor existente (475 lineas) es la base — se expande, no se reescribe.
 - `slow_mode_seconds` por sesion sobreescribe `chat_slow_mode_seconds` del evento.
+- Custom embed: solo HTTPS, whitelist dominios, iframe sandboxed.
+- HMAC token es one-way (no se puede derivar el secret), timing-safe comparison con hash_equals.
