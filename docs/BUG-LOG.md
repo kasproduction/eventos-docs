@@ -90,6 +90,56 @@
 - **Fix parcial:** Migrar a useTheme(). Accent cambiado a #1A1A1A. Falta pulido visual.
 - **Archivo:** PollSlides.tsx, PollPanel.tsx, QnAPanel.tsx
 
+### BUG-119: onclick inline en lista baneados del monitor (RESUELTO)
+- **Severidad:** MEDIA — anti-pattern XSS, onclick con datos dinamicos
+- **Fix:** Event delegation con data-aid en bannedList
+- **Archivo:** mission-control/app.js
+
+### BUG-120: onclick inline en botones Q&A moderacion (RESUELTO)
+- **Severidad:** MEDIA — onclick con q.id y status en strings HTML
+- **Fix:** Event delegation con data-qid y data-status en qnaList
+- **Archivo:** mission-control/app.js
+
+### BUG-121: API response sin validacion de shape en config load (RESUELTO)
+- **Severidad:** MEDIA — si API retorna shape inesperado, falla silenciosamente
+- **Fix:** Validar r.data existe y es object antes de usar
+- **Archivo:** mission-control/app.js, useSessionConfig.ts
+
+### BUG-122: Poll results sin validacion de shape (RESUELTO)
+- **Severidad:** MEDIA — si r.questions no existe, rendering crashea
+- **Fix:** Verificar r && r.questions antes de cachear
+- **Archivo:** mission-control/app.js
+
+### BUG-123: custom_enabled + interactive_mode coexisten sin validacion (RESUELTO)
+- **Severidad:** BAJA — estado inconsistente en BD
+- **Fix:** Si custom_enabled=true, forzar interactive_mode=none en controller
+- **Archivo:** SessionConfigController.php
+
+### BUG-124: evento inactivo permite abrir monitor (RESUELTO)
+- **Severidad:** MEDIA — monitor funciona en eventos pausados/cancelados
+- **Fix:** Verificar event.is_active antes de generar token
+- **Archivo:** routes/web.php
+
+### BUG-125: sesiones soft-deleted no excluidas en ruta monitor (RESUELTO)
+- **Severidad:** ALTA — podria servir monitor de sesion eliminada
+- **Fix:** Usar withoutTrashed() explicito en findOrFail
+- **Archivo:** routes/web.php
+
+### BUG-126: token flood en personal_access_tokens (RESUELTO)
+- **Severidad:** MEDIA — cada visita al monitor creaba token sin limpiar
+- **Fix:** Eliminar tokens MC anteriores de la misma sesion antes de crear nuevo
+- **Archivo:** routes/web.php
+
+### BUG-127: response unwrapping incorrecto en useSessionConfig (RESUELTO)
+- **Severidad:** ALTA — fallback resp podria mergear shape incorrecto al config
+- **Fix:** Usar resp?.data con validacion typeof object
+- **Archivo:** useSessionConfig.ts
+
+### BUG-128: cooldown no se limpia cuando slowModeSeconds cambia a 0 (RESUELTO)
+- **Severidad:** MEDIA — usuario queda con countdown activo aunque admin desactivo slow mode
+- **Fix:** useEffect con dependencia slowModeSeconds, clearInterval si <= 0
+- **Archivo:** ChatPanel.tsx
+
 ### BUG-117: reload en Expo manda al onboarding (PENDIENTE)
 - **Severidad:** MEDIA — por investigar si es solo hot reload dev o afecta produccion
 - **Causa:** Desconocida. Posible que el token/session se pierda en reload.
