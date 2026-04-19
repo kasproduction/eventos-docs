@@ -83,15 +83,23 @@
 - [x] App: api.ts network error → ApiError(0, 'NETWORK_ERROR'), no crash en status 0
 - [x] App: React Query retry inteligente (no reintenta 401/403/404/422)
 
+#### Completado Mission Control (2026-04-19)
+- [x] **Display LED session-level** — `/display/session/{id}?token=HMAC`, Lumina Noir, socket RT, persistencia Redis (sobrevive refresh)
+- [x] **Boton copiar enlace LED** — Sidebar MC, fallback execCommand para HTTP
+- [x] **Persistencia metricas** — Redis INCR por mensaje, `session:metrics` al join
+- [x] **Audiencia en vivo** — `session:audience` broadcast debounce 500ms en join/leave
+- [x] **Engagement real** — (mensajes + preguntas) / audiencia * 100, client-side cada 5s
+- [x] **Display premium** — Counters animados, ranking visual, star track bar, open text cola 1.8s, fade entre proyecciones
+- [x] **Q&A proyectable** — Boton Proyectar en preguntas aprobadas/respondidas, render alineado izquierda, autor bottom-right
+- [x] **Moderacion open text** — `is_approved` en live_poll_votes, modal MC con aprobar/rechazar/batch, blocked words, display solo muestra aprobadas
+- [x] **Timeline persistente** — localStorage por sesion, sobrevive refresh
+- [x] **YouTube interactivo** — pointer-events:none en overlay, controles accesibles
+- [x] **13 bugs corregidos** — BUG-135 a BUG-147 (ver BUG-LOG.md)
+
 #### Pendientes Mission Control
-- [ ] **Display LED session-level** — Ruta `/display/session/{id}?token=HMAC` + pagina HTML con socket listener. El moderador copia el enlace desde el preview LED y lo envia a produccion. Reemplaza el `/display/polls/{id}` actual (por poll individual). Necesita: ruta web.php + HTML/JS + socket events `display:project` / `display:stop` en socket server. ~4h
-- [ ] **Boton "Copiar enlace" en LED preview** — En el sidebar del MC, debajo del mini preview, boton que genera y copia la URL HMAC del display. El operador de la pantalla LED abre ese enlace en el browser de la pantalla.
-- [ ] **Persistencia metricas** — Redis counter `INCR chat:count:session:{id}` por mensaje. Al cargar MC, leer counter de Redis. Fallback: `SELECT COUNT` de MySQL. No usar AOF Redis (overkill para metricas informativas). ~30min
-- [ ] **Audiencia en vivo** — Socket broadcast count de conexiones al room al join/leave. `io.in(room).fetchSockets().length` → emit `session:audience`. ~30min
-- [ ] **Engagement real** — Definir formula: (mensajes + votos + preguntas) / audiencia * 100. Calcular client-side desde las otras metricas. ~15min
-- [ ] **Games tab** — 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity. Misma arquitectura que Polls pero con logica de juego. Depende de que exista el backend de juegos.
-- [ ] **Responsive tablet 1024px** — Pulir iPad landscape (backstage). Stream full width + control panel abajo en <1024px.
-- [ ] **Prototipo design/Monitor** — Ya esta desincronizado del production. No mantener, solo referencia historica.
+- [ ] **Games tab** — 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity. Depende del backend de juegos.
+- [ ] **Responsive tablet 1024px** — Pulir iPad landscape (backstage).
+
 
 ---
 

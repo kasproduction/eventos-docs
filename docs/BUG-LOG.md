@@ -767,6 +767,88 @@ Bugs pendientes: BUG-117 (reload onboarding), BUG-118 (push ban en onboarding), 
 
 ---
 
+## 2026-04-19 — Sesion Mission Control Display + Metricas + Moderacion
+
+### BUG-135: Display LED pierde proyeccion al refrescar (RESUELTO)
+- **Severidad:** ALTA — operador de pantalla pierde contenido al recargar browser
+- **Causa:** Estado de proyeccion (que poll se muestra) solo existia como evento socket transitorio, sin persistencia
+- **Fix:** Guardar en Redis `display:active:session:{id}` (TTL 4h) al proyectar. En join:session, socket envia estado guardado al display
+- **Archivo:** eventos-socket/src/chat.ts (display:project handler + join:session)
+
+### BUG-136: Animaciones display se resetean en cada voto (RESUELTO)
+- **Severidad:** MEDIA — barras parpadean y se reinician con cada poll:updated
+- **Causa:** `renderPollResults` usaba `innerHTML` para reconstruir todo el DOM en cada update, reiniciando CSS animations
+- **Fix:** Separar `renderPollFull` (primera carga con animaciones) de `updatePollInPlace` (solo cambia widths y counters via CSS transition)
+- **Archivo:** public/display/session.html
+
+### BUG-137: Open text empuja titulo fuera de pantalla (RESUELTO)
+- **Severidad:** ALTA — respuestas crecian infinito, titulo desaparecia del viewport
+- **Causa:** Container sin altura fija ni overflow hidden, items se acumulaban sin limite
+- **Fix:** `.d-poll` con flex column height:100%, `.d-text-scroll` con flex:1 overflow:hidden, mask-image gradient top, max 20 items DOM
+- **Archivo:** public/display/session.html (CSS + JS)
+
+### BUG-138: Aprobar todas dispara rate limit 429 (RESUELTO)
+- **Severidad:** ALTA — boton "Aprobar todas" en MC lanzaba N requests simultaneos, Laravel rate limiter los bloqueaba
+- **Causa:** `Promise.all(ids.map(id => apiFetch(...)))` — un POST por voto
+- **Fix:** Nuevo endpoint `POST /admin/polls/votes/approve-batch` que acepta array vote_ids, 1 sola query
+- **Archivo:** PollController.php (approveVoteBatch), routes/api/admin.php, app.js
+
+### BUG-139: Respuestas aprobadas en batch salen de golpe en display (RESUELTO)
+- **Severidad:** MEDIA — 10 respuestas aprobadas simultaneamente aparecian todas de golpe, no se leian
+- **Causa:** Display renderizaba todas las nuevas inmediatamente sin delay
+- **Fix:** Cola de presentacion client-side (textQueue): despacha 1 respuesta cada 1.8s, el moderador aprueba cuando quiera
+- **Archivo:** public/display/session.html (textQueue, drainTextQueue, showNextText)
+
+### BUG-140: Duplicate socket.on('poll:updated') listener en MC (RESUELTO)
+- **Severidad:** BAJA — doble fetch de resultados en cada update, race condition potencial
+- **Causa:** Un listener para handlePollUpdate (linea 474) y otro para refreshModList (linea 877)
+- **Fix:** Integrar refresh del modal dentro de handlePollUpdate, eliminar listener duplicado
+- **Archivo:** public/mission-control/app.js
+
+### BUG-141: chat:history sobreescribia msgCount de Redis (RESUELTO)
+- **Severidad:** MEDIA — counter de mensajes bajaba de 500 a 20 al reconectar
+- **Causa:** `msgCount = msgs.length` (historial max 20) reemplazaba el count real de Redis
+- **Fix:** Solo actualizar msgCount desde historial si Redis no ha enviado un count mayor
+- **Archivo:** public/mission-control/app.js
+
+### BUG-142: apiFetch crash en DELETE sin JSON body (RESUELTO)
+- **Severidad:** MEDIA — rechazar respuesta podia crashear si backend devolvia 204 o body vacio
+- **Causa:** `r.json()` siempre se llamaba sin verificar content-type
+- **Fix:** Verificar content-type contiene `application/json` y status !== 204 antes de parsear
+- **Archivo:** public/mission-control/app.js (apiFetch)
+
+### BUG-143: Keyboard shortcuts activos en TEXTAREA (RESUELTO)
+- **Severidad:** BAJA — escribir "1" en pin modal cambiaba al tab Chat
+- **Causa:** Filter solo excluia INPUT y SELECT, no TEXTAREA
+- **Fix:** Agregar TEXTAREA al filtro de keydown
+- **Archivo:** public/mission-control/app.js
+
+### BUG-144: navigator.clipboard undefined en HTTP (RESUELTO)
+- **Severidad:** MEDIA — boton copiar enlace LED no funcionaba en desarrollo (HTTP)
+- **Causa:** `navigator.clipboard` solo existe en contextos seguros (HTTPS/localhost)
+- **Fix:** Fallback con `textarea + execCommand('copy')` para HTTP
+- **Archivo:** public/mission-control/app.js (copyText function)
+
+### BUG-145: YouTube iframe overlay bloqueaba controles (RESUELTO)
+- **Severidad:** MEDIA — no se podia subir volumen ni interactuar con player YouTube
+- **Causa:** `.mc-stream-top` con z-index:2 cubria toda la parte superior del iframe
+- **Fix:** `pointer-events:none` en el overlay, `pointer-events:auto` solo en los hijos (chip, fullscreen btn)
+- **Archivo:** public/mission-control/styles.css
+
+### BUG-146: open_text answers sin moderacion en display publico (RESUELTO)
+- **Severidad:** CRITICA — cualquier texto escrito por asistentes salia directamente en pantalla LED sin filtro
+- **Causa:** No existia sistema de moderacion para respuestas de texto abierto
+- **Fix:** Campo `is_approved` en live_poll_votes (default false para open_text), modal de moderacion en MC, endpoints approve/reject/batch, display solo muestra aprobadas
+- **Archivo:** Migracion, LivePollVote model, PollController, app.js, styles.css, index.html
+
+### BUG-147: results endpoint crash por first_name en attendees (RESUELTO)
+- **Severidad:** ALTA — pending_answers query fallaba con "Unknown column first_name"
+- **Causa:** Query usaba `with('attendee:id,first_name,last_name')` pero attendees no tiene esos campos, el nombre viene de User
+- **Fix:** Cambiar a `with('attendee.user:id,name')`
+- **Archivo:** PollController.php (results method)
+
+---
+
 ## Patrones recurrentes (para prevenir)
 
 1. **Android vs iOS** — Pressable, GestureDetector, flash blanco, stacking contexts
