@@ -60,7 +60,6 @@
 
 ### Mission Control — Pendientes
 - [ ] **Games tab** — 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity. Depende del backend de juegos.
-- [ ] **Responsive tablet 1024px** — Pulir iPad landscape (backstage).
 - [ ] **Prototipo design/Monitor** — Referencia historica, no mantener.
 
 

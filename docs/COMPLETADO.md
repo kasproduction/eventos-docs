@@ -693,9 +693,18 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - [x] Poll cards: update individual sin re-render de toda la lista
 - [x] Animaciones: bars con deferred rAF (0→target), cards sin reset en updates
 
+### Herramientas moderador (2026-04-19b)
+- [x] Reloj real en header (hora actual, reemplaza elapsed timer)
+- [x] Countdown sesion: verde/amber(<5min)/rojo(pasado)
+- [x] Mini agenda sidebar: sesiones del dia, actual resaltada, pasadas gris
+- [x] Tareas: checkbox list con localStorage, add/toggle/remove, word-break completo
+- [x] Responsive: sidebar drawer <1200px, stack <1024px, compacto <768px
+- [x] Audiencia: cuenta usuarios unicos, excluye admin/moderator/organizer
+
 ### Testing
 - [x] DisplayTestSeeder: 3 tipos de poll con 10 votos cada uno
 - [x] SimulateVotes command: `php artisan app:simulate-votes {pollId} --count=20 --delay=2`
+- [x] simulate-audience.cjs: 50 conexiones socket simultaneas
 - [x] 13 bugs encontrados y corregidos (BUG-135 a BUG-147)
 
 ### Totales 2026-04-16
