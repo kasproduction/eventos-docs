@@ -659,6 +659,45 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - [x] Tema pre-auth: default_theme aplicado en queryFn de useOnboarding antes del render (2026-04-17)
 - [x] primary_color_light: accent adaptativo por tema en themeStore (2026-04-17)
 
+## Mission Control v4 — Display + Metricas + Moderacion (2026-04-19)
+
+### Display LED session-level
+- [x] Ruta `/display/session/{id}?token=HMAC` — pagina publica Lumina Noir
+- [x] Socket RT: `display:project` / `display:stop` con persistencia Redis (TTL 4h, sobrevive refresh)
+- [x] Render polls: multiple choice (barras + ranking + counter animado), star rating (track + counter), open text (cola 1.8s)
+- [x] Render Q&A: pregunta alineada izquierda, autor bottom-right, slide-in animation
+- [x] Fade suave entre proyecciones, standby con breathing animation
+- [x] Boton copiar enlace HMAC en sidebar MC (fallback execCommand para HTTP)
+
+### Metricas en vivo
+- [x] Redis `INCR chat:count:session:{id}` por mensaje de chat
+- [x] `session:audience` broadcast debounce 500ms en join/leave (fetchSockets count)
+- [x] `session:metrics` event al join con chat count persistido
+- [x] Engagement: (mensajes + preguntas) / audiencia * 100, client-side cada 5s
+- [x] MPM (messages per minute) con ventana deslizante 60s
+
+### Moderacion open text
+- [x] Migracion `is_approved` en live_poll_votes (default false para open_text)
+- [x] Modal de moderacion en MC con aprobar/rechazar individual
+- [x] Endpoint batch `POST /admin/polls/votes/approve-batch` (1 request, sin rate limit)
+- [x] Display solo muestra respuestas aprobadas
+- [x] Cola de presentacion: respuestas salen 1 cada 1.8s aunque se aprueben de golpe
+
+### Q&A proyectable
+- [x] Boton Proyectar en preguntas aprobadas/respondidas del tab Q&A
+- [x] Display: pregunta grande alineada izquierda, autor small bottom-right
+
+### Mejoras MC
+- [x] Timeline persistente en localStorage por sesion
+- [x] YouTube iframe: pointer-events passthrough, controles accesibles
+- [x] Poll cards: update individual sin re-render de toda la lista
+- [x] Animaciones: bars con deferred rAF (0→target), cards sin reset en updates
+
+### Testing
+- [x] DisplayTestSeeder: 3 tipos de poll con 10 votos cada uno
+- [x] SimulateVotes command: `php artisan app:simulate-votes {pollId} --count=20 --delay=2`
+- [x] 13 bugs encontrados y corregidos (BUG-135 a BUG-147)
+
 ### Totales 2026-04-16
 - Backend: 465 tests, 1168 assertions, 0 fallos
 - ~20 commits backend, ~20 commits app, 1 commit socket, 3 commits docs

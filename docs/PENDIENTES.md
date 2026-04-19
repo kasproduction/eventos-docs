@@ -58,47 +58,10 @@
 - [ ] Inbound: POST /api/v1/webhooks/checkin con API key
 - [ ] API keys por partner, rate limiting
 
-### Mission Control v3 — Rediseno completo (2026-04-18)
-- [x] Backend + monitor + app + Filament — funcional completo
-- [x] Archivos separados (mission-control/index.html + styles.css + app.js)
-- [x] Streaming side-by-side, tabs Material Icons, Q&A/Polls/Chat/Custom
-- [x] Rediseno Lumina Noir real (#0A0A0A), accent blanco, sin neons/glows
-- [x] About section debajo del stream (speaker, horario, escenario, descripcion)
-- [x] Stream 16:9 con YouTube iframe real
-- [x] Metrics con color (azul/verde/amber/teal), borde izquierdo
-- [x] Chat: nombres con 8 colores hash, badges MOD/SPEAKER, zebra, timestamps visibles
-- [x] Polls: 3 tipos (multiple_choice, star_rating, open_text) con crear/lanzar/cerrar
-- [x] Crear encuesta: modal overlay con selector de tipo, oculta opciones en star/text
-- [x] Emoji only + slow mode dentro del tab Chat (no universal)
-- [x] Auto-save al togglear emoji/slow (sin engano de toast)
-- [x] Proyeccion: boton Proyectar en polls, indicador bar, mini LED preview en sidebar
-- [x] Timeline client-side (log acciones moderador)
-- [x] Toast esquina superior derecha, ban confirm modal, pin modal con textarea + contador 500
-- [x] EN VIVO solo cuando socket conecta, OFFLINE por defecto
-- [x] Disconnect banner, save button estados, empty states
-- [x] MC_CONFIG expandido: speakers, description, room, type, starts_at, ends_at, event_name
-- [x] Socket: role en ChatMessagePayload (MOD/SPEAKER badges en chat RT)
-- [x] App: PinnedBanner reescrito (sin socket extra, usa useChat, visible en Noir+Lux)
-- [x] App: PollSlides estrellas gold fijo #F5B740, sin sombras Lux, blur reducido
-- [x] App: api.ts network error → ApiError(0, 'NETWORK_ERROR'), no crash en status 0
-- [x] App: React Query retry inteligente (no reintenta 401/403/404/422)
-
-#### Completado Mission Control (2026-04-19)
-- [x] **Display LED session-level** — `/display/session/{id}?token=HMAC`, Lumina Noir, socket RT, persistencia Redis (sobrevive refresh)
-- [x] **Boton copiar enlace LED** — Sidebar MC, fallback execCommand para HTTP
-- [x] **Persistencia metricas** — Redis INCR por mensaje, `session:metrics` al join
-- [x] **Audiencia en vivo** — `session:audience` broadcast debounce 500ms en join/leave
-- [x] **Engagement real** — (mensajes + preguntas) / audiencia * 100, client-side cada 5s
-- [x] **Display premium** — Counters animados, ranking visual, star track bar, open text cola 1.8s, fade entre proyecciones
-- [x] **Q&A proyectable** — Boton Proyectar en preguntas aprobadas/respondidas, render alineado izquierda, autor bottom-right
-- [x] **Moderacion open text** — `is_approved` en live_poll_votes, modal MC con aprobar/rechazar/batch, blocked words, display solo muestra aprobadas
-- [x] **Timeline persistente** — localStorage por sesion, sobrevive refresh
-- [x] **YouTube interactivo** — pointer-events:none en overlay, controles accesibles
-- [x] **13 bugs corregidos** — BUG-135 a BUG-147 (ver BUG-LOG.md)
-
-#### Pendientes Mission Control
+### Mission Control — Pendientes
 - [ ] **Games tab** — 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity. Depende del backend de juegos.
 - [ ] **Responsive tablet 1024px** — Pulir iPad landscape (backstage).
+- [ ] **Prototipo design/Monitor** — Referencia historica, no mantener.
 
 
 ---
