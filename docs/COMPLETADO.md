@@ -711,3 +711,38 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - Backend: 488+ tests, 1168+ assertions, 0 fallos
 - Features completados: campos unificados, staff invite, registro cerrado, login lockout, encuesta post-evento, FAQ, soporte completo, push navigation, SEC-6.2 rate limits, push reminders configurables, agregar todas al calendario, .ics en email bienvenida, mensaje anclado chat, componentes base, Light Mode Lux v2, Mission Control v4 display+metricas+moderacion+herramientas moderador
 - Bugs: BUG-001 a BUG-147 registrados, 145+ resueltos
+
+---
+
+## 2026-04-20 — Quick Wins + Stand Stats + Rendimiento
+
+### Quick wins
+- [x] Health check endpoint: DB + Redis + Queue en /api/v1/health
+- [x] Permisos granulares Filament: HasResourcePermission trait, 41 recursos, canAccessPanel gate (super_admin/org_admin/event_admin/moderator), 10 permisos mapeados
+
+### Stand Stats + Contacts
+- [x] GET /me/stand/stats: leads, views, favorites, contacts, stamps, trivia, by_tier, by_member, top_services
+- [x] GET /me/stand/contacts: solicitudes de contacto con attendee info completa
+- [x] App stand-stats.tsx: engagement unificado, tier bars, ranking equipo, servicios, export, pull-to-refresh
+- [x] App stand-contacts.tsx: inbox solicitudes con Llamar/Email/WhatsApp
+- [x] Mi Stand simplificado: 3 stats + hero + FAB (eliminados duplicados)
+- [x] CSV export con resumen stats
+- [x] StandStatsSeeder + 13 tests (49 assertions)
+
+### Rendimiento
+- [x] Polling eliminado: encuestas (30s), gamification (30s+15s), passport (15s)
+- [x] Invalidacion targeted: broadcastToAttendee() para gamification/passport
+- [x] Leaderboard: staleTime 60s + refetchOnWindowFocus
+
+### Bug fixes (BUG-148 a BUG-154)
+- [x] BUG-148: reload Expo → onboarding (isHydrated guard)
+- [x] BUG-149: push ban sin sesion (onboarding_seen + activated_at + activeBan)
+- [x] BUG-150: session detail UI hardcodeada (GlassCard/GlassButton/tokens)
+- [x] BUG-151: polling innecesario (3 refetchInterval eliminados)
+- [x] BUG-152: resolveAvatarUrl firma incorrecta
+- [x] BUG-153: handleRefresh sin try/finally
+- [x] BUG-154: BanTest sin activated_at
+
+### Totales acumulados 2026-04-20
+- Backend: 526+ tests, 1318+ assertions, 0 fallos
+- Bugs: BUG-001 a BUG-154 registrados, 152+ resueltos

@@ -10,16 +10,6 @@
 
 ## App movil
 
-### Bugs reportados (2026-04-19)
-- [x] Bug: reload Expo → onboarding — fix: guard isHydrated en (app)/_layout.tsx (2026-04-19)
-- [x] Bug: push ban sin sesion — fix: guard onboarding_seen en useNotifications + activated_at en BanController + whereDoesntHave('activeBan') en NotificationController (2026-04-19)
-- [x] Session detail UI inconsistente — fix: GlassCard, GlassButton, surface tokens, sin hardcodes (2026-04-19)
-- [x] Bug: Mi QR tab vs DoneStep — fix: DoneStep badge ahora dark island identico a MiQrScreen (#0a0a0a + shadow.lg en Lux) (2026-04-19)
-- [x] Bug: Onboarding sombra/elevation en transiciones — fix: FadeOut exiting + elevation removido de StatCards/FocusInput/AuthSheet (2026-04-19)
-- [x] Bug: PollSlides estrellas rojas en Lux — fix: color gold fijo #F5B740, sombras eliminadas (2026-04-18)
-- [x] Bug: PinnedBanner invisible (surface.medium = transparent) — fix: backgroundElevated + sin socket extra (2026-04-18)
-- [x] Bug: app crash RangeError status 0 cuando socket/backend cae — fix: ApiError NETWORK_ERROR + retry inteligente (2026-04-18)
-
 ### Features app pendientes
 - [ ] Racha de visitas a la app (streak gamification — dia consecutivo = bonus puntos)
 
@@ -61,12 +51,6 @@
 - [ ] Crear enlaces con token HMAC por feature para acceso directo sin Filament
 
 ### Mission Control — Pendientes
-- [x] Display LED session-level (proyectable, socket RT, polls/Q&A, standby) — COMPLETADO 2026-04-19
-- [x] Metricas en vivo (audiencia, MPM, engagement) — COMPLETADO 2026-04-19
-- [x] Moderacion open text (batch approve, cola presentacion) — COMPLETADO 2026-04-19
-- [x] Q&A proyectable (boton Proyectar, display grande) — COMPLETADO 2026-04-19
-- [x] Herramientas moderador (reloj, countdown, mini agenda, tareas, responsive) — COMPLETADO 2026-04-19
-- [x] Pulido visual Lumina Noir (rediseno completo v3: #0A0A0A, metricas color, chat badges, hover) — COMPLETADO 2026-04-18
 - [ ] **Games tab** — 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity. Depende del backend de juegos.
 
 
@@ -74,19 +58,12 @@
 
 ## Backend / Admin
 
-### Sponsors — Log de actividad + estadisticas
-- [x] Estadisticas Mi Stand: endpoint /me/stand/stats, pantalla stand-stats, CSV con resumen. Visitas perfil, favoritos, contactos, stamps, trivia, leads by tier, by member, top services. Mi Stand simplificado (3 stats + hero + FAB). (2026-04-20)
-
 ### Sesiones — Estadisticas post-sesion
 - [ ] Cuantos ingresaron al streaming, duracion promedio, engagement (chat/Q&A/polls)
 - [ ] Vista resumen al finalizar sesion (Filament + posible API)
 
 ### Uptime / Monitoreo
-- [x] Health check endpoint (DB + Redis + Queue) — COMPLETADO 2026-04-19
 - [ ] Uptime monitoring externo, alertas cuando cae
-
-### Rendimiento — Verificar carga encuestas
-- [x] Auditoria polling: eliminado refetchInterval de encuestas (30s), gamification (30s+15s), passport (15s). Reemplazado por socket data:invalidate. Chat/Q&A ya usaban socket. (2026-04-19)
 
 ### Analytics Dashboard (1.C1)
 - [ ] Filament dashboard: ROI, engagement, asistencia, sponsors, leads
@@ -111,9 +88,6 @@
 - [ ] Alertas visuales cuando algo falla (no esperar a que alguien se queje)
 - [ ] Filtrable por evento activo
 - [ ] Stack: Laravel Pulse (gratis) como base + custom visual + Sentry
-
-### Permisos
-- [x] Permisos granulares Filament — 41 recursos con HasResourcePermission trait, canAccessPanel gate, 7 roles, 10 permisos — COMPLETADO 2026-04-19
 
 ### Seguridad
 - [ ] SEC-3.1: 2FA OTP — codigo 6 digitos por email
