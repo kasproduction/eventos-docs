@@ -5,6 +5,45 @@
 
 ---
 
+## 2026-04-20 — Mission Control: Config Streaming + About Fix
+
+### BUG-155: MC boton config streaming invisible en desktop (RESUELTO)
+- **Severidad:** MEDIA — boton usaba clase mc-drawer-btn que tiene display:none en desktop
+- **Causa:** Clase compartida con el boton hamburguesa del sidebar, oculto hasta tablet
+- **Fix:** Nueva clase mc-header-btn con display:flex siempre visible
+- **Archivo:** index.html, styles.css
+
+### BUG-156: MC custom_url en modal config causaba error 422 (RESUELTO)
+- **Severidad:** ALTA — al guardar config streaming, custom_url pasaba por validacion de dominio whitelist y fallaba
+- **Causa:** El modal enviaba custom_url que se valida con validateEmbedDomain. Campo duplicado con tab Custom
+- **Fix:** Eliminado custom_url del modal config (ya se gestiona en tab Custom)
+- **Archivo:** app.js, index.html
+
+### BUG-157: MC apiFetch crasheaba con respuestas error no-JSON (RESUELTO)
+- **Severidad:** MEDIA — si el server devuelve HTML en error 500, r.json() lanzaba uncaught exception
+- **Causa:** apiFetch asumia que todas las respuestas error eran JSON
+- **Fix:** Verificar content-type antes de parsear JSON en errores
+- **Archivo:** app.js
+
+### BUG-158: MC stream_iframe acepta HTML arbitrario — vector XSS (RESUELTO)
+- **Severidad:** ALTA — admin podia inyectar scripts via campo stream_iframe
+- **Causa:** Validacion solo era nullable|string|max:2000, sin sanitizacion
+- **Fix:** strip_tags() solo permite tag iframe
+- **Archivo:** SessionConfigController.php
+
+### BUG-159: MC about section margenes vacios sin speakers/descripcion (RESUELTO)
+- **Severidad:** BAJA — divs vacios dejaban margin-bottom:10px sin contenido visible
+- **Causa:** aboutSpeaker y aboutDesc se renderizaban como elementos vacios
+- **Fix:** display:none cuando no hay contenido
+- **Archivo:** app.js
+
+### BUG-160: MC tareas texto poco legible — color gris medio (RESUELTO)
+- **Severidad:** BAJA — texto de tareas usaba var(--t2) gris, poca legibilidad
+- **Fix:** Cambiado a var(--t) blanco principal
+- **Archivo:** styles.css
+
+---
+
 ## 2026-04-20 — Sesion Quick Wins + Stand Stats + QA
 
 ### BUG-148: Reload Expo manda al onboarding — race condition hydrate (RESUELTO)
