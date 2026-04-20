@@ -1,7 +1,7 @@
 # Roadmap UI/UX + Landing + Registro Premium
 
 > Spec de diseno UI/UX de EventOS — landing, estados evento, design system, pasos.
-> Fecha: 2026-04-07 | Actualizado: 2026-04-15 | Estado: Paso 5 COMPLETADO + Lifecycle COMPLETADO + FAQ COMPLETADO
+> Fecha: 2026-04-07 | Actualizado: 2026-04-19 | Estado: Paso 5 COMPLETADO + Lifecycle COMPLETADO + FAQ COMPLETADO + Lux v2 COMPLETADO + MC v4 COMPLETADO
 >
 > **Status tracking:** `docs/PENDIENTES.md` (lo que falta) + `docs/COMPLETADO.md` (lo que se hizo)
 

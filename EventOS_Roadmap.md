@@ -1,7 +1,7 @@
 # EventOS — Roadmap
 
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
-_Actualizado: 2026-04-15 | v4.3_
+_Actualizado: 2026-04-19 | v4.5_
 
 ---
 
@@ -11,11 +11,13 @@ _Actualizado: 2026-04-15 | v4.3_
 |------|--------|---------|
 | **Fase 0** — Setup | ✅ Completa | 4 sesiones, 2026-03-28 |
 | **Fase 1** — MVP funcional | ✅ 100% | 22+ sesiones + extras. Tags, lifecycle, FAQ, soporte, registro avanzado |
-| **UI/UX Lumina Noir** | ✅ ~99% | Barrido completo + FAQ + soporte + onboarding. Falta: light mode |
-| **Seguridad** | ✅ 85% | SEC-1/2/3 + 3b completo. Pendiente: 2FA, device, infra (SEC-4/5) |
+| **UI/UX Lumina Noir** | ✅ 100% | Barrido completo, todas las pantallas |
+| **UI/UX Lumina Lux v2** | ✅ 100% | Light mode "The Gallery", ~85 archivos, dark islands, session types |
+| **Mission Control v4** | ✅ 100% | Display LED, metricas RT, moderacion, Q&A proyectable, herramientas moderador, responsive |
+| **Seguridad** | ✅ 90% | SEC-1/2/3/3b/6 completo. Pendiente: 2FA, device, infra (SEC-4/5) |
 | **Onboarding DaVinci** | ✅ | 6 steps, configurable, campos unificados, depends_on avanzado |
-| **Moderacion** | ✅ | Ban RT, palabras bloqueadas, chat monitor, slow mode |
-| **QA** | ✅ | 70+ endpoints, 20 modulos, 397 tests backend, 1009 assertions |
+| **Moderacion** | ✅ | Ban RT, palabras bloqueadas, chat monitor, slow mode, pin Twitch |
+| **QA** | ✅ | 70+ endpoints, 20 modulos, 488+ tests backend, 1168+ assertions |
 | **Deploy** | ⏳ | Docker + VPS + CI/CD |
 | **Fase 2** — Web app | ⏳ | Next.js, W.0-W.12 |
 | **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion |
@@ -49,7 +51,7 @@ _Actualizado: 2026-04-15 | v4.3_
 | **Alta Disponibilidad** | `docs/DISPONIBILIDAD-HA.md` | 2 VPS, PlanetScale, Upstash, Cloudflare, 99.99% |
 | **QA Master** | `docs/QA-MASTER.md` | Barrido 60+ endpoints, 20 modulos, 3 roles |
 | **QA Auth** | `docs/QA-AUTH-ONBOARDING.md` | 30+ escenarios auth/onboarding |
-| **Bug Log** | `docs/BUG-LOG.md` | Bugs historicos BUG-001 a BUG-078 |
+| **Bug Log** | `docs/BUG-LOG.md` | Bugs historicos BUG-001 a BUG-147 |
 | **Documento maestro** | `EventOS_ClaudeCode_Prompt_v2.md` | Stack, modelos, API contracts, reglas de negocio |
 | **Dev setup** | `EventOS_DevSetup.md` | Instrucciones de desarrollo local |
 | **Roadmap historico** | `docs/ROADMAP-HISTORICO-v3.1.md` | Roadmap v3.1 completo (3,144 lineas) — checklists detallados de cada sesion, notas tecnicas, apendices A-J |
@@ -232,10 +234,16 @@ git push origin develop
 | 1.x-H | Staff invite: QR+email+link, aceptacion, socket RT, landing | 04-15 |
 | 1.x-I | FAQ asistente: orbe, categorias, accordion, soporte, push | 04-15 |
 | post | Encuesta post-evento: scope post_event, auto-activacion, CSV | 04-15 |
+| 1.x-J | Componentes base GlassCard/GlassButton + Theme tokens | 04-16 |
+| 1.x-K | Mensaje anclado chat tipo Twitch (pin/unpin RT, Redis TTL) | 04-16 |
+| 1.x-L | Calendar .ics en email bienvenida | 04-16 |
+| LUX | Light mode Lux v2 "The Gallery" completo (12 fases, ~85 archivos) | 04-17 |
+| types | Session types configurables desde Filament (colores API) | 04-17 |
+| MC | Mission Control v4: display LED + metricas RT + moderacion + Q&A + herramientas | 04-17→04-19 |
 
 ---
 
-## Seguridad ✅ 80% (2026-04-07 → 2026-04-12)
+## Seguridad ✅ 90% (2026-04-07 → 2026-04-15)
 
 | Bloque | Estado | Tests | Fecha |
 |--------|--------|-------|-------|
@@ -248,17 +256,17 @@ git push origin develop
 | SEC-3b.2: Validar token al startup (GET /me) | ✅ | — | 04-13 |
 | SEC-3b.4: Middleware approval server-side (CheckApproval) | ✅ | — | 04-13 |
 | SEC-6.1: Rate limit networking (100/evento, 30/dia) | ✅ | 3 | 04-15 |
-| SEC-6.2: Rate limit escritura (posts, comments, Q&A, support, photos) | ⏳ CRITICO | — | pre-deploy |
+| SEC-6.2: Rate limit escritura (posts, comments, Q&A, support, photos, stories, leads) | ✅ | 31 | 04-15 |
 | SEC-3.1: 2FA OTP | ⏳ | — | — |
 | SEC-3.2: Device fingerprinting | ⏳ | — | — |
 | SEC-4: Docker, server hardening, Cloudflare, backups | ⏳ | — | sesion deploy |
 | SEC-5: SecurityLogger, Sentry, uptime | ⏳ | — | sesion deploy |
 
-Total: 45+ security tests, 415 tests backend, 1045 assertions, 0 TS errors.
+Total: 75+ security tests, 488+ tests backend, 1168+ assertions, 0 TS errors.
 
 ---
 
-## UI/UX Lumina Noir ✅ ~98% (2026-04-07 → 2026-04-12)
+## UI/UX Lumina Noir ✅ 100% (2026-04-07 → 2026-04-12)
 
 Detalle completo en `docs/ROADMAP-UIUX-LANDING.md` (Paso 5) y `docs/COMPLETADO.md`.
 
@@ -270,6 +278,38 @@ Home, Agenda, Speakers, Streaming, Social, Sponsors, Profile, Encuestas, Chat, M
 **Onboarding DaVinci:** Welcome (5 pills, 5 backgrounds), Auth (login inteligente 2 pasos), Photo, About (preview live), Interests (chips), Done (badge MiQR), gamificacion (AnimatedPts 80pts), configurable Filament (7 secciones, FormStep generico, colores master/slave, steps dinamicos).
 
 **Moderacion chat:** Ban RT socket, CheckBan middleware, palabras bloqueadas, chat monitor HTML, slow mode, batching.
+
+---
+
+## UI/UX Lumina Lux v2 "The Gallery" ✅ 100% (2026-04-16 → 2026-04-17)
+
+Detalle completo en `docs/ROADMAP-LUX-V2.md` y `docs/COMPLETADO.md`.
+
+**Sistema:** theme-lux.ts tokens completos, useTheme() en ~85 archivos, accent dinamico (Noir=#FFFFFF, Lux=#1A1A1A), session types configurables desde Filament.
+
+**12 fases completadas:** Tokens, Tab Bar, Onboarding, Home, Agenda, Session Detail, Speakers, Mi QR, Social, Sponsors, Networking, Leaderboard, About, Perfil.
+
+**Dark islands:** HappeningNow, GamificationHud, Mi QR badge, Scanner, Streaming — siempre Noir (#0a0a0a solido).
+
+**NativeWind migrado:** 12 archivos (173 className → StyleSheet). FormStep/DynamicField sin accent. Backend theme toggle en Filament.
+
+---
+
+## Mission Control v4 ✅ 100% (2026-04-17 → 2026-04-19)
+
+Detalle completo en `docs/ROADMAP-MISSION-CONTROL.md` y `docs/COMPLETADO.md`.
+
+**Core (04-17):** Control bar (Chat/Q&A/Polls/Custom), toggles RT, HMAC access, app reacciona a toggles, Filament integration.
+
+**Display LED (04-19):** Pagina publica Lumina Noir `/display/session/{id}?token=HMAC`, socket RT project/stop, render polls (barras+ranking+counter), Q&A (slide-in), fade entre proyecciones, standby breathing.
+
+**Metricas RT (04-19):** Audiencia (fetchSockets, excluye admin), MPM ventana 60s, engagement %, Redis INCR chat count.
+
+**Moderacion (04-19):** Open text batch approve, cola presentacion 1.8s, Q&A proyectable.
+
+**Herramientas moderador (04-19):** Reloj real, countdown sesion (verde/amber/rojo), mini agenda sidebar, tareas localStorage, responsive drawer <1200px.
+
+**Testing:** DisplayTestSeeder, SimulateVotes command, simulate-audience.cjs 50 conexiones, 13 bugs (BUG-135 a BUG-147).
 
 ---
 
@@ -473,15 +513,26 @@ UI/UX:    Barrido visual Lumina Noir + onboarding DaVinci      ✅ ~98%
 COMPLETADO 04-15:
   → Campos unificados, FAQ+soporte, staff invite, registro cerrado
   → Login lockout, encuesta post-evento, push navigation, dev build
-  → 397 tests, 1009 assertions
+  → SEC-6.2 rate limits, push reminders configurables
+
+COMPLETADO 04-16 a 04-17:
+  → Light mode Lux v2 "The Gallery" (12 fases, ~85 archivos)
+  → Session types configurables, .ics en email, mensaje anclado chat
+  → NativeWind → StyleSheet (12 archivos), componentes base
+
+COMPLETADO 04-18 a 04-19:
+  → Mission Control v4 (display LED, metricas RT, moderacion, Q&A proyectable)
+  → Herramientas moderador (reloj, countdown, tareas, mini agenda, responsive)
+  → 13 bugs MC resueltos (BUG-135 a BUG-147)
+  → 488+ tests, 1168+ assertions
 
 PENDIENTE:
-  → Setup wizard Filament, light mode/theming
-  → Features competitivos (1.C1 analytics, 1.C5 .ics, 1.23 permisos)
-  → Web app (W.0-W.12)
+  → Features competitivos (1.C1 analytics, 1.23 permisos granulares)
+  → Web app (W.0-W.12) — PRIORIDAD por Bancolombia
   → Deploy (Docker + VPS + CI/CD + EAS Build)
-  → Fase 2 (cuando haya cliente con requerimiento web/video)
-  → Fase 3 (cuando haya segundo cliente o monetizacion)
+  → Seguridad restante (2FA, device fingerprinting, SEC-4/5 infra)
+  → Fase 2 features (juegos, video calls, silent disco)
+  → Fase 3 (multi-tenant, monetizacion)
 ```
 
 ---
@@ -550,5 +601,5 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 
 ---
 
-_EventOS Roadmap v4.3 — Kasproduction_
-_15 abril 2026_
+_EventOS Roadmap v4.5 — Kasproduction_
+_19 abril 2026_

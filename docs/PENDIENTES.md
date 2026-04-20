@@ -2,18 +2,20 @@
 
 > La UNICA fuente de verdad de lo que falta por hacer.
 > Organizado por area de trabajo, no por prioridad.
-> Actualizado: 2026-04-18
-> Backend: 488+ tests
+> Actualizado: 2026-04-19
+> Backend: 488+ tests, 1168+ assertions
 > Fuentes cruzadas: ROADMAP-UIUX-LANDING.md, WEB-APP-PLAN.md, EventOS_Roadmap.md
 
 ---
 
 ## App movil
 
-### Bugs reportados (2026-04-18)
+### Bugs reportados (2026-04-19)
 - [ ] Bug: reload en Expo manda al onboarding — verificar si es hot reload dev o flujo roto en produccion
 - [ ] Bug: notificacion de ban llega aunque usuario no inicio sesion / esta en onboarding — verificar push lifecycle
 - [ ] Session detail no tiene el aspecto visual de las otras pantallas (inconsistencia UI)
+- [x] Bug: Mi QR tab vs DoneStep — fix: DoneStep badge ahora dark island identico a MiQrScreen (#0a0a0a + shadow.lg en Lux) (2026-04-19)
+- [x] Bug: Onboarding sombra/elevation en transiciones — fix: FadeOut exiting + elevation removido de StatCards/FocusInput/AuthSheet (2026-04-19)
 - [x] Bug: PollSlides estrellas rojas en Lux — fix: color gold fijo #F5B740, sombras eliminadas (2026-04-18)
 - [x] Bug: PinnedBanner invisible (surface.medium = transparent) — fix: backgroundElevated + sin socket extra (2026-04-18)
 - [x] Bug: app crash RangeError status 0 cuando socket/backend cae — fix: ApiError NETWORK_ERROR + retry inteligente (2026-04-18)
@@ -58,9 +60,18 @@
 - [ ] Inbound: POST /api/v1/webhooks/checkin con API key
 - [ ] API keys por partner, rate limiting
 
+### Mission Control — Migrar interaccion publica
+- [ ] Migrar toda interaccion con publico (Q&A, polls, chat) a Mission Control unificado
+- [ ] Crear enlaces con token HMAC por feature para acceso directo sin Filament
+
 ### Mission Control — Pendientes
+- [x] Display LED session-level (proyectable, socket RT, polls/Q&A, standby) — COMPLETADO 2026-04-19
+- [x] Metricas en vivo (audiencia, MPM, engagement) — COMPLETADO 2026-04-19
+- [x] Moderacion open text (batch approve, cola presentacion) — COMPLETADO 2026-04-19
+- [x] Q&A proyectable (boton Proyectar, display grande) — COMPLETADO 2026-04-19
+- [x] Herramientas moderador (reloj, countdown, mini agenda, tareas, responsive) — COMPLETADO 2026-04-19
+- [x] Pulido visual Lumina Noir (rediseno completo v3: #0A0A0A, metricas color, chat badges, hover) — COMPLETADO 2026-04-18
 - [ ] **Games tab** — 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity. Depende del backend de juegos.
-- [ ] **Prototipo design/Monitor** — Referencia historica, no mantener.
 
 
 ---
@@ -84,6 +95,27 @@
 
 ### Analytics Dashboard (1.C1)
 - [ ] Filament dashboard: ROI, engagement, asistencia, sponsors, leads
+
+### Event Pulse — Dashboard live para CLIENTE (1.C7)
+- [ ] Dashboard visual standalone, blanco, clean. NO es Filament, NO es MC, NO es admin
+- [ ] TV mode / acuario del evento — el organizador solo mira, no controla
+- [ ] Salas como burbujas/circulos — personas fluyendo con animacion al entrar/salir
+- [ ] Activity feed visual: "Stand Amazon capturo lead" (foto, fade), "Pedro reclamo camiseta", "Ruleta en Salon 1"
+- [ ] Click en sala → expande: quienes estan, engagement, speaker, estado sesion
+- [ ] Metricas vivas (numeros animados, circulos que crecen), NO graficas de barras
+- [ ] Todo lo que genera metricas: check-ins, streaming, chat, polls, Q&A, networking, leads, rewards
+- [ ] Stack: web standalone (Next.js o HTML+GSAP), Socket.IO RT, datos Redis+activity_log
+- [ ] Backend ya emite 80% de los datos. Falta la capa visual.
+- [ ] Diferenciador: ningun competidor tiene esto. Cierra deals solo. Viral por screenshot.
+
+### Platform Health — Dashboard para NOSOTROS (1.C8)
+- [ ] Dashboard interno: salud de toda la plataforma en tiempo real
+- [ ] Health por modulo: API, Socket, Redis, MySQL, Queue (verde/rojo)
+- [ ] Peticiones erroneas: 500s, 429s, timeouts — log visual RT (no texto plano)
+- [ ] Metricas: requests/sec, latencia p50/p95/p99, memoria, conexiones socket
+- [ ] Alertas visuales cuando algo falla (no esperar a que alguien se queje)
+- [ ] Filtrable por evento activo
+- [ ] Stack: Laravel Pulse (gratis) como base + custom visual + Sentry
 
 ### Permisos
 - [ ] Permisos granulares Filament — roles admin diferenciados. Spatie ya seedeado, falta wiring.

@@ -2,7 +2,7 @@
 
 > Historial de todo lo implementado, organizado por area.
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
-> Actualizado: 2026-04-15
+> Actualizado: 2026-04-19
 
 ---
 
@@ -707,8 +707,7 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - [x] simulate-audience.cjs: 50 conexiones socket simultaneas
 - [x] 13 bugs encontrados y corregidos (BUG-135 a BUG-147)
 
-### Totales 2026-04-16
-- Backend: 465 tests, 1168 assertions, 0 fallos
-- ~20 commits backend, ~20 commits app, 1 commit socket, 3 commits docs
-- Features completados: campos unificados, staff invite, registro cerrado, login lockout, encuesta post-evento, FAQ, soporte completo, push navigation, SEC-6.2 rate limits, push reminders configurables, agregar todas al calendario, .ics en email bienvenida, mensaje anclado chat, componentes base
-- Bugs: BUG-100 a BUG-103 resueltos
+### Totales acumulados 2026-04-19
+- Backend: 488+ tests, 1168+ assertions, 0 fallos
+- Features completados: campos unificados, staff invite, registro cerrado, login lockout, encuesta post-evento, FAQ, soporte completo, push navigation, SEC-6.2 rate limits, push reminders configurables, agregar todas al calendario, .ics en email bienvenida, mensaje anclado chat, componentes base, Light Mode Lux v2, Mission Control v4 display+metricas+moderacion+herramientas moderador
+- Bugs: BUG-001 a BUG-147 registrados, 145+ resueltos

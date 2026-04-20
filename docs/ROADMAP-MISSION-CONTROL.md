@@ -1,7 +1,7 @@
 # ROADMAP — Mission Control (Moderador)
 
-**Fecha:** 2026-04-17
-**Estado:** TODAS LAS FASES COMPLETAS. Pendiente: pulido visual monitor.
+**Fecha:** 2026-04-19
+**Estado:** v4 COMPLETO — Display LED, metricas RT, moderacion, Q&A proyectable, herramientas moderador, responsive.
 **Objetivo:** Panel web donde el moderador controla toda la interaccion en vivo de una sesion
 
 ---
@@ -124,16 +124,17 @@ Filament (admin)
 
 ## Pendiente
 
-### Pulido visual premium
-- [ ] Muy blanco, sin depth — necesita contraste, gradientes sutiles, sombras mas pronunciadas
-- [ ] Micro-interacciones hover, mejor jerarquia visual. Referencia: Linear dashboard
-- [ ] Q&A cards centradas 720px max-width (ya en CSS, verificar render)
-- [ ] Polls barras necesitan mas feedback visual animado
+### Pulido visual premium — COMPLETADO (2026-04-18)
+- [x] Rediseno completo Lumina Noir (#0A0A0A, accent blanco)
+- [x] Metricas con color (azul/verde/amber/teal), chat con badges/zebra/timestamps
+- [x] Hover states, toast top-right, timeline client-side, ban confirm modal
+- [x] Polls barras animadas con deferred rAF, counter animado, ranking
 
-### Migracion a Mission Control unificado
-- [ ] Migrar toda interaccion publica a mission-control — crear enlaces con token por feature
-- [ ] Display publico proyectable (pantalla venue) como modulo separado
-| **Total restante** | **3-4h** | — |
+### Games tab
+- [ ] 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity
+- [ ] Depende del backend de juegos (Fase 2)
+
+| **Total restante** | **2-3h pulido** | — |
 
 ---
 
