@@ -240,6 +240,9 @@ git push origin develop
 | LUX | Light mode Lux v2 "The Gallery" completo (12 fases, ~85 archivos) | 04-17 |
 | types | Session types configurables desde Filament (colores API) | 04-17 |
 | MC | Mission Control v4: display LED + metricas RT + moderacion + Q&A + herramientas | 04-17→04-19 |
+| 1.23 | Permisos granulares Filament (41 recursos, HasResourcePermission, canAccessPanel) | 04-19 |
+| perf | Auditoria polling: 3 refetchInterval eliminados, invalidacion targeted por socket | 04-19 |
+| fix | Health check +Queue, reload→onboarding, push ban lifecycle, session detail UI | 04-19 |
 
 ---
 
@@ -333,7 +336,7 @@ Detalle completo en `docs/ROADMAP-MISSION-CONTROL.md` y `docs/COMPLETADO.md`.
 | 1.C1 | Analytics dashboard | MAXIMA | ROI, engagement, asistencia. Justifica precio. Ambos competidores lo tienen. |
 | 1.C3 | ~~QR dinamico rotativo~~ | ✅ | HMAC-SHA256 60s, O(1). Completado 04-13. |
 | 1.C5 | Calendar sync (.ics) | Media | Archivo .ics universal por sesion. QA-MASTER confirma endpoint funcional. |
-| 1.23 | Permisos granulares Filament | Media | Spatie ya instalado, falta wiring. |
+| 1.23 | ~~Permisos granulares Filament~~ | ✅ | HasResourcePermission trait, 41 recursos, canAccessPanel. Completado 04-19. |
 | 1.C2 | Wallet digital | Baja | Apple Wallet + Google Wallet. Post-venta. |
 | 1.C4 | Digital signage | Baja | Pantallas venue. Base checki. Post-venta. |
 | 1.C6 | Badge printing | Baja | Impresora termica. Add-on. Post-venta. |
@@ -526,8 +529,44 @@ COMPLETADO 04-18 a 04-19:
   → 13 bugs MC resueltos (BUG-135 a BUG-147)
   → 488+ tests, 1168+ assertions
 
+COMPLETADO 04-19 (quick wins + bugs + rendimiento):
+  → Health check: endpoint /api/v1/health ahora verifica DB + Redis + Queue
+  → Permisos Filament: HasResourcePermission trait en 41 recursos, canAccessPanel
+    gate (solo super_admin/org_admin/event_admin/moderator entran al panel),
+    10 permisos mapeados por recurso, super_admin bypasea todo
+  → Bug fix: reload Expo → onboarding. Guard isHydrated en (app)/_layout.tsx
+    antes del check de token (race condition SecureStore async)
+  → Bug fix: push ban sin sesion. App: guard onboarding_seen en useNotifications
+    antes de registrar push token. Backend: BanController verifica activated_at
+    antes de enviar push. NotificationController filtra whereDoesntHave('activeBan')
+  → Bug fix: session detail UI hardcodeada. GlassCard, GlassButton, surface tokens
+    reemplazan rgba/hex hardcodeados
+  → Auditoria polling: eliminado refetchInterval de encuestas (30s, redundante con
+    socket poll:new/poll:closed), gamification (30s+15s), passport (15s)
+  → Invalidacion targeted: gamification y passport usan broadcastToAttendee()
+    (socket solo al usuario afectado, no broadcast a 10K). Leaderboard usa
+    staleTime 60s + refetchOnWindowFocus (max 1 req/min por usuario que mire
+    la pantalla). InvalidationService::broadcastToAttendee() via /internal/emit-to-user.
+    Cero thundering herd a escala.
+  → ENTITY_KEYS ampliado: gamification → ['my-points'], passport → ['my-passport']
+  → Eliminados de pendientes: Branded QR, Crop circular (nice-to-have innecesarios)
+
+COMPLETADO 04-20 (stand stats + contacts + QA):
+  → Stand stats: GET /me/stand/stats — leads, views, favorites, contacts, stamps,
+    trivia, by_tier, by_member, top_services. Todo con tablas existentes, cero migraciones
+  → Stand contacts: GET /me/stand/contacts — solicitudes de contacto con attendee
+    info completa (foto, email, phone, company, job_title, servicios, mensaje)
+  → App stand-stats.tsx: pantalla engagement unificada, tier bars, ranking equipo,
+    servicios solicitados, export con BottomSheet, pull-to-refresh
+  → App stand-contacts.tsx: inbox solicitudes con acciones (Llamar/Email/WhatsApp)
+  → Mi Stand simplificado: 3 stats (Estadisticas/Hoy/Equipo) + hero + FAB.
+    Eliminados: leads recientes, boton ver todos, boton exportar (redundantes)
+  → CSV export mejorado: header con resumen stats antes de tabla de leads
+  → StandStatsSeeder: 5 visitors con fotos, phones, leads, views, favs, contacts
+  → 13 tests stand stats, 526 total, 1318 assertions
+
 PENDIENTE:
-  → Features competitivos (1.C1 analytics, 1.23 permisos granulares)
+  → Features competitivos (1.C1 analytics)
   → Web app (W.0-W.12) — PRIORIDAD por Bancolombia
   → Deploy (Docker + VPS + CI/CD + EAS Build)
   → Seguridad restante (2FA, device fingerprinting, SEC-4/5 infra)
