@@ -61,7 +61,7 @@
 
 ### Sesiones — Estadisticas post-sesion
 - [x] SessionStatsService centralizado, attendance tracking, CSV export queue, Filament resumen, API stats/viewers — COMPLETADO 2026-04-20
-- [ ] **Stress test 10K**: simular 10K attendees + chat activo + export simultaneo en VPS (requiere deploy)
+- [ ] **Stress test 10K**: ver `docs/PLAN-STRESS-TEST.md` para plan completo
 
 ### Uptime / Monitoreo
 - [ ] Uptime monitoring externo, alertas cuando cae
