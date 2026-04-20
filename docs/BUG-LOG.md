@@ -5,6 +5,67 @@
 
 ---
 
+## 2026-04-20 — Sesion Quick Wins + Stand Stats + QA
+
+### BUG-148: Reload Expo manda al onboarding — race condition hydrate (RESUELTO)
+- **Severidad:** ALTA — usuario autenticado pierde sesion al recargar
+- **Causa:** `(app)/_layout.tsx` evaluaba `if (!token)` antes de que `hydrate()` terminara de leer de SecureStore. Token era `null` por defecto, no porque el user no estuviera autenticado.
+- **Fix:** Agregar `if (!isHydrated) return null` antes del check de token
+- **Archivo:** `app/(app)/_layout.tsx:55`
+- **Commit:** ed1f83a
+
+### BUG-149: Push ban llega aunque usuario no inicio sesion / esta en onboarding (RESUELTO)
+- **Severidad:** ALTA — notificacion de ban en onboarding, UX confuso
+- **Causa:** 3 problemas: (1) push token se registraba durante onboarding antes de completar, (2) BanController enviaba push sin verificar `activated_at`, (3) NotificationController no filtraba usuarios baneados en notificaciones masivas
+- **Fix:** (1) Guard `onboarding_seen` en useNotifications, (2) check `activated_at` en BanController, (3) `whereDoesntHave('activeBan')` en NotificationController
+- **Archivos:** `hooks/useNotifications.ts:102`, `BanController.php:69`, `NotificationController.php:80`
+- **Commit:** 53a535c + ed1f83a
+
+### BUG-150: Session detail UI inconsistente — colores hardcodeados (RESUELTO)
+- **Severidad:** MEDIA — pantalla se veia diferente al resto en dark/light mode
+- **Causa:** Card de hora/ubicacion usaba `rgba(255,255,255,0.03)`, botones usaban `#FFF0F3`, `#F0F2F5`, fotos con `#151515` hardcoded en vez de tokens del theme
+- **Fix:** Reemplazado por GlassCard, GlassButton, `surface.backgroundElevated`, `surface.low`
+- **Archivo:** `app/(app)/session/[id].tsx`
+- **Commit:** ed1f83a
+
+### BUG-151: Polling innecesario en encuestas, gamification y passport (RESUELTO)
+- **Severidad:** MEDIA — 6,000 req/min con 500 usuarios sin necesidad
+- **Causa:** `refetchInterval` de 15-30s en 3 hooks aunque encuestas ya tenia socket y gamification/passport no necesitaban polling
+- **Fix:** Eliminado refetchInterval, agregado socket invalidation targeted via `broadcastToAttendee()`. Leaderboard usa `staleTime: 60s` + `refetchOnWindowFocus`
+- **Archivos:** `encuestas.tsx:37`, `useGamification.ts:58,71`, `usePassport.ts:32`, `useDataInvalidation.ts:14`, `PointsService.php:104`, `LeadController.php:159`
+- **Commit:** 53a535c + ed1f83a
+
+### BUG-152: resolveAvatarUrl llamada con firma incorrecta en stand-contacts (RESUELTO)
+- **Severidad:** MEDIA — fotos de solicitudes de contacto se veian en blanco
+- **Causa:** `resolveAvatarUrl(att.name)` pasaba nombre como primer argumento (photoUrl), funcion interpretaba el nombre como URL y `fixStorageUrl("Laura Martinez")` retornaba URL invalida
+- **Fix:** Cambiar a `resolveAvatarUrl(att.photo_url, att.name)`
+- **Archivo:** `app/(app)/stand-contacts.tsx:52`
+- **Commit:** ed1f83a
+
+### BUG-153: handleRefresh sin error handling — UI congelada si refetch falla (RESUELTO)
+- **Severidad:** MEDIA — pull-to-refresh se queda girando infinitamente si hay error de red
+- **Causa:** `await refetch()` sin try/catch, `setRefreshing(false)` nunca se ejecutaba en caso de error
+- **Fix:** Wrap en `try { await refetch(); } finally { setRefreshing(false); }`
+- **Archivos:** `stand-stats.tsx:137`, `stand-contacts.tsx:146`
+- **Commit:** ed1f83a
+
+### BUG-154: Tests BanTest fallaban por activated_at null (RESUELTO)
+- **Severidad:** BAJA — solo tests, no produccion
+- **Causa:** BanController ahora requiere `activated_at` para enviar push, pero el test creaba users sin ese campo
+- **Fix:** Agregar `['activated_at' => now()]` al factory del target user
+- **Archivo:** `tests/Feature/Admin/BanTest.php:30`
+- **Commit:** 53a535c
+
+---
+
+## 2026-04-20 — QA Hallazgos (no bugs, mejoras pendientes)
+
+- **QA-01:** Colores hardcodeados en `speakers.tsx` (trending-up #22C55E, trending-down #EF4444 en stand-stats). No es bug funcional, es deuda de tokens. Pendiente.
+- **QA-02:** `require('expo-router')` dinamico dentro de listener en `useNotifications.ts:143`. Funciona pero es ineficiente. Pendiente.
+- **QA-03:** `debounceTimers` en `useDataInvalidation.ts` no limpia timers al desconectar socket. Posible leak si hay reconexiones frecuentes. Pendiente.
+
+---
+
 ## 2026-04-18 — Sesion Mission Control QA Live
 
 ### BUG-105: role 'admin' no reconocido en requireModerator Q&A (RESUELTO)
@@ -175,13 +236,11 @@
 - **Causa:** Counter es variable JS client-side. Redis guarda ultimos 20 mensajes pero no el count total.
 - **Fix pendiente:** Redis INCR `chat:count:session:{id}` por mensaje. Leer al cargar MC.
 
-### BUG-117: reload en Expo manda al onboarding (PENDIENTE)
-- **Severidad:** MEDIA — por investigar si es solo hot reload dev o afecta produccion
-- **Causa:** Desconocida. Posible que el token/session se pierda en reload.
+### BUG-117: reload en Expo manda al onboarding (RESUELTO — ver BUG-148)
+- **Resuelto en:** BUG-148 (2026-04-20). Race condition hydrate, guard isHydrated.
 
-### BUG-118: push de ban llega aunque usuario no inicio sesion (PENDIENTE)
-- **Severidad:** MEDIA — usuario en onboarding recibe notificacion de ban
-- **Causa:** Desconocida. Push se envia antes de limpiar token? O llega delayed?
+### BUG-118: push de ban llega aunque usuario no inicio sesion (RESUELTO — ver BUG-149)
+- **Resuelto en:** BUG-149 (2026-04-20). Triple fix: onboarding_seen + activated_at + activeBan filter.
 
 ---
 
