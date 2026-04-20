@@ -743,6 +743,11 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - [x] BUG-153: handleRefresh sin try/finally
 - [x] BUG-154: BanTest sin activated_at
 
+### QA hallazgos resueltos
+- [x] QA-01: colores hardcodeados trending → constante STATUS_COLORS
+- [x] QA-02: require('expo-router') dinamico → import estatico
+- [x] QA-03: debounceTimers leak → cleanup clearTimeout en disconnect
+
 ### Totales acumulados 2026-04-20
 - Backend: 526+ tests, 1318+ assertions, 0 fallos
-- Bugs: BUG-001 a BUG-154 registrados, 152+ resueltos
+- Bugs: BUG-001 a BUG-154 registrados, 154+ resueltos (+ 3 QA)

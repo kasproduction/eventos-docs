@@ -60,9 +60,9 @@
 
 ## 2026-04-20 — QA Hallazgos (no bugs, mejoras pendientes)
 
-- **QA-01:** Colores hardcodeados en `speakers.tsx` (trending-up #22C55E, trending-down #EF4444 en stand-stats). No es bug funcional, es deuda de tokens. Pendiente.
-- **QA-02:** `require('expo-router')` dinamico dentro de listener en `useNotifications.ts:143`. Funciona pero es ineficiente. Pendiente.
-- **QA-03:** `debounceTimers` en `useDataInvalidation.ts` no limpia timers al desconectar socket. Posible leak si hay reconexiones frecuentes. Pendiente.
+- **QA-01:** Colores hardcodeados trending — RESUELTO: constante STATUS_COLORS en stand-stats.tsx
+- **QA-02:** require('expo-router') dinamico — RESUELTO: import estatico `import { router } from 'expo-router'`
+- **QA-03:** debounceTimers leak — RESUELTO: cleanup en return del useEffect (clearTimeout + batchTimer)
 
 ---
 
