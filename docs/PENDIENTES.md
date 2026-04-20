@@ -34,8 +34,6 @@
 > Contexto: reunion 2026-04-14. Formato: silent disco + multi-pais.
 
 ### Silent Disco — Toggle por evento
-- [x] Backend: `silent_disco_enabled`, tabla `session_attendances`, attendance tracking socket+Redis+cron — COMPLETADO 2026-04-20
-- [x] Filament: toggle en GamificationSettings, vista asistencia en resumen sesion — COMPLETADO 2026-04-20
 - [ ] App: boton "Asistir" + selector sesiones simultaneas (UI silent disco)
 - [ ] Socket: contadores RT por canal. Metricas engagement cruzado
 
@@ -59,8 +57,7 @@
 
 ## Backend / Admin
 
-### Sesiones — Estadisticas post-sesion
-- [x] SessionStatsService centralizado, attendance tracking, CSV export queue, Filament resumen, API stats/viewers — COMPLETADO 2026-04-20
+### Sesiones — Pendientes
 - [ ] **Stress test 10K**: ver `docs/PLAN-STRESS-TEST.md` para plan completo
 
 ### Uptime / Monitoreo
