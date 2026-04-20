@@ -7,6 +7,13 @@
 
 ## 2026-04-20 — Mission Control: Config Streaming + About Fix
 
+### BUG-161: Session stats crash — null component en infolist schema (RESUELTO)
+- **Severidad:** ALTA — pagina /admin/event-sessions/{id}/stats crasheaba completamente
+- **Causa:** Secciones condicionales (top question, polls) retornaban `null` en el array del schema cuando no habia datos. Filament no acepta null como componente.
+- **Fix:** Spread operator `...($condition ? [Section] : [])` en vez de ternario con null
+- **Archivo:** ViewSessionStats.php
+- **Commit:** e9eee0a
+
 ### BUG-155: MC boton config streaming invisible en desktop (RESUELTO)
 - **Severidad:** MEDIA — boton usaba clase mc-drawer-btn que tiene display:none en desktop
 - **Causa:** Clase compartida con el boton hamburguesa del sidebar, oculto hasta tablet
