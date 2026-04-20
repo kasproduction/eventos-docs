@@ -748,6 +748,20 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - [x] QA-02: require('expo-router') dinamico → import estatico
 - [x] QA-03: debounceTimers leak → cleanup clearTimeout en disconnect
 
-### Totales acumulados 2026-04-20
-- Backend: 526+ tests, 1318+ assertions, 0 fallos
+### Session Stats + Attendance Tracking
+- [x] Migracion: tabla `session_attendances` (session_id, attendee_id, source, joined_at, left_at, duration_seconds)
+- [x] Migracion: 6 campos config en events (silent_disco_enabled, attendance_min_minutes, attendance_points, attendance_bonus_full, certificate_min_sessions, certificate_min_duration_pct)
+- [x] SessionStatsService: attendance, chat, Q&A, polls, ratings, engagement score 0-100, activity timeline, attendance detail
+- [x] Socket: Redis SADD/HSET en join:session, SREM/HSET en leave:session (tracking asistencia RT)
+- [x] FlushSessionAttendanceJob: cron cada 60s Redis → DB (batch upsert)
+- [x] AwardSessionAttendancePointsJob: puntos al finalizar sesion (min minutos + bonus >90%)
+- [x] API: GET /sessions/{id}/stats, GET /sessions/{id}/viewers, GET /sessions/{id}/export
+- [x] ExportSessionStatsJob: CSV en background con notificacion Filament (campana + boton descargar)
+- [x] Filament ViewSessionStats: pagina resumen por sesion con boton "Exportar CSV"
+- [x] Filament GamificationSettings: toggle silent disco + config asistencia/certificados
+- [x] SessionStatsSeeder: 50 usuarios simulados con asistencia, chat, Q&A, polls, ratings
+- [x] 11 tests session stats (59 assertions)
+
+### Totales acumulados 2026-04-20b
+- Backend: 537+ tests, 1377+ assertions, 0 fallos
 - Bugs: BUG-001 a BUG-154 registrados, 154+ resueltos (+ 3 QA)

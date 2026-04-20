@@ -243,6 +243,11 @@ git push origin develop
 | 1.23 | Permisos granulares Filament (41 recursos, HasResourcePermission, canAccessPanel) | 04-19 |
 | perf | Auditoria polling: 3 refetchInterval eliminados, invalidacion targeted por socket | 04-19 |
 | fix | Health check +Queue, reload→onboarding, push ban lifecycle, session detail UI | 04-19 |
+| stats | Stand stats/contacts + Mi Stand simplificado + CSV con resumen | 04-20 |
+| perf | Polling eliminado (3 refetchInterval), invalidacion targeted socket | 04-20 |
+| sess | Session attendance tracking (socket→Redis→cron DB), SessionStatsService, CSV queue export | 04-20 |
+| 1.23 | Permisos granulares Filament (41 recursos, canAccessPanel) | 04-20 |
+| conf | Silent disco toggle + attendance gamification config + certificate criteria | 04-20 |
 
 ---
 
@@ -564,6 +569,21 @@ COMPLETADO 04-20 (stand stats + contacts + QA):
   → CSV export mejorado: header con resumen stats antes de tabla de leads
   → StandStatsSeeder: 5 visitors con fotos, phones, leads, views, favs, contacts
   → 13 tests stand stats, 526 total, 1318 assertions
+
+COMPLETADO 04-20b (session stats + attendance):
+  → Tabla session_attendances: source (app/web/kiosko/manual), joined_at, left_at,
+    duration_seconds. Config evento: silent_disco, attendance points, certificate criteria
+  → SessionStatsService centralizado: attendance, chat, Q&A, polls, ratings,
+    engagement score 0-100, activity timeline, attendance detail por fuente
+  → Socket tracking: Redis SADD/HSET en join:session, SREM en leave:session.
+    Cron FlushSessionAttendanceJob cada 60s Redis→DB (batch upsert)
+  → AwardSessionAttendancePointsJob: puntos por duracion al cerrar sesion
+  → ExportSessionStatsJob: CSV en queue con notificacion Filament (campana+descargar)
+  → API: GET /sessions/{id}/stats + /viewers + /export (Event Pulse ready)
+  → Filament: ViewSessionStats pagina resumen + boton export en tabla sesiones
+  → GamificationSettings: toggle silent disco + config asistencia/certificados
+  → SessionStatsSeeder: 50 users simulados, 537+ tests, 1377+ assertions
+  → Pendiente: stress test 10K en VPS (requiere deploy)
 
 PENDIENTE:
   → Features competitivos (1.C1 analytics)
