@@ -33,9 +33,23 @@
 
 > Contexto: reunion 2026-04-14. Formato: silent disco + multi-pais.
 
-### Silent Disco — Toggle por evento
-- [ ] App: boton "Asistir" + selector sesiones simultaneas (UI silent disco)
-- [ ] Socket: contadores RT por canal. Metricas engagement cruzado
+### Room Check-in (salones con totems) — Pulido
+> Backend + kiosko web implementados (sesion 2026-04-20c). Falta pulido visual + integraciones.
+- [ ] **Kiosko: diseño Lumina Noir** — sin emojis, tipografia PlusJakarta/Urbanist, resultado limpio
+- [ ] **Kiosko: protagonismo sesion actual** — sesion EN VIVO grande y destacada, demas en segundo plano
+- [ ] **Kiosko: seeder sesion AHORA** — para pruebas en desarrollo
+- [ ] App movil: **rol staff_checkin** — pantalla scanner + selector salon + cola offline MMKV (similar a vendedor)
+
+### Silent Disco — Pulido
+> Backend completo (attendance_checks, trigger, confirm, report). Falta UI final.
+- [ ] **MC: verificar boton attendance check visible** — necesita sesiones con silent_disco_group asignado
+- [ ] App: modal bottom al recibir push → selector sesion → confirmar (endpoint pending ya existe)
+- [ ] Socket: contadores RT por canal (endpoint attendance:check:update ya emite)
+
+### Mission Control — Navegacion
+- [ ] **MC: agenda navegable** — sidebar/seccion con agenda del salon, click en sesion → redirige al MC de ESA sesion (genera HMAC, navega). Sin ir a Filament.
+- [ ] **MC: filtro por tracks** — si hay multiples tracks, filtrar agenda
+- [ ] **Games tab** — 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity. Depende del backend de juegos.
 
 ### Multi-location con tracks
 - [ ] Crear tracks por ciudad/pais, agenda filtra por track
@@ -44,13 +58,6 @@
 - [ ] Outbound: attendee.registered/updated/approved con retry
 - [ ] Inbound: POST /api/v1/webhooks/checkin con API key
 - [ ] API keys por partner, rate limiting
-
-### Mission Control — Migrar interaccion publica
-- [ ] Migrar toda interaccion con publico (Q&A, polls, chat) a Mission Control unificado
-- [ ] Crear enlaces con token HMAC por feature para acceso directo sin Filament
-
-### Mission Control — Pendientes
-- [ ] **Games tab** — 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity. Depende del backend de juegos.
 
 
 ---
