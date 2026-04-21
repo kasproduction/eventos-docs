@@ -2,9 +2,9 @@
 
 > La UNICA fuente de verdad de lo que falta por hacer.
 > Organizado por area de trabajo, no por prioridad.
-> Actualizado: 2026-04-20
-> Backend: 526+ tests, 1318+ assertions
-> Fuentes cruzadas: ROADMAP-UIUX-LANDING.md, WEB-APP-PLAN.md, EventOS_Roadmap.md
+> Actualizado: 2026-04-20c
+> Backend: 553+ tests, 1593+ assertions
+> Fuentes cruzadas: ROADMAP-UIUX-LANDING.md, WEB-APP-PLAN.md, EventOS_Roadmap.md, ROADMAP-KIOSK.md
 
 ---
 
@@ -33,21 +33,29 @@
 
 > Contexto: reunion 2026-04-14. Formato: silent disco + multi-pais.
 
-### Room Check-in (salones con totems) — Pulido
-> Backend + kiosko web implementados (sesion 2026-04-20c). Falta pulido visual + integraciones.
-- [ ] **Kiosko: diseño Lumina Noir** — sin emojis, tipografia PlusJakarta/Urbanist, resultado limpio
-- [ ] **Kiosko: protagonismo sesion actual** — sesion EN VIVO grande y destacada, demas en segundo plano
+### Room Check-in — Kiosko UI (ver `docs/ROADMAP-KIOSK.md`)
+> Backend + kiosko web funcional (sesion 2026-04-20c). UI generico — falta rediseno premium.
+> Refs: `design/checkin/Kiosk Display.html` (editorial) + `design/checkin/stitch_*/` (Aether Noir)
+- [ ] **Demo HTML hibrido** — fusionar las 2 refs en demo standalone con nuestros tokens
+- [ ] **Kiosko: implementar diseño en React** — reemplazar RoomApp.tsx con el diseño aprobado
+- [ ] **Kiosko: stage scaling** — landscape 1920x1080 / portrait 1080x1920, auto-escala a pantalla
+- [ ] **Kiosko: titulo sesion GIGANTE** — estilo Aether Noir, titulo domina la pantalla
+- [ ] **Kiosko: speaker con foto** — circular con iniciales fallback
+- [ ] **Kiosko: progress bar** — avance de la sesion en vivo (gradient emerald)
+- [ ] **Kiosko: timeline horizontal** — slots past/live/upcoming con indicador NOW
+- [ ] **Kiosko: overlays check-in/out/error** — dramaticos, tipografia enorme, radial gradients, stats grid
 - [ ] **Kiosko: seeder sesion AHORA** — para pruebas en desarrollo
 - [ ] App movil: **rol staff_checkin** — pantalla scanner + selector salon + cola offline MMKV (similar a vendedor)
 
 ### Silent Disco — Pulido
-> Backend completo (attendance_checks, trigger, confirm, report). Falta UI final.
-- [ ] **MC: verificar boton attendance check visible** — necesita sesiones con silent_disco_group asignado
+> Backend completo (attendance_checks, trigger, confirm, report). Falta verificar UI + app.
+- [ ] **MC: verificar boton attendance check visible** — crear sesiones con silent_disco_group para probar
 - [ ] App: modal bottom al recibir push → selector sesion → confirmar (endpoint pending ya existe)
 - [ ] Socket: contadores RT por canal (endpoint attendance:check:update ya emite)
 
 ### Mission Control — Navegacion
-- [ ] **MC: agenda navegable** — sidebar/seccion con agenda del salon, click en sesion → redirige al MC de ESA sesion (genera HMAC, navega). Sin ir a Filament.
+> Problema: moderador tiene que ir a Filament a buscar el enlace de cada sesion.
+- [ ] **MC: agenda navegable en sidebar** — lista sesiones del evento/salon, click → navega al MC de ESA sesion (genera HMAC on-the-fly)
 - [ ] **MC: filtro por tracks** — si hay multiples tracks, filtrar agenda
 - [ ] **Games tab** — 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity. Depende del backend de juegos.
 
