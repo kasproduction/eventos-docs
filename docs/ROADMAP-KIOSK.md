@@ -74,16 +74,16 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 - [x] Scan optimizado backend: lock non-blocking, Event cacheado
 
 ### Pendiente — Pre-produccion (critico)
-- [ ] **Sonido de confirmacion** — beep checkin, tono checkout, buzz error. Staff no puede mirar la pantalla con fila de 100
-- [ ] **Contador check-ins** — "142 check-ins hoy" en el footer. Staff necesita saber que funciona
-- [ ] **Test de carga 1000+ attendees** — verificar peso manifest (~1.2MB), tiempo de carga, memoria browser
+- [x] ~~Sonido de confirmacion~~ — descartado: ruido ambiental en eventos hace inutil cualquier beep
+- [x] **Contador check-ins** — "142 check-ins today" en footer emerald. Backend cuenta en ping, +1 optimista local tras scan exitoso
+- [x] **Test de carga 5000 attendees** — 682 KB full / 99 bytes delta / 584ms Windows (est. ~150ms Linux). Sin problema de memoria
 
 ### Pendiente — Pulido
 - [ ] **Scan endpoint < 100ms** — en produccion Linux sera ~50ms, verificar con VPS real
-- [ ] Indicador visual de "cache cargado" (cuantos attendees en memoria, dot verde cuando listo)
-- [ ] Portrait: ajustar bottom zone cuando no hay next session (espacio vacio)
-- [ ] Overlay: mostrar foto del attendee si existe en el cache (avatar_url)
-- [ ] Footer: mostrar "Online · 4,231 cached" para debug en dev
+- [x] Indicador visual de "cache cargado" — footer muestra "Online · 1,086 cached · 23:45"
+- [x] Portrait: bottom zone con clase `.compact` cuando no hay next session
+- [x] Overlay: foto del attendee desde cache (avatar_url en manifest + lookupAvatar)
+- [x] Footer: "Online · X cached · HH:MM" en landscape y portrait
 
 ### Decisiones de arquitectura
 - **Cache solo nombres** (Opcion 2): no predice checkin/checkout, API decide.
@@ -95,15 +95,22 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 
 ---
 
-## Fase 2 — Mission Control navegacion
+## Fase 2 — Mission Control navegacion — COMPLETADA
 
 > Resolver: moderador no deberia ir a Filament para abrir MC de otra sesion.
 
-- [ ] MC sidebar/drawer: agenda del evento con sesiones agrupadas por salon/track
-- [ ] Click en sesion → genera HMAC token → navega al MC de esa sesion
-- [ ] Filtro por track (tabs o select)
-- [ ] Indicador visual: cual sesion esta "live" (dot verde)
-- [ ] Sesion actual destacada en la lista
+- [x] MC sidebar agenda con sesiones agrupadas por salon (multi-room headers)
+- [x] Click en sesion → navega con HMAC pre-generado (zero API calls)
+- [x] Indicador visual: dot verde animado en sesiones "live"
+- [x] Sesion actual: borde left blanco + font-weight bold
+- [x] Sesiones pasadas: opacity reducida
+- [x] Hover state en links (background tonal shift)
+- [x] Agrupacion por dia (multi-dia: "lun 21 abr", "mar 22 abr")
+- [x] Dentro de cada dia, agrupacion por room (headers separadores)
+- [x] Filtro por track: pills compactas (All / Platform / Workshop / etc.)
+- [x] Backend inyecta track + day en all_sessions
+- [x] Max-height 240px con scroll, auto-scroll a sesion actual
+- [x] Fallback: si no hay all_sessions inyectadas, carga desde API
 
 ---
 
@@ -116,15 +123,28 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 
 ---
 
-## Fase 4 — App movil: rol staff_checkin
+## Fase 4 — App movil: rol staff_checkin — BACKEND COMPLETADO
 
 > Alternativa al totem fijo — staff con telefono en la puerta.
+> Admin escanea QR de un attendee → lo convierte en staff_checkin asignado a un salon.
 
-- [ ] Nuevo rol: staff_checkin (o permiso adicional en vendedor)
-- [ ] Pantalla: selector salon asignado + boton scan QR
-- [ ] Resultado: verde/azul/rojo con info del attendee
-- [ ] Cola offline: MMKV
-- [ ] Sync: batch al reconectar
+### Backend completado
+- [x] Nuevo rol `staff_checkin` en enum attendees
+- [x] Tabla `staff_room_assignments` (attendee_id, room_id, assigned_by, is_active)
+- [x] `POST /staff-checkin/assign` — admin escanea QR → asigna staff a room
+- [x] `POST /staff-checkin/unassign` — admin remueve asignacion (revierte rol si no quedan)
+- [x] `POST /staff-checkin/scan` — staff escanea QR en puerta (Bearer auth, reutiliza RoomCheckinService)
+- [x] `GET /staff-checkin/my-rooms` — rooms asignados al staff con stats
+- [x] `GET /staff-checkin/rooms` — admin ve todos los rooms con staff asignados
+- [x] Socket notify `staff:room_assigned` / `staff:room_unassigned`
+- [x] 8 tests, 25 assertions
+
+### Pendiente — App movil
+- [ ] Pantalla staff: selector salon + scanner QR (CameraView)
+- [ ] Resultado: overlay verde/azul/rojo con info attendee
+- [ ] Pantalla admin: "Asignar Staff" con scanner + selector room
+- [ ] Deteccion automatica: si role=staff_checkin, app cambia a modo scanner
+- [ ] Cola offline: MMKV + batch sync
 - [ ] Contador: "12 checkins / 3 checkouts hoy"
 
 ---
