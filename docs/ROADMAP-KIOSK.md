@@ -139,13 +139,23 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 - [x] Socket notify `staff:room_assigned` / `staff:room_unassigned`
 - [x] 8 tests, 25 assertions
 
-### Pendiente — App movil
-- [ ] Pantalla staff: selector salon + scanner QR (CameraView)
-- [ ] Resultado: overlay verde/azul/rojo con info attendee
-- [ ] Pantalla admin: "Asignar Staff" con scanner + selector room
-- [ ] Deteccion automatica: si role=staff_checkin, app cambia a modo scanner
-- [ ] Cola offline: MMKV + batch sync
-- [ ] Contador: "12 checkins / 3 checkouts hoy"
+### App movil — implementado (parcial)
+- [x] `staff-checkin.tsx` — selector salon + scanner QR (CameraView + BottomSheet)
+- [x] `roomCheckinApi.ts` — myRooms + scan via api.get/api.post
+- [x] `StaffHappeningNow.tsx` — card Room Check-in en home (mismo layout que Mi Stand del vendedor)
+- [x] `ModuleMenu.tsx` — modulo "Room Check-in" visible solo si role=staff_checkin
+- [x] `authStore.ts` — UserRole incluye 'staff_checkin'
+- [x] Home: StaffHappeningNow con carousel + card Room Check-in (occupancy, checkins_today)
+- [x] Auto-select room si solo tiene 1 asignado
+- [x] Filament: accion "Asignar salon" en attendees con rol staff_checkin
+- [x] Spatie role `staff_checkin` con permisos view-events, manage-checkin, scan-qr
+
+### Pendiente — Pulido visual (proxima sesion)
+- [ ] **StaffHappeningNow: soporte tema Lux** — hardcoded Noir, no usa useTheme()
+- [ ] **staff-checkin.tsx: soporte tema Lux** — colores hardcoded, BottomSheet no se ve en Lux
+- [ ] **BottomSheet resultado scan: tema dual** — fondo/texto deben respetar Noir/Lux
+- [ ] Cola offline: MMKV + batch sync (pendiente)
+- [ ] Pantalla admin en app: "Asignar Staff" con scanner QR + selector room (hoy solo via Filament)
 
 ---
 
