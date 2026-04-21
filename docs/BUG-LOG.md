@@ -954,6 +954,46 @@ Bugs pendientes: BUG-117 (reload onboarding), BUG-118 (push ban en onboarding), 
 
 ---
 
+## 2026-04-21 — Kiosk + Staff Check-in
+
+### BUG-162: Manifest endpoint crash — is_banned column not found (RESUELTO)
+- **Severidad:** ALTA — manifest retornaba 500, kiosko no cargaba cache de nombres
+- **Causa:** Query usaba `get(['id','user_id','checked_in_at','is_banned'])` pero attendees no tiene columna `is_banned`, el ban esta en tabla separada `attendee_bans`
+- **Fix:** Remover `is_banned` del select, query separada a `AttendeeBan` con flip() para lookup rapido
+- **Archivo:** RoomCheckinController.php (manifest method)
+
+### BUG-163: Manifest endpoint crash — undefined variable $now (RESUELTO)
+- **Severidad:** ALTA — manifest seguia con 500 despues del fix de BUG-162
+- **Causa:** Variable `$now` fue eliminada en el refactor pero seguia usandose en `generated_at`
+- **Fix:** Cambiar `$now->toISOString()` a `now()->toISOString()`
+- **Archivo:** RoomCheckinController.php (manifest method)
+
+### BUG-164: Kiosko socket WebSocket error en consola (RESUELTO)
+- **Severidad:** BAJA — error en consola, no afecta funcionalidad
+- **Causa:** Kiosko enviaba totem_token al socket server que espera Bearer Sanctum token. Socket rechazaba con 401.
+- **Fix:** Eliminar conexion socket del kiosko. Ping HTTP cada 10s es suficiente para actualizaciones.
+- **Archivo:** useRoomTotem.ts (socket removed)
+
+### BUG-165: roomCheckinApi usaba api como funcion callable (RESUELTO)
+- **Severidad:** ALTA — staff-checkin mostraba "Sin salones asignados" siempre
+- **Causa:** `api` es un objeto con `.get()/.post()`, no una funcion. `api<T>(path)` fallaba silenciosamente.
+- **Fix:** Cambiar a `api.get<T>(path)` y `api.post<T>(path, body)`
+- **Archivo:** lib/roomCheckinApi.ts
+
+### BUG-166: Staff check-in layout aislado en vez de modulo (RESUELTO)
+- **Severidad:** MEDIA — staff perdia acceso a agenda, networking, etc.
+- **Causa:** Implementacion inicial redirigia a Stack separado sin tabs. El usuario esperaba la misma experiencia que el vendedor (app completa + modulo extra).
+- **Fix:** Revertir redirect, agregar como modulo en ModuleMenu y StaffHappeningNow card en home
+- **Archivo:** _layout.tsx, ModuleMenu.tsx, index.tsx
+
+### BUG-167: StaffHappeningNow y staff-checkin no respetan tema Lux (PENDIENTE)
+- **Severidad:** MEDIA — colores hardcoded Noir, BottomSheet invisible en tema Lux
+- **Causa:** Componentes creados con tokens Noir estaticos en vez de useTheme()
+- **Fix:** Pendiente proxima sesion — migrar a useTheme() tokens duales
+- **Archivo:** StaffHappeningNow.tsx, staff-checkin.tsx
+
+---
+
 ## Patrones recurrentes (para prevenir)
 
 1. **Android vs iOS** — Pressable, GestureDetector, flash blanco, stacking contexts
