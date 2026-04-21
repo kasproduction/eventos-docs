@@ -73,12 +73,17 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 - [x] Nombre instantaneo en overlay antes de que API responda
 - [x] Scan optimizado backend: lock non-blocking, Event cacheado
 
-### Pendiente
-- [ ] **Scan endpoint < 100ms** — en produccion Linux sera ~50ms, verificar
-- [ ] Indicador visual de "cache cargado" (cuantos attendees en memoria)
-- [ ] Sonido de confirmacion (beep checkin, tono checkout, buzz error)
-- [ ] Portrait: ajustar bottom zone si no hay next session
-- [ ] Test con 1000+ attendees en manifest (verificar peso/tiempo)
+### Pendiente — Pre-produccion (critico)
+- [ ] **Sonido de confirmacion** — beep checkin, tono checkout, buzz error. Staff no puede mirar la pantalla con fila de 100
+- [ ] **Contador check-ins** — "142 check-ins hoy" en el footer. Staff necesita saber que funciona
+- [ ] **Test de carga 1000+ attendees** — verificar peso manifest (~1.2MB), tiempo de carga, memoria browser
+
+### Pendiente — Pulido
+- [ ] **Scan endpoint < 100ms** — en produccion Linux sera ~50ms, verificar con VPS real
+- [ ] Indicador visual de "cache cargado" (cuantos attendees en memoria, dot verde cuando listo)
+- [ ] Portrait: ajustar bottom zone cuando no hay next session (espacio vacio)
+- [ ] Overlay: mostrar foto del attendee si existe en el cache (avatar_url)
+- [ ] Footer: mostrar "Online · 4,231 cached" para debug en dev
 
 ### Decisiones de arquitectura
 - **Cache solo nombres** (Opcion 2): no predice checkin/checkout, API decide.
