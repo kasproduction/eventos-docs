@@ -986,11 +986,53 @@ Bugs pendientes: BUG-117 (reload onboarding), BUG-118 (push ban en onboarding), 
 - **Fix:** Revertir redirect, agregar como modulo en ModuleMenu y StaffHappeningNow card en home
 - **Archivo:** _layout.tsx, ModuleMenu.tsx, index.tsx
 
-### BUG-167: StaffHappeningNow y staff-checkin no respetan tema Lux (PENDIENTE)
+### BUG-167: StaffHappeningNow y staff-checkin no respetan tema Lux (RESUELTO)
 - **Severidad:** MEDIA — colores hardcoded Noir, BottomSheet invisible en tema Lux
 - **Causa:** Componentes creados con tokens Noir estaticos en vez de useTheme()
-- **Fix:** Pendiente proxima sesion — migrar a useTheme() tokens duales
+- **Fix:** Migrado a useTheme() tokens duales, BottomSheet textos/botones theme-aware, boton "Escanear otro" ink #1A1A1A en Lux
 - **Archivo:** StaffHappeningNow.tsx, staff-checkin.tsx
+
+### BUG-168: RoomAssignmentModal doble tap en aceptar/rechazar (RESUELTO)
+- **Severidad:** ALTA — dos taps rapidos enviaban dos API calls, podian activar role dos veces
+- **Causa:** `handleAccept` no verificaba `loading` state antes de ejecutar. Entre el tap y el setState async, el segundo tap pasaba el guard.
+- **Fix:** Agregar `if (!pending || loading) return` en accept y reject
+- **Archivo:** components/ui/RoomAssignmentModal.tsx
+
+### BUG-169: reassign no validaba from_room del mismo evento (RESUELTO)
+- **Severidad:** ALTA — admin de evento A podria desactivar assignment de evento B
+- **Causa:** `reassign` solo validaba `to_room_id` con `event_id`, pero `from_room_id` se usaba sin verificar pertenencia al evento
+- **Fix:** Agregar `firstOrFail()` con `event_id` para from_room antes de desactivar
+- **Archivo:** StaffCheckinController.php (reassign)
+
+### BUG-170: acceptAssignment race condition — dos accepts concurrentes (RESUELTO)
+- **Severidad:** ALTA — dos requests simultaneos podian ambos leer accepted_at=NULL y ejecutar el update
+- **Causa:** Query sin lock, permitia lecturas concurrentes del mismo row
+- **Fix:** `lockForUpdate()` en la query de assignment
+- **Archivo:** StaffCheckinController.php (acceptAssignment)
+
+### BUG-171: Cola offline descartaba scans fallidos en flush (RESUELTO)
+- **Severidad:** ALTA — si scanBatch retornaba errores parciales (ej. NOT_ASSIGNED), flush borraba toda la cola incluyendo scans que podrian reintentarse
+- **Causa:** `saveQueue([])` incondicional despues de scanBatch, sin distinguir entre errores permanentes (DEBOUNCE, QR_INVALID) y transitorios
+- **Fix:** Solo descartar scans con errores permanentes, re-encolar el resto
+- **Archivo:** hooks/useOfflineScanQueue.ts
+
+### BUG-172: auto-flush useEffect con stale closure de flush (RESUELTO)
+- **Severidad:** MEDIA — el effect usaba `flush` directo como dependencia, que cambiaba en cada render y causaba re-runs innecesarios
+- **Causa:** `flush` es un `useCallback` pero sus dependencias cambian, creando nueva referencia cada vez
+- **Fix:** `flushRef.current` pattern para evitar dependencia directa en el effect
+- **Archivo:** app/(app)/staff-checkin.tsx
+
+### BUG-173: assign-staff doble submit al seleccionar room (RESUELTO)
+- **Severidad:** MEDIA — tap rapido en room picker podia enviar dos assigns del mismo QR al mismo room
+- **Causa:** `handleRoomSelect` no verificaba si ya estaba en estado `assigning`
+- **Fix:** Guard `if (scanState.status === 'assigning') return` al inicio
+- **Archivo:** app/(app)/assign-staff.tsx
+
+### BUG-174: HMAC incompatible en StaffCheckinController.resolveAttendeeFromQr (RESUELTO)
+- **Severidad:** CRITICA — assign staff siempre fallaba con "QR no valido" para tokens dinamicos
+- **Causa:** Implementacion propia usaba formato `{id}.{window}` con sig 12 chars y ventana 30s, pero CheckinService genera `{id}|{event_id}|{window}` con sig 32 chars y ventana 60s
+- **Fix:** Delegar a `CheckinService::validateDynamicToken()` como fuente unica de verdad
+- **Archivo:** StaffCheckinController.php (resolveAttendeeFromQr)
 
 ---
 

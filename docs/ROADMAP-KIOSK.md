@@ -114,49 +114,81 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 
 ---
 
-## Fase 3 — Silent disco UI completa
+## Fase 3 — Silent disco UI — EN PROGRESO
 
-- [ ] MC: crear sesiones de prueba con silent_disco_group_id para verificar boton
-- [ ] MC tab Control: boton "Check Asistencia" funcional con countdown + resultados RT
-- [ ] App movil: push notification handler → modal bottom selector sesion → confirm
-- [ ] Reporte final: endpoint ya existe, verificar CSV export con datos reales
+### Completado
+- [x] MC tab Asistencia: tab dedicado (solo visible si silent_disco_group_id)
+- [x] MC: boton "Iniciar check" con countdown RT + contadores por sesion
+- [x] MC: historial permanente con barras proporcionales (scroll, ultimos 20)
+- [x] MC: resume countdown al recargar pagina (GET /active)
+- [x] MC: estilos Noir completos (confirm modal, botones, status, countdown)
+- [x] MC: zero emojis — Material Icons en confirm modal
+- [x] MC: socket join:event fix (fallback si ya conectado)
+- [x] App: `AttendanceCheckModal` 85% pantalla, countdown RT, selector sesion
+- [x] App: socket `attendance:check` → modal automatico
+- [x] App: foreground resume → consulta pending check
+- [x] App: `attendanceApi` — pending (con event_id + room_id), confirm
+- [x] App: `useAttendanceCheckStore` zustand global
+- [x] Backend: `/internal/broadcast` endpoint generico en socket server
+- [x] Backend: GET /active, GET /history, pending incluye room_id
+- [x] Backend: EventSessionResource incluye room_id + silent_disco_group_id
+- [x] Tests: 23 tests, 96 assertions (mass confirm 20 users, history, active, expired)
+
+### Pulido completado
+- [x] MC: personas en salon ("21 personas en el salon") antes de disparar
+- [x] App: filtro por room — verifica via API pending antes de mostrar modal
+- [x] MC: TTL configurable — pills 30s/60s/90s/2min, se envia al backend
+- [x] Backend: trigger acepta `ttl` opcional (15-300s)
+- [x] MC: barra de progreso visual en countdown
+- [x] MC: porcentaje + ganador (verde) en contadores RT y historial
+- [x] MC: historial con % por sesion y barra ganadora resaltada
+- [x] App: doble vibracion al recibir check (Warning + Heavy)
+- [x] App: modal no se cierra sin responder (toast advertencia)
+- [x] MC: boton "Exportar CSV" — descarga asistencia por sesion
+- [x] MC: socket join:event fix (fallback si ya conectado)
+- [x] Backend: fix avatar_url → photo_url en report endpoint
+- [ ] Push notification — pendiente verificar con dev build real
 
 ---
 
-## Fase 4 — App movil: rol staff_checkin — BACKEND COMPLETADO
+## Fase 4 — App movil: rol staff_checkin — COMPLETADA
 
 > Alternativa al totem fijo — staff con telefono en la puerta.
-> Admin escanea QR de un attendee → lo convierte en staff_checkin asignado a un salon.
+> Staff/admin escanea QR de un attendee → crea asignacion pendiente → target aprueba → UI cambia RT.
 
-### Backend completado
+### Backend
 - [x] Nuevo rol `staff_checkin` en enum attendees
-- [x] Tabla `staff_room_assignments` (attendee_id, room_id, assigned_by, is_active)
-- [x] `POST /staff-checkin/assign` — admin escanea QR → asigna staff a room
-- [x] `POST /staff-checkin/unassign` — admin remueve asignacion (revierte rol si no quedan)
+- [x] Tabla `staff_room_assignments` (attendee_id, room_id, assigned_by, is_active, accepted_at)
+- [x] `POST /staff-checkin/assign` — crea asignacion **pendiente** + socket al target
+- [x] `POST /staff-checkin/accept-assignment` — target acepta, activa role
+- [x] `POST /staff-checkin/reject-assignment` — target rechaza, elimina assignment
+- [x] `POST /staff-checkin/reassign` — mover staff de un salon a otro (inmediato)
+- [x] `POST /staff-checkin/unassign` — remover staff (revierte rol si no quedan)
 - [x] `POST /staff-checkin/scan` — staff escanea QR en puerta (Bearer auth, reutiliza RoomCheckinService)
 - [x] `GET /staff-checkin/my-rooms` — rooms asignados al staff con stats
-- [x] `GET /staff-checkin/rooms` — admin ve todos los rooms con staff asignados
-- [x] Socket notify `staff:room_assigned` / `staff:room_unassigned`
-- [x] 8 tests, 25 assertions
+- [x] `GET /staff-checkin/rooms` — ve todos los rooms con staff asignados
+- [x] `GET /staff-checkin/pending-assignment` — consulta asignacion pendiente
+- [x] `canAssignStaff()` permite admin + staff_checkin
+- [x] `isBanned()` eliminado de processScan (presencial only)
+- [x] Cache requireStaff + assignment check 60s
+- [x] HMAC fix: resolveAttendeeFromQr delega a CheckinService
+- [x] Socket: assignment_request, assignment_accepted, room_changed, room_unassigned
+- [x] 10 tests, 35 assertions
 
-### App movil — implementado (parcial)
-- [x] `staff-checkin.tsx` — selector salon + scanner QR (CameraView + BottomSheet)
-- [x] `roomCheckinApi.ts` — myRooms + scan via api.get/api.post
-- [x] `StaffHappeningNow.tsx` — card Room Check-in en home (mismo layout que Mi Stand del vendedor)
-- [x] `ModuleMenu.tsx` — modulo "Room Check-in" visible solo si role=staff_checkin
-- [x] `authStore.ts` — UserRole incluye 'staff_checkin'
-- [x] Home: StaffHappeningNow con carousel + card Room Check-in (occupancy, checkins_today)
-- [x] Auto-select room si solo tiene 1 asignado
-- [x] Filament: accion "Asignar salon" en attendees con rol staff_checkin
-- [x] Spatie role `staff_checkin` con permisos view-events, manage-checkin, scan-qr
+### App movil
+- [x] Hub tipo Mi Stand: hero room, stats, FAB scanner flotante, soporte Lux
+- [x] StaffHappeningNow card limpia (icon + titulo + pill + "Abrir >")
+- [x] `assign-staff.tsx` — scanner QR + room picker + resultado "Solicitud enviada"
+- [x] `RoomAssignmentModal` — modal global aprobacion via socket RT (aceptar/rechazar)
+- [x] Gestion staff: seccion dedicada "Gestionar staff (N)" con lista, mover, remover
+- [x] Cambiar salon: pantalla selector para reasignar staff a otro room
+- [x] BottomSheet scan result theme-aware (Noir/Lux)
+- [x] Toasts en todo el feature: scan, assign, accept, reject, remove, move
+- [x] Zero polling: invalidacion via socket + mutaciones locales
+- [x] ModuleMenu: centrado impar para modulos extra
 
-### Pendiente — Pulido visual (proxima sesion)
-- [ ] **StaffHappeningNow: soporte tema Lux** — hardcoded Noir, no usa useTheme()
-- [ ] **staff-checkin.tsx: soporte tema Lux** — colores hardcoded, BottomSheet no se ve en Lux
-- [ ] **BottomSheet resultado scan: tema dual** — fondo/texto deben respetar Noir/Lux
-- [ ] Cola offline: MMKV + batch sync (pendiente)
-- [ ] Pantalla admin en app: "Asignar Staff" con scanner QR + selector room (hoy solo via Filament)
-
+### Pendiente
+- [ ] Cola offline: MMKV + batch sync
 ---
 
 ## Documentos de referencia

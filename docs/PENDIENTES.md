@@ -47,16 +47,27 @@
 - [ ] **Kiosko: seeder sesion AHORA** — para pruebas en desarrollo
 - [ ] App movil: **rol staff_checkin** — pantalla scanner + selector salon + cola offline MMKV (similar a vendedor)
 
-### Silent Disco — Pulido
-> Backend completo (attendance_checks, trigger, confirm, report). Falta verificar UI + app.
-- [ ] **MC: verificar boton attendance check visible** — crear sesiones con silent_disco_group para probar
-- [ ] App: modal bottom al recibir push → selector sesion → confirmar (endpoint pending ya existe)
-- [ ] Socket: contadores RT por canal (endpoint attendance:check:update ya emite)
+### Silent Disco — COMPLETADO (excepto push)
+> Tab Asistencia en MC, modal app, historial, TTL configurable, filtro room, vibracion.
+- [x] MC tab Asistencia completo (countdown, barras, historial, CSV, TTL pills, ocupacion)
+- [x] App AttendanceCheckModal (85%, countdown, barra progreso, sesion confirmada)
+- [x] Socket RT: contadores por canal, broadcast generico
+- [ ] Push notification: verificar pushToAttendeesInRoom con dev build real
 
-### Mission Control — Navegacion
-> Problema: moderador tiene que ir a Filament a buscar el enlace de cada sesion.
-- [ ] **MC: agenda navegable en sidebar** — lista sesiones del evento/salon, click → navega al MC de ESA sesion (genera HMAC on-the-fly)
-- [ ] **MC: filtro por tracks** — si hay multiples tracks, filtrar agenda
+### Session Lifecycle (Control tab) — BUG CRITICO PENDIENTE
+> Modelo de 3 tiempos implementado (start_datetime/end_datetime inmutables, adjusted_end_at, actual_start/end).
+> Delay usa adjusted_end_at, start/end solo marcan actual. Revert al finalizar antes.
+> 18 tests pasando.
+
+- [ ] **BUG: agenda no se actualiza RT cuando cambia horario** — titulo y otros campos SI se actualizan RT via socket+invalidation, pero start/end NO. El API devuelve datos correctos, el socket emite invalidation correctamente, pero la app no re-renderiza los tiempos. Investigar: posible cache MMKV en useAgenda (initialData), staleTime 2min, o quirk de react-query con invalidateQueries. Cache de 60s del endpoint agenda ya eliminado. Necesita debugging profundo en sesion dedicada.
+- [ ] **BUG: verificar que Filament cambiando horario SI actualiza RT** — si no actualiza, el problema es global de como la app maneja fechas, no del delay
+- [ ] Kiosk: verificar que ping refleja adjusted_end_at en el schedule
+- [ ] MC Control: cronometro "En vivo — X min" (implementado pero no testeado E2E)
+
+### Mission Control — Navegacion — COMPLETADO
+- [x] MC: agenda navegable en sidebar con sesiones agrupadas por dia > room
+- [x] MC: filtro por tracks (pills compactas)
+- [x] MC: click navega con HMAC pre-generado
 - [ ] **Games tab** — 5ta tab "Games" o "Interactivo" para ruleta/Kahoot/bingo/Unity. Depende del backend de juegos.
 
 ### Multi-location con tracks
