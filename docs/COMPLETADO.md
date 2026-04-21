@@ -765,3 +765,92 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 ### Totales acumulados 2026-04-20b
 - Backend: 537+ tests, 1377+ assertions, 0 fallos
 - Bugs: BUG-001 a BUG-154 registrados, 154+ resueltos (+ 3 QA)
+
+---
+
+## Room Check-in System — Salones con Totems (2026-04-20c)
+
+> Adaptacion completa del sistema Checki (PHP vanilla) a EventOS Laravel.
+> 7 commits backend, 3 commits kiosko. 17 tests, 216+ assertions.
+
+### Migraciones
+- [x] `event_rooms`: salones del evento (name, capacity, checkin_enabled, is_active)
+- [x] `room_totems`: tablets/iPads en puertas (name, type entrada/salida/bidireccional, auth_token 64 chars, last_heartbeat_at)
+- [x] `room_movements`: movimientos inmutables (type checkin/checkout, scanned_at servidor, device_timestamp referencia, method qr_scan/manual/auto_room_change/auto_end_day/auto_end_session, flags JSON)
+- [x] `room_attendee_states`: cache estado actual attendee+room (inside/outside, reconstruible desde movements)
+- [x] `attendance_checks`: triggers moderador silent disco (session_ids JSON, ttl_seconds, expires_at)
+- [x] `attendance_check_responses`: confirmaciones individuales (UNIQUE check_id+attendee_id)
+- [x] `event_sessions` +: room_id FK, silent_disco_group_id, actual_start_at, actual_end_at, cancelled_at
+- [x] `events` +: room_checkin_enabled, room_debounce_seconds, room_auto_checkout_buffer_minutes, attendance_check_ttl, attendance_check_min_confirms
+
+### Modelos
+- [x] EventRoom, RoomTotem (auto-genera auth_token), RoomMovement, RoomAttendeeState
+- [x] AttendanceCheck, AttendanceCheckResponse
+- [x] EventSession: effectiveStart(), effectiveEnd(), isCancelled()
+
+### Services
+- [x] RoomCheckinService: processScan() 10 pasos (resolve QR, verify ban/checkin, toggle state, auto-checkout otro salon, debounce, lock, create movement, update state, broadcast socket)
+- [x] Cache layer: getStateFromCache, getOtherRoomInside, setCacheState, resolveTotem, cacheTotem (Cache facade con fallback DB)
+- [x] RoomAttendanceCalculator: calculate() por evento/room, effectiveStart/End, skip cancelled, overlap rule (primera sesion gana), buffer 15min pre-inicio, buildIntervals, getAttendeesInsideAt
+- [x] Batch offline: processScan con device_timestamp + flag cola_offline
+
+### Controller — RoomCheckinController
+- [x] POST /api/v1/rooms/scan — escaneo QR totem (auth X-Totem-Token)
+- [x] POST /api/v1/rooms/scan/batch — sync cola offline (array scans con device_timestamp)
+- [x] GET /api/v1/rooms/ping — heartbeat + schedule completo salon (sesiones con status live/ended/upcoming)
+- [x] GET /events/rooms/{eventId}/occupancy — aforo RT por salon (admin)
+- [x] GET /events/rooms/{roomId}/attendees — lista asistentes dentro (admin)
+- [x] POST /events/attendance-checks/trigger — admin dispara check silent disco (push + socket a quienes estan DENTRO del salon)
+- [x] POST /events/attendance-checks/{id}/confirm — attendee confirma sesion (valida TTL, valida inside room, idempotente, award points)
+- [x] GET /events/attendance-checks/pending — check activo sin responder (para app al abrir desde push)
+- [x] GET /events/attendance-checks/{id}/results — resultados por sesion (admin)
+- [x] GET /events/attendance-checks/report — reporte final mayoria (admin, entregable sponsor)
+
+### Controller — SessionConfigController (lifecycle)
+- [x] POST /admin/sessions/{id}/start — marca actual_start_at, broadcast session:started
+- [x] POST /admin/sessions/{id}/end — marca actual_end_at, broadcast session:ended
+- [x] POST /admin/sessions/{id}/cancel — marca cancelled_at, broadcast session:cancelled
+- [x] POST /admin/sessions/{id}/delay — retrasa agenda salon X minutos (todas las futuras)
+
+### Jobs / Cron
+- [x] AutoCheckoutEndOfDayJob: diario 23:30, checkout todos los "inside" con flag inferido
+- [x] SmartAutoCheckoutJob: cada 15min, si salon sin sesion activa ni proxima (buffer configurable) → auto-checkout
+- [x] SmartAutoCheckoutJob: auto-cierra sesiones sin "End" (actual_start_at set pero actual_end_at null, 30min despues de end_datetime)
+- [x] ExportRoomAttendanceJob: CSV con nombre, email, empresa, telefono, minutos, % asistencia, calidad dato
+
+### Filament Admin
+- [x] EventRoomResource: CRUD salones (event, name, capacity, toggle checkin, activo)
+- [x] RoomTotemResource: CRUD totems (evento, salon, nombre, tipo, IP, token copiable, last heartbeat)
+- [x] EventSessionResource: Select room_id + TextInput silent_disco_group_id
+
+### Mission Control
+- [x] Tab "Control" (5ta tab, tecla 5): botones Start/End/Cancel/Delay con modal confirmacion
+- [x] Estado visual sesion (Programada/En vivo/Finalizada/Cancelada)
+- [x] Boton attendance check (solo visible si sesion tiene silent_disco_group_id)
+- [x] Countdown + resultados RT por sesion via socket attendance:check:update
+- [x] MC_CONFIG inyecta actual_start_at, actual_end_at, cancelled_at
+- [x] attendance-check.html: pagina standalone para trigger + resultados (alternativa al boton en MC)
+
+### Kiosko Web (eventos-kiosko, modo room)
+- [x] Modo activado por URL: ?mode=room&totem_token=XXX
+- [x] Camara oculta siempre activa (sin viewfinder, detecta QR en cualquier parte del frame)
+- [x] Cooldown 5s: mismo QR no se reprocesa, previene loop infinito
+- [x] Offline queue: IndexedDB almacena scans cuando servidor no responde
+- [x] Batch sync: al reconectar, envia cola en orden cronologico con device_timestamp
+- [x] Heartbeat ping cada 10s: devuelve schedule completo del salon (status live/ended/upcoming)
+- [x] Socket listeners: session:started, session:ended, session:cancelled, agenda:updated → re-ping
+- [x] Resultado 4s: checkin (verde), checkout (azul), error (rojo), offline (amber) → auto-regresa
+- [x] room-api.ts, offline-queue.ts, useRoomTotem.ts, RoomApp.tsx
+
+### CORS / Routing
+- [x] X-Totem-Token agregado a allowed_headers
+- [x] Puertos 5173/5174/5175 en allowed_origins
+- [x] Rutas totem en web.php (bypass Sanctum statefulApi que bloqueaba desde browser)
+
+### Tests
+- [x] RoomCheckinTest: 16 tests, 48 assertions (scan, checkout, auto-checkout, debounce, banned, unauthorized, ping, trigger, confirm, expired, idempotent, not-in-room, pending)
+- [x] RoomStressTest: 1 test, 168 assertions (50 personas, 17 escenarios: normal, late start, late arrival, break, no checkout, room change, cancelled, extended, lunch auto-checkout, silent disco, debounce, banned, no event checkin, no end press, delay, offline batch, saturation)
+
+### Totales acumulados 2026-04-20c
+- Backend: 553+ tests, 1593+ assertions
+- Kiosko: build exitoso, funcional en localhost
