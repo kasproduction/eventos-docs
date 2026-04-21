@@ -1,109 +1,92 @@
 # Roadmap — Kiosko Room Check-in
 
-> Interfaz de los totems (iPads) en las puertas de los salones.
+> Interfaz de los totems (iPads/pantallas) en las puertas de los salones.
 > Backend 100% funcional. Este roadmap es solo la interfaz.
-> Refs: `design/checkin/Kiosk Display.html` + `design/checkin/stitch_*/`
-> Design system: DESIGN.md "The Nocturnal Concierge" (Aether Noir)
+> Design system: Lumina Noir (Plus Jakarta Sans + Urbanist, NO JetBrains Mono)
+> Actualizado: 2026-04-21
 
 ---
 
 ## Estado actual
 
 Backend completo:
-- POST /rooms/scan, /scan/batch, GET /ping (schedule completo)
+- POST /rooms/scan, /scan/batch, GET /ping, GET /manifest
 - Auto-checkout otro salon, debounce, offline batch, heartbeat
 - 17 tests, 216+ assertions, stress test 50 personas 17 escenarios
+- Manifest endpoint: all checked-in attendees para cache local kiosko
 
-Kiosko React funcional pero **generico** — necesita rediseno premium.
+Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 
 ---
 
-## Fase 0 — Demo HTML hibrido (standalone)
+## Fase 0 — Demo HTML hibrido (standalone) — COMPLETADA
 
-> Objetivo: aprobar el diseño antes de implementar en React.
 > Archivo: `design/checkin/kiosk-eventos-demo.html`
+> Aprobado: 2026-04-20
 
-### Pantalla principal (idle + scanner activo)
-- [ ] Stage scaling: 1920x1080 landscape / 1080x1920 portrait (auto-detect o toggle)
-- [ ] Header: `ROOM · SALA` eyebrow + nombre salon + reloj en vivo + fecha
-- [ ] Indicador scanner: pill con breathing dot emerald + "READY" (sutil, no protagonista)
-- [ ] Hero sesion EN VIVO:
-  - Titulo GIGANTE (88px landscape / 92px portrait, Plus Jakarta Sans, -0.035em)
-  - Badge "LIVE NOW" pill con dot pulse + borde emerald
-  - Track tag + idioma
-  - Meta grid: Time (14:00 — 14:45), Format (Keynote · 45 min)
-  - Progress bar: track 2px + fill gradient emerald + labels (Started / X of Y min)
-- [ ] Speaker: foto circular 148px (o iniciales fallback) + nombre 36px + cargo + empresa
-- [ ] Siguiente sesion: seccion separada, titulo 30px ink-70, speaker, hora, "In X min"
-- [ ] Timeline horizontal: slots con hora + nombre, estados past(opacity 0.35)/live(emerald bg)/upcoming
-- [ ] Indicador NOW: linea vertical emerald con dot en la posicion proporcional al tiempo
-- [ ] Footer: nombre evento + "Kiosk 01 · Salon" + "Synced HH:MM"
-- [ ] Sin bordes visibles (No-Line Rule) — depth via tonal layering
-- [ ] Sin iconos — tipografia como unico recurso
-
-### Overlay check-in (4 segundos)
-- [ ] Backdrop blur 8px + fondo radial gradient emerald sobre noir
-- [ ] Card: border ghost (10% opacity), bg glassmorphic
-- [ ] Eyebrow: dot emerald glow + "CHECK-IN · ENTRADA" JetBrains Mono
-- [ ] Greeting: "Bienvenido," 44px weight 300
-- [ ] Nombre: **104px weight 700** (el nombre DOMINA la pantalla)
-- [ ] Sesion: titulo de la charla actual, 22px ink-50
-- [ ] Stats grid: Entry time, Badge #, nivel (con labels uppercase mono)
-- [ ] Timer: "Closing in Xs" arriba derecha, auto-regresa
-
-### Overlay checkout
-- [ ] Radial gradient azul sobre noir
-- [ ] "GOODBYE" + "Hasta luego," 44px light
-- [ ] Nombre 104px bold
-- [ ] Sesion + "You stayed X minutes"
-- [ ] Stats: Duration (X min), Arrived (HH:MM), Left (HH:MM)
-
-### Overlay error
-- [ ] Radial gradient rojo dramatico
-- [ ] "Scan unrecognized" 44px
-- [ ] "Badge not found" o mensaje especifico 104px
-- [ ] Mensaje: "Please visit the registration desk"
-- [ ] Stats: Code (ERR_XXX), Time (HH:MM)
-
-### Tokens (del DESIGN.md Aether Noir adaptados a EventOS)
-```
---bg: #0c0c16
---bg-2: #12121f
---ink: #ffffff
---ink-70: rgba(255,255,255,0.70)
---ink-50: rgba(255,255,255,0.50)
---ink-35: rgba(255,255,255,0.35)
---ink-20: rgba(255,255,255,0.20)
---ink-10: rgba(255,255,255,0.10)
---border: rgba(255,255,255,0.06)
---emerald: oklch(0.78 0.17 155)
---emerald-soft: oklch(0.78 0.17 155 / 0.12)
---green-tint: oklch(0.42 0.13 155)
---blue-tint: oklch(0.42 0.13 245)
---red-tint: oklch(0.45 0.17 25)
-Font headlines: Plus Jakarta Sans
-Font body: Urbanist
-Font mono/labels: JetBrains Mono
-```
+- [x] Stage scaling: 1920x1080 landscape / 1080x1920 portrait
+- [x] Dos layouts separados (no responsive, diseño propio por orientacion)
+- [x] Header: Room eyebrow + nombre salon + reloj en vivo + fecha
+- [x] Scan pill con breathing dot emerald + "Ready"
+- [x] Hero sesion EN VIVO: titulo 96px (landscape) / 82px (portrait), weight 800
+- [x] LIVE NOW pill con dot pulse
+- [x] Meta grid: Time, Format con labels Urbanist uppercase
+- [x] Progress bar: track 2px + fill gradient emerald
+- [x] Speaker: foto circular (o iniciales fallback) + nombre + cargo
+- [x] Siguiente sesion: seccion separada en bottom zone (bg tonal shift)
+- [x] Timeline horizontal: slots past/live/upcoming + indicador NOW
+- [x] Footer: nombre evento + kiosk ID + synced time
+- [x] Overlays dramaticos: checkin (emerald), checkout (blue), error (red)
+  - Nombre 108px weight 800, radial gradients, countdown bar
+  - Stats grid: badge, entry time, duration
+- [x] No-Line Rule (sin 1px borders, depth via tonal shift #0A0A0A → #0E0E0E)
+- [x] Solo 2 fuentes: Plus Jakarta Sans + Urbanist
+- [x] Tokens Lumina Noir corregidos (no Aether Noir azulado)
+- [x] Tweaks panel para dev (orientation, overlay, clock)
 
 ---
 
-## Fase 1 — Implementar en React (Kiosko)
+## Fase 1 — Implementar en React (Kiosko) — EN PROGRESO
 
-> Reemplazar RoomApp.tsx con el diseño aprobado del demo.
+> Reemplazado RoomApp.tsx con diseño Lumina Noir.
 
-- [ ] Portar CSS del demo a inline styles (o CSS module)
-- [ ] Conectar al API: ping cada 10s → schedule completo → render dinamico
-- [ ] Scanner QR oculto (camara invisible, deteccion automatica)
-- [ ] Cooldown 5s entre scans
-- [ ] Overlays animados con transition opacity 260ms
-- [ ] Timer countdown en overlay (4s)
-- [ ] Progress bar actualiza en tiempo real (% avance sesion)
-- [ ] Timeline NOW indicator se mueve cada minuto
-- [ ] Reloj en vivo (tick cada segundo)
-- [ ] Socket listeners: session:started/ended/cancelled/agenda:updated → re-render
-- [ ] Offline queue: IndexedDB + batch sync (ya implementado, mantener)
-- [ ] Indicador offline: dot rojo + texto (minimo, no protagonista)
+### Completado
+- [x] Portar CSS del demo a kiosk.css (design system completo)
+- [x] Dos layouts separados en React (landscape `k-l` / portrait `k-p`)
+- [x] Stage scaling con dimensiones fijas (no DOM-dependent)
+- [x] Conectar al API: ping cada 10s → schedule completo → render dinamico
+- [x] Ping enriquecido: speaker_photo, speaker_role, track, type
+- [x] Scanner USB/HID (useUsbScanner) — reemplaza camara ZXing
+- [x] Cooldown con busyRef sincronico (previene double-fire)
+- [x] Overlays 4 estados: checkin, checkout, error, offline
+- [x] Timer countdown en overlay (2.5s auto-close)
+- [x] Progress bar actualiza cada 60s (no cada segundo)
+- [x] Timeline NOW indicator calculado
+- [x] Reloj en vivo (tick cada segundo, solo para display)
+- [x] Socket listeners: session events → re-ping schedule
+- [x] Offline queue: IndexedDB + batch sync (existente, mantenido)
+- [x] Indicador offline: dot rojo en scan pill
+- [x] Wake Lock (mantener pantalla encendida)
+- [x] Auto-detect orientacion (viewport o ?orientation= URL param)
+- [x] KioskDemoSeeder: room Atlas + totem + 8 sesiones con 1 LIVE ahora
+- [x] Cache local nombres (useAttendeeCache): manifest → delta cada 60s
+- [x] Nombre instantaneo en overlay antes de que API responda
+- [x] Scan optimizado backend: lock non-blocking, Event cacheado
+
+### Pendiente
+- [ ] **Scan endpoint < 100ms** — en produccion Linux sera ~50ms, verificar
+- [ ] Indicador visual de "cache cargado" (cuantos attendees en memoria)
+- [ ] Sonido de confirmacion (beep checkin, tono checkout, buzz error)
+- [ ] Portrait: ajustar bottom zone si no hay next session
+- [ ] Test con 1000+ attendees en manifest (verificar peso/tiempo)
+
+### Decisiones de arquitectura
+- **Cache solo nombres** (Opcion 2): no predice checkin/checkout, API decide.
+  Sin riesgo de estado inconsistente entre totems. Cache es solo para velocidad visual.
+- **USB scanner > camara**: los lectores HID son 100x mas confiables que ZXing.
+  Detecta patron keystroke rapido (< 80ms gap) + Enter.
+- **Scan non-blocking**: lock `Cache::lock()->get()` falla inmediato en vez de
+  `block(2)` que esperaba hasta 2 segundos.
 
 ---
 
@@ -135,7 +118,7 @@ Font mono/labels: JetBrains Mono
 - [ ] Nuevo rol: staff_checkin (o permiso adicional en vendedor)
 - [ ] Pantalla: selector salon asignado + boton scan QR
 - [ ] Resultado: verde/azul/rojo con info del attendee
-- [ ] Cola offline: MMKV (solido, no IndexedDB)
+- [ ] Cola offline: MMKV
 - [ ] Sync: batch al reconectar
 - [ ] Contador: "12 checkins / 3 checkouts hoy"
 
@@ -145,12 +128,10 @@ Font mono/labels: JetBrains Mono
 
 | Doc | Contenido |
 |-----|-----------|
-| `design/checkin/Kiosk Display.html` | Ref 1: editorial, stage scaling, timeline, overlays |
-| `design/checkin/stitch_*/DESIGN.md` | Ref 2: "The Nocturnal Concierge", tokens, reglas No-Line/No-Icon |
-| `design/checkin/in.png` | Ref 2: overlay check-in |
-| `design/checkin/out.png` | Ref 2: overlay checkout |
-| `design/checkin/error.png` | Ref 2: overlay error |
-| `design/checkin/stitch_*/kiosk_display_portrait/screen.png` | Ref 2: pantalla principal portrait |
-| `design/checkin/stitch_*/scan_success_welcome/screen.png` | Ref 2: welcome scan |
-| `design/checkin/stitch_*/scan_success_farewell/screen.png` | Ref 2: farewell scan |
-| `docs/COMPLETADO.md` | Backend room check-in completo (seccion 2026-04-20c) |
+| `design/checkin/kiosk-eventos-demo.html` | Demo hibrido aprobado (Lumina Noir) |
+| `design/checkin/Kiosk Display.html` | Ref 1: editorial, stage scaling, overlays |
+| `design/checkin/stitch_*/DESIGN.md` | Ref 2: "The Nocturnal Concierge", Aether Noir |
+| `design/checkin/in.png` | Ref check-in overlay |
+| `design/checkin/out.png` | Ref checkout overlay |
+| `design/checkin/error.png` | Ref error overlay |
+| `docs/COMPLETADO.md` | Backend room check-in completo |
