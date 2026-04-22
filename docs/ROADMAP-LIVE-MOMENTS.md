@@ -5,7 +5,7 @@
 > Display usa libreria spin-wheel (angulos, pesos, animacion nativos).
 > Controles en el DISPLAY (el moderador esta frente a la pantalla, no en el laptop).
 > Prioridad: P1 (diferenciador — competencia NO lo tiene)
-> Estado: Fase 2 completada — pendiente 2.6 y 2.7 (2026-04-22)
+> Estado: Fase 2.6 completada — pendiente 2.7 (2026-04-22)
 
 ---
 
@@ -14,7 +14,7 @@
 1. **Sesion-scoped**: el juego pertenece a una sesion. El pool se calcula automaticamente.
 2. **Pool = salon + online**: presenciales (`room_attendee_states` inside) + virtuales (socket server real-time `GET /internal/session/viewers`).
 3. **Ruleta = siempre all_win**: todos los elegibles reciben los puntos del sector ganador. No hay "un ganador".
-4. **Sorteo = un ganador**: slot machine con fotos, se detiene en el ganador. Premio fisico.
+4. **Sorteo = un ganador**: ceremony con foto cascade (strip GSAP), se detiene en el ganador. Premio fisico.
 5. **Controles en display**: boton Girar/Sortear en la pantalla del display (usa token MC, POST al backend).
 6. **Resultado server-side**: el backend decide sector/ganador, no el cliente.
 7. **Persistencia de premios**: el ganador del jackpot recibe anuncio permanente + entrada en "Mis premios".
@@ -155,13 +155,19 @@ UNIQUE(game_id, attendee_id, round)
 ### 2.5 Elegibles con spin-wheel — COMPLETADO
 - [x] Libreria JS maneja visualizacion de sectores con pesos
 
-### 2.6 Jackpot slot machine con fotos — PENDIENTE ~2-3h
-- [ ] Display: fase "draw" muestra fotos de elegibles girando en 3 carriles verticales
-- [ ] Fotos vienen del pool (endpoint eligible con photo_url)
-- [ ] Animacion: carriles giran rapido, desaceleran, se detienen uno a uno (izq→centro→der)
-- [ ] Los 3 carriles paran en la misma persona = ganador
-- [ ] Confetti CSS al revelar ganador
-- [ ] Foto grande + nombre + premio
+### 2.6 Sorteo Ceremony (reemplaza slot machine) — COMPLETADO 2026-04-22
+- [x] Rewrite completo: slot machine 3 reels → Photo Cascade Ceremony
+- [x] Strip vertical unico con 20 celdas (random picks del pool + winner al final)
+- [x] GSAP `power4.out` — desaceleracion natural, 60fps con cualquier cantidad de participantes
+- [x] Responsive: reel `min(45vh, 420px)`, celdas proporcionales
+- [x] Outline amber en reel, intensifica al frenar, fade en lock
+- [x] Shockwave doble (amber + white) al parar
+- [x] Winner reveal: foto 320px + "GANADOR" + nombre 80px + premio 30px uppercase + session name
+- [x] Confetti amber geometric con GSAP (no CSS keyframes)
+- [x] Fase participacion simplificada: titulo + premio + "Preparate..." (sin counter inutil)
+- [x] Info (titulo + premio) posicionado absolute top-right (no se monta con reel)
+- [x] Fallbacks: beam si no hay foto, `[winner]` si participants vacio
+- [x] 10 bugs resueltos (BUG-162 a BUG-171)
 
 ### 2.7 Persistencia de premios (jackpot) — PENDIENTE ~1h
 - [ ] Al ganar: generar claim_code (6 chars alfanumerico)

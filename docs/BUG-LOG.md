@@ -5,6 +5,60 @@
 
 ---
 
+## 2026-04-22 — Sorteo Ceremony: Rewrite + Bug Fixes
+
+### BUG-162: Slot machine 3 reels — feo, demasiado espacio negro, casino feel (RESUELTO)
+- **Severidad:** MEDIA — UX/diseño inaceptable para pantalla de evento premium
+- **Causa:** Implementacion original usaba 3 columnas de fotos girando (slot machine literal). Se veian 3 puntos focales compitiendo, mucho negro entre reels, aspecto de casino.
+- **Fix:** Rewrite completo → "Photo Cascade Ceremony": strip vertical unico con GSAP `power4.out`, 20 celdas max, shockwave, winner reveal con nombre grande (80px) + confetti amber
+
+### BUG-163: Confetti no aparecia en winner reveal (RESUELTO)
+- **Severidad:** MEDIA — confetti invisible despues del reveal
+- **Causa:** CSS `.d-confetti-piece` tenia `animation:confettiFall linear forwards` que competia con GSAP. La CSS animation forzaba opacity a 0, pisando los valores de GSAP.
+- **Fix:** Quitar CSS keyframes de confetti, dejar solo GSAP para animar las piezas
+
+### BUG-164: Winner name no aparecia en reveal — letters stagger vacias (RESUELTO)
+- **Severidad:** ALTA — nombre del ganador no se mostraba
+- **Causa:** `gsap.to('.winner-letter', ...)` se agendaba al construir el timeline, pero las letras se creaban dinamicamente en un `call()` posterior. GSAP no encontraba elementos.
+- **Fix:** Mover stagger dentro de un `call()` para que ejecute cuando las letras ya existan en DOM
+
+### BUG-165: Nombre duplicado en reel — overlay + label debajo (RESUELTO)
+- **Severidad:** BAJA — nombre aparecia dentro de la foto Y debajo del reel
+- **Causa:** Se renderizaba `.cell-name` overlay dentro de cada celda + `#reelName` debajo del reel simultaneamente
+- **Fix:** Quitar overlay de las celdas, dejar solo el label debajo
+
+### BUG-166: Fase participacion mostraba "0 PARTICIPANTES" sin sentido (RESUELTO)
+- **Severidad:** MEDIA — confuso para el publico
+- **Causa:** El counter de participacion y countdown se mostraban en el display publico. El pool se calcula automaticamente, no hay nada que "unirse".
+- **Fix:** Reemplazar counter/countdown por "Preparate..." pulsante. El MC ya tiene el eligible count para el moderador.
+
+### BUG-167: Premio y titulo montados encima del reel (RESUELTO)
+- **Severidad:** MEDIA — texto se superponia con las fotos del reel
+- **Causa:** `.d-ceremony-info` estaba en el flow normal con `margin-bottom` insuficiente. Al crecer el reel con `min(45vh,420px)`, el espacio no alcanzaba.
+- **Fix:** Mover info a `position:absolute; top:0; right:0` — queda al nivel del header, nunca se monta
+
+### BUG-168: Glow ring desalineado del reel — fotos fuera del borde dorado (RESUELTO)
+- **Severidad:** MEDIA — borde dorado no contenia las fotos
+- **Causa:** Glow era un `div` separado con tamaño fijo en CSS que no matcheaba el reel responsivo (`min(45vh,420px)`)
+- **Fix:** Eliminar div glow separado, usar `outline` directo en el reel con `outline-offset:8px`. Siempre rodea el reel exacto.
+
+### BUG-169: Participants vacio causa crash en ceremony (RESUELTO)
+- **Severidad:** ALTA — si backend manda `participants:[]`, `others[random]` da undefined
+- **Causa:** No habia fallback cuando la lista de participantes venia vacia
+- **Fix:** `if (!others.length) others = participants.length ? participants : [winner]`
+
+### BUG-170: Winner beam avatar pixelado — usaba tamaño del reel (RESUELTO)
+- **Severidad:** BAJA — beam en reveal se veia borroso
+- **Causa:** `beamFallback` usaba `imgSize` del reel (~386px) pero la foto del winner es 320px max. En realidad el beam se pedia a tamaño reel cuando debia ser 320.
+- **Fix:** `beamFallback` ahora acepta parametro `size`, winner usa `beamFallback(name, 320)`
+
+### BUG-171: Photo src vacio no dispara onerror — imagen rota invisible (RESUELTO)
+- **Severidad:** MEDIA — si `photo_url` es null/empty, `src=""` no dispara onerror en todos los browsers
+- **Causa:** Celdas del reel usaban `src="${photo_url || ''}"` que es un src vacio
+- **Fix:** Si no hay `photo_url`, usar beam directamente como src: `p.photo_url || beamFallback(p.name)`
+
+---
+
 ## 2026-04-20 — Mission Control: Config Streaming + About Fix
 
 ### BUG-161: Session stats crash — null component en infolist schema (RESUELTO)
