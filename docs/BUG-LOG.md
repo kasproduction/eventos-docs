@@ -5,6 +5,57 @@
 
 ---
 
+## 2026-04-22 — Auditoria sistema invalidacion RT (10 bugs)
+
+### BUG-172: broadcastToAttendee llama endpoint inexistente en socket server (RESUELTO)
+- **Severidad:** CRITICA — toda invalidacion per-attendee fallaba silenciosamente (404)
+- **Causa:** `InvalidationService::broadcastToAttendee()` POSTeaba a `/internal/emit-to-user` que no existia en el socket server
+- **Fix:** Endpoint agregado en socket server, usa `attendeeConnections` map para emitir a sockets especificos
+
+### BUG-173: EventObserver isDirty() siempre false en saved() — polls post-evento nunca se activan (RESUELTO)
+- **Severidad:** CRITICA — encuestas post-evento nunca se activaban automaticamente
+- **Causa:** `isDirty()` en hook `saved()` siempre retorna false porque el modelo ya sincronizo atributos con la DB
+- **Fix:** Cambiar a `wasChanged('status')` que funciona correctamente en `saved()`
+
+### BUG-174: ModuleObserver limpia cache pero nunca broadcast — app no se entera (RESUELTO)
+- **Severidad:** ALTA — cambios de modulos (habilitar/deshabilitar) no llegaban a la app en RT
+- **Causa:** Observer solo llamaba `Cache::forget()` + push silencioso, nunca `InvalidationService::broadcast()`
+- **Fix:** Agregar `InvalidationService::broadcast($eventId, 'modules')` en created/updated/deleted
+
+### BUG-175: Speaker y Announcement observers incompletos — uno limpia cache, otro broadcast (RESUELTO)
+- **Severidad:** ALTA — doble observer con responsabilidades partidas
+- **Causa:** `SpeakerObserver` solo broadcasteaba, `ContentObserver` solo limpiaba cache. Idem `AnnouncementObserver`
+- **Fix:** Cada observer dedicado ahora hace cache clear + broadcast. ContentObserver como respaldo
+
+### BUG-176: SessionTrack sin observer — cambios de track invisibles (RESUELTO)
+- **Severidad:** ALTA — renombrar track o cambiar color no se reflejaba en la app
+- **Causa:** No existia observer para `SessionTrack`
+- **Fix:** `SessionTrackObserver` creado: cache clear agenda + broadcast
+
+### BUG-177: EventRoom sin observer — cambios de sala invisibles (RESUELTO)
+- **Severidad:** ALTA — renombrar sala no se reflejaba en agenda de la app
+- **Causa:** No existia observer para `EventRoom`
+- **Fix:** `EventRoomObserver` creado: cache clear agenda + broadcast
+
+### BUG-178: Docblock InvalidationService dice 200ms, implementacion es 1s (RESUELTO)
+- **Severidad:** MEDIA — documentacion inconsistente con implementacion
+- **Fix:** Docblock corregido a "1 second"
+
+### BUG-179: EventObserver cache key modules sin sufijo de rol — no limpia nada (RESUELTO)
+- **Severidad:** MEDIA — `Cache::forget("event:{id}:modules")` no matcheaba keys reales `event:{id}:modules:attendee`
+- **Fix:** Iterar roles (attendee/vendedor/guest) + vendedor_extra, igual que ModuleObserver
+
+### BUG-180: Throttle key se setea ANTES del broadcast — fallo silencioso sin retry (RESUELTO)
+- **Severidad:** MEDIA — si HTTP falla, throttle bloquea reintento por 1 segundo
+- **Causa:** `Cache::put(throttleKey)` se ejecutaba antes del HTTP POST. Si el POST fallaba, el throttle ya estaba activo.
+- **Fix:** Throttle key solo se setea DESPUES de response exitoso. Si falla, retry posible inmediatamente.
+
+### BUG-181: HTTP response del socket nunca se validaba (RESUELTO)
+- **Severidad:** MEDIA — respuestas 4xx/5xx del socket se trataban como exito
+- **Fix:** Validar `$response->successful()`, log warning si no es 2xx
+
+---
+
 ## 2026-04-22 — Sorteo Ceremony: Rewrite + Bug Fixes
 
 ### BUG-162: Slot machine 3 reels — feo, demasiado espacio negro, casino feel (RESUELTO)
