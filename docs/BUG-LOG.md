@@ -5,6 +5,15 @@
 
 ---
 
+## 2026-04-22 — Agenda end_datetime no se actualizaba en RT
+
+### BUG-182: Hora de fin no se reflejaba en agenda despues de editar en Filament (RESUELTO)
+- **Severidad:** ALTA — admin cambiaba hora de fin y la app seguia mostrando la vieja
+- **Causa:** `publicEnd()` retorna `adjusted_end_at ?? end_datetime`. Si en algun momento se hizo un delay desde MC, `adjusted_end_at` se seteaba y tenia prioridad permanente sobre `end_datetime`. Al editar `end_datetime` en Filament, la API seguia devolviendo el `adjusted_end_at` viejo.
+- **Fix:** `EventSessionObserver::updated()` ahora limpia `adjusted_end_at` via `updateQuietly()` cuando `end_datetime` cambia. Asi `publicEnd()` refleja el nuevo horario.
+
+---
+
 ## 2026-04-22 — Auditoria sistema invalidacion RT (10 bugs)
 
 ### BUG-172: broadcastToAttendee llama endpoint inexistente en socket server (RESUELTO)
