@@ -862,13 +862,13 @@
 
 | Severidad | Count | Resueltos | Pendientes |
 |-----------|-------|-----------|------------|
-| CRITICA | 14 | 14 | 0 |
-| ALTA | 20 | 20 | 0 |
-| MEDIA | 42+ | 41+ | 1 (BUG-134) |
-| BAJA | 16+ | 16+ | 0 |
-| **Total** | **92+** | **91+** | **1** |
+| CRITICA | 15 | 15 | 0 |
+| ALTA | 27 | 27 | 0 |
+| MEDIA | 44+ | 43+ | 1 (BUG-134) |
+| BAJA | 17+ | 17+ | 0 |
+| **Total** | **103+** | **102+** | **1** |
 
-Bugs pendientes: BUG-117 (reload onboarding), BUG-118 (push ban en onboarding), BUG-134 (metricas MC persist).
+Bugs pendientes: BUG-134 (metricas MC persist).
 
 ---
 
@@ -951,6 +951,80 @@ Bugs pendientes: BUG-117 (reload onboarding), BUG-118 (push ban en onboarding), 
 - **Causa:** Query usaba `with('attendee:id,first_name,last_name')` pero attendees no tiene esos campos, el nombre viene de User
 - **Fix:** Cambiar a `with('attendee.user:id,name')`
 - **Archivo:** PollController.php (results method)
+
+---
+
+## 2026-04-21 — Session Lifecycle + Mission Control + Agenda RT
+
+### BUG-175: Carbon mutation corrompe duracion de siguiente sesion al retrasar (RESUELTO)
+- **Severidad:** CRITICA — la siguiente sesion en el salon quedaba con duracion 0 minutos
+- **Consecuencia:** Si Salon A tiene sesion de 60 min y se retrasa 10 min, la siguiente sesion pasaba de 60 min a 0 min de duracion (start y end iguales). En la agenda publica la sesion aparecia como instantanea, imposible de entrar al stream.
+- **Causa:** `addMinutes()` de Carbon MUTA el objeto en lugar de crear uno nuevo. PHP evalua los valores del array secuencialmente: el primer valor muta el Carbon, el segundo usa el ya-mutado. Ambos campos (`start_datetime`, `end_datetime`) terminan apuntando al mismo valor.
+- **Fix:** `->copy()->addMinutes()` para crear instancias independientes
+- **Archivo:** SessionConfigController.php:350-354 (adjustNextSession)
+- **Test nuevo:** `test_delay_preserves_next_session_duration`
+
+### BUG-176: Archivo .ics de calendario ignora delays — hora original (RESUELTO)
+- **Severidad:** ALTA — usuario descarga sesion al calendario y la hora no refleja el retraso
+- **Consecuencia:** Si una sesion fue retrasada 30 min, el .ics seguia mostrando la hora original. El asistente llegaba 30 min antes al salon vacio, o perdia el inicio real.
+- **Causa:** Endpoint calendar usaba `$session->end_datetime` (hora original) en vez de `$session->publicEnd()` (hora ajustada con delay)
+- **Fix:** Cambiar a `publicEnd()` que prioriza `adjusted_end_at` sobre `end_datetime`
+- **Archivo:** AgendaController.php:63
+
+### BUG-177: Delay podia mover sesiones ya iniciadas (RESUELTO)
+- **Severidad:** ALTA — sesion en vivo se movia en la agenda, confundiendo asistentes
+- **Consecuencia:** Si la sesion B ya estaba en vivo y el moderador retrasaba sesion A, sesion B se movia en la agenda publica. Asistentes en B veian "Sesion en vivo" con horario futuro, inconsistencia critica.
+- **Causa:** `adjustNextSession()` buscaba la siguiente sesion por `start_datetime` sin excluir las que ya tienen `actual_start_at`
+- **Fix:** Agregar `->whereNull('actual_start_at')` al query
+- **Archivo:** SessionConfigController.php:334
+- **Test nuevo:** `test_delay_does_not_move_already_started_next`
+
+### BUG-178: start() permitia iniciar sesion finalizada o cancelada (RESUELTO)
+- **Severidad:** ALTA — moderador podia "reiniciar" una sesion terminada, corrompiendo datos de asistencia
+- **Consecuencia:** Si moderador clickeaba "Iniciar" en una sesion ya finalizada (por error de UI o segundo MC), se sobreescribia `actual_start_at`. Todas las metricas de asistencia (duracion, check-in/out) quedaban invalidas.
+- **Causa:** Solo se validaba `actual_start_at` (ya iniciada), sin verificar `actual_end_at` ni `cancelled_at`
+- **Fix:** Guards para ALREADY_ENDED y CANCELLED antes del check de ALREADY_STARTED
+- **Archivo:** SessionConfigController.php:148
+- **Tests nuevos:** `test_start_rejects_already_ended`, `test_start_rejects_cancelled`
+
+### BUG-179: Cancelar sesion retrasada no revertia el delay en la siguiente (RESUELTO)
+- **Severidad:** ALTA — la siguiente sesion quedaba desplazada sin razon
+- **Consecuencia:** Si sesion A tenia +15 min de delay (empujando sesion B), y luego A se cancelaba, sesion B seguia desplazada +15 min innecesariamente. En un dia con 8 sesiones, esto podia acumular 30+ min de gap fantasma.
+- **Causa:** `cancel()` solo seteaba `cancelled_at` sin verificar si habia un delay activo que revertir
+- **Fix:** Si la sesion cancelada tenia `adjusted_end_at`, calcular el delay y revertirlo en la siguiente sesion
+- **Archivo:** SessionConfigController.php:242-249
+- **Test nuevo:** `test_cancel_reverts_delay_on_next_session`
+
+### BUG-180: Agenda app no actualizaba horarios en tiempo real (RESUELTO)
+- **Severidad:** ALTA — moderador cambiaba horario, asistentes veian hora vieja hasta reabrir app
+- **Consecuencia:** Titulo, descripcion y otros campos SI se actualizaban RT. Pero start/end NO. El asistente veia "10:00 AM" cuando la sesion ya estaba movida a "10:30 AM". Llegaba tarde o se confundia.
+- **Causa:** 3 problemas simultaneos:
+  1. MMKV disk cache (`initialData`) restauraba datos stale al re-montar componentes
+  2. FlashList `extraData` no incluia la data de sesiones, no forzaba re-render al cambiar horarios
+  3. `ENTITY_KEYS['agenda']` solo invalidaba `['agenda']`, no `['mi-agenda']` — favoritos nunca se refrescaban
+- **Fix:** (1) `deleteCached()` del MMKV al recibir invalidation socket, (2) agregar `sessionsForDay` a extraData, (3) agregar `'mi-agenda'` a ENTITY_KEYS
+- **Archivos:** useDataInvalidation.ts, AgendaScreen.tsx
+
+### BUG-181: MC segundo moderador no recibia timer ni stop al cambiar estado (RESUELTO)
+- **Severidad:** MEDIA — si dos moderadores abrian MC, el segundo no veia el cronometro correcto
+- **Consecuencia:** Moderador 1 inicia sesion. Moderador 2 recibe evento socket `session:started` pero no iniciaba el timer — mostraba "En vivo" sin cronometro. Al finalizar, timer del moderador 2 seguia corriendo.
+- **Causa:** Socket listeners para session:started/ended/cancelled solo cambiaban `sessionState` y llamaban `updateControlUI()`, sin llamar `startLiveTimer()`/`stopLiveTimer()` ni usar `actual_start_at` del payload
+- **Fix:** Iniciar timer con `actual_start_at` del server al recibir started, detener en ended/cancelled
+- **Archivo:** public/mission-control/app.js:1607-1609
+
+### BUG-183: Kiosk ping ignora adjusted_end_at — muestra hora original tras delay (RESUELTO)
+- **Severidad:** ALTA — kiosk mostraba hora de fin sin reflejar el retraso
+- **Consecuencia:** Moderador retrasa sesion 15 min desde MC, pero el totem en la puerta del salon sigue mostrando la hora original. Asistentes que miran la pantalla creen que la sesion termina antes. Progress bar tambien incorrecta.
+- **Causa:** `RoomCheckinController::ping()` usaba `$s->actual_end_at ?? $s->end_datetime` ignorando `adjusted_end_at` (el campo que guarda el delay)
+- **Fix:** Cambiar a `$s->actual_end_at ?? $s->publicEnd()` — `publicEnd()` ya prioriza adjusted sobre original
+- **Archivo:** RoomCheckinController.php:95
+
+### BUG-182: Push de delay incluia asistentes de sesiones pasadas (RESUELTO)
+- **Severidad:** BAJA — notificacion innecesaria a gente que favorito sesiones de hace meses
+- **Consecuencia:** Si un salon tuvo un evento hace 6 meses y se reusa, los asistentes del evento viejo que favoritaron sesiones en ese salon recibian push "Agenda retrasada X min" sin contexto.
+- **Causa:** Query de favoritos no filtraba por fecha, incluia todas las sesiones del salon sin importar cuando fueron
+- **Fix:** Filtro `where('start_datetime', '>=', now()->subHours(2))` para solo incluir sesiones recientes
+- **Archivo:** SessionConfigController.php:382
 
 ---
 
@@ -1046,3 +1120,4 @@ Bugs pendientes: BUG-117 (reload onboarding), BUG-118 (push ban en onboarding), 
 6. **Integracion** — NUNCA integrar 3+ componentes de golpe, uno a la vez
 7. **DB schema** — si un campo puede ser negativo en el futuro, usar signed desde el inicio
 8. **Error handling** — NUNCA exponer errores tecnicos al usuario, siempre try-catch en endpoints
+9. **Carbon mutation** — `addMinutes()`/`addHours()` MUTAN el objeto. SIEMPRE usar `->copy()->addMinutes()` cuando se necesita el valor original intacto

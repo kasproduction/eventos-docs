@@ -46,11 +46,10 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 
 ---
 
-## Fase 1 — Implementar en React (Kiosko) — EN PROGRESO
+## Fase 1 — Implementar en React (Kiosko) — COMPLETADA
 
-> Reemplazado RoomApp.tsx con diseño Lumina Noir.
+> RoomApp.tsx con diseño Lumina Noir completo.
 
-### Completado
 - [x] Portar CSS del demo a kiosk.css (design system completo)
 - [x] Dos layouts separados en React (landscape `k-l` / portrait `k-p`)
 - [x] Stage scaling con dimensiones fijas (no DOM-dependent)
@@ -72,18 +71,16 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 - [x] Cache local nombres (useAttendeeCache): manifest → delta cada 60s
 - [x] Nombre instantaneo en overlay antes de que API responda
 - [x] Scan optimizado backend: lock non-blocking, Event cacheado
-
-### Pendiente — Pre-produccion (critico)
 - [x] ~~Sonido de confirmacion~~ — descartado: ruido ambiental en eventos hace inutil cualquier beep
-- [x] **Contador check-ins** — "142 check-ins today" en footer emerald. Backend cuenta en ping, +1 optimista local tras scan exitoso
-- [x] **Test de carga 5000 attendees** — 682 KB full / 99 bytes delta / 584ms Windows (est. ~150ms Linux). Sin problema de memoria
-
-### Pendiente — Pulido
-- [ ] **Scan endpoint < 100ms** — en produccion Linux sera ~50ms, verificar con VPS real
+- [x] Contador check-ins — "142 check-ins today" en footer emerald
+- [x] Test de carga 5000 attendees — 682 KB full / 99 bytes delta / 584ms Windows
 - [x] Indicador visual de "cache cargado" — footer muestra "Online · 1,086 cached · 23:45"
 - [x] Portrait: bottom zone con clase `.compact` cuando no hay next session
 - [x] Overlay: foto del attendee desde cache (avatar_url en manifest + lookupAvatar)
 - [x] Footer: "Online · X cached · HH:MM" en landscape y portrait
+
+### Pendiente — Verificar en VPS real
+- [ ] **Scan endpoint < 100ms** — en produccion Linux sera ~50ms, verificar con VPS real
 
 ### Decisiones de arquitectura
 - **Cache solo nombres** (Opcion 2): no predice checkin/checkout, API decide.
@@ -93,7 +90,7 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 - **Scan non-blocking**: lock `Cache::lock()->get()` falla inmediato en vez de
   `block(2)` que esperaba hasta 2 segundos.
 
----
+
 
 ## Fase 2 — Mission Control navegacion — COMPLETADA
 
@@ -114,9 +111,8 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 
 ---
 
-## Fase 3 — Silent disco UI — EN PROGRESO
+## Fase 3 — Silent disco UI — COMPLETADA (excepto push)
 
-### Completado
 - [x] MC tab Asistencia: tab dedicado (solo visible si silent_disco_group_id)
 - [x] MC: boton "Iniciar check" con countdown RT + contadores por sesion
 - [x] MC: historial permanente con barras proporcionales (scroll, ultimos 20)
@@ -133,8 +129,6 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 - [x] Backend: GET /active, GET /history, pending incluye room_id
 - [x] Backend: EventSessionResource incluye room_id + silent_disco_group_id
 - [x] Tests: 23 tests, 96 assertions (mass confirm 20 users, history, active, expired)
-
-### Pulido completado
 - [x] MC: personas en salon ("21 personas en el salon") antes de disparar
 - [x] App: filtro por room — verifica via API pending antes de mostrar modal
 - [x] MC: TTL configurable — pills 30s/60s/90s/2min, se envia al backend
@@ -145,7 +139,6 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 - [x] App: doble vibracion al recibir check (Warning + Heavy)
 - [x] App: modal no se cierra sin responder (toast advertencia)
 - [x] MC: boton "Exportar CSV" — descarga asistencia por sesion
-- [x] MC: socket join:event fix (fallback si ya conectado)
 - [x] Backend: fix avatar_url → photo_url en report endpoint
 - [ ] Push notification — pendiente verificar con dev build real
 
@@ -187,8 +180,9 @@ Kiosko React **Lumina Noir implementado** — Fase 0 + Fase 1 parcial.
 - [x] Zero polling: invalidacion via socket + mutaciones locales
 - [x] ModuleMenu: centrado impar para modulos extra
 
-### Pendiente
-- [ ] Cola offline: MMKV + batch sync
+### Pendiente (nice to have)
+- [ ] Cola offline: MMKV + batch sync (staff scan en zonas sin WiFi)
+
 ---
 
 ## Documentos de referencia

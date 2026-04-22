@@ -2,7 +2,7 @@
 
 > Historial de todo lo implementado, organizado por area.
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
-> Actualizado: 2026-04-19
+> Actualizado: 2026-04-21
 
 ---
 
@@ -854,3 +854,106 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 ### Totales acumulados 2026-04-20c
 - Backend: 553+ tests, 1593+ assertions
 - Kiosko: build exitoso, funcional en localhost
+
+---
+
+## 2026-04-21 — Kiosk Fases 3-4 + Staff App + Session Lifecycle + Bug Audit
+
+### Kiosk Roadmap — Fases completadas
+- [x] **Fase 0** — Demo HTML hibrido (standalone) — COMPLETADA
+- [x] **Fase 1** — Implementar en React (Kiosko) — COMPLETADA (28 items, solo falta verificar scan <100ms en VPS)
+- [x] **Fase 2** — Mission Control navegacion — COMPLETADA (sidebar agenda, HMAC nav, tracks)
+- [x] **Fase 3** — Silent disco UI — COMPLETADA (MC tab asistencia, app modal, TTL, CSV, socket RT; push pendiente dev build)
+- [x] **Fase 4** — App movil staff_checkin — COMPLETADA (backend 10 tests, app hub+scanner+assignment, socket RT; cola offline nice-to-have)
+
+### Staff App (sesion 2026-04-21b)
+- [x] StaffHappeningNow card en home
+- [x] ModuleMenu: modulo staff_checkin visible solo para rol staff_checkin
+- [x] Scanner staff con room picker + resultado BottomSheet
+- [x] Filament: assign staff desde admin panel
+- [x] Fix: roomCheckinApi usaba `api` como callable (BUG-165)
+
+### Session Lifecycle — 8 bugs criticos corregidos (sesion 2026-04-21c)
+- [x] **BUG-175 CRITICO**: Carbon mutation en adjustNextSession() — siguiente sesion quedaba con duracion 0 min (start=end). Fix: `->copy()->addMinutes()`
+- [x] **BUG-176 ALTO**: .ics calendario usaba end_datetime en vez de publicEnd() — usuario descargaba hora sin delay. Fix: `publicEnd()`
+- [x] **BUG-177 ALTO**: Delay movia sesiones ya iniciadas. Fix: `whereNull('actual_start_at')`
+- [x] **BUG-178 ALTO**: start() permitia iniciar sesion finalizada/cancelada. Fix: guards ended + cancelled
+- [x] **BUG-179 ALTO**: cancel() no revertia delay en siguiente sesion. Fix: revert logic + clear adjusted_end_at
+- [x] **BUG-180 ALTO**: Agenda RT no actualizaba horarios (titulo si, start/end no). Fix: MMKV cache clear + FlashList extraData + mi-agenda invalidation
+- [x] **BUG-181 MEDIO**: MC segundo moderador no recibia timer correcto. Fix: startLiveTimer/stopLiveTimer en socket listeners
+- [x] **BUG-182 BAJO**: Push delay incluia sesiones pasadas. Fix: filtro `>= now()-2h`
+- [x] 5 tests nuevos: preserva duracion, no mueve started, rechaza ended/cancelled, cancel revierte delay
+- [x] **BUG-183**: Kiosk ping ignoraba adjusted_end_at — totem mostraba hora sin delay. Fix: `publicEnd()` en RoomCheckinController:95
+- [x] **MC cronometro verificado**: elapsed desde actual_start_at server, remaining contra SESSION_END (actualizado por delay), warning amber <5min, sync socket entre MCs
+
+### MC Session Lifecycle — Control tab completado
+- [x] Botones Start/End/Cancel con modal confirmacion
+- [x] Delay +5/+10/+15/+30 con cascade a siguiente sesion
+- [x] Cronometro "En vivo — X min" con warning <5 min restantes
+- [x] Timeline persistente en localStorage
+- [x] Socket sync entre multiples MCs (started/ended/cancelled)
+- [x] Estado inicial desde MC_CONFIG (actual_start_at, actual_end_at, cancelled_at)
+
+### QA Pre-produccion documentado
+- [x] PLAN-STRESS-TEST.md ampliado: QA de integridad funcional + 4 smoke tests E2E + chaos testing (6 escenarios) + calendario pre-prod semana -8 a dia D
+
+---
+
+## Webhooks Integracion Partners — COMPLETADO (2026-04-21)
+
+> P0 non-negotiable. Bancolombia usa empresas externas para badges.
+> Roadmap: docs/ROADMAP-WEBHOOKS.md
+
+### Fase 1 — Modelo de datos
+- [x] 3 migraciones: webhook_endpoints, webhook_api_keys, webhook_logs
+- [x] 3 modelos: auto-genera secret (64 chars), key con prefijo wh_live_ (48 chars), log inmutable
+- [x] Helpers: listensTo(), signPayload() HMAC-SHA256, hasPermission(), isSuccess()
+
+### Fase 2 — Outbound (EventOS → Partner)
+- [x] WebhookDispatchService: busca endpoints activos, filtra por evento suscrito, filtra campos seleccionados
+- [x] DispatchWebhookJob: HTTP POST con HMAC signature, retry 3x (1min/5min/30min), respeta 429 Retry-After
+- [x] AttendeeWebhookObserver: dispara en created (registered), updated (approved/checked_in/profile), deleted (cancelled)
+- [x] Idempotency key ULID en cada payload
+- [x] Test mode: payloads con `"test": true`
+- [x] needs_attention: marca endpoint tras 3 fallos consecutivos
+
+### Fase 3 — Inbound (Partner → EventOS)
+- [x] WebhookInboundController: check-in individual y batch (max 100)
+- [x] Auth por header X-Webhook-Key (sin Sanctum)
+- [x] Rate limit atomico por key (configurable, default 100/hora), Retry-After header en 429
+- [x] Check-in por email o por attendee_id
+- [x] Test mode: no marca checked_in_at, responde would_check_in
+- [x] Idempotente: re-checkin devuelve already_checked_in
+- [x] Validaciones: banned (403), not found (404), inactive key (401), sin permiso (403)
+- [x] Batch transaccional (DB::transaction)
+
+### Fase 4 — Filament Admin
+- [x] WebhookEndpointResource: CRUD + acciones (Enviar prueba, Copiar secret, Reenviar fallidos, Descargar spec)
+- [x] WebhookApiKeyResource: CRUD + accion Regenerar key
+- [x] WebhookLogResource: read-only, filtros direction/status/test, detalle payload+response
+- [x] WebhookStatsWidget: enviados hoy, check-ins recibidos, tasa de exito
+- [x] Boton "Simular evento": 5 registros + 3 check-ins fake al partner
+- [x] Boton "Descargar spec": TXT con URLs, keys, payload ejemplo, codigos respuesta, verificacion HMAC
+
+### Fase 5 — Operaciones
+- [x] PruneWebhookLogsCommand: `webhook:prune-logs --days=90` en cron diario 2am
+- [x] TestWebhooksCommand: `app:test-webhooks` — 19 checks automaticos (setup + outbound + inbound + logs)
+
+### Bugs post-audit corregidos
+- [x] Rate limit race condition: Cache::get+increment → increment atomico
+- [x] Retry-After header faltante en 429
+- [x] Batch sin transaccion → DB::transaction
+- [x] Sin idempotency key → ULID por dispatch
+- [x] Logs sin cleanup → prune command cron
+
+### Totales
+- 24 tests unitarios, 60 assertions
+- 19 checks en test command
+- 3 Filament resources, 1 widget, 6 acciones
+- 0 bugs pendientes
+
+### Totales acumulados 2026-04-21
+- Backend: 582+ tests, 1664+ assertions
+- Bugs: BUG-001 a BUG-183 registrados, 182+ resueltos, 1 pendiente (BUG-134)
+- Kiosk roadmap: 4 de 4 fases completadas
+- Webhooks: COMPLETADO (P0 cerrado)

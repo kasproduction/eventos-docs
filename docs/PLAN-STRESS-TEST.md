@@ -341,6 +341,109 @@ Despues de cada fix, repetir TEST 4 (10K, 2h) para verificar que:
 
 ---
 
+## QA de integridad funcional (pre-stress test)
+
+> Antes de lanzar carga, validar que la logica de negocio no tiene bugs de integridad.
+> Estos bugs no se detectan con stress test — solo con tests que verifican **consecuencias**, no solo acciones.
+> Leccion aprendida: sesion 2026-04-21 encontro 8 bugs criticos/altos revisando Session Lifecycle + MC.
+
+### Principio: no revisar modulo por modulo
+
+Revisar CRUD simples (speakers, FAQ, documents) es desperdicio — ahi los bugs son cosmeticos.
+Los bugs de integridad viven en modulos con **estado derivado, cascadas, cache multicapa o concurrencia**.
+
+### Modulos que requieren revision profunda
+
+| Modulo | Por que | Que verificar |
+|--------|---------|---------------|
+| **Session Lifecycle** | Cascadas (delay→next, cancel→revert), Carbon mutation, estado compartido | Duracion preservada, sesiones ya iniciadas intocables, revert correcto, .ics con publicEnd |
+| **Agenda RT** | Cache 3 capas (MMKV + react-query + socket) | Cambio desde Filament/MC refleja en app <3s, mi-agenda tambien, reconexion socket resync |
+| **Gamification** | Puntos derivados de 13+ acciones, canje, leaderboard | Puntos = suma exacta de acciones, canje descuenta, no doble award, leaderboard ordenado |
+| **Networking requests** | Optimistic UI + infinite query + socket RT | Request → accept → aparece en contactos, no duplicados, badge correcto, cancel revierte |
+| **Registration flow** | 6 modos combinables (approval + access_code + invite_only + domain + depends_on + verify) | Cada combinacion funciona, token no reutilizable, race condition max_uses, replay pre-fill |
+| **Check-in / Room** | Kiosk cache vs API source of truth, staff assignment, offline queue | Scan correcto, ban rechazado, offline queue flush parcial, concurrent accept lock |
+| **Moderation** | Ban RT, palabras bloqueadas, chat delete, Q&A approve | Ban desconecta socket <2s, palabras filtradas, delete RT, aprobacion RT en display |
+
+### Smoke tests E2E (1 test, flujo completo)
+
+Estos tests simulan un flujo de usuario real de punta a punta. Si pasan, la integridad funcional esta validada.
+
+#### Test 1: Dia de evento completo (backend)
+```
+Crear evento → 3 salas × 3 sesiones/sala → 5 attendees, 2 vendedores, 1 admin
+1. Admin: delay sesion A1 +15min → verificar:
+   - A1.end_datetime intacto, A1.adjusted_end_at = original+15
+   - A2.start movido +15, A2.duracion preservada (60 min)
+   - A3 NO movido
+   - .ics de A1 usa adjusted_end_at
+2. Admin: start sesion A1 → verificar:
+   - actual_start_at = now
+   - A2 (ya movida) NO se mueve otra vez
+3. Admin: end sesion A1 antes del original → verificar:
+   - adjusted_end_at cleared, A2 revertida
+4. Admin: cancel sesion B1 (que tenia delay) → verificar:
+   - B2 revertida, B1.adjusted_end_at cleared
+5. Attendee: favoritar A2 → verificar mi-agenda incluye A2
+6. Vendedor: scan attendee → lead creado → puntos gamification
+7. Admin: ban attendee → verificar 403 en siguiente request
+```
+
+#### Test 2: Cache RT de agenda (app, manual o Detox)
+```
+1. Abrir app → ver agenda → anotar hora de sesion X
+2. Desde Filament: cambiar titulo sesion X → app debe mostrar nuevo titulo <3s
+3. Desde MC: delay sesion X +10min → app debe mostrar nueva hora <3s
+4. Cambiar a tab Mi Agenda → verificar que tambien tiene hora nueva
+5. Cerrar app, reabrir → verificar que muestra hora nueva (no la vieja del MMKV)
+6. Matar socket server → Filament cambia titulo → levantar socket → app debe sincronizar al reconectar
+```
+
+#### Test 3: Gamification integridad de puntos
+```
+1. Attendee con 0 puntos
+2. Check-in (+50) → verify total = 50
+3. Favoritar sesion (+10) → verify total = 60
+4. Scan por vendedor (+20 lead) → verify total = 80
+5. Rating sesion (+15) → verify total = 95
+6. Canjear reward (-50) → verify total = 45
+7. Intentar canjear reward de 50 → verify rejected (insuficiente)
+8. Leaderboard: attendee en posicion correcta
+```
+
+#### Test 4: Networking consistency
+```
+1. A envia request a B → B tiene 1 pending
+2. B acepta → A y B en contactos mutuos, request desaparece
+3. A envia request a C → C rechaza → request desaparece, no en contactos
+4. Directory: B ya no aparece como "sugerido" para A
+5. Badge networking: B acepto → badge +1 para A
+```
+
+### Chaos testing (post-stress, pre-produccion)
+
+| Escenario | Que hacer | Que debe pasar |
+|-----------|-----------|----------------|
+| Socket muere 30s | `kill socket`, esperar, levantar | App reconecta, refetch agenda/announcements, no pierde estado |
+| Redis muere 10s | `redis-cli shutdown`, levantar | API degrada (no cache), no crash. Socket reconecta pub/sub |
+| MySQL slow (5s queries) | Simular con `SLEEP(5)` en trigger | API devuelve 504 timeout, app muestra error, no crash |
+| 2 MCs misma sesion | Abrir 2 tabs MC, operar ambas | Estado sincronizado via socket, no conflicto |
+| App pierde red 60s | Modo avion, volver | Socket reconecta, agenda fresca, chat historial intacto |
+| Double-tap rapido | Tap start 2 veces en MC | Solo 1 request pasa (409 en segunda) |
+
+### Calendario pre-produccion
+
+```
+Semana -8 (junio):  Smoke tests E2E (Test 1-4) — automatizar con PHPUnit/Pest
+Semana -6:          Stress test carga (10K plan existente)
+Semana -4:          Chaos testing + fixes
+Semana -3:          Dry run con cliente (Eventos Efectivos opera MC, nosotros attendee)
+Semana -2:          Fix bugs del dry run + re-test
+Semana -1:          Freeze — solo hotfixes criticos
+Dia D (sept):       Evento real
+```
+
+---
+
 ## Documentos relacionados
 
 | Doc | Contenido |
