@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golden Ticket — Rediseno DaVinci</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Urbanist:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --elevated: #1c1c1c;
+    --border: rgba(255,255,255,0.06);
+    --text: #f5f5f5;
+    --text-secondary: rgba(255,255,255,0.7);
+    --text-muted: rgba(255,255,255,0.4);
+    --text-placeholder: rgba(255,255,255,0.2);
+    --teal: #39d2c0;
+
+    --gold: #B5A68B;
+    --gold-soft: rgba(181,166,139,0.4);
+    --gold-glow: rgba(181,166,139,0.15);
+    --gold-surface: rgba(181,166,139,0.08);
+    --gold-border: rgba(181,166,139,0.15);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Urbanist', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    padding: 60px 40px;
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .column-label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+  }
+
+  /* ═══ PHONE FRAME ═══ */
+  .phone {
+    width: 375px;
+    height: 780px;
+    background: var(--bg);
+    border-radius: 40px;
+    border: 2px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  /* Simulated background content (leaderboard blurred) */
+  .phone-bg {
+    position: absolute;
+    inset: 0;
+    padding: 60px 20px 20px;
+    filter: blur(3px);
+    opacity: 0.25;
+  }
+
+  .phone-bg-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 20px;
+  }
+
+  .phone-bg-card {
+    height: 120px;
+    background: var(--surface);
+    border-radius: 16px;
+    margin-bottom: 12px;
+  }
+
+  /* ═══ MODAL OVERLAY ═══ */
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    backdrop-filter: blur(8px);
+  }
+
+  /* ═══ CURRENT (old) ═══ */
+  .old-modal {
+    width: 100%;
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 0 24px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .old-blob {
+    width: 200px;
+    height: 100px;
+    background: rgba(255,215,0,0.35);
+    filter: blur(40px);
+    border-radius: 50%;
+    margin: -30px auto 0;
+  }
+
+  .old-icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: rgba(255,215,0,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: -10px auto 10px;
+    font-size: 28px;
+  }
+
+  .old-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+
+  .old-prize {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: #FFD700;
+    margin-bottom: 4px;
+  }
+
+  .old-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .old-code-wrap {
+    border: 1px dashed rgba(255,215,0,0.3);
+    border-radius: 10px;
+    padding: 8px 16px;
+    background: rgba(255,215,0,0.05);
+    margin-bottom: 16px;
+  }
+
+  .old-code-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .old-code {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: 6px;
+    color: #FFD700;
+  }
+
+  .old-qr {
+    width: 160px;
+    height: 160px;
+    background: white;
+    border-radius: 12px;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #999;
+    /* RGB glow border like the screenshot */
+    box-shadow:
+      0 0 0 4px rgba(200,100,255,0.4),
+      0 0 0 6px rgba(100,200,255,0.3),
+      0 0 20px rgba(200,100,255,0.2);
+  }
+
+  .old-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .old-hint2 {
+    font-size: 11px;
+    color: var(--text-placeholder);
+    margin-bottom: 8px;
+  }
+
+  .old-close {
+    font-size: 12px;
+    color: var(--text-placeholder);
+  }
+
+  /* ═══ NEW — Award Certificate ═══ */
+  .new-modal {
+    width: 100%;
+    background: var(--elevated);
+    border-radius: 24px;
+    padding: 32px 24px 24px;
+    text-align: center;
+    position: relative;
+    border: 1px solid var(--gold-border);
+  }
+
+  /* Subtle top accent line instead of blob */
+  .new-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 24px;
+    right: 24px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .new-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--gold-surface);
+    border: 1.5px solid var(--gold-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+
+  .new-icon {
+    font-size: 22px;
+    color: var(--gold);
+  }
+
+  .new-overline {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .new-prize {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  .new-sponsor {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .new-game {
+    font-size: 11px;
+    color: var(--text-placeholder);
+    margin-bottom: 20px;
+  }
+
+  .new-code-wrap {
+    background: var(--gold-surface);
+    border: 1px solid var(--gold-border);
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+  }
+
+  .new-code-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .new-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: 8px;
+    color: var(--gold);
+  }
+
+  .new-qr-wrap {
+    display: inline-block;
+    padding: 10px;
+    background: white;
+    border-radius: 16px;
+    border: 2px solid var(--gold-border);
+    margin-bottom: 16px;
+  }
+
+  .new-qr {
+    width: 140px;
+    height: 140px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #999;
+  }
+
+  .new-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+
+  .new-close {
+    font-size: 11px;
+    color: var(--text-placeholder);
+    letter-spacing: 0.5px;
+  }
+
+  /* ═══ CLAIMED VERSION ═══ */
+  .new-modal.claimed {
+    border-color: rgba(57,210,192,0.15);
+  }
+
+  .new-modal.claimed::before {
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  }
+
+  .new-modal.claimed .new-icon-wrap {
+    background: rgba(57,210,192,0.08);
+    border-color: rgba(57,210,192,0.15);
+  }
+
+  .new-modal.claimed .new-icon {
+    color: var(--teal);
+  }
+
+  .new-modal.claimed .new-overline {
+    color: var(--teal);
+  }
+
+  .new-modal.claimed .new-code-wrap {
+    background: rgba(57,210,192,0.06);
+    border-color: rgba(57,210,192,0.12);
+  }
+
+  .new-modal.claimed .new-code {
+    color: var(--teal);
+    text-decoration: line-through;
+    text-decoration-color: rgba(57,210,192,0.3);
+  }
+
+  .claimed-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(57,210,192,0.08);
+    border: 1px solid rgba(57,210,192,0.15);
+    color: var(--teal);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ CURRENT ═══ -->
+<div class="column">
+  <div class="column-label">Actual</div>
+  <div class="phone">
+    <div class="phone-bg">
+      <div class="phone-bg-title">Desafio</div>
+      <div class="phone-bg-card"></div>
+      <div class="phone-bg-card"></div>
+      <div class="phone-bg-card"></div>
+    </div>
+    <div class="modal-overlay">
+      <div class="old-modal">
+        <div class="old-blob"></div>
+        <div class="old-icon-wrap">&#127903;</div>
+        <div class="old-title">PREMIO GANADO</div>
+        <div class="old-prize">iPhone 16 Pro</div>
+        <div class="old-sub">Sorteo: Golden Test</div>
+        <div class="old-code-wrap">
+          <div class="old-code-label">Codigo de reclamo</div>
+          <div class="old-code">KEVJDV</div>
+        </div>
+        <div class="old-qr">[QR Code]</div>
+        <div class="old-hint">Presenta tu codigo en el stand principal para reclamar tu premio.</div>
+        <div class="old-hint2">Presenta este codigo en el punto de reclamo</div>
+        <div class="old-close">Toca para cerrar</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NEW — PENDING ═══ -->
+<div class="column">
+  <div class="column-label">Propuesta — Pendiente</div>
+  <div class="phone">
+    <div class="phone-bg">
+      <div class="phone-bg-title">Desafio</div>
+      <div class="phone-bg-card"></div>
+      <div class="phone-bg-card"></div>
+      <div class="phone-bg-card"></div>
+    </div>
+    <div class="modal-overlay">
+      <div class="new-modal">
+        <div class="new-icon-wrap">
+          <span class="new-icon">&#127942;</span>
+        </div>
+        <div class="new-overline">Ganador</div>
+        <div class="new-prize">iPhone 16 Pro</div>
+        <div class="new-sponsor">por AWS</div>
+        <div class="new-game">Sorteo Golden Test</div>
+
+        <div class="new-code-wrap">
+          <div class="new-code-label">Codigo de reclamo</div>
+          <div class="new-code">KEVJDV</div>
+        </div>
+
+        <div class="new-qr-wrap">
+          <div class="new-qr">[QR Code]</div>
+        </div>
+
+        <div class="new-hint">Presenta este codigo en el punto de reclamo</div>
+        <div class="new-close">Toca para cerrar</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NEW — CLAIMED ═══ -->
+<div class="column">
+  <div class="column-label">Propuesta — Reclamado</div>
+  <div class="phone">
+    <div class="phone-bg">
+      <div class="phone-bg-title">Desafio</div>
+      <div class="phone-bg-card"></div>
+      <div class="phone-bg-card"></div>
+      <div class="phone-bg-card"></div>
+    </div>
+    <div class="modal-overlay">
+      <div class="new-modal claimed">
+        <div class="new-icon-wrap">
+          <span class="new-icon">&#10003;</span>
+        </div>
+        <div class="new-overline">Reclamado</div>
+        <div class="new-prize">iPhone 16 Pro</div>
+        <div class="new-sponsor">por AWS</div>
+        <div class="new-game">Sorteo Golden Test</div>
+
+        <div class="claimed-badge">&#10003; Premio reclamado</div>
+
+        <div class="new-code-wrap">
+          <div class="new-code-label">Codigo de reclamo</div>
+          <div class="new-code">KEVJDV</div>
+        </div>
+
+        <div class="new-hint" style="color:var(--text-placeholder)">Reclamado el 23 abr 2026, 14:30</div>
+        <div class="new-close">Toca para cerrar</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
