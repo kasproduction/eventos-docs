@@ -153,7 +153,7 @@
 ## Completados recientes (referencia, no pendientes)
 
 ### Session Lifecycle + Silent Disco + MC — COMPLETADO (2026-04-21)
-> 23 tests, 59 assertions, 9 bugs (BUG-175 a BUG-183). Ver COMPLETADO.md.
+> 23 tests, 59 assertions, 9 bugs. Ver BUG-LOG.md (numeracion reorganizada 2026-04-23).
 
 ### Room Check-in — Kiosko + Staff — COMPLETADO (Fases 0-4)
 > Pendientes menores:

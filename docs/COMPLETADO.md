@@ -2,7 +2,9 @@
 
 > Historial de todo lo implementado, organizado por area.
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
-> Actualizado: 2026-04-21
+> **NOTA:** Los numeros BUG-XXX en este archivo son historicos. La numeracion fue reorganizada el 2026-04-23.
+> Fuente de verdad para bugs: `docs/BUG-LOG.md` (numeracion secuencial BUG-001 a BUG-232).
+> Actualizado: 2026-04-23
 
 ---
 

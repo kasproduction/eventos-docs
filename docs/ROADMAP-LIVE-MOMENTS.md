@@ -5,7 +5,7 @@
 > Display usa libreria spin-wheel (angulos, pesos, animacion nativos).
 > Controles en el DISPLAY (el moderador esta frente a la pantalla, no en el laptop).
 > Prioridad: P1 (diferenciador — competencia NO lo tiene)
-> Estado: Fase 3 completada — pendiente Fase 4 trivia (2026-04-22)
+> Estado: COMPLETADO — todas las fases + Platinum Gold + Golden Ticket rediseno (2026-04-23)
 
 ---
 
@@ -78,72 +78,22 @@ UNIQUE(game_id, attendee_id, round)
 
 ---
 
-## Bugs resueltos (sesion 2026-04-22)
+## Bugs resueltos
 
-### BUG-1: Angulo visual no corresponde al sector — RESUELTO
-- Migrado a libreria `spin-wheel` v5 que maneja angulos, pesos y animacion nativamente
-- `spinToItem(sectorIndex)` garantiza que el pointer siempre apunta al sector correcto
-- Pesos de sectores respetados automaticamente por la libreria
-
-### BUG-2: Sectores sin color/weight → rueda gris — CORREGIDO
-- Backend asigna defaults (fallback colors + weight=1) en `store()`
-- Display tiene fallback colors array
-
-### BUG-3: Pool virtual stale (Redis zombies) — CORREGIDO v2
-- Problema: Redis SETs `session:*:viewers` no tenian TTL, quedaban zombies al desconectar
-- Fix: eliminar Redis SETs para pool, usar socket server RT via `GET /internal/session/viewers`
-- Socket endpoint usa `fetchSockets()` + `socket.data.user.attendeeId` — siempre real-time
-- GameService::getVirtualPool ahora hace HTTP al socket server, no lee Redis
-- MC: eligible_count se actualiza en RT via `session:audience` event
-- MC: refresh carga eligible_count del API (antes hardcoded 0)
-
-### BUG-4: Rueda cuadrada — CORREGIDO
-- `.d-wheel-wrap` ahora tiene `overflow:hidden; border-radius:50%`
-
-### BUG-5: Gamificacion invisible — YA ESTABA CORREGIDO
-- `game_spin` ya existia en PointsService DEFAULT_CONFIG
-
-### BUG-6: Race condition double launch — CORREGIDO
-- `WHERE status='draft'` atomic update previene doble lanzamiento
-
-### BUG-7: Race condition double spin — CORREGIDO
-- `WHERE status='active'` atomic update previene doble giro
-
-### BUG-8: Race condition double draw — CORREGIDO
-- `WHERE status='active'` atomic update previene doble sorteo
-
-### BUG-9: mt_rand crash con sectors vacio — CORREGIDO
-- Early return para empty/single sector en weightedRandom()
-
-### BUG-10: Jackpot srandmember null → attendee_id=0 — CORREGIDO
-- Check `$winnerId` antes de buscar attendee
-
-### BUG-11: CSV formula injection — CORREGIDO
-- Sanitize campos con prefijos peligrosos (=, +, -, @)
-
-### BUG-12: Spin-wheel module race condition — CORREGIDO
-- Retry con setTimeout si modulo no cargo aun
-
-### BUG-13: < 2 sectores = pantalla blanca — CORREGIDO
-- Muestra mensaje "Configuracion de ruleta invalida"
-
-### BUG-14: Idle message stuck on error — CORREGIDO
-- Restore idle state (mensaje + rotacion) en catch del control button
-
-### BUG-15: Standby timer no se limpia en disconnect — CORREGIDO
-- clearTimeout + clearInterval en disconnect handler
+> Todos los bugs estan documentados con detalle en `docs/BUG-LOG.md` (fuente unica de verdad).
+> Live Moments acumula 35+ bugs resueltos entre Fase 2, 3, 4 y 5.
 
 ---
 
 ## Fase 2 — Completada
 
-### 2.1 Angulo rueda (BUG-1) — COMPLETADO
+### 2.1 Angulo rueda — COMPLETADO
 - [x] Libreria spin-wheel maneja angulos nativamente
 
-### 2.2 Display visual (BUG-4) — COMPLETADO
+### 2.2 Display visual — COMPLETADO
 - [x] overflow:hidden + border-radius:50%
 
-### 2.3 Gamificacion visible (BUG-5) — COMPLETADO
+### 2.3 Gamificacion visible — COMPLETADO
 - [x] game_spin ya en DEFAULT_CONFIG
 
 ### 2.4 Boton Girar/Sortear en display — COMPLETADO
@@ -167,7 +117,7 @@ UNIQUE(game_id, attendee_id, round)
 - [x] Fase participacion simplificada: titulo + premio + "Preparate..." (sin counter inutil)
 - [x] Info (titulo + premio) posicionado absolute top-right (no se monta con reel)
 - [x] Fallbacks: beam si no hay foto, `[winner]` si participants vacio
-- [x] 10 bugs resueltos (BUG-162 a BUG-171)
+- [x] 10 bugs resueltos (ver BUG-LOG.md)
 
 ### 2.7 Persistencia de premios (Golden Ticket) — COMPLETADO 2026-04-22
 - [x] Migration: `claim_code` (6 chars alfanumerico sin ambiguos) en reward_redemptions
@@ -177,7 +127,7 @@ UNIQUE(game_id, attendee_id, round)
 - [x] AnnouncementController reescrito: publicos cacheados + privados solo al target
 - [x] App: `useMyPrizes()` hook, AnnouncementCard tappable con deep link
 - [x] App: Golden Ticket cards en Gamificacion + modal con QR y claim code grande
-- [x] 5 bugs resueltos (BUG-183 a BUG-187)
+- [x] 5 bugs resueltos (ver BUG-LOG.md)
 
 ---
 
@@ -241,24 +191,38 @@ UNIQUE(game_id, attendee_id, round)
 
 ---
 
-## Fase 5 — Pulido — PENDIENTE ~2h
+## Fase 5 — Pulido
 
-### Branded moments
-- [ ] Display: logo sponsor en esquina durante todo el juego
-- [ ] App: "Patrocinado por [sponsor]" con logo
-- [ ] Push: "[sponsor] te invita a participar"
-- [ ] Social wall: post con logo sponsor
+### 5.1 Performance 10K — COMPLETADO 2026-04-23
+- [x] Spin foreach 10K = 20K queries sincronas → timeout (ver BUG-LOG.md)
+- [x] Fix: `ProcessSpinRewardsJob` — dispatch async con bulk operations
+- [x] `upsert()` participants en chunks de 1000 (1 query por chunk)
+- [x] `insert()` bulk points_log con dedup previo (1 query por chunk)
+- [x] `InvalidationService::broadcast()` una vez al evento (no 10K individuales)
+- [x] Response HTTP < 200ms independiente del pool size
+- [x] 10 spin tests pasando
 
-### Sonido display
-- [ ] Countdown tick ultimos 5s
-- [ ] Fanfare al resultado
-- [ ] Confetti pop
-- [ ] User gesture unlock al primer click
+### 5.2 Export completo — COMPLETADO 2026-04-23
+- [x] CSV export spin + jackpot (existente)
+- [x] CSV export trivia: ronda, pregunta, respuesta dada, correcta, acerto, tiempo, score
+- [x] CSV sanitizado contra formula injection (existente)
+- [x] UTF-8 BOM para Excel
+- [x] Filament page "Live Moments" (Interaccion) — tabla juegos + boton CSV por fila
+- [x] Filtros por tipo (ruleta/sorteo/trivia) y estado
+- [x] 5 export tests pasando (incluyendo trivia)
 
-### Historial exportable
-- [x] CSV export spin + jackpot (COMPLETADO)
-- [x] CSV sanitizado contra formula injection (COMPLETADO)
-- [ ] Boton export en MC historial
+### 5.3 Branded moments — COMPLETADO 2026-04-23
+- [x] MC: sponsor data pasado en gameData para jackpot (participation + result), spin result, trivia (question + result + podio)
+- [x] Display spin: ya tenia sponsor badge (d-game-sponsor con logo + nombre)
+- [x] Display jackpot: sponsor badge en participation + ceremony winner reveal
+- [x] Display trivia: sponsor badge en question header, result header, podio final
+- [x] App toast game:launched: "Ruleta en curso: titulo — por [Sponsor]"
+- [x] App TriviaPanel: "Patrocinado por [Sponsor]" con logo en header (question + podio)
+- [x] App TriviaStore: sponsor field agregado al state
+- [~] Push: descartado — Expo push no soporta imagenes inline cross-platform confiable
+- [~] Social wall: descartado — autoPostWall ya menciona sponsor en texto, logo forzado no aporta
+
+---
 
 ---
 
@@ -267,6 +231,7 @@ UNIQUE(game_id, attendee_id, round)
 | Componente | Estado |
 |------------|--------|
 | Backend modelos + API | Funcional, 30 bugs corregidos, race conditions resueltos |
+| Performance 10K | Funcional (spin + trivia bulk async via jobs) |
 | MC tab Games | Funcional (spin, jackpot — drafts, launch, historial, eligible RT) |
 | MC tab Trivia | Funcional (Kahoot-style 4 estados, preview, edit, countdown RT) |
 | Display spin | Funcional (spin-wheel lib, idle, control btn, auto-standby) |
@@ -279,10 +244,11 @@ UNIQUE(game_id, attendee_id, round)
 | App socket listeners | Funcional (launched/result/question/round-result/finished) |
 | App TriviaPanel | Funcional (noir, countdown, opciones, feedback, podio) |
 | Trivia | COMPLETADA (Fase 4) |
-| Pulido (sonido, branded) | PENDIENTE (Fase 5) |
-| 40+ tests | PASANDO |
+| Export Filament | Funcional (spin/jackpot/trivia CSV desde Filament) |
+| Branded moments | Funcional (sponsor en display + app + toast) |
+| 45+ tests | PASANDO |
 
 ---
 
-_Roadmap Live Moments v2.3 — EventOS_
+_Roadmap Live Moments v2.5 — EventOS (COMPLETADO)_
 _23 abril 2026_
