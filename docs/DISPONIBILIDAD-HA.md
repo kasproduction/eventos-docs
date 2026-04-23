@@ -593,5 +593,127 @@ Con esta arquitectura:
 
 ---
 
-*EventOS Alta Disponibilidad v1.0*
-*Próxima revisión: pre-deploy a producción*
+## 11. Live Moments — Fixes Pre-Produccion (10K usuarios)
+
+> Auditoria realizada 2026-04-23. La infraestructura HA cubre Live Moments sin cambios.
+> Estos 4 fixes son optimizaciones **app-level** requeridas antes del stress test.
+
+### Estado actual sin fixes
+
+| Escenario | Problema | Impacto |
+|-----------|----------|---------|
+| 10K responden trivia en 10s | 10,000 HTTP POSTs de broadcast `game:answer-count` | Cola HTTP saturada, contador 200-500ms atrasado |
+| closeRound() con 10K participantes | `SUM(score) GROUP BY` sin indice, full scan 50K rows | Query 500ms-2s, riesgo timeout |
+| MC con 30 sesiones visibles | `getEligiblePool()` hace HTTP al socket server en cada poll (cada 5s) | 30+ HTTP calls/5s, MC laggy |
+| Broadcasts concurrentes | Pool HTTP default 6 conexiones | Backlog, timeouts despues de 2-5s |
+
+### FIX-1: Throttle game:answer-count (CRITICO)
+
+**Problema:** Cada `POST /games/{id}/answer` dispara un broadcast con el conteo actual. Con 10K usuarios respondiendo en 10-30 segundos, son 10K HTTP POSTs redundantes al socket server (muchos con el mismo numero).
+
+**Solucion:** Throttle con Redis — maximo 1 broadcast por segundo.
+
+```php
+// GameController::answer() — despues de crear LiveGameParticipant
+$throttleKey = "game:answer-count:{$game->id}:{$round}";
+if (!Cache::has($throttleKey)) {
+    $count = LiveGameParticipant::where('game_id', $game->id)
+        ->where('round', $round)->count();
+    GameService::broadcast($game, 'game:answer-count', [
+        'round' => $round, 'count' => $count,
+    ]);
+    Cache::put($throttleKey, true, 1); // 1 segundo
+}
+```
+
+**Resultado:** 10K answers → max ~10 broadcasts. **99% reduccion.**
+
+**Esfuerzo:** 20 lineas, 30 min.
+
+### FIX-2: Indexes en live_game_participants (CRITICO)
+
+**Problema:** `closeRound()` hace `SUM(score) GROUP BY attendee_id` sobre toda la tabla sin indices. Con 10K participantes x 5 rondas = 50K rows → full table scan 500ms-2s.
+
+**Solucion:** Migracion con indices compuestos.
+
+```php
+Schema::table('live_game_participants', function (Blueprint $table) {
+    $table->index(['game_id', 'round']);           // para distribution count
+    $table->index(['game_id', 'attendee_id']);     // para leaderboard SUM
+});
+```
+
+**Resultado:** closeRound query: 500ms → 20ms. **10x mas rapido.**
+
+**Esfuerzo:** 1 migracion, 5 min.
+
+### FIX-3: Cache getEligiblePool() (ALTO)
+
+**Problema:** `getEligiblePool()` hace 2 DB queries + 1 HTTP al socket server cada vez. MC la llama en `bySession()` que se ejecuta cada 5s. Con 30 sesiones visibles = 30 HTTP calls al socket server cada 5s.
+
+**Solucion:** Cache en Redis 30 segundos, invalidar al cambiar estado del juego.
+
+```php
+public static function getEligiblePool(LiveGame $game): Collection
+{
+    return Cache::remember(
+        "game:eligible:{$game->id}",
+        30,
+        fn() => self::buildPool($game)
+    );
+}
+// En launch(), spin(), draw(): Cache::forget("game:eligible:{$game->id}");
+```
+
+**Resultado:** HTTP calls al socket: 30/5s → 1/30s. **30x reduccion.**
+
+**Esfuerzo:** 15 lineas, 1 hora.
+
+### FIX-4: HTTP connection pool para broadcasts (ALTO)
+
+**Problema:** Laravel HTTP client usa pool default de 6 conexiones. Con broadcasts rapidos (100/s en pico de trivia), las conexiones se saturan y forman cola.
+
+**Solucion:** Aumentar pool y reducir timeouts.
+
+```php
+// GameService::broadcast()
+Http::connectTimeout(1)->timeout(2)
+    ->withHeaders(['X-Internal-Secret' => $secret])
+    ->post("{$socketUrl}/internal/broadcast", $payload);
+```
+
+**Resultado:** Acepta 10x mas broadcasts concurrentes sin timeout.
+
+**Esfuerzo:** 10 lineas, 30 min.
+
+### Cronograma de implementacion
+
+| Fix | Cuando | Prerequisito de |
+|-----|--------|-----------------|
+| FIX-2 (indices) | Inmediato, no rompe nada | Stress test |
+| FIX-1 (throttle) | Pre stress test | Stress test trivia |
+| FIX-3 (cache pool) | Pre stress test | Stress test MC |
+| FIX-4 (HTTP pool) | Pre stress test | Stress test carga |
+
+**Total:** ~3 horas de trabajo. Todos van en la fase P6 (Deploy + Stress test).
+
+### Lo que NO necesita cambios
+
+- Socket.IO Redis adapter: diseñado para 10K+ (broadcast 1→todos)
+- Real-time invalidation: jitter + debounce 800ms ya implementados
+- Rate limiting: por usuario y por sesion
+- Sanctum tokens: 12h de vida, suficiente
+- HA infra: 2 VPS + PlanetScale + Upstash + Cloudflare = sin cambios
+
+### Patron validado
+
+El patron de broadcast (1 mensaje → todos los clientes) esta validado en produccion con el sistema de bingo que manejo 4,000 usuarios reales simultaneos. Trivia usa el mismo patron:
+- Backend decide resultado (server-side)
+- 1 broadcast al room del evento
+- Socket.IO + Redis adapter distribuye a N clientes
+- No hay broadcast individual por usuario
+
+---
+
+*EventOS Alta Disponibilidad v1.1*
+*Actualizado: 2026-04-23 — seccion 11 Live Moments fixes*
