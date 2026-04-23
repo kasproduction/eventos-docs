@@ -956,6 +956,64 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 
 ### Totales acumulados 2026-04-21
 - Backend: 582+ tests, 1664+ assertions
-- Bugs: BUG-001 a BUG-183 registrados, 182+ resueltos, 1 pendiente (BUG-134)
 - Kiosk roadmap: 4 de 4 fases completadas
 - Webhooks: COMPLETADO (P0 cerrado)
+
+---
+
+## 2026-04-22/23 — Live Moments (Juegos en Vivo) COMPLETADO
+
+> Roadmap completo: docs/ROADMAP-LIVE-MOMENTS.md v2.5
+> Bugs: ver BUG-LOG.md (numeracion reorganizada, BUG-177 a BUG-232)
+
+### Fase 1 — Backend + MC base (2026-04-21/22)
+- [x] LiveGame + LiveGameParticipant models, migrations, relations
+- [x] GameService: pool RT (presencial room + virtual socket), weightedRandom, broadcast, cooldown
+- [x] CRUD + launch + spin + draw + next-question + close-round + answer endpoints
+- [x] MC tab Games: drafts, launch, historial, eligible RT
+- [x] Display spin: spin-wheel lib, idle, control btn, auto-standby
+- [x] Display jackpot: photo cascade ceremony GSAP, shockwave, confetti
+- [x] MasterSeeder: 50 attendees, 25 check-in, 12 games
+
+### Fase 2 — Sorteo Ceremony + Golden Ticket (2026-04-22)
+- [x] Rewrite slot machine → Photo Cascade Ceremony (strip vertical GSAP power4.out)
+- [x] Golden Ticket: claim_code 6 chars, /me/prizes, Filament PrizeRedemptions page
+- [x] AnnouncementController: publicos cacheados + privados solo al target
+- [x] App: useMyPrizes hook, AnnouncementCard tappable deep link
+- [x] 15 bugs resueltos (pool RT, race conditions, ceremony visual)
+
+### Fase 3 — App integration (2026-04-22)
+- [x] Socket listeners: game:launched, game:result, game:question, game:round-result, game:finished
+- [x] Toast info/success, invalidacion my-points/my-prizes/announcements
+- [x] Push al ganador jackpot con claim_code + deep link
+
+### Fase 4 — Trivia Kahoot-style (2026-04-23)
+- [x] Backend: next-question (broadcast sin respuesta), close-round (distribucion, leaderboard, auto-finish)
+- [x] Answer: scoring correcta + speed bonus, previene doble (unique constraint)
+- [x] MC tab Trivia: 4 estados (draft, lobby, question activa, resultado, podio)
+- [x] Display LED: pregunta+opciones, barras distribucion RT, leaderboard, podio
+- [x] App TriviaPanel: countdown, opciones, feedback correcto/incorrecto, mini leaderboard, podio
+- [x] useTriviaStore zustand: 4 fases (idle, question, result, finished)
+- [x] 15 bugs resueltos (activePanel critico, countdown, toast labels, MC handlers)
+
+### Fase 5 — Performance + Export + Branded + Platinum Gold (2026-04-23)
+- [x] ProcessSpinRewardsJob: bulk upsert + insertOrIgnore (20K queries → ~10)
+- [x] ProcessTriviaRewardsJob: bulk points award async
+- [x] points_log unique constraint migration
+- [x] Trivia CSV export (ronda, pregunta, respuesta, tiempo, score)
+- [x] Filament page LiveGameResults con export por juego
+- [x] Branded moments: sponsor en MC projections, display, app toast + TriviaPanel
+- [x] Platinum Gold #B5A68B unificado (3 repos, ~15 archivos)
+- [x] MC metrics elevation (box-shadow, sin barras color generico)
+- [x] Golden Ticket rediseno "Award Certificate" (linea accent, trophy, QR limpio)
+- [x] AgendaScreen Evaluar + PollSlides star_rating colores corregidos
+- [x] 6 bugs resueltos (10K spin, 10K trivia, answer race condition, points_log unique, Redis flushdb)
+
+### BUG-LOG reorganizado (2026-04-23)
+- [x] Renumerado BUG-001 a BUG-232, cero duplicados (antes habia ~15 duplicados)
+- [x] 210+ bugs total, 208+ resueltos, 2 pendientes
+
+### Totales acumulados 2026-04-23
+- Backend: 582+ tests, 1664+ assertions (41 Game tests, 172 assertions)
+- Live Moments: COMPLETADO (5 fases, 35+ bugs resueltos)
+- Bugs: BUG-001 a BUG-232, 208+ resueltos, 2 pendientes (BUG-111, BUG-127)
