@@ -1222,6 +1222,36 @@ Bugs pendientes: BUG-134 (metricas MC persist).
 - **Fix:** Delegar a `CheckinService::validateDynamicToken()` como fuente unica de verdad
 - **Archivo:** StaffCheckinController.php (resolveAttendeeFromQr)
 
+### BUG-183: RewardRedemption::isExpired() crash con expires_at null (RESUELTO)
+- **Severidad:** CRITICA — premios tipo prize (jackpot) tienen expires_at=null, isExpired() llamaba ->isPast() en null
+- **Causa:** Metodo no contemplaba que prize redemptions no expiran
+- **Fix:** Nullsafe operator `$this->expires_at?->isPast()`
+- **Archivo:** app/Models/RewardRedemption.php
+
+### BUG-184: RewardService::confirm() crash con expires_at null (RESUELTO)
+- **Severidad:** CRITICA — confirmar un premio de jackpot (expires_at=null) crasheaba con "Call to a member function isPast() on null"
+- **Causa:** abort_if no verificaba null antes de ->isPast()
+- **Fix:** `abort_if($redemption->expires_at && $redemption->expires_at->isPast(), 410, ...)`
+- **Archivo:** app/Services/RewardService.php
+
+### BUG-185: RewardController::redeem() response crash expires_at null (RESUELTO)
+- **Severidad:** MEDIA — aunque redeem() solo crea redemptions con expires_at, la respuesta no usaba nullsafe
+- **Causa:** `->toIso8601String()` en campo que podria ser null en futuras extensiones
+- **Fix:** `$redemption->expires_at?->toIso8601String()`
+- **Archivo:** app/Http/Controllers/Api/V1/RewardController.php
+
+### BUG-186: RewardController::myRedemptions() response crash expires_at null (RESUELTO)
+- **Severidad:** CRITICA — listar redemptions con prizes (expires_at=null) crasheaba al mapear la respuesta
+- **Causa:** `$r->expires_at->toIso8601String()` sin nullsafe
+- **Fix:** `$r->expires_at?->toIso8601String()`
+- **Archivo:** app/Http/Controllers/Api/V1/RewardController.php
+
+### BUG-187: Announcements privados visibles a todos los attendees del mismo rol (RESUELTO)
+- **Severidad:** ALTA — announcements con target_attendee_id (ej: "Ganaste el sorteo") se mostraban a todos los attendees del mismo rol, no solo al target
+- **Causa:** AnnouncementController filtraba por roles pero no por target_attendee_id
+- **Fix:** Separar query: publicos (cacheados por rol, whereNull target_attendee_id) + privados (sin cache, where target_attendee_id = attendee actual)
+- **Archivo:** app/Http/Controllers/Api/V1/AnnouncementController.php
+
 ---
 
 ## Patrones recurrentes (para prevenir)

@@ -5,7 +5,7 @@
 > Display usa libreria spin-wheel (angulos, pesos, animacion nativos).
 > Controles en el DISPLAY (el moderador esta frente a la pantalla, no en el laptop).
 > Prioridad: P1 (diferenciador — competencia NO lo tiene)
-> Estado: Fase 2.6 completada — pendiente 2.7 (2026-04-22)
+> Estado: Fase 3 completada — pendiente Fase 4 trivia (2026-04-22)
 
 ---
 
@@ -169,28 +169,30 @@ UNIQUE(game_id, attendee_id, round)
 - [x] Fallbacks: beam si no hay foto, `[winner]` si participants vacio
 - [x] 10 bugs resueltos (BUG-162 a BUG-171)
 
-### 2.7 Persistencia de premios (jackpot) — PENDIENTE ~1h
-- [ ] Al ganar: generar claim_code (6 chars alfanumerico)
-- [ ] Al ganar: crear Announcement privado para el ganador
-- [ ] Nuevo endpoint: `GET /me/prizes` → lista de premios ganados
-- [ ] Filament: boton "Marcar reclamado"
-- [ ] App: seccion "Mis premios" en pantalla Gamificacion
+### 2.7 Persistencia de premios (Golden Ticket) — COMPLETADO 2026-04-22
+- [x] Migration: `claim_code` (6 chars alfanumerico sin ambiguos) en reward_redemptions
+- [x] `RewardService::createPrize()` genera claim_code automaticamente
+- [x] `GET /me/prizes` — endpoint dedicado (premio, sponsor, juego, claim_code, estado)
+- [x] Filament: pagina "Premios Ganados" con tabla, filtros, accion "Marcar reclamado"
+- [x] AnnouncementController reescrito: publicos cacheados + privados solo al target
+- [x] App: `useMyPrizes()` hook, AnnouncementCard tappable con deep link
+- [x] App: Golden Ticket cards en Gamificacion + modal con QR y claim code grande
+- [x] 5 bugs resueltos (BUG-183 a BUG-187)
 
 ---
 
-## Fase 3 — App integration — PENDIENTE ~3h
+## Fase 3 — App integration — COMPLETADA 2026-04-22
 
 ### Socket listeners
-- [ ] `game:launched` → banner contextual en Home + session: "Ruleta en vivo — Mira la pantalla!"
-- [ ] `game:result` type=spin → toast "Ganaste [N] pts en [titulo]!" + AnimatedPts
-- [ ] `game:result` type=jackpot → si ganaste: pantalla especial confetti + "GANASTE [premio]!"
-- [ ] `game:result` type=jackpot → si no ganaste: "El ganador es [nombre]"
-- [ ] `game:ended` → dismiss banner
+- [x] `game:launched` → toast info "Ruleta/Sorteo en curso: {title}" (6s, global)
+- [x] `game:result` type=spin → toast success "+{points} pts en la ruleta" + invalida my-points
+- [x] `game:result` type=jackpot → invalida my-prizes + announcements (ganador ve Golden Ticket)
+- [x] Listeners en `useDataInvalidation.ts` — funciona en toda la app, cualquier pantalla
 
-### Push notifications (requiere dev build)
-- [ ] Spin: no push (toast via socket es suficiente)
-- [ ] Jackpot ganador: push "Ganaste [premio]! Toca para ver detalles" → deep link a Mis Premios
-- [ ] Jackpot todos: push "Se sorteo [premio] — el ganador es [nombre]!"
+### Push notifications
+- [x] Spin: no push (toast via socket es suficiente)
+- [x] Jackpot ganador: push "Ganaste {premio}! Codigo: {claim_code}" + deep link gamification/rewards
+- [ ] Jackpot todos: push "Se sorteo [premio] — el ganador es [nombre]!" (descartado — no aporta valor)
 
 ---
 
@@ -249,21 +251,22 @@ UNIQUE(game_id, attendee_id, round)
 
 | Componente | Estado |
 |------------|--------|
-| Backend modelos + API | Funcional, 11 bugs corregidos, race conditions resueltos |
+| Backend modelos + API | Funcional, 20 bugs corregidos, race conditions resueltos |
 | MC tab Games | Funcional (drafts, launch, spin, draw, historial, eligible RT) |
 | Display spin | Funcional (spin-wheel lib, idle, control btn, auto-standby) |
-| Display jackpot | Basico (contador + ganador, sin slot machine) |
+| Display jackpot | Funcional (photo cascade ceremony GSAP) |
 | Pool RT (socket+presencial) | Funcional (socket /internal/session/viewers + MC RT refresh) |
 | Gamificacion visible | Funcional (game_spin en config) |
 | Boton en display | Funcional (Girar/Sortear con token MC) |
-| Slot machine fotos | PENDIENTE (Fase 2.6) |
-| Premios persistentes | PENDIENTE (Fase 2.7) |
-| App socket listeners | PENDIENTE (Fase 3) |
-| Push notifications | PENDIENTE (Fase 3, requiere dev build) |
+| Sorteo Ceremony | Funcional (strip GSAP, reveal, confetti amber) |
+| Golden Ticket | Funcional (claim_code, /me/prizes, Filament, modal QR) |
+| App socket listeners | Funcional (game:launched toast, game:result pts, global) |
+| Push jackpot ganador | Funcional (SendPushToAttendeeJob con claim_code) |
 | Trivia | PENDIENTE (Fase 4) |
-| 24 tests | PASANDO |
+| Pulido (sonido, branded) | PENDIENTE (Fase 5) |
+| 30+ tests | PASANDO |
 
 ---
 
-_Roadmap Live Moments v2.1 — EventOS_
+_Roadmap Live Moments v2.2 — EventOS_
 _22 abril 2026_
