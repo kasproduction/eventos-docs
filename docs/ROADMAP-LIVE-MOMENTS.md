@@ -207,22 +207,37 @@ UNIQUE(game_id, attendee_id, round)
 - [ ] `GET /games/{id}/leaderboard` → ranking acumulado
 - [ ] Tests: 8
 
-### Display LED
-- [ ] Pregunta: texto grande + 4 opciones coloreadas + countdown circular
-- [ ] Barras de respuestas RT
-- [ ] Resultado: correcta resaltada + distribucion + top 3
-- [ ] Final: podio top 3 + confetti
+### Backend — COMPLETADO
+- [x] Type trivia en LiveGame, validacion config questions[]
+- [x] POST next-question (broadcast sin respuesta correcta)
+- [x] POST close-round (distribucion, leaderboard, auto-finish ultima ronda)
+- [x] POST answer (scoring correcta + speed bonus, previene doble)
+- [x] game_trivia en PointsService, puntos acumulados al finalizar
+- [x] PATCH games/{id} para editar draft/active
+- [x] 10 tests (28 assertions)
 
-### MC
-- [ ] Modal crear trivia: titulo, preguntas repeater, sponsor, audience
-- [ ] Panel activo: pregunta actual, countdown, respuestas RT, boton Siguiente/Cerrar
-- [ ] Leaderboard sidebar RT
+### Display LED — COMPLETADO
+- [x] Pregunta: texto grande + 4 opciones coloreadas + countdown
+- [x] Barras de respuestas RT con distribucion
+- [x] Resultado: correcta resaltada verde + top 5
+- [x] Final: podio top 3
+- [x] Auto-proyeccion desde MC al enviar pregunta/cerrar ronda
 
-### App
-- [ ] Socket game:update → pantalla pregunta + 4 botones + countdown
-- [ ] Tap respuesta → POST answer → disabled + "Esperando..."
-- [ ] Socket game:result → correcta verde/rojo + puntos animados + posicion
-- [ ] Socket game:ended → resultado final con podio
+### MC — COMPLETADO (Kahoot-style 4 estados)
+- [x] Tab Trivia separado (cambia interactive_mode al guardar)
+- [x] Draft: preview preguntas con correcta verde, editar, lanzar, eliminar
+- [x] Lobby: titulo + total preguntas + boton Iniciar
+- [x] Pregunta activa: texto + opciones + correcta marcada + countdown + contador respuestas RT
+- [x] Resultado: barras distribucion + correcta + top 5 leaderboard + boton Siguiente
+- [x] Podio final: top 5 + boton Proyectar Podio
+
+### App — COMPLETADO
+- [x] TriviaPanel noir en session-stream (como polls/chat/QA)
+- [x] Socket game:question → muestra pregunta + 4 opciones + countdown
+- [x] Tap respuesta → POST answer → countdown para, feedback correcto/incorrecto
+- [x] Socket game:round-result → muestra correcta + mini leaderboard
+- [x] Socket game:finished → podio final con scores
+- [x] useTriviaStore zustand para estado global
 
 ---
 
@@ -251,22 +266,23 @@ UNIQUE(game_id, attendee_id, round)
 
 | Componente | Estado |
 |------------|--------|
-| Backend modelos + API | Funcional, 20 bugs corregidos, race conditions resueltos |
-| MC tab Games | Funcional (drafts, launch, spin, draw, historial, eligible RT) |
+| Backend modelos + API | Funcional, 30 bugs corregidos, race conditions resueltos |
+| MC tab Games | Funcional (spin, jackpot — drafts, launch, historial, eligible RT) |
+| MC tab Trivia | Funcional (Kahoot-style 4 estados, preview, edit, countdown RT) |
 | Display spin | Funcional (spin-wheel lib, idle, control btn, auto-standby) |
 | Display jackpot | Funcional (photo cascade ceremony GSAP) |
+| Display trivia | Funcional (pregunta+opciones, barras, leaderboard, podio) |
 | Pool RT (socket+presencial) | Funcional (socket /internal/session/viewers + MC RT refresh) |
-| Gamificacion visible | Funcional (game_spin en config) |
-| Boton en display | Funcional (Girar/Sortear con token MC) |
+| Gamificacion visible | Funcional (game_spin + game_trivia en config) |
 | Sorteo Ceremony | Funcional (strip GSAP, reveal, confetti amber) |
-| Golden Ticket | Funcional (claim_code, /me/prizes, Filament, modal QR) |
-| App socket listeners | Funcional (game:launched toast, game:result pts, global) |
-| Push jackpot ganador | Funcional (SendPushToAttendeeJob con claim_code) |
-| Trivia | PENDIENTE (Fase 4) |
+| Golden Ticket | Funcional (claim_code, /me/prizes, Filament, modal QR, push) |
+| App socket listeners | Funcional (launched/result/question/round-result/finished) |
+| App TriviaPanel | Funcional (noir, countdown, opciones, feedback, podio) |
+| Trivia | COMPLETADA (Fase 4) |
 | Pulido (sonido, branded) | PENDIENTE (Fase 5) |
-| 30+ tests | PASANDO |
+| 40+ tests | PASANDO |
 
 ---
 
-_Roadmap Live Moments v2.2 — EventOS_
-_22 abril 2026_
+_Roadmap Live Moments v2.3 — EventOS_
+_23 abril 2026_

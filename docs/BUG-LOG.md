@@ -1252,6 +1252,66 @@ Bugs pendientes: BUG-134 (metricas MC persist).
 - **Fix:** Separar query: publicos (cacheados por rol, whereNull target_attendee_id) + privados (sin cache, where target_attendee_id = attendee actual)
 - **Archivo:** app/Http/Controllers/Api/V1/AnnouncementController.php
 
+### BUG-188: publicShow recibia eventId como sessionId — config de sesion incorrecta (RESUELTO)
+- **Severidad:** CRITICA — GET /events/{eventId}/sessions/{sessionId}/live-config siempre devolvia config de sesion 1 (eventId) en vez de la sesion real
+- **Causa:** publicShow(int $sessionId) solo recibia 1 parametro, Laravel inyectaba el primer parametro de ruta (eventId)
+- **Fix:** publicShow(int $eventId, int $sessionId) — recibir ambos parametros
+- **Archivo:** SessionConfigController.php
+
+### BUG-189: effectiveMode mapping no incluia trivia — panel siempre 'none' (RESUELTO)
+- **Severidad:** CRITICA — session-stream linea 302 tenia mapping manual hardcodeado que no incluia 'trivia', siempre caia en 'none' mostrando "Interaccion desactivada"
+- **Causa:** Se usaba effectiveMode con ternarios en vez de activePanel del config
+- **Fix:** Reemplazar mapping manual por activePanel directo de useSessionConfig
+- **Archivo:** app/(app)/session-stream/[id].tsx
+
+### BUG-190: configPayload no devolvia feature flags individuales (RESUELTO)
+- **Severidad:** ALTA — API devolvia interactive_mode pero no chat_enabled/qna_enabled/polls_enabled/trivia_enabled, frontend no podia derivar activePanel
+- **Causa:** configPayload solo retornaba interactive_mode raw
+- **Fix:** Derivar flags de interactive_mode en configPayload + derivar activePanel de interactive_mode directamente
+- **Archivo:** SessionConfigController.php, useSessionConfig.ts
+
+### BUG-191: GameController errores usaban 'error' en vez de 'message' — MC no mostraba mensajes (RESUELTO)
+- **Severidad:** MEDIA — apiFetch busca d.message pero backend enviaba d.error, toasts de error vacios
+- **Causa:** Inconsistencia en formato de respuesta de error
+- **Fix:** Reemplazar todos response()->json(['error' =>]) por ['message' =>]
+- **Archivo:** GameController.php (26 ocurrencias)
+
+### BUG-192: Countdown trivia no se detenia al responder (RESUELTO)
+- **Severidad:** MEDIA — despues de responder una pregunta, el timer seguia contando en la app
+- **Causa:** useEffect del countdown no observaba myAnswer
+- **Fix:** Agregar useEffect separado que limpia el interval cuando myAnswer cambia
+- **Archivo:** components/screens/TriviaPanel.tsx
+
+### BUG-193: Toast game:launched decia "Ruleta en curso" para trivia (RESUELTO)
+- **Severidad:** BAJA — el label solo chequeaba jackpot, todo lo demas era "Ruleta"
+- **Causa:** Ternario simple sin caso trivia
+- **Fix:** Record con labels por tipo: spin/jackpot/trivia
+- **Archivo:** hooks/useDataInvalidation.ts
+
+### BUG-194: Boton trivia en Games estaba disabled con titulo "Proximamente" (RESUELTO)
+- **Severidad:** BAJA — boton de trivia en panel Games tenia disabled y title="Proximamente"
+- **Causa:** Placeholder viejo nunca removido
+- **Fix:** Removido — trivia ahora vive en su propio tab MC
+- **Archivo:** mission-control/index.html
+
+### BUG-195: initGames tenia handlers de trivia huerfanos — crash null addEventListener (RESUELTO)
+- **Severidad:** CRITICA — gameTriviaNextBtn/gameTriviaCloseBtn/gameAddQuestion ya no existian en HTML pero los listeners seguian en JS, crash al cargar MC
+- **Causa:** Migracion incompleta de trivia de Games a su propio tab
+- **Fix:** Eliminar todos los handlers y elementos de trivia del IIFE de initGames
+- **Archivo:** mission-control/app.js, mission-control/index.html
+
+### BUG-196: renderGameTrivia usaba standbyTimer y displayContent inexistentes (RESUELTO)
+- **Severidad:** CRITICA — display crasheaba al recibir proyeccion de trivia
+- **Causa:** Variables copiadas mal: standbyTimer→_standbyTimer, displayContent→content
+- **Fix:** Corregir nombres de variables
+- **Archivo:** public/display/session.html
+
+### BUG-197: loadTrivia llamada antes de definirse — ReferenceError (RESUELTO)
+- **Severidad:** MEDIA — setActiveFeature llamaba loadTrivia() que se definia en IIFE posterior
+- **Causa:** Orden de ejecucion: setActiveFeature se define antes que initTrivia IIFE
+- **Fix:** Guard typeof loadTrivia === 'function'
+- **Archivo:** mission-control/app.js
+
 ---
 
 ## Patrones recurrentes (para prevenir)
