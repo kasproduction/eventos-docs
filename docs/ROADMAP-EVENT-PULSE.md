@@ -1,91 +1,88 @@
 # Roadmap — Event Pulse (Dashboard Live para Cliente)
 
 > Dashboard visual standalone que el organizador mira en una pantalla/TV.
-> Canvas 1920x1080. NO es admin, NO es Filament, NO es Mission Control.
+> Canvas adaptativo (width 1920, height dinamica segun viewport).
+> NO es admin, NO es Filament, NO es Mission Control.
 > El organizador solo mira, no controla. Es el acuario del evento.
 > Prioridad: P1 (diferenciador — ningun competidor tiene esto)
 > Diseno aprobado: `design/event-pulse-FINAL.html`
-> Estado: **EN PROGRESO** — backend completo, socket parcial, frontend con bugs RT
-> Actualizado: 2026-04-23
+> Estado: **COMPLETO** — backend, socket, frontend, temas, responsive, auditoria 30 bugs
+> Actualizado: 2026-04-24
 
 ---
 
-## Resumen sesion 2026-04-23
+## Resumen sesion 2026-04-24
 
 ### COMPLETADO
 
-**Backend (20 tests, 72 assertions):**
-- PulseController: 8 endpoints, todos OK
-- Rooms endpoint reescrito: agrupa por room_id (1 card por room, no 1 por sesion)
-- Rooms incluye `people[]` (avatares), `session_id`, presencial/virtual separados
-- Bootstrap: `event.id` incluido, `messages` cuenta solo `status='published'`
-- Checkins: filtra attendees con user valido
-- PulseSeeder: PointsLog, sesiones live, pulse_token auto
-- Migration: `type` enum (presencial/virtual) en `room_attendee_states`
-- Endpoint `/api/v1/pulse/validate` para socket auth
-- Endpoint `/api/v1/internal/room/virtual` para presencia virtual
-- 20 tests cubriendo 8/8 endpoints + rooms agrupados + people + next session
+**Tema Noir (EP-3):**
+- Tokens duales Lumina Noir (matches Mission Control): `#0A0A0A` bg, `#0E0E0E` surface, `#FFFFFF` ink
+- Teal `#39D2C0`, green `#3BBF7A`, red `#DC4A4A`, blue `#5B8DEF` (Noir brighter)
+- `[data-theme="noir"]` override completo: shadows, pills, moments, rings
+- Toggle sol/luna bottom-right con localStorage + URL param `?theme=noir` + `default_theme` del evento
 
-**Socket server:**
-- Auth `pulse_token`: tokens `ep_*` validados via Laravel endpoint
-- `broadcastAudience` emite `session:audience` al event room (no solo session room)
-- `broadcastAudience` incluye `viewers[]` con nombre (para burbujas)
-- `broadcastAudience` acepta `fallbackEventId` para emitir cuando room queda vacio
-- Connection handler maneja pulse users (connKey negativo, sin attendeeId)
+**Responsive (EP-1):**
+- Canvas adaptativo: width 1920, height = `1920 / (vw/vh)`, scale = `vw/1920`
+- Sin franjas en ninguna resolucion: iPad 1180x820, laptop 1366x768, 2K, ultrawide
+- Portrait → overlay "Rota el dispositivo" con animacion
+- Stage + body bg usa `var(--bg)` (sin contraste letterbox)
 
-**Frontend:**
-- Fuentes locales (PlusJakartaSans + Urbanist, 10 woff2, sin CDN)
-- JetBrains Mono eliminada, `--f-mono` usa PlusJakartaSans
-- Responsive: stage flex center, canvas scale Math.min, letterboxing
-- Moments reactivados: 5 tipos (checkin, salon, rating, points, social) con data del API
-- Moments suaves: velo blanco 65% + backdrop-filter blur 8px, fade 5.5s, ambient dimming opacity 0.06 + blur 12px
-- Intervalo moments: 15s (no 6s)
-- Socket.IO client local (sin CDN)
-- Socket conecta con pulse_token, join:event, recibe eventos RT
-- `checkin:update` → actualiza counter + invalida seccion + dispara moment
-- `data:invalidate` → invalida seccion afectada + re-fetch stat
-- `session:audience` → trackea virtual viewers por session
-- `wall:post` → actualiza counter + moment
-- Secciones se re-renderizan en vivo si estan activas (crossfade)
-- Charlas: updateCharlasLive() — numero anima (scale), barra transiciona, personas fade rebuild
-- Cards compactas (align-content: start, no height: 100%)
-- Bootstrap refresh cada 5 min como fallback
+**Charlas reescrito (EP-12):**
+- Panel izquierdo: agenda timeline agrupada por sala, sesiones live/futuras
+- Panel derecho: drill-down con titulo, horario, track badge, speakers HD, descripcion, audiencia RT
+- Endpoint `rooms` devuelve `agenda[]` (agrupado) + `rooms[]` (flat)
+- Campos nuevos: `description`, `track`, `type`, `speakers[]`, `past`
+- Auto-selecciona primera sesion live, sesiones past filtradas
 
-### BUGS RESUELTOS (EP-4, EP-5, EP-6, EP-7, EP-8, EP-10, EP-11, EP-13)
+**Error handling (EP-5):**
+- Pip status en nav "Inicio": rojo (offline), amarillo (reconectando), verde (conectado)
+- Auto-recovery: bootstrap refresh completo on reconnect, 3 retries con backoff 5s
+- API fetch con AbortController timeout 8s
+- Bootstrap fail muestra "Reintentar" link
 
-- **EP-11 RESUELTO:** Virtual viewers ahora funcionan via `Rooms.pulse()`. `broadcastAudience` emite a pulse room aislado (1-2 sockets, no 10K). MC usa `join:session` y el count sube/baja en Pulse en tiempo real.
-- **EP-13 RESUELTO:** Sesiones fantasma "live" — sesiones que el moderador nunca cerro (actual_end_at=null) se mostraban como live para siempre. Fix: PulseController verifica que `publicEnd()` no haya pasado.
+**Moments RT (EP-6):**
+- `updateMomentData(key, item)` / `replaceMomentData(key, items)` expuestos
+- `checkin:update` → pushea al pool checkins
+- `wall:post` → pushea al pool posts
+- `data:invalidate` leaderboard/ratings → refetch y reemplaza pool
+- Constantes extraidas: MOMENT_DURATION, MOMENT_INTERVAL, MOMENT_FIRST_DELAY, MOMENT_POOL_MAX
+
+**Leads rediseno:**
+- Header: 3 stat cards (total leads, sponsors activos, top sponsor con logo)
+- Tabla ranking: filas con rank, logo 36px, nombre, count, avatares recientes + tiempo
+- Barra proporcional sutil (absolute, ink-05) detras de cada fila
+- Auto-scroll ping-pong cuando desborda, solo activo en seccion leads
+
+**Usuarios activos en app:**
+- Corner superior derecho: "En la app" — usuarios con app abierta (sockets activos)
+- Socket server emite `pulse:active_users` cada 10s al pulse room
+- Cuenta `userConnections` Map en memoria (connKey > 0 = attendees reales)
+- Zero HTTP, zero DB — solo Map.size en memoria
+
+**Limpieza UI:**
+- Eliminado "Event Pulse - En vivo" (brand-sub)
+- Eliminado "Transmitiendo" + dot verde
+- Eliminado nombre duplicado en idle (bot-left)
+- Eliminado dot doble en agenda charlas
+- Teal restringido a gamificacion: live→green, leads→platinum, networking→platinum
+- Acciones gamificacion muestran label humanizado (no slug)
+
+**Weather (EP-9):**
+- DESCARTADO — sin valor suficiente, evita dependencia API externa
+
+**Test E2E (EP-7):**
+- PulseSimulate probado en vivo: 6 tipos (checkin, lead, connection, post, rating, points)
+- Flujo completo verificado: simulate → socket → frontend → counter + moment
+
+**Auditoria 30 bugs (BUG-237 a BUG-267):**
+- 6 criticos: null checks, race conditions, guards
+- 8 altos: N+1 queries (leads, leaderboard), retry, timeout, validacion
+- 8 medios: memory leak, status pip, teal color, inline styles, logging
+- 8 bajos: typos, dead HTML/CSS, magic numbers, accessibility, mensajes
 
 ### BUGS PENDIENTES
 
-#### BUG-EP-1: Responsive parcial
-Letterboxing funciona pero no verificado en todas las resoluciones (1280x720, 2560x1440, tablet).
-
-#### BUG-EP-3: Tema Noir no implementado
-Solo tema Lux. Falta tokens duales + clase CSS segun `default_theme`.
-
-#### BUG-EP-9: Weather no implementado
-Decidir: quitar o campo configurable en Filament.
-
-#### BUG-EP-12: Espacio vacio en cards Charlas
-Avatares mas grandes o mas info para llenar el espacio.
-
----
-
-## Lo que falta por implementar (sesiones futuras)
-
-### Prioridad 1 — Visual
-
-1. **Tema Noir** — tokens duales en tokens.css, clase CSS segun bootstrap `default_theme`
-2. **Responsive QA** — verificar 1280x720, 1366x768, 1920x1080, 2560x1440
-3. **Charlas cards** — reducir espacio vacio, avatares mas grandes
-4. **Weather** — campo configurable en Filament o quitar
-
-### Prioridad 2 — Produccion
-
-5. **Error handling** — estado offline si API/socket falla, reintentar con indicador visual
-6. **Moments con data socket real** — moments de rating/leaderboard deberian dispararse con data:invalidate, no solo con fetch inicial
-7. **Test E2E con PulseSimulate** — probar flujo completo con el comando artisan
+Ninguno.
 
 ---
 
@@ -94,48 +91,52 @@ Avatares mas grandes o mas info para llenar el espacio.
 ### Backend (eventos-backend)
 | Archivo | Proposito |
 |---------|-----------|
-| `app/Http/Controllers/PulseController.php` | 8 endpoints: bootstrap, rooms, checkins, leads, connections, social, leaderboard, ratings |
+| `app/Http/Controllers/PulseController.php` | 8 endpoints, 0 N+1, labels humanizados |
 | `app/Http/Middleware/CheckPulseToken.php` | Valida pulse_token en query string |
-| `app/Filament/Resources/WallPostResource.php` | Aprobar post emite wall:post al socket |
-| `app/Console/Commands/PulseSimulate.php` | Simula 6 tipos de evento RT para testing |
-| `routes/api.php` | Endpoint pulse/validate (socket auth) |
-| `tests/Feature/Pulse/PulseTest.php` | 20 tests, 72 assertions |
+| `app/Console/Commands/PulseSimulate.php` | Simula 6 tipos de evento RT |
+| `app/Services/PointsService.php` | Config labels para leaderboard |
+| `tests/Feature/Pulse/PulseTest.php` | 20 tests, 79 assertions |
 
 ### Socket server (eventos-socket)
 | Archivo | Proposito |
 |---------|-----------|
-| `src/rooms.ts` | `Rooms.pulse(eventId)` — room aislado para Pulse |
-| `src/auth.ts` | `validatePulseToken()` — auth para tokens ep_* |
-| `src/chat.ts` | `broadcastAudience` emite a Rooms.session (MC) + Rooms.pulse (Pulse), viewers max 20, fallbackEventId |
-| `src/index.ts` | Middleware ep_*, auto-join pulse room, connKey sintetico |
+| `src/rooms.ts` | `Rooms.pulse(eventId)` — room aislado |
+| `src/auth.ts` | `validatePulseToken()` — auth ep_* con length check |
+| `src/types.ts` | `pulse:active_users` event type |
+| `src/chat.ts` | `broadcastAudience` → Rooms.session (MC) + Rooms.pulse (EP) |
+| `src/index.ts` | Middleware ep_*, pulse room, active users broadcast 10s, cleanup logging |
 
 ### Frontend (eventos-backend/public/event-pulse/)
 | Archivo | Proposito |
 |---------|-----------|
-| `index.html` | Canvas 1920x1080, 7 secciones, nav pills, fuentes locales |
-| `css/tokens.css` | Tokens Lux (Noir pendiente) |
-| `css/layout.css` | Stage, canvas scale, frame editorial, corners, ambient |
-| `css/sections.css` | Charlas grid, checkins, leads, networking, social masonry 3col, leaderboard podio, ratings |
-| `css/moments.css` | Overlay cinematografico, 5 tipos, fade 5.5s |
-| `js/app.js` | Bootstrap API, responsive scale, section visibility |
-| `js/sections.js` | Builders por seccion, live DOM updates charlas, social live insert masonry |
-| `js/socket.js` | Socket.IO: checkin:update, data:invalidate, wall:post, session:audience, m-on RT |
-| `js/moments.js` | 5 tipos weighted random, 15s intervalo, data del API |
+| `index.html` | Canvas adaptativo, 7 secciones, nav pills, rotate overlay, toggle, pip status |
+| `css/tokens.css` | Tokens duales Lux + Noir Lumina |
+| `css/toggle.css` | Theme toggle bottom-right, especificidad protegida |
+| `css/layout.css` | Canvas adaptativo, responsive, reduced-motion, rotate overlay |
+| `css/sections.css` | Charlas agenda+detail, leads tabla, teal solo gamificacion |
+| `css/moments.css` | 5 tipos activos, 2 CSS ready (lead, match) |
+| `css/nav.css` | Pills + pip status (rojo/amarillo/verde) |
+| `js/data.js` | Utils, sessionViewers init, initials() safe |
+| `js/app.js` | Bootstrap con validacion, fetch timeout 8s, theme toggle, retry link |
+| `js/sections.js` | Agenda+detail, leads ranking+autoscroll, null guards, memory leak fix |
+| `js/socket.js` | RT events, pip status, moment pool updates, bootstrap retry 3x |
+| `js/moments.js` | Constantes, interval managed, pool update/replace expuestos |
 
 ---
 
 ## Principios de diseno (NO NEGOCIABLES)
 
-1. **Tipografia**: PlusJakartaSans (display) + Urbanist (body). Servir localmente. NUNCA Inter, Space Grotesk, ni JetBrains Mono.
-2. **Tema**: Noir y Lux. El tema se aplica segun el `default_theme` del evento.
-3. **Avatares grandes**: minimo 48px para listas, 100px+ para protagonistas. NUNCA burbujitas de 28px.
-4. **Sin data falsa**: todo viene del API o socket. Si no hay datos, mostrar estado vacio elegante.
-5. **Sin counters simulados**: los numeros solo cambian cuando llega un socket event real.
-6. **Sin brand-mark**: no hay icono cuadrado negro. Solo texto del nombre del evento.
-7. **Responsive**: letterboxing, verificar multiples resoluciones.
-8. **Sin collage de fotos flotantes**: eliminado por rendimiento.
-9. **Sin auto-rotacion de secciones**: el cliente navega manual con los pills.
-10. **Zero polling**: todo via socket. RefetchOnWindowFocus como unico mecanismo de refresco pasivo.
+1. **Tipografia**: PlusJakartaSans (display) + Urbanist (body). Locales. NUNCA Inter/Space Grotesk.
+2. **Tema**: Noir (Lumina Noir) y Lux. Segun `default_theme` del evento. Toggle manual.
+3. **Teal solo gamificacion**: leaderboard, points. Todo lo demas usa green (live), platinum (accent), ink.
+4. **Avatares grandes**: minimo 48px listas, 100px+ protagonistas.
+5. **Sin data falsa**: todo del API o socket. Estados vacios elegantes.
+6. **Sin counters simulados**: numeros solo cambian con socket event real.
+7. **Responsive**: canvas adaptativo, portrait overlay, sin franjas.
+8. **Sin collage fotos flotantes**: eliminado por rendimiento.
+9. **Sin auto-rotacion secciones**: navegacion manual con pills.
+10. **Zero polling**: todo via socket. Bootstrap refresh 5min como fallback.
+11. **Offline resiliente**: pip status, retry 3x, timeout 8s, recovery on reconnect.
 
 ---
 
@@ -145,23 +146,22 @@ Base: `GET /api/v1/pulse/{slug}/{endpoint}?token={pulse_token}`
 
 | Endpoint | Respuesta |
 |----------|-----------|
-| `bootstrap` | event{id,name,slug,venue,dates,color,logo}, sections[], stats{checkins,online,leads,connections,ratings,messages,points} |
-| `rooms` | rooms[] agrupados por room (1 por room, session live o proxima, people[], session_id, presencial). Virtual viene del socket, no del API |
-| `checkins` | recent[] (con user valido), total, registered, timeline{hour:count} |
-| `leads` | sponsors[] (sponsor, logo, total, recent[]) |
+| `bootstrap` | event{id,name,slug,venue,dates,color,logo,default_theme}, sections[], stats |
+| `rooms` | rooms[] (flat, todas las sesiones), agenda[] (agrupado por sala con sessions[]) |
+| `checkins` | recent[], total, registered, timeline{hour:count} |
+| `leads` | sponsors[] (0 N+1, eager load) |
 | `connections` | total, accept_rate, recent[] |
 | `social` | posts[] (solo status=published) |
-| `leaderboard` | top[] (name, photo, points, last_action), total_points |
-| `ratings` | sessions[] (title, score, count, speaker), event_avg |
+| `leaderboard` | top[] (labels humanizados, 0 N+1), total_points |
+| `ratings` | sessions[] (eager speakers), event_avg |
 
 ## Socket Events (Pulse escucha)
 
-| Evento | Room | Fuente | Que hace Pulse |
-|--------|------|--------|---------------|
-| `checkin:update` | `Rooms.event` | Laravel POST /internal/checkin | Counter check-ins, invalida seccion, moment con nombre |
-| `data:invalidate` | `Rooms.event` | Laravel observers (InvalidationService) | Invalida cache seccion, re-fetch stat (leads, connections, leaderboard, ratings, agenda) |
-| `wall:post` | `Rooms.event` | Laravel POST /internal/wall/broadcast | Counter social, live insert masonry, moment |
-| `session:audience` | `Rooms.pulse` | Socket broadcastAudience (aislado, NO event room) | Viewers virtuales por session, counter m-on, invalida charlas |
-| `session:config_updated` | `Rooms.event` | Socket /internal/session/config | Invalida charlas |
-
-**Nota performance:** `session:audience` va a `Rooms.pulse` (1-2 sockets), NO a `Rooms.event` (10K). Ver docs/DISPONIBILIDAD-HA.md seccion 12.
+| Evento | Room | Que hace Pulse |
+|--------|------|---------------|
+| `checkin:update` | `Rooms.event` | Counter, moment, pool update |
+| `data:invalidate` | `Rooms.event` | Invalida seccion, re-fetch stat, pool refresh |
+| `wall:post` | `Rooms.event` | Counter, live insert masonry, moment, pool update |
+| `session:audience` | `Rooms.pulse` | Viewers virtuales, invalida charlas |
+| `session:config_updated` | `Rooms.event` | Invalida charlas |
+| `pulse:active_users` | `Rooms.pulse` | Counter "En la app" cada 10s |

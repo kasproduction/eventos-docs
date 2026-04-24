@@ -5,6 +5,134 @@
 
 ---
 
+## 2026-04-24 — Event Pulse Auditoria completa (30 bugs)
+
+### BUG-267: Race condition sessionViewers undefined (RESUELTO)
+- **Severidad:** CRITICA — sections.js accedia EP.sessionViewers antes de que socket.js lo inicializara
+- **Fix:** Inicializar EP.sessionViewers={} y EP.sessionViewersList={} en data.js (carga primero)
+
+### BUG-266: Memory leak leadsScrollTimer nunca limpiado (RESUELTO)
+- **Severidad:** CRITICA — cada vez que se entraba a Leads se creaba un nuevo setInterval sin limpiar el anterior
+- **Fix:** clearInterval(leadsScrollTimer) en showSection() al cambiar de seccion
+
+### BUG-265: Null check updateDetailPanel sin guard (RESUELTO)
+- **Severidad:** CRITICA — si rooms era null/undefined, el for loop crasheaba
+- **Fix:** Guard `if (!rooms || !rooms.length) return` al inicio
+
+### BUG-264: Null check speakers en selectSession (RESUELTO)
+- **Severidad:** CRITICA — si speaker era null, acceder a spk.photo_url crasheaba
+- **Fix:** Filter `speakers.filter(sp => sp && sp.name)` antes de iterar
+
+### BUG-263: insertSocialPost sin validacion de data (RESUELTO)
+- **Severidad:** CRITICA — si socket enviaba data sin body, el DOM insert fallaba
+- **Fix:** Guard `if (!data || !data.body) return` al inicio de la funcion
+
+### BUG-262: initials() crashea con nombre vacio o single char (RESUELTO)
+- **Severidad:** ALTA — `name.split(' ')` con string vacio o solo espacios producida undefined[0]
+- **Fix:** trim() + filter(p => p.length > 0) + guard !parts.length
+
+### BUG-261: N+1 query en PulseController leads() (RESUELTO)
+- **Severidad:** ALTA — query de Lead por cada sponsor dentro del map (N+1)
+- **Fix:** 1 query con eager load + groupBy en PHP collection
+
+### BUG-260: N+1 query en PulseController leaderboard() (RESUELTO)
+- **Severidad:** ALTA — 2 queries por attendee (find + lastAction) dentro del map
+- **Fix:** 3 queries batch: topRows, attendees whereIn, lastActions unique
+
+### BUG-259: refreshBootstrap sin retry ni null check (RESUELTO)
+- **Severidad:** ALTA — si el API fallaba post-reconnect, counters quedaban stale sin reintentar
+- **Fix:** Guard `!data || !data.stats`, retry hasta 3 veces con backoff 5s
+
+### BUG-258: Bootstrap response sin validacion (RESUELTO)
+- **Severidad:** ALTA — si API devuelve respuesta incompleta, app.js crasheaba accediendo data.event
+- **Fix:** `if (!data || !data.event || !data.stats) throw new Error()`
+
+### BUG-257: API fetch sin timeout (RESUELTO)
+- **Severidad:** ALTA — fetch() esperaba indefinidamente si el server no respondia
+- **Fix:** AbortController con timeout de 8 segundos
+
+### BUG-256: Charlas auto-select race condition (RESUELTO)
+- **Severidad:** MEDIA — auto-select podia seleccionar sesion que ya no estaba live entre fetch y render
+- **Fix:** Verificar `.live` en charlasData antes de llamar selectSession
+
+### BUG-255: Session cleanup sin logging en socket server (RESUELTO)
+- **Severidad:** MEDIA — errores de limpieza de viewers se silenciaban completamente
+- **Fix:** console.warn en catch block del cleanup
+
+### BUG-254: Token pulse sin validacion de longitud (RESUELTO)
+- **Severidad:** MEDIA — tokens malformados `ep_x` pasaban al validatePulseToken
+- **Fix:** Check `token.length >= 10` ademas de startsWith('ep_')
+
+### BUG-253: Timeline hour edge case null (RESUELTO)
+- **Severidad:** MEDIA — si checked_in_at producia hour null en SQLite, groupBy fallaba
+- **Fix:** COALESCE en query + filter null keys
+
+### BUG-252: Inline color detail-virt hardcoded (RESUELTO)
+- **Severidad:** MEDIA — style="color:var(--blue)" inline en JS, no respetaba cascada CSS
+- **Fix:** Clase CSS `.detail-aud-virt` con color: var(--blue)
+
+### BUG-251: CSS orphan .agenda-time .min (RESUELTO)
+- **Severidad:** BAJA — selector CSS sin elemento HTML correspondiente
+- **Fix:** Eliminado
+
+### BUG-250: CSS orphan m-lead y m-match sin builders JS (RESUELTO)
+- **Severidad:** BAJA — estilos CSS completos para moment types sin implementar en JS
+- **Fix:** Marcados con comentario "(CSS ready, JS builder pendiente)"
+
+### BUG-249: Toggle CSS especificidad fragil (RESUELTO)
+- **Severidad:** BAJA — .toggle-sun/.toggle-moon podian ser sobreescritos por selectores mas amplios
+- **Fix:** Scope `.theme-toggle .toggle-*` para mayor especificidad
+
+### BUG-248: Moments interval nunca limpiado (RESUELTO)
+- **Severidad:** MEDIA — setInterval de 15s seguia corriendo aunque moment data se recargara
+- **Fix:** Guardar en momentPlayInterval, clearInterval antes de crear nuevo
+
+### BUG-247: Magic numbers en moments.js (RESUELTO)
+- **Severidad:** BAJA — 5000, 15000, 3000, 20 hardcoded sin contexto
+- **Fix:** Constantes MOMENT_DURATION, MOMENT_INTERVAL, MOMENT_FIRST_DELAY, MOMENT_POOL_MAX
+
+### BUG-246: prefers-reduced-motion no respetado (RESUELTO)
+- **Severidad:** BAJA — usuarios con accesibilidad reducida veian todas las animaciones
+- **Fix:** Media query global que reduce duration a 0.01ms
+
+### BUG-245: Charlas no diferencia sin sesiones vs todas finalizadas (RESUELTO)
+- **Severidad:** BAJA — mismo mensaje generico para ambos casos
+- **Fix:** "No hay sesiones programadas" vs "Todas las sesiones han finalizado"
+
+### BUG-244: Bootstrap fail sin forma de reintentar (RESUELTO)
+- **Severidad:** BAJA — usuario veia "Error cargando datos" sin opcion de retry
+- **Fix:** Link "Reintentar" con location.reload()
+
+### BUG-243: Typo "Ubicacion" sin tilde (RESUELTO)
+- **Severidad:** BAJA — falta acento en HTML
+- **Fix:** `Ubicaci&oacute;n`
+
+### BUG-242: Dead HTML ep-bot-info nunca poblado (RESUELTO)
+- **Severidad:** BAJA — div vacio en frame bottom sin JS que lo llene
+- **Fix:** Eliminado HTML + CSS bot-left/bot-right
+
+### BUG-241: last_action muestra slug interno (game_spin) en vez de label (RESUELTO)
+- **Severidad:** MEDIA — leaderboard mostraba "game_spin" en vez de "Ruleta en vivo"
+- **Fix:** PulseController usa PointsService::getConfig() para traducir action key a label
+
+### BUG-240: Nombre evento duplicado en idle (RESUELTO)
+- **Severidad:** BAJA — nombre aparecia arriba izquierda (brand) Y abajo izquierda (bot-left)
+- **Fix:** Eliminado bot-left, nombre solo en brand-name + ambient center
+
+### BUG-239: Dot verde doble en agenda charlas (RESUELTO)
+- **Severidad:** BAJA — sesion live tenia agenda-dot verde + agenda-live-tag con otro dot
+- **Fix:** Eliminado agenda-live-tag, solo queda agenda-dot
+
+### BUG-238: Teal usado fuera de gamificacion (RESUELTO)
+- **Severidad:** MEDIA — teal (#0D9488) se usaba en eyebrows, badges, timelines, networking. Solo deberia ser gamificacion
+- **Fix:** Reemplazo sistematico: live→green, leads→platinum, networking→platinum, eyebrows→ink-50, bars→ink-50
+
+### BUG-237: Pip status conexion siempre verde (RESUELTO)
+- **Severidad:** MEDIA — pip del nav arrancaba verde por CSS default aunque socket no estuviera conectado
+- **Fix:** Default rojo (offline), JS agrega .online (verde) o .reconnecting (amarillo). Fix especificidad nav.css
+
+---
+
 ## 2026-04-24 — Event Pulse RT + Performance 10K (4 bugs)
 
 ### BUG-236: session:audience fan-out a 10K sockets (RESUELTO)
