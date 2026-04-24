@@ -67,41 +67,25 @@ Solo tema Lux. Falta tokens duales + clase CSS segun `default_theme`.
 #### BUG-EP-9: Weather no implementado
 Decidir: quitar o campo configurable en Filament.
 
-#### BUG-EP-11: Virtual viewers — salida no se refleja
-**Que pasa:** Cuando el usuario entra a una sesion desde la app, Pulse muestra el virtual viewer (count sube, burbuja aparece). Pero cuando sale, el count NO baja y la burbuja queda.
-**Causa raiz:** La app mobile NO emite `join:session` al abrir una sesion. Solo MC lo hace. Los logs del socket muestran que user=3 hace `join:event` pero nunca `join:session`. Cuando se simula `join:session` con script Node.js, todo funciona perfecto (audience sube y baja).
-**Fix necesario:** En la app mobile (`C:\Users\Kasproduction\Projects\eventos-app`), agregar `socket.emit('join:session', { sessionId })` cuando el usuario abre el detalle/streaming de una sesion. El hook `useChat` ya lo hace pero solo cuando se abre el chat, no al entrar a la sesion.
-**Archivos relevantes app:**
-- `hooks/useChat.ts:118` — ya emite `join:session` (solo para chat)
-- `hooks/useSessionMode.ts:45` — ya emite `join:session` (solo para streaming)
-- `app/(app)/session/[id].tsx` — detalle de sesion, NO emite `join:session`
-**Estado socket server:** Todo funciona. Probado con script Node.js: join emite audience=1 con viewers[], disconnect emite audience=0 al event room via fallbackEventId.
-
 #### BUG-EP-12: Espacio vacio en cards Charlas
-Las cards de Charlas tienen mucho espacio en blanco debajo de los avatares. El grid ya no se estira (align-content: start) pero las cards individuales siguen grandes. Considerar reducir padding o hacer avatares mas grandes.
+Avatares mas grandes o mas info para llenar el espacio.
 
 ---
 
-## Lo que falta por implementar
+## Lo que falta por implementar (sesiones futuras)
 
-### Prioridad 1 — Criticos (proxima sesion)
+### Prioridad 1 — Visual
 
-1. **Fix app mobile: join:session** — sin esto el tracking virtual no funciona. Es 1 linea en session/[id].tsx
-2. **Verificar audience=0 al salir** — una vez la app emita join:session, probar que al salir el count baje
-3. **Responsive QA** — verificar 1280x720, 1366x768, 1920x1080, 2560x1440
+1. **Tema Noir** — tokens duales en tokens.css, clase CSS segun bootstrap `default_theme`
+2. **Responsive QA** — verificar 1280x720, 1366x768, 1920x1080, 2560x1440
+3. **Charlas cards** — reducir espacio vacio, avatares mas grandes
+4. **Weather** — campo configurable en Filament o quitar
 
-### Prioridad 2 — Visual
+### Prioridad 2 — Produccion
 
-4. **Tema Noir** — tokens duales en tokens.css, clase CSS segun bootstrap `default_theme`
-5. **Weather** — campo configurable en Filament o quitar
-6. **Charlas cards** — reducir espacio vacio, avatares mas grandes o mas info
-7. **Overflow badge** — estilo actual (cuadro negro) se ve mal, redisenar
-
-### Prioridad 3 — Produccion
-
-8. **Error handling** — estado offline si API/socket falla, reintentar
-9. **Moments con data socket real** — actualmente moments usan data del API (simulacro). Cuando socket funcione completo, moments deben dispararse con el evento real (checkin:update → moment checkin con nombre real del que llego)
-10. **Test E2E** — probar flujo completo: check-in desde app → moment en Pulse + counter sube + seccion se actualiza
+5. **Error handling** — estado offline si API/socket falla, reintentar con indicador visual
+6. **Moments con data socket real** — moments de rating/leaderboard deberian dispararse con data:invalidate, no solo con fetch inicial
+7. **Test E2E con PulseSimulate** — probar flujo completo con el comando artisan
 
 ---
 
