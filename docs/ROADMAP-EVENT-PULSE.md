@@ -89,41 +89,38 @@ Avatares mas grandes o mas info para llenar el espacio.
 
 ---
 
-## Archivos modificados en esta sesion
+## Archivos clave (estado actual 2026-04-24)
 
 ### Backend (eventos-backend)
-| Archivo | Cambio |
-|---------|--------|
-| `app/Http/Controllers/PulseController.php` | Rooms agrupado por room, people[], session_id, presencial/virtual, messages=published, checkins whereHas user |
-| `database/seeders/PulseSeeder.php` | PointsLog, sesiones live, pulse_token, status published |
-| `database/migrations/2026_04_23_220056_add_type_to_room_attendee_states.php` | Campo `type` enum presencial/virtual |
-| `app/Models/RoomAttendeeState.php` | `type` en fillable |
-| `routes/api.php` | Endpoint pulse/validate, internal/room/virtual |
-| `tests/Feature/Pulse/PulseTest.php` | 20 tests (rooms groups, people, next session, social published, ratings, bootstrap messages) |
-| `public/event-pulse/` | Frontend completo (ver abajo) |
+| Archivo | Proposito |
+|---------|-----------|
+| `app/Http/Controllers/PulseController.php` | 8 endpoints: bootstrap, rooms, checkins, leads, connections, social, leaderboard, ratings |
+| `app/Http/Middleware/CheckPulseToken.php` | Valida pulse_token en query string |
+| `app/Filament/Resources/WallPostResource.php` | Aprobar post emite wall:post al socket |
+| `app/Console/Commands/PulseSimulate.php` | Simula 6 tipos de evento RT para testing |
+| `routes/api.php` | Endpoint pulse/validate (socket auth) |
+| `tests/Feature/Pulse/PulseTest.php` | 20 tests, 72 assertions |
 
 ### Socket server (eventos-socket)
-| Archivo | Cambio |
-|---------|--------|
+| Archivo | Proposito |
+|---------|-----------|
+| `src/rooms.ts` | `Rooms.pulse(eventId)` — room aislado para Pulse |
 | `src/auth.ts` | `validatePulseToken()` — auth para tokens ep_* |
-| `src/index.ts` | Import validatePulseToken, middleware acepta ep_*, connKey para pulse, fallbackEventId en disconnect |
-| `src/chat.ts` | `broadcastAudience` emite al event room, incluye viewers[], acepta fallbackEventId |
+| `src/chat.ts` | `broadcastAudience` emite a Rooms.session (MC) + Rooms.pulse (Pulse), viewers max 20, fallbackEventId |
+| `src/index.ts` | Middleware ep_*, auto-join pulse room, connKey sintetico |
 
 ### Frontend (eventos-backend/public/event-pulse/)
-| Archivo | Cambio |
-|---------|--------|
-| `index.html` | Fuentes locales, socket.io.min.js, socket.js, version bust |
-| `css/tokens.css` | --f-mono = PlusJakartaSans (no JetBrains) |
-| `css/layout.css` | Stage flex center, canvas relative, ambient dimming fuerte (opacity 0.06, blur 12px) |
-| `css/sections.css` | Cards compactas (align-content start), room-people margin, room-av.virtual borde azul |
-| `css/moments.css` | Velo blanco 65% + backdrop-filter, animacion 5.5s suave, m-avatar-xl wrapper |
-| `js/app.js` | Scale limpio Math.min |
-| `js/data.js` | Sin cambios (ya estaba limpio) |
-| `js/sections.js` | invalidateSectionCache con live re-render, updateCharlasLive (fade rebuild), charlas sin cache, buildCharlas con data-room-id y session_id |
-| `js/moments.js` | Reactivado con data API: 5 tipos, weighted random, 15s intervalo |
-| `js/socket.js` | NUEVO: conecta socket, checkin:update, data:invalidate, wall:post, session:audience, bootstrap refresh 5min |
-| `js/counters.js` | Vacio (datos via socket) |
-| `fonts/` | NUEVO: 10 woff2 + fonts.css (PlusJakartaSans + Urbanist) |
+| Archivo | Proposito |
+|---------|-----------|
+| `index.html` | Canvas 1920x1080, 7 secciones, nav pills, fuentes locales |
+| `css/tokens.css` | Tokens Lux (Noir pendiente) |
+| `css/layout.css` | Stage, canvas scale, frame editorial, corners, ambient |
+| `css/sections.css` | Charlas grid, checkins, leads, networking, social masonry 3col, leaderboard podio, ratings |
+| `css/moments.css` | Overlay cinematografico, 5 tipos, fade 5.5s |
+| `js/app.js` | Bootstrap API, responsive scale, section visibility |
+| `js/sections.js` | Builders por seccion, live DOM updates charlas, social live insert masonry |
+| `js/socket.js` | Socket.IO: checkin:update, data:invalidate, wall:post, session:audience, m-on RT |
+| `js/moments.js` | 5 tipos weighted random, 15s intervalo, data del API |
 
 ---
 
@@ -149,7 +146,7 @@ Base: `GET /api/v1/pulse/{slug}/{endpoint}?token={pulse_token}`
 | Endpoint | Respuesta |
 |----------|-----------|
 | `bootstrap` | event{id,name,slug,venue,dates,color,logo}, sections[], stats{checkins,online,leads,connections,ratings,messages,points} |
-| `rooms` | rooms[] agrupados por room (1 por room, session live o proxima, people[], session_id, presencial, virtual) |
+| `rooms` | rooms[] agrupados por room (1 por room, session live o proxima, people[], session_id, presencial). Virtual viene del socket, no del API |
 | `checkins` | recent[] (con user valido), total, registered, timeline{hour:count} |
 | `leads` | sponsors[] (sponsor, logo, total, recent[]) |
 | `connections` | total, accept_rate, recent[] |
@@ -159,10 +156,12 @@ Base: `GET /api/v1/pulse/{slug}/{endpoint}?token={pulse_token}`
 
 ## Socket Events (Pulse escucha)
 
-| Evento | Fuente | Que hace Pulse |
-|--------|--------|---------------|
-| `checkin:update` | Laravel POST /internal/checkin | Actualiza counter check-ins, invalida seccion, dispara moment |
-| `data:invalidate` | Laravel observers | Invalida cache de la seccion afectada, re-fetch stat |
-| `wall:post` | Laravel POST /internal/broadcast | Actualiza counter social, dispara moment |
-| `session:audience` | Socket broadcastAudience | Trackea virtual viewers por session, invalida charlas |
-| `session:config_updated` | Socket | Invalida charlas |
+| Evento | Room | Fuente | Que hace Pulse |
+|--------|------|--------|---------------|
+| `checkin:update` | `Rooms.event` | Laravel POST /internal/checkin | Counter check-ins, invalida seccion, moment con nombre |
+| `data:invalidate` | `Rooms.event` | Laravel observers (InvalidationService) | Invalida cache seccion, re-fetch stat (leads, connections, leaderboard, ratings, agenda) |
+| `wall:post` | `Rooms.event` | Laravel POST /internal/wall/broadcast | Counter social, live insert masonry, moment |
+| `session:audience` | `Rooms.pulse` | Socket broadcastAudience (aislado, NO event room) | Viewers virtuales por session, counter m-on, invalida charlas |
+| `session:config_updated` | `Rooms.event` | Socket /internal/session/config | Invalida charlas |
+
+**Nota performance:** `session:audience` va a `Rooms.pulse` (1-2 sockets), NO a `Rooms.event` (10K). Ver docs/DISPONIBILIDAD-HA.md seccion 12.
