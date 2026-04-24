@@ -715,5 +715,62 @@ El patron de broadcast (1 mensaje → todos los clientes) esta validado en produ
 
 ---
 
-*EventOS Alta Disponibilidad v1.1*
-*Actualizado: 2026-04-23 — seccion 11 Live Moments fixes*
+## 12. Rooms aislados: Event Pulse (Rooms.pulse)
+
+### Problema detectado (2026-04-24)
+
+`broadcastAudience()` emitia `session:audience` al `Rooms.event()` (todos los usuarios del evento). Con 10K usuarios y 10 salones activos, esto generaba hasta **200,000 mensajes/segundo** que los 10K usuarios recibian e ignoraban — solo Event Pulse (1-2 dashboards) necesitaba esa data.
+
+### Solucion: Rooms.pulse()
+
+Se creo un room aislado `pulse:{eventId}` exclusivo para dashboards Event Pulse. `broadcastAudience()` ahora emite a:
+
+1. `Rooms.session(sessionId)` — Mission Control (sin cambios, como siempre funciono)
+2. `Rooms.pulse(eventId)` — Event Pulse (1-2 sockets, aislado del event room)
+
+**Ya NO se emite `session:audience` al `Rooms.event()`** (10K sockets). Los 10K usuarios nunca usaban ese evento.
+
+### Impacto en performance (10K, 10 salones)
+
+| Metrica | ANTES | AHORA |
+|---------|-------|-------|
+| Destino session:audience | event room (10,000 sockets) | pulse room (1-2 sockets) |
+| Payload viewers[] | sin limite (hasta 1,000 objetos) | max 20 objetos |
+| Msgs/sec pico | ~200,000 | ~25 |
+| Bandwidth desperdiciado | ~8 MB/s | ~20 KB/s |
+
+### Que NO cambio
+
+- `checkin:update` → sigue en `Rooms.event()` (la app lo necesita, rate bajo ~10/min)
+- `data:invalidate` → sigue en `Rooms.event()` (la app lo necesita para refrescar agenda, branding)
+- `wall:post` → sigue en `Rooms.event()` (rate bajo ~5/min)
+- `session:audience` a `Rooms.session()` → sigue igual (MC lo usa)
+- Disconnect handler → sin cambios, MC sigue funcionando identico
+
+### Si Pulse se cae
+
+Cero impacto. Pulse es read-only (no escribe, no controla). Si se desconecta:
+- La app sigue funcionando
+- Mission Control sigue funcionando
+- El socket server sigue funcionando
+- Los 1-2 sockets de Pulse se desconectan y nadie lo nota
+
+### Auth: tokens ep_*
+
+Pulse se autentica con `pulse_token` (prefijo `ep_`), validado via `GET /api/v1/pulse/validate`. El socket server asigna `role: 'pulse'` y auto-join a `Rooms.pulse(eventId)` en la conexion. No necesita `join:event` para recibir `session:audience`.
+
+Pulse SI hace `join:event` para recibir `checkin:update`, `data:invalidate` y `wall:post` que van al event room.
+
+### Archivos modificados
+
+| Archivo | Repo | Cambio |
+|---------|------|--------|
+| `src/rooms.ts` | Socket | `Rooms.pulse(eventId)` agregado |
+| `src/auth.ts` | Socket | `validatePulseToken()` para tokens ep_* |
+| `src/chat.ts` | Socket | `broadcastAudience` emite a `Rooms.pulse()`, viewers max 20, `fallbackEventId` |
+| `src/index.ts` | Socket | Middleware ep_*, auto-join pulse room, connKey sintetico |
+
+---
+
+*EventOS Alta Disponibilidad v1.2*
+*Actualizado: 2026-04-24 — seccion 12 Rooms.pulse aislamiento 10K*
