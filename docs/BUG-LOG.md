@@ -5,6 +5,30 @@
 
 ---
 
+## 2026-04-24 — Event Pulse RT + Performance 10K (4 bugs)
+
+### BUG-236: session:audience fan-out a 10K sockets (RESUELTO)
+- **Severidad:** CRITICA — con 10K usuarios y 10 salones, broadcastAudience generaba ~200K msgs/sec al event room que nadie usaba
+- **Causa:** broadcastAudience emitia session:audience a Rooms.event() (todos los usuarios) en vez de un room aislado
+- **Fix:** Rooms.pulse(eventId) exclusivo para dashboards Pulse (1-2 sockets). MC sigue via Rooms.session(). App no recibe session:audience
+
+### BUG-235: Sesiones fantasma "live" en Event Pulse (RESUELTO)
+- **Severidad:** ALTA — sesiones que terminaron ayer seguian mostrando como "En vivo" en Pulse
+- **Causa:** PulseController rooms() solo verificaba actual_end_at === null, sin considerar que publicEnd() ya habia pasado. Si el moderador nunca presiono "Terminar", la sesion quedaba live para siempre
+- **Fix:** Agregar check `publicEnd()->isAfter(now())` en la condicion de live. Eliminar fallback a "most recent session"
+
+### BUG-234: viewers[] sin limite en payload session:audience (RESUELTO)
+- **Severidad:** MEDIA — con 1000 personas en un salon, el payload tenia 1000 objetos {id, name} (~40KB) enviados a todos
+- **Causa:** broadcastAudience recolectaba TODOS los viewers sin limite
+- **Fix:** Limitar a max 20 viewers. Pulse muestra max 8 burbujas + badge "+N"
+
+### BUG-233: Counter m-on (En linea) solo se actualizaba cada 5 min (RESUELTO)
+- **Severidad:** MEDIA — el counter "En linea" en Pulse solo cambiaba con el bootstrap refresh (5 min)
+- **Causa:** socket.js no sumaba EP.sessionViewers al recibir session:audience. Solo el bootstrap cada 5min actualizaba m-on
+- **Fix:** Calcular totalOnline sumando todos los EP.sessionViewers al recibir session:audience
+
+---
+
 ## 2026-04-23 — Sesion Performance + Async Jobs (5 bugs)
 
 ### BUG-232: Redis del wildcard no limpia keys en tests (RESUELTO)
