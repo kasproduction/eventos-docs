@@ -3,8 +3,9 @@
 > La UNICA fuente de verdad de lo que falta por hacer.
 > Organizado por PRIORIDAD DE NEGOCIO, no por area tecnica.
 > Filtro: "esto me acerca a cerrar el deal de septiembre con Eventos Efectivos?"
-> Actualizado: 2026-04-23
+> Actualizado: 2026-04-25
 > Backend: 582+ tests, 1664+ assertions
+> Audit: 30 acciones usuario, 150+ endpoints, 3 repos mapeados
 > Ref competencia: Cisco $88K USD, ICE360 $49M COP (docs/ANALISIS-COMPETITIVO.md)
 
 ---
@@ -38,8 +39,7 @@
 
 > Estos dependen de que features existan. Cada feature nuevo cambia que datos hay para analytics y que mostrar en el recap.
 
-### Analytics Dashboard — 4-6h
-- [ ] Filament dashboard: ROI, engagement, asistencia, sponsors, leads
+ - [ ] Filament dashboard: ROI, engagement, asistencia, sponsors, leads
 - [ ] Justifica el precio ante la agencia
 - [ ] Datos ya existen: session_stats, gamification, leads, networking, social, checkins
 - [ ] **Hacer al final**: cada feature nuevo (ruleta, trivia, sorteo) agrega metricas. Si se hace antes, hay que rehacerlo.
@@ -108,13 +108,34 @@
 ## P6 — Deploy + Infra + Stress
 
 > Bloquea testing real pero no bloquea desarrollo de features.
+> Stack migrado a DO sao1 consolidado (2026-04-25). Ver docs/PLAN-STRESS-TESTDO.md v2.1.
 
-- [ ] SEC-4: Docker Compose, VPS Hetzner, Cloudflare, backups
-- [ ] SEC-5: Sentry, SecurityLogger, uptime monitoring
-- [ ] GitHub Actions CI/CD
+- [ ] SEC-4: Docker Compose, 2 Droplets DO sao1, Cloudflare WAF+LB, DO Managed MySQL+Redis, VPC privada
+- [ ] SEC-5: Sentry, SecurityLogger, uptime monitoring (BetterStack)
+- [ ] GitHub Actions CI/CD (blue-green deploy)
 - [ ] EAS Build production (Android + iOS)
-- [ ] Stress test 10K: ver `docs/PLAN-STRESS-TEST.md`
-- [ ] QA integridad funcional: smoke tests E2E + chaos testing (ver PLAN-STRESS-TEST.md)
+- [ ] 4 FIX Live Moments pre-stress: throttle game broadcasts, indices live_game_participants, cache getEligiblePool, HTTP connection pool (ver DISPONIBILIDAD-HA.md seccion 11)
+- [ ] Stress test 10K: 9 tests formales (ver `docs/PLAN-STRESS-TESTDO.md` v2.1)
+  - TEST 1-4: Warmup → 1K → Login stampede → 5K
+  - TEST 5: Red degradada 4G Colombia
+  - TEST 6: 10K 2h flujo natural (EL TEST PRINCIPAL)
+  - TEST 7: Failover durante carga (matar Droplet-1)
+  - TEST 8: Export aislado (VPS-3 no toca API)
+  - TEST 9: Break point (escalar hasta romper)
+- [ ] QA integridad funcional: smoke tests E2E + chaos testing
+- [ ] Device real iOS + Android con Sentry Performance en 4G Bogota
+
+### Optimistic UI (post-pendientes, pre-stress)
+> Implementar DESPUES de cerrar P1-P5, ANTES del stress test.
+> Plan completo en docs/OPTIMISTIC-UI-PLAN.md. Audit en docs/OPTIMISTIC-UI-AUDIT.md.
+
+- [x] Haptic feedback: 7 hooks, 9 puntos (favoritos, likes, upvotes, votes, networking)
+- [x] Retry automatico API: network errors + 502/503/504, backoff+jitter
+- [x] Bug fix Q&A: blocked words retornaba 201 fake → ahora 422
+- [ ] Chat tempId + ack + estados progresivos (2-3h, cambio mobile + socket server)
+- [ ] Emoji skip-self (30min, cambio socket server)
+- [ ] Dedup wall:comment con socket broadcast (20min)
+- [ ] Q&A upvote anti-parpadeo (15min)
 
 ---
 
@@ -218,7 +239,7 @@
 
 | Doc | Contenido |
 |-----|-----------|
-| `EventOS_Roadmap.md` | Fases, sesiones, timeline |
+| `EventOS_Roadmap.md` | Fases, sesiones, timeline (v5.0) |
 | `docs/COMPLETADO.md` | Historial completo |
 | `docs/PLAN-TAGS-MODULOS.md` | Plan tags + visibilidad modulos |
 | `docs/ROADMAP-UIUX-LANDING.md` | Spec diseno landing + UI |
@@ -226,8 +247,15 @@
 | `docs/ANALISIS-COMPETITIVO.md` | Cotizaciones, gaps, pricing |
 | `docs/WHITE-LABEL.md` | App config dinamico |
 | `docs/FASE-SEGURIDAD.md` | Auditoria OWASP |
-| `docs/DISPONIBILIDAD-HA.md` | Arquitectura HA, deploy |
+| `docs/DISPONIBILIDAD-HA.md` | Arquitectura HA DO sao1, deploy, RT invalidation |
 | `docs/BUG-LOG.md` | Bugs historicos |
 | `docs/QA-MASTER.md` | Barrido endpoints |
-| `docs/PLAN-STRESS-TEST.md` | Stress test 10K + QA integridad + chaos testing + calendario pre-prod |
+| `docs/PLAN-STRESS-TEST.md` | Stress test v2.0 (Hetzner, referencia historica) |
+| `docs/PLAN-STRESS-TESTDO.md` | Stress test v2.1 (DO sao1 consolidado, plan definitivo) |
 | `docs/ROADMAP-LUX-V2.md` | Light mode completo |
+| `docs/CODEBASE-MAP.md` | Mapeo completo 3 repos: 150+ endpoints, socket events, observers |
+| `docs/OPTIMISTIC-UI-AUDIT.md` | 30 acciones auditadas, estado optimistic, gaps |
+| `docs/GAPS-ANALYSIS.md` | Gaps detallados, dedup socket, coordinacion REST+socket |
+| `docs/OPTIMISTIC-UI-PLAN.md` | Plan 3 semanas: 9 PRs, cross-cutting, metricas |
+| `docs/BRIEF-CLAUDE-CODE-OPTIMISTIC-UI.md` | Brief original del audit optimistic UI |
+| `docs/MODULOS.md` | 15 modulos + 6 sistemas + admin (v1.0) |

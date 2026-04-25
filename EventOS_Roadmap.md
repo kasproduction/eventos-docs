@@ -1,7 +1,7 @@
 # EventOS — Roadmap
 
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
-_Actualizado: 2026-04-19 | v4.5_
+_Actualizado: 2026-04-25 | v5.0_
 
 ---
 
@@ -14,16 +14,25 @@ _Actualizado: 2026-04-19 | v4.5_
 | **UI/UX Lumina Noir** | ✅ 100% | Barrido completo, todas las pantallas |
 | **UI/UX Lumina Lux v2** | ✅ 100% | Light mode "The Gallery", ~85 archivos, dark islands, session types |
 | **Mission Control v4** | ✅ 100% | Display LED, metricas RT, moderacion, Q&A proyectable, herramientas moderador, responsive |
+| **Live Moments** | ✅ 100% | Ruleta + Sorteo + Trivia Kahoot-style, branded, performance 10K, 41 tests |
+| **Event Pulse** | ✅ 100% | Dashboard RT standalone, Noir/Lux, 7 secciones, responsive, 20 tests |
+| **Concurso Fotos** | ✅ 100% | Contest lifecycle, Golden Ticket generico, anti-gaming, 36 tests |
+| **Room Check-in** | ✅ 100% | Kiosk + Staff + Silent disco + attendance tracking |
+| **Webhooks** | ✅ 100% | 5 fases, 24 tests, integracion partners |
 | **Seguridad** | ✅ 90% | SEC-1/2/3/3b/6 completo. Pendiente: 2FA, device, infra (SEC-4/5) |
 | **Onboarding DaVinci** | ✅ | 6 steps, configurable, campos unificados, depends_on avanzado |
 | **Moderacion** | ✅ | Ban RT, palabras bloqueadas, chat monitor, slow mode, pin Twitch |
-| **QA** | ✅ | 70+ endpoints, 20 modulos, 488+ tests backend, 1168+ assertions |
-| **Deploy** | ⏳ | Docker + VPS + CI/CD |
+| **Optimistic UI** | ✅ Audit | 30 acciones auditadas, 10 con optimistic, haptics, retry API. Plan listo |
+| **QA** | ✅ | 150+ endpoints, 20 modulos, 582+ tests backend, 1664+ assertions |
+| **Deploy** | ⏳ | Docker + DO sao1 + CI/CD. Arquitectura HA definida |
 | **Fase 2** — Web app | ⏳ | Next.js, W.0-W.12 |
 | **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion |
 
 **Que falta:** ver `docs/PENDIENTES.md`
 **Que se hizo:** ver `docs/COMPLETADO.md`
+**Arquitectura:** ver `docs/DISPONIBILIDAD-HA.md` (migrado a DO sao1 consolidado)
+**Stress test:** ver `docs/PLAN-STRESS-TESTDO.md` (v2.1, DO sao1, 9 tests)
+**Optimistic UI:** ver `docs/OPTIMISTIC-UI-PLAN.md` (30 acciones auditadas, plan 3 semanas)
 
 ---
 
@@ -48,7 +57,7 @@ _Actualizado: 2026-04-19 | v4.5_
 | **White-Label** | `docs/WHITE-LABEL.md` | app.config.js, clients/, EAS build |
 | **Seguridad** | `docs/FASE-SEGURIDAD.md` | Auditoria OWASP, SEC-1 a SEC-5, 42 tests |
 | **Compliance** | `docs/COMPLIANCE-SEGURIDAD.md` | ISO 27001, Ley 1581, GDPR, cabeceras HTTP |
-| **Alta Disponibilidad** | `docs/DISPONIBILIDAD-HA.md` | 2 VPS, PlanetScale, Upstash, Cloudflare, 99.99% |
+| **Alta Disponibilidad** | `docs/DISPONIBILIDAD-HA.md` | 2 Droplets DO sao1, DO Managed MySQL/Redis, Cloudflare, 99.9% |
 | **QA Master** | `docs/QA-MASTER.md` | Barrido 60+ endpoints, 20 modulos, 3 roles |
 | **QA Auth** | `docs/QA-AUTH-ONBOARDING.md` | 30+ escenarios auth/onboarding |
 | **Bug Log** | `docs/BUG-LOG.md` | Bugs historicos BUG-001 a BUG-147 |
@@ -401,32 +410,56 @@ Niveles de aislamiento incremental:
 
 ## Deploy a produccion ⏳
 
-### Arquitectura
+> Arquitectura migrada a DigitalOcean sao1 consolidado (2026-04-25).
+> Ver `docs/DISPONIBILIDAD-HA.md` para detalle completo y `docs/PLAN-STRESS-TESTDO.md` para validacion.
+
+### Arquitectura HA (DO sao1 consolidado)
 
 ```
-Internet
+Cloudflare (DNS + WAF + DDoS + CDN + LB)
    |
-   +-- app.eventos.com (HTTPS)
-   |     +-- Nginx → Laravel (PHP-FPM) + Queue Worker + Scheduler
+   +-- api.eventos.com (proxy a origins DO)
+   |     +-- Droplet-1 DO sao1 (4 vCPU, 8 GB) — Nginx + Laravel + Socket.IO
+   |     +-- Droplet-2 DO sao1 (4 vCPU, 8 GB) — Nginx + Laravel + Socket.IO
+   |           |
+   |           +-- VPC privada DO (< 1ms RTT):
+   |                 +-- DO Managed MySQL sao1 (1GB + read replica)
+   |                 +-- DO Managed Redis sao1 (1GB, HA)
    |
-   +-- socket.eventos.com (WSS)
-   |     +-- Socket.IO Node.js
-   |
-   +-- CDN / R2 — assets estaticos
+   +-- Cloudflare R2 — storage (egress gratis)
+   +-- Droplet-3 (opcional) — Worker headless exports, lee de read replica
 ```
 
-### Docker Compose — 6 servicios
+### Por que DO sao1 y no Hetzner+PlanetScale+Upstash
+
+| Decision | Razon |
+|----------|-------|
+| DO en lugar de Hetzner | Audiencia 100% Latam. Hetzner no tiene region Latam. RTT Bogota: ~80ms vs ~150ms |
+| DO Managed MySQL | VPC privada < 1ms vs PlanetScale remoto 80-150ms. Pricing flat |
+| DO Managed Redis | VPC privada, no TLS overhead, pricing flat |
+| R2 se mantiene | Egress gratis. DO Spaces no tiene region sao1 |
+| Cloudflare adelante | WAF + DDoS que DO LB no tiene |
+
+### Docker Compose por Droplet — 3 servicios
 
 | Servicio | Imagen | Proposito |
 |---|---|---|
-| app | php:8.3-fpm + nginx | Laravel API + Filament |
-| queue | mismo Dockerfile | php artisan queue:work |
-| scheduler | mismo Dockerfile | php artisan schedule:run |
+| app | php:8.3-fpm + nginx | Laravel API + Filament + Queue Worker + Scheduler |
 | socket | node:20-alpine | Socket.IO server |
-| mysql | mysql:8 | Base de datos |
-| redis | redis:7-alpine | Cache + queues |
 
-**VPS:** Hetzner CX22 (2 vCPU, 4 GB RAM, ~$5/mes). Suficiente para 3-5 eventos simultaneos, ~500 asistentes c/u.
+**NO hay MySQL ni Redis local** — son DO Managed services en VPC privada.
+
+### Costo mensual
+
+| Concepto | Costo |
+|---------|-------|
+| Droplet-1 sao1 (4 vCPU, 8 GB) | $48 |
+| Droplet-2 sao1 (4 vCPU, 8 GB) | $48 |
+| DO Managed MySQL 1GB + read replica | $30 |
+| DO Managed Redis 1GB (HA) | $15 |
+| Cloudflare Pro + LB | $26 |
+| R2 storage | ~$1 |
+| **Total** | **~$168/mes** |
 
 ### Checklist pre-deploy
 
@@ -585,12 +618,52 @@ COMPLETADO 04-20b (session stats + attendance):
   → SessionStatsSeeder: 50 users simulados, 537+ tests, 1377+ assertions
   → Pendiente: stress test 10K en VPS (requiere deploy)
 
+COMPLETADO 04-20 a 04-21 (room check-in + kiosk + staff):
+  → Room check-in completo: Fases 0-4, occupancy RT, silent disco
+  → Kiosk Lumina Noir: USB scanner, cache, flujo optimista, offline queue
+  → Staff app: asignacion, scan batch, rooms, reassign, socket RT
+  → MC Control: toggles live-config, silent disco, attendance checks
+  → Session lifecycle bugs: 8 criticos resueltos (cascadas, Carbon, revert)
+  → Webhooks: 5 fases, 24 tests, attendee.registered/approved/checked_in/updated/cancelled
+
+COMPLETADO 04-21 a 04-23 (Live Moments completo):
+  → Live Moments F0-F5: Ruleta + Sorteo + Trivia Kahoot-style
+  → Sorteo Ceremony: GSAP, Golden Ticket claim_code, pantalla display
+  → Trivia: 4 estados, speed bonus, leaderboard RT, 10 rondas
+  → Performance 10K: throttle game broadcasts, indices, cache pool
+  → Platinum Gold: paleta #B5A68B unificada
+  → 41 tests, 172 assertions
+
+COMPLETADO 04-23 a 04-24 (Event Pulse completo):
+  → Event Pulse RT: 7 secciones (checkins, rooms, leads, networking, social, leaderboard, ratings)
+  → Noir/Lux responsive, active users RT, moments timeline
+  → Rooms.pulse aislamiento: 200K msgs/sec → 25 msgs/sec
+  → Bootstrap endpoint agregado
+  → 20 tests, 79 assertions, 30 bugs corregidos
+
+COMPLETADO 04-24 (Concurso fotos + Golden Ticket):
+  → Contest lifecycle: toggle/horario, 1 entry por attendee, anti-gaming
+  → Golden Ticket generico desacoplado de sorteo
+  → 36 tests, 108 assertions, 10 bugs
+
+COMPLETADO 04-25 (Optimistic UI audit + fixes):
+  → Audit completo: 30 acciones del usuario mapeadas (3 repos, 150+ endpoints, socket events)
+  → 4 documentos: CODEBASE-MAP, OPTIMISTIC-UI-AUDIT, GAPS-ANALYSIS, OPTIMISTIC-UI-PLAN
+  → Bug fix: Q&A blocked words retornaba 201 fake → ahora 422 con error code
+  → Retry automatico API: network errors + 502/503/504, 2 reintentos con backoff+jitter
+  → Haptic feedback: 7 hooks, 9 puntos de insercion (favoritos, likes, upvotes, votes, networking)
+  → Arquitectura HA migrada de Hetzner+PlanetScale+Upstash a DO sao1 consolidado
+  → Stress test plan v2.1 con DO sao1, 9 tests formales, thresholds enterprise
+  → 582+ tests, 1664+ assertions
+
 PENDIENTE:
-  → Features competitivos (1.C1 analytics)
+  → Features competitivos (1.C1 analytics dashboard)
   → Web app (W.0-W.12) — PRIORIDAD por Bancolombia
-  → Deploy (Docker + VPS + CI/CD + EAS Build)
+  → Deploy (Docker + DO sao1 + CI/CD + EAS Build)
   → Seguridad restante (2FA, device fingerprinting, SEC-4/5 infra)
-  → Fase 2 features (juegos, video calls, silent disco)
+  → Optimistic UI implementacion (chat tempId, post-pendientes)
+  → Stress test 10K (post-deploy)
+  → Fase 2 features (video calls, spatial audio)
   → Fase 3 (multi-tenant, monetizacion)
 ```
 
@@ -632,15 +705,15 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 
 ---
 
-## Timeline — ajustada con Bancolombia
+## Timeline — ajustada post-audit (2026-04-25)
 
 | Mes | Objetivo | Entregable |
 |-----|----------|------------|
-| **Abril** | Silent Disco spec + web app setup + features competitivos | Backend silent disco + Next.js base |
-| **Mayo** | Web app core (landing + registro + agenda + streaming) | Demo web funcional |
-| **Junio** | Web app completa + deploy + demo Bancolombia | Producto desplegado, web + app |
-| **Julio** | Pitch Eventos Efectivos + onboarding Bancolombia | White-label, datos reales |
-| **Agosto** | Pruebas + ajustes ambos clientes | Stress test, feedback |
+| **Abril** (hecho) | Diferenciadores + audit | Live Moments, Event Pulse, Concurso Fotos, Golden Ticket, Optimistic UI audit, Kiosk, Room Check-in, Webhooks. 582+ tests |
+| **Mayo** | Web app core + deploy staging | Next.js base + Home + Agenda + Streaming. Deploy staging DO sao1 |
+| **Junio** | Web app completa + stress test | Web app W.2-W.12. Stress test 10K (9 tests). Optimistic UI chat |
+| **Julio** | Demo Bancolombia + pitch Eventos Efectivos | Producto desplegado, web + app. Dry run 1 con cliente |
+| **Agosto** | Onboarding clientes + fixes | Dry run 2. Fix rondas. Freeze semana -2 |
 | **Septiembre** | Eventos en vivo | Casos de estudio reales |
 
 ### Estrategia competitiva
@@ -660,5 +733,6 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 
 ---
 
-_EventOS Roadmap v4.5 — Kasproduction_
-_19 abril 2026_
+_EventOS Roadmap v5.0 — Kasproduction_
+_25 abril 2026_
+_Cambios v4.5→v5.0: Live Moments/Event Pulse/Concurso completados, audit optimistic UI (4 docs), stack DO sao1, stress test v2.1, haptics+retry+bug fix Q&A, 582+ tests_

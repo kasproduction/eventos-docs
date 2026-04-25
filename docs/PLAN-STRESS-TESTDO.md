@@ -1,23 +1,25 @@
-# Plan de Stress Test — EventOS
+si# Plan de Stress Test — EventOS
 
 > Validacion empirica de que 10,000 asistentes simultaneos tienen experiencia indistinguible de una plataforma enterprise.
 > No se trata de probar que Laravel no se cae. Se trata de probar que el dia del evento, con 12,000 personas en Movistar Arena, el director ejecutivo de Bancolombia abre la app y siente instantaneidad.
-> Version: 2.0 | Fecha: 2026-04-24
+> Version: 2.1 | Fecha: 2026-04-24
+> Stack: DigitalOcean consolidado en sao1 (Sao Paulo) + Cloudflare adelante + R2 storage
 > Prerequisito: deploy HA real (no Docker Compose local monolitico)
 
 ---
 
 ## 0. Cambios vs v1.0
 
-| Area | v1.0 | v2.0 |
+| Area | v1.0 | v2.1 |
 |------|------|------|
-| Stack de prueba | VPS unico + MySQL/Redis local en Docker | Stack identico a produccion: 2 VPS + PlanetScale + Upstash + CF LB |
-| Generador de carga | Hetzner → Hetzner (2ms RTT) | k6 Cloud regional o generador con `tc` para simular 4G Colombia |
+| Stack de prueba | VPS unico + MySQL/Redis local en Docker | Stack identico a produccion: 2 Droplets DO + DO Managed MySQL + DO Managed Redis + CF LB, todo en sao1 |
+| Region | No especificada (default us) | DO sao1 (Sao Paulo) — RTT Bogota ~80ms vs us-east ~150ms |
+| Generador de carga | Hetzner local (2ms RTT) | k6 Cloud regional o Droplet en otra region con `tc` para simular 4G Colombia |
 | Threshold p95 | < 2s warning | < 800ms hard limit |
 | Threshold 5xx | < 0.1% aceptable | < 0.01% hard limit |
 | Metricas cliente | No estaban | TTI, click-to-response, RUM desde device real |
 | Login stampede | Dentro del flujo general | Test aislado (bcrypt es CPU-bound, asesino silencioso) |
-| Failover durante carga | No estaba | Test critico: matar VPS-1 con 10K activos |
+| Failover durante carga | No estaba | Test critico: matar Droplet-1 con 10K activos |
 | Break point | No estaba | Escalar hasta romper para conocer margen real |
 | Red degradada | No estaba | `tc` simulando 150ms RTT + 2% packet loss + 1 Mbps |
 | Export aislado | Mencionado | Test formal: API p95 con/sin exports debe ser igual |
@@ -42,7 +44,7 @@ Si el test pasa en estos tres ejes, la plataforma es enterprise. Si pasa solo en
 
 ### El principio que rige todo
 
-**Probar contra la realidad, no contra un universo paralelo.** Tu arquitectura de produccion tiene PlanetScale remoto, Upstash remoto, 2 VPS, CF LB. Tu test tiene que correr contra eso mismo, o el test miente.
+**Probar contra la realidad, no contra un universo paralelo.** Tu arquitectura de produccion es DO consolidado en sao1 (2 Droplets + Managed MySQL + Managed Redis en VPC privada) detras de Cloudflare. Tu test tiene que correr contra eso mismo, o el test miente.
 
 ---
 
@@ -65,7 +67,7 @@ Si el test pasa en estos tres ejes, la plataforma es enterprise. Si pasa solo en
 
 | Componente | Que falta | Prioridad |
 |-----------|-----------|-----------|
-| Stack HA desplegado | 2 VPS + PlanetScale + Upstash + CF LB en staging | P0 |
+| Stack HA desplegado | 2 Droplets DO sao1 + DO Managed MySQL + DO Managed Redis + CF (DNS+WAF+LB) en staging | P0 |
 | Generador de carga realista | k6 Cloud o VPS con `tc` para red Colombia | P0 |
 | Escenarios flujo natural | Scripts que simulen persona real completa | P0 |
 | Escalado 10K | Subir de 1,400 a 10,000 VUs con ramp up realista | P0 |
@@ -83,60 +85,74 @@ Si el test pasa en estos tres ejes, la plataforma es enterprise. Si pasa solo en
 ### 3.1 Stack del servidor = identico a produccion
 
 ```
-Cloudflare (DNS + LB + WAF)
+Cloudflare (DNS + WAF + DDoS + CDN estaticos)
    |
-   +-- api-staging.eventos.com
+   +-- api-staging.eventos.com (proxy a origins DO)
            |
-           +-- VPS-1 (Hetzner CPX31, 4 vCPU, 8 GB RAM)
-           +-- VPS-2 (Hetzner CPX31, 4 vCPU, 8 GB RAM)
+           +-- Droplet-1 DO sao1 (4 vCPU, 8 GB RAM)
+           +-- Droplet-2 DO sao1 (4 vCPU, 8 GB RAM)
                  |
                  +-- Nginx + Laravel PHP-FPM + Socket.IO (Redis adapter)
                  |
-                 +-- Cada uno conecta a:
-                      - PlanetScale (DB test, region cercana)
-                      - Upstash Redis (tier Pro o free de test)
-                      - Cloudflare R2 (bucket test)
+                 +-- Cada uno conecta via VPC privada DO (< 1ms RTT) a:
+                      - DO Managed MySQL sao1 (1GB + read replica)
+                      - DO Managed Redis sao1 (1GB con HA)
+                 +-- Y a Cloudflare R2 para storage (mantenido por egress gratis)
    |
-   +-- No hay MySQL local. No hay Redis local. No hay "todo en un VPS".
+   +-- No hay MySQL local. No hay Redis local. No hay "todo en un Droplet".
 ```
 
+**Por que DO sao1 consolidado y no Hetzner US + servicios dispersos:**
+
+| Decision | Razon |
+|----------|-------|
+| **DO en lugar de Hetzner** | Audiencia 100% Latam. Hetzner no tiene region Latam. DO sao1 baja RTT Bogota de ~150ms (us-east) a ~80ms |
+| **Sao1 (Sao Paulo)** | Region mas cercana a Colombia. Tiene Managed MySQL, Managed Redis, VPC, todo lo que necesitas |
+| **DO Managed MySQL en lugar de PlanetScale** | Vive en la misma VPC que los Droplets — RTT < 1ms vs 80-150ms a PlanetScale. Pricing flat (no se dispara en bursts de evento) |
+| **DO Managed Redis en lugar de Upstash** | VPC privada, no TLS overhead por cada comando, pricing flat |
+| **R2 se mantiene** | Egress gratis es imposible de batir. Spaces de DO no esta en sao1 (sgp1, ams3, fra1, nyc3, sfo3) — irrelevante para ti |
+| **Cloudflare adelante** | DO LB no tiene WAF ni DDoS protection comparable. CF se queda como primera linea |
+
 **Por que no el CCX33 monolitico de v1.0:**
-MySQL/Redis local tienen 0.1ms de latencia. PlanetScale remoto tiene 40-180ms segun region. Un endpoint con 5 queries pasa de 5ms a 750ms de piso. El test con stack local pasa brillante y produccion duele. **No validamos un universo paralelo.**
+MySQL local en Docker tiene 0.1ms de latencia. DO Managed MySQL en la misma VPC tiene < 1ms. No es la misma config pero el delta es marginal (vs 150ms si la DB estuviera fuera de la region). Lo que NO podemos hacer es testear con MySQL local — eso fue el error de v1.0, porque produccion va a tener Managed DB y la diferencia de comportamiento con MySQL local + reservas de memoria + caches calientes es gigante.
 
-**Region de PlanetScale/Upstash para el test:**
-Idealmente la misma que vas a usar en produccion (ver `DISPONIBILIDAD-HA.md` seccion 3.1, recomendacion: sa-east-1 Sao Paulo para audiencia Colombia). Si el test corre contra us-east-1, corre contra las condiciones de RTT real desde Bogota.
-
-**Costo stack test (una vez, se destruye):**
+**Costo stack test (1 mes de uso, se baja despues a produccion):**
 
 | Concepto | Costo |
 |---------|-------|
-| VPS-1 (CPX31 4/8) | ~$8 por mes de prueba |
-| VPS-2 (CPX31 4/8) | ~$8 por mes de prueba |
-| PlanetScale Scaler (mes test) | $29 |
-| Upstash Pro (mes test) | $10 |
-| Cloudflare Pro + LB | $25 |
+| Droplet-1 sao1 (4 vCPU, 8 GB) | $48 |
+| Droplet-2 sao1 (4 vCPU, 8 GB) | $48 |
+| DO Managed MySQL 1GB sao1 + read replica | $30 |
+| DO Managed Redis 1GB sao1 (HA) | $15 |
+| Cloudflare Pro + LB | $26 |
 | R2 bucket test | ~$1 |
-| **Total stack** | **~$80 por mes** |
+| **Total stack staging/test** | **~$168/mes** |
+
+Comparado contra los $76/mes del stack actual (Hetzner + PlanetScale + Upstash + CF), son ~$92/mes mas. La ganancia: latencia inter-servicio < 1ms (vs 80-150ms), latencia usuario ~80ms (vs ~150ms), una sola consola, una sola factura, pricing predictible.
 
 ### 3.2 Generador de carga = latencia real del usuario
 
-**Problema con v1.0:** generador Hetzner → servidor Hetzner = 2-5ms RTT. El usuario real en Movistar Arena tiene 80-300ms RTT + packet loss 1-3%.
+**Problema con v1.0:** generador en mismo data center que servidor = 2-5ms RTT. El usuario real en Movistar Arena tiene 80-300ms RTT + packet loss 1-3%.
+
+**Importante:** si el generador esta en sao1 (mismo region que los Droplets de produccion), tampoco vamos a medir latencia real Bogota-Sao Paulo. Hay que pensar bien la ubicacion del generador.
 
 **Opciones (elegir una):**
 
 | Opcion | Costo | Fidelidad | Esfuerzo |
 |--------|-------|-----------|----------|
-| **k6 Cloud con nodos Sao Paulo** | ~$99 por test run | Alta (latencia Latam real) | Bajo |
-| **VPS generador + `tc` (traffic control)** | ~$1 por dia | Media (latencia simulada) | Medio |
+| **k6 Cloud con nodos Sao Paulo** | ~$99 por test run | Alta (latencia Latam real medida desde regiones DO/AWS reales) | Bajo |
+| **Droplet temporal en sao1 + `tc`** | ~$2 (1 dia, $0.08/hora 4vCPU/8GB) | Media (latencia simulada via traffic control) | Medio |
+| **Droplet temporal en nyc3 (sin tc)** | ~$2 | Media-baja (RTT 150ms real, pero no simula 4G Colombia) | Trivial |
 | **Artillery desde laptop con throttling Chrome** | $0 | Baja (solo valida UX en tu maquina) | Trivial, solo dev |
 
-**Recomendacion: k6 Cloud para el test final de 10K.** Para iteraciones intermedias, VPS generador con `tc` basta:
+**Recomendacion: k6 Cloud para el test final de 10K.** Para iteraciones intermedias, Droplet temporal en sao1 con `tc` basta:
 
 ```bash
-# En el VPS generador, antes de correr k6:
+# En el Droplet generador (mismo sao1), antes de correr k6:
 # Simular red 4G Colombia congestionada
 sudo tc qdisc add dev eth0 root netem delay 150ms 30ms distribution normal loss 2% rate 1mbit
 # 150ms RTT +- 30ms jitter, 2% packet loss, 1 Mbps bandwidth
+# Esto simula el RTT Bogota-saopaulo + congestion 4G Movistar
 ```
 
 ### 3.3 Device real para metricas cliente
@@ -185,14 +201,14 @@ Esto NO es opcional. Pon un iPhone de gama media (ej. iPhone 12) y un Android me
 
 | Metrica | Donde | Alarma |
 |---------|-------|--------|
-| CPU VPS-1, VPS-2 | htop / Grafana | > 75% sostenido |
-| RAM VPS | free -m | > 80% |
+| CPU Droplet-1, Droplet-2 | htop / Grafana | > 75% sostenido |
+| RAM Droplet | free -m | > 80% |
 | PHP-FPM workers activos | `pm status` | > 90% del pool |
-| Upstash commands/sec | Upstash dashboard | > 80% del plan |
-| PlanetScale connections | PS dashboard | > 80% pool |
-| PlanetScale slow queries | PS Insights | cualquiera > 500ms |
-| Disk I/O VPS | iostat | > 80% util |
-| Socket connections | `fetchSockets()` | > 6K por VPS |
+| DO Managed Redis ops/sec | DO panel | > 80% del plan |
+| DO Managed MySQL connections | DO panel | > 80% pool (default 25 por droplet) |
+| DO Managed MySQL slow queries | DO Insights | cualquiera > 500ms |
+| Disk I/O Droplet | iostat | > 80% util |
+| Socket connections | `fetchSockets()` | > 6K por Droplet |
 | Queue workers activos | `queue:monitor` | backlog creciente |
 | Sentry error rate | Sentry dashboard | > 0.05% |
 
@@ -344,7 +360,7 @@ FASE 3 — Post-evento (minuto 180-210)
 
 ### 6.1 Test de Login Stampede (aislado)
 
-**Por que existe:** bcrypt es CPU-bound (~50-100ms por hash segun cost factor). 10K logins en 10 minutos = pico de 50-100 logins/seg. Si los 2 VPS tienen 4 vCPU cada uno, saturas CPU en bcrypt y **todo cae** — no solo login, sino la API entera porque PHP-FPM queda sin workers libres.
+**Por que existe:** bcrypt es CPU-bound (~50-100ms por hash segun cost factor). 10K logins en 10 minutos = pico de 50-100 logins/seg. Si los 2 Droplets tienen 4 vCPU cada uno, saturas CPU en bcrypt y **todo cae** — no solo login, sino la API entera porque PHP-FPM queda sin workers libres.
 
 **Escenario:**
 ```
@@ -355,36 +371,37 @@ Endpoint: POST /auth/login (email + password real, no mockeado)
 ```
 
 **Metricas criticas:**
-- CPU de los VPS durante el burst (threshold: < 80%)
+- CPU de los Droplets durante el burst (threshold: < 80%)
 - API p95 de **otros endpoints** durante el burst (threshold: el mismo que el base; si sube, hay contention)
 - Login p95 propio (threshold: < 1.5s porque bcrypt es lento por diseño)
 
 **Mitigaciones si falla:**
-- Subir vCPU del VPS (CPX41 o CCX33)
+- Subir Droplets a 8 vCPU/16GB ($84/mes c/u en lugar de $48)
 - Bajar cost factor de bcrypt de 12 a 10 (ojo: menos seguro)
 - Encolar logins via Redis rate limiting + queue
 - Usar Argon2 con menos iteraciones
 
 ### 6.2 Test de Failover durante carga (critico para 99.9%)
 
-**Por que existe:** tu arquitectura HA promete "si VPS-1 cae, CF redirige a VPS-2 en <30s sin impacto". Esa promesa NO esta validada. Hay que probarla.
+**Por que existe:** tu arquitectura HA promete "si Droplet-1 cae, CF redirige a Droplet-2 en <30s sin impacto". Esa promesa NO esta validada. Hay que probarla.
 
 **Escenario:**
 ```
 T+0:00   Lanzar test 10K (flujos naturales, fases 1-2)
 T+0:30   Minuto 30 del test, con 10K activos en sesiones:
-         - `docker stop app` en VPS-1 (mata Nginx + Laravel + Socket)
+         - `docker stop app` en Droplet-1 (mata Nginx + Laravel + Socket)
+         - O en DO panel: "Power off" del Droplet-1
          - Cloudflare deberia detectar en < 30s (health check cada 10s, 2 failures)
-         - Todo el trafico pasa a VPS-2
+         - Todo el trafico pasa a Droplet-2
 T+0:32   Monitorear:
          - Cuantos requests fallan durante la transicion? (contador desde el generador)
          - Cuantos sockets se reconectan? (monitorear reconnect events)
          - p95 de API durante la transicion (deberia subir momentaneamente)
          - Usuarios notan algo? (device real + Sentry)
-T+0:35   Esperar 3 minutos con VPS-2 solo
-T+0:35   `docker start app` en VPS-1
+T+0:35   Esperar 3 minutos con Droplet-2 solo
+T+0:35   `docker start app` en Droplet-1 (o "Power on")
 T+0:36   Verificar que CF vuelve a usar ambos (balance vuelve)
-T+0:40   Mismo test con VPS-2 muerto en vez de VPS-1
+T+0:40   Mismo test con Droplet-2 muerto en vez de Droplet-1
 ```
 
 **Pass criteria:**
@@ -418,7 +435,7 @@ Ramp up progresivo:
 **Que capturar:**
 - Numero de VUs donde p95 rompe 2s
 - Numero de VUs donde 5xx supera 1%
-- Cual componente cae primero: CPU VPS? PlanetScale connections? Upstash rate? Socket adapter?
+- Cual componente cae primero: CPU Droplet? DO Managed MySQL connections? DO Managed Redis ops? Socket adapter?
 
 **Accion:** documentar el break point. Si es < 15K (solo 1.5x de margen), considerar escalar infra antes de produccion.
 
@@ -469,14 +486,14 @@ Parte B — Con exports simultaneos
 
 **Pass criteria:**
 - API p95 Parte B <= API p95 Parte A * 1.1 (maximo 10% de degradacion)
-- CPU VPS-1 y VPS-2: sin cambio
-- CPU VPS-3: alto durante exports (como debe ser)
+- CPU Droplet-1 y Droplet-2: sin cambio
+- CPU Droplet-3 (worker): alto durante exports (como debe ser)
 - Exports completan en < 90s cada uno
 
 **Si no pasa:** el aislamiento no funciona. Revisar:
 - Que los jobs de export realmente van a la cola `exports` y no `default`
-- Que VPS-3 realmente lee de la replica y no del primary
-- Que VPS-1/VPS-2 no tienen workers de la cola `exports`
+- Que Droplet-3 realmente lee de la **read replica de DO Managed MySQL** y no del primary
+- Que Droplet-1/Droplet-2 no tienen workers de la cola `exports`
 
 ---
 
@@ -554,9 +571,10 @@ Con 2-3 devices reales generando transacciones durante el test de 10K, tienes da
 
 ### 8.1 Pre-requisitos
 
-- [ ] Deploy HA completo en staging: 2 VPS + PlanetScale + Upstash + CF LB + R2
+- [ ] Deploy HA completo en staging: 2 Droplets DO sao1 + DO Managed MySQL + DO Managed Redis + CF (DNS+WAF+LB) + R2
+- [ ] VPC privada DO configurada para que los Droplets hablen con MySQL/Redis sin pasar por internet publica
 - [ ] Sentry configurado (backend + app mobile)
-- [ ] DNS + SSL via Cloudflare
+- [ ] DNS + SSL via Cloudflare apuntando a IPs publicas de los Droplets
 - [ ] Seeders de datos:
   - 10,000 attendees con tokens pre-generados
   - 50 vendedores con stands asignados
@@ -565,8 +583,8 @@ Con 2-3 devices reales generando transacciones durante el test de 10K, tienes da
   - 15 sponsors con contenido
   - 200 preguntas pre-seed, 10 polls, 5 rewards
 - [ ] Tokens pre-generados en `tests/load/tokens.json` (10,055 tokens)
-- [ ] VPS generador con k6 + Artillery instalados
-- [ ] `tc` configurado en el generador para profiles de red
+- [ ] Droplet generador temporal (sao1 con `tc` o region distinta) con k6 + Artillery instalados
+- [ ] Profiles `tc` configurados en el generador para red 4G Colombia
 - [ ] 2 devices fisicos (iOS + Android) con la app + Sentry
 - [ ] Alertas Slack/email configuradas para hard limits
 
@@ -575,16 +593,21 @@ Con 2-3 devices reales generando transacciones durante el test de 10K, tienes da
 ```
 HORA    ACTIVIDAD
 
-07:00   Provisionar stack HA en staging (si no estaba ya)
+07:00   Provisionar stack HA en staging DO sao1 (si no estaba ya)
+        - 2 Droplets via Terraform o panel
+        - DO Managed MySQL + read replica
+        - DO Managed Redis HA
+        - VPC privada conectando los 5
+        - CF DNS + LB apuntando a Droplets
 07:30   Ejecutar seeders: 10K users + 30 sessions + data
-08:00   Verificar health: GET /api/v1/health en CF LB, VPS-1, VPS-2
-08:15   Configurar monitoreo: Sentry, Grafana, tail de logs, PS/Upstash dashboards
+08:00   Verificar health: GET /api/v1/health en CF, Droplet-1, Droplet-2
+08:15   Configurar monitoreo: Sentry, Grafana, tail de logs, DO panel (MySQL/Redis insights)
 08:30   Conectar devices reales, instalar build de staging de la app
 08:45   Smoke run: 50 VUs durante 5 min, verificar nada roto
 
 09:00   TEST 1 — Warmup
         100 VUs, 15 min, red buena
-        Verificar flujo basico funciona contra stack HA
+        Verificar flujo basico funciona contra stack DO
 
 09:20   TEST 2 — Carga media
         1,000 VUs, 30 min
@@ -592,7 +615,7 @@ HORA    ACTIVIDAD
 
 09:55   TEST 3 — Login Stampede (aislado)
         10K logins en 10 min + pico 100/s durante 30s
-        Verificar CPU no satura y otros endpoints no se degradan
+        Verificar CPU Droplets no satura y otros endpoints no se degradan
 
 10:15   TEST 4 — Carga alta
         5,000 VUs, 45 min, flujo natural
@@ -601,7 +624,7 @@ HORA    ACTIVIDAD
 11:05   Pausa de 30 min para analisis intermedio
 
 11:35   TEST 5 — Red degradada
-        2,000 VUs con profile 4G Colombia (200ms + 2% loss + 2 Mbps)
+        2,000 VUs con profile 4G Colombia (tc en generador: 200ms + 2% loss + 2 Mbps)
         Verificar thresholds cliente se mantienen
 
 12:10   Almuerzo
@@ -615,33 +638,34 @@ HORA    ACTIVIDAD
 
 15:00   (Dentro de TEST 6) T+2h, justo al terminar:
         TEST 7 — Failover durante carga
-        Mantener 10K activos, matar VPS-1
-        Medir transicion, reconexion, degradacion
-        3 min con VPS-2 solo, luego recuperar VPS-1
-        Repetir matando VPS-2
+        Mantener 10K activos, "Power off" Droplet-1 desde DO panel
+        Medir transicion, reconexion, degradacion via CF LB
+        3 min con Droplet-2 solo, luego Power on Droplet-1
+        Repetir matando Droplet-2
 
 15:30   TEST 8 — Export aislado
         Mantener 2K VUs baseline
         Disparar 15 exports simultaneos
         Verificar API p95 no se degrada > 10%
+        Verificar Droplet-3 (worker) lee de read replica, no primary
 
 16:00   TEST 9 — Break Point (si todo lo anterior paso)
         Escalar 10K -> 15K -> 20K -> 25K hasta romper
-        Documentar punto de quiebre
+        Documentar punto de quiebre y componente que cayo primero
 
 17:00   Fin de tests. Capturar reportes de todas las herramientas.
 
 17:30   Analisis
         - Endpoints mas lentos
         - Errores por tipo
-        - Bottleneck identificado (CPU, DB, Redis, Socket, network)
+        - Bottleneck identificado (CPU Droplet, DO MySQL connections, DO Redis ops, Socket, network)
         - Compare contra thresholds
         - Metricas device real vs backend
         - Break point numerico
 
 18:30   Documentar en STRESS-TEST-RESULTS-v1.md
 19:00   Lista priorizada de fixes
-19:30   Destruir stack de test si se va a reciclar
+19:30   Destruir Droplet generador (los de staging quedan para regression tests)
 
 Dias siguientes: implementar fixes, repetir TEST 6 hasta limpio.
 ```
@@ -796,15 +820,16 @@ Crear evento -> 3 salas x 3 sesiones/sala -> 5 attendees, 2 vendedores, 1 admin
 
 | Escenario | Que hacer | Que debe pasar |
 |-----------|-----------|----------------|
-| Socket muere 30s | `docker stop socket` en ambos VPS | App reconecta, refetch agenda/announcements, no pierde estado |
-| Upstash muere 10s | Bloquear con firewall temporal al Upstash | API degrada (no cache), no crash. Socket reconecta pub/sub |
-| PlanetScale slow (5s queries) | Simular con `SLEEP(5)` en trigger | API devuelve 504 timeout, app muestra error, circuit breaker rompe |
-| Cloudflare LB falla a failover | Bajar healthcheck del VPS-1 manualmente | CF redirige a VPS-2 en < 30s, usuarios no notan |
+| Socket muere 30s | `docker stop socket` en ambos Droplets | App reconecta, refetch agenda/announcements, no pierde estado |
+| DO Managed Redis falla 10s | Bloquear con firewall temporal el endpoint Redis | API degrada (no cache), no crash. Socket reconecta pub/sub al volver |
+| DO Managed MySQL slow (5s queries) | Simular con `SLEEP(5)` en trigger o `SET GLOBAL max_execution_time` | API devuelve 504 timeout, app muestra error, circuit breaker rompe |
+| Cloudflare LB falla a failover | Bajar healthcheck del Droplet-1 manualmente | CF redirige a Droplet-2 en < 30s, usuarios no notan |
 | 2 MCs misma sesion | Abrir 2 tabs MC, operar ambas | Estado sincronizado via socket, no conflicto |
 | App pierde red 60s | Modo avion, volver | Socket reconecta, agenda fresca, chat historial intacto |
 | Double-tap rapido | Tap start 2 veces en MC | Solo 1 request pasa (409 en segunda) |
 | DDoS sintetico | 100K req/s desde el generador | Cloudflare absorbe, app no se entera |
-| DB connection pool exhausted | Subir pool_max a 5, cargar 10K | CF LB retorna 503, requests caen, mobile retry rescata |
+| DB connection pool exhausted | Reducir pool a 5 conexiones, cargar 10K | CF LB retorna 503, requests caen, mobile retry rescata |
+| DO Managed MySQL primary cae, failover a replica | DO panel: trigger failover manual | DO promueve replica en < 30s, app degrada brevemente |
 
 ---
 
@@ -860,6 +885,7 @@ El plan esta completo cuando:
 
 ---
 
-_Plan de Stress Test v2.0 — EventOS_
+_Plan de Stress Test v2.1 — EventOS_
 _24 abril 2026_
-_Cambios vs v1.0: test contra stack HA real, thresholds enterprise, metricas cliente (TTI, click-to-response), 5 tests criticos nuevos (stampede, failover, breakpoint, red degradada, export aislado)._
+_Cambios v1.0 -> v2.0: test contra stack HA real, thresholds enterprise, metricas cliente (TTI, click-to-response), 5 tests criticos nuevos (stampede, failover, breakpoint, red degradada, export aislado)._
+_Cambios v2.0 -> v2.1: stack consolidado en DigitalOcean sao1 (Sao Paulo) en lugar de Hetzner + servicios dispersos. Latencia inter-servicio < 1ms via VPC privada DO. Latencia usuario Bogota ~80ms vs ~150ms anterior. Costos predictibles flat._

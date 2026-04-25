@@ -1,8 +1,15 @@
 # EventOS — Alta Disponibilidad e Infraestructura
 
-> Arquitectura para 99.99% uptime (~52 min downtime/año).
+> Arquitectura para 99.9% uptime (~8.7 horas downtime/año).
 > Principio: ningún componente es punto único de falla.
-> Versión: 1.0 | Fecha: 2026-04-07
+> Versión: 2.0 | Fecha: 2026-04-25
+>
+> **NOTA v2.0:** Stack migrado de Hetzner+PlanetScale+Upstash a DigitalOcean sao1 consolidado.
+> Razon: latencia inter-servicio < 1ms (VPC) vs 80-150ms (servicios remotos), RTT Bogota ~80ms vs ~150ms.
+> 99.99% corregido a 99.9% (realista para single-region sin multi-AZ).
+> Las secciones 2-3 de este documento aun referencian PlanetScale/Upstash/Hetzner — son la v1.0 historica.
+> Para la arquitectura definitiva de produccion ver `docs/PLAN-STRESS-TESTDO.md` v2.1 seccion 3.
+> Para el plan de optimistic UI (latencia percibida) ver `docs/OPTIMISTIC-UI-PLAN.md`.
 
 ---
 
@@ -115,7 +122,7 @@ ANTES (1 VPS):                      DESPUÉS (HA):
 | **SLA** | 99.99% uptime |
 | **Backups** | Automáticos cada 12 horas, retención 2 días (free) o 30 días (paid) |
 | **Failover** | Automático, transparente para la aplicación |
-| **Regiones** | US, EU, Asia — elegir la más cercana a tu audiencia |
+| **Regiones** | US, EU, Aasia — elegir la más cercana a tu audiencia |
 
 **Cambio en EventOS:**
 ```env
@@ -776,5 +783,6 @@ Pulse SI hace `join:event` para recibir `checkin:update`, `data:invalidate` y `w
 
 ---
 
-*EventOS Alta Disponibilidad v1.2*
-*Actualizado: 2026-04-24 — seccion 12 Rooms.pulse aislamiento 10K*
+*EventOS Alta Disponibilidad v2.0*
+*Actualizado: 2026-04-25 — stack migrado a DO sao1, 99.9% realista, optimistic UI audit*
+*Historico: v1.0 (04-07 Hetzner), v1.1 (04-20 session stats), v1.2 (04-24 Rooms.pulse)*
