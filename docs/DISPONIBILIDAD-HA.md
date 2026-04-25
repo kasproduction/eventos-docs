@@ -319,7 +319,153 @@ Resultado: 0 downtime. Si v1.1 tiene bug → rollback = meter Droplet-1 (v1.0) d
 | Droplet destruido | Levantar nuevo Droplet en sao1, `docker compose up`. DB y Redis intactos (managed en VPC). **Tiempo: 15-30 min** |
 | DB corrupta | DO restore desde backup diario. **Tiempo: <10 min** |
 | Cuenta cloud comprometida | Rotar secrets, revocar tokens, restore desde backup. **Tiempo: 1-2 horas** |
-| Region sao1 cae | DO no tiene multi-region failover automatico. Levantar en otra region + restore DB. **Tiempo: 1-2 horas** |
+| Region sao1 cae | Plan de contingencia seccion 6.4. **Tiempo: 30-60 min** |
+
+### 6.4 Plan de contingencia — Caida regional DO sao1
+
+> Probabilidad: ~0.01% durante un evento de 4-8 horas.
+> Este plan es cold standby: cero costo mensual, preparacion previa unica, recovery manual.
+> NO es multi-region activo (complejidad y costo injustificados para la escala actual).
+
+#### Estrategia: Cold Standby + Backup externo a DO
+
+```
+ESTADO NORMAL (99.99% del tiempo):
+  Cloudflare LB → DO sao1 (Droplets + MySQL + Redis en VPC)
+
+EMERGENCIA (DO sao1 caido):
+  1. Cloudflare DNS → apuntar a Droplets de emergencia en DO nyc3 (o Vultr/Hetzner)
+  2. Restore MySQL desde backup en R2 (fuera de DO)
+  3. Redis se reconstruye solo (cache + pub/sub, no datos criticos)
+  4. App funciona en 30-60 min con ~150ms RTT (vs ~80ms normal)
+```
+
+#### Preparacion previa (hacer UNA VEZ antes del primer evento)
+
+**1. Snapshots semanales de Droplets**
+
+Los snapshots de DO capturan la imagen completa (Docker, config, codigo).
+Se pueden restaurar en cualquier region DO.
+
+```bash
+# Automatizar con DO API (cron semanal o pre-evento)
+doctl compute droplet-action snapshot <droplet-1-id> --snapshot-name "eventos-d1-$(date +%Y%m%d)"
+doctl compute droplet-action snapshot <droplet-2-id> --snapshot-name "eventos-d2-$(date +%Y%m%d)"
+```
+
+**2. Backup MySQL externo a DO (en Cloudflare R2)**
+
+DO Managed MySQL hace backups diarios, pero si toda la region cae, esos backups
+podrian ser inaccesibles. Un dump en R2 (fuera de DO) garantiza acceso independiente.
+
+```bash
+# Cron semanal en Droplet-1 (o manual la noche antes del evento)
+mysqldump -h private-db-eventos.ondigitalocean.com \
+  -u doadmin -p eventos_prod \
+  --single-transaction --routines --triggers \
+  | gzip > /tmp/backup-$(date +%Y%m%d).sql.gz
+
+# Subir a R2 (fuera de DO, accesible siempre)
+aws s3 cp /tmp/backup-$(date +%Y%m%d).sql.gz \
+  s3://eventos-backups/ \
+  --endpoint-url https://ACCOUNT_ID.r2.cloudflarestorage.com
+
+# Limpiar local
+rm /tmp/backup-*.sql.gz
+```
+
+**3. Documentar .env de emergencia**
+
+Tener preparado un `.env.emergency` con las variables para region alternativa
+(hosts DB/Redis cambian, el resto es igual). Guardarlo encrypted en R2 o GitHub Secrets.
+
+#### Runbook de emergencia — DO sao1 caido durante evento
+
+```
+PASO 0 — VERIFICAR (2 minutos)
+  [ ] Confirmar que es DO, no Cloudflare ni red del venue
+  [ ] dash.cloudflare.com → funciona? Si no, es Cloudflare (diferente problema)
+  [ ] status.digitalocean.com → sao1 reportado down?
+  [ ] Si solo es 1 Droplet → CF LB ya hizo failover, no hacer nada
+  [ ] Si es toda la region sao1 → continuar con paso 1
+
+PASO 1 — LEVANTAR INFRA ALTERNATIVA (15-20 minutos)
+  [ ] DO panel → crear 2 Droplets en nyc3 desde snapshots mas recientes
+      (o Vultr/Hetzner si DO completo esta caido)
+  [ ] Instalar MySQL en el Droplet (o DO Managed MySQL en nyc3 si disponible)
+  [ ] Descargar backup de R2:
+      aws s3 cp s3://eventos-backups/backup-YYYYMMDD.sql.gz /tmp/ \
+        --endpoint-url https://ACCOUNT_ID.r2.cloudflarestorage.com
+  [ ] Restore:
+      gunzip -c /tmp/backup-*.sql.gz | mysql -u root eventos_prod
+  [ ] Instalar Redis (apt install redis-server o DO Managed en nyc3)
+
+PASO 2 — CONFIGURAR Y ARRANCAR (10 minutos)
+  [ ] Copiar .env.emergency a ambos Droplets
+  [ ] Actualizar DB_HOST, REDIS_HOST con nuevas IPs
+  [ ] docker compose up -d en ambos
+  [ ] Verificar: curl http://NUEVA_IP/api/v1/health → 200
+
+PASO 3 — REDIRIGIR TRAFICO (5 minutos)
+  [ ] Cloudflare → Load Balancer → cambiar origins a nuevas IPs
+  [ ] Cloudflare → purge cache
+  [ ] Verificar: curl https://api.eventos.com/api/v1/health → 200
+  [ ] Verificar: WebSocket conecta al nuevo socket server
+
+PASO 4 — COMUNICAR (inmediato)
+  [ ] Notificar al cliente: "hubo una interrupcion de 30 min, ya estamos operativos"
+  [ ] Los usuarios solo vieron ~30 min de downtime
+  [ ] Con retry automatico en la app, muchos ni lo notaron
+```
+
+#### Que se pierde en la evacuacion
+
+| Dato | Estado |
+|------|--------|
+| Registros hasta ultimo backup R2 | Intactos |
+| Datos entre backup y la caida (hasta 24h) | **Perdidos** |
+| Check-ins del dia | Perdidos si no estaban en el backup |
+| Chat history (Redis) | Perdido (efimero, se reconstruye) |
+| Leads escaneados post-backup | Perdidos |
+| Imagenes/fotos | Intactas (R2 es independiente de DO) |
+| Gamification points post-backup | Perdidos |
+
+**Mitigacion para evento critico:** La noche antes del evento, correr el backup manual a R2. RPO baja de 7 dias a < 12 horas.
+
+#### Que NO hacer durante la emergencia
+
+- **No esperar a que DO se recupere** — puede tardar horas. Mejor evacuar en 30 min
+- **No intentar acceder a DO Managed MySQL** — si la region cayo, los managed services tambien
+- **No rutear a un servidor casero** — internet residencial no soporta la carga
+- **No cambiar DNS directamente** — usar Cloudflare LB (cambiar origins), el DNS no cambia
+
+#### Protocolo dia del evento
+
+```
+DIA D - 2 HORAS ANTES:
+  [ ] Verificar DO status page: todo verde en sao1
+  [ ] Verificar CF health checks: ambos Droplets UP
+  [ ] Verificar snapshot reciente (< 7 dias)
+  [ ] Verificar backup MySQL en R2 (< 24h, hacer manual si > 24h)
+  [ ] Tener runbook impreso o en laptop (no depender de acceso a GitHub)
+  [ ] Tener hotspot 4G propio (independiente del WiFi del venue)
+
+DURANTE:
+  [ ] Monitorear alertas BetterStack
+  [ ] Si alerta → paso 0 del runbook
+```
+
+#### Costo del cold standby
+
+| Item | Costo mensual |
+|------|---------------|
+| Snapshots DO | Gratis (incluido en plan) |
+| Backup MySQL en R2 | ~$0.01 (< 1GB comprimido) |
+| Droplets de emergencia | $0 (solo se crean si se necesitan, se cobran por hora) |
+| **Total** | **~$0/mes** |
+
+Si se activa la emergencia, los Droplets temporales cuestan ~$0.07/hora cada uno.
+Un evento de 8 horas con 2 Droplets de emergencia = ~$1.12 total.
 
 ---
 
