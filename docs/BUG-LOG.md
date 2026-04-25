@@ -3,6 +3,15 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+### BUG-268: Filament searchable selects no cargan opciones (PENDIENTE)
+- **Severidad**: ALTA
+- **Fecha**: 2026-04-24
+- **Donde**: Filament v3.3.49 — TODOS los Select con `->searchable()` en forms y actions
+- **Sintoma**: Escribes texto en el campo de busqueda y no retorna resultados. Afecta: Totems (salon), Golden Tickets (asistente), Patrocinadores, y cualquier Select searchable
+- **Causa probable**: Combinacion de `->options(closure)` + `->searchable()` sin `->preload()` en Filament v3. En actions/modals el closure no se re-evalua. `filament:assets` y `optimize:clear` no lo resuelven
+- **Workaround parcial**: Agregar `->preload()` a cada Select afectado, o cambiar a `->options()` estaticas sin `->searchable()`
+- **Fix pendiente**: Auditar TODOS los Select searchable en `app/Filament/Resources/` y agregar `->preload()` donde falte. Considerar upgrade Filament si el bug persiste
+
 ---
 
 ## 2026-04-24 — Event Pulse Auditoria completa (30 bugs)

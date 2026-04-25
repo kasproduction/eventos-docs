@@ -86,6 +86,13 @@
 
 > El organizador de Eventos Efectivos opera desde Filament. Si esta en ingles o desordenado, se ve amateur.
 
+### BUG-268: Searchable selects rotos — URGENTE
+- [ ] Todos los `Select::searchable()` en Filament no retornan resultados al buscar
+- [ ] Afecta: Totems, Golden Tickets, Patrocinadores, y cualquier form con Select searchable
+- [ ] Fix: auditar todos los Select en `app/Filament/Resources/`, agregar `->preload()` donde falte
+- [ ] Si persiste, evaluar upgrade Filament (actual: v3.3.49)
+- [ ] Ver BUG-LOG.md BUG-268
+
 ### Filament UI Enterprise
 - [ ] Nivel 1: columns, labels espanol, secciones con icon/description, custom theme
 - [ ] Nivel 2: Tabs por recurso (EventBranding, Gamification, Registration)
