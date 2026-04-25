@@ -33,28 +33,180 @@ La competencia (Cisco Webex Events $88K, ICE360 $49M COP) entrega reportes detal
     +-- Descarga: link temporal (signed URL, 24h expiry)
 ```
 
-### Queue Strategy (CRITICO)
+### Performance Strategy (CRITICO — 10K usuarios activos)
+
+El evento NO puede parar porque alguien pidio un export. Cinco capas de proteccion.
+
+#### Capa 1: VPS-3 Worker de Exports (AISLAMIENTO TOTAL)
+
+**Problema:** Si exports comparten PHP-FPM con la API, un query de 300K filas satura workers y tumba el check-in.
+**Problema inverso:** Si movemos Filament entero a VPS-3 y se cae, el organizador no puede banear, moderar ni operar Mission Control. Inaceptable.
+**Solucion:** VPS-1/VPS-2 mantienen Filament completo. VPS-3 es SOLO un worker headless que procesa exports.
 
 ```
-Queue: "exports" (dedicado, separado de "default")
-Concurrencia: max 2 exports simultaneos
-Timeout: 300s (5 min)
-Retry: 1 intento
-Cleanup: Cron borra exports > 48h
+INTERNET
+   |
+CLOUDFLARE (WAF + LB + CDN)
+   |
+   +--- api.eventos.com ---> VPS-1 + VPS-2 (round robin, failover)
+   |                          |
+   |                    [API + Socket.IO + Filament]
+   |                    [Queue: default (push, email, games)]
+   |                    [Lee/Escribe: PRIMARY MySQL]
+   |                    [10K asistentes + 1-5 admins]
+   |
+   +--- (sin HTTP) ----------> VPS-3 (worker headless)
+                                |
+                          [Queue: exports SOLAMENTE]
+                          [NO Nginx, NO HTTP, NO Filament]
+                          [Lee: REPLICA MySQL (read-only)]
+                          [Escribe: solo archivos a R2]
+   |
+   +--- Managed Services
+         |
+         +-- PlanetScale PRIMARY ($29/mes) <--- VPS-1, VPS-2
+         |      |
+         |      +-- PlanetScale REPLICA (~$10/mes) <--- VPS-3
+         |
+         +-- Upstash Redis ($10/mes) <--- todos (cache + queue broker)
+         |
+         +-- Cloudflare R2 (storage) <--- todos (exports, fotos, docs)
 ```
 
-El worker de exports corre en un queue separado para que NUNCA compita con:
-- Push notifications (queue: default)
-- Emails (queue: default)
-- Gamificacion: ProcessSpinRewardsJob, ProcessTriviaRewardsJob (queue: default)
-- Webhooks: DispatchWebhookJob (queue: default)
-- Attendance: AwardSessionAttendancePointsJob, FlushSessionAttendanceJob (queue: default)
+**Principio: El admin opera desde VPS-1/VPS-2 (mismo Filament de siempre). Los queries pesados de export corren en VPS-3 contra la replica.**
 
-```bash
-# Worker produccion
-php artisan queue:work --queue=default --tries=3
-php artisan queue:work --queue=exports --tries=1 --timeout=300
+**Flujo del Data Center:**
+1. Organizador abre Data Center en Filament (VPS-1 o VPS-2)
+2. Ve 16 stats cacheados en Redis (0 queries al MySQL)
+3. Click "Descargar Leads" --> despacha job al queue "exports" (Redis)
+4. VPS-3 toma el job del queue (Upstash compartido)
+5. VPS-3 ejecuta query pesado contra REPLICA MySQL
+6. VPS-3 genera CSV --> sube a Cloudflare R2
+7. VPS-3 envia Filament Notification al admin con link
+8. Admin descarga CSV (link firmado a R2)
+
+| VPS | Que corre | Quien lo usa | Lee de | Escribe en |
+|-----|-----------|-------------|--------|------------|
+| VPS-1 | API + Socket + Filament + Queue:default | 10K asistentes + admins | Primary | Primary |
+| VPS-2 | API + Socket + Filament + Queue:default | 10K asistentes + admins | Primary | Primary |
+| VPS-3 | Queue:exports (worker headless) | Nadie directamente | **REPLICA** | Solo R2 (archivos) |
+
+**Si VPS-3 se cae:**
+- El evento sigue perfecto (VPS-1/VPS-2 no se enteran)
+- Filament sigue en VPS-1/VPS-2 (bans, MC, polls, moderacion — todo)
+- Export jobs se acumulan en Redis (Upstash tiene persistencia)
+- Cuando VPS-3 vuelve, procesa cola pendiente automaticamente
+- Unico impacto: exports tardan mas
+
+**Si VPS-1 se cae:**
+- Cloudflare redirige a VPS-2 en <30s
+- VPS-3 sigue procesando exports
+- Cero impacto
+
+**Costo:** +$5/mes VPS-3 (Hetzner CX22) + ~$10/mes replica MySQL = $15/mes extra
+
+**VPS-3 docker-compose.worker.yml:**
+```yaml
+services:
+  worker:
+    build:
+      context: ./eventos-backend
+      dockerfile: Dockerfile
+    command: php artisan queue:work --queue=exports --tries=1 --timeout=300 --sleep=3
+    env_file: .env.worker
+    deploy:
+      resources:
+        limits: { cpus: '1', memory: 1024M }
+    restart: unless-stopped
 ```
+
+```env
+# .env.worker (VPS-3)
+DB_CONNECTION=mysql
+DB_HOST=replica.connect.psdb.cloud    # SOLO replica, NUNCA primary
+DB_DATABASE=eventos_prod
+QUEUE_CONNECTION=redis
+REDIS_HOST=global-xxxxx.upstash.io    # Mismo Redis compartido
+FILESYSTEM_DISK=r2                     # Exports van a R2
+```
+
+#### Capa 2: Read Replica (MySQL)
+
+PlanetScale soporta read replicas nativas:
+- VPS-1/VPS-2 --> `primary.connect.psdb.cloud` (read + write)
+- VPS-3 --> `replica.connect.psdb.cloud` (read only)
+
+VPS-3 NUNCA escribe en MySQL. Solo lee datos y sube archivos a R2.
+
+**Delay de replica:** ~1-2 segundos. Datos de hace 2 seg para exports = perfectamente valido.
+
+#### Capa 3: Queue separado
+
+```
+VPS-1/VPS-2:  php artisan queue:work --queue=default --tries=3
+              --> Push, emails, gamificacion, webhooks, attendance
+
+VPS-3:        php artisan queue:work --queue=exports --tries=1 --timeout=300
+              --> SOLO export jobs, max 2 simultaneos
+```
+
+Ambos usan Upstash Redis como broker. Workers en VPS diferentes. Si VPS-3 muere, jobs esperan en Redis.
+
+#### Capa 4: Query optimization
+
+Cada export job sigue estas reglas:
+- `->cursor()` para CSV streaming (write row by row, ~2MB RAM)
+- `->select(['id','name','email'])` — no SELECT *
+- `->with(['user:id,name,email,phone,company,job_title'])` — eager load con select
+- Todos los joins resueltos en 1-2 queries max (no N+1)
+- Indices en `(event_id, created_at)` minimo por tabla
+
+**Pico de viewers (sweep line en PHP, no query por minuto):**
+```php
+$records = SessionAttendance::where('session_id', $id)
+    ->select('joined_at', 'left_at')->cursor();
+$events = [];
+foreach ($records as $r) {
+    $events[] = [$r->joined_at, +1];
+    $events[] = [$r->left_at ?? $sessionEnd, -1];
+}
+sort($events);
+$peak = $current = 0;
+foreach ($events as [$time, $delta]) {
+    $current += $delta;
+    if ($current > $peak) { $peak = $current; $peakMinute = $time; }
+}
+// 1 query + O(n log n) PHP. 50K records = ~50ms.
+```
+
+#### Capa 5: Redis cache para stat cards
+
+Las 16 cards del Data Center NO hacen query en vivo:
+
+```php
+Cache::remember("dc:stats:{$eventId}", 60, function () {
+    return [
+        'registered' => Attendee::where('event_id', $id)->count(),
+        'checked_in' => Attendee::...whereNotNull('checked_in_at')->count(),
+        // ...12 cards mas
+    ];
+});
+```
+
+Max 60 segundos de delay. Cero impacto en primary.
+
+#### Resumen
+
+```
+Capa 1: VPS-3 worker     --> Queries pesados en servidor aparte (+$5/mes)
+Capa 2: Read Replica      --> VPS-3 lee de replica MySQL (+$10/mes)
+Capa 3: Queue separado    --> Export workers en VPS-3, evento en VPS-1/VPS-2
+Capa 4: Query optimize    --> Cursor streaming, eager load, indices
+Capa 5: Redis cache       --> Stat cards cacheadas 60s
+```
+
+**Resultado:** 10K activos + organizador descargando 44 exports = 0 impacto.
+**Costo total infra:** ~$90/mes (vs $75 base). $15 extra por aislamiento total.
 
 ---
 
@@ -207,20 +359,32 @@ Fila 4: [Virtuales activos] [Presenciales en sala] [Juegos jugados] [Posts muro]
 
 ## Fases de Implementacion
 
-### FASE 0: Infraestructura de Export (2h)
-**Objetivo:** Base reutilizable para los 44 exports
+### FASE 0: Infraestructura de Export + VPS-3 + Read Replica (3h)
+**Objetivo:** Base reutilizable para los 44 exports + aislamiento total de performance
 
 ```
 app/
   Jobs/Exports/              <-- Namespace dedicado
-    BaseExportJob.php        <-- Job abstracto: queue, timeout, notification, cleanup
+    BaseExportJob.php        <-- Job abstracto: queue exports, timeout, notification, cleanup
   Services/
     ExportService.php        <-- Registra exports, genera filename, signed URL, throttle
   Filament/Pages/
     DataCenter.php           <-- Page principal con tabs
   Console/Commands/
     CleanupExportsCommand.php
+config/
+  database.php               <-- read/write split (VPS-3 lee de replica)
+docker/
+  docker-compose.admin.yml   <-- Docker compose para VPS-3 (solo Filament + queue worker)
 ```
+
+**Incluye:**
+- docker-compose.admin.yml para VPS-3 (Nginx + PHP-FPM + queue worker exports)
+- Cloudflare routing: admin.eventos.com → VPS-3
+- Configurar read/write split en database.php (DB_HOST=replica, DB_WRITE_HOST=primary)
+- BaseExportJob con `$queue = 'exports'` (worker en VPS-3)
+- Redis cache helper para stat cards (TTL 60s)
+- En dev sin replica ni VPS-3, todo local (transparente, misma DB)
 
 **BaseExportJob** (patron):
 ```php
@@ -466,16 +630,22 @@ app/
 Ya instalado:
 - `maatwebsite/excel` v3.1
 - `Filament Notifications` (DatabaseNotification)
-- `Queue database` con tabla `jobs`
+- `Queue database` con tabla `jobs` (produccion: Redis)
 - `Job Batching` con tabla `job_batches`
 - `ExportSessionStatsJob` como patron de referencia
 - `ExportPollResponsesJob` como patron de referencia
 - `ExportRoomAttendanceJob` como patron de referencia
 - `AttendeesExport` como patron maatwebsite
+- Redis 3 databases (default, cache, socket)
 
 Nuevo:
-- Agregar queue "exports" al worker de produccion
+- **VPS-3 dedicado** para Filament + queue exports (~$5/mes Hetzner CX22)
+- **Read Replica MySQL** en PlanetScale (~$10/mes). VPS-3 lee de replica.
+- Cloudflare routing: admin.eventos.com → VPS-3, api.eventos.com → VPS-1+VPS-2
+- docker-compose.admin.yml para VPS-3
+- Queue "exports" con worker en VPS-3
 - Comando `exports:cleanup` en Kernel scheduler
+- **Redis cache** para stat cards del header (TTL 60s)
 - Los 3 export jobs existentes se refactorizan para extender BaseExportJob
 
 ---

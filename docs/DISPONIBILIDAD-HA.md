@@ -91,6 +91,7 @@ ANTES (1 VPS):                      DESPUÉS (HA):
 |------------|----------|----------------------|------------------------|
 | VPS-1 se cae | Cloudflare LB redirige todo a VPS-2 | **<30 segundos** | Ninguno (tal vez 1 request falla) |
 | VPS-2 se cae | Cloudflare LB redirige todo a VPS-1 | **<30 segundos** | Ninguno |
+| VPS-3 se cae | Export jobs se acumulan en Redis, se procesan al volver | **auto-recovery** | Exports tardan mas, evento intacto |
 | MySQL se cae | PlanetScale failover a réplica | **<5 segundos** | Ninguno (automático) |
 | Redis se cae | Upstash failover a réplica | **<3 segundos** | Reconexión de socket (automática) |
 | R2 se cae | Cloudflare distribuido, 99.99% SLA | **~0 segundos** | Ninguno (CDN cache) |
@@ -316,13 +317,16 @@ Resultado: 0 downtime. Si v1.1 tiene bug → rollback = meter VPS-1 (v1.0) de vu
 
 ### Escenario: Escalar a 10+ eventos, 10,000+ usuarios
 
-| Cambio | Costo adicional |
-|--------|----------------|
-| +1 VPS (VPS-3) | +$5/mes |
-| PlanetScale Team | +$10/mes |
-| Upstash Business | +$40/mes |
-| Sentry Team | +$26/mes |
-| **TOTAL escalado** | **~$160/mes** |
+| Cambio | Costo adicional | Proposito |
+|--------|----------------|-----------|
+| VPS-3 (Hetzner CX22) | +$5/mes | Worker headless para export jobs (Data Center) |
+| PlanetScale Read Replica | +$10/mes | VPS-3 lee de replica, nunca toca primary |
+| PlanetScale Team | +$10/mes | Mas capacity |
+| Upstash Business | +$40/mes | Mas commands/sec |
+| Sentry Team | +$26/mes | Mas events |
+| **TOTAL escalado** | **~$170/mes** |
+
+**VPS-3 es un worker headless:** Solo corre `php artisan queue:work --queue=exports`. No tiene Nginx, no sirve HTTP, no corre Filament. Lee de la replica MySQL, sube archivos a R2. Si se cae, el evento sigue perfecto — los export jobs se acumulan en Redis hasta que VPS-3 vuelva. Ver `docs/ROADMAP-DATA-CENTER.md` para detalles.
 
 ### Comparación con 1 VPS
 
