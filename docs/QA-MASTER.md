@@ -2,7 +2,7 @@
 
 > Auditoria endpoint por endpoint de todos los modulos.
 > Actualizado: 2026-04-25 | Metodo: curl real + tests automatizados
-> Tests: 69 archivos, 712 test methods, 1664+ assertions
+> Tests: 71 archivos, 743 test methods, 1947+ assertions
 > IMPORTANTE: Socket server debe estar corriendo para real-time. Iniciar con: cd eventos-socket && npx ts-node src/index.ts
 
 ---
@@ -11,7 +11,7 @@
 
 | Modulos probados | Endpoints testados | Tests automatizados | Archivos test | Bugs historicos |
 |-----------------|-------------------|---------------------|---------------|-----------------|
-| 35+ | 186 | 712 | 69 | 278 registrados, todos corregidos |
+| 36+ | 193 | 743 | 71 | 286 registrados, todos corregidos |
 
 ### Cambios desde QA 04-17 (490 tests) a QA 04-25 (712 tests)
 
@@ -33,7 +33,8 @@
 | Event Pulse (bootstrap, 7 secciones, auth) | 20 | 04-24 |
 | Photo Contest (lifecycle, anti-gaming, voting) | 25 | 04-24 |
 | Stand Stats (leads, views, favorites, contacts, tier) | 13 | 04-20 |
-| **Total nuevos** | **~220** | 04-18 a 04-24 |
+| Data Center (API auth, exports, jobs, contract) | 31 | 04-25 |
+| **Total nuevos** | **~251** | 04-18 a 04-25 |
 
 ---
 
@@ -995,6 +996,51 @@ Tests cubren: contest toggle, horario apertura/cierre, 1 entry por attendee, ant
 
 ---
 
+## 38. Data Center — Exports & API (2026-04-25) — 31 tests
+
+| Endpoint / Feature | Metodo | Auth | Resultado | HTTP | Test |
+|---------------------|--------|------|-----------|------|------|
+| `/data-center/events` | GET | sanctum | OK | 200 | DataCenterApiTest |
+| `/data-center/{event}/stats` | GET | sanctum | OK | 200 | DataCenterApiTest |
+| `/data-center/{event}/stats` (moderator) | GET | sanctum | FORBIDDEN | 403 | DataCenterApiTest |
+| `/data-center/{event}/stats` (no auth) | GET | - | UNAUTH | 401 | DataCenterApiTest |
+| `/data-center/{event}/export` | POST | sanctum | OK | 202 | DataCenterApiTest |
+| `/data-center/{event}/export` (invalid type) | POST | sanctum | REJECT | 422 | DataCenterApiTest |
+| `/data-center/{event}/export` (throttle 3ro) | POST | sanctum | THROTTLE | 429 | DataCenterApiTest |
+| `/data-center/{event}/export-all` | POST | sanctum | OK | 202 | DataCenterApiTest |
+| `/data-center/{event}/export-all` (cooldown) | POST | sanctum | THROTTLE | 429 | DataCenterApiTest |
+| `/data-center/{event}/exports` | GET | sanctum | OK | 200 | DataCenterApiTest |
+| `/data-center/{event}/notifications` | GET | sanctum | OK | 200 | DataCenterApiTest |
+
+**Tests de contract (ExportJobsTest):**
+
+| Test | Que valida |
+|------|-----------|
+| all export jobs extend BaseExportJob | 44 clases verificadas |
+| all export jobs use queue exports | Queue name = 'exports' en las 44 |
+| all export jobs have public headers and query | Metodos publicos para MasterZipJob |
+| 44 export types are valid | EXPORT_MAP tiene 44 entries, todas las clases existen |
+
+**Tests de datos por export (ExportJobsTest):**
+
+| Export testeado | Que valida |
+|-----------------|-----------|
+| AttendeesMaster | Headers correctos, 2 rows, campos dinamicos registration_fields |
+| Checkins | Solo incluye checked_in (1 de 2) |
+| ConsentLog | accepted_at mapeado, IP correcta |
+| LeadsMaster | Sponsor name, vendor, scanned, tier hot |
+| LeadsMaster (filtro) | sponsor_id filter respetado (1 de 2 sponsors) |
+| SessionRatings | strip_tags en comentarios HTML |
+| WallPosts | likes_count y comments_count correctos |
+| Connections | sender y receiver mapeados, status accepted |
+| AuditLog | action ban_attendee registrada |
+| Job handle() | CSV creado + Filament notification enviada |
+| Job failed() | Error notification enviada al admin |
+
+**Bugs encontrados y corregidos:** 8 (BUG-279 a BUG-286)
+
+---
+
 ## Estado final QA (2026-04-25)
 
 | Categoria | Tests | OK | Bugs | Notas |
@@ -1023,4 +1069,5 @@ Tests cubren: contest toggle, horario apertura/cierre, 1 entry por attendee, ant
 | Security (SEC-1 a SEC-7) | 50+ | 50 | 3 hist. | Socket auth, headers, ban, URL injection |
 | Presets/Fields/Theme | 30+ | 30 | 0 | 11 tipos, onboarding, branding |
 | Admin endpoints | 30+ | 30 | 0 | Bans, polls, notifications, uploads, games |
-| **TOTAL** | **712** | **712** | **0 activos** | 69 archivos test, 1664+ assertions |
+| Data Center | 31 | 31 | 8 corr. | 44 exports, 7 endpoints, SPA standalone |
+| **TOTAL** | **743** | **743** | **0 activos** | 71 archivos test, 1947+ assertions |

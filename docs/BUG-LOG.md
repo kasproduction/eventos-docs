@@ -3,6 +3,48 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-04-25 — Data Center (8 bugs)
+
+### BUG-286: CSV renombrado a .xlsx genera error en Excel (RESUELTO)
+- **Severidad:** ALTA — BaseExportJob generaba CSV con fputcsv pero ponia extension .xlsx cuando el usuario elegia formato Excel
+- **Sintoma:** Excel muestra error de formato corrupto al abrir el archivo
+- **Fix:** Forzar siempre extension .csv. XLSX real requiere maatwebsite/excel (pendiente P2)
+
+### BUG-285: R2 bucket vacio causa 500 en cada export (RESUELTO)
+- **Severidad:** CRITICA — `shouldUploadToR2()` verificaba `config('filesystems.disks.r2.key')` pero en dev la key existe y el bucket esta vacio
+- **Sintoma:** `The GetObject operation requires non-empty parameter: Bucket` en cada export
+- **Fix:** Verificar `bucket` en vez de `key`, skip completo en environment testing
+
+### BUG-284: readonly + SerializesModels causa 500 al dispatch (RESUELTO)
+- **Severidad:** CRITICA — BaseExportJob usaba `public readonly int $eventId` en constructor. `SerializesModels` trait intenta reinicializar propiedades readonly al deserializar el job
+- **Sintoma:** `Cannot initialize readonly property from scope ExportAttendeesMasterJob`
+- **Fix:** Quitar `readonly` de las 4 propiedades del constructor en BaseExportJob y ExportMasterZipJob
+
+### BUG-283: ExportService stats query — ChatMessage sin relacion session() (RESUELTO)
+- **Severidad:** ALTA — `ExportService::computeStats()` usaba `ChatMessage::whereHas('session', ...)` pero ChatMessage no tiene relacion `session()`, tiene campo `room` (string) y relacion `sender()`
+- **Sintoma:** 500 en endpoint `/api/v1/data-center/{event}/stats`
+- **Fix:** Cambiado a `ChatMessage::where('event_id', $eventId)->count()`. Mismo fix para LiveGame
+
+### BUG-282: N+1 queries en ExportGamesSummaryJob (RESUELTO)
+- **Severidad:** MEDIA — Dentro del `cursor()->map()`, ejecutaba `LiveGameParticipant::where()->count()` y `->with()->get()` por cada juego
+- **Sintoma:** Performance degradada, potencial timeout con muchos juegos
+- **Fix:** Preload `participantCounts` y `triviaWinners` antes del cursor con queries agrupadas
+
+### BUG-281: ExportAttendeesMasterJob — cursor() con HasMany no eager load (RESUELTO)
+- **Severidad:** MEDIA — `cursor()` con `with('registrationFieldValues')` (HasMany) no hace eager loading. Cada attendee ejecuta query individual para sus field values
+- **Sintoma:** N+1 queries silencioso, lento con muchos asistentes
+- **Fix:** Cambiado de `cursor()` a `get()` para que el eager loading funcione correctamente
+
+### BUG-280: ExportSpinResultsJob — NPE en sector null (RESUELTO)
+- **Severidad:** MEDIA — `$sector['label']` cuando `$sector` es null (sector index invalido o config corrupta)
+- **Sintoma:** Potential TypeError en PHP 7.x (PHP 8 permite null['key'] → null, pero no es defensivo)
+- **Fix:** Default `$sector` a `[]` en vez de `null` cuando el index no se encuentra
+
+### BUG-279: Selector de evento faltante en SPA (RESUELTO)
+- **Severidad:** ALTA — SPA solo funcionaba si el URL tenia el event ID (`/data-center/1`). No habia forma de seleccionar evento desde la interfaz
+- **Sintoma:** Mensaje "Selecciona un evento desde Filament" sin poder hacer nada
+- **Fix:** Agregado endpoint `GET /api/v1/data-center/events`, dropdown en header de la SPA, preseleccion por URL
+
 ## 2026-04-24 — Concurso de Fotos + Golden Ticket (10 bugs)
 
 ### BUG-278: Archivos prize support no commiteados (RESUELTO)
