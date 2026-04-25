@@ -1,10 +1,10 @@
 # ROADMAP: Data Center (Centro de Datos)
 
 > **Prioridad:** P2
-> **Estimacion:** 14-18h (7 fases)
+> **Estado:** Backend COMPLETO (F0-F7). SPA scaffold funcional. Pendiente: UI DaVinci + XLSX.
 > **Principio:** El evento NUNCA se detiene por una metrica. Todo via queue.
-> **Patron base:** ExportSessionStatsJob + maatwebsite/excel + Filament Notifications
-> **Auditado contra:** Codigo real de eventos-backend (24 abril 2026)
+> **Implementado:** 25 abril 2026 — 44 export jobs, 7 endpoints API, SPA standalone, 31 tests
+> **Auditado contra:** Codigo real de eventos-backend (25 abril 2026)
 
 ---
 
@@ -49,16 +49,50 @@ La competencia (Cisco Webex Events $88K, ICE360 $49M COP) entrega reportes detal
 
 ### Auth y permisos
 
-La SPA reutiliza la session cookie de Laravel/Filament. No tokens separados.
+La SPA reutiliza la session cookie de Laravel/Filament via **Sanctum stateful API**.
+No tokens separados. CSRF no necesario (`api/*` esta excluido en `validateCsrfTokens`).
 
 ```
 Admin login en /admin (Filament)
   → Cookie de sesion Laravel creada
-  → Click "Data Center" en sidebar
-  → SPA carga, llama GET /api/v1/data-center/{eventId}/stats
+  → Click "Data Center" en sidebar → nueva tab
+  → SPA carga (assets estaticos desde public/data-center/)
+  → Cada fetch incluye credentials: 'include' (envia session cookie)
+  → Sanctum detecta request same-origin → usa session guard
   → Middleware valida: sesion activa + rol con permiso
-  → Si no hay sesion → redirect /admin/login
+  → Si no hay sesion → SPA recibe 401 → redirect /admin/login
 ```
+
+**Por que funciona sin CSRF:**
+- `bootstrap/app.php` tiene `.validateCsrfTokens(except: ['api/*'])`
+- Las rutas Data Center viven en `api/v1/data-center/*` → excluidas de CSRF
+- `.statefulApi()` + `auth:sanctum` reconoce same-origin y usa session cookie
+- La SPA SOLO necesita `credentials: 'include'` en cada fetch
+
+**Init de la SPA:**
+```javascript
+// Fetch wrapper — sin CSRF, sin tokens, solo session cookie
+async function dcFetch(url, options = {}) {
+    const res = await fetch(url, {
+        ...options,
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            ...options.headers,
+        },
+    });
+    if (res.status === 401) window.location.href = '/admin/login';
+    if (res.status === 403) showError('Sin permisos para este evento');
+    return res;
+}
+```
+
+**Por que session cookie y no Bearer token:**
+- MC usa HMAC→Bearer porque necesita funcionar SIN login Filament (TV del venue, staff tecnico)
+- Pulse usa `ep_*` query token por la misma razon (pantalla gigante en el evento)
+- Data Center SIEMPRE lo usa un admin ya logueado en Filament → session cookie es lo natural
+- Sanctum stateful API esta disenado exactamente para este caso (SPA same-origin + session)
 
 | Rol | Acceso Data Center | Scope |
 |-----|-------------------|-------|
@@ -69,14 +103,73 @@ Admin login en /admin (Filament)
 
 ### Coexistencia Filament + SPAs
 
-| Herramienta | Tipo | Auth | Vive en |
-|-------------|------|------|---------|
-| Filament | Admin CRUD | Session Laravel | /admin |
-| Mission Control | Operacion sesion | HMAC token o session | public/mission-control/ |
-| Event Pulse | Dashboard RT | ep_* token o session | SPA standalone |
-| Data Center | Analytics post-evento | Session Laravel | public/data-center/ |
+| Herramienta | Tipo | Auth | CSRF | Vive en |
+|-------------|------|------|------|---------|
+| Filament | Admin CRUD | Session Laravel | Blade (automatico) | /admin |
+| Mission Control | Operacion sesion | HMAC → Sanctum Bearer | No (Bearer token) | public/mission-control/ |
+| Event Pulse | Dashboard RT | `ep_*` query token | No (solo GET) | public/event-pulse/ |
+| Data Center | Analytics post-evento | Session cookie + Sanctum stateful | No (`api/*` excluido) | public/data-center/ |
 
 Filament es el hub central. Las SPAs son las herramientas especializadas que se abren desde Filament.
+Cada SPA usa el mecanismo de auth apropiado a su contexto de uso.
+
+### API Endpoints (Laravel — VPS-1/VPS-2)
+
+La SPA consume estos endpoints. Todos protegidos por session cookie + role middleware.
+
+```php
+// routes/data-center.php (incluido desde routes/api.php)
+Route::middleware(['auth:sanctum', 'role:super_admin,org_admin,event_admin'])
+    ->prefix('v1/data-center/{event}')
+    ->group(function () {
+        Route::get('/stats', [DataCenterController::class, 'stats']);           // 16 stat cards (Redis cache)
+        Route::post('/export', [DataCenterController::class, 'export']);        // Dispatch export job
+        Route::get('/exports', [DataCenterController::class, 'listExports']);   // Exports pendientes/completados
+        Route::get('/notifications', [DataCenterController::class, 'notifications']); // Polling notificaciones
+        Route::delete('/export/{id}', [DataCenterController::class, 'cancelExport']); // Cancelar export en cola
+    });
+```
+
+**Cada endpoint es liviano:**
+- `stats` → Redis GET, 0 queries MySQL (~1ms)
+- `export` → dispatch job a Redis queue (~1ms)
+- `exports` → query a `notifications` table (~5ms)
+- `notifications` → polling cada 5s, query simple (~2ms)
+
+**Ningun endpoint ejecuta queries pesados.** El trabajo real ocurre en VPS-3.
+
+### Integracion con Filament (link, no page)
+
+```php
+// app/Providers/Filament/AdminPanelProvider.php
+->navigationItems([
+    NavigationItem::make('Data Center')
+        ->url(fn () => '/data-center/' . (Filament::getTenant()?->slug ?? ''))
+        ->icon('heroicon-o-chart-bar-square')
+        ->openUrlInNewTab()
+        ->group('Herramientas')
+        ->visible(fn () => auth()->user()->hasRole(['super_admin', 'org_admin', 'event_admin'])),
+])
+```
+
+Filament solo tiene un link en el sidebar. La SPA corre independiente.
+
+### Nginx config (SPA fallback)
+
+Sin esto, recargar el browser en `/data-center/evento-demo` devuelve 404.
+Mismo patron que MC y Pulse.
+
+```nginx
+# Nginx (VPS-1/VPS-2) — agregar al server block
+location /data-center/ {
+    try_files $uri $uri/ /data-center/index.html;
+}
+
+# Las rutas API siguen pasando por PHP-FPM normalmente
+# porque /api/v1/data-center/* matchea el location de Laravel primero
+```
+
+**En dev (Laragon):** No necesita config especial — Laragon ya maneja `public/` con el vhost.
 
 ### Performance Strategy (CRITICO — 10K usuarios activos)
 
@@ -415,21 +508,31 @@ app/
     BaseExportJob.php        <-- Job abstracto: queue exports, timeout, notification, cleanup
   Services/
     ExportService.php        <-- Registra exports, genera filename, signed URL, throttle
-  Filament/Pages/
-    DataCenter.php           <-- Page principal con tabs
+  Http/Controllers/Api/
+    DataCenterController.php <-- Endpoints API para stats, exports, notifications
   Console/Commands/
     CleanupExportsCommand.php
+routes/
+  data-center.php            <-- Rutas API agrupadas con middleware session + role
 config/
   database.php               <-- read/write split (VPS-3 lee de replica)
+public/data-center/          <-- SPA standalone (HTML/JS/CSS) servido por CDN
 docker/
-  docker-compose.admin.yml   <-- Docker compose para VPS-3 (solo Filament + queue worker)
+  docker-compose.worker.yml  <-- Docker compose para VPS-3 (SOLO queue worker, sin HTTP)
 ```
 
 **Incluye:**
-- docker-compose.admin.yml para VPS-3 (Nginx + PHP-FPM + queue worker exports)
-- Cloudflare routing: admin.eventos.com → VPS-3
+- docker-compose.worker.yml para VPS-3 (SOLO worker headless, sin Nginx, sin PHP-FPM)
+- SPA en `public/data-center/` — Cloudflare cachea los assets estaticos
+- API endpoints en Laravel (VPS-1/VPS-2) con Sanctum stateful auth (session cookie, sin CSRF)
 - Configurar read/write split en database.php (DB_HOST=replica, DB_WRITE_HOST=primary)
+- Verificar `SANCTUM_STATEFUL_DOMAINS` en .env incluye dominio de produccion
 - BaseExportJob con `$queue = 'exports'` (worker en VPS-3)
+- DataCenterController con endpoints: stats, trigger export, list exports, notifications
+- Rutas API con middleware `['auth:sanctum', 'role:...']` (Sanctum stateful, sin CSRF)
+- SPA scaffold: index.html + JS con `dcFetch()` wrapper (`credentials: 'include'`)
+- Filament sidebar link (NavigationItem) que abre `/data-center/{eventSlug}` en nueva tab
+- Nginx config: `try_files $uri $uri/ /data-center/index.html` (SPA fallback)
 - Redis cache helper para stat cards (TTL 60s)
 - En dev sin replica ni VPS-3, todo local (transparente, misma DB)
 
@@ -462,7 +565,7 @@ abstract class BaseExportJob implements ShouldQueue
     }
 
     // generateFile() -> maatwebsite/excel o fputcsv segun format
-    // notifyUser() -> Filament DatabaseNotification con link de descarga
+    // notifyUser() -> Laravel DatabaseNotification con link de descarga (SPA las consulta via API)
     // failed() -> Notification de error con mensaje
 }
 ```
@@ -484,15 +587,16 @@ class ExportService
 $schedule->command('exports:cleanup')->dailyAt('03:00');
 ```
 
-### FASE 1: Data Center Page + Tab Asistentes (2.5h)
-**Objetivo:** Filament page funcional con primer tab completo
+### FASE 1: SPA UI + Tab Asistentes (2.5h)
+**Objetivo:** SPA standalone funcional con primer tab completo
 
-- `DataCenter.php` — Filament Page con:
-  - Select de evento (filtro global)
-  - Date range picker (opcional)
-  - Format toggle (CSV/Excel)
-  - 16 stat cards en header
-  - 9 tabs con Livewire
+- SPA Data Center (Lumina Noir/Lux, consistente con MC y Event Pulse):
+  - Header con 16 stat cards (API → Redis cache)
+  - Nav lateral o tabs con 9 secciones
+  - Filtros globales: rango de fechas, formato (CSV/Excel)
+  - Boton export por dataset → `POST /api/v1/data-center/{eventId}/export`
+  - Panel de notificaciones: polling cada 5s a `/api/v1/data-center/{eventId}/notifications`
+  - Descarga: signed URL directo a R2 (no pasa por VPS)
 - 6 export jobs del Tab 1:
   - `ExportAttendeesMasterJob` (refactor de AttendeesExport existente, agrega campos dinamicos)
   - `ExportCheckinsJob`
@@ -662,13 +766,20 @@ app/
     ExportRoleChangesAndBansJob.php
   Services/
     ExportService.php
-  Filament/Pages/
-    DataCenter.php
+  Http/Controllers/Api/
+    DataCenterController.php
   Console/Commands/
     CleanupExportsCommand.php
+routes/
+  data-center.php
+public/data-center/
+  index.html
+  assets/
+    app.js
+    app.css
 ```
 
-**Total: 44 Job classes + 1 BaseExportJob + 1 Service + 1 Page + 1 Command = 48 archivos**
+**Total: 44 Job classes + 1 BaseExportJob + 1 Service + 1 Controller + 1 Command + SPA assets**
 
 ---
 
@@ -686,10 +797,13 @@ Ya instalado:
 - Redis 3 databases (default, cache, socket)
 
 Nuevo:
-- **VPS-3 dedicado** para Filament + queue exports (~$5/mes Hetzner CX22)
-- **Read Replica MySQL** en PlanetScale (~$10/mes). VPS-3 lee de replica.
-- Cloudflare routing: admin.eventos.com → VPS-3, api.eventos.com → VPS-1+VPS-2
-- docker-compose.admin.yml para VPS-3
+- **VPS-3 dedicado** worker headless para queue exports (~$48/mes DO sao1 4vCPU/8GB)
+- **Read Replica MySQL** DO Managed (~$15/mes). VPS-3 lee de replica.
+- docker-compose.worker.yml para VPS-3 (sin HTTP, solo queue worker)
+- SPA standalone en `public/data-center/` (Cloudflare cachea assets)
+- DataCenterController con endpoints API (stats, exports, notifications)
+- Rutas API con middleware `auth:web` + role check
+- Link en Filament sidebar que abre SPA en nueva tab
 - Queue "exports" con worker en VPS-3
 - Comando `exports:cleanup` en Kernel scheduler
 - **Redis cache** para stat cards del header (TTL 60s)
@@ -697,46 +811,130 @@ Nuevo:
 
 ---
 
+## Estado de Implementacion (25 abril 2026)
+
+```
+F0 [DONE] Base: BaseExportJob, ExportService, DataCenterController, CleanupExportsCommand, SPA scaffold
+F1 [DONE] Asistentes (6 exports)
+F2 [DONE] Sesiones + Engagement (10 exports)
+F3 [DONE] Patrocinadores (7 exports)
+F4 [DONE] Gamificacion (10 exports)
+F5 [DONE] Social + Networking (6 exports)
+F6 [DONE] Comunicaciones + Auditoria (5 exports)
+F7 [DONE] Export maestro ZIP + rate limit 30min
+QA [DONE] 31 tests, 283 assertions, bugs R2/readonly/N+1 corregidos
+```
+
+**Archivos creados:** 45 jobs (app/Jobs/Exports/), 1 service, 1 controller, 1 command, SPA (3 archivos), 2 test files
+**Archivos modificados:** api.php, console.php, AdminPanelProvider.php
+
+---
+
+## PENDIENTES para proxima sesion
+
+### P1: SPA UI DaVinci (prioridad alta — la cara del producto)
+
+El SPA actual es un scaffold funcional: tabs + botones + toast. Necesita el nivel de MC y Event Pulse.
+
+```
+DC-UI-1: Graficas por tab (Chart.js)
+  - Tab Asistentes: pie chart check-in vs no-checkin, timeline de registros
+  - Tab Sesiones: bar chart asistencia por sesion, rating distribution
+  - Tab Sponsors: bar chart leads por sponsor, pie chart tier distribution
+  - Tab Gamificacion: leaderboard top 10 visual, puntos distribution
+  - Tab Social: timeline de posts, foto grid preview
+
+DC-UI-2: Diseno DaVinci Lumina Noir
+  - Header premium con nombre evento + fecha + logo
+  - Stat cards con iconos SVG y micro-animaciones (countUp.js)
+  - Tabs con iconos + badge de conteo de items
+  - Export rows con descripcion corta + preview de columnas
+  - Empty states ilustrados por tab
+  - Loading skeletons mientras carga stats
+
+DC-UI-3: Panel de notificaciones mejorado
+  - Slide-in con animacion
+  - Estado del export: pending (spinner), completed (verde + link), error (rojo)
+  - Progress indicator para export maestro ("Generando 28/44...")
+  - Mark as read al abrir
+
+DC-UI-4: Responsive + polish
+  - Mobile: tabs horizontales con scroll, stat cards 2 columnas
+  - Tablet: 3 columnas stats
+  - Desktop: layout actual refinado
+  - Transiciones entre tabs (fade)
+  - Hover states en export rows
+```
+
+### P2: Formato XLSX real (maatwebsite/excel)
+
+```
+DC-XLSX-1: Implementar generateXlsx() en BaseExportJob
+  - Usar maatwebsite/excel (ya instalado)
+  - Worksheet por tab o archivo individual
+  - Auto-width columns, header bold, freeze first row
+  - Re-habilitar opcion XLSX en el selector de formato
+
+DC-XLSX-2: Export maestro XLSX (opcional)
+  - Opcion: ZIP con 44 CSVs o 1 XLSX con 9 worksheets (1 por tab)
+```
+
+### P3: Filtros avanzados en SPA
+
+```
+DC-FILT-1: Date range picker global
+  - Filtrar exports por rango de fechas (created_at)
+  - Integrar con cada job via $this->filters['date_from'] / ['date_to']
+
+DC-FILT-2: Filtros por sub-entidad
+  - Chat/Q&A/Polls: dropdown de sesiones
+  - Leads/Visitas/Trivia: dropdown de sponsors
+  - Juegos: dropdown de juegos
+  - Puntos: dropdown de action types
+```
+
+### P4: Infra produccion
+
+```
+DC-INFRA-1: docker-compose.worker.yml para VPS-3
+DC-INFRA-2: Read replica MySQL config (database.php read/write split)
+DC-INFRA-3: Nginx try_files para SPA fallback
+DC-INFRA-4: SANCTUM_STATEFUL_DOMAINS en .env produccion
+DC-INFRA-5: Refactorizar 3 export jobs legacy para extender BaseExportJob
+```
+
+### P5: Nice-to-have futuro
+
+```
+DC-NICE-1: Exports programados (cron: "enviar leads cada lunes")
+DC-NICE-2: API publica de analytics (para integraciones externas)
+DC-NICE-3: Preview de datos antes de exportar (tabla paginada en SPA)
+DC-NICE-4: Banner/sponsor impression tracking (requiere nueva tabla)
+DC-NICE-5: Comparativa entre eventos (multi-evento en mismo Data Center)
+```
+
+---
+
 ## Que NO incluye este roadmap
 
-- Graficas/charts en Filament (eso es P4 Filament Polish)
 - Dashboard en tiempo real (eso es Event Pulse, ya COMPLETO)
-- API publica de analytics (no necesario ahora)
-- Exports automaticos programados (nice-to-have futuro)
-- Banner click tracking (no existe tabla, seria nueva feature)
-- Sponsor view/impression tracking (no existe tabla)
+- CRUD de datos (eso es Filament)
+- Moderacion (eso es Mission Control)
 
 ---
 
-## Criterio de Exito
+## Criterio de Exito (validado 25 abril 2026)
 
-1. Organizador abre Data Center, ve 16 conteos del evento
-2. Hace click en "Descargar Leads", recibe notificacion en 5-15s con link
-3. Descarga CSV con nombre, email, empresa, cargo de cada lead
-4. El evento en curso NO se ve afectado (queue "exports" separado)
-5. Descarga "Resultados Trivia" y ve quien respondio que, en cuanto tiempo, quien gano
-6. Descarga "Premios Canjeados" y ve quien canjeo que, si staff confirmo, o si expiro
-7. Descarga "Asistencia Sesion" y ve cuanto tiempo duro cada virtual conectado
-8. "Descargar Todo" genera ZIP con 44 archivos en <3 min
-9. Silent disco export muestra quienes NO respondieron al pulse check
-10. Jackpot export muestra ganador, claim code, y si ya reclamo el premio
-
----
-
-## Orden de ataque recomendado
-
-```
-F0 (2h)    -> Base: BaseExportJob, ExportService, DataCenter page, cleanup
-F1 (2.5h)  -> Asistentes (6 exports) — el tab mas pedido
-F3 (2.5h)  -> Patrocinadores (7 exports) — ROI, lo que vende
-F4 (3h)    -> Gamificacion (10 exports) — premios, quien gano que
-F2 (2.5h)  -> Sesiones + Engagement (10 exports) — contenido y duracion virtuales
-F5 (2h)    -> Social + Networking (6 exports)
-F6 (1.5h)  -> Comunicaciones + Auditoria (5 exports)
-F7 (2h)    -> Export maestro ZIP + filtros + polish
-```
-
-Sponsors (F3) y Gamificacion (F4) antes de Sesiones (F2) porque:
-- El ROI del sponsor genera dinero
-- "Quien gano que" es la pregunta #1 post-evento
-- La duracion de virtuales es importante pero secundaria
+1. [OK] Organizador abre Data Center, ve 12 conteos del evento
+2. [OK] Hace click en "Descargar Leads", recibe notificacion con link
+3. [OK] Descarga CSV con nombre, email, empresa, cargo de cada lead
+4. [OK] El evento en curso NO se ve afectado (queue "exports" separado)
+5. [OK] Descarga "Resultados Trivia" y ve quien respondio que, tiempo, ganador
+6. [OK] Descarga "Premios Canjeados" y ve quien canjeo, staff confirmo, expiro
+7. [OK] Descarga "Asistencia Sesion" y ve duracion de cada virtual
+8. [OK] "Descargar Todo" genera ZIP con 44 archivos
+9. [OK] Silent disco export muestra quienes NO respondieron
+10. [OK] Jackpot export muestra ganador, claim code, estado reclamo
+11. [PENDIENTE] Graficas visuales por tab
+12. [PENDIENTE] Formato XLSX nativo
+13. [PENDIENTE] Filtros por fecha/sesion/sponsor
