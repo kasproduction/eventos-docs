@@ -161,6 +161,22 @@ Si falla cualquiera → oculto.
 
 ---
 
+## Principio: pausas de revision periodica
+
+Cada 5-7 dias de desarrollo intenso, hacer una sesion de revision que cubra:
+
+1. **QA-MASTER** — actualizar con tests y endpoints nuevos. En 8 dias se acumularon 220 tests sin documentar.
+2. **Roadmap + PENDIENTES** — reflejar lo completado. Sin esto el roadmap miente sobre el estado real.
+3. **Docs de arquitectura** — verificar que reflejan decisiones actuales (ej: HA doc decia PlanetScale cuando ya habiamos decidido DO).
+4. **Audit tecnico rapido** — buscar bugs silenciosos, deuda tecnica, patrones inconsistentes. La sesion 04-25 encontro: bug Q&A (201 fake), zero retry en API, zero haptics en 30 acciones.
+5. **Memorias de sesion** — guardar contexto para futuras conversaciones.
+
+Esta practica se demostro valiosa el 04-25: en una sesion de revision se corrigieron 3 bugs, se actualizaron 6 documentos, se auditaron 3 repos completos, y se alinearon decisiones de arquitectura que estaban dispersas en 3 documentos diferentes.
+
+**Frecuencia recomendada:** cada viernes o al cerrar un bloque de features (P0, P1, etc).
+
+---
+
 ## Principio: dependencias progresivas
 
 **No instalar todo al inicio.** Cada sesion instala solo lo que necesita.
