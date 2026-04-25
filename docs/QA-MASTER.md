@@ -1,19 +1,39 @@
 # QA Master — Barrido Completo de Plataforma
 
 > Auditoria endpoint por endpoint de todos los modulos.
-> Actualizado: 2026-04-17 | Metodo: curl real + tests automatizados (490 tests, 1219 assertions)
-> IMPORTANTE: Socket server debe estar corriendo para real-time (agenda, chat, pinned, branding). Iniciar con: cd eventos-socket && npx ts-node src/index.ts
+> Actualizado: 2026-04-25 | Metodo: curl real + tests automatizados
+> Tests: 69 archivos, 712 test methods, 1664+ assertions
+> IMPORTANTE: Socket server debe estar corriendo para real-time. Iniciar con: cd eventos-socket && npx ts-node src/index.ts
 
 ---
 
 ## Resumen ejecutivo
 
-| Modulos probados | Endpoints testados | OK | Bugs | Notas |
-|-----------------|-------------------|-----|------|-------|
-| 26 | 100+ | 100 | 1 corregido | + rate limits + reminders + calendar bulk + session changed |
+| Modulos probados | Endpoints testados | Tests automatizados | Archivos test | Bugs historicos |
+|-----------------|-------------------|---------------------|---------------|-----------------|
+| 35+ | 186 | 712 | 69 | 278 registrados, todos corregidos |
 
-**Bug corregido en esta sesion:**
-- `/me`, `/refresh`, `/verify-email`, `/expo-token` no tenian `check.ban` middleware — usuario baneado podia llamar `/me` y recibir 200. Fix: `eeb6ebc`
+### Cambios desde QA 04-17 (490 tests) a QA 04-25 (712 tests)
+
+| Area nueva | Tests | Fecha |
+|------------|-------|-------|
+| Session Lifecycle (delay, cancel, revert, cascada) | 23 | 04-21 |
+| Session Stats (attendance, engagement, export) | 11 | 04-20 |
+| Session Config (start/end/cancel/delay, live-config) | 23 | 04-18 |
+| Room Check-in (occupancy, attendees, attendance checks) | 23 | 04-21 |
+| Staff Check-in (assign, scan, batch, reassign) | 18 | 04-21 |
+| Room Stress (concurrent scans, edge cases) | 5+ | 04-20 |
+| Webhooks Outbound (5 eventos, retry, payload) | 8 | 04-21 |
+| Webhooks Inbound (check-in externo, batch) | 11 | 04-21 |
+| Webhook Model (config, filtering) | 5+ | 04-21 |
+| Trivia Kahoot-style (rondas, speed bonus, leaderboard) | 10 | 04-23 |
+| Spin/Ruleta (sectores, pesos, rewards) | 10 | 04-22 |
+| Jackpot/Sorteo (draw, golden ticket, claim) | 10 | 04-22 |
+| Game Export (CSV resultados) | 5+ | 04-23 |
+| Event Pulse (bootstrap, 7 secciones, auth) | 20 | 04-24 |
+| Photo Contest (lifecycle, anti-gaming, voting) | 25 | 04-24 |
+| Stand Stats (leads, views, favorites, contacts, tier) | 13 | 04-20 |
+| **Total nuevos** | **~220** | 04-18 a 04-24 |
 
 ---
 
@@ -775,22 +795,232 @@ WelcomeMail ahora adjunta archivo `.ics` con las fechas del evento al email de c
 
 ---
 
-## Estado final QA
+## 28. Session Lifecycle (2026-04-21) — 23 tests
 
-| Categoria | Total | OK | Bugs | Notas |
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/admin/sessions/{id}/start` | POST | Admin | OK | actual_start_at = now, sesiones ya iniciadas intocables |
+| `/admin/sessions/{id}/end` | POST | Admin | OK | actual_end_at = now, adjusted_end_at cleared, siguiente revertida |
+| `/admin/sessions/{id}/cancel` | POST | Admin | OK | status=cancelled, siguiente revertida, delay cleared |
+| `/admin/sessions/{id}/delay` | POST | Admin | OK | Cascada: siguiente se mueve, duracion preservada |
+| `/admin/sessions/{id}/live-config` | PATCH | Admin | OK | Toggle chat/Q&A/polls/stream, socket broadcast |
+| `/sessions/{id}/live-config` | GET | Public | OK | Config publica (sin auth, para display) |
+
+Tests cubren: cascada delay->next, cancel->revert, duracion preservada, sesiones ya iniciadas intocables, .ics con adjusted_end_at, Carbon mutation safety.
+
+---
+
+## 29. Session Stats & Attendance (2026-04-20) — 11 tests
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/sessions/{id}/stats` | GET | Admin | OK | Attendance, chat, Q&A, polls, ratings, engagement 0-100 |
+| `/sessions/{id}/viewers` | GET | Admin | OK | Attendees activos en sesion (Redis) |
+| `/sessions/{id}/export` | GET | Admin | OK | CSV en queue, notificacion campana |
+
+Tests cubren: SessionStatsService, attendance tracking Redis→DB, engagement score, export queue.
+
+---
+
+## 30. Room Check-in & Staff (2026-04-20 a 04-21) — 41 tests
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/rooms/{id}/occupancy` | GET | Auth | OK | Personas en cada sala RT |
+| `/rooms/{id}/attendees` | GET | Auth | OK | Lista attendees en sala |
+| `/attendance-checks/trigger` | POST | Admin | OK | Dispara check silent disco |
+| `/attendance-checks/{id}/confirm` | POST | Auth | OK | Attendee confirma presencia |
+| `/attendance-checks/pending` | GET | Auth | OK | Checks pendientes del usuario |
+| `/attendance-checks/active` | GET | Auth | OK | Check activo actual |
+| `/attendance-checks/history` | GET | Auth | OK | Historial de checks |
+| `/attendance-checks/{id}/results` | GET | Admin | OK | Resultados de un check |
+| `/attendance-checks/report` | GET | Admin | OK | Reporte general |
+| `/staff-checkin/assign` | POST | Admin | OK | Asignar staff a sala |
+| `/staff-checkin/unassign` | POST | Admin | OK | Desasignar |
+| `/staff-checkin/scan` | POST | Staff | OK | Scan QR individual |
+| `/staff-checkin/scan-batch` | POST | Staff | OK | Scan batch (kiosk) |
+| `/staff-checkin/my-rooms` | GET | Staff | OK | Salas asignadas |
+| `/staff-checkin/rooms` | GET | Auth | OK | Todas las salas |
+| `/staff-checkin/accept-assignment` | POST | Staff | OK | Aceptar asignacion |
+| `/staff-checkin/reject-assignment` | POST | Staff | OK | Rechazar |
+| `/staff-checkin/pending-assignment` | GET | Staff | OK | Asignaciones pendientes |
+| `/staff-checkin/reassign` | POST | Admin | OK | Reasignar staff |
+
+Tests: RoomCheckinTest (23), StaffCheckinTest (18), RoomStressTest (concurrent scans, edge cases).
+
+---
+
+## 31. Webhooks (2026-04-21) — 24 tests
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/webhooks/checkin` | POST | X-Webhook-Key | OK | Check-in externo, actualiza checked_in_at |
+| `/webhooks/checkin/batch` | POST | X-Webhook-Key | OK | Batch check-in (multiples attendees) |
+
+**Outbound (Observer-driven):**
+
+| Evento | Trigger | Payload |
+|--------|---------|---------|
+| `attendee.registered` | Attendee created | name, email, event, fields |
+| `attendee.approved` | registration_approved_at set | attendee data |
+| `attendee.checked_in` | checked_in_at set | attendee + timestamp |
+| `attendee.updated` | name/phone/company/job_title/tags change | changed fields |
+| `attendee.cancelled` | Attendee deleted | attendee_id |
+
+Tests: WebhookInboundTest (11), WebhookOutboundTest (8), WebhookModelTest (5+). Retry con backoff, payload signing, filtering por evento.
+
+---
+
+## 32. Live Moments — Games (2026-04-21 a 04-23) — 41 tests
+
+### Spin / Ruleta — 10 tests
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/admin/games` | POST | Admin | OK | Crear juego tipo spin |
+| `/admin/games/{id}/launch` | POST | Admin | OK | Broadcast game:launched |
+| `/admin/games/{id}/spin` | POST | Admin | OK | Ejecuta giro, selecciona ganador |
+| `/games/{id}/join` | POST | Auth | OK | Attendee se une al pool |
+
+### Jackpot / Sorteo — 10 tests
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/admin/games/{id}/draw` | POST | Admin | OK | Sortea ganador del pool, genera claim_code 6 chars |
+| `/rewards/confirm` | POST | Staff | OK | Confirma claim_code, entrega premio |
+
+### Trivia Kahoot-style — 10 tests
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/admin/games/{id}/next-question` | POST | Admin | OK | Broadcast game:question a attendees |
+| `/admin/games/{id}/close-round` | POST | Admin | OK | Cierra ronda, calcula scores, broadcast game:round-result |
+| `/admin/games/{id}/results` | GET | Admin | OK | Leaderboard final |
+| `/games/{id}/answer` | POST | Auth | OK | Respuesta con speed bonus |
+
+### Game Export — 5+ tests
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/admin/games/{id}/export` | GET | Admin | OK | CSV resultados |
+| `/admin/sessions/{id}/games` | GET | Admin | OK | Games por sesion |
+
+Tests cubren: pool eligibility, weighted random, speed bonus, anti-duplicate, leaderboard ordering, claim_code validation, golden ticket lifecycle.
+
+---
+
+## 33. Event Pulse (2026-04-24) — 20 tests
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/pulse/{slug}/bootstrap` | GET | pulse_token | OK | Stats agregados: checkins, online, leads, connections, ratings, messages, points |
+| `/pulse/{slug}/rooms` | GET | pulse_token | OK | Occupancy por sala |
+| `/pulse/{slug}/checkins` | GET | pulse_token | OK | Timeline check-ins |
+| `/pulse/{slug}/leads` | GET | pulse_token | OK | Leads por sponsor |
+| `/pulse/{slug}/connections` | GET | pulse_token | OK | Conexiones networking |
+| `/pulse/{slug}/social` | GET | pulse_token | OK | Actividad social wall |
+| `/pulse/{slug}/leaderboard` | GET | pulse_token | OK | Top attendees |
+| `/pulse/{slug}/ratings` | GET | pulse_token | OK | Ratings por sesion |
+
+Auth via middleware `check.pulse` con `pulse_token` query param. Socket: auto-join `pulse:{eventId}` room, recibe `pulse:active_users` cada 10s.
+
+---
+
+## 34. Photo Contest + Golden Ticket (2026-04-24) — 25 tests
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/events/{id}/photos/contest` | GET | Auth | OK | Fotos en concurso con votos |
+| `/events/{id}/photos/{id}/like` | POST | Auth | OK | Like con anti-gaming (no self-like, rate limit concurso) |
+| `/events/{id}/photos/{id}/like` | DELETE | Auth | OK | Unlike |
+
+Tests cubren: contest toggle, horario apertura/cierre, 1 entry por attendee, anti-gaming (no self-like, max likes en concurso), Golden Ticket generico desacoplado de sorteo, claim_code validation.
+
+---
+
+## 35. Stand Stats & Contacts (2026-04-20) — 13 tests
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/me/stand/stats` | GET | Vendedor | OK | leads, views, favorites, contacts, stamps, trivia, by_tier, by_member, top_services |
+| `/me/stand/contacts` | GET | Vendedor | OK | Solicitudes contacto con attendee info completa |
+
+---
+
+## 36. Admin endpoints (2026-04-18 a 04-24)
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/admin/events/{id}/attendees` | GET | Admin | OK | Lista paginada |
+| `/admin/attendees/{id}/role` | PATCH | Admin | OK | Cambiar rol |
+| `/admin/attendees/{id}/ban` | POST | Admin | OK | Ban con motivo + expiracion |
+| `/admin/attendees/{id}/ban` | DELETE | Admin | OK | Unban |
+| `/admin/attendees/{id}/ban-history` | GET | Admin | OK | Historial bans |
+| `/admin/events/{id}/notifications/send` | POST | Admin | OK | Push masivo |
+| `/admin/events/{id}/notifications/schedule` | POST | Admin | OK | Push programado |
+| `/admin/polls` | POST | Admin | OK | Crear poll |
+| `/admin/polls/{id}/start` | POST | Admin | OK | Activar, broadcast poll:new |
+| `/admin/polls/{id}/close` | POST | Admin | OK | Cerrar, broadcast poll:closed |
+| `/admin/polls/{id}/results` | GET | Admin | OK | Resultados |
+| `/admin/polls/votes/{id}/approve` | POST | Admin | OK | Aprobar voto open-text |
+| `/admin/polls/votes/approve-batch` | POST | Admin | OK | Batch approve |
+| `/admin/uploads` | POST | Admin | OK | Upload archivo |
+| `/admin/chat/messages/{id}` | DELETE | Admin | OK | Borrar mensaje chat |
+
+---
+
+## 37. Endpoints adicionales verificados (2026-04-25)
+
+| Endpoint | Metodo | Auth | Resultado | Notas |
+|----------|--------|------|-----------|-------|
+| `/events/{id}/photos/mine` | GET | Auth | OK | Fotos del usuario |
+| `/events/{id}/my-ratings` | GET | Auth | OK | Ratings del usuario |
+| `/events/{id}/my-speaker-ratings` | GET | Auth | OK | Ratings a speakers |
+| `/events/{id}/speakers/{id}/rate` | POST | Auth | OK | Rating speaker |
+| `/events/{id}/gamification-config` | GET | Auth | OK | Config puntos |
+| `/events/{id}/gamification/rules` | GET | Auth | OK | Reglas visibles |
+| `/events/{id}/visit-stand/{id}` | POST | Auth | OK | Tracking visita, +20pts |
+| `/me/contact-requests/sent` | GET | Auth | OK | Solicitudes enviadas |
+| `/me/blocked` | GET | Auth | OK | Lista bloqueados |
+| `/me/onboarding-data` | GET | Auth | OK | Data onboarding |
+| `/me/onboarding-data` | PUT | Auth | OK | Actualizar data |
+| `/me/prizes` | GET | Auth | OK | Premios ganados |
+| `/me/redemptions` | GET | Auth | OK | Canjes realizados |
+| `/events/{id}/rewards/{id}/redeem` | POST | Auth | OK | Canje con lockForUpdate, 5min token |
+| `/rewards/confirm` | POST | Staff | OK | Confirmar canje con claim code |
+| `/events/{id}/faqs` | GET | Auth | OK | FAQs del evento |
+| `/health` | GET | No | OK | DB + Redis + Queue health |
+| `/version` | GET | No | OK | Version app |
+| `/track` | POST | Auth | OK | Tracking analitico |
+
+---
+
+## Estado final QA (2026-04-25)
+
+| Categoria | Tests | OK | Bugs | Notas |
 |-----------|-------|-----|------|-------|
-| GET endpoints | 40+ | 40 | 0 | Todos responden |
-| POST/PUT/DELETE | 15+ | 15 | 0 | Escritura funciona |
-| Auth/Ban/Approval | 11 | 11 | 1 corregido | check.ban en auth routes |
-| Presets API | 7 | 7 | 0 | countries, industries, cities, onboarding |
-| Field types | 11 | 11 | 0 | 8 existentes + 3 nuevos |
-| Roles (3) | 3 | 3 | 0 | presencial/virtual/vendedor |
-| Middleware | 5 | 5 | 0 | auth, ban, throttle, security headers |
-| Rate Limits SEC-6.2 | 31 | 31 | 0 | 10 unit + 13 feature + 8 spam |
-| Push Reminders | 19 | 19 | 0 | 5 unit + 14 feature (dedup, spam, multi-evento) |
-| Mensaje anclado chat | 11 | 11 | 0 | Socket flow verificado, TypeScript 0 errores |
-| Calendar .ics email | 7 | 7 | 0 | Mailpit verificado, adjunto valido |
-| Push token ban cleanup | 3 | 3 | 0 | Token limpiado, orden push→cleanup, sin token no falla |
-| Auditoria seguridad SEC-7 | 9 | 9 | 0 | URL injection, photo path, chat null guard |
-| Theme fields | 13 | 13 | 0 | Branding API, onboarding API, model defaults |
-| **TOTAL** | **143+** | **143** | **1 corregido** | Plataforma solida — 490 tests automatizados |
+| Auth/Ban/Approval/Toast | 50+ | 50 | 1 hist. | check.ban, lockout, toast messages, restriction |
+| Agenda/Favorites/Calendar | 15+ | 15 | 0 | Toggle, .ics, reminders |
+| Session Lifecycle | 23 | 23 | 0 | Delay, cancel, revert, cascada |
+| Session Config | 23 | 23 | 0 | Start/end/cancel, live-config, socket broadcast |
+| Session Stats | 11 | 11 | 0 | Attendance, engagement, export |
+| Room Check-in | 23 | 23 | 0 | Occupancy, attendance checks, silent disco |
+| Staff Check-in | 18 | 18 | 0 | Assign, scan, batch, reassign |
+| Room Stress | 5+ | 5 | 0 | Concurrent scans |
+| Chat/Pinned | 15+ | 15 | 0 | Socket flow, pin/unpin, rate limit |
+| Q&A | 10+ | 10 | 0 | Submit, upvote, moderate, blocked words (422 fix) |
+| Polls/Surveys | 20+ | 20 | 0 | Vote, post-event, auto-activate |
+| Social Wall | 10+ | 10 | 0 | Posts, likes, comments |
+| Photos/Contest | 35+ | 35 | 0 | Upload, like, contest lifecycle, anti-gaming |
+| Networking | 15+ | 15 | 0 | Request, respond, block, matchmaking, swipe |
+| Gamification/Rewards | 15+ | 15 | 0 | Points, redeem, confirm, lockForUpdate |
+| Sponsors/Stand | 30+ | 30 | 0 | Favorite, stats, contacts, team, invite |
+| Live Moments (Games) | 41 | 41 | 0 | Spin, jackpot, trivia, export, golden ticket |
+| Event Pulse | 20 | 20 | 0 | Bootstrap, 7 secciones, auth pulse_token |
+| Webhooks | 24 | 24 | 0 | Inbound, outbound, model, retry |
+| Rate Limits | 31 | 31 | 0 | 7 endpoints, spam simulation |
+| Push/Reminders | 19 | 19 | 0 | Dedup, windows, multi-evento |
+| Security (SEC-1 a SEC-7) | 50+ | 50 | 3 hist. | Socket auth, headers, ban, URL injection |
+| Presets/Fields/Theme | 30+ | 30 | 0 | 11 tipos, onboarding, branding |
+| Admin endpoints | 30+ | 30 | 0 | Bans, polls, notifications, uploads, games |
+| **TOTAL** | **712** | **712** | **0 activos** | 69 archivos test, 1664+ assertions |
