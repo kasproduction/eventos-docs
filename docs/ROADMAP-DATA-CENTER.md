@@ -18,20 +18,65 @@ La competencia (Cisco Webex Events $88K, ICE360 $49M COP) entrega reportes detal
 
 ## Arquitectura
 
+> **Decision 2026-04-25:** Data Center es SPA standalone, NO Filament Page.
+> Filament = administrador de recursos (CRUD). Data Center = generador de recursos (graficas, insights, exports).
+> Mismo patron que Mission Control y Event Pulse.
+
 ```
-[Filament Page: DataCenter]
+[Filament Sidebar]
     |
-    +-- Tabs por categoria (9 tabs)
+    +-- Link "Data Center" → abre SPA en nueva tab
+    |
+    +-- Auth: session cookie Laravel (misma que Filament)
+    +-- Rol: super_admin, org_admin, event_admin (moderator NO)
+
+[SPA standalone: /data-center/{eventSlug}]
+    |
+    +-- Secciones por categoria (9 secciones, scroll o nav lateral)
     |     |
-    |     +-- Cards con conteo + boton "Descargar"
-    |     +-- Cada boton despacha un Job al queue
-    |     +-- Job genera CSV/Excel en storage/exports/
-    |     +-- Filament Notification con link de descarga
+    |     +-- Graficas + stat cards (Chart.js o Recharts)
+    |     +-- Boton "Descargar CSV" por cada dataset
+    |     +-- Cada boton llama endpoint API que despacha Job al queue
+    |     +-- Notificacion en la SPA cuando el export esta listo
+    |     +-- Descarga: signed URL a R2 (24h expiry)
     |
-    +-- Filtros globales: Evento, Rango de fechas
+    +-- Filtros: Rango de fechas, sesion especifica, sponsor
     +-- Formato: CSV (default) o Excel
-    +-- Descarga: link temporal (signed URL, 24h expiry)
+    +-- Diseno: Lumina Noir/Lux, consistente con Pulse y MC
+    +-- Stack: HTML/JS/CSS standalone (o React si la complejidad lo amerita)
+    +-- Vive en: public/data-center/ o repo separado
 ```
+
+### Auth y permisos
+
+La SPA reutiliza la session cookie de Laravel/Filament. No tokens separados.
+
+```
+Admin login en /admin (Filament)
+  → Cookie de sesion Laravel creada
+  → Click "Data Center" en sidebar
+  → SPA carga, llama GET /api/v1/data-center/{eventId}/stats
+  → Middleware valida: sesion activa + rol con permiso
+  → Si no hay sesion → redirect /admin/login
+```
+
+| Rol | Acceso Data Center | Scope |
+|-----|-------------------|-------|
+| super_admin | Si | Todos los eventos |
+| org_admin | Si | Eventos de su organizacion |
+| event_admin | Si | Solo su evento |
+| moderator | No | Solo tiene MC |
+
+### Coexistencia Filament + SPAs
+
+| Herramienta | Tipo | Auth | Vive en |
+|-------------|------|------|---------|
+| Filament | Admin CRUD | Session Laravel | /admin |
+| Mission Control | Operacion sesion | HMAC token o session | public/mission-control/ |
+| Event Pulse | Dashboard RT | ep_* token o session | SPA standalone |
+| Data Center | Analytics post-evento | Session Laravel | public/data-center/ |
+
+Filament es el hub central. Las SPAs son las herramientas especializadas que se abren desde Filament.
 
 ### Performance Strategy (CRITICO — 10K usuarios activos)
 
@@ -62,13 +107,13 @@ CLOUDFLARE (WAF + LB + CDN)
                           [Lee: REPLICA MySQL (read-only)]
                           [Escribe: solo archivos a R2]
    |
-   +--- Managed Services
+   +--- Managed Services DO sao1 (VPC privada, < 1ms RTT)
          |
-         +-- PlanetScale PRIMARY ($29/mes) <--- VPS-1, VPS-2
+         +-- DO Managed MySQL PRIMARY ($15/mes) <--- VPS-1, VPS-2
          |      |
-         |      +-- PlanetScale REPLICA (~$10/mes) <--- VPS-3
+         |      +-- DO Managed MySQL REPLICA ($15/mes) <--- VPS-3
          |
-         +-- Upstash Redis ($10/mes) <--- todos (cache + queue broker)
+         +-- DO Managed Redis HA ($15/mes) <--- todos (cache + queue broker)
          |
          +-- Cloudflare R2 (storage) <--- todos (exports, fotos, docs)
 ```
@@ -103,9 +148,9 @@ CLOUDFLARE (WAF + LB + CDN)
 - VPS-3 sigue procesando exports
 - Cero impacto
 
-**Costo:** +$5/mes VPS-3 (Hetzner CX22) + ~$10/mes replica MySQL = $15/mes extra
+**Costo:** +$48/mes Droplet-3 DO sao1 (4vCPU/8GB) + $15/mes read replica MySQL = $63/mes extra
 
-**VPS-3 docker-compose.worker.yml:**
+**Droplet-3 docker-compose.worker.yml:**
 ```yaml
 services:
   worker:
@@ -116,25 +161,27 @@ services:
     env_file: .env.worker
     deploy:
       resources:
-        limits: { cpus: '1', memory: 1024M }
+        limits: { cpus: '2', memory: 2048M }
     restart: unless-stopped
 ```
 
 ```env
-# .env.worker (VPS-3)
+# .env.worker (Droplet-3 DO sao1)
 DB_CONNECTION=mysql
-DB_HOST=replica.connect.psdb.cloud    # SOLO replica, NUNCA primary
+DB_HOST=private-replica-db-eventos.ondigitalocean.com   # SOLO replica via VPC
+DB_PORT=25060
 DB_DATABASE=eventos_prod
 QUEUE_CONNECTION=redis
-REDIS_HOST=global-xxxxx.upstash.io    # Mismo Redis compartido
-FILESYSTEM_DISK=r2                     # Exports van a R2
+REDIS_HOST=private-redis-eventos.ondigitalocean.com     # Mismo Redis compartido via VPC
+REDIS_PORT=25061
+FILESYSTEM_DISK=r2                                       # Exports van a R2
 ```
 
 #### Capa 2: Read Replica (MySQL)
 
-PlanetScale soporta read replicas nativas:
-- VPS-1/VPS-2 --> `primary.connect.psdb.cloud` (read + write)
-- VPS-3 --> `replica.connect.psdb.cloud` (read only)
+DO Managed MySQL soporta read replicas:
+- Droplet-1/Droplet-2 --> `private-db-eventos.ondigitalocean.com` (read + write, VPC)
+- Droplet-3 --> `private-replica-db-eventos.ondigitalocean.com` (read only, VPC)
 
 VPS-3 NUNCA escribe en MySQL. Solo lee datos y sube archivos a R2.
 
@@ -150,7 +197,7 @@ VPS-3:        php artisan queue:work --queue=exports --tries=1 --timeout=300
               --> SOLO export jobs, max 2 simultaneos
 ```
 
-Ambos usan Upstash Redis como broker. Workers en VPS diferentes. Si VPS-3 muere, jobs esperan en Redis.
+Ambos usan DO Managed Redis como broker (VPC compartida). Workers en Droplets diferentes. Si Droplet-3 muere, jobs esperan en Redis.
 
 #### Capa 4: Query optimization
 
@@ -206,7 +253,7 @@ Capa 5: Redis cache       --> Stat cards cacheadas 60s
 ```
 
 **Resultado:** 10K activos + organizador descargando 44 exports = 0 impacto.
-**Costo total infra:** ~$90/mes (vs $75 base). $15 extra por aislamiento total.
+**Costo total infra:** ~$231/mes (vs $168 base). $63 extra por aislamiento total (Droplet-3 + read replica).
 
 ---
 
