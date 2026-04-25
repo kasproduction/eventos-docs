@@ -3,6 +3,52 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-04-24 — Concurso de Fotos + Golden Ticket (10 bugs)
+
+### BUG-278: Archivos prize support no commiteados (RESUELTO)
+- **Severidad:** ALTA — Announcement.php, Reward.php, bootstrap/app.php sin pushear de sesiones anteriores
+- **Fix:** Commit separado con archivos pendientes
+
+### BUG-277: action_url sin scheme eventos:// (RESUELTO)
+- **Severidad:** ALTA — Announcements creados con `action_url: 'gamification/rewards'` sin scheme
+- **Sintoma:** Android crashea: "No Activity found to handle Intent"
+- **Fix:** Cambiar a `eventos://gamification/rewards` en todos los Announcement::create
+
+### BUG-276: Announcement sin published_at (RESUELTO)
+- **Severidad:** ALTA — Golden Tickets creaban announcements con `published_at: null`
+- **Sintoma:** Announcements no aparecian en la app (endpoint filtra `whereNotNull('published_at')`)
+- **Fix:** Agregar `'published_at' => now()` en los 4 Announcement::create de Filament
+
+### BUG-275: LikesMilestoneService crash en fotos oficiales (RESUELTO)
+- **Severidad:** CRITICA — `totalLikesForAttendee()` recibia null cuando `attendee_id` es null en fotos oficiales
+- **Fix:** Guard `if ($photo->attendee_id !== null)` antes de llamar milestone service
+
+### BUG-274: Self-like check crasheaba en fotos oficiales (RESUELTO)
+- **Severidad:** MEDIA — Comparaba `null === $attendee->id` en fotos con attendee_id=null
+- **Fix:** Guard `$photo->attendee_id !== null &&` antes de la comparacion
+
+### BUG-273: Route /photos/contest despues de /{photoId} (RESUELTO)
+- **Severidad:** MEDIA — Ruta literal despues de parametrizada, fragil ante cambios
+- **Fix:** Mover GET /photos/contest antes de las rutas con {photoId}
+
+### BUG-272: PhotoGrid viewer mostraba foto invertida (RESUELTO)
+- **Severidad:** MEDIA — Sort por likes en MemoriasContent pero PhotoViewer usaba array original
+- **Fix:** Mover sort al parent con useMemo, pasar mismo array sorted a grid y viewer
+
+### BUG-271: Contest entry multiple por attendee (RESUELTO)
+- **Severidad:** ALTA — Cada foto subida durante concurso se marcaba como contest entry
+- **Fix:** Check `exists()` + `lockForUpdate()` — solo 1 entry por attendee
+
+### BUG-270: ContestBanner crash "cannot read subtle" (RESUELTO)
+- **Severidad:** CRITICA — `border.subtle` no existe en theme tokens, `border` es string plano
+- **Fix:** Fallback `typeof border === 'string' ? border : border?.subtle`
+
+### BUG-269: console.error en upload foto muestra red screen Expo (RESUELTO)
+- **Severidad:** BAJA — `console.error` en catch mostraba error rojo en Expo debug ademas del toast
+- **Fix:** Cambiar a `console.warn` solo en `__DEV__`
+
+---
+
 ### BUG-268: Filament searchable selects no cargan opciones (PENDIENTE)
 - **Severidad**: ALTA
 - **Fecha**: 2026-04-24

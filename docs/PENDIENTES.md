@@ -24,20 +24,13 @@
 > Fases 1-5 completas. Performance 10K, export Filament, branded moments, Platinum Gold.
 > 41 tests, 172 assertions. Ver docs/ROADMAP-LIVE-MOMENTS.md y BUG-LOG.md (BUG-177 a BUG-232).
 
-### Event Pulse — Dashboard live para CLIENTE (1.C7) — 12-16h
-- [ ] Dashboard visual standalone, blanco, clean. NO es Filament, NO es MC, NO es admin
-- [ ] TV mode / acuario del evento — el organizador solo mira, no controla
-- [ ] Salas como burbujas/circulos — personas fluyendo con animacion al entrar/salir
-- [ ] Activity feed visual: "Stand Amazon capturo lead", "Pedro reclamo camiseta"
-- [ ] Click en sala → expande: quienes estan, engagement, speaker, estado sesion
-- [ ] Metricas vivas (numeros animados, circulos que crecen), NO graficas de barras
-- [ ] Stack: web standalone (HTML+GSAP o Next.js), Socket.IO RT, datos Redis+activity_log
-- [ ] Backend ya emite 80% de los datos. Falta la capa visual.
-- [ ] **"Ningun competidor tiene esto. Cierra deals solo. Viral por screenshot."**
+### Event Pulse — COMPLETADO (2026-04-24)
+> Dashboard live standalone. Noir/Lux, responsive, 7 secciones, moments RT, active users.
+> 20 tests, 79 assertions, 30 bugs corregidos. Ver docs/ROADMAP-EVENT-PULSE.md y BUG-LOG.md (BUG-237 a BUG-267).
 
-### Foto mas votada — 2-3h
-- [ ] Top fotos por likes → puntos bonus gamificacion → ranking premiado
-- [ ] Ya existe base en photobooth, solo falta premio automatico
+### Concurso de Fotos + Golden Ticket Generico — COMPLETADO (2026-04-24)
+> Contest lifecycle con toggle/horario, 1 entry por attendee, anti-gaming, Golden Ticket desacoplado.
+> 36 tests, 108 assertions, 10 bugs corregidos. Ver BUG-LOG.md (BUG-269 a BUG-278).
 
 ---
 
