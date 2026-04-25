@@ -1,7 +1,7 @@
 # Plan de Stress Test — EventOS
 
 > Validacion empirica de que 10,000 asistentes simultaneos tienen experiencia indistinguible de una plataforma enterprise.
-> No se trata de probar que Laravel no se cae. Se trata de probar que el dia del evento, con 12,000 personas en Movistar Arena, el director ejecutivo de Bancolombia abre la app y siente instantaneidad.
+> No se trata de probar que Laravel no se cae. Se trata de probar que en el dia del evento, cualquier asistente abre la app y siente instantaneidad.
 > Version: 2.0 | Fecha: 2026-04-24
 > Prerequisito: deploy HA real (no Docker Compose local monolitico)
 
@@ -120,7 +120,7 @@ Idealmente la misma que vas a usar en produccion (ver `DISPONIBILIDAD-HA.md` sec
 
 ### 3.2 Generador de carga = latencia real del usuario
 
-**Problema con v1.0:** generador Hetzner → servidor Hetzner = 2-5ms RTT. El usuario real en Movistar Arena tiene 80-300ms RTT + packet loss 1-3%.
+**Problema con v1.0:** generador Hetzner → servidor Hetzner = 2-5ms RTT. El usuario real en un venue con 4G Colombia tiene 80-300ms RTT + packet loss 1-3%.
 
 **Opciones (elegir una):**
 
@@ -424,7 +424,7 @@ Ramp up progresivo:
 
 ### 6.4 Test de Red Degradada (latencia real del evento)
 
-**Por que existe:** en el Movistar Arena con 12K personas, WiFi del venue + 4G Movistar/Claro van saturados. El test que no simula esto miente.
+**Por que existe:** en un venue con miles de personas, WiFi + 4G van saturados. El test que no simula esto miente.
 
 **Escenario (usando `tc` en el generador k6 o un profile de k6 Cloud):**
 ```
