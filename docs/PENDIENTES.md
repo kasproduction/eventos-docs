@@ -3,57 +3,28 @@
 > La UNICA fuente de verdad de lo que falta por hacer.
 > Organizado por PRIORIDAD DE NEGOCIO, no por area tecnica.
 > Filtro: "esto me acerca a cerrar el deal de septiembre con Eventos Efectivos?"
-> Actualizado: 2026-04-25
-> Backend: 582+ tests, 1664+ assertions
-> Audit: 30 acciones usuario, 150+ endpoints, 3 repos mapeados
-> Ref competencia: Cisco $88K USD, ICE360 $49M COP (docs/ANALISIS-COMPETITIVO.md)
+> Actualizado: 2026-04-26
+> Backend: 611+ tests, 1735+ assertions
+> Bugs: BUG-001 a BUG-305, 226+ resueltos, 2 pendientes (BUG-111, BUG-127)
 
 ---
 
-## P0 — COMPLETADO
+## Modulos cerrados
 
-### Webhooks integracion badges — COMPLETADO (2026-04-21)
+> Detalle completo en `docs/COMPLETADO.md`. Aqui solo lista breve para no duplicar.
 
-> 5 fases, 24 tests, 60 assertions, 5 bugs post-audit. Ver docs/ROADMAP-WEBHOOKS.md y COMPLETADO.md.
+- Webhooks integracion partners (2026-04-21) — 24 tests, 5 bugs
+- Live Moments Ruleta + Sorteo + Trivia (2026-04-23) — 41 tests, Platinum Gold, 35 bugs
+- Event Pulse dashboard live (2026-04-24) — 20 tests, 30 bugs
+- Concurso de Fotos + Golden Ticket (2026-04-24) — 36 tests, 10 bugs
+- Data Center analytics (2026-04-26) — 9 tabs, 44 exports, 29 tests, 5 migraciones, 6 iteraciones
+- Mission Control 15 bugs auditoria + ruleta + brand (2026-04-26) — BUG-291 a BUG-305
 
 ---
 
-## P1 — Diferenciadores (la competencia NO lo tiene, nosotros SI podemos)
+## P1 — Deuda tecnica de modulos recien cerrados
 
-> Esto cierra deals. Ningun competidor ofrece juegos en vivo ni TV dashboard.
-
-### Live Moments (Ruleta + Sorteo + Trivia) — COMPLETADO (2026-04-23)
-
-> Fases 1-5 completas. Performance 10K, export Filament, branded moments, Platinum Gold.
-> 41 tests, 172 assertions. Ver docs/ROADMAP-LIVE-MOMENTS.md y BUG-LOG.md (BUG-177 a BUG-232).
-
-### Event Pulse — COMPLETADO (2026-04-24)
-
-> Dashboard live standalone. Noir/Lux, responsive, 7 secciones, moments RT, active users.
-> 20 tests, 79 assertions, 30 bugs corregidos. Ver docs/ROADMAP-EVENT-PULSE.md y BUG-LOG.md (BUG-237 a BUG-267).
-
-### Concurso de Fotos + Golden Ticket Generico — COMPLETADO (2026-04-24)
-
-> Contest lifecycle con toggle/horario, 1 entry por attendee, anti-gaming, Golden Ticket desacoplado.
-> 36 tests, 108 assertions, 10 bugs corregidos. Ver BUG-LOG.md (BUG-269 a BUG-278).
-
-### Data Center — COMPLETADO (2026-04-26)
-
-> SPA standalone analytics con 9 tabs enriquecidas, 44 export jobs (CSV+XLSX), comparativa periodos,
-> Goals/targets configurables, Scheduled exports recurrentes, Comparador A/B sesiones, Multi-evento
-> dashboard, tema Lux v2 con toggle, filtros reactivos (date range + sub-entity), cache invalidation
-> automatica con Observer, infra produccion lista (Docker worker headless + read replica).
-> 6 iteraciones, 5 migraciones nuevas, ~25h trabajo. Cubre tab P2 "Filament dashboard ROI/engagement".
-> Solo pendiente: deploy a VPS-3 (plan en ROADMAP-DATA-CENTER.md).
-
-### Mission Control — bugs cerrados (2026-04-26)
-
-> 15 bugs detectados en auditoria + bug visual ruleta resuelto. Token expiration con auto-refresh,
-> socket listeners deduplicados, memory leaks fixed, error handling sistematico, race conditions,
-> XSS audit, doble-click guard, ESC en modales, brand unificado al estilo Data Center.
-> Ver BUG-LOG.md: BUG-291 a BUG-305 (15 bugs).
-
-### QA Mission Control + Data Center — DEUDA TECNICA
+### QA Mission Control + Data Center
 
 - [ ] Tests funcionales para Mission Control (~1.5h) — depende de mock de token HMAC `/monitor/{id}?token=...`
 - [ ] Tests E2E flujos criticos: aprobar Q&A, lanzar game, cancelar sesion, scheduled export trigger
@@ -206,23 +177,11 @@
 
 ---
 
-## Completados recientes (referencia, no pendientes)
-
-### Session Lifecycle + Silent Disco + MC — COMPLETADO (2026-04-21)
-
-> 23 tests, 59 assertions, 9 bugs. Ver BUG-LOG.md (numeracion reorganizada 2026-04-23).
-
-### Room Check-in — Kiosko + Staff — COMPLETADO (Fases 0-4)
-
-> Pendientes menores:
+## Pendientes menores de modulos cerrados (Room Check-in / Kiosk / Silent Disco)
 
 - [ ] Kiosko: verificar scan endpoint < 100ms en VPS real (Linux)
 - [ ] Staff app: cola offline MMKV + batch sync (nice-to-have)
 - [ ] Silent disco push notification — verificar con dev build real
-
-### Mission Control Games + Trivia tabs — COMPLETADO (2026-04-23)
-
-> Tab Games (spin/jackpot) + Tab Trivia (Kahoot-style 4 estados). Display LED para los 3 tipos.
 
 ---
 
