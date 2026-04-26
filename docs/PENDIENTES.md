@@ -1,7 +1,7 @@
 # Pendientes — EventOS
 
 > La UNICA fuente de verdad de lo que falta por hacer.
-> Organizado por PRIORIDAD DE NEGOCIO, no por area tecnica.
+> Organizado por AREA tecnica, con prioridad de impacto dentro de cada una.
 > Filtro: "esto me acerca a cerrar el deal de septiembre con Eventos Efectivos?"
 > Actualizado: 2026-04-26
 > Backend: 611+ tests, 1735+ assertions
@@ -9,9 +9,9 @@
 
 ---
 
-## Modulos cerrados
+## Modulos cerrados (referencia)
 
-> Detalle completo en `docs/COMPLETADO.md`. Aqui solo lista breve para no duplicar.
+> Detalle completo en `docs/COMPLETADO.md`. Aqui solo lista breve.
 
 - Webhooks integracion partners (2026-04-21) — 24 tests, 5 bugs
 - Live Moments Ruleta + Sorteo + Trivia (2026-04-23) — 41 tests, Platinum Gold, 35 bugs
@@ -22,49 +22,51 @@
 
 ---
 
-## P1 — Deuda tecnica de modulos recien cerrados
+## 1. App movil (Expo) — features pendientes
 
-### QA Mission Control + Data Center
+### Lightmode — Fase 7 + 8 (~4.5h)
 
-- [ ] Tests funcionales para Mission Control (~1.5h) — depende de mock de token HMAC `/monitor/{id}?token=...`
-- [ ] Tests E2E flujos criticos: aprobar Q&A, lanzar game, cancelar sesion, scheduled export trigger
-- [ ] Fix flaky test pre-existente `SessionLifecycleTest > cancel reverts delay on next session`
-      (assertLessThan con timestamps iguales por ejecucion mismo segundo — usar assertLessThanOrEqual)
+> ROADMAP-LIGHTMODE.md. Cierra el sistema de tema completo.
 
-### Unificacion SPAs (deuda tecnica) — ~10-12h
+- [ ] **Fase 7 backend** (~1.5h): migration `events.primary_color_light` (default #1A1B1E), Filament EventBranding doble color picker (Noir/Lux), API response incluye `primary_color_light`, App `useColorScheme()` lee el correcto, Profile toggle Auto/Light/Dark con persist
+- [ ] **Fase 8 QA visual** (~3h): auditar 360dp/411dp en Noir/Lux, BlurView fallback Android, colores semanticos legibles en Lux (red/amber/green con suficiente contrast), fondos onboarding con tema correcto
 
-> Cada SPA usa toasts/modales/colores/fetch wrappers diferentes. Crear biblioteca compartida.
+### Optimistic UI restantes (~3-4h)
 
-- [ ] Crear `public/shared/` con `tokens.css` (variables Noir + Lux unificadas)
-- [ ] Crear `public/shared/components.css` con .btn, .modal, .toast, .empty, .card consistentes
-- [ ] Crear `public/shared/lib.js` con apiFetch(), toast(type), openModal(), helpers DOM
-- [ ] Migrar Chat Monitor (`public/chat-monitor.html`) a Material Symbols + tokens unificados
-- [ ] Migrar Attendance Check (`public/attendance-check.html`) — actualmente usa colores propios (#6366f1)
-- [ ] Migrar Display Session (`public/display/session.html`) — alinear empty states
-- [ ] Migrar Event Pulse (`public/event-pulse/`) — `--ink` → `--t` consistente con Noir/Lux
+> Plan completo en `docs/OPTIMISTIC-UI-PLAN.md`. Audit en `docs/OPTIMISTIC-UI-AUDIT.md`.
+> Implementar DESPUES de cerrar features de negocio, ANTES del stress test.
 
----
+- [ ] Chat tempId + ack + estados progresivos (2-3h, cambio mobile + socket server)
+- [ ] Emoji skip-self (30min, cambio socket server)
+- [ ] Dedup wall:comment con socket broadcast (20min)
+- [ ] Q&A upvote anti-parpadeo (15min)
 
-## P2 — Post-features (hacer DESPUES de terminar juegos/diferenciadores)
+### Recap compartible — post-evento (6-8h)
 
-> Estos dependen de que features existan. Cada feature nuevo cambia que datos hay para analytics y que mostrar en el recap.
-> (Filament dashboard ROI/engagement quedo cubierto por Data Center, ver `docs/COMPLETADO.md`.)
-
-### Recap compartible (reemplaza certificado PDF tradicional) — 6-8h
+> Reemplaza certificado PDF tradicional. Mas viral en redes.
 
 - [ ] Card/story visual con stats personales del attendee: sesiones, conexiones, puntos, ranking, fotos
-- [ ] Diseño para compartir en redes (Instagram story format, LinkedIn post format)
+- [ ] Diseno para compartir en redes (Instagram story format, LinkedIn post format)
 - [ ] Branding del evento integrado (logo, colores, nombre)
 - [ ] Boton "Compartir mi experiencia" en pantalla post-evento
 - [ ] Opcionalmente incluye certificado de asistencia (horas, sesiones) como dato dentro del recap
-- [ ] Mas viral y moderno que un PDF aburrido que nadie comparte
+
+### Pendientes menores app (Kiosk / Silent disco)
+
+- [ ] Kiosko: verificar scan endpoint < 100ms en VPS real (en local Windows ~150ms, Linux produccion estimado ~50ms)
+- [ ] Staff app: cola offline MMKV + batch sync (nice-to-have, solo si zonas sin WiFi son problema real)
+- [ ] Silent disco push notification — verificar con dev build real (no Expo Go)
+
+### Lux V2 — futuro (bloqueante externo)
+
+- [ ] Tab Bar polish con `@callstack/liquid-glass` cuando la libreria soporte Expo (actualmente solo iOS 26 nativo)
 
 ---
 
-## P3 — Web App (Bancolombia virtual)
+## 2. Web App (Bancolombia virtual)
 
 > Bancolombia pidio webapp. La competencia ya presento una (fea). Sin esto perdemos ese deal.
-> Ref: docs/WEB-APP-PLAN.md
+> Ref: `docs/WEB-APP-PLAN.md`
 
 - [ ] W.0-W.1: Setup Next.js 15 + Spatial UI (pill nav, paneles max 3, presets)
 - [ ] W.2: Home + branding + countdown
@@ -82,74 +84,10 @@
 
 ---
 
-## P4 — Admin Filament polish (el cliente lo va a usar)
+## 3. Landing Web (registro publico)
 
-> El organizador de Eventos Efectivos opera desde Filament. Si esta en ingles o desordenado, se ve amateur.
-
-### BUG-268: Searchable selects rotos — URGENTE
-
-- [ ] Todos los `Select::searchable()` en Filament no retornan resultados al buscar
-- [ ] Afecta: Totems, Golden Tickets, Patrocinadores, y cualquier form con Select searchable
-- [ ] Fix: auditar todos los Select en `app/Filament/Resources/`, agregar `->preload()` donde falte
-- [ ] Si persiste, evaluar upgrade Filament (actual: v3.3.49)
-- [ ] Ver BUG-LOG.md BUG-268
-
-### Filament UI Enterprise
-
-- [ ] Nivel 1: columns, labels espanol, secciones con icon/description, custom theme
-- [ ] Nivel 2: Tabs por recurso (EventBranding, Gamification, Registration)
-- [ ] Nivel 3: Wizards features complejos
-- [ ] Nivel 4: Dashboard evento con stats (conecta con Analytics Dashboard de P0)
-
----
-
-## P5 — Seguridad pre-produccion
-
-> No bloquea demo pero si bloquea Bancolombia (enterprise = compliance).
-
-- [ ] SEC-3.1: 2FA OTP — codigo 6 digitos por email
-- [ ] SEC-3.2: Device fingerprinting — login nuevo fuerza 2FA
-- [ ] Magic link login — token un solo uso 15 min
-- [ ] Session management — ver/cerrar dispositivos
-
----
-
-## P6 — Deploy + Infra + Stress
-
-> Bloquea testing real pero no bloquea desarrollo de features.
-> Stack migrado a DO sao1 consolidado (2026-04-25). Ver docs/PLAN-STRESS-TESTDO.md v2.1.
-
-- [ ] SEC-4: Docker Compose, 2 Droplets DO sao1, Cloudflare WAF+LB, DO Managed MySQL+Redis, VPC privada
-- [ ] SEC-5: Sentry, SecurityLogger, uptime monitoring (BetterStack)
-- [ ] GitHub Actions CI/CD (blue-green deploy)
-- [ ] EAS Build production (Android + iOS)
-- [ ] 4 FIX Live Moments pre-stress: throttle game broadcasts, indices live_game_participants, cache getEligiblePool, HTTP connection pool (ver DISPONIBILIDAD-HA.md seccion 11)
-- [ ] Stress test 10K: 9 tests formales (ver `docs/PLAN-STRESS-TESTDO.md` v2.1)
-  - TEST 1-4: Warmup → 1K → Login stampede → 5K
-  - TEST 5: Red degradada 4G Colombia
-  - TEST 6: 10K 2h flujo natural (EL TEST PRINCIPAL)
-  - TEST 7: Failover durante carga (matar Droplet-1)
-  - TEST 8: Export aislado (VPS-3 no toca API)
-  - TEST 9: Break point (escalar hasta romper)
-- [ ] QA integridad funcional: smoke tests E2E + chaos testing
-- [ ] Device real iOS + Android con Sentry Performance en 4G Bogota
-
-### Optimistic UI (post-pendientes, pre-stress)
-
-> Implementar DESPUES de cerrar P1-P5, ANTES del stress test.
-> Plan completo en docs/OPTIMISTIC-UI-PLAN.md. Audit en docs/OPTIMISTIC-UI-AUDIT.md.
-> (Haptic feedback, retry API, bug Q&A blocked words ya completados — ver `docs/COMPLETADO.md`.)
-
-- [ ] Chat tempId + ack + estados progresivos (2-3h, cambio mobile + socket server)
-- [ ] Emoji skip-self (30min, cambio socket server)
-- [ ] Dedup wall:comment con socket broadcast (20min)
-- [ ] Q&A upvote anti-parpadeo (15min)
-
----
-
-## P7 — Landing Web (registro publico)
-
-> Ultimo porque el registro puede hacerse por CSV/import hasta tener landing.
+> Ultimo en orden porque el registro puede hacerse por CSV/import hasta tener landing.
+> Ref: `docs/ROADMAP-UIUX-LANDING.md`
 
 ### Secciones
 
@@ -174,15 +112,109 @@
 
 ---
 
-## Pendientes menores de modulos cerrados (Room Check-in / Kiosk / Silent Disco)
+## 4. Admin Filament — polish (el cliente lo va a usar)
 
-- [ ] Kiosko: verificar scan endpoint < 100ms en VPS real (Linux)
-- [ ] Staff app: cola offline MMKV + batch sync (nice-to-have)
-- [ ] Silent disco push notification — verificar con dev build real
+> El organizador de Eventos Efectivos opera desde Filament. Si esta en ingles o desordenado, se ve amateur.
+
+### BUG-268: Searchable selects rotos — URGENTE
+
+- [ ] Todos los `Select::searchable()` en Filament no retornan resultados al buscar
+- [ ] Afecta: Totems, Golden Tickets, Patrocinadores, y cualquier form con Select searchable
+- [ ] Fix: auditar todos los Select en `app/Filament/Resources/`, agregar `->preload()` donde falte
+- [ ] Si persiste, evaluar upgrade Filament (actual: v3.3.49)
+- [ ] Ver `BUG-LOG.md` BUG-268
+
+### Filament UI Enterprise
+
+- [ ] Nivel 1: columns, labels espanol, secciones con icon/description, custom theme
+- [ ] Nivel 2: Tabs por recurso (EventBranding, Gamification, Registration)
+- [ ] Nivel 3: Wizards features complejos
+- [ ] Nivel 4: Dashboard evento con stats — SUPERADO por Data Center
+
+### Admin Premium (UIUX-LANDING Paso 6)
+
+- [ ] Configuracion canales (email/WhatsApp/SMS) desde Filament
+- [ ] Preview landing en tiempo real
+- [ ] Branded QR codes con logo
 
 ---
 
-## Nice to have (NO hacer antes de cerrar deal septiembre)
+## 5. Seguridad pre-produccion
+
+> No bloquea demo pero si bloquea Bancolombia (enterprise = compliance).
+> Ref: `docs/FASE-SEGURIDAD.md`
+
+- [ ] SEC-3.1: 2FA OTP — codigo 6 digitos por email
+- [ ] SEC-3.2: Device fingerprinting — login nuevo fuerza 2FA
+- [ ] Magic link login — token un solo uso 15 min
+- [ ] Session management — ver/cerrar dispositivos
+
+---
+
+## 6. Deploy + Infra
+
+> Bloquea testing real pero no bloquea desarrollo de features.
+> Stack DO sao1 consolidado. Ref: `docs/DISPONIBILIDAD-HA.md` y `docs/PLAN-STRESS-TESTDO.md` v2.1.
+
+- [ ] SEC-4: Docker Compose, 2 Droplets DO sao1, Cloudflare WAF+LB, DO Managed MySQL+Redis, VPC privada
+- [ ] SEC-5: Sentry, SecurityLogger, uptime monitoring (BetterStack)
+- [ ] GitHub Actions CI/CD (blue-green deploy)
+- [ ] EAS Build production (Android + iOS)
+- [ ] Data Center: deploy VPS-3 worker headless (plan en `ROADMAP-DATA-CENTER.md` DC-DEPLOY-1 a DC-DEPLOY-6)
+- [ ] Read replica MySQL + R2 storage para exports
+
+---
+
+## 7. Stress test 10K (Bancolombia validation)
+
+> Despues de Deploy + Infra. Ref: `docs/PLAN-STRESS-TESTDO.md` v2.1.
+
+### Fixes pre-stress (Live Moments)
+
+- [ ] Throttle game broadcasts (ver DISPONIBILIDAD-HA.md seccion 11)
+- [ ] Indices `live_game_participants`
+- [ ] Cache `getEligiblePool`
+- [ ] HTTP connection pool
+
+### 9 tests formales
+
+- [ ] TEST 1-4: Warmup → 1K → Login stampede → 5K
+- [ ] TEST 5: Red degradada 4G Colombia
+- [ ] TEST 6: 10K 2h flujo natural (EL TEST PRINCIPAL)
+- [ ] TEST 7: Failover durante carga (matar Droplet-1)
+- [ ] TEST 8: Export aislado (VPS-3 no toca API)
+- [ ] TEST 9: Break point (escalar hasta romper)
+
+### QA en device real
+
+- [ ] Smoke tests E2E + chaos testing
+- [ ] iOS + Android con Sentry Performance en 4G Bogota
+
+---
+
+## 8. Deuda tecnica
+
+### QA Mission Control + Data Center
+
+- [ ] Tests funcionales para Mission Control (~1.5h) — depende de mock de token HMAC `/monitor/{id}?token=...`
+- [ ] Tests E2E flujos criticos: aprobar Q&A, lanzar game, cancelar sesion, scheduled export trigger
+- [ ] Fix flaky test pre-existente `SessionLifecycleTest > cancel reverts delay on next session` (assertLessThan con timestamps iguales — usar assertLessThanOrEqual)
+
+### Unificacion SPAs (~10-12h)
+
+> Cada SPA usa toasts/modales/colores/fetch wrappers diferentes. Crear biblioteca compartida.
+
+- [ ] Crear `public/shared/tokens.css` (variables Noir + Lux unificadas)
+- [ ] Crear `public/shared/components.css` con .btn, .modal, .toast, .empty, .card consistentes
+- [ ] Crear `public/shared/lib.js` con apiFetch(), toast(type), openModal(), helpers DOM
+- [ ] Migrar Chat Monitor (`public/chat-monitor.html`) a Material Symbols + tokens unificados
+- [ ] Migrar Attendance Check (`public/attendance-check.html`) — actualmente usa colores propios (#6366f1)
+- [ ] Migrar Display Session (`public/display/session.html`) — alinear empty states
+- [ ] Migrar Event Pulse (`public/event-pulse/`) — `--ink` → `--t` consistente con Noir/Lux
+
+---
+
+## 9. Nice to have (NO hacer antes de cerrar deal septiembre)
 
 > Mover a activo solo si un cliente lo pide explicitamente.
 
@@ -248,46 +280,14 @@
 
 ---
 
-## Pendientes consolidados por roadmap (auditoria 2026-04-26)
-
-> Mapa unico de todos los `[ ]` reales que quedan en cada `docs/ROADMAP-*.md`.
-> NO se borran de los roadmaps individuales — esta seccion es solo cross-reference.
-> Roadmaps cerrados (sin pendientes reales): ROADMAP-DATA-CENTER (salvo deploy), ROADMAP-EVENT-PULSE, ROADMAP-LIVE-MOMENTS, ROADMAP-WEBHOOKS.
-
-### ROADMAP-LIGHTMODE — Fase 7 + 8 (~4.5h)
-
-- [ ] **Fase 7 backend** (~1.5h): migration `events.primary_color_light` (default #1A1B1E), Filament EventBranding doble color picker (Noir/Lux), API response incluye `primary_color_light`, App `useColorScheme()` lee el correcto, Profile toggle Auto/Light/Dark con persist
-- [ ] **Fase 8 QA visual** (~3h): auditar 360dp/411dp en Noir/Lux, BlurView fallback Android, colores semanticos legibles en Lux (red/amber/green con sufficient contrast), fondos onboarding con tema correcto
-
-### ROADMAP-KIOSK — verificaciones de produccion
-
-- [ ] Scan endpoint < 100ms — verificar con VPS real (en local Windows da ~150ms, en Linux produccion estimado ~50ms)
-- [ ] Push notification — verificar con dev build real (no Expo Go)
-- [ ] Cola offline para staff scan (MMKV + batch sync) — solo si zonas sin WiFi son problema real
-
-### ROADMAP-LUX-V2 — futuro (depende de Expo)
-
-- [ ] Tab Bar polish con `@callstack/liquid-glass` cuando la libreria soporte Expo (actualmente solo iOS 26 nativo). Bloqueante: dependencia externa.
-
-### ROADMAP-DATA-CENTER — solo deploy
-
-- [ ] Deploy a VPS-3 (plan completo en `ROADMAP-DATA-CENTER.md` seccion "PLAN DE DEPLOY A VPS-3", DC-DEPLOY-1 a DC-DEPLOY-6)
-
-### ROADMAP-UIUX-LANDING — Paso 6 parcial
-
-> Paso 2 Landing Web ya esta en P7 (registro publico). Dashboard analytics quedo cubierto por Data Center.
-
-- [ ] Paso 6 Admin Premium: configuracion canales (email/WhatsApp/SMS), preview landing en tiempo real, branded QR codes con logo
-- [ ] Showcase demo (de Nice to have): panels clickeables, responsive 1920x1080, audio, hints, social wall
-
----
-
 ## Documentos de referencia
 
 | Doc                                       | Contenido                                                        |
 | ----------------------------------------- | ---------------------------------------------------------------- |
-| `EventOS_Roadmap.md`                      | Fases, sesiones, timeline (v5.0)                                 |
+| `EventOS_Roadmap.md`                      | Fases, sesiones, timeline (v5.1)                                 |
 | `docs/COMPLETADO.md`                      | Historial completo                                               |
+| `docs/BUG-LOG.md`                         | Bugs historicos                                                  |
+| `docs/QA-MASTER.md`                       | Barrido endpoints                                                |
 | `docs/PLAN-TAGS-MODULOS.md`               | Plan tags + visibilidad modulos                                  |
 | `docs/ROADMAP-UIUX-LANDING.md`            | Spec diseno landing + UI                                         |
 | `docs/WEB-APP-PLAN.md`                    | Spec web app spatial UI                                          |
@@ -295,11 +295,16 @@
 | `docs/WHITE-LABEL.md`                     | App config dinamico                                              |
 | `docs/FASE-SEGURIDAD.md`                  | Auditoria OWASP                                                  |
 | `docs/DISPONIBILIDAD-HA.md`               | Arquitectura HA DO sao1, deploy, RT invalidation                 |
-| `docs/BUG-LOG.md`                         | Bugs historicos                                                  |
-| `docs/QA-MASTER.md`                       | Barrido endpoints                                                |
 | `docs/PLAN-STRESS-TEST.md`                | Stress test v2.0 (Hetzner, referencia historica)                 |
 | `docs/PLAN-STRESS-TESTDO.md`              | Stress test v2.1 (DO sao1 consolidado, plan definitivo)          |
-| `docs/ROADMAP-LUX-V2.md`                  | Light mode completo                                              |
+| `docs/ROADMAP-DATA-CENTER.md`             | Data Center analytics modulo (cerrado)                           |
+| `docs/ROADMAP-EVENT-PULSE.md`             | Dashboard live standalone (cerrado)                              |
+| `docs/ROADMAP-KIOSK.md`                   | Kiosko + Staff check-in                                          |
+| `docs/ROADMAP-LIGHTMODE.md`               | Light mode Fases 1-8                                             |
+| `docs/ROADMAP-LIVE-MOMENTS.md`            | Ruleta + Sorteo + Trivia (cerrado)                               |
+| `docs/ROADMAP-LUX-V2.md`                  | Light mode Lux completo                                          |
+| `docs/ROADMAP-MISSION-CONTROL.md`         | Mission Control v4 (cerrado)                                     |
+| `docs/ROADMAP-WEBHOOKS.md`                | Webhooks partners (cerrado)                                      |
 | `docs/CODEBASE-MAP.md`                    | Mapeo completo 3 repos: 150+ endpoints, socket events, observers |
 | `docs/OPTIMISTIC-UI-AUDIT.md`             | 30 acciones auditadas, estado optimistic, gaps                   |
 | `docs/GAPS-ANALYSIS.md`                   | Gaps detallados, dedup socket, coordinacion REST+socket          |
