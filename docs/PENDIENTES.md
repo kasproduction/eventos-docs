@@ -292,6 +292,44 @@
 
 ---
 
+## Pendientes consolidados por roadmap (auditoria 2026-04-26)
+
+> Mapa unico de todos los `[ ]` reales que quedan en cada `docs/ROADMAP-*.md`.
+> NO se borran de los roadmaps individuales — esta seccion es solo cross-reference.
+> Roadmaps cerrados (sin pendientes reales): ROADMAP-DATA-CENTER (salvo deploy), ROADMAP-EVENT-PULSE, ROADMAP-LIVE-MOMENTS, ROADMAP-WEBHOOKS.
+
+### ROADMAP-LIGHTMODE — Fase 7 + 8 (~4.5h)
+
+- [ ] **Fase 7 backend** (~1.5h): migration `events.primary_color_light` (default #1A1B1E), Filament EventBranding doble color picker (Noir/Lux), API response incluye `primary_color_light`, App `useColorScheme()` lee el correcto, Profile toggle Auto/Light/Dark con persist
+- [ ] **Fase 8 QA visual** (~3h): auditar 360dp/411dp en Noir/Lux, BlurView fallback Android, colores semanticos legibles en Lux (red/amber/green con sufficient contrast), fondos onboarding con tema correcto
+
+### ROADMAP-KIOSK — verificaciones de produccion
+
+- [ ] Scan endpoint < 100ms — verificar con VPS real (en local Windows da ~150ms, en Linux produccion estimado ~50ms)
+- [ ] Push notification — verificar con dev build real (no Expo Go)
+- [ ] Cola offline para staff scan (MMKV + batch sync) — solo si zonas sin WiFi son problema real
+
+### ROADMAP-LUX-V2 — futuro (depende de Expo)
+
+- [ ] Tab Bar polish con `@callstack/liquid-glass` cuando la libreria soporte Expo (actualmente solo iOS 26 nativo). Bloqueante: dependencia externa.
+
+### ROADMAP-MISSION-CONTROL — superado
+
+- [x] ~~5ta tab "Games" / "Interactivo" para ruleta/Kahoot/bingo/Unity~~ → **SUPERADO**: Live Moments completo + tabs MC con Ruleta/Sorteo/Trivia ya integradas
+
+### ROADMAP-DATA-CENTER — solo deploy
+
+- [ ] Deploy a VPS-3 (plan completo en `ROADMAP-DATA-CENTER.md` seccion "PLAN DE DEPLOY A VPS-3", DC-DEPLOY-1 a DC-DEPLOY-6)
+
+### ROADMAP-UIUX-LANDING — Paso 2 + Paso 6 parcial
+
+- [ ] **Paso 2 Landing Web** ya esta en P7 (registro publico) — secciones, form embebido, SEO, performance, animaciones
+- [x] ~~Paso 6 Admin Premium: dashboard analytics~~ → **SUPERADO** por Data Center
+- [ ] Paso 6 Admin Premium restante: configuracion canales (email/WhatsApp/SMS), preview landing en tiempo real, branded QR codes con logo
+- [ ] Showcase demo (de Nice to have): panels clickeables, responsive 1920x1080, audio, hints, social wall
+
+---
+
 ## Documentos de referencia
 
 | Doc                                       | Contenido                                                        |
