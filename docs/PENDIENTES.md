@@ -13,6 +13,7 @@
 ## P0 — COMPLETADO
 
 ### Webhooks integracion badges — COMPLETADO (2026-04-21)
+
 > 5 fases, 24 tests, 60 assertions, 5 bugs post-audit. Ver docs/ROADMAP-WEBHOOKS.md y COMPLETADO.md.
 
 ---
@@ -22,16 +23,54 @@
 > Esto cierra deals. Ningun competidor ofrece juegos en vivo ni TV dashboard.
 
 ### Live Moments (Ruleta + Sorteo + Trivia) — COMPLETADO (2026-04-23)
+
 > Fases 1-5 completas. Performance 10K, export Filament, branded moments, Platinum Gold.
 > 41 tests, 172 assertions. Ver docs/ROADMAP-LIVE-MOMENTS.md y BUG-LOG.md (BUG-177 a BUG-232).
 
 ### Event Pulse — COMPLETADO (2026-04-24)
+
 > Dashboard live standalone. Noir/Lux, responsive, 7 secciones, moments RT, active users.
 > 20 tests, 79 assertions, 30 bugs corregidos. Ver docs/ROADMAP-EVENT-PULSE.md y BUG-LOG.md (BUG-237 a BUG-267).
 
 ### Concurso de Fotos + Golden Ticket Generico — COMPLETADO (2026-04-24)
+
 > Contest lifecycle con toggle/horario, 1 entry por attendee, anti-gaming, Golden Ticket desacoplado.
 > 36 tests, 108 assertions, 10 bugs corregidos. Ver BUG-LOG.md (BUG-269 a BUG-278).
+
+### Data Center — COMPLETADO (2026-04-26)
+
+> SPA standalone analytics con 9 tabs enriquecidas, 44 export jobs (CSV+XLSX), comparativa periodos,
+> Goals/targets configurables, Scheduled exports recurrentes, Comparador A/B sesiones, Multi-evento
+> dashboard, tema Lux v2 con toggle, filtros reactivos (date range + sub-entity), cache invalidation
+> automatica con Observer, infra produccion lista (Docker worker headless + read replica).
+> 6 iteraciones, 5 migraciones nuevas, ~25h trabajo. Cubre tab P2 "Filament dashboard ROI/engagement".
+> Solo pendiente: deploy a VPS-3 (plan en ROADMAP-DATA-CENTER.md).
+
+### Mission Control — bugs cerrados (2026-04-26)
+
+> 15 bugs detectados en auditoria + bug visual ruleta resuelto. Token expiration con auto-refresh,
+> socket listeners deduplicados, memory leaks fixed, error handling sistematico, race conditions,
+> XSS audit, doble-click guard, ESC en modales, brand unificado al estilo Data Center.
+> Ver BUG-LOG.md: BUG-291 a BUG-305 (15 bugs).
+
+### QA Mission Control + Data Center — DEUDA TECNICA
+
+- [ ] Tests funcionales para Mission Control (~1.5h) — depende de mock de token HMAC `/monitor/{id}?token=...`
+- [ ] Tests E2E flujos criticos: aprobar Q&A, lanzar game, cancelar sesion, scheduled export trigger
+- [ ] Fix flaky test pre-existente `SessionLifecycleTest > cancel reverts delay on next session`
+      (assertLessThan con timestamps iguales por ejecucion mismo segundo — usar assertLessThanOrEqual)
+
+### Unificacion SPAs (deuda tecnica) — ~10-12h
+
+> Cada SPA usa toasts/modales/colores/fetch wrappers diferentes. Crear biblioteca compartida.
+
+- [ ] Crear `public/shared/` con `tokens.css` (variables Noir + Lux unificadas)
+- [ ] Crear `public/shared/components.css` con .btn, .modal, .toast, .empty, .card consistentes
+- [ ] Crear `public/shared/lib.js` con apiFetch(), toast(type), openModal(), helpers DOM
+- [ ] Migrar Chat Monitor (`public/chat-monitor.html`) a Material Symbols + tokens unificados
+- [ ] Migrar Attendance Check (`public/attendance-check.html`) — actualmente usa colores propios (#6366f1)
+- [ ] Migrar Display Session (`public/display/session.html`) — alinear empty states
+- [ ] Migrar Event Pulse (`public/event-pulse/`) — `--ink` → `--t` consistente con Noir/Lux
 
 ---
 
@@ -39,12 +78,10 @@
 
 > Estos dependen de que features existan. Cada feature nuevo cambia que datos hay para analytics y que mostrar en el recap.
 
- - [ ] Filament dashboard: ROI, engagement, asistencia, sponsors, leads
-- [ ] Justifica el precio ante la agencia
-- [ ] Datos ya existen: session_stats, gamification, leads, networking, social, checkins
-- [ ] **Hacer al final**: cada feature nuevo (ruleta, trivia, sorteo) agrega metricas. Si se hace antes, hay que rehacerlo.
+- [x] **Filament dashboard ROI/engagement → CUBIERTO POR DATA CENTER** (2026-04-26). Mejor que Filament: 9 tabs, 44 datasets, graficas reales, comparativa periodos, multi-evento, scheduled, goals, comparador A/B
 
 ### Recap compartible (reemplaza certificado PDF tradicional) — 6-8h
+
 - [ ] Card/story visual con stats personales del attendee: sesiones, conexiones, puntos, ranking, fotos
 - [ ] Diseño para compartir en redes (Instagram story format, LinkedIn post format)
 - [ ] Branding del evento integrado (logo, colores, nombre)
@@ -80,6 +117,7 @@
 > El organizador de Eventos Efectivos opera desde Filament. Si esta en ingles o desordenado, se ve amateur.
 
 ### BUG-268: Searchable selects rotos — URGENTE
+
 - [ ] Todos los `Select::searchable()` en Filament no retornan resultados al buscar
 - [ ] Afecta: Totems, Golden Tickets, Patrocinadores, y cualquier form con Select searchable
 - [ ] Fix: auditar todos los Select en `app/Filament/Resources/`, agregar `->preload()` donde falte
@@ -87,6 +125,7 @@
 - [ ] Ver BUG-LOG.md BUG-268
 
 ### Filament UI Enterprise
+
 - [ ] Nivel 1: columns, labels espanol, secciones con icon/description, custom theme
 - [ ] Nivel 2: Tabs por recurso (EventBranding, Gamification, Registration)
 - [ ] Nivel 3: Wizards features complejos
@@ -126,6 +165,7 @@
 - [ ] Device real iOS + Android con Sentry Performance en 4G Bogota
 
 ### Optimistic UI (post-pendientes, pre-stress)
+
 > Implementar DESPUES de cerrar P1-P5, ANTES del stress test.
 > Plan completo en docs/OPTIMISTIC-UI-PLAN.md. Audit en docs/OPTIMISTIC-UI-AUDIT.md.
 
@@ -144,19 +184,24 @@
 > Ultimo porque el registro puede hacerse por CSV/import hasta tener landing.
 
 ### Secciones
+
 - [ ] Hero, Sobre el evento, Speakers, Agenda, Sponsors, Venue, Testimonios, Galeria, FAQ, Footer
 
 ### Registro embebido
+
 - [ ] Form integrado, progressive profiling, social proof, CAPTCHA, rate limiting
 
 ### Post-registro
+
 - [ ] Confirmacion web + QR descarga app
 
 ### Endpoints publicos
+
 - [ ] GET /api/public/event/{slug} (datos, speakers, agenda, sponsors, faqs, registration-count)
 - [ ] POST /api/public/event/{slug}/register (rate limited + CAPTCHA)
 
 ### Stack
+
 - [ ] Next.js SSG/ISR o Astro, Tailwind, Framer Motion/GSAP, SEO/OG, Responsive, Dark/Light
 
 ---
@@ -164,15 +209,19 @@
 ## Completados recientes (referencia, no pendientes)
 
 ### Session Lifecycle + Silent Disco + MC — COMPLETADO (2026-04-21)
+
 > 23 tests, 59 assertions, 9 bugs. Ver BUG-LOG.md (numeracion reorganizada 2026-04-23).
 
 ### Room Check-in — Kiosko + Staff — COMPLETADO (Fases 0-4)
+
 > Pendientes menores:
+
 - [ ] Kiosko: verificar scan endpoint < 100ms en VPS real (Linux)
 - [ ] Staff app: cola offline MMKV + batch sync (nice-to-have)
 - [ ] Silent disco push notification — verificar con dev build real
 
 ### Mission Control Games + Trivia tabs — COMPLETADO (2026-04-23)
+
 > Tab Games (spin/jackpot) + Tab Trivia (Kahoot-style 4 estados). Display LED para los 3 tipos.
 
 ---
@@ -182,54 +231,62 @@
 > Mover a activo solo si un cliente lo pide explicitamente.
 
 ### App movil — cosmetico/incremental
+
 - [ ] Racha de visitas a la app (streak gamification — dia consecutivo = bonus puntos)
 - [ ] Orbe FAQ a Skia shader (reemplazar Reanimated+BlurView, solo cosmetic)
 - [ ] Venue + Mapa (depende de si el evento tiene plano)
-- [ ] Networking Tinder-style swipe (ya funciona con cards)
 - [ ] react-native-image-crop-picker: crop circular dark
 
 ### Registro & Acceso avanzado
+
 - [ ] Waitlist (cuando max_attendees se llena)
 - [ ] Referral tracking
 - [ ] Social login (Google)
 
 ### Comunicacion avanzada
+
 - [ ] WhatsApp Business API (ICE360 lo tiene por $850K COP — evaluar si vale la pena)
 - [ ] SMS fallback
 - [ ] Email builder visual (Fase 2+)
 
 ### Post-evento
+
 - [ ] Networking follow-up ("Conectaste con X personas")
 - [ ] Highlight reel (collage automatico fotos)
 - [ ] Event replay (grabaciones post-evento)
 
 ### Seguridad avanzada
+
 - [ ] Anomaly detection — alertar admin (Fase 2+)
 - [ ] Backup/Restore de evento (snapshot JSON)
 
 ### Platform Health — Dashboard interno
+
 - [ ] Dashboard interno: salud plataforma RT
 - [ ] Health por modulo: API, Socket, Redis, MySQL, Queue
 - [ ] Metricas: requests/sec, latencia, memoria
 - [ ] Stack: Laravel Pulse + Sentry
 
 ### Documentacion
+
 - [ ] Documentar arquitectura socket
 - [ ] White-label: migrar app.json → app.config.js + estructura clients/
 
 ### Features opcionales
+
 - [ ] Wallet digital (.pkpass + Google Wallet)
 - [ ] Digital signage (pantallas venue)
 - [ ] Badge printing fisico
 - [ ] Landing builder Filament (Fase 2+)
 - [ ] A/B testing emails (Fase 2+)
-- [ ] Donde esta el patrocinador (logo escondido, mini-game)
 - [ ] Juegos Unity en stands (requiere dev Unity separado)
 
 ### Showcase / Demo inversor
+
 - [ ] Panels clickeables, responsive 1920x1080, audio, hints, social wall
 
 ### Fase 3 — SaaS + Monetizacion
+
 - [ ] Multi-tenant, Stripe, Data export GDPR, Juegos Unity bridge
 - [ ] Multi-location con tracks (Bancolombia: Colombia + Panama)
 
@@ -237,25 +294,25 @@
 
 ## Documentos de referencia
 
-| Doc | Contenido |
-|-----|-----------|
-| `EventOS_Roadmap.md` | Fases, sesiones, timeline (v5.0) |
-| `docs/COMPLETADO.md` | Historial completo |
-| `docs/PLAN-TAGS-MODULOS.md` | Plan tags + visibilidad modulos |
-| `docs/ROADMAP-UIUX-LANDING.md` | Spec diseno landing + UI |
-| `docs/WEB-APP-PLAN.md` | Spec web app spatial UI |
-| `docs/ANALISIS-COMPETITIVO.md` | Cotizaciones, gaps, pricing |
-| `docs/WHITE-LABEL.md` | App config dinamico |
-| `docs/FASE-SEGURIDAD.md` | Auditoria OWASP |
-| `docs/DISPONIBILIDAD-HA.md` | Arquitectura HA DO sao1, deploy, RT invalidation |
-| `docs/BUG-LOG.md` | Bugs historicos |
-| `docs/QA-MASTER.md` | Barrido endpoints |
-| `docs/PLAN-STRESS-TEST.md` | Stress test v2.0 (Hetzner, referencia historica) |
-| `docs/PLAN-STRESS-TESTDO.md` | Stress test v2.1 (DO sao1 consolidado, plan definitivo) |
-| `docs/ROADMAP-LUX-V2.md` | Light mode completo |
-| `docs/CODEBASE-MAP.md` | Mapeo completo 3 repos: 150+ endpoints, socket events, observers |
-| `docs/OPTIMISTIC-UI-AUDIT.md` | 30 acciones auditadas, estado optimistic, gaps |
-| `docs/GAPS-ANALYSIS.md` | Gaps detallados, dedup socket, coordinacion REST+socket |
-| `docs/OPTIMISTIC-UI-PLAN.md` | Plan 3 semanas: 9 PRs, cross-cutting, metricas |
-| `docs/BRIEF-CLAUDE-CODE-OPTIMISTIC-UI.md` | Brief original del audit optimistic UI |
-| `docs/MODULOS.md` | 15 modulos + 6 sistemas + admin (v1.0) |
+| Doc                                       | Contenido                                                        |
+| ----------------------------------------- | ---------------------------------------------------------------- |
+| `EventOS_Roadmap.md`                      | Fases, sesiones, timeline (v5.0)                                 |
+| `docs/COMPLETADO.md`                      | Historial completo                                               |
+| `docs/PLAN-TAGS-MODULOS.md`               | Plan tags + visibilidad modulos                                  |
+| `docs/ROADMAP-UIUX-LANDING.md`            | Spec diseno landing + UI                                         |
+| `docs/WEB-APP-PLAN.md`                    | Spec web app spatial UI                                          |
+| `docs/ANALISIS-COMPETITIVO.md`            | Cotizaciones, gaps, pricing                                      |
+| `docs/WHITE-LABEL.md`                     | App config dinamico                                              |
+| `docs/FASE-SEGURIDAD.md`                  | Auditoria OWASP                                                  |
+| `docs/DISPONIBILIDAD-HA.md`               | Arquitectura HA DO sao1, deploy, RT invalidation                 |
+| `docs/BUG-LOG.md`                         | Bugs historicos                                                  |
+| `docs/QA-MASTER.md`                       | Barrido endpoints                                                |
+| `docs/PLAN-STRESS-TEST.md`                | Stress test v2.0 (Hetzner, referencia historica)                 |
+| `docs/PLAN-STRESS-TESTDO.md`              | Stress test v2.1 (DO sao1 consolidado, plan definitivo)          |
+| `docs/ROADMAP-LUX-V2.md`                  | Light mode completo                                              |
+| `docs/CODEBASE-MAP.md`                    | Mapeo completo 3 repos: 150+ endpoints, socket events, observers |
+| `docs/OPTIMISTIC-UI-AUDIT.md`             | 30 acciones auditadas, estado optimistic, gaps                   |
+| `docs/GAPS-ANALYSIS.md`                   | Gaps detallados, dedup socket, coordinacion REST+socket          |
+| `docs/OPTIMISTIC-UI-PLAN.md`              | Plan 3 semanas: 9 PRs, cross-cutting, metricas                   |
+| `docs/BRIEF-CLAUDE-CODE-OPTIMISTIC-UI.md` | Brief original del audit optimistic UI                           |
+| `docs/MODULOS.md`                         | 15 modulos + 6 sistemas + admin (v1.0)                           |

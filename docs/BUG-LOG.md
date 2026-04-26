@@ -3,6 +3,106 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-04-26 — Mission Control + Data Center cierre (19 bugs)
+
+### BUG-305: Ruleta MC muestra resultado antes de fin de animacion (RESUELTO)
+- **Severidad:** ALTA — En Mission Control, despues de POST /spin el panel mostraba el sector ganador y los puntos inmediatamente, mientras la animacion de la ruleta en el display seguia girando 5s mas
+- **Causa:** showGameResult() llamado en el .then() del fetch sin esperar spin_duration_ms
+- **Fix:** Disparar projectGameSpin() primero (broadcast socket inicia animacion), luego setManagedTimeout('spin-reveal-{id}', spinDuration) revela el resultado en MC sincronizado con el display
+- **Archivo:** public/mission-control/app.js linea 2034
+
+### BUG-304: Socket.IO status bar casi invisible (RESUELTO)
+- **Severidad:** BAJA — Indicador "Socket.IO conectado" font-size 10px color t5 sin badge, no se notaba el estado
+- **Fix:** Pill con borde+fondo card, dot 7px verde con glow + animacion pulse 2s, "Socket.IO" en var(--t) negrita
+- **Archivo:** public/mission-control/styles.css linea 400
+
+### BUG-303: Render sin error boundary (RESUELTO)
+- **Severidad:** BAJA — innerHTML = renderX(data) sin null-check podia romper toda la SPA si data venia mal
+- **Fix:** Helper safeRender(el, fn, fallback) captura excepciones y muestra mensaje fallback
+- **Archivo:** public/mission-control/app.js cleanup section
+
+### BUG-302: Z-index conflicts sin escala centralizada (RESUELTO)
+- **Severidad:** BAJA — Modal podia quedar detras de stream cuando fullscreen
+- **Fix:** Variables CSS --z-base/stream/drawer/overlay/modal/toast en :root
+- **Archivo:** public/mission-control/styles.css linea 14
+
+### BUG-301: ESC no cierra modales (RESUELTO)
+- **Severidad:** BAJA — Modales (poll, game, confirm, ban) no respondian a tecla Escape
+- **Fix:** Listener global keydown ESC que cierra confirmOverlay, banOverlay, .mc-poll-overlay.on, .mc-game-overlay.on
+- **Archivo:** public/mission-control/app.js
+
+### BUG-300: Substring tras HTML escape rompe entities (RESUELTO)
+- **Severidad:** BAJA — Linea 550 LED Q&A: esc(q.body).substring(0, 60) cortaba HTML entities a la mitad (&lt; → &lt sin cerrar)
+- **Fix:** Truncar primero, escapar despues: esc((q.body || '').substring(0, 60))
+- **Archivo:** public/mission-control/app.js linea 550
+
+### BUG-299: Progress bar attendance imprecisa (RESUELTO)
+- **Severidad:** MEDIA — Bar usaba contador setInterval cada 1s (drift +/-2s en checks de 30s)
+- **Fix:** attendanceEndAt = Date.now() + ttl*1000, calcular msLeft = endAt - now en cada tick
+- **Archivo:** public/mission-control/app.js linea 1576
+
+### BUG-298: Doble-click en game spin/draw/launch/trivia (RESUELTO)
+- **Severidad:** MEDIA — Click rapido podia disparar 2 spins/draws/jackpot. Doble jackpot = doble premio
+- **Fix:** Helper lockButton(key, ms) que rechaza segundas llamadas en ventana de tiempo. Aplicado a: spin (8s), draw (12s), launch (5s), trivia next-question (5s), trivia close-round (5s), trivia launch (5s)
+- **Archivo:** public/mission-control/app.js varios callsites
+
+### BUG-297: localStorage parse sin validar tipo (RESUELTO)
+- **Severidad:** MEDIA — JSON.parse en try-catch vacio. Si user corrompe localStorage, codigo asume array y .map() falla con TypeError
+- **Fix:** Array.isArray() check post-parse para timelineLog y mcTasks; fallback a []
+- **Archivo:** public/mission-control/app.js lineas 822, 1144
+
+### BUG-296: Socket no rejoinea al reconnect (RESUELTO)
+- **Severidad:** ALTA — Tras desconexion+reconexion, admin "estaba en vivo" pero no recibia eventos nuevos (chat, Q&A, polls). Solo el primer connect emit join:event/session
+- **Fix:** socketOn('reconnect', onSocketConnect) que re-emite joins. Tambien onSocketConnect ahora emite SIEMPRE en cualquier connect (no solo el primero)
+- **Archivo:** public/mission-control/app.js linea 196
+
+### BUG-295: Race conditions en modales sin lock (RESUELTO)
+- **Severidad:** ALTA — Click rapido en "Crear encuesta" + cerrar 3x rapido podia generar overlays apilados o estado de botones inconsistente
+- **Fix:** ESC global cierra overlays activos. lockButton(key) rechaza clicks dentro de ventana
+- **Archivo:** public/mission-control/app.js cleanup section
+
+### BUG-294: 50+ catches silenciosos en apiFetch (RESUELTO)
+- **Severidad:** ALTA — Patron sistemico: .catch(function() {}) sin loguear ni notificar. Backend cae y admin no se entera
+- **Fix:** Helper apiCatch(label) que console.error + toast. sed reemplazo masivo de .catch(function(){}) → .catch(apiCatch())
+- **Archivo:** public/mission-control/app.js multiple callsites
+
+### BUG-293: Memory leaks de timers en sesiones largas (RESUELTO)
+- **Severidad:** ALTA — setInterval/setTimeout sin clearInterval global. CPU creep + memory bloat en sesiones >1h. attInterval, _jackpotTimer, _triviaTimer, liveTimerInterval, _tt acumulaban
+- **Fix:** Helpers setManagedInterval/Timeout(key, fn, ms) con registro global. cleanupAll() en beforeunload limpia todo + disconnect socket
+- **Archivo:** public/mission-control/app.js cleanup section
+
+### BUG-292: Listeners socket duplicados al reconectar (CRITICO, RESUELTO)
+- **Severidad:** CRITICA — Cada socket.on() se acumulaba sin limpieza. Al reconectar o reintentar, mensajes procesados 2x: Q&A aprobadas dobles, metricas infladas
+- **Fix:** Wrapper socketOn(event, handler) que registra _socketHandlers[event] y hace socket.off(event, prevHandler) antes de socket.on. Reemplazo masivo en 21 callsites
+- **Archivo:** public/mission-control/app.js linea 169
+
+### BUG-291: Token MC expira a 12h sin refresh (CRITICO, RESUELTO)
+- **Severidad:** CRITICA — En eventos de 8+h, despues de 12h todos los apiFetch fallaban con 401 silencioso. Admin con UI funcional pero ningun POST/GET surte efecto
+- **Fix:** apiFetch detecta 401/419 y dispara handleTokenExpired() con debounce 10s que toast + reload de URL (Laravel /monitor/{id}?token=... emite nuevo token)
+- **Archivo:** public/mission-control/app.js apiFetch
+
+### BUG-290: Hero card delta % absurdo en Data Center (RESUELTO)
+- **Severidad:** MEDIA — Chip mostraba "+5300%" cuando comparaba total historico del evento vs solo periodo previo (60-30d)
+- **Causa:** Logica conceptual incorrecta. cmp.registered eran los nuevos del periodo previo; s.registered eran TODOS historicos
+- **Fix:** Backend devuelve compare = { current: ventana 30d, previous: ventana 30-60d }. Frontend con MIN_BASE=5 (si previo<5 muestra "+N 30d" no %), PCT_CAP=150 (>150% muestra absoluto). Tooltip con valores crudos
+- **Archivo:** app/Services/ExportService.php + public/data-center/assets/app.js
+
+### BUG-289: Schedule::call con withoutOverlapping requiere name() antes (RESUELTO)
+- **Severidad:** ALTA — Cron processor scheduled exports lanzaba LogicException al cargar console.php, rompiendo TODA la suite de tests. Detectado al correr php artisan test
+- **Fix:** Reordenar: ->name('dc:scheduled-exports')->everyFiveMinutes()->withoutOverlapping()
+- **Archivo:** routes/console.php linea 95
+
+### BUG-288: ExportService HOUR() no portable a SQLite (RESUELTO)
+- **Severidad:** ALTA — selectRaw('HOUR(created_at) as h, ...') falla en SQLite ("no such function: HOUR"). Test suite no podia validar Data Center stats
+- **Causa:** SQLite usa strftime, no funciones MySQL
+- **Fix:** Helper hourSql($col) que detecta DB::connection()->getDriverName() y emite "CAST(strftime('%H', col) AS INTEGER)" en SQLite o "HOUR(col)" en MySQL. Aplicado a 3 lugares: chat_by_hour, checkins_by_hour, net_by_hour
+- **Archivo:** app/Services/ExportService.php lineas 122-129
+
+### BUG-287: ExportService HAVING sin GROUP BY (RESUELTO)
+- **Severidad:** ALTA — Query session_ratings con ->having('ratings_count', '>', 0) falla en SQLite ("HAVING clause on a non-aggregate query"). Detectado por test
+- **Fix:** Cambiado ->having() por ->whereHas('ratings') que filtra sesiones con al menos 1 rating sin requerir GROUP BY
+- **Archivo:** app/Services/ExportService.php
+
 ## 2026-04-25 — Data Center (8 bugs)
 
 ### BUG-286: CSV renombrado a .xlsx genera error en Excel (RESUELTO)
@@ -1653,11 +1753,11 @@
 
 | Severidad | Count | Resueltos | Pendientes |
 |-----------|-------|-----------|------------|
-| CRITICA | 28 | 28 | 0 |
-| ALTA | 72 | 72 | 0 |
-| MEDIA | 93 | 91 | 2 (BUG-111, BUG-127) |
-| BAJA | 17 | 17 | 0 |
-| **Total** | **210+** | **208+** | **2** |
+| CRITICA | 30 | 30 | 0 |
+| ALTA | 79 | 79 | 0 |
+| MEDIA | 97 | 95 | 2 (BUG-111, BUG-127) |
+| BAJA | 22 | 22 | 0 |
+| **Total** | **228+** | **226+** | **2** |
 
 > Nota: BUG-005 a BUG-015 cuentan como 11 bugs individuales en una sola entrada.
 

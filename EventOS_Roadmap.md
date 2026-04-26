@@ -1,7 +1,7 @@
 # EventOS — Roadmap
 
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
-_Actualizado: 2026-04-25 | v5.0_
+_Actualizado: 2026-04-26 | v5.1 — Data Center cerrado_
 
 ---
 
@@ -17,6 +17,7 @@ _Actualizado: 2026-04-25 | v5.0_
 | **Live Moments** | ✅ 100% | Ruleta + Sorteo + Trivia Kahoot-style, branded, performance 10K, 41 tests |
 | **Event Pulse** | ✅ 100% | Dashboard RT standalone, Noir/Lux, 7 secciones, responsive, 20 tests |
 | **Concurso Fotos** | ✅ 100% | Contest lifecycle, Golden Ticket generico, anti-gaming, 36 tests |
+| **Data Center** | ✅ 100% | SPA standalone analytics, 9 tabs, 44 exports CSV/XLSX, comparativa periodos, goals, scheduled, comparador A/B, multi-evento, tema Lux toggle, infra prod lista |
 | **Room Check-in** | ✅ 100% | Kiosk + Staff + Silent disco + attendance tracking |
 | **Webhooks** | ✅ 100% | 5 fases, 24 tests, integracion partners |
 | **Seguridad** | ✅ 90% | SEC-1/2/3/3b/6 completo. Pendiente: 2FA, device, infra (SEC-4/5) |

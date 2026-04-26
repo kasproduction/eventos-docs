@@ -1017,3 +1017,105 @@ Commits: ~20 commits en 3 repos (app, backend, docs)
 - Backend: 582+ tests, 1664+ assertions (41 Game tests, 172 assertions)
 - Live Moments: COMPLETADO (5 fases, 35+ bugs resueltos)
 - Bugs: BUG-001 a BUG-232, 208+ resueltos, 2 pendientes (BUG-111, BUG-127)
+
+## Data Center modulo (2026-04-25 al 2026-04-26) — 6 iteraciones, ~25h
+
+### SPA standalone con 9 tabs analytics
+- [x] F0-F7 backend: 44 export jobs en app/Jobs/Exports/, BaseExportJob, ExportService
+- [x] Queue separado 'exports' para aislamiento de evento en vivo (10K activos)
+- [x] DataCenterController + Sanctum stateful auth (session cookie Filament)
+- [x] SPA en public/data-center/ — index.html + assets/app.js + assets/app.css
+- [x] 9 tabs enriquecidas: Asistentes, Sesiones, Engagement, Sponsors, Gamificacion, Social, Networking, Comunicaciones, Auditoria
+
+### Bloques A/B/C/D enterprise
+- [x] A1 Sub-filtros extendidos (chat_by_hour por session_id)
+- [x] A2 Cache invalidation con DataCenterCacheObserver
+- [x] A3 Polling notifs adaptativo (pausa tras 3 polls vacios)
+- [x] B1 Tooltips en graficas (title SVG en donuts)
+- [x] B2 Chip "Actualizado hace Xs" en header
+- [x] B3 Sparkline en card Check-ins con checkins_by_hour
+- [x] B4 Empty states con microcopy especifica
+- [x] B5 Loading granular fade
+- [x] C1 Comparativa entre periodos (30d vs 30d, capped 150%, +N fallback)
+- [x] C2 Goals/targets con UI modal CRUD + barras progreso bajo hero cards
+- [x] C3 Scheduled exports con cron processor + modal UI + lista
+- [x] C4 Embed publico backend listo (UI descartada por redundante con Event Pulse)
+- [x] C5 Multi-evento dashboard (UI en empty state + tabla comparativa)
+- [x] D1 Comparador A/B sesiones (2 selects + tabla winner highlight)
+- [x] D2 Export "vista actual" hereda filtros del tab activo
+
+### Tema Lux v2 + filtros + XLSX
+- [x] Tema Lux con toggle, localStorage persiste sin flash
+- [x] Filtros reactivos: date range global + sub-entidad por tab
+- [x] XLSX real con maatwebsite/excel — generateXlsx() en BaseExportJob
+- [x] Cards con shadow en lugar de border (regla Lux)
+
+### Infra produccion lista
+- [x] docker/Dockerfile.worker + docker/docker-compose.worker.yml
+- [x] .env.worker.example completo (replica + R2 + VPC Redis)
+- [x] config/database.php read/write split condicional
+- [x] SANCTUM_STATEFUL_DOMAINS en .env.example
+- [x] routes/web.php fallback /data-center/{any?} con auth + role check
+
+### 5 migraciones nuevas
+- [x] dc_event_goals, dc_scheduled_exports, dc_embed_tokens
+- [x] /dc-embed/{token} ruta publica con embed.html standalone
+
+### QA: 29 tests nuevos (100% passing)
+- [x] DataCenterFiltersTest — 7 tests
+- [x] DataCenterFeaturesTest — 14 tests
+- [x] DataCenterCacheObserverTest — 4 tests
+- [x] BaseExportJobXlsxTest — 3 tests
+- [x] phpunit.xml: memory_limit 2048M
+- [x] Suite global: 769/772 passed (3 fallos pre-existentes flaky no relacionados)
+
+### Seeder demo
+- [x] DataCenterDemoSeeder con pravatar avatars, clearbit logos, 54 attendees,
+      280 session_attendances, 360 push_logs, 80 webhook_logs, 58 questions,
+      90 audit_log, 8 bans, 12 role changes
+
+## Mission Control bugs cierre (2026-04-26) — 15 bugs + ruleta + brand
+
+### Bugs criticos (2)
+- [x] BUG-291: Token 12h expira sin refresh
+- [x] BUG-292: Listeners socket duplicados
+
+### Bugs altos (5)
+- [x] BUG-293: Memory leaks timers
+- [x] BUG-294: 50+ catches silenciosos
+- [x] BUG-295: Race conditions modales
+- [x] BUG-296: Socket no rejoinea reconnect
+- [x] BUG-287: ExportService HAVING sin GROUP BY
+
+### Bugs medios (5)
+- [x] BUG-288: HOUR() no portable SQLite
+- [x] BUG-297: localStorage sin validar tipo
+- [x] BUG-298: Doble-click games (lockButton 6 callsites)
+- [x] BUG-299: Progress bar attendance imprecisa
+- [x] BUG-290: Hero card delta % absurdo
+
+### Bugs bajos (5)
+- [x] BUG-289: Schedule::call name() antes withoutOverlapping
+- [x] BUG-300: Substring tras escape rompe HTML entities
+- [x] BUG-301: ESC no cierra modales
+- [x] BUG-302: Z-index conflicts
+- [x] BUG-303: Render error boundary
+
+### Polish UI
+- [x] BUG-304: Status bar Socket.IO casi invisible
+- [x] BUG-305: Ruleta resultado antes de fin animacion
+- [x] Brand "MISSION CONTROL" estilo unificado con Data Center (mc-brand-mark eliminado)
+
+### Nuevos endpoints + cron
+- [x] /data-center/{event}/goals (GET, POST, DELETE/{metric})
+- [x] /data-center/{event}/scheduled (GET, POST, DELETE/{id})
+- [x] /data-center/{event}/embeds (GET, POST, DELETE/{token})
+- [x] /data-center/multi?event_ids= (multi-evento comparativa)
+- [x] /data-center/{event}/notifications/read-all (POST), /clear (DELETE)
+- [x] Cron Schedule::call cada 5min procesa dc_scheduled_exports
+
+### Totales acumulados 2026-04-26
+- Backend: 611+ tests (582 + 29 nuevos), 1735+ assertions
+- Data Center: COMPLETADO (6 iteraciones, ~25h)
+- Mission Control: 15/15 bugs + ruleta + brand unificado
+- Bugs: BUG-001 a BUG-305, 226+ resueltos, 2 pendientes (BUG-111, BUG-127)
