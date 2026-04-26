@@ -5,7 +5,7 @@
 > Fecha: 2026-04-16 | Actualizado: 2026-04-17
 > Aprobado visualmente: HTML v2 con 7 pantallas
 >
-> **ESTADO: Fases 1-6 COMPLETADAS (2026-04-16/17). Pendiente: Fase 7 (backend) + Fase 8 (QA).**
+> **ESTADO: TODAS LAS FASES COMPLETADAS (2026-04-16/17). Fase 7 backend + Fase 8 QA absorbida en rediseno Lux v2 (28 archivos sesion 17d) + responsive 360dp + elevation Android fixes.**
 >
 > **Decisiones aprobadas:**
 > - Accent dual: `primary_color` (Noir) + `primary_color_light` (Lux) desde Filament

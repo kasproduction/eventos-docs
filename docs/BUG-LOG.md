@@ -191,14 +191,15 @@
 
 ---
 
-### BUG-268: Filament searchable selects no cargan opciones (PENDIENTE)
+### BUG-268: Filament searchable selects no cargan opciones (RESUELTO)
 - **Severidad**: ALTA
-- **Fecha**: 2026-04-24
+- **Fecha reportado**: 2026-04-24
+- **Fecha resuelto**: 2026-04-26
 - **Donde**: Filament v3.3.49 — TODOS los Select con `->searchable()` en forms y actions
 - **Sintoma**: Escribes texto en el campo de busqueda y no retorna resultados. Afecta: Totems (salon), Golden Tickets (asistente), Patrocinadores, y cualquier Select searchable
-- **Causa probable**: Combinacion de `->options(closure)` + `->searchable()` sin `->preload()` en Filament v3. En actions/modals el closure no se re-evalua. `filament:assets` y `optimize:clear` no lo resuelven
-- **Workaround parcial**: Agregar `->preload()` a cada Select afectado, o cambiar a `->options()` estaticas sin `->searchable()`
-- **Fix pendiente**: Auditar TODOS los Select searchable en `app/Filament/Resources/` y agregar `->preload()` donde falte. Considerar upgrade Filament si el bug persiste
+- **Causa raiz**: `vendor/filament/forms/src/Components/Select.php:622-624` — cuando `Select::searchable()` se invoca sin `->preload()` y sin `getSearchResultsUsing` callback, el metodo `getSearchResults()` retorna `[]` vacio. El AJAX call al escribir vuelve sin resultados aunque las opciones existan
+- **Fix aplicado**: Barrido a 26 archivos en `app/Filament/Resources/` y `Pages/` agregando `->preload()` a todos los `Forms\Components\Select::make()` y `Tables\Filters\SelectFilter::make()` que tenian `->searchable()` sin `->preload()`. 27 fixes totales (algunos archivos con multiples Selects). 769 tests backend pasan, 0 regresiones
+- **Archivos afectados**: AnnouncementResource, AttendeeAdminResource (form + 2 filters), AttendeeAdminResource\Pages\ListAttendeeAdmins (3), AttendeeBanResource (filter), BannerResource, CustomPageResource, DocumentResource (2), EmailTemplateResource, EventFaqResource, EventOnboardingResource, EventResource\Pages\CreateEvent, EventRoomResource, EventSessionResource, GoldenTicketResource, HighlightResource, LivePollResource (2), ModuleResource, OnboardingSurveyOptionResource, OrganizationEmailSettingsResource, PostEventSurveyResource, RegistrationFieldResource (form + filter), RoomTotemResource, ScheduledNotificationResource, SessionTrackResource, SessionTypeResource, SpeakerResource, SponsorResource (event_id + owner_attendee_id)
 
 ---
 

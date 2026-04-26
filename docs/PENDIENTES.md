@@ -24,32 +24,18 @@
 
 ## 1. App movil (Expo) — features pendientes
 
-### Lightmode — Fase 7 + 8 (~4.5h)
+### Recap compartible — post-evento (~26h, 3-4 dias) — 0/75
 
-> ROADMAP-LIGHTMODE.md. Cierra el sistema de tema completo.
+> Plan completo: `docs/ROADMAP-RECAP.md` (DaVinci mode, con tests + refs).
+> Solo app movil en Fase 1. Webapp consume mismo backend en Fase 2 (post Web App Bancolombia).
 
-- [ ] **Fase 7 backend** (~1.5h): migration `events.primary_color_light` (default #1A1B1E), Filament EventBranding doble color picker (Noir/Lux), API response incluye `primary_color_light`, App `useColorScheme()` lee el correcto, Profile toggle Auto/Light/Dark con persist
-- [ ] **Fase 8 QA visual** (~3h): auditar 360dp/411dp en Noir/Lux, BlurView fallback Android, colores semanticos legibles en Lux (red/amber/green con suficiente contrast), fondos onboarding con tema correcto
-
-### Optimistic UI restantes (~3-4h)
-
-> Plan completo en `docs/OPTIMISTIC-UI-PLAN.md`. Audit en `docs/OPTIMISTIC-UI-AUDIT.md`.
-> Implementar DESPUES de cerrar features de negocio, ANTES del stress test.
-
-- [ ] Chat tempId + ack + estados progresivos (2-3h, cambio mobile + socket server)
-- [ ] Emoji skip-self (30min, cambio socket server)
-- [ ] Dedup wall:comment con socket broadcast (20min)
-- [ ] Q&A upvote anti-parpadeo (15min)
-
-### Recap compartible — post-evento (6-8h)
-
-> Reemplaza certificado PDF tradicional. Mas viral en redes.
-
-- [ ] Card/story visual con stats personales del attendee: sesiones, conexiones, puntos, ranking, fotos
-- [ ] Diseno para compartir en redes (Instagram story format, LinkedIn post format)
-- [ ] Branding del evento integrado (logo, colores, nombre)
-- [ ] Boton "Compartir mi experiencia" en pantalla post-evento
-- [ ] Opcionalmente incluye certificado de asistencia (horas, sesiones) como dato dentro del recap
+- [ ] Fase 0: Investigacion + refs visuales (~2h) — 0/8
+- [ ] Fase 1: Backend datos (RecapService + API + tests) (~4h) — 0/12
+- [ ] Fase 2: Backend imagen Browsershot + R2 (~4h) — 0/10
+- [ ] Fase 3: Backend email + URL firmada + trigger (~4h) — 0/13
+- [ ] Fase 4: App pantalla recap nativa (~7h) — 0/15
+- [ ] Fase 5: App distribucion (push, deeplink, banner, lista) (~2.5h) — 0/8
+- [ ] Fase 6: QA + edge cases + tests E2E (~3h) — 0/9
 
 ### Pendientes menores app (Kiosk / Silent disco)
 
@@ -116,16 +102,11 @@
 
 > El organizador de Eventos Efectivos opera desde Filament. Si esta en ingles o desordenado, se ve amateur.
 
-### BUG-268: Searchable selects rotos — URGENTE
-
-- [ ] Todos los `Select::searchable()` en Filament no retornan resultados al buscar
-- [ ] Afecta: Totems, Golden Tickets, Patrocinadores, y cualquier form con Select searchable
-- [ ] Fix: auditar todos los Select en `app/Filament/Resources/`, agregar `->preload()` donde falte
-- [ ] Si persiste, evaluar upgrade Filament (actual: v3.3.49)
-- [ ] Ver `BUG-LOG.md` BUG-268
-
 ### Filament UI Enterprise
 
+> Plan completo en `docs/ROADMAP-FILAMENT-PULIDO.md`.
+
+- [ ] **Event Switcher global** (~3-4h) — topbar widget con Select de evento activo, default automatico al primer evento activo, todos los Resources/Pages respetan `session('filament_event_id')`, quitar Selects "Evento" duplicados de forms. URGENTE para UX profesional
 - [ ] Nivel 1: columns, labels espanol, secciones con icon/description, custom theme
 - [ ] Nivel 2: Tabs por recurso (EventBranding, Gamification, Registration)
 - [ ] Nivel 3: Wizards features complejos
@@ -169,6 +150,16 @@
 
 > Despues de Deploy + Infra. Ref: `docs/PLAN-STRESS-TESTDO.md` v2.1.
 
+### Optimistic UI restantes (~3-4h) — pre-stress polish
+
+> Plan completo en `docs/OPTIMISTIC-UI-PLAN.md`. Audit en `docs/OPTIMISTIC-UI-AUDIT.md`.
+> Implementar DESPUES de cerrar features de negocio (app + webapp), ANTES del stress test.
+
+- [ ] Chat tempId + ack + estados progresivos (2-3h, cambio mobile + socket server)
+- [ ] Emoji skip-self (30min, cambio socket server)
+- [ ] Dedup wall:comment con socket broadcast (20min)
+- [ ] Q&A upvote anti-parpadeo (15min)
+
 ### Fixes pre-stress (Live Moments)
 
 - [ ] Throttle game broadcasts (ver DISPONIBILIDAD-HA.md seccion 11)
@@ -199,6 +190,7 @@
 - [ ] Tests funcionales para Mission Control (~1.5h) — depende de mock de token HMAC `/monitor/{id}?token=...`
 - [ ] Tests E2E flujos criticos: aprobar Q&A, lanzar game, cancelar sesion, scheduled export trigger
 - [ ] Fix flaky test pre-existente `SessionLifecycleTest > cancel reverts delay on next session` (assertLessThan con timestamps iguales — usar assertLessThanOrEqual)
+toca revisar la autenticacion aca como funciona y tener claro los token cuando expiran etc 
 
 ### Unificacion SPAs (~10-12h)
 
@@ -298,6 +290,8 @@
 | `docs/PLAN-STRESS-TEST.md`                | Stress test v2.0 (Hetzner, referencia historica)                 |
 | `docs/PLAN-STRESS-TESTDO.md`              | Stress test v2.1 (DO sao1 consolidado, plan definitivo)          |
 | `docs/ROADMAP-DATA-CENTER.md`             | Data Center analytics modulo (cerrado)                           |
+| `docs/ROADMAP-FILAMENT-PULIDO.md`         | Event Switcher global + UI Enterprise Niveles 1-3                |
+| `docs/ROADMAP-RECAP.md`                   | Recap post-evento estilo Wrapped — app movil Fase 1              |
 | `docs/ROADMAP-EVENT-PULSE.md`             | Dashboard live standalone (cerrado)                              |
 | `docs/ROADMAP-KIOSK.md`                   | Kiosko + Staff check-in                                          |
 | `docs/ROADMAP-LIGHTMODE.md`               | Light mode Fases 1-8                                             |
