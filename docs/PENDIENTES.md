@@ -48,8 +48,7 @@
 ## P2 — Post-features (hacer DESPUES de terminar juegos/diferenciadores)
 
 > Estos dependen de que features existan. Cada feature nuevo cambia que datos hay para analytics y que mostrar en el recap.
-
-- [x] **Filament dashboard ROI/engagement → CUBIERTO POR DATA CENTER** (2026-04-26). Mejor que Filament: 9 tabs, 44 datasets, graficas reales, comparativa periodos, multi-evento, scheduled, goals, comparador A/B
+> (Filament dashboard ROI/engagement quedo cubierto por Data Center, ver `docs/COMPLETADO.md`.)
 
 ### Recap compartible (reemplaza certificado PDF tradicional) — 6-8h
 
@@ -139,10 +138,8 @@
 
 > Implementar DESPUES de cerrar P1-P5, ANTES del stress test.
 > Plan completo en docs/OPTIMISTIC-UI-PLAN.md. Audit en docs/OPTIMISTIC-UI-AUDIT.md.
+> (Haptic feedback, retry API, bug Q&A blocked words ya completados — ver `docs/COMPLETADO.md`.)
 
-- [x] Haptic feedback: 7 hooks, 9 puntos (favoritos, likes, upvotes, votes, networking)
-- [x] Retry automatico API: network errors + 502/503/504, backoff+jitter
-- [x] Bug fix Q&A: blocked words retornaba 201 fake → ahora 422
 - [ ] Chat tempId + ack + estados progresivos (2-3h, cambio mobile + socket server)
 - [ ] Emoji skip-self (30min, cambio socket server)
 - [ ] Dedup wall:comment con socket broadcast (20min)
@@ -272,19 +269,15 @@
 
 - [ ] Tab Bar polish con `@callstack/liquid-glass` cuando la libreria soporte Expo (actualmente solo iOS 26 nativo). Bloqueante: dependencia externa.
 
-### ROADMAP-MISSION-CONTROL — superado
-
-- [x] ~~5ta tab "Games" / "Interactivo" para ruleta/Kahoot/bingo/Unity~~ → **SUPERADO**: Live Moments completo + tabs MC con Ruleta/Sorteo/Trivia ya integradas
-
 ### ROADMAP-DATA-CENTER — solo deploy
 
 - [ ] Deploy a VPS-3 (plan completo en `ROADMAP-DATA-CENTER.md` seccion "PLAN DE DEPLOY A VPS-3", DC-DEPLOY-1 a DC-DEPLOY-6)
 
-### ROADMAP-UIUX-LANDING — Paso 2 + Paso 6 parcial
+### ROADMAP-UIUX-LANDING — Paso 6 parcial
 
-- [ ] **Paso 2 Landing Web** ya esta en P7 (registro publico) — secciones, form embebido, SEO, performance, animaciones
-- [x] ~~Paso 6 Admin Premium: dashboard analytics~~ → **SUPERADO** por Data Center
-- [ ] Paso 6 Admin Premium restante: configuracion canales (email/WhatsApp/SMS), preview landing en tiempo real, branded QR codes con logo
+> Paso 2 Landing Web ya esta en P7 (registro publico). Dashboard analytics quedo cubierto por Data Center.
+
+- [ ] Paso 6 Admin Premium: configuracion canales (email/WhatsApp/SMS), preview landing en tiempo real, branded QR codes con logo
 - [ ] Showcase demo (de Nice to have): panels clickeables, responsive 1920x1080, audio, hints, social wall
 
 ---
