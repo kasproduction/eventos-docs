@@ -1,7 +1,7 @@
 # EventOS — Roadmap
 
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
-_Actualizado: 2026-04-26 | v5.1 — Data Center cerrado_
+_Actualizado: 2026-05-01 | v5.2 — Webapp planeacion completa (18 modulos) + repo reorganizado_
 
 ---
 
@@ -26,14 +26,15 @@ _Actualizado: 2026-04-26 | v5.1 — Data Center cerrado_
 | **Optimistic UI** | ✅ Audit | 30 acciones auditadas, 10 con optimistic, haptics, retry API. Plan listo |
 | **QA** | ✅ | 150+ endpoints, 20 modulos, 582+ tests backend, 1664+ assertions |
 | **Deploy** | ⏳ | Docker + DO sao1 + CI/CD. Arquitectura HA definida |
-| **Fase 2** — Web app | ⏳ | Next.js, W.0-W.12 |
+| **Fase 2** — Web app | 📐 Planeacion completa | 18 modulos W.0-W.17, ~132h estimado, 23 docs en `docs/webapp/`. Ejecucion arranca por W.1 (Setup+Auth) |
 | **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion |
 
-**Que falta:** ver `docs/PENDIENTES.md`
-**Que se hizo:** ver `docs/COMPLETADO.md`
-**Arquitectura:** ver `docs/DISPONIBILIDAD-HA.md` (migrado a DO sao1 consolidado)
-**Stress test:** ver `docs/PLAN-STRESS-TESTDO.md` (v2.1, DO sao1, 9 tests)
-**Optimistic UI:** ver `docs/OPTIMISTIC-UI-PLAN.md` (30 acciones auditadas, plan 3 semanas)
+**Que falta:** ver `docs/living/PENDIENTES.md`
+**Que se hizo:** ver `docs/living/COMPLETADO.md`
+**Arquitectura:** ver `docs/infra/DISPONIBILIDAD-HA.md` (DO sao1 consolidado)
+**Stress test:** ver `docs/infra/PLAN-STRESS-TESTDO.md` (v2.1, DO sao1, 9 tests)
+**Optimistic UI:** ver `docs/analysis/OPTIMISTIC-UI-PLAN.md` (30 acciones auditadas, plan 3 semanas)
+**Webapp:** ver `docs/webapp/PLAN.md` (master) + `DECISIONS.md` + `AUTH-SPEC.md` + 18 roadmaps W.X
 
 ---
 
@@ -48,23 +49,89 @@ _Actualizado: 2026-04-26 | v5.1 — Data Center cerrado_
 
 ## Documentos
 
+> **Reorganizacion 2026-05-01:** docs/ ahora estructurado en categorias (living/roadmaps/analysis/infra/briefs/archive/webapp). Indice maestro en `docs/_index.md`.
+
+### Indices maestros (entry points)
+
 | Documento | Ruta | Contenido |
 |-----------|------|-----------|
-| **Pendientes** | `docs/PENDIENTES.md` | TODO lo que falta — la unica fuente de verdad |
-| **Completado** | `docs/COMPLETADO.md` | Historial de todo lo hecho por area |
-| **UI/UX + Landing** | `docs/ROADMAP-UIUX-LANDING.md` | Spec diseno: landing, estados evento, design system, pasos |
-| **Web App** | `docs/WEB-APP-PLAN.md` | Spatial UI, W.0-W.12, stack Next.js |
-| **Competitivo** | `docs/ANALISIS-COMPETITIVO.md` | Cisco $88K vs ICE360 $49M vs EventOS, pricing, escala |
-| **White-Label** | `docs/WHITE-LABEL.md` | app.config.js, clients/, EAS build |
-| **Seguridad** | `docs/FASE-SEGURIDAD.md` | Auditoria OWASP, SEC-1 a SEC-5, 42 tests |
-| **Compliance** | `docs/COMPLIANCE-SEGURIDAD.md` | ISO 27001, Ley 1581, GDPR, cabeceras HTTP |
-| **Alta Disponibilidad** | `docs/DISPONIBILIDAD-HA.md` | 2 Droplets DO sao1, DO Managed MySQL/Redis, Cloudflare, 99.9% |
-| **QA Master** | `docs/QA-MASTER.md` | Barrido 60+ endpoints, 20 modulos, 3 roles |
-| **QA Auth** | `docs/QA-AUTH-ONBOARDING.md` | 30+ escenarios auth/onboarding |
-| **Bug Log** | `docs/BUG-LOG.md` | Bugs historicos BUG-001 a BUG-147 |
+| **Indice docs** | `docs/_index.md` | Links a toda la doc por categoria |
+| **Indice design** | `design/_index.md` | Estructura visual + estado por feature |
 | **Documento maestro** | `EventOS_ClaudeCode_Prompt_v2.md` | Stack, modelos, API contracts, reglas de negocio |
 | **Dev setup** | `EventOS_DevSetup.md` | Instrucciones de desarrollo local |
-| **Roadmap historico** | `docs/ROADMAP-HISTORICO-v3.1.md` | Roadmap v3.1 completo (3,144 lineas) — checklists detallados de cada sesion, notas tecnicas, apendices A-J |
+
+### `docs/living/` — Vivos
+
+| Documento | Ruta | Contenido |
+|-----------|------|-----------|
+| **Pendientes** | `docs/living/PENDIENTES.md` | TODO lo que falta — la unica fuente de verdad |
+| **Completado** | `docs/living/COMPLETADO.md` | Historial de todo lo hecho por area |
+| **Bug Log** | `docs/living/BUG-LOG.md` | Bugs historicos BUG-001 a BUG-305 |
+| **QA Master** | `docs/living/QA-MASTER.md` | Barrido endpoints, 20 modulos, 3 roles |
+| **Modulos** | `docs/living/MODULOS.md` | 15 modulos + 6 sistemas + admin |
+
+### `docs/webapp/` — Plan webapp completo (NUEVO)
+
+| Documento | Ruta | Contenido |
+|-----------|------|-----------|
+| **Master plan** | `docs/webapp/PLAN.md` | Vision, stack, scope, 16 gaps, ~132h estimado |
+| **Decisiones** | `docs/webapp/DECISIONS.md` | 20 ADRs (auth, deploy, PWA, i18n, streaming, responsive) |
+| **Auth spec** | `docs/webapp/AUTH-SPEC.md` | Magic link + Bearer Sanctum + refresh + multi-device |
+| **Responsive** | `docs/webapp/RESPONSIVE-SPEC.md` | 3 disenios dedicados por viewport |
+| **Design system** | `docs/webapp/DESIGN-SYSTEM.md` | Tokens Lumina Noir + Lux portados |
+| **W.0-W.17** | `docs/webapp/W.X-*.md` | 18 roadmaps modulares DaVinci |
+
+### `docs/roadmaps/` — Plans por feature
+
+| Documento | Estado |
+|-----------|--------|
+| `docs/roadmaps/ROADMAP-DATA-CENTER.md` | Cerrado |
+| `docs/roadmaps/ROADMAP-EVENT-PULSE.md` | Cerrado |
+| `docs/roadmaps/ROADMAP-FILAMENT-PULIDO.md` | Pendiente |
+| `docs/roadmaps/ROADMAP-KIOSK.md` | En progreso |
+| `docs/roadmaps/ROADMAP-LIGHTMODE.md` | Cerrado |
+| `docs/roadmaps/ROADMAP-LIVE-MOMENTS.md` | Cerrado |
+| `docs/roadmaps/ROADMAP-LUX-V2.md` | Cerrado |
+| `docs/roadmaps/ROADMAP-MISSION-CONTROL.md` | Cerrado |
+| `docs/roadmaps/ROADMAP-RECAP.md` | Implementado (validacion visual pendiente) |
+| `docs/roadmaps/ROADMAP-UIUX-LANDING.md` | Pendiente |
+| `docs/roadmaps/ROADMAP-WEBHOOKS.md` | Cerrado |
+
+### `docs/analysis/` — Auditorias
+
+| Documento | Contenido |
+|-----------|-----------|
+| `docs/analysis/ANALISIS-COMPETITIVO.md` | Cisco $88K vs ICE360 $49M vs EventOS |
+| `docs/analysis/ANALISIS-LIGHTMODE.md` | Audit pre-implementacion light mode |
+| `docs/analysis/CODEBASE-MAP.md` | 150+ endpoints, socket events, observers |
+| `docs/analysis/GAPS-ANALYSIS.md` | Dedup socket, coordinacion REST+socket |
+| `docs/analysis/OPTIMISTIC-UI-AUDIT.md` | 30 acciones auditadas |
+| `docs/analysis/OPTIMISTIC-UI-PLAN.md` | Plan 3 semanas, 9 PRs |
+
+### `docs/infra/` — Deploy + seguridad + stress
+
+| Documento | Contenido |
+|-----------|-----------|
+| `docs/infra/COMPLIANCE-SEGURIDAD.md` | ISO 27001, Ley 1581, GDPR |
+| `docs/infra/FASE-SEGURIDAD.md` | OWASP, SEC-1 a SEC-6 |
+| `docs/infra/DISPONIBILIDAD-HA.md` | 2 Droplets DO sao1, 99.9% uptime |
+| `docs/infra/PLAN-STRESS-TESTDO.md` | Stress test v2.1, 9 tests |
+| `docs/infra/WHITE-LABEL.md` | App config dinamico multi-cliente |
+
+### `docs/briefs/` — One-shots
+
+| Documento | Contenido |
+|-----------|-----------|
+| `docs/briefs/BRIEF-CLAUDE-CODE-OPTIMISTIC-UI.md` | Brief original audit |
+| `docs/briefs/PLAN-TAGS-MODULOS.md` | Plan tags + visibilidad |
+| `docs/briefs/QA-AUTH-ONBOARDING.md` | 30+ escenarios |
+
+### `docs/archive/` — Legacy preservado
+
+| Documento | Razon |
+|-----------|-------|
+| `docs/archive/ROADMAP-HISTORICO-v3.1.md` | Reemplazado por v5.2 (este doc) |
+| `docs/archive/WEB-APP-PLAN.md` | Stub legacy → redirige a `docs/webapp/PLAN.md` |
 
 ---
 
@@ -722,14 +789,14 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 
 ---
 
-## Timeline — ajustada post-audit (2026-04-25)
+## Timeline — ajustada post-planeacion webapp (2026-05-01)
 
 | Mes | Objetivo | Entregable |
 |-----|----------|------------|
-| **Abril** (hecho) | Diferenciadores + audit | Live Moments, Event Pulse, Concurso Fotos, Golden Ticket, Optimistic UI audit, Kiosk, Room Check-in, Webhooks. 582+ tests |
-| **Mayo** | Web app core + deploy staging | Next.js base + Home + Agenda + Streaming. Deploy staging DO sao1 |
-| **Junio** | Web app completa + stress test | Web app W.2-W.12. Stress test 10K (9 tests). Optimistic UI chat |
-| **Julio** | Demo Bancolombia + pitch Eventos Efectivos | Producto desplegado, web + app. Dry run 1 con cliente |
+| **Abril** (hecho) | Diferenciadores + audit + Recap + Data Center + Filament BUG-268 + planeacion webapp | Live Moments, Event Pulse, Concurso Fotos, Golden Ticket, Optimistic UI audit, Kiosk, Room Check-in, Webhooks, Mission Control v4, Recap v6 disenio aprobado, Data Center 9 tabs/44 exports, BUG-268 cerrado, planeacion webapp 18 modulos. 582+ tests |
+| **Mayo** | Webapp cimientos + core | W.1 (Setup+Auth+magic link) + W.0 (Spatial UI) + W.2 Home + W.3 Agenda + W.4 Streaming. Deploy staging DO sao1. ~46h de las 132h |
+| **Junio** | Webapp completa + stress test | W.5-W.17 (resto de modulos) + W.12 Polish + PWA. Stress test 10K (9 tests). Optimistic UI chat. ~86h restantes |
+| **Julio** | Demo Bancolombia + pitch Eventos Efectivos | Producto desplegado web + app. Dry run 1 con cliente |
 | **Agosto** | Onboarding clientes + fixes | Dry run 2. Fix rondas. Freeze semana -2 |
 | **Septiembre** | Eventos en vivo | Casos de estudio reales |
 
@@ -750,6 +817,8 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 
 ---
 
-_EventOS Roadmap v5.0 — Kasproduction_
-_25 abril 2026_
-_Cambios v4.5→v5.0: Live Moments/Event Pulse/Concurso completados, audit optimistic UI (4 docs), stack DO sao1, stress test v2.1, haptics+retry+bug fix Q&A, 582+ tests_
+_EventOS Roadmap v5.2 — Kasproduction_
+_1 mayo 2026_
+_Cambios v5.1→v5.2: Webapp planeacion completa (18 modulos W.0-W.17, ~132h, 23 docs en `docs/webapp/`), repo reorganizado por categoria (docs/ y design/), Recap v6 disenio aprobado e implementado, BUG-268 Filament searchable cerrado_
+_Cambios v5.0→v5.1 (2026-04-26): Data Center cerrado (9 tabs, 44 exports, SPA standalone), 19 bugs nuevos (BUG-287 a BUG-305), 29 tests Data Center_
+_Cambios v4.5→v5.0 (2026-04-25): Live Moments/Event Pulse/Concurso completados, audit optimistic UI (4 docs), stack DO sao1, stress test v2.1, haptics+retry+bug fix Q&A, 582+ tests_
