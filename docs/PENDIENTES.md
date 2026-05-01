@@ -49,24 +49,47 @@
 
 ---
 
-## 2. Web App (Bancolombia virtual)
+## 2. Web App (Bancolombia virtual) — ~132h, ~30-34 dias — 0/18
 
-> Bancolombia pidio webapp. La competencia ya presento una (fea). Sin esto perdemos ese deal.
-> Ref: `docs/WEB-APP-PLAN.md`
+> Bancolombia pidio webapp. La competencia ya presento una. Sin esto perdemos ese deal.
+> Ref: `docs/webapp/PLAN.md` (master) + 4 specs + 18 roadmaps modulares.
+> Stack: Next.js 15 + TypeScript + Tailwind + shadcn/ui + Framer Motion + TanStack Query + Socket.IO + Zustand.
+> Repo: `eventos-web` (separado). Deploy: DO sao1. Auth: Bearer Sanctum + magic link principal.
+> **Auditoria 2026-05-01:** Modulos W.13-W.17 agregados tras comparar con app movil. Submodulos faltantes en W.2/W.3/W.4/W.5/W.6/W.8/W.9/W.10 expandidos.
 
-- [ ] W.0-W.1: Setup Next.js 15 + Spatial UI (pill nav, paneles max 3, presets)
-- [ ] W.2: Home + branding + countdown
-- [ ] W.3: Agenda + favoritos
-- [ ] W.4: Streaming + chat + Q&A + polls
-- [ ] W.5: Speakers
-- [ ] W.6: Social wall
-- [ ] W.7: Sponsors
-- [ ] W.8: Networking
-- [ ] W.9: Encuestas
-- [ ] W.10: Notificaciones
-- [ ] W.11: Sockets RT
-- [ ] W.12: Polish
-- [ ] Command palette, paneles arrastrables, presets
+### Cimientos (2 sesiones)
+- [ ] W.1: Setup Next.js + Auth (magic link + email/password) + i18n + tour bienvenida (~10h)
+- [ ] W.0: Spatial UI System (PanelManager, PillBar, presets, command palette, drag) (~12h)
+
+### Modulos core asistente virtual (10 sesiones)
+- [ ] W.2: Home (hero, countdown, happening now, GamificationHud, recap banner, anuncios mini, post-event survey, EventArchive) (~9h)
+- [ ] W.3: Agenda (lista, filtros, favoritos, lifecycle, conflictos, room-checkin, .ics, ratings, recordatorios) (~11h)
+- [ ] W.4: Streaming (Vimeo + Q&A + chat + polls + Trivia + anuncios in-stream + replay) (~14h)
+- [ ] W.5: Speakers (directorio, ratings en lista, perfil, favoritos) (~5h)
+- [ ] W.6: Social Wall (feed, Stories, Hashtags, Photo Contest, Memorias) (~10h)
+- [ ] W.7: Sponsors (Brand Wall, Profile, lead capture, trivia) (~7h)
+- [ ] W.8: Networking (matchmaking, sent/received, chat 1:1, bookmarks, blocked) (~7h)
+- [ ] W.9: Engagement (encuestas, leaderboard, badges, passport, rewards, prizes, streak) (~10h)
+- [ ] W.10: Hub Personal (notif, perfil, settings, Mi QR, Mis Stands, Mis Redenciones, Mis Prizes, Mi Recap, Soporte access, Cambiar evento) (~8h)
+
+### Modulos transversales (1 sesion)
+- [ ] W.11: Sockets RT (Socket.IO, dedup, long-polling fallback, 4 capas RT invalidation) (~6h)
+
+### Modulos nuevos (auditoria)
+- [ ] W.13: FAQ + Documentos + Pages dinamicas (~3h)
+- [ ] W.14: Anuncios + Boletines (anuncios urgentes, banners rotativos, highlights) (~3h)
+- [ ] W.15: Vendor Dashboard (Mi Stand, Leads, Stats, Team) **— OPCIONAL Fase 1** (~6h)
+- [ ] W.16: Live Moments subset web (Trivia engine, Sorteo Ceremony display, Concurso Fotos, Golden Ticket reveal) (~6h)
+- [ ] W.17: Soporte (tickets, chat staff, RT) (~3h)
+
+### Cierre (1 sesion)
+- [ ] W.12: Polish + E2E + PWA (responsive final, transiciones, loading states, install prompt condicional) (~8h)
+
+**Decisiones cerradas (2026-05-01):** Vimeo streaming, DO sao1 deploy, magic link principal, i18n es-CO/en/pt-BR, PWA install prompt condicional (desktop/tablet only), responsive con 3 disenios dedicados por viewport. Detalle en `docs/webapp/DECISIONS.md`.
+
+**Backend bloqueante (~3-4h)**: Endpoints `POST /api/v1/auth/magic-link` + `POST /api/v1/auth/verify-magic-link` + `POST /api/v1/auth/refresh`. Se hace en sesion separada o paralela a W.1.
+
+**Auditoria submodulos vs app movil:** Reporte completo en `docs/webapp/PLAN.md`. 39 pantallas movil + 37 hooks revisados. Items presenciales (scanner camara, QR badge, staff tools) confirmados como solo movil.
 
 ---
 
@@ -282,7 +305,12 @@ toca revisar la autenticacion aca como funciona y tener claro los token cuando e
 | `docs/QA-MASTER.md`                       | Barrido endpoints                                                |
 | `docs/PLAN-TAGS-MODULOS.md`               | Plan tags + visibilidad modulos                                  |
 | `docs/ROADMAP-UIUX-LANDING.md`            | Spec diseno landing + UI                                         |
-| `docs/WEB-APP-PLAN.md`                    | Spec web app spatial UI                                          |
+| `docs/webapp/PLAN.md`                     | Master plan webapp (reemplaza WEB-APP-PLAN.md legacy)            |
+| `docs/webapp/DECISIONS.md`                | ADRs webapp (auth, deploy, PWA, i18n, streaming, responsive)     |
+| `docs/webapp/AUTH-SPEC.md`                | Auth detallado: magic link + Bearer Sanctum + refresh            |
+| `docs/webapp/RESPONSIVE-SPEC.md`          | 3 disenios dedicados por viewport (no responsive automatico)     |
+| `docs/webapp/DESIGN-SYSTEM.md`            | Tokens Lumina Noir + Lux portados desde app movil                |
+| `docs/webapp/W.0-W.12-*.md`               | 13 roadmaps modulares DaVinci con counter 0/N                    |
 | `docs/ANALISIS-COMPETITIVO.md`            | Cotizaciones, gaps, pricing                                      |
 | `docs/WHITE-LABEL.md`                     | App config dinamico                                              |
 | `docs/FASE-SEGURIDAD.md`                  | Auditoria OWASP                                                  |
