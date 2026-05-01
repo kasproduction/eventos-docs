@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#393844",
+                        "on-surface": "#e4e1f0",
+                        "tertiary-container": "#08a56e",
+                        "on-surface-variant": "#bdcac0",
+                        "on-tertiary-fixed": "#002112",
+                        "on-primary-container": "#282a2a",
+                        "error-container": "#93000a",
+                        "primary": "#c6c6c7",
+                        "tertiary-fixed": "#7bfabb",
+                        "outline-variant": "#3e4942",
+                        "surface-dim": "#12121d",
+                        "on-tertiary": "#003823",
+                        "on-primary": "#2f3131",
+                        "on-error-container": "#ffdad6",
+                        "error": "#ffb4ab",
+                        "outline": "#87948b",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-secondary": "#003824",
+                        "on-tertiary-container": "#00311d",
+                        "on-secondary-fixed": "#002113",
+                        "on-primary-fixed-variant": "#454747",
+                        "inverse-on-surface": "#302f3b",
+                        "inverse-primary": "#5d5f5f",
+                        "background": "#12121d",
+                        "secondary": "#6edba7",
+                        "surface-container-low": "#1b1b25",
+                        "secondary-fixed": "#8bf8c2",
+                        "on-background": "#e4e1f0",
+                        "surface-container-high": "#292934",
+                        "surface-tint": "#c6c6c7",
+                        "tertiary": "#5ddda1",
+                        "surface-variant": "#34343f",
+                        "surface-container-highest": "#34343f",
+                        "on-secondary-fixed-variant": "#005235",
+                        "surface-container-lowest": "#0d0d17",
+                        "secondary-fixed-dim": "#6edba7",
+                        "tertiary-fixed-dim": "#5ddda1",
+                        "primary-container": "#909191",
+                        "primary-fixed": "#e2e2e2",
+                        "on-secondary-container": "#00311e",
+                        "secondary-container": "#30a374",
+                        "inverse-surface": "#e4e1f0",
+                        "surface-container": "#1f1f29",
+                        "on-error": "#690005",
+                        "surface": "#12121d",
+                        "on-tertiary-fixed-variant": "#005234",
+                        "on-primary-fixed": "#1a1c1c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        .deep-crimson-noir {
+            background-color: #2a0a0a;
+            background-image: radial-gradient(circle at 50% -20%, #4a0f0f 0%, #2a0a0a 100%);
+        }
+        .ghost-border {
+            border: 1px solid rgba(228, 225, 240, 0.1);
+        }
+        .text-glow {
+            text-shadow: 0 0 40px rgba(255, 180, 171, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-hidden">
+<!-- Error Overlay Canvas -->
+<main class="relative h-screen w-full deep-crimson-noir flex flex-col justify-between overflow-hidden">
+<!-- Top Navigation Anchor -->
+<header class="flex justify-between items-center w-full px-12 py-8 bg-gradient-to-b from-[#12121d] to-transparent z-50">
+<div class="font-headline tracking-[0.05em] uppercase text-sm font-semibold text-[#c6c6c7]">
+                CONFERENCE ROOM 402
+            </div>
+<div class="flex flex-col items-end">
+<span class="text-lg font-bold tracking-tight text-[#c6c6c7]">AUTHENTICATION</span>
+<span class="font-label text-[10px] tracking-[0.1em] text-on-surface-variant/50 uppercase">Security Protocol v4.0</span>
+</div>
+</header>
+<!-- Centered Error Message Content -->
+<div class="relative flex flex-col items-center justify-center flex-grow px-12 text-center">
+<!-- Abstract Architectural Glow -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="w-[140%] h-96 bg-[#93000a] blur-[160px] opacity-20 rotate-12"></div>
+</div>
+<!-- Error Label -->
+<div class="relative z-10 mb-8">
+<span class="font-label text-xs tracking-[0.4em] text-error font-bold uppercase opacity-80">
+                    System Protocol Interference
+                </span>
+</div>
+<!-- Primary Headline -->
+<div class="relative z-10">
+<h1 class="font-headline text-8xl md:text-9xl font-extrabold tracking-tighter text-on-surface text-glow leading-none">
+                    ACCESS<br/>DENIED
+                </h1>
+</div>
+<!-- Detailed Message Box -->
+<div class="relative z-10 mt-16 max-w-sm">
+<div class="surface-variant/20 ghost-border px-8 py-10 backdrop-blur-3xl rounded-xl">
+<p class="font-body text-lg font-light text-on-surface tracking-wide leading-relaxed">
+                        The scanned credential is <span class="text-error font-semibold">unauthorized</span> for this sector. Please verify your credentials with the concierge desk.
+                    </p>
+<div class="mt-8 pt-8 border-t border-on-surface/5 flex flex-col items-center gap-4">
+<div class="font-label text-[10px] tracking-[0.2em] text-on-surface-variant/40 uppercase">Error Code</div>
+<div class="font-body text-sm font-medium text-on-surface/60 font-mono">SEC-ERR_BADGE_INVALID_403</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-center gap-24 items-center pb-10 bg-[#0d0d17]/80 backdrop-blur-xl">
+<!-- Schedule (Inactive) -->
+<div class="flex flex-col items-center justify-center text-[#c6c6c7]/40 pt-4 hover:text-[#c6c6c7] transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_today">calendar_today</span>
+<span class="font-headline tracking-[0.05em] text-[10px] font-bold">SCHEDULE</span>
+</div>
+<!-- Reserve (Inactive) -->
+<div class="flex flex-col items-center justify-center text-[#c6c6c7]/40 pt-4 hover:text-[#c6c6c7] transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="add_box">add_box</span>
+<span class="font-headline tracking-[0.05em] text-[10px] font-bold">RESERVE</span>
+</div>
+<!-- Dismiss Action (Floating Intent) -->
+<div class="absolute -top-12 left-1/2 -translate-x-1/2">
+<button class="bg-primary text-on-primary px-8 py-3 rounded-sm font-label text-xs font-bold tracking-[0.2em] uppercase hover:opacity-80 transition-opacity">
+                    RESCAN
+                </button>
+</div>
+</footer>
+<!-- Aesthetic Background Texture -->
+<div class="absolute bottom-0 right-0 w-full h-full opacity-10 pointer-events-none mix-blend-overlay">
+<div class="w-full h-full bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:40px_40px]"></div>
+</div>
+</main>
+</body></html>

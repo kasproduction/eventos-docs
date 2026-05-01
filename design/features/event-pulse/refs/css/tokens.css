@@ -1,0 +1,52 @@
+/* ============================================================
+   Event Pulse — Design Tokens
+   Fuentes: PlusJakartaSans (display) + Urbanist (body) + JetBrains Mono (mono)
+   Tema: Lux v2 (fondo claro fijo, sin sky dinamico)
+   ============================================================ */
+
+:root {
+  /* --- Surfaces --- */
+  --bg: #F6F8FA;
+  --surface: #FFFFFF;
+
+  /* --- Ink --- */
+  --ink: #1A1A1A;
+  --ink-70: rgba(26, 26, 26, 0.72);
+  --ink-50: rgba(26, 26, 26, 0.5);
+  --ink-35: rgba(26, 26, 26, 0.35);
+  --ink-20: rgba(26, 26, 26, 0.2);
+  --ink-10: rgba(26, 26, 26, 0.1);
+  --ink-05: rgba(26, 26, 26, 0.05);
+
+  /* --- Accent --- */
+  --teal: #0D9488;
+  --teal-soft: rgba(13, 148, 136, 0.08);
+  --blue: #2563EB;
+  --blue-soft: rgba(37, 99, 235, 0.06);
+  --platinum: #B5A68B;
+  --plat-soft: rgba(181, 166, 139, 0.1);
+  --green: #16A34A;
+  --red: #DC2626;
+
+  /* --- Typography --- */
+  --f-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --f-body: 'Urbanist', system-ui, sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* --- Radii --- */
+  --r: 20px;
+  --r-sm: 14px;
+  --r-pill: 999px;
+
+  /* --- Shadows --- */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-avatar: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 0 3px white, 0 0 0 4px var(--ink-10);
+  --shadow-avatar-lg: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 0 5px white, 0 0 0 6px var(--ink-10);
+  --shadow-avatar-xl: 0 40px 80px -20px rgba(15, 23, 42, 0.35), 0 0 0 6px white, 0 0 0 7px var(--ink-10);
+
+  /* --- Canvas --- */
+  --canvas-w: 1920;
+  --canvas-h: 1080;
+}

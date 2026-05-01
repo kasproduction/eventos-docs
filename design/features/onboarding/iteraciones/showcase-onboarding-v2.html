@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventOS — Showcase Onboarding v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1a1a1a;
+    --accent: #6C63FF;
+    --accent2: #00D4AA;
+    --accent3: #FF6B6B;
+    --accent4: #FFB800;
+    --text: #ffffff;
+    --text2: rgba(255,255,255,0.6);
+    --text3: rgba(255,255,255,0.35);
+  }
+
+  body {
+    background: #000;
+    color: var(--text);
+    font-family: 'Urbanist', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #stage {
+    width: 1200px;
+    height: 720px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: var(--bg);
+  }
+
+  /* ========== CANVAS ========== */
+  #fx-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ========== PILL BAR ========== */
+  .pill-bar {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    display: flex;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(20,20,20,0.92);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 50px;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+
+  .pill-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 23px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pill-icon svg {
+    width: 20px; height: 20px;
+    stroke: rgba(255,255,255,0.12);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .pill-icon .fill-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    opacity: 0;
+  }
+
+  .pill-icon .fill-dot {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    opacity: 0;
+  }
+
+  .pill-icon .fill-bg {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  /* ========== FEATURE LABEL (big centered text) ========== */
+  .feature-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .feature-label .fl-category {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+  }
+
+  .feature-label .fl-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1.1;
+  }
+
+  .feature-label .fl-desc {
+    font-size: 14px;
+    color: var(--text2);
+    margin-top: 10px;
+    font-weight: 500;
+  }
+
+  /* ========== CONTENT AREA (centered showcase) ========== */
+  .showcase-area {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  /* ========== SPEAKER CARDS ========== */
+  .speakers-row {
+    display: flex;
+    gap: 20px;
+    opacity: 0;
+  }
+
+  .speaker-card {
+    width: 150px;
+    height: 210px;
+    border-radius: 16px;
+    background: linear-gradient(160deg, #1a1a2e, #10101c);
+    border: 1px solid rgba(108,99,255,0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(-60px) rotateY(90deg) scale(0.7);
+  }
+
+  .speaker-card .s-rating {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .speaker-card .s-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    position: relative;
+  }
+
+  .speaker-card .s-avatar::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: #1a1a2e;
+  }
+
+  .speaker-card .s-name {
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  .speaker-card .s-role {
+    font-size: 10px;
+    color: var(--text3);
+    text-align: center;
+    padding: 0 8px;
+  }
+
+  /* ========== AGENDA BLOCKS ========== */
+  .agenda-row {
+    display: flex;
+    gap: 14px;
+    opacity: 0;
+  }
+
+  .agenda-block {
+    width: 180px;
+    padding: 16px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    opacity: 0;
+    transform: translateX(80px);
+  }
+
+  .agenda-block .a-time {
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0.6;
+  }
+
+  .agenda-block .a-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .agenda-block .a-track {
+    font-size: 10px;
+    font-weight: 600;
+    opacity: 0.4;
+  }
+
+  /* ========== HAPPENING NOW ========== */
+  .hn-card {
+    width: 420px;
+    padding: 28px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(255,107,107,0.08), rgba(108,99,255,0.06));
+    border: 1px solid rgba(255,107,107,0.2);
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  .hn-card .hn-dot-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .hn-card .hn-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent3);
+    box-shadow: 0 0 16px var(--accent3), 0 0 32px rgba(255,107,107,0.3);
+  }
+
+  .hn-card .hn-label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--accent3);
+  }
+
+  .hn-card .hn-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .hn-card .hn-speaker {
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  .hn-card .hn-bar {
+    margin-top: 16px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+
+  .hn-card .hn-bar-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent3), var(--accent));
+  }
+
+  /* ========== LIVE COMPOSICION ========== */
+  .live-comp {
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+    opacity: 0;
+  }
+
+  .live-player {
+    width: 380px;
+    height: 220px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #0d0d18, #141428);
+    border: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  .live-player .play-circle {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: rgba(108,99,255,0.2);
+    border: 2px solid rgba(108,99,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .live-player .play-circle::after {
+    content: '';
+    width: 0; height: 0;
+    border-left: 18px solid var(--accent);
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+    margin-left: 4px;
+  }
+
+  .live-player .scan-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.4;
+  }
+
+  .live-sidebar {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+  }
+
+  .chat-msg {
+    padding: 10px 14px;
+    border-radius: 12px 12px 4px 12px;
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.04);
+    font-size: 11px;
+    color: var(--text2);
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  .chat-msg .cm-name {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .poll-mini {
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.04);
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  .poll-mini .pm-q {
+    font-size: 10px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text2);
+  }
+
+  .poll-mini .pm-bar {
+    height: 20px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    margin-bottom: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    font-size: 9px;
+    font-weight: 700;
+    position: relative;
+  }
+
+  .poll-mini .pm-bar .pm-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    border-radius: 6px;
+    width: 0;
+    opacity: 0.25;
+  }
+
+  .poll-mini .pm-bar span { position: relative; z-index: 1; }
+
+  /* ========== CONNECT ========== */
+  .connect-comp {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    opacity: 0;
+  }
+
+  .profile-card {
+    width: 150px;
+    height: 190px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    opacity: 0;
+  }
+
+  .profile-card .pc-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+  }
+
+  .profile-card .pc-name {
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .profile-card .pc-role {
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  .profile-card .pc-interests {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 10px;
+  }
+
+  .profile-card .pc-chip {
+    font-size: 8px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: rgba(108,99,255,0.12);
+    color: var(--accent);
+  }
+
+  .match-zone {
+    width: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .match-zone .mz-line {
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    box-shadow: 0 0 12px rgba(108,99,255,0.4);
+  }
+
+  .match-zone .mz-badge {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  .match-zone .mz-pct {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--accent2);
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  /* ========== SOCIAL ========== */
+  .social-card {
+    width: 280px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 18px;
+    margin-left: 24px;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .social-card .sc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .social-card .sc-av {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent3), var(--accent4));
+  }
+
+  .social-card .sc-name { font-size: 12px; font-weight: 700; }
+  .social-card .sc-time { font-size: 10px; color: var(--text3); }
+
+  .social-card .sc-text {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .social-card .sc-img {
+    width: 100%;
+    height: 100px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(108,99,255,0.1), rgba(0,212,170,0.08));
+    margin-bottom: 12px;
+  }
+
+  .social-card .sc-actions {
+    display: flex;
+    gap: 20px;
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .social-card .sc-heart {
+    color: var(--accent3);
+    font-weight: 700;
+  }
+
+  .social-card .sc-counter {
+    display: inline-block;
+  }
+
+  /* ========== ENGAGE (Gamification) ========== */
+  .engage-comp {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    opacity: 0;
+  }
+
+  .points-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pt-fly {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    opacity: 0;
+    text-shadow: 0 0 24px currentColor;
+  }
+
+  .leaderboard {
+    width: 240px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 18px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .leaderboard .lb-title {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent4);
+    margin-bottom: 14px;
+  }
+
+  .lb-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+  }
+
+  .lb-rank {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    width: 24px;
+  }
+
+  .lb-rank.gold { color: var(--accent4); }
+  .lb-rank.silver { color: #aaa; }
+  .lb-rank.bronze { color: #cd7f32; }
+
+  .lb-av {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+  }
+
+  .lb-name {
+    font-size: 12px;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .lb-pts {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent2);
+  }
+
+  .stamp-card {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px dashed rgba(255,184,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    opacity: 0;
+    transform: scale(1.8) rotate(-15deg);
+  }
+
+  .stamp-card .st-icon {
+    font-size: 24px;
+    color: var(--accent4);
+  }
+
+  .stamp-card .st-label {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent4);
+  }
+
+  .stamp-card.stamped {
+    border-style: solid;
+    border-color: var(--accent4);
+    background: rgba(255,184,0,0.06);
+  }
+
+  /* ========== BRANDS ========== */
+  .brands-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    opacity: 0;
+  }
+
+  .brand-logo {
+    width: 120px;
+    height: 65px;
+    border-radius: 12px;
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  .brand-logo.gold {
+    border-color: rgba(255,184,0,0.25);
+    color: var(--accent4);
+    box-shadow: 0 0 0 rgba(255,184,0,0);
+  }
+
+  /* ========== QR BADGE ========== */
+  .qr-badge {
+    width: 220px;
+    height: 280px;
+    border-radius: 22px;
+    background: linear-gradient(160deg, #16162a, #0d0d18);
+    border: 2px solid rgba(108,99,255,0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    opacity: 0;
+    transform: scale(0);
+    position: absolute;
+    top: 50%; left: 50%;
+    margin-left: -110px;
+    margin-top: -140px;
+    z-index: 60;
+  }
+
+  .qr-badge .qb-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+  }
+
+  .qr-badge .qb-role {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .qr-badge .qb-qr {
+    width: 100px; height: 100px;
+    border-radius: 12px;
+    background: #fff;
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    grid-template-rows: repeat(7,1fr);
+    gap: 1px;
+    padding: 6px;
+  }
+
+  .qr-badge .qb-qr div {
+    border-radius: 1px;
+  }
+
+  .qr-badge .qb-event {
+    font-size: 10px;
+    color: var(--text3);
+    font-weight: 600;
+  }
+
+  /* ========== HOME PANELS ========== */
+  .home-panels {
+    position: absolute;
+    inset: 0;
+    bottom: 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    padding: 20px;
+    z-index: 5;
+    opacity: 0;
+  }
+
+  .home-panel {
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .home-panel .hp-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+
+  .home-panel .hp-body {
+    height: calc(100% - 30px);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.015);
+  }
+
+  /* ========== COMPRESSION TRAIL ========== */
+  .trail-dot {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    opacity: 0;
+    z-index: 99;
+    pointer-events: none;
+  }
+
+  /* ========== SKIP / REPLAY ========== */
+  .skip-btn {
+    position: absolute;
+    bottom: 36px;
+    right: 28px;
+    font-family: 'Urbanist', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text3);
+    background: none;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    z-index: 200;
+    opacity: 0;
+    transition: all 0.2s;
+  }
+
+  .skip-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .replay-btn {
+    position: absolute;
+    top: 20px; right: 20px;
+    font-family: 'Urbanist', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text3);
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    z-index: 200;
+    opacity: 0;
+    transition: all 0.2s;
+  }
+
+  .replay-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  /* ========== PROGRESS BAR ========== */
+  .progress-bar {
+    position: absolute;
+    top: 0; left: 0;
+    height: 2px;
+    width: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    z-index: 200;
+    box-shadow: 0 0 10px var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <canvas id="fx-canvas"></canvas>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- PILL BAR -->
+  <div class="pill-bar" id="pillBar">
+    <div class="pill-icon" id="pill-discover" data-label="Discover">
+      <div class="fill-bg" style="background:var(--accent)"></div>
+      <div class="fill-ring"></div>
+      <div class="fill-dot" style="background:var(--accent)"></div>
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+    <div class="pill-icon" id="pill-live" data-label="Live">
+      <div class="fill-bg" style="background:var(--accent3)"></div>
+      <div class="fill-ring"></div>
+      <div class="fill-dot" style="background:var(--accent3)"></div>
+      <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    </div>
+    <div class="pill-icon" id="pill-connect" data-label="Connect">
+      <div class="fill-bg" style="background:var(--accent2)"></div>
+      <div class="fill-ring"></div>
+      <div class="fill-dot" style="background:var(--accent2)"></div>
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div class="pill-icon" id="pill-engage" data-label="Engage">
+      <div class="fill-bg" style="background:var(--accent4)"></div>
+      <div class="fill-ring"></div>
+      <div class="fill-dot" style="background:var(--accent4)"></div>
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    </div>
+    <div class="pill-icon" id="pill-brands" data-label="Brands">
+      <div class="fill-bg" style="background:var(--accent4)"></div>
+      <div class="fill-ring"></div>
+      <div class="fill-dot" style="background:var(--accent4)"></div>
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    </div>
+    <div class="pill-icon" id="pill-you" data-label="Tu">
+      <div class="fill-bg" style="background:var(--accent)"></div>
+      <div class="fill-ring"></div>
+      <div class="fill-dot" style="background:var(--accent)"></div>
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 12h10M7 17h4"/></svg>
+    </div>
+  </div>
+
+  <!-- FEATURE LABEL -->
+  <div class="feature-label" id="featureLabel">
+    <div class="fl-category" id="flCategory">SPEAKERS</div>
+    <div class="fl-name" id="flName">Speakers</div>
+    <div class="fl-desc" id="flDesc">Descubre quienes presentan</div>
+  </div>
+
+  <!-- BEAT 1: DISCOVER -->
+  <div class="showcase-area" id="discoverArea" style="top:55%">
+    <div class="speakers-row" id="speakersRow">
+      <div class="speaker-card" id="spk1">
+        <div class="s-rating">92</div>
+        <div class="s-avatar"></div>
+        <div class="s-name">Ana Torres</div>
+        <div class="s-role">AI & Machine Learning</div>
+      </div>
+      <div class="speaker-card" id="spk2">
+        <div class="s-rating">89</div>
+        <div class="s-avatar" style="background:linear-gradient(135deg,var(--accent4),#cc9500)"></div>
+        <div class="s-name">Carlos Ruiz</div>
+        <div class="s-role">Product Design</div>
+      </div>
+      <div class="speaker-card" id="spk3">
+        <div class="s-rating">95</div>
+        <div class="s-avatar" style="background:linear-gradient(135deg,var(--accent3),#cc4444)"></div>
+        <div class="s-name">Maria Chen</div>
+        <div class="s-role">CEO TechVentures</div>
+      </div>
+      <div class="speaker-card" id="spk4">
+        <div class="s-rating">87</div>
+        <div class="s-avatar" style="background:linear-gradient(135deg,var(--accent2),#00a88a)"></div>
+        <div class="s-name">David Park</div>
+        <div class="s-role">Blockchain Lead</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEAT 1b: AGENDA -->
+  <div class="showcase-area" id="agendaArea" style="top:55%">
+    <div class="agenda-row" id="agendaRow">
+      <div class="agenda-block" style="background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.2)">
+        <div class="a-time">9:00 AM</div>
+        <div class="a-title">Keynote Opening</div>
+        <div class="a-track">Main Stage</div>
+      </div>
+      <div class="agenda-block" style="background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.2)">
+        <div class="a-time">10:30 AM</div>
+        <div class="a-title">Future of AI</div>
+        <div class="a-track">Tech Track</div>
+      </div>
+      <div class="agenda-block" style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.2)">
+        <div class="a-time">11:45 AM</div>
+        <div class="a-title">Design Systems</div>
+        <div class="a-track">Design Track</div>
+      </div>
+      <div class="agenda-block" style="background:rgba(255,184,0,0.1);border:1px solid rgba(255,184,0,0.2)">
+        <div class="a-time">2:00 PM</div>
+        <div class="a-title">Workshop React</div>
+        <div class="a-track">Hands-on</div>
+      </div>
+      <div class="agenda-block" style="background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.2)">
+        <div class="a-time">3:30 PM</div>
+        <div class="a-title">Panel Startups</div>
+        <div class="a-track">Business</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEAT 2: LIVE -->
+  <div class="showcase-area" id="liveArea" style="top:48%">
+    <!-- Happening Now first -->
+    <div class="hn-card" id="hnCard">
+      <div class="hn-dot-row">
+        <div class="hn-dot"></div>
+        <div class="hn-label">En vivo ahora</div>
+      </div>
+      <div class="hn-title">The Future of AI in Product Design</div>
+      <div class="hn-speaker">Ana Torres &middot; Main Stage</div>
+      <div class="hn-bar"><div class="hn-bar-fill" id="hnBarFill"></div></div>
+    </div>
+  </div>
+
+  <div class="showcase-area" id="liveCompArea" style="top:50%">
+    <div class="live-comp" id="liveComp">
+      <div class="live-player" id="livePlayer">
+        <div class="scan-line" id="scanLine"></div>
+        <div class="play-circle"></div>
+      </div>
+      <div class="live-sidebar" id="liveSidebar">
+        <div class="chat-msg" id="cm1">
+          <div class="cm-name">Laura M.</div>
+          Increible la sesion
+        </div>
+        <div class="chat-msg" id="cm2">
+          <div class="cm-name">Pedro G.</div>
+          Alguien tiene el link del repo?
+        </div>
+        <div class="poll-mini" id="pollMini">
+          <div class="pm-q">Que tema te interesa mas?</div>
+          <div class="pm-bar"><div class="pm-fill" style="background:var(--accent)"></div><span>AI — 42%</span></div>
+          <div class="pm-bar"><div class="pm-fill" style="background:var(--accent2)"></div><span>Design — 31%</span></div>
+          <div class="pm-bar"><div class="pm-fill" style="background:var(--accent4)"></div><span>Web3 — 27%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEAT 3: CONNECT -->
+  <div class="showcase-area" id="connectArea" style="top:48%">
+    <div class="connect-comp" id="connectComp">
+      <div class="profile-card" id="profA">
+        <div class="pc-avatar" style="background:linear-gradient(135deg,var(--accent),#4a3fcc)"></div>
+        <div class="pc-name">Tu</div>
+        <div class="pc-role">Asistente</div>
+        <div class="pc-interests">
+          <span class="pc-chip">AI</span>
+          <span class="pc-chip">UX</span>
+          <span class="pc-chip">React</span>
+        </div>
+      </div>
+      <div class="match-zone" id="matchZone">
+        <div class="mz-pct" id="mzPct">87%</div>
+        <div class="mz-line" id="mzLine"></div>
+        <div class="mz-badge" id="mzBadge">MATCH</div>
+      </div>
+      <div class="profile-card" id="profB">
+        <div class="pc-avatar" style="background:linear-gradient(135deg,var(--accent2),#00a88a)"></div>
+        <div class="pc-name">Laura M.</div>
+        <div class="pc-role">UX Designer</div>
+        <div class="pc-interests">
+          <span class="pc-chip">Design</span>
+          <span class="pc-chip">AI</span>
+          <span class="pc-chip">Figma</span>
+        </div>
+      </div>
+      <div class="social-card" id="socialCard">
+        <div class="sc-header">
+          <div class="sc-av"></div>
+          <div>
+            <div class="sc-name">Pedro Gomez</div>
+            <div class="sc-time">hace 2 min</div>
+          </div>
+        </div>
+        <div class="sc-text">Increible sesion sobre IA. El futuro es ahora.</div>
+        <div class="sc-img"></div>
+        <div class="sc-actions">
+          <span class="sc-heart"><span class="sc-counter" id="likeCount">23</span> likes</span>
+          <span>8 comments</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEAT 4: ENGAGE -->
+  <div class="showcase-area" id="engageArea" style="top:50%">
+    <div class="engage-comp" id="engageComp">
+      <div class="points-column" id="ptsCol">
+        <div class="pt-fly" id="pt1" style="color:var(--accent2)">+10</div>
+        <div class="pt-fly" id="pt2" style="color:var(--accent4)">+25</div>
+        <div class="pt-fly" id="pt3" style="color:var(--accent)">+50</div>
+      </div>
+      <div class="leaderboard" id="lboard">
+        <div class="lb-title">Ranking en vivo</div>
+        <div class="lb-row">
+          <div class="lb-rank gold">1</div>
+          <div class="lb-av" style="background:linear-gradient(135deg,var(--accent4),#cc9500)"></div>
+          <div class="lb-name">Maria C.</div>
+          <div class="lb-pts">2,450</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank silver">2</div>
+          <div class="lb-av" style="background:linear-gradient(135deg,var(--accent),#4a3fcc)"></div>
+          <div class="lb-name">Tu</div>
+          <div class="lb-pts">1,890</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank bronze">3</div>
+          <div class="lb-av" style="background:linear-gradient(135deg,var(--accent2),#00a88a)"></div>
+          <div class="lb-name">Carlos R.</div>
+          <div class="lb-pts">1,620</div>
+        </div>
+      </div>
+      <div class="stamp-card" id="stampCard">
+        <div class="st-icon">&#9733;</div>
+        <div class="st-label">Stand<br>visitado</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEAT 5: BRANDS -->
+  <div class="showcase-area" id="brandsArea" style="top:50%">
+    <div class="brands-grid" id="brandsGrid">
+      <div class="brand-logo gold">GOLD A</div>
+      <div class="brand-logo gold">GOLD B</div>
+      <div class="brand-logo">Silver 1</div>
+      <div class="brand-logo">Silver 2</div>
+      <div class="brand-logo">Silver 3</div>
+      <div class="brand-logo">Bronze 1</div>
+      <div class="brand-logo">Bronze 2</div>
+      <div class="brand-logo">Bronze 3</div>
+    </div>
+  </div>
+
+  <!-- QR BADGE -->
+  <div class="qr-badge" id="qrBadge">
+    <div class="qb-name">TU NOMBRE</div>
+    <div class="qb-role">Asistente VIP</div>
+    <div class="qb-qr" id="qrGrid"></div>
+    <div class="qb-event">EventOS 2026</div>
+  </div>
+
+  <!-- HOME -->
+  <div class="home-panels" id="homePanels">
+    <div class="home-panel">
+      <div class="hp-label">Happening Now</div>
+      <div class="hp-body"></div>
+    </div>
+    <div class="home-panel">
+      <div class="hp-label">Agenda</div>
+      <div class="hp-body"></div>
+    </div>
+    <div class="home-panel">
+      <div class="hp-label">Social Feed</div>
+      <div class="hp-body"></div>
+    </div>
+  </div>
+
+  <button class="skip-btn" id="skipBtn">Saltar &rarr;</button>
+  <button class="replay-btn" id="replayBtn">Replay</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+<script>
+// ============ CANVAS FX ============
+const canvas = document.getElementById('fx-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let W, H;
+
+function resizeCanvas() {
+  const r = canvas.parentElement.getBoundingClientRect();
+  W = canvas.width = r.width;
+  H = canvas.height = r.height;
+}
+resizeCanvas();
+
+function spawn(x, y, count, color, speed, life) {
+  for (let i = 0; i < count; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const v = (speed || 3) * (0.3 + Math.random() * 0.7);
+    particles.push({
+      x, y,
+      vx: Math.cos(a) * v,
+      vy: Math.sin(a) * v,
+      life: life || (30 + Math.random() * 30),
+      maxLife: life || 60,
+      r: 1.5 + Math.random() * 2.5,
+      color
+    });
+  }
+}
+
+// Trail particles (fly from element to pill icon)
+function spawnTrail(fromX, fromY, toX, toY, color, count) {
+  for (let i = 0; i < count; i++) {
+    const delay = i * 2;
+    const p = {
+      x: fromX + (Math.random() - 0.5) * 40,
+      y: fromY + (Math.random() - 0.5) * 40,
+      tx: toX, ty: toY,
+      life: 30 + delay,
+      maxLife: 30 + delay,
+      r: 2 + Math.random() * 2,
+      color,
+      trail: true,
+      progress: 0
+    };
+    particles.push(p);
+  }
+}
+
+let glowState = { x: 0, y: 0, r: 0, opacity: 0, color: [108, 99, 255] };
+let shockwaves = [];
+
+function triggerShockwave(x, y, r, g, b) {
+  shockwaves.push({ x, y, radius: 10, opacity: 0.5, r, g, b });
+}
+
+function renderFX() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Glow
+  if (glowState.opacity > 0.005) {
+    const gr = ctx.createRadialGradient(glowState.x, glowState.y, 0, glowState.x, glowState.y, glowState.r);
+    const [r, g, b] = glowState.color;
+    gr.addColorStop(0, `rgba(${r},${g},${b},${glowState.opacity})`);
+    gr.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = gr;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    if (p.trail) {
+      p.progress += 1 / p.maxLife;
+      const t = Math.min(p.progress, 1);
+      const ease = t * t; // ease-in
+      p.x += (p.tx - p.x) * ease * 0.15;
+      p.y += (p.ty - p.y) * ease * 0.15;
+    } else {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vx *= 0.97;
+      p.vy *= 0.97;
+    }
+    p.life--;
+    const alpha = Math.max(0, p.life / p.maxLife);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * alpha, 0, Math.PI * 2);
+    ctx.fillStyle = p.color.replace('A)', `${alpha.toFixed(2)})`);
+    ctx.fill();
+    // Glow on particle
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * alpha * 3, 0, Math.PI * 2);
+    ctx.fillStyle = p.color.replace('A)', `${(alpha * 0.15).toFixed(2)})`);
+    ctx.fill();
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+
+  // Shockwaves
+  for (let i = shockwaves.length - 1; i >= 0; i--) {
+    const s = shockwaves[i];
+    s.radius += 8;
+    s.opacity *= 0.94;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(${s.r},${s.g},${s.b},${s.opacity.toFixed(2)})`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    if (s.opacity < 0.01) shockwaves.splice(i, 1);
+  }
+
+  requestAnimationFrame(renderFX);
+}
+renderFX();
+
+// ============ QR GRID ============
+const qrGrid = document.getElementById('qrGrid');
+for (let i = 0; i < 49; i++) {
+  const d = document.createElement('div');
+  d.style.background = Math.random() > 0.4 ? '#000' : '#fff';
+  qrGrid.appendChild(d);
+}
+
+// ============ HELPERS ============
+const stageEl = document.getElementById('stage');
+const stageRect = () => stageEl.getBoundingClientRect();
+
+function getPillPos(id) {
+  const el = document.getElementById(id);
+  const pr = el.getBoundingClientRect();
+  const sr = stageRect();
+  return { x: pr.left - sr.left + 23, y: pr.top - sr.top + 23 };
+}
+
+function showLabel(category, name, desc, color) {
+  const fl = document.getElementById('featureLabel');
+  document.getElementById('flCategory').textContent = category;
+  document.getElementById('flCategory').style.color = color;
+  document.getElementById('flName').textContent = name;
+  document.getElementById('flDesc').textContent = desc;
+  return gsap.timeline()
+    .fromTo(fl, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' })
+    .to(fl, { opacity: 1, duration: 0.8 }) // hold
+    .to(fl, { opacity: 0, y: -15, duration: 0.3, ease: 'power2.in' });
+}
+
+function fillPillIcon(pillId, rgb, timeline, position) {
+  const pos = getPillPos(pillId);
+
+  timeline
+    .to(`#${pillId} .fill-bg`, {
+      scale: 1, opacity: 0.2, duration: 0.4, ease: 'back.out(2)'
+    }, position)
+    .to(`#${pillId} .fill-dot`, {
+      opacity: 1, duration: 0.25
+    }, position)
+    .to(`#${pillId} svg`, {
+      stroke: '#fff', duration: 0.2
+    }, position)
+    .to(`#${pillId} .fill-ring`, {
+      borderColor: rgb.replace('A)', '0.4)'),
+      opacity: 1,
+      duration: 0.3
+    }, position)
+    .call(() => {
+      spawn(pos.x, pos.y, 12, rgb, 2, 25);
+    }, null, position);
+}
+
+function compressTo(selectors, pillId, rgb, timeline, position) {
+  const pos = getPillPos(pillId);
+
+  timeline.to(selectors, {
+    scale: 0.1,
+    opacity: 0,
+    duration: 0.6,
+    ease: 'power3.in',
+    onStart: () => {
+      // Trail particles
+      const sr = stageRect();
+      const elements = document.querySelectorAll(selectors);
+      elements.forEach(el => {
+        const r = el.getBoundingClientRect();
+        spawnTrail(
+          r.left - sr.left + r.width / 2,
+          r.top - sr.top + r.height / 2,
+          pos.x, pos.y,
+          rgb, 5
+        );
+      });
+    }
+  }, position);
+}
+
+
+// ============ MAIN TIMELINE ============
+const tl = gsap.timeline({ paused: true,
+  onUpdate: function() {
+    gsap.set('#progressBar', { width: (this.progress() * 100) + '%' });
+  }
+});
+
+// ===== BEAT 0: PILL BAR =====
+tl.to('#pillBar', { y: 0, duration: 0.7, ease: 'back.out(1.7)', delay: 0.8 })
+  .to('#skipBtn', { opacity: 1, duration: 0.3 }, '-=0.2')
+  .call(() => {
+    glowState.x = W / 2; glowState.y = H - 50;
+    glowState.r = 250; glowState.opacity = 0.12;
+    glowState.color = [108, 99, 255];
+    gsap.to(glowState, { opacity: 0, duration: 1.2 });
+  });
+
+// ===== BEAT 1a: SPEAKERS =====
+tl.addLabel('speakers')
+  .add(showLabel('DISCOVER', 'Speakers', 'Conoce a quienes presentan', 'var(--accent)'), 'speakers')
+  .to('#speakersRow', { opacity: 1, duration: 0.01 }, 'speakers+=0.5');
+
+// FIFA card drops staggered
+['#spk1', '#spk2', '#spk3', '#spk4'].forEach((s, i) => {
+  tl.to(s, {
+    opacity: 1, rotateY: 0, y: 0, scale: 1.05, duration: 0.4,
+    ease: 'back.out(2.5)'
+  }, `speakers+=${0.7 + i * 0.25}`)
+  .to(s, {
+    scale: 1, duration: 0.2,
+    boxShadow: '0 0 30px rgba(108,99,255,0.3)',
+    ease: 'power2.out'
+  }, `speakers+=${1.0 + i * 0.25}`)
+  .call(() => {
+    const el = document.querySelector(s);
+    const r = el.getBoundingClientRect();
+    const sr = stageRect();
+    spawn(r.left - sr.left + 75, r.top - sr.top + 105, 8, 'rgba(108,99,255,A)', 2.5, 20);
+  }, null, `speakers+=${0.7 + i * 0.25}`);
+});
+
+// Hold to see them
+tl.to({}, { duration: 1.0 }, 'speakers+=2.5');
+
+// Compress to pill
+compressTo('.speaker-card', 'pill-discover', 'rgba(108,99,255,A)', tl, 'speakers+=3.5');
+fillPillIcon('pill-discover', 'rgba(108,99,255,A)', tl, 'speakers+=3.9');
+tl.set('#speakersRow', { opacity: 0 }, 'speakers+=4.2');
+
+
+// ===== BEAT 1b: AGENDA =====
+tl.addLabel('agenda', 'speakers+=4.4')
+  .add(showLabel('DISCOVER', 'Agenda', 'Tu dia completo, organizado', 'var(--accent)'), 'agenda');
+
+tl.to('#agendaRow', { opacity: 1, duration: 0.01 }, 'agenda+=0.5');
+
+// Blocks slide in staggered
+document.querySelectorAll('.agenda-block').forEach((_, i) => {
+  tl.to(`.agenda-block:nth-child(${i + 1})`, {
+    opacity: 1, x: 0, duration: 0.35, ease: 'power2.out'
+  }, `agenda+=${0.6 + i * 0.12}`);
+});
+
+// Hold
+tl.to({}, { duration: 1.0 }, 'agenda+=1.8');
+
+// Compress
+compressTo('.agenda-block', 'pill-discover', 'rgba(108,99,255,A)', tl, 'agenda+=2.8');
+tl.set('#agendaRow', { opacity: 0 }, 'agenda+=3.4');
+tl.call(() => {
+  spawn(getPillPos('pill-discover').x, getPillPos('pill-discover').y, 6, 'rgba(108,99,255,A)', 1.5, 15);
+}, null, 'agenda+=3.2');
+
+
+// ===== BEAT 2a: HAPPENING NOW =====
+tl.addLabel('live', 'agenda+=3.5')
+  .add(showLabel('LIVE', 'Happening Now', 'Lo que esta pasando ahora mismo', 'var(--accent3)'), 'live')
+  .call(() => {
+    glowState.x = W / 2; glowState.y = H / 2;
+    glowState.r = 350; glowState.opacity = 0.1;
+    glowState.color = [255, 107, 107];
+    gsap.to(glowState, { opacity: 0, duration: 2 });
+  }, null, 'live');
+
+tl.to('#hnCard', {
+  opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(2)'
+}, 'live+=0.6')
+.to('#hnCard .hn-dot', {
+  scale: 1.6, duration: 0.4, repeat: 2, yoyo: true, ease: 'sine.inOut'
+}, 'live+=0.8')
+.to('#hnBarFill', { width: '65%', duration: 1.5, ease: 'none' }, 'live+=0.8');
+
+// Hold
+tl.to({}, { duration: 0.5 }, 'live+=2.2');
+
+// Compress HN
+compressTo('#hnCard', 'pill-live', 'rgba(255,107,107,A)', tl, 'live+=2.7');
+
+
+// ===== BEAT 2b: STREAMING + CHAT + POLL =====
+tl.addLabel('stream', 'live+=3.3')
+  .add(showLabel('LIVE', 'Streaming + Chat', 'Sesiones en vivo con interaccion', 'var(--accent3)'), 'stream');
+
+tl.to('#liveComp', { opacity: 1, duration: 0.01 }, 'stream+=0.5')
+  .to('#livePlayer', { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out' }, 'stream+=0.6')
+  .to('#scanLine', { top: '100%', duration: 1.5, ease: 'none', repeat: 1 }, 'stream+=0.7')
+  .to('#liveSidebar', { opacity: 1, duration: 0.2 }, 'stream+=0.7');
+
+// Chat messages
+['#cm1', '#cm2'].forEach((c, i) => {
+  tl.to(c, { opacity: 1, x: 0, duration: 0.3, ease: 'power2.out' }, `stream+=${0.8 + i * 0.3}`);
+});
+
+// Poll
+tl.to('#pollMini', { opacity: 1, x: 0, duration: 0.3, ease: 'power2.out' }, 'stream+=1.2')
+  .to('#pollMini .pm-bar:nth-child(2) .pm-fill', { width: '42%', duration: 0.5 }, 'stream+=1.4')
+  .to('#pollMini .pm-bar:nth-child(3) .pm-fill', { width: '31%', duration: 0.4 }, 'stream+=1.5')
+  .to('#pollMini .pm-bar:nth-child(4) .pm-fill', { width: '27%', duration: 0.3 }, 'stream+=1.6');
+
+// Hold
+tl.to({}, { duration: 0.8 }, 'stream+=2.2');
+
+// Compress
+compressTo('#liveComp', 'pill-live', 'rgba(255,107,107,A)', tl, 'stream+=3.0');
+fillPillIcon('pill-live', 'rgba(255,107,107,A)', tl, 'stream+=3.4');
+tl.set('#liveComp, #hnCard', { opacity: 0 }, 'stream+=3.6');
+
+
+// ===== BEAT 3: CONNECT =====
+tl.addLabel('connect', 'stream+=3.8')
+  .add(showLabel('CONNECT', 'Networking', 'Conecta con personas afines', 'var(--accent2)'), 'connect');
+
+tl.to('#connectComp', { opacity: 1, duration: 0.01 }, 'connect+=0.5');
+
+// Profiles slide in from sides
+tl.fromTo('#profA', { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out' }, 'connect+=0.6')
+  .fromTo('#profB', { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out' }, 'connect+=0.7');
+
+// Match line + percentage
+tl.to('#mzLine', { width: 80, duration: 0.4, ease: 'power2.out' }, 'connect+=1.1')
+  .to('#mzPct', { opacity: 1, scale: 1, duration: 0.3, ease: 'back.out(3)' }, 'connect+=1.3')
+  .to('#mzBadge', { opacity: 1, scale: 1, duration: 0.25, ease: 'back.out(3)' }, 'connect+=1.5')
+  .call(() => {
+    spawn(W / 2, H / 2, 20, 'rgba(0,212,170,A)', 3, 25);
+  }, null, 'connect+=1.5');
+
+// Social card
+tl.to('#socialCard', { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 'connect+=1.0')
+  .call(() => {
+    // Animate like count
+    const el = document.getElementById('likeCount');
+    let v = 23;
+    const iv = setInterval(() => { v++; el.textContent = v; if (v >= 28) clearInterval(iv); }, 200);
+  }, null, 'connect+=1.5')
+  .to('.sc-heart', { scale: 1.2, duration: 0.15, yoyo: true, repeat: 2 }, 'connect+=1.6');
+
+// Hold
+tl.to({}, { duration: 1.0 }, 'connect+=2.0');
+
+// Compress
+compressTo('#connectComp', 'pill-connect', 'rgba(0,212,170,A)', tl, 'connect+=3.0');
+fillPillIcon('pill-connect', 'rgba(0,212,170,A)', tl, 'connect+=3.4');
+tl.set('#connectComp', { opacity: 0 }, 'connect+=3.6');
+
+
+// ===== BEAT 4: ENGAGE =====
+tl.addLabel('engage', 'connect+=3.8')
+  .add(showLabel('ENGAGE', 'Gamificacion', 'Gana puntos, sube en el ranking', 'var(--accent4)'), 'engage');
+
+tl.to('#engageComp', { opacity: 1, duration: 0.01 }, 'engage+=0.5');
+
+// Points fly up
+['#pt1', '#pt2', '#pt3'].forEach((p, i) => {
+  tl.to(p, { opacity: 1, y: -20, scale: 1.3, duration: 0.35, ease: 'power2.out' }, `engage+=${0.6 + i * 0.3}`)
+    .to(p, { opacity: 0, y: -50, duration: 0.4 }, `engage+=${0.9 + i * 0.3}`);
+});
+
+// Leaderboard
+tl.to('#lboard', { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 'engage+=0.7');
+
+// Passport stamp
+tl.to('#stampCard', {
+  opacity: 1, scale: 1, rotate: 0, duration: 0.4, ease: 'back.out(2)'
+}, 'engage+=1.0')
+.call(() => {
+  document.getElementById('stampCard').classList.add('stamped');
+  spawn(getPillPos('pill-engage').x + 300, H / 2, 15, 'rgba(255,184,0,A)', 3, 20);
+}, null, 'engage+=1.2');
+
+// Hold
+tl.to({}, { duration: 1.0 }, 'engage+=1.6');
+
+// Compress
+compressTo('#engageComp', 'pill-engage', 'rgba(255,184,0,A)', tl, 'engage+=2.6');
+fillPillIcon('pill-engage', 'rgba(255,184,0,A)', tl, 'engage+=3.0');
+tl.set('#engageComp', { opacity: 0 }, 'engage+=3.2');
+
+
+// ===== BEAT 5: BRANDS =====
+tl.addLabel('brands', 'engage+=3.4')
+  .add(showLabel('BRANDS', 'Sponsors', 'Marcas que hacen posible el evento', 'var(--accent4)'), 'brands');
+
+tl.to('#brandsGrid', { opacity: 1, duration: 0.01 }, 'brands+=0.5')
+  .to('.brand-logo', {
+    scale: 1, opacity: 1, duration: 0.25, ease: 'back.out(2)',
+    stagger: { each: 0.08, from: 'random' }
+  }, 'brands+=0.6')
+  .to('.brand-logo.gold', {
+    boxShadow: '0 0 24px rgba(255,184,0,0.25)', duration: 0.4
+  }, 'brands+=1.3');
+
+// Hold
+tl.to({}, { duration: 0.8 }, 'brands+=1.5');
+
+// Compress
+compressTo('#brandsGrid', 'pill-brands', 'rgba(255,184,0,A)', tl, 'brands+=2.3');
+fillPillIcon('pill-brands', 'rgba(255,184,0,A)', tl, 'brands+=2.7');
+tl.set('#brandsGrid', { opacity: 0 }, 'brands+=2.9');
+
+
+// ===== BEAT 6: THE DROP =====
+tl.addLabel('drop', 'brands+=3.1')
+  .call(() => {
+    glowState.x = W / 2; glowState.y = H / 2;
+    glowState.r = 400; glowState.opacity = 0.25;
+    glowState.color = [108, 99, 255];
+    spawn(W / 2, H / 2, 40, 'rgba(108,99,255,A)', 5, 40);
+    spawn(W / 2, H / 2, 25, 'rgba(0,212,170,A)', 4, 35);
+  }, null, 'drop');
+
+// QR Badge
+tl.to('#qrBadge', {
+  opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(2)'
+}, 'drop+=0.2')
+.to('#qrBadge', {
+  borderColor: 'rgba(108,99,255,0.5)',
+  boxShadow: '0 0 50px rgba(108,99,255,0.2), 0 0 100px rgba(108,99,255,0.1)',
+  duration: 0.5
+}, 'drop+=0.5');
+
+fillPillIcon('pill-you', 'rgba(108,99,255,A)', tl, 'drop+=0.7');
+
+// Label
+tl.add(showLabel('TU IDENTIDAD', 'Tu Badge', 'Listo para el evento', 'var(--accent)'), 'drop+=0.3');
+
+// Shockwaves
+tl.call(() => {
+  triggerShockwave(W / 2, H - 50, 108, 99, 255);
+}, null, 'drop+=1.2')
+.call(() => {
+  triggerShockwave(W / 2, H - 50, 0, 212, 170);
+}, null, 'drop+=1.5')
+.call(() => {
+  gsap.to(glowState, { opacity: 0, duration: 1 });
+}, null, 'drop+=1.5');
+
+// Badge out
+tl.to('#qrBadge', { scale: 0.7, opacity: 0, duration: 0.5, ease: 'power2.in' }, 'drop+=2.5');
+
+// Home panels
+tl.to('#homePanels', { opacity: 1, duration: 0.3 }, 'drop+=3.0')
+  .to('.home-panel', {
+    opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.12
+  }, 'drop+=3.1')
+  .to('#skipBtn', { opacity: 0, duration: 0.2 }, 'drop+=3.0')
+  .to('#replayBtn', { opacity: 1, duration: 0.4 }, 'drop+=3.8');
+
+
+// ============ CONTROLS ============
+document.getElementById('skipBtn').addEventListener('click', () => {
+  tl.progress(1);
+});
+
+document.getElementById('replayBtn').addEventListener('click', () => {
+  // Reset everything
+  particles = [];
+  shockwaves = [];
+  glowState.opacity = 0;
+  document.getElementById('stampCard').classList.remove('stamped');
+  document.getElementById('likeCount').textContent = '23';
+
+  gsap.set('.speaker-card', { opacity: 0, y: -60, rotateY: 90, scale: 0.7, boxShadow: 'none' });
+  gsap.set('#speakersRow, #agendaRow', { opacity: 0 });
+  gsap.set('.agenda-block', { opacity: 0, x: 80 });
+  gsap.set('#hnCard', { opacity: 0, scale: 0.8 });
+  gsap.set('#hnBarFill', { width: 0 });
+  gsap.set('#liveComp', { opacity: 0, scale: 1 });
+  gsap.set('#livePlayer', { opacity: 0, scale: 0.9 });
+  gsap.set('#scanLine', { top: 0 });
+  gsap.set('#liveSidebar', { opacity: 0 });
+  gsap.set('.chat-msg', { opacity: 0, x: 30 });
+  gsap.set('#pollMini', { opacity: 0, x: 30 });
+  gsap.set('.pm-fill', { width: 0 });
+  gsap.set('#connectComp', { opacity: 0, scale: 1 });
+  gsap.set('#profA', { opacity: 0, x: -60 });
+  gsap.set('#profB', { opacity: 0, x: 60 });
+  gsap.set('#mzLine', { width: 0 });
+  gsap.set('#mzPct, #mzBadge', { opacity: 0, scale: 0 });
+  gsap.set('#socialCard', { opacity: 0, y: 30 });
+  gsap.set('.sc-heart', { scale: 1 });
+  gsap.set('#engageComp', { opacity: 0, scale: 1 });
+  gsap.set('.pt-fly', { opacity: 0, y: 0, scale: 1 });
+  gsap.set('#lboard', { opacity: 0, y: 20 });
+  gsap.set('#stampCard', { opacity: 0, scale: 1.8, rotate: -15 });
+  gsap.set('#brandsGrid', { opacity: 0, scale: 1 });
+  gsap.set('.brand-logo', { opacity: 0, scale: 0, boxShadow: 'none' });
+  gsap.set('#qrBadge', { opacity: 0, scale: 0, borderColor: 'rgba(108,99,255,0.15)', boxShadow: 'none' });
+  gsap.set('#homePanels', { opacity: 0 });
+  gsap.set('.home-panel', { opacity: 0, y: 20 });
+  gsap.set('#replayBtn', { opacity: 0 });
+  gsap.set('#featureLabel', { opacity: 0 });
+  gsap.set('.pill-bar', { y: 100 });
+  gsap.set('.pill-icon .fill-bg', { scale: 0, opacity: 0 });
+  gsap.set('.pill-icon .fill-dot', { opacity: 0 });
+  gsap.set('.pill-icon .fill-ring', { borderColor: 'transparent', opacity: 0 });
+  gsap.set('.pill-icon svg', { stroke: 'rgba(255,255,255,0.12)' });
+  gsap.set('#progressBar', { width: 0 });
+  gsap.set('#skipBtn', { opacity: 0 });
+
+  tl.restart();
+});
+
+// Auto play
+tl.play();
+</script>
+
+</body>
+</html>

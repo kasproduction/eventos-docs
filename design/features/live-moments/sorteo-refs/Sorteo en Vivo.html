@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Sorteo en Vivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0A0A;
+    --amber: #E8A93E;
+    --amber-soft: #E8A93E;
+    --white: #FFFFFF;
+    --muted: rgba(255,255,255,0.55);
+    --dim: rgba(255,255,255,0.32);
+    --faint: rgba(255,255,255,0.18);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow: hidden;
+  }
+  #stage-wrap {
+    position: fixed; inset: 0;
+    display: grid; place-items: center;
+    background: #000;
+  }
+  #stage {
+    position: relative;
+    width: 1920px; height: 1080px;
+    transform-origin: center center;
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .scanlines {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.012) 0px,
+      rgba(255,255,255,0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    z-index: 50;
+    mix-blend-mode: overlay;
+  }
+  .vignette {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+    z-index: 40;
+  }
+
+  /* Top chrome */
+  .top-bar {
+    position: absolute;
+    top: 56px; left: 80px; right: 80px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 20;
+  }
+  .session {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .live {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.72);
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #4ADE80;
+    box-shadow: 0 0 12px rgba(74,222,128,0.8);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.85); }
+  }
+
+  /* Particles */
+  #particles {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: var(--amber);
+    border-radius: 50%;
+    opacity: 0;
+  }
+
+  /* ===== CASCADE ===== */
+  .cascade {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0;
+    transition: opacity 600ms ease;
+    pointer-events: none;
+  }
+  .cascade.active { opacity: 1; pointer-events: auto; }
+
+  .cascade-glow {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 900px; height: 900px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(232,169,62,0.22) 0%, rgba(232,169,62,0.08) 30%, transparent 65%);
+    filter: blur(20px);
+    z-index: 1;
+  }
+
+  .eyebrow {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 22px;
+    position: relative; z-index: 10;
+  }
+  .eyebrow::before, .eyebrow::after {
+    content: '';
+    display: inline-block;
+    width: 28px; height: 1px;
+    background: var(--faint);
+    vertical-align: middle;
+    margin: 0 18px;
+  }
+  .prize {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--amber);
+    letter-spacing: 0.04em;
+    margin-bottom: 52px;
+    position: relative; z-index: 10;
+  }
+
+  .photo-wrap {
+    position: relative;
+    width: 280px; height: 280px;
+    z-index: 10;
+    margin-bottom: 36px;
+  }
+  .photo-ring {
+    position: absolute; inset: -18px;
+    border-radius: 46px;
+    background: radial-gradient(circle, rgba(232,169,62,0.45) 0%, rgba(232,169,62,0.15) 55%, transparent 75%);
+    filter: blur(12px);
+    animation: ringPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes ringPulse {
+    0%,100% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.04); }
+  }
+  .photo {
+    position: relative;
+    width: 100%; height: 100%;
+    border-radius: 28px;
+    overflow: hidden;
+    background: #1a1a1a;
+    box-shadow: 0 0 0 1px rgba(232,169,62,0.35), 0 30px 80px rgba(0,0,0,0.7);
+  }
+  .photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo.cycling img {
+    filter: blur(1.2px) saturate(1.05);
+  }
+  .photo-flash {
+    position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(232,169,62,0.15) 50%, transparent 70%);
+    animation: flash 0.22s linear infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes flash {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .participant-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.78);
+    letter-spacing: 0.01em;
+    position: relative; z-index: 10;
+    margin-bottom: 10px;
+    font-variant-numeric: tabular-nums;
+    transition: opacity 80ms;
+  }
+  .participant-count {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--dim);
+    position: relative; z-index: 10;
+  }
+
+  /* Cycling strip preview below */
+  .cycle-strip {
+    position: absolute;
+    bottom: 90px; left: 0; right: 0;
+    display: flex; justify-content: center; gap: 14px;
+    z-index: 10;
+    opacity: 0.35;
+  }
+  .cycle-thumb {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #1a1a1a;
+    flex-shrink: 0;
+  }
+  .cycle-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .cycle-thumb.center {
+    opacity: 1;
+    transform: scale(1.08);
+    box-shadow: 0 0 0 1px var(--amber);
+  }
+
+  /* ===== WINNER ===== */
+  .winner {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0;
+    transition: opacity 700ms ease;
+    pointer-events: none;
+  }
+  .winner.active { opacity: 1; pointer-events: auto; }
+
+  .winner-glow {
+    position: absolute;
+    top: 42%; left: 50%;
+    width: 1400px; height: 1400px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle,
+      rgba(232,169,62,0.38) 0%,
+      rgba(232,169,62,0.20) 18%,
+      rgba(232,169,62,0.08) 38%,
+      transparent 65%);
+    filter: blur(24px);
+    z-index: 1;
+    animation: winnerGlow 3.5s ease-in-out infinite;
+  }
+  @keyframes winnerGlow {
+    0%,100% { opacity: 0.85; }
+    50% { opacity: 1; }
+  }
+
+  .winner-eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 38px;
+    position: relative; z-index: 10;
+  }
+
+  .winner-photo-wrap {
+    position: relative;
+    width: 380px; height: 380px;
+    z-index: 10;
+    margin-bottom: 46px;
+  }
+  .winner-photo-halo {
+    position: absolute; inset: -80px;
+    border-radius: 120px;
+    background: radial-gradient(circle, rgba(232,169,62,0.5) 0%, rgba(232,169,62,0.18) 45%, transparent 70%);
+    filter: blur(40px);
+    opacity: 0.4;
+    animation: haloBreathe 2.8s ease-in-out infinite;
+  }
+  @keyframes haloBreathe {
+    0%,100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(1.06); }
+  }
+  .winner-photo {
+    position: relative;
+    width: 100%; height: 100%;
+    border-radius: 36px;
+    overflow: hidden;
+    border: 3px solid var(--amber);
+    box-shadow:
+      0 0 0 1px rgba(232,169,62,0.3),
+      0 40px 120px rgba(0,0,0,0.9),
+      0 0 80px rgba(232,169,62,0.3);
+  }
+  .winner-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .ganador-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 28px;
+    position: relative; z-index: 10;
+    text-indent: 0.5em;
+  }
+  .ganador-label::before, .ganador-label::after {
+    content: '';
+    display: inline-block;
+    width: 32px; height: 1px;
+    background: var(--amber);
+    vertical-align: middle;
+    margin: 0 20px;
+    opacity: 0.6;
+  }
+  .winner-name {
+    font-size: 84px;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    margin-bottom: 32px;
+    position: relative; z-index: 10;
+    text-align: center;
+    text-shadow: 0 4px 40px rgba(0,0,0,0.5);
+  }
+  .winner-prize {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--amber);
+    letter-spacing: 0.04em;
+    position: relative; z-index: 10;
+  }
+  .winner-prize-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 8px;
+    position: relative; z-index: 10;
+  }
+
+  /* Confetti */
+  #confetti {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    z-index: 30;
+    overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute;
+    background: var(--amber);
+    top: -30px;
+    will-change: transform, opacity;
+  }
+
+  /* Tweaks panel */
+  .tweaks {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    z-index: 1000;
+    background: rgba(20,20,20,0.94);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 18px;
+    width: 280px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #fff;
+    display: none;
+    transform-origin: bottom right;
+  }
+  .tweaks.open { display: block; }
+  .tweaks h3 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 14px;
+  }
+  .tweak-row {
+    display: flex; flex-direction: column; gap: 6px;
+    margin-bottom: 14px;
+  }
+  .tweak-row label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.04em;
+  }
+  .tweak-row input[type="text"], .tweak-row select {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: #fff;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .tweak-btn-row {
+    display: flex; gap: 6px;
+  }
+  .tweak-btn {
+    flex: 1;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 11px;
+    font-family: inherit;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 150ms;
+  }
+  .tweak-btn:hover { background: rgba(255,255,255,0.1); }
+  .tweak-btn.active {
+    background: var(--amber);
+    color: #0A0A0A;
+    border-color: var(--amber);
+  }
+  .tweak-btn.primary {
+    background: var(--amber);
+    color: #0A0A0A;
+    border-color: var(--amber);
+  }
+</style>
+</head>
+<body>
+
+<div id="stage-wrap">
+  <div id="stage">
+    <!-- Particles -->
+    <div id="particles"></div>
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="session" id="sessionName">Keynote: El Futuro de la IA</div>
+      <div class="live"><span class="live-dot"></span><span>LIVE</span></div>
+    </div>
+
+    <!-- ===== CASCADE SCREEN ===== -->
+    <div class="cascade active" id="cascadeScreen">
+      <div class="cascade-glow"></div>
+      <div class="eyebrow">Sorteo en Vivo</div>
+      <div class="prize" id="prizeCascade">MacBook Pro 14"</div>
+
+      <div class="photo-wrap">
+        <div class="photo-ring"></div>
+        <div class="photo cycling" id="heroPhoto">
+          <img id="heroImg" alt="" />
+          <div class="photo-flash"></div>
+        </div>
+      </div>
+
+      <div class="participant-name" id="participantName">Sofia Torres</div>
+      <div class="participant-count"><span id="participantCount">15</span> Participantes</div>
+
+      <div class="cycle-strip" id="cycleStrip"></div>
+    </div>
+
+    <!-- ===== WINNER SCREEN ===== -->
+    <div class="winner" id="winnerScreen">
+      <div class="winner-glow"></div>
+      <div class="winner-eyebrow" id="sessionNameWinner">Keynote: El Futuro de la IA</div>
+
+      <div class="winner-photo-wrap">
+        <div class="winner-photo-halo"></div>
+        <div class="winner-photo">
+          <img id="winnerImg" alt="" />
+        </div>
+      </div>
+
+      <div class="ganador-label">Ganador</div>
+      <div class="winner-name" id="winnerName">CAMILA ROJAS</div>
+      <div class="winner-prize-label">Premio</div>
+      <div class="winner-prize" id="prizeWinner">MacBook Pro 14"</div>
+    </div>
+
+    <!-- Confetti layer -->
+    <div id="confetti"></div>
+
+    <!-- Overlays -->
+    <div class="vignette"></div>
+    <div class="scanlines"></div>
+  </div>
+</div>
+
+<!-- Tweaks panel -->
+<div class="tweaks" id="tweaksPanel">
+  <h3>Tweaks</h3>
+
+  <div class="tweak-row">
+    <label>State</label>
+    <div class="tweak-btn-row">
+      <button class="tweak-btn active" data-state="cascade">Cascade</button>
+      <button class="tweak-btn" data-state="winner">Winner</button>
+    </div>
+  </div>
+
+  <div class="tweak-row">
+    <label>Session</label>
+    <input type="text" id="twSession" value="Keynote: El Futuro de la IA" />
+  </div>
+
+  <div class="tweak-row">
+    <label>Prize</label>
+    <input type="text" id="twPrize" value='MacBook Pro 14"' />
+  </div>
+
+  <div class="tweak-row">
+    <label>Winner name</label>
+    <input type="text" id="twWinner" value="CAMILA ROJAS" />
+  </div>
+
+  <div class="tweak-row">
+    <label>Cycle speed</label>
+    <select id="twSpeed">
+      <option value="60">Fast (60ms)</option>
+      <option value="110" selected>Normal (110ms)</option>
+      <option value="180">Slow (180ms)</option>
+    </select>
+  </div>
+
+  <div class="tweak-row">
+    <button class="tweak-btn primary" id="btnReveal">▶ Reveal Winner</button>
+  </div>
+  <div class="tweak-row">
+    <button class="tweak-btn" id="btnRestart">↻ Restart Cascade</button>
+  </div>
+</div>
+
+<script>
+  // ====== TWEAK DEFAULTS (persisted via editmode) ======
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "session": "Keynote: El Futuro de la IA",
+    "prize": "MacBook Pro 14\"",
+    "winnerName": "CAMILA ROJAS",
+    "cycleSpeed": 110,
+    "state": "winner"
+  }/*EDITMODE-END*/;
+
+  // ====== SCALE STAGE ======
+  function scaleStage() {
+    const stage = document.getElementById('stage');
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const s = Math.min(w / 1920, h / 1080);
+    stage.style.transform = `scale(${s})`;
+  }
+  window.addEventListener('resize', scaleStage);
+  scaleStage();
+
+  // ====== PARTICIPANTS (15) — using initials-based avatars as placeholders ======
+  const PARTICIPANTS = [
+    { name: "Sofia Torres",    hue: 14  },
+    { name: "Diego Ramírez",   hue: 210 },
+    { name: "Valentina Cruz",  hue: 340 },
+    { name: "Mateo Herrera",   hue: 160 },
+    { name: "Isabella Mora",   hue: 280 },
+    { name: "Lucas Peña",      hue: 40  },
+    { name: "Camila Rojas",    hue: 28  },
+    { name: "Tomás Vega",      hue: 200 },
+    { name: "Emilia Castro",   hue: 320 },
+    { name: "Joaquín Silva",   hue: 100 },
+    { name: "Renata Ortiz",    hue: 260 },
+    { name: "Andrés Fuentes",  hue: 180 },
+    { name: "Martina Soto",    hue: 360 },
+    { name: "Bruno Navarro",   hue: 60  },
+    { name: "Antonia León",    hue: 240 }
+  ];
+
+  // Generate a placeholder "photo" — subtle gradient + initials, styled to look like a real portrait thumbnail
+  function makeAvatar(name, hue) {
+    const initials = name.split(' ').map(s => s[0]).slice(0,2).join('');
+    const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <radialGradient id="g${hue}" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="hsl(${hue}, 35%, 42%)"/>
+      <stop offset="60%" stop-color="hsl(${hue}, 30%, 22%)"/>
+      <stop offset="100%" stop-color="hsl(${hue}, 28%, 12%)"/>
+    </radialGradient>
+    <linearGradient id="shade${hue}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.08)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.25)"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#g${hue})"/>
+  <rect width="400" height="400" fill="url(#shade${hue})"/>
+  <!-- abstract portrait silhouette -->
+  <ellipse cx="200" cy="170" rx="72" ry="82" fill="rgba(255,255,255,0.14)"/>
+  <path d="M 80 400 Q 80 280 200 275 Q 320 280 320 400 Z" fill="rgba(255,255,255,0.12)"/>
+  <text x="200" y="230" font-family="Plus Jakarta Sans, sans-serif" font-size="110" font-weight="800" fill="rgba(255,255,255,0.85)" text-anchor="middle" letter-spacing="-2">${initials}</text>
+</svg>`.trim();
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+  }
+
+  PARTICIPANTS.forEach(p => p.src = makeAvatar(p.name, p.hue));
+
+  // Prime image srcs immediately so browser never requests an empty src
+  document.getElementById('heroImg').src = PARTICIPANTS[0].src;
+  document.getElementById('winnerImg').src = PARTICIPANTS[0].src;
+
+  // ====== STATE ======
+  let state = {
+    mode: TWEAK_DEFAULTS.state,              // 'cascade' | 'winner'
+    cycleSpeed: TWEAK_DEFAULTS.cycleSpeed,
+    session: TWEAK_DEFAULTS.session,
+    prize: TWEAK_DEFAULTS.prize,
+    winnerName: TWEAK_DEFAULTS.winnerName
+  };
+  let cycleIdx = 0;
+  let cycleTimer = null;
+
+  // ====== CASCADE CYCLING ======
+  const heroImg = document.getElementById('heroImg');
+  const heroPhoto = document.getElementById('heroPhoto');
+  const participantNameEl = document.getElementById('participantName');
+  const participantCountEl = document.getElementById('participantCount');
+  const cycleStrip = document.getElementById('cycleStrip');
+
+  function renderCycleStrip(centerIdx) {
+    cycleStrip.innerHTML = '';
+    const offsets = [-3,-2,-1,0,1,2,3];
+    offsets.forEach(off => {
+      const i = ((centerIdx + off) % PARTICIPANTS.length + PARTICIPANTS.length) % PARTICIPANTS.length;
+      const div = document.createElement('div');
+      div.className = 'cycle-thumb' + (off === 0 ? ' center' : '');
+      div.innerHTML = `<img src="${PARTICIPANTS[i].src}" alt="" />`;
+      cycleStrip.appendChild(div);
+    });
+  }
+
+  function tickCascade() {
+    cycleIdx = (cycleIdx + 1) % PARTICIPANTS.length;
+    const p = PARTICIPANTS[cycleIdx];
+    heroImg.src = p.src;
+    participantNameEl.style.opacity = '0';
+    setTimeout(() => {
+      participantNameEl.textContent = p.name;
+      participantNameEl.style.opacity = '0.78';
+    }, 40);
+    renderCycleStrip(cycleIdx);
+  }
+
+  function startCascade() {
+    stopCascade();
+    heroPhoto.classList.add('cycling');
+    participantCountEl.textContent = PARTICIPANTS.length;
+    tickCascade();
+    cycleTimer = setInterval(tickCascade, state.cycleSpeed);
+  }
+  function stopCascade() {
+    if (cycleTimer) clearInterval(cycleTimer);
+    cycleTimer = null;
+  }
+
+  // ====== WINNER ======
+  const winnerImg = document.getElementById('winnerImg');
+  const winnerNameEl = document.getElementById('winnerName');
+  const sessionNameWinner = document.getElementById('sessionNameWinner');
+  const prizeWinner = document.getElementById('prizeWinner');
+  const confettiLayer = document.getElementById('confetti');
+
+  function pickWinnerSrc() {
+    // match by name if possible, otherwise use current cycle idx or first
+    const byName = PARTICIPANTS.find(p => p.name.toUpperCase() === state.winnerName.toUpperCase());
+    if (byName) return byName.src;
+    return PARTICIPANTS[cycleIdx]?.src || PARTICIPANTS[0].src;
+  }
+
+  function setMode(mode) {
+    state.mode = mode;
+    const cascadeEl = document.getElementById('cascadeScreen');
+    const winnerEl = document.getElementById('winnerScreen');
+    if (mode === 'cascade') {
+      cascadeEl.classList.add('active');
+      winnerEl.classList.remove('active');
+      startCascade();
+      clearConfetti();
+    } else {
+      stopCascade();
+      cascadeEl.classList.remove('active');
+      winnerEl.classList.add('active');
+      winnerImg.src = pickWinnerSrc();
+      winnerNameEl.textContent = state.winnerName;
+      // Fire confetti
+      fireConfetti();
+    }
+    // Update tweak buttons
+    document.querySelectorAll('[data-state]').forEach(b => {
+      b.classList.toggle('active', b.dataset.state === mode);
+    });
+    persist({ state: mode });
+  }
+
+  // ====== CONFETTI — amber geometric rectangles ======
+  function fireConfetti() {
+    clearConfetti();
+    const count = 90;
+    const shades = ['#E8A93E', '#F4C170', '#C4872A', '#FFD98A', '#B5761F'];
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      const w = 6 + Math.random() * 10;
+      const h = 14 + Math.random() * 22;
+      piece.style.width = w + 'px';
+      piece.style.height = h + 'px';
+      piece.style.background = shades[Math.floor(Math.random() * shades.length)];
+      piece.style.left = (Math.random() * 100) + '%';
+      piece.style.opacity = (0.75 + Math.random() * 0.25).toString();
+      const rot = Math.random() * 360;
+      const drift = (Math.random() - 0.5) * 400;
+      const dur = 3200 + Math.random() * 2400;
+      const delay = Math.random() * 800;
+      piece.style.transform = `translate(0, -40px) rotate(${rot}deg)`;
+      piece.animate([
+        { transform: `translate(0, -40px) rotate(${rot}deg)`, opacity: 0 },
+        { transform: `translate(${drift*0.3}px, 200px) rotate(${rot+180}deg)`, opacity: 1, offset: 0.1 },
+        { transform: `translate(${drift}px, 1120px) rotate(${rot+720}deg)`, opacity: 0.9 }
+      ], {
+        duration: dur,
+        delay: delay,
+        easing: 'cubic-bezier(0.2, 0.6, 0.4, 1)',
+        fill: 'forwards'
+      });
+      confettiLayer.appendChild(piece);
+    }
+    // Repeat every 4.5s while on winner screen
+    if (state.mode === 'winner') {
+      setTimeout(() => { if (state.mode === 'winner') fireConfetti(); }, 4500);
+    }
+  }
+  function clearConfetti() {
+    confettiLayer.innerHTML = '';
+  }
+
+  // ====== PARTICLES (ambient) ======
+  function initParticles() {
+    const layer = document.getElementById('particles');
+    const n = 40;
+    for (let i = 0; i < n; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 1 + Math.random() * 2.5;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.left = (Math.random() * 100) + '%';
+      p.style.top = (Math.random() * 100) + '%';
+      p.style.background = Math.random() > 0.6 ? '#E8A93E' : '#FFFFFF';
+      const dur = 6000 + Math.random() * 8000;
+      const delay = Math.random() * 8000;
+      p.animate([
+        { opacity: 0, transform: 'translateY(0)' },
+        { opacity: 0.4, offset: 0.3 },
+        { opacity: 0.4, offset: 0.7 },
+        { opacity: 0, transform: `translateY(-${80 + Math.random()*120}px)` }
+      ], { duration: dur, delay: delay, iterations: Infinity, easing: 'ease-in-out' });
+      layer.appendChild(p);
+    }
+  }
+  initParticles();
+
+  // ====== TWEAK PERSISTENCE ======
+  function persist(edits) {
+    try {
+      window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+    } catch(e) {}
+  }
+
+  // ====== TWEAK PANEL WIRING ======
+  const twSession = document.getElementById('twSession');
+  const twPrize = document.getElementById('twPrize');
+  const twWinner = document.getElementById('twWinner');
+  const twSpeed = document.getElementById('twSpeed');
+
+  twSession.value = state.session;
+  twPrize.value = state.prize;
+  twWinner.value = state.winnerName;
+  twSpeed.value = state.cycleSpeed;
+
+  function updateSession() {
+    state.session = twSession.value;
+    document.getElementById('sessionName').textContent = state.session;
+    sessionNameWinner.textContent = state.session;
+    persist({ session: state.session });
+  }
+  function updatePrize() {
+    state.prize = twPrize.value;
+    document.getElementById('prizeCascade').textContent = state.prize;
+    prizeWinner.textContent = state.prize;
+    persist({ prize: state.prize });
+  }
+  function updateWinner() {
+    state.winnerName = twWinner.value.toUpperCase();
+    winnerNameEl.textContent = state.winnerName;
+    persist({ winnerName: state.winnerName });
+  }
+  function updateSpeed() {
+    state.cycleSpeed = parseInt(twSpeed.value, 10);
+    if (state.mode === 'cascade') startCascade();
+    persist({ cycleSpeed: state.cycleSpeed });
+  }
+
+  twSession.addEventListener('input', updateSession);
+  twPrize.addEventListener('input', updatePrize);
+  twWinner.addEventListener('input', updateWinner);
+  twSpeed.addEventListener('change', updateSpeed);
+
+  document.querySelectorAll('[data-state]').forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.state));
+  });
+  document.getElementById('btnReveal').addEventListener('click', () => setMode('winner'));
+  document.getElementById('btnRestart').addEventListener('click', () => setMode('cascade'));
+
+  // Apply initial values
+  updateSession();
+  updatePrize();
+
+  // ====== INIT ======
+  setMode(state.mode);
+
+  // ====== EDIT MODE (Tweaks toggle) ======
+  const tweaksPanel = document.getElementById('tweaksPanel');
+  window.addEventListener('message', (e) => {
+    if (!e.data || typeof e.data !== 'object') return;
+    if (e.data.type === '__activate_edit_mode') {
+      tweaksPanel.classList.add('open');
+    } else if (e.data.type === '__deactivate_edit_mode') {
+      tweaksPanel.classList.remove('open');
+    }
+  });
+  try {
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+  } catch(e) {}
+
+  // ====== Keyboard shortcut: Spacebar to reveal, R to restart ======
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      setMode(state.mode === 'cascade' ? 'winner' : 'cascade');
+    } else if (e.key === 'r' || e.key === 'R') {
+      setMode('cascade');
+    }
+  });
+</script>
+
+</body>
+</html>

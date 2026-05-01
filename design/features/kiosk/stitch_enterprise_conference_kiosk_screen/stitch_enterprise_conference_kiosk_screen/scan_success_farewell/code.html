@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scan Result - Success OUT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#393844",
+                    "on-surface": "#e4e1f0",
+                    "tertiary-container": "#08a56e",
+                    "on-surface-variant": "#bdcac0",
+                    "on-tertiary-fixed": "#002112",
+                    "on-primary-container": "#282a2a",
+                    "error-container": "#93000a",
+                    "primary": "#c6c6c7",
+                    "tertiary-fixed": "#7bfabb",
+                    "outline-variant": "#3e4942",
+                    "surface-dim": "#12121d",
+                    "on-tertiary": "#003823",
+                    "on-primary": "#2f3131",
+                    "on-error-container": "#ffdad6",
+                    "error": "#ffb4ab",
+                    "outline": "#87948b",
+                    "primary-fixed-dim": "#c6c6c7",
+                    "on-secondary": "#003824",
+                    "on-tertiary-container": "#00311d",
+                    "on-secondary-fixed": "#002113",
+                    "on-primary-fixed-variant": "#454747",
+                    "inverse-on-surface": "#302f3b",
+                    "inverse-primary": "#5d5f5f",
+                    "background": "#12121d",
+                    "secondary": "#6edba7",
+                    "surface-container-low": "#1b1b25",
+                    "secondary-fixed": "#8bf8c2",
+                    "on-background": "#e4e1f0",
+                    "surface-container-high": "#292934",
+                    "surface-tint": "#c6c6c7",
+                    "tertiary": "#5ddda1",
+                    "surface-variant": "#34343f",
+                    "surface-container-highest": "#34343f",
+                    "on-secondary-fixed-variant": "#005235",
+                    "surface-container-lowest": "#0d0d17",
+                    "secondary-fixed-dim": "#6edba7",
+                    "tertiary-fixed-dim": "#5ddda1",
+                    "primary-container": "#909191",
+                    "primary-fixed": "#e2e2e2",
+                    "on-secondary-container": "#00311e",
+                    "secondary-container": "#30a374",
+                    "inverse-surface": "#e4e1f0",
+                    "surface-container": "#1f1f29",
+                    "on-error": "#690005",
+                    "surface": "#12121d",
+                    "on-tertiary-fixed-variant": "#005234",
+                    "on-primary-fixed": "#1a1c1c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #12121d;
+            color: #e4e1f0;
+            margin: 0;
+            overflow: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-overlay {
+            background: linear-gradient(180deg, rgba(10, 26, 47, 0.95) 0%, rgba(13, 13, 23, 1) 100%);
+            backdrop-filter: blur(40px);
+        }
+        .ambient-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(110, 219, 167, 0.08) 0%, rgba(110, 219, 167, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body selection:bg-secondary/30">
+<!-- Main Success Overlay Canvas -->
+<main class="relative h-screen w-full flex flex-col justify-between items-center glass-overlay overflow-hidden">
+<!-- Background Ambient Accents -->
+<div class="ambient-glow -top-48 -right-48"></div>
+<div class="ambient-glow -bottom-48 -left-48"></div>
+<!-- Top AppBar Integration -->
+<header class="flex justify-between items-center w-full px-12 py-8 bg-gradient-to-b from-[#12121d] to-transparent z-10">
+<div class="flex flex-col">
+<span class="font-headline tracking-[0.05em] uppercase text-sm font-semibold text-[#c6c6c7]">CONFERENCE ROOM 402</span>
+<span class="font-label text-[10px] text-on-surface-variant tracking-widest mt-1">SANTANDER TOWER · LEVEL 14</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-primary font-bold text-xs">
+                402
+            </div>
+</header>
+<!-- Center Content: The Confirmation Journey -->
+<section class="flex-grow flex flex-col justify-center items-start w-full px-12 max-w-4xl self-center z-10">
+<!-- Status Beacon -->
+<div class="mb-12">
+<div class="inline-flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_15px_rgba(110,219,167,0.6)]"></div>
+<span class="font-label text-secondary tracking-[0.15em] text-xs font-bold uppercase">Departure Confirmed</span>
+</div>
+</div>
+<!-- Main Identity Block -->
+<div class="space-y-4">
+<h2 class="font-headline text-on-surface-variant text-sm tracking-[0.3em] uppercase opacity-60">Goodbye</h2>
+<h1 class="font-headline text-6xl md:text-8xl font-extrabold text-on-surface tracking-tighter leading-none">
+                    MARCUS<br/>HOLLOWAY
+                </h1>
+</div>
+<!-- Asymmetric Data Visualization -->
+<div class="mt-20 w-full flex flex-col md:flex-row gap-16 items-start md:items-end">
+<div class="flex flex-col border-l border-outline-variant/30 pl-8">
+<span class="font-label text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/50 mb-2">Duration</span>
+<span class="font-body text-4xl font-light text-on-surface flex items-baseline gap-2">
+                        42 <span class="text-sm font-headline tracking-widest text-secondary uppercase font-bold">Minutes Spent</span>
+</span>
+</div>
+<div class="flex flex-col border-l border-outline-variant/30 pl-8">
+<span class="font-label text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/50 mb-2">Next Availability</span>
+<span class="font-body text-4xl font-light text-on-surface flex items-baseline gap-2">
+                        14:00 <span class="text-sm font-headline tracking-widest text-on-surface-variant uppercase font-medium">PM Today</span>
+</span>
+</div>
+</div>
+</section>
+<!-- Final Message & Interactive Layer -->
+<section class="w-full px-12 pb-24 z-10">
+<div class="flex flex-col items-center">
+<div class="w-px h-24 bg-gradient-to-b from-secondary/40 to-transparent mb-12"></div>
+<h3 class="font-headline text-2xl tracking-[0.5em] text-primary font-extralight uppercase opacity-90">
+                    HASTA LUEGO
+                </h3>
+</div>
+</section>
+<!-- Bottom UI Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-center gap-24 items-center pb-10 bg-[#0d0d17]/80 backdrop-blur-xl">
+<button class="flex flex-col items-center justify-center text-[#c6c6c7]/40 pt-4 hover:text-[#c6c6c7] transition-all duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_today">calendar_today</span>
+<span class="font-['Plus_Jakarta_Sans'] tracking-[0.05em] text-[10px] font-bold">SCHEDULE</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#c6c6c7]/40 pt-4 hover:text-[#c6c6c7] transition-all duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="add_box">add_box</span>
+<span class="font-['Plus_Jakarta_Sans'] tracking-[0.05em] text-[10px] font-bold">RESERVE</span>
+</button>
+</nav>
+<!-- Signature Editorial Texture (Portrait Edge) -->
+<div class="absolute right-0 top-0 h-full w-2 flex flex-col">
+<div class="flex-1 bg-secondary/10"></div>
+<div class="flex-1 bg-surface-container-high"></div>
+<div class="flex-1 bg-secondary/20"></div>
+</div>
+</main>
+<!-- Visual Artifacts -->
+<div class="fixed inset-0 pointer-events-none z-0">
+<div class="absolute top-1/4 left-1/4 w-[120%] h-[120%] bg-gradient-to-br from-secondary/5 via-transparent to-transparent -rotate-12 opacity-50"></div>
+</div>
+</body></html>

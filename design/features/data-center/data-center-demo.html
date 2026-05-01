@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Center — EventOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Urbanist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0A0A0A; --bg-1:#0E0E0E; --bg-2:#141414; --bg-3:#1A1A1A;
+  --card:rgba(255,255,255,0.03); --card-hi:rgba(255,255,255,0.05);
+  --b:rgba(255,255,255,0.06); --b-hi:rgba(255,255,255,0.10); --b-st:rgba(255,255,255,0.14);
+  --t:#FFFFFF; --t2:rgba(255,255,255,0.6); --t3:rgba(255,255,255,0.4);
+  --t4:rgba(255,255,255,0.25); --t5:rgba(255,255,255,0.15);
+  --teal:#39D2C0; --green:#3BBF7A; --red:#DC4A4A; --amber:#E8A93E;
+  --blue:#5B8DEF; --violet:#A78BFA; --pink:#F472B6; --cyan:#67E8F9;
+  --slate:#94A3B8; --platinum:#B5A68B;
+  --r:8px; --r-s:6px; --r-l:12px;
+  --f:'Urbanist',system-ui,sans-serif;
+  --fh:'Plus Jakarta Sans',var(--f);
+  --fm:'JetBrains Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f);background:var(--bg);color:var(--t);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+/* Ambient glow — cool purple undertone like reference */
+body::before{content:'';position:fixed;top:-300px;left:30%;width:800px;height:600px;background:radial-gradient(ellipse,rgba(167,139,250,0.03),transparent 70%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;bottom:-200px;right:10%;width:600px;height:500px;background:radial-gradient(ellipse,rgba(91,141,239,0.025),transparent 70%);pointer-events:none;z-index:0}
+button{border:none;background:none;font-family:inherit;cursor:pointer;color:inherit}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+.icon{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;display:inline-block;vertical-align:middle;-webkit-font-smoothing:antialiased;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}
+.icon.fill{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
+
+#app{max-width:1480px;margin:0 auto;padding:0 28px 48px;position:relative;z-index:1}
+
+/* ── Header ─────────────────────────────────────────────── */
+.dc-hdr{display:flex;justify-content:space-between;align-items:center;height:52px;border-bottom:1px solid var(--b);margin-bottom:20px}
+.dc-hdr-l{display:flex;align-items:center;gap:16px}
+.dc-brand{display:flex;align-items:center;gap:8px}
+.dc-dot{width:7px;height:7px;border-radius:50%;background:var(--t);box-shadow:0 0 10px rgba(255,255,255,0.15);animation:breathe 2.4s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.5}50%{opacity:1}}
+.dc-brand-t{font-family:var(--fm);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--t3)}
+.dc-brand-t b{color:var(--t);font-weight:500}
+.dc-sep{width:1px;height:24px;background:var(--b)}
+.dc-ev-name{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--t);letter-spacing:-.01em}
+.dc-ev-meta{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:6px}
+.dc-ev-meta .d{width:3px;height:3px;border-radius:50%;background:var(--t4)}
+.dc-hdr-r{display:flex;align-items:center;gap:10px}
+.dc-sel{appearance:none;background:var(--bg-2);border:1px solid var(--b);border-radius:var(--r-s);color:var(--t3);padding:5px 24px 5px 8px;font-family:var(--f);font-size:11px;font-weight:500;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%23ffffff' stroke-opacity='0.25' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.dc-bell{position:relative;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--r-s);border:1px solid var(--b);color:var(--t3);transition:all .15s}
+.dc-bell:hover{border-color:var(--b-hi);color:var(--t);background:var(--bg-2)}
+.dc-bell .icon{font-size:17px}
+.dc-bell-b{position:absolute;top:-3px;right:-3px;background:var(--violet);color:#fff;font-family:var(--fm);font-size:8px;font-weight:500;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
+
+/* ── Hero Metrics ───────────────────────────────────────── */
+.dc-hero{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.dc-hc{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:16px 18px;display:flex;flex-direction:column;gap:6px;transition:all .2s;position:relative;overflow:hidden;animation:cardIn .4s cubic-bezier(.2,.7,.2,1) backwards}
+.dc-hc:hover{border-color:var(--b-hi);transform:translateY(-1px)}
+.dc-hc:nth-child(1){animation-delay:.05s}.dc-hc:nth-child(2){animation-delay:.1s}.dc-hc:nth-child(3){animation-delay:.15s}.dc-hc:nth-child(4){animation-delay:.2s}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.dc-hc-top{display:flex;align-items:center;justify-content:space-between}
+.dc-hc-icon{font-size:16px;color:var(--t4)}
+.dc-hc-delta{font-family:var(--fm);font-size:9px;font-weight:500;padding:2px 6px;border-radius:4px}
+.dc-hc-val{font-family:var(--fh);font-size:28px;font-weight:800;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.dc-hc-lbl{font-family:var(--fm);font-size:9px;font-weight:500;color:var(--t4);text-transform:uppercase;letter-spacing:.14em}
+.dc-hc-spark{position:absolute;bottom:0;left:0;right:0;height:28px;opacity:.4}
+.dc-hc:hover .dc-hc-spark{opacity:.7}
+.dc-hc-bar{height:3px;border-radius:2px;background:var(--bg-3);margin-top:2px;overflow:hidden}
+.dc-hc-bar-fill{height:100%;border-radius:2px}
+.dc-hc-sub{font-family:var(--fm);font-size:9px;color:var(--t4)}
+
+/* ── Action Bar ─────────────────────────────────────────── */
+.dc-abar{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.dc-abar-l{font-family:var(--fm);font-size:10px;color:var(--t4);letter-spacing:.04em}
+.dc-abar-l b{color:var(--t3);font-weight:500}
+.dc-btn-zip{display:inline-flex;align-items:center;gap:6px;background:var(--t);color:#000;border-radius:var(--r);padding:0 18px;height:34px;font-family:var(--f);font-size:12px;font-weight:700;transition:all .2s}
+.dc-btn-zip:hover{box-shadow:0 4px 20px rgba(255,255,255,0.08);transform:translateY(-1px)}
+.dc-btn-zip:active{transform:scale(.97)}
+.dc-btn-zip .icon{font-size:15px}
+
+/* ── Tabs ───────────────────────────────────────────────── */
+.dc-tabs{display:flex;gap:1px;border-bottom:1px solid var(--b);margin-bottom:20px;overflow-x:auto;scrollbar-width:none;padding-top:8px}
+.dc-tabs::-webkit-scrollbar{display:none}
+.dc-tab{display:flex;align-items:center;gap:5px;color:var(--t3);font-size:12px;font-weight:500;padding:9px 12px;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s}
+.dc-tab:hover{color:var(--t2)}
+.dc-tab.on{color:var(--t);border-bottom-color:var(--t)}
+.dc-tab .icon{font-size:15px;opacity:.5}
+.dc-tab.on .icon{opacity:.8}
+.dc-tab-b{font-family:var(--fm);font-size:8px;font-weight:500;padding:1px 5px;border-radius:3px;background:var(--bg-3);color:var(--t4)}
+.dc-tab.on .dc-tab-b{background:rgba(255,255,255,0.08);color:var(--t2)}
+
+/* ── Section ────────────────────────────────────────────── */
+.dc-section{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.dc-sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.dc-sec-hdr-t{font-family:var(--fm);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.14em;color:var(--t4)}
+.dc-sec-hdr-line{flex:1;height:1px;background:var(--b)}
+.dc-sec-hdr-c{font-family:var(--fm);font-size:9px;color:var(--t4)}
+
+/* ── Chart Cards ────────────────────────────────────────── */
+.dc-grid{display:grid;gap:12px}
+.dc-grid.c2{grid-template-columns:1fr 1fr}
+.dc-grid.c64{grid-template-columns:1.4fr 1fr}
+.dc-grid.c1{grid-template-columns:1fr}
+.dc-card{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:20px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s;animation:cardIn .35s cubic-bezier(.2,.7,.2,1) backwards}
+.dc-card:hover{border-color:var(--b-hi)}
+.dc-card-hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--b)}
+.dc-card-title{font-family:var(--fm);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--t3)}
+.dc-card-export{font-size:10px;font-weight:600;color:var(--t4);display:flex;align-items:center;gap:3px;transition:color .15s}
+.dc-card-export:hover{color:var(--t2)}
+.dc-card-export .icon{font-size:13px}
+
+/* ── Donut ──────────────────────────────────────────────── */
+.dc-donut-wrap{display:flex;align-items:center;justify-content:center;gap:32px;padding:12px 0}
+.dc-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dc-donut-val{font-family:var(--fh);font-size:28px;font-weight:800;color:var(--t)}
+.dc-donut-sub{font-family:var(--fm);font-size:9px;color:var(--t4)}
+.dc-legend{display:flex;flex-direction:column;gap:8px}
+.dc-legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2)}
+.dc-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dc-legend-item span.n{font-family:var(--fm);font-size:11px;color:var(--t);margin-left:auto;padding-left:12px}
+
+/* ── Bars ───────────────────────────────────────────────── */
+.dc-bar-row{display:flex;align-items:center;gap:12px;padding:4px 0}
+.dc-bar-rank{font-family:var(--fm);font-size:10px;color:var(--t4);width:18px;text-align:center}
+.dc-bar-label{font-size:12px;color:var(--t2);width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dc-bar-track{flex:1;height:6px;border-radius:3px;background:var(--bg-3);overflow:hidden}
+.dc-bar-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.2,.7,.2,1)}
+.dc-bar-val{font-family:var(--fm);font-size:11px;color:var(--t);width:48px;text-align:right}
+.dc-bar-pct{font-family:var(--fm);font-size:10px;color:var(--t3);width:36px;text-align:right}
+
+/* ── Mini Stats ─────────────────────────────────────────── */
+.dc-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;flex:1}
+.dc-mini{padding:14px;border-bottom:1px solid var(--b);display:flex;flex-direction:column;gap:4px}
+.dc-mini:nth-child(odd){border-right:1px solid var(--b)}
+.dc-mini:nth-last-child(-n+2){border-bottom:none}
+.dc-mini-val{font-family:var(--fh);font-size:20px;font-weight:700}
+.dc-mini-lbl{font-family:var(--fm);font-size:9px;color:var(--t4);text-transform:uppercase;letter-spacing:.1em}
+
+/* ── Heatmap ────────────────────────────────────────────── */
+.dc-hm-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.dc-hm-room{width:90px;font-family:var(--fm);font-size:10px;color:var(--t2);text-align:right}
+.dc-hm-cells{display:grid;grid-template-columns:repeat(11,1fr);gap:3px;flex:1}
+.dc-hm-cell{height:28px;border-radius:3px;transition:opacity .15s}
+.dc-hm-cell:hover{outline:1px solid var(--t4)}
+.dc-hm-axis{display:grid;grid-template-columns:repeat(11,1fr);gap:3px;margin-left:98px}
+.dc-hm-axis span{font-family:var(--fm);font-size:8px;color:var(--t4);text-align:center}
+
+/* ── Sponsor Cards ──────────────────────────────────────── */
+.dc-sponsor{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:18px;display:flex;flex-direction:column;gap:10px;transition:all .2s}
+.dc-sponsor:hover{border-color:var(--b-hi);transform:translateY(-1px)}
+.dc-sponsor-tier{font-family:var(--fm);font-size:8px;font-weight:500;padding:2px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:.08em}
+.dc-sponsor-name{font-family:var(--fh);font-size:14px;font-weight:700}
+.dc-sponsor-leads{font-family:var(--fh);font-size:32px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.dc-sponsor-lbl{font-family:var(--fm);font-size:9px;color:var(--t4);text-transform:uppercase;letter-spacing:.1em}
+.dc-sponsor-bar{height:3px;border-radius:2px;background:var(--bg-3);overflow:hidden}
+.dc-sponsor-bar-fill{height:100%;border-radius:2px}
+.dc-sponsor-time{font-family:var(--fm);font-size:9px;color:var(--t4)}
+
+/* ── ROI Table ──────────────────────────────────────────── */
+.dc-table{width:100%;border-collapse:collapse}
+.dc-table th{font-family:var(--fm);font-size:9px;font-weight:500;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;text-align:left;padding:10px 12px;border-bottom:1px solid var(--b-st);background:var(--bg-2)}
+.dc-table th:last-child{text-align:right}
+.dc-table td{font-size:12px;padding:12px;border-bottom:1px solid var(--b);color:var(--t2);vertical-align:middle}
+.dc-table tr:hover td{background:var(--card-hi)}
+.dc-table .td-name{display:flex;align-items:center;gap:10px;color:var(--t);font-weight:600;font-family:var(--fh);font-size:13px}
+.dc-table .td-logo{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.dc-table .td-num{font-family:var(--fm);font-size:12px;font-variant-numeric:tabular-nums;text-align:right;color:var(--t)}
+.dc-table .td-score{display:flex;gap:2px;justify-content:flex-end}
+.dc-table .td-score-bar{width:8px;height:16px;border-radius:2px}
+.dc-btn-exp{display:inline-flex;align-items:center;gap:6px;background:var(--t);color:#000;border-radius:var(--r);padding:0 20px;height:36px;font-size:12px;font-weight:700;transition:all .2s}
+.dc-btn-exp:hover{box-shadow:0 4px 20px rgba(255,255,255,0.08)}
+.dc-btn-exp .icon{font-size:15px}
+
+/* ── Podium ─────────────────────────────────────────────── */
+.dc-podium-wrap{display:flex;gap:24px;align-items:stretch}
+.dc-podium{flex:0 0 420px;display:flex;align-items:flex-end;justify-content:center;gap:8px;padding-bottom:8px}
+.dc-pod{display:flex;flex-direction:column;align-items:center;text-align:center}
+.dc-pod-av{border-radius:50%;background:var(--bg-3);margin-bottom:8px}
+.dc-pod.p1 .dc-pod-av{width:90px;height:90px;border:3px solid var(--amber);box-shadow:0 0 20px rgba(232,169,62,0.15)}
+.dc-pod.p2 .dc-pod-av{width:64px;height:64px;border:3px solid var(--teal)}
+.dc-pod.p3 .dc-pod-av{width:64px;height:64px;border:3px solid var(--t4)}
+.dc-pod-name{font-family:var(--fh);font-size:12px;font-weight:700;margin-bottom:2px}
+.dc-pod.p1 .dc-pod-name{font-size:14px;font-weight:800}
+.dc-pod-pts{font-family:var(--fh);font-size:18px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-bottom:8px}
+.dc-pod.p1 .dc-pod-pts{font-size:22px;color:var(--amber)}
+.dc-pod.p2 .dc-pod-pts{color:var(--teal)}
+.dc-pod.p3 .dc-pod-pts{color:var(--t3)}
+.dc-pod-pillar{width:100%;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center}
+.dc-pod.p1 .dc-pod-pillar{height:100px;background:linear-gradient(180deg,rgba(232,169,62,0.5),rgba(232,169,62,0.1));min-width:110px}
+.dc-pod.p2 .dc-pod-pillar{height:70px;background:linear-gradient(180deg,rgba(57,210,192,0.4),rgba(57,210,192,0.08));min-width:90px}
+.dc-pod.p3 .dc-pod-pillar{height:48px;background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));min-width:90px}
+.dc-pod-rank{font-family:var(--fh);font-size:24px;font-weight:800;color:rgba(255,255,255,0.4)}
+.dc-rank-list{flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center}
+.dc-rank-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--b);border-radius:var(--r)}
+.dc-rank-pos{font-family:var(--fm);font-size:11px;color:var(--t4);width:20px}
+.dc-rank-av{width:32px;height:32px;border-radius:50%;background:var(--bg-3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:10px;font-weight:700;color:var(--t3)}
+.dc-rank-name{flex:1;font-size:13px;font-weight:600}
+.dc-rank-dots{flex:1;border-bottom:1px dotted var(--b);height:1px}
+.dc-rank-pts{font-family:var(--fh);font-size:16px;font-weight:800;color:var(--teal);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+
+/* ── Notification Panel ─────────────────────────────────── */
+.dc-overlay{position:fixed;inset:0;background:rgba(10,10,10,0.55);z-index:90;opacity:0;pointer-events:none;transition:opacity .25s}
+.dc-overlay.on{opacity:1;pointer-events:auto}
+.dc-npanel{position:fixed;top:0;right:0;width:380px;height:100vh;background:var(--bg-1);border-left:1px solid var(--b);z-index:100;transform:translateX(100%);transition:transform .3s cubic-bezier(.2,.7,.2,1);display:flex;flex-direction:column}
+.dc-npanel.on{transform:translateX(0)}
+.dc-np-hdr{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--b)}
+.dc-np-title{font-family:var(--fm);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.14em;color:var(--t3)}
+.dc-np-close{width:26px;height:26px;border-radius:var(--r-s);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;color:var(--t3);transition:all .15s}
+.dc-np-close:hover{background:var(--bg-2);color:var(--t)}
+.dc-np-close .icon{font-size:14px}
+.dc-np-list{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+
+/* Notif — clean card style, NO left borders, NO dots */
+.dc-notif{padding:14px 16px;border-radius:10px;background:var(--bg-2);border:1px solid var(--b);animation:notifIn .3s cubic-bezier(.2,.7,.2,1) backwards;display:flex;flex-direction:column;gap:8px}
+.dc-notif:nth-child(1){animation-delay:.05s}.dc-notif:nth-child(2){animation-delay:.1s}.dc-notif:nth-child(3){animation-delay:.15s}.dc-notif:nth-child(4){animation-delay:.2s}
+@keyframes notifIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+.dc-notif-top{display:flex;align-items:center;gap:10px}
+.dc-notif-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dc-notif-icon .icon{font-size:16px}
+.dc-notif-info{flex:1}
+.dc-notif-name{font-family:var(--fh);font-size:13px;font-weight:600}
+.dc-notif-body{font-size:11px;color:var(--t3)}
+.dc-notif-st{font-family:var(--fm);font-size:9px;font-weight:500;padding:3px 8px;border-radius:var(--r-s)}
+.dc-notif-prog{height:3px;border-radius:2px;background:var(--bg);overflow:hidden}
+.dc-notif-prog-fill{height:100%;border-radius:2px;transition:width .6s}
+.dc-notif-foot{display:flex;align-items:center;justify-content:space-between}
+.dc-notif-time{font-family:var(--fm);font-size:9px;color:var(--t4)}
+.dc-btn-dl{display:inline-flex;align-items:center;gap:3px;height:26px;padding:0 12px;border-radius:6px;background:var(--green);color:#000;font-size:10px;font-weight:700;transition:opacity .15s}
+.dc-btn-dl:hover{opacity:.85}
+.dc-btn-dl .icon{font-size:12px}
+
+/* ── Toast ──────────────────────────────────────────────── */
+.dc-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);padding:10px 20px;border-radius:10px;font-size:12px;font-weight:600;z-index:300;opacity:0;transition:all .3s;pointer-events:none;display:flex;align-items:center;gap:6px;background:var(--bg-3);border:1px solid var(--b-hi);color:var(--t);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.dc-toast.on{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.dc-toast .icon{font-size:16px;color:var(--green)}
+
+.dc-foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--b);display:flex;justify-content:space-between}
+.dc-foot span{font-family:var(--fm);font-size:9px;color:var(--t5);letter-spacing:.06em;text-transform:uppercase}
+
+@media(max-width:1200px){.dc-hero{grid-template-columns:repeat(2,1fr)}.dc-grid.c2,.dc-grid.c64{grid-template-columns:1fr}.dc-podium-wrap{flex-direction:column}}
+@media(max-width:768px){.dc-hero{grid-template-columns:1fr 1fr}.dc-hdr{flex-direction:column;height:auto;padding:12px 0;gap:10px;align-items:flex-start}.dc-npanel{width:100%}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<header class="dc-hdr">
+  <div class="dc-hdr-l">
+    <div class="dc-brand"><div class="dc-dot"></div><div class="dc-brand-t"><b>DATA</b> CENTER</div></div>
+    <div class="dc-sep"></div>
+    <div><div class="dc-ev-name">Summit Empresarial 2026</div><div class="dc-ev-meta"><span>25 - 27 Abril</span><span class="d"></span><span>Bogota</span><span class="d"></span><span>1,247 registrados</span></div></div>
+  </div>
+  <div class="dc-hdr-r">
+    <select class="dc-sel"><option>Summit Empresarial 2026</option></select>
+    <select class="dc-sel"><option>CSV</option><option>XLSX</option></select>
+    <button class="dc-bell" onclick="togglePanel()"><span class="icon">notifications</span><span class="dc-bell-b">3</span></button>
+  </div>
+</header>
+
+<section class="dc-hero">
+  <div class="dc-hc">
+    <div class="dc-hc-top"><span class="icon dc-hc-icon">group</span><span class="dc-hc-delta" style="color:var(--green);background:rgba(59,191,122,0.1)">+124</span></div>
+    <div class="dc-hc-val" data-count="1247">0</div>
+    <div class="dc-hc-lbl">Registrados</div>
+    <svg class="dc-hc-spark" viewBox="0 0 100 28" preserveAspectRatio="none"><path d="M0,26 C15,24 25,22 35,20 C50,16 60,22 70,12 C80,6 90,8 100,3 L100,28 L0,28Z" fill="rgba(91,141,239,0.12)"/><path d="M0,26 C15,24 25,22 35,20 C50,16 60,22 70,12 C80,6 90,8 100,3" fill="none" stroke="rgba(91,141,239,0.4)" stroke-width="1.5"/></svg>
+  </div>
+  <div class="dc-hc">
+    <div class="dc-hc-top"><span class="icon dc-hc-icon">login</span></div>
+    <div class="dc-hc-val" data-count="892">0</div>
+    <div class="dc-hc-lbl">Check-ins</div>
+    <div class="dc-hc-bar"><div class="dc-hc-bar-fill" style="width:71.5%;background:linear-gradient(90deg,var(--violet),var(--blue))"></div></div>
+    <div class="dc-hc-sub">71.5% asistencia</div>
+  </div>
+  <div class="dc-hc">
+    <div class="dc-hc-top"><span class="icon dc-hc-icon fill" style="color:var(--amber)">star</span></div>
+    <div class="dc-hc-val">4.6</div>
+    <div class="dc-hc-lbl">Rating Promedio</div>
+    <div style="display:flex;gap:2px;margin-top:2px">${'star'.repeat(4).split('star').filter(Boolean).map(()=>'<span class="icon fill" style="font-size:12px;color:var(--amber)">star</span>').join('')}<span class="icon" style="font-size:12px;color:var(--amber)">star_half</span></div>
+    <div class="dc-hc-sub">892 reviews</div>
+  </div>
+  <div class="dc-hc">
+    <div class="dc-hc-top"><span class="icon dc-hc-icon">contact_page</span><span class="dc-hc-delta" style="color:var(--cyan);background:rgba(103,232,249,0.08)">+8 hoy</span></div>
+    <div class="dc-hc-val" data-count="156">0</div>
+    <div class="dc-hc-lbl">Leads Capturados</div>
+    <div class="dc-hc-sub">Avg. 12 por sesion</div>
+  </div>
+</section>
+
+<div class="dc-abar">
+  <div class="dc-abar-l"><b>44</b> datasets en <b>9</b> categorias</div>
+  <button class="dc-btn-zip" onclick="toast('Generando ZIP con 44 datasets...')"><span class="icon">folder_zip</span>Descargar Todo</button>
+</div>
+
+<nav class="dc-tabs" id="tabNav"></nav>
+<main id="tabContent"></main>
+
+<footer class="dc-foot"><span>EventOS Data Center v1.0</span><span>Cache: hace 42s</span></footer>
+</div>
+
+<!-- Notification Panel -->
+<div class="dc-overlay" id="overlay" onclick="togglePanel()"></div>
+<aside class="dc-npanel" id="npanel">
+  <div class="dc-np-hdr"><span class="dc-np-title">Exports</span><button class="dc-np-close" onclick="togglePanel()"><span class="icon">close</span></button></div>
+  <div class="dc-np-list">
+    <!-- Completed -->
+    <div class="dc-notif">
+      <div class="dc-notif-top">
+        <div class="dc-notif-icon" style="background:rgba(59,191,122,0.1)"><span class="icon" style="color:var(--green)">check_circle</span></div>
+        <div class="dc-notif-info"><div class="dc-notif-name">Leads Master</div><div class="dc-notif-body">156 registros · CSV · 12 KB</div></div>
+        <span class="dc-notif-st" style="color:var(--green);background:rgba(59,191,122,0.1)">Listo</span>
+      </div>
+      <div class="dc-notif-foot"><span class="dc-notif-time">Hace 2s</span><button class="dc-btn-dl"><span class="icon">download</span>Descargar</button></div>
+    </div>
+    <!-- Completed -->
+    <div class="dc-notif">
+      <div class="dc-notif-top">
+        <div class="dc-notif-icon" style="background:rgba(59,191,122,0.1)"><span class="icon" style="color:var(--green)">check_circle</span></div>
+        <div class="dc-notif-info"><div class="dc-notif-name">Leaderboard Final</div><div class="dc-notif-body">892 registros · CSV · 48 KB</div></div>
+        <span class="dc-notif-st" style="color:var(--green);background:rgba(59,191,122,0.1)">Listo</span>
+      </div>
+      <div class="dc-notif-foot"><span class="dc-notif-time">Hace 1m</span><button class="dc-btn-dl"><span class="icon">download</span>Descargar</button></div>
+    </div>
+    <!-- Processing -->
+    <div class="dc-notif">
+      <div class="dc-notif-top">
+        <div class="dc-notif-icon" style="background:rgba(167,139,250,0.1)"><span class="icon" style="color:var(--violet)">hourglass_top</span></div>
+        <div class="dc-notif-info"><div class="dc-notif-name">Asistentes Master</div><div class="dc-notif-body">Procesando 1,247 registros...</div></div>
+        <span class="dc-notif-st" style="color:var(--violet);background:rgba(167,139,250,0.1)">67%</span>
+      </div>
+      <div class="dc-notif-prog"><div class="dc-notif-prog-fill" style="width:67%;background:linear-gradient(90deg,var(--violet),var(--blue))"></div></div>
+    </div>
+    <!-- ZIP -->
+    <div class="dc-notif">
+      <div class="dc-notif-top">
+        <div class="dc-notif-icon" style="background:rgba(91,141,239,0.1)"><span class="icon" style="color:var(--blue)">folder_zip</span></div>
+        <div class="dc-notif-info"><div class="dc-notif-name">Descarga Completa</div><div class="dc-notif-body">Generando ZIP con 44 datasets...</div></div>
+        <span class="dc-notif-st" style="color:var(--blue);background:rgba(91,141,239,0.1)">28/44</span>
+      </div>
+      <div class="dc-notif-prog"><div class="dc-notif-prog-fill" style="width:64%;background:linear-gradient(90deg,var(--blue),var(--cyan))"></div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="dc-toast" id="toast"><span class="icon">check_circle</span><span id="toastMsg"></span></div>
+
+<script>
+const TABS=[
+  {key:'asistentes',icon:'group',label:'Asistentes',count:6},
+  {key:'sesiones',icon:'calendar_month',label:'Sesiones',count:5},
+  {key:'engagement',icon:'chat',label:'Engagement',count:5},
+  {key:'sponsors',icon:'storefront',label:'Patrocinadores',count:7},
+  {key:'gamificacion',icon:'emoji_events',label:'Gamificacion',count:10},
+  {key:'social',icon:'photo_library',label:'Social',count:4},
+  {key:'networking',icon:'handshake',label:'Networking',count:2},
+  {key:'comunicaciones',icon:'campaign',label:'Comunicaciones',count:3},
+  {key:'auditoria',icon:'shield',label:'Auditoria',count:2},
+];
+const nav=document.getElementById('tabNav');
+TABS.forEach((t,i)=>{const b=document.createElement('button');b.className='dc-tab'+(i===0?' on':'');b.dataset.tab=t.key;b.innerHTML=`<span class="icon">${t.icon}</span>${t.label}<span class="dc-tab-b">${t.count}</span>`;b.onclick=()=>{document.querySelectorAll('.dc-tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderTab(t.key)};nav.appendChild(b)});
+
+function exp(t){toast(t+' agregado a la cola')}
+function hdr(title){return `<div class="dc-card-hdr"><span class="dc-card-title">${title}</span><button class="dc-card-export" onclick="exp('${title}')"><span class="icon">download</span>Exportar</button></div>`}
+
+function renderTab(k){const c=document.getElementById('tabContent');const fn={asistentes:tabA,sponsors:tabS,gamificacion:tabG}[k];if(fn){c.innerHTML=fn();c.style.animation='none';c.offsetHeight;c.style.animation='';setTimeout(()=>{document.querySelectorAll('.dc-bar-fill[data-w]').forEach(b=>{b.style.width=b.dataset.w+'%'})},50)}else{c.innerHTML=`<div class="dc-section"><div class="dc-sec-hdr"><span class="dc-sec-hdr-t">${k.toUpperCase()}</span><span class="dc-sec-hdr-line"></span></div><div style="text-align:center;padding:60px;color:var(--t4);font-size:14px">Proximamente — ${TABS.find(t=>t.key===k)?.count||0} datasets disponibles</div></div>`}}
+
+function tabA(){
+const bars=[['Keynote: AI for Enterprise',89,1112],['Workshop: Data Strategy',78,975],['Panel: Leadership 2030',67,838],['Networking Lunch',54,675],['Workshop: Cloud Native',48,600],['Closing Ceremony',38,475]];
+// Colors for bars — gradient from violet to blue
+const barColors=['var(--violet)','rgba(167,139,250,0.8)','var(--blue)','rgba(91,141,239,0.7)','rgba(91,141,239,0.5)','rgba(91,141,239,0.35)'];
+const hm=[['Sala Principal',[5,80,90,40,15,8,55,70,50,25,5]],['Sala A',[3,15,45,60,75,25,8,35,55,15,3]],['Sala B',[3,8,25,35,15,3,75,85,45,8,3]],['Expo Hall',[15,25,35,45,80,90,65,55,45,25,8]]];
+return `<div class="dc-section">
+<div class="dc-sec-hdr"><span class="dc-sec-hdr-t">Asistentes y Acceso</span><span class="dc-sec-hdr-line"></span><span class="dc-sec-hdr-c">6 datasets</span></div>
+<div class="dc-grid c2" style="margin-bottom:12px">
+  <div class="dc-card">${hdr('Estado de Check-in')}
+    <div class="dc-donut-wrap">
+      <div style="position:relative;width:180px;height:180px">
+        <svg width="180" height="180" viewBox="0 0 100 100" style="transform:rotate(-90deg)">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--bg-3)" stroke-width="10"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--blue)" stroke-width="10" stroke-dasharray="238.76" stroke-dashoffset="68" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--t5)" stroke-width="10" stroke-dasharray="238.76" stroke-dashoffset="196" transform="rotate(257 50 50)" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--pink)" stroke-width="10" stroke-dasharray="238.76" stroke-dashoffset="214" transform="rotate(322 50 50)" stroke-linecap="round" opacity=".6"/>
+        </svg>
+        <div class="dc-donut-center"><div class="dc-donut-val">892</div><div class="dc-donut-sub">de 1,247</div></div>
+      </div>
+      <div class="dc-legend">
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--blue)"></div>Checked-in<span class="n">892 · 71.5%</span></div>
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--t5)"></div>Pendiente<span class="n">224 · 18.0%</span></div>
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--pink);opacity:.6"></div>No-show<span class="n">131 · 10.5%</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="dc-card">${hdr('Registro en el Tiempo')}
+    <div style="flex:1;position:relative;padding:8px 0">
+      <svg width="100%" height="180" viewBox="0 0 400 180" preserveAspectRatio="none">
+        <line x1="0" y1="45" x2="400" y2="45" stroke="var(--b)" stroke-width="0.5"/><line x1="0" y1="90" x2="400" y2="90" stroke="var(--b)" stroke-width="0.5"/><line x1="0" y1="135" x2="400" y2="135" stroke="var(--b)" stroke-width="0.5"/>
+        <defs><linearGradient id="gA" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="var(--violet)" stop-opacity="0.2"/><stop offset="100%" stop-color="var(--blue)" stop-opacity="0.15"/></linearGradient></defs>
+        <path d="M0,170 C40,168 80,165 120,155 C160,140 200,130 240,100 C280,65 320,30 360,15 L400,8 L400,180 L0,180Z" fill="url(#gA)"/>
+        <path d="M0,170 C40,168 80,165 120,155 C160,140 200,130 240,100 C280,65 320,30 360,15 L400,8" fill="none" stroke="var(--violet)" stroke-width="2"/>
+        <line x1="360" y1="0" x2="360" y2="180" stroke="var(--t4)" stroke-width="1" stroke-dasharray="4 3"/>
+        <circle cx="400" cy="8" r="4" fill="var(--blue)"/><text x="388" y="24" fill="var(--t3)" font-family="JetBrains Mono" font-size="9" text-anchor="end">1,247</text>
+      </svg>
+      <div style="display:flex;justify-content:space-between;font-family:var(--fm);font-size:8px;color:var(--t4);margin-top:4px"><span>Mar 1</span><span>Mar 15</span><span>Abr 1</span><span>Abr 15</span><span>Abr 25</span></div>
+    </div>
+  </div>
+</div>
+<div class="dc-grid c64" style="margin-bottom:12px">
+  <div class="dc-card">${hdr('Top Sesiones por Asistencia')}
+    <div style="display:flex;flex-direction:column;gap:8px;padding:4px 0">
+      ${bars.map(([n,p,v],i)=>`<div class="dc-bar-row"><span class="dc-bar-rank">#${i+1}</span><span class="dc-bar-label">${n}</span><div class="dc-bar-track"><div class="dc-bar-fill" data-w="${p}" style="width:0;background:${barColors[i]}"></div></div><span class="dc-bar-pct">${p}%</span><span class="dc-bar-val">${v.toLocaleString()}</span></div>`).join('')}
+    </div>
+  </div>
+  <div class="dc-card">${hdr('Metricas Rapidas')}
+    <div class="dc-mini-grid">
+      <div class="dc-mini"><div class="dc-mini-val" style="color:var(--cyan)">23m</div><div class="dc-mini-lbl">Avg Stay</div></div>
+      <div class="dc-mini"><div class="dc-mini-val" style="color:var(--violet)">4,312</div><div class="dc-mini-lbl">Mensajes</div></div>
+      <div class="dc-mini"><div class="dc-mini-val" style="color:var(--amber)">156</div><div class="dc-mini-lbl">Leads</div></div>
+      <div class="dc-mini"><div class="dc-mini-val" style="color:var(--blue)">89</div><div class="dc-mini-lbl">Conexiones</div></div>
+      <div class="dc-mini"><div class="dc-mini-val" style="color:var(--pink)">267</div><div class="dc-mini-lbl">Fotos</div></div>
+      <div class="dc-mini"><div class="dc-mini-val" style="color:var(--green)">82%</div><div class="dc-mini-lbl">Push Open</div></div>
+    </div>
+  </div>
+</div>
+<div class="dc-grid c1">
+  <div class="dc-card">${hdr('Ocupacion por Sala y Hora')}
+    <div style="overflow-x:auto">
+      <div class="dc-hm-axis"><span>08</span><span>09</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span></div>
+      ${hm.map(([name,vals])=>`<div class="dc-hm-row"><div class="dc-hm-room">${name}</div><div class="dc-hm-cells">${vals.map(v=>{const h=v/100;return `<div class="dc-hm-cell" style="background:color-mix(in srgb, var(--violet) ${Math.round(h*60)}%, var(--blue) ${Math.round(h*40)}%);opacity:${Math.max(h,0.05)}" title="${name} — ${v}%"></div>`}).join('')}</div></div>`).join('')}
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-top:6px"><span style="font-family:var(--fm);font-size:8px;color:var(--t4)">0</span><div style="width:60px;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--bg-3),var(--violet),var(--blue))"></div><span style="font-family:var(--fm);font-size:8px;color:var(--t4)">350+</span></div>
+  </div>
+</div>
+</div>`}
+
+function tabS(){
+const sp=[['TC','TechCorp International','PLATINUM',47,30,'var(--violet)','12 min'],['ML','Meridian Labs','GOLD',38,24,'var(--amber)','34 min'],['CB','CloudBase Solutions','GOLD',31,20,'var(--blue)','1h'],['DF','DataFlow Analytics','SILVER',22,14,'var(--cyan)','2h']];
+const spBars=[['TechCorp International',47,'var(--violet)',100],['Meridian Labs',38,'var(--amber)',81],['CloudBase Solutions',31,'var(--blue)',66],['DataFlow Analytics',22,'var(--cyan)',47],['InnovateCO',18,'var(--pink)',38]];
+const rows=[['TC','TechCorp Int.','PLATINUM','var(--violet)',47,312,89,12,5],['ML','Meridian Labs','GOLD','var(--amber)',38,267,67,8,4],['CB','CloudBase Sol.','GOLD','var(--blue)',31,198,54,6,3],['DF','DataFlow Ana.','SILVER','var(--cyan)',22,145,32,4,2],['IN','InnovateCO','SILVER','var(--pink)',18,98,21,2,1]];
+return `<div class="dc-section">
+<div class="dc-sec-hdr"><span class="dc-sec-hdr-t">Patrocinadores y Leads</span><span class="dc-sec-hdr-line"></span><span class="dc-sec-hdr-c">7 datasets</span></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+  ${sp.map(([i,n,tier,leads,pct,c,t])=>`<div class="dc-sponsor"><div style="display:flex;align-items:center;justify-content:space-between"><div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:14px;font-weight:800;color:#fff;background:${c}">${i}</div><span class="dc-sponsor-tier" style="background:${c}15;color:${c}">${tier}</span></div><div class="dc-sponsor-name">${n}</div><div class="dc-sponsor-leads">${leads}</div><div class="dc-sponsor-lbl">Leads capturados</div><div class="dc-sponsor-bar"><div class="dc-sponsor-bar-fill" style="width:${pct}%;background:${c}"></div></div><div class="dc-sponsor-time">Hace ${t}</div></div>`).join('')}
+</div>
+<div class="dc-grid c64" style="margin-bottom:12px">
+  <div class="dc-card">${hdr('Leads por Patrocinador')}
+    <div style="display:flex;flex-direction:column;gap:8px;padding:4px 0">
+      ${spBars.map(([n,v,c,w],i)=>`<div class="dc-bar-row"><span class="dc-bar-rank">#${i+1}</span><span class="dc-bar-label">${n}</span><div class="dc-bar-track"><div class="dc-bar-fill" data-w="${w}" style="width:0;background:${c}"></div></div><span class="dc-bar-val">${v}</span></div>`).join('')}
+    </div>
+  </div>
+  <div class="dc-card">${hdr('Leads por Calificacion')}
+    <div class="dc-donut-wrap">
+      <div style="position:relative;width:160px;height:160px">
+        <svg width="160" height="160" viewBox="0 0 100 100" style="transform:rotate(-90deg)">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--bg-3)" stroke-width="10"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--green)" stroke-width="10" stroke-dasharray="238.76" stroke-dashoffset="155" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--amber)" stroke-width="10" stroke-dasharray="238.76" stroke-dashoffset="131" transform="rotate(126 50 50)" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--t4)" stroke-width="10" stroke-dasharray="238.76" stroke-dashoffset="190" transform="rotate(288 50 50)" stroke-linecap="round"/>
+        </svg>
+        <div class="dc-donut-center"><div class="dc-donut-val" style="font-size:24px">156</div><div class="dc-donut-sub">total</div></div>
+      </div>
+      <div class="dc-legend">
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--green)"></div>Hot<span class="n">55 · 35%</span></div>
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--amber)"></div>Warm<span class="n">70 · 45%</span></div>
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--t4)"></div>Cold<span class="n">31 · 20%</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="dc-grid c1">
+  <div class="dc-card">${hdr('Resumen ROI por Patrocinador')}
+    <div style="overflow-x:auto">
+      <table class="dc-table"><thead><tr><th>Patrocinador</th><th>Tier</th><th style="text-align:right">Leads</th><th style="text-align:right">Visitas</th><th style="text-align:right">Trivia</th><th style="text-align:right">Contactos</th><th style="text-align:right">Score</th></tr></thead>
+      <tbody>${rows.map(([i,n,tier,c,leads,vis,tri,con,score])=>`<tr><td><div class="td-name"><div class="td-logo" style="background:${c}">${i}</div>${n}</div></td><td><span class="dc-sponsor-tier" style="background:${c}15;color:${c}">${tier}</span></td><td class="td-num">${leads}</td><td class="td-num">${vis}</td><td class="td-num">${tri}</td><td class="td-num">${con}</td><td class="td-num"><div class="td-score">${Array(5).fill(0).map((_,j)=>`<div class="td-score-bar" style="background:${j<score?c:'var(--bg-3)'}"></div>`).join('')}</div></td></tr>`).join('')}</tbody></table>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="dc-btn-exp" onclick="exp('Leads Master')"><span class="icon">download</span>Exportar Leads Master</button></div>
+  </div>
+</div>
+</div>`}
+
+function tabG(){
+const ranks=[['Ana Martinez',1650],['Carlos Rodriguez',1520],['Laura Perez',1380],['Miguel Sanchez',1240],['Valentina Gomez',1100],['Andres Fernandez',980],['Diana Castillo',870]];
+const games=[['quiz','Tech Trivia Sprint','234 participantes','Sofia R.','var(--violet)'],['casino','Ruleta de Sponsors','189 participantes','48,920 pts','var(--amber)'],['confirmation_number','Gran Sorteo Jackpot','312 elegibles','Daniel O.','var(--pink)']];
+return `<div class="dc-section">
+<div class="dc-sec-hdr"><span class="dc-sec-hdr-t">Gamificacion y Juegos</span><span class="dc-sec-hdr-line"></span><span class="dc-sec-hdr-c">10 datasets</span></div>
+<div class="dc-grid c1" style="margin-bottom:12px">
+  <div class="dc-card">${hdr('Leaderboard')}
+    <div class="dc-podium-wrap">
+      <div class="dc-podium">
+        <div class="dc-pod p2"><div class="dc-pod-av"></div><div class="dc-pod-name">Daniel O.</div><div class="dc-pod-pts">2,150</div><div class="dc-pod-pillar"><div class="dc-pod-rank">2</div></div></div>
+        <div class="dc-pod p1"><div class="dc-pod-av"></div><div class="dc-pod-name">Sofia Ramirez</div><div class="dc-pod-pts">2,480</div><div class="dc-pod-pillar"><div class="dc-pod-rank">1</div></div></div>
+        <div class="dc-pod p3"><div class="dc-pod-av"></div><div class="dc-pod-name">Maria T.</div><div class="dc-pod-pts">1,890</div><div class="dc-pod-pillar"><div class="dc-pod-rank">3</div></div></div>
+      </div>
+      <div class="dc-rank-list">${ranks.map(([n,p],i)=>`<div class="dc-rank-row"><span class="dc-rank-pos">${i+4}</span><div class="dc-rank-av">${n.split(' ').map(w=>w[0]).join('')}</div><span class="dc-rank-name">${n}</span><span class="dc-rank-dots"></span><span class="dc-rank-pts">${p.toLocaleString()}</span></div>`).join('')}</div>
+    </div>
+  </div>
+</div>
+<div class="dc-grid c2">
+  <div class="dc-card">${hdr('Distribucion de Puntos por Accion')}
+    <div class="dc-donut-wrap">
+      <div style="position:relative;width:170px;height:170px">
+        <svg width="170" height="170" viewBox="0 0 100 100" style="transform:rotate(-90deg)">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--bg-3)" stroke-width="10"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--teal)" stroke-width="10" stroke-dasharray="238.76" stroke-dashoffset="186" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--violet)" stroke-width="10" stroke-dasharray="238.76" stroke-dashoffset="196" transform="rotate(79 50 50)" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--amber)" stroke-width="10" stroke-dasharray="238.76" stroke-dashoffset="203" transform="rotate(143 50 50)" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--blue)" stroke-width="10" stroke-dasharray="238.76" stroke-dashoffset="205" transform="rotate(193 50 50)" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--pink)" stroke-width="10" stroke-dasharray="238.76" stroke-dashoffset="210" transform="rotate(240 50 50)" stroke-linecap="round"/>
+        </svg>
+        <div class="dc-donut-center"><div class="dc-donut-val" style="font-size:20px">48,920</div><div class="dc-donut-sub">puntos</div></div>
+      </div>
+      <div class="dc-legend">
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--teal)"></div>Check-in<span class="n">22%</span></div>
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--violet)"></div>Visitar stand<span class="n">18%</span></div>
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--amber)"></div>Rate session<span class="n">15%</span></div>
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--blue)"></div>Chat sesion<span class="n">14%</span></div>
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--pink)"></div>Subir foto<span class="n">12%</span></div>
+        <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--t5)"></div>Otros<span class="n">19%</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="dc-card">${hdr('Juegos del Evento')}
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${games.map(([icon,name,p1,p2,c])=>`<div style="padding:12px;border:1px solid var(--b);border-radius:var(--r);display:flex;align-items:center;gap:12px;background:var(--card);transition:background .15s" onmouseover="this.style.background='var(--card-hi)'" onmouseout="this.style.background='var(--card)'"><div style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:${c}15"><span class="icon" style="font-size:18px;color:${c}">${icon}</span></div><div style="flex:1"><div style="font-family:var(--fh);font-size:13px;font-weight:600">${name}</div><div style="font-size:11px;color:var(--t3)">${p1} · ${p2}</div></div><span style="font-family:var(--fm);font-size:8px;padding:3px 8px;border-radius:3px;background:rgba(59,191,122,0.1);color:var(--green)">FINALIZADO</span></div>`).join('')}
+    </div>
+  </div>
+</div>
+</div>`}
+
+function togglePanel(){document.getElementById('npanel').classList.toggle('on');document.getElementById('overlay').classList.toggle('on')}
+function toast(msg){const t=document.getElementById('toast');document.getElementById('toastMsg').textContent=msg;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),3500)}
+function countUp(el,target){const dur=1200,start=performance.now();(function tick(now){const p=Math.min((now-start)/dur,1),ease=1-Math.pow(1-p,3);el.textContent=Math.round(target*ease).toLocaleString();if(p<1)requestAnimationFrame(tick)})(start)}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  renderTab('asistentes');
+  setTimeout(()=>{document.querySelectorAll('.dc-hc-val[data-count]').forEach(el=>countUp(el,+el.dataset.count))},200);
+});
+</script>
+</body>
+</html>

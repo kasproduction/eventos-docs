@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sorteo Ceremony — Photo Cascade Reveal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+<style>
+:root {
+  --bg:#0A0A0A;--t:#FFFFFF;--t2:rgba(255,255,255,.7);--t3:rgba(255,255,255,.4);--t5:rgba(255,255,255,.12);
+  --amber:#E8A93E;
+  --fh:'Plus Jakarta Sans',system-ui,sans-serif;
+  --reel:280px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--t);font-family:var(--fh);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+.display{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+
+/* Ambient */
+.ambient{position:fixed;top:50%;left:50%;width:900px;height:900px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(232,169,62,.05) 0%,transparent 70%);pointer-events:none;z-index:0}
+
+/* Particles */
+.particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.particle{position:absolute;width:2px;height:2px;background:rgba(255,255,255,.12);border-radius:50%}
+
+/* Scanlines */
+.scanlines{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.006) 2px,rgba(255,255,255,.006) 4px);opacity:0}
+
+/* Header */
+.d-header{position:absolute;top:40px;left:56px;right:56px;display:flex;align-items:flex-start;justify-content:space-between;z-index:2}
+.d-session-name{font-size:15px;font-weight:600;color:var(--t3);letter-spacing:.04em;text-transform:uppercase}
+.d-live{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3BBF7A}
+.d-live-dot{width:8px;height:8px;border-radius:50%;background:#3BBF7A;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Top info */
+.top-info{display:flex;flex-direction:column;align-items:center;z-index:2;margin-bottom:20px}
+.overline{font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3)}
+.prize-label{font-size:24px;font-weight:800;color:var(--amber);margin-top:6px;opacity:0}
+
+/* ── Reel: compact strip, smooth scroll ── */
+.reel-window{position:relative;width:var(--reel);height:var(--reel);overflow:hidden;border-radius:28px;z-index:3;contain:strict}
+.reel-window::before,.reel-window::after{content:'';position:absolute;left:0;right:0;height:30%;z-index:2;pointer-events:none}
+.reel-window::before{top:0;background:linear-gradient(to bottom,var(--bg),transparent)}
+.reel-window::after{bottom:0;background:linear-gradient(to top,var(--bg),transparent)}
+
+.reel-strip{position:absolute;left:0;right:0;display:flex;flex-direction:column;will-change:transform;backface-visibility:hidden}
+.reel-cell{width:var(--reel);height:var(--reel);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.reel-cell img{width:260px;height:260px;border-radius:24px;object-fit:cover;background:rgba(255,255,255,.04)}
+
+/* Glow ring */
+.glow-ring{position:absolute;width:300px;height:300px;border-radius:32px;border:2px solid rgba(232,169,62,.06);z-index:2;opacity:0;pointer-events:none}
+
+/* Name below */
+.reel-name{font-size:22px;font-weight:700;color:var(--t2);z-index:3;margin-top:16px;height:28px;text-align:center;opacity:0}
+
+/* Count */
+.participant-count{font-size:14px;color:var(--t3);z-index:2;margin-top:8px;opacity:0}
+
+/* Shockwave */
+.shockwave{position:fixed;top:50%;left:50%;width:20px;height:20px;border-radius:50%;border:2px solid var(--amber);transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:5;opacity:0}
+.shockwave-2{position:fixed;top:50%;left:50%;width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,.25);transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:5;opacity:0}
+
+/* ── Winner reveal ── */
+.winner-area{position:absolute;display:flex;flex-direction:column;align-items:center;z-index:10;opacity:0;pointer-events:none}
+.winner-photo-wrap{position:relative}
+.winner-photo{width:min(38vh, 320px);height:min(38vh, 320px);border-radius:32px;object-fit:cover;border:3px solid var(--amber);box-shadow:0 0 0 rgba(232,169,62,0)}
+.winner-glow{position:absolute;inset:-24px;border-radius:48px;background:radial-gradient(circle,rgba(232,169,62,.18) 0%,transparent 70%);z-index:-1;opacity:0}
+.winner-overline{font-size:14px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-top:28px;opacity:0}
+.winner-name-wrap{display:flex;gap:0;margin-top:10px;overflow:hidden;height:92px;align-items:center;justify-content:center}
+.winner-letter{font-size:80px;font-weight:800;letter-spacing:-0.03em;display:inline-block;opacity:0;transform:translateY(100%)}
+.winner-letter.space{width:22px}
+.winner-prize{font-size:26px;font-weight:700;color:var(--amber);margin-top:16px;opacity:0}
+.winner-session{font-size:15px;color:var(--t3);margin-top:12px;opacity:0;letter-spacing:.04em}
+
+/* Confetti */
+.confetti-wrap{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;overflow:hidden}
+.confetti-piece{position:absolute;top:-20px;border-radius:2px}
+
+/* Controls */
+.demo-controls{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;gap:12px}
+.demo-btn{padding:12px 28px;border-radius:60px;border:none;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);color:#fff;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:all .2s}
+.demo-btn:hover{background:rgba(255,255,255,.18);transform:scale(1.04)}
+.demo-btn:active{transform:scale(.97)}
+.demo-btn.amber{background:var(--amber);color:#0A0A0A}
+.demo-btn.amber:hover{background:#f0b84e}
+</style>
+</head>
+<body>
+
+<div class="display">
+  <div class="ambient" id="ambient"></div>
+  <div class="particles" id="particles"></div>
+  <div class="scanlines" id="scanlines"></div>
+
+  <div class="d-header">
+    <div class="d-session-name">Keynote: El Futuro de la IA</div>
+    <div class="d-live"><div class="d-live-dot"></div>LIVE</div>
+  </div>
+
+  <div class="top-info">
+    <div class="overline" id="overline">SORTEO EN VIVO</div>
+    <div class="prize-label" id="prizeLabel">MacBook Pro 14"</div>
+  </div>
+
+  <div class="glow-ring" id="glowRing"></div>
+
+  <div class="reel-window" id="reelWindow">
+    <div class="reel-strip" id="reelStrip"></div>
+  </div>
+
+  <div class="reel-name" id="reelName"></div>
+  <div class="participant-count" id="participantCount"></div>
+
+  <div class="winner-area" id="winnerArea">
+    <div class="winner-photo-wrap">
+      <img class="winner-photo" id="winnerPhoto" src="" alt="">
+      <div class="winner-glow" id="winnerGlow"></div>
+    </div>
+    <div class="winner-overline" id="winnerOverline">GANADOR</div>
+    <div class="winner-name-wrap" id="winnerNameWrap"></div>
+    <div class="winner-prize" id="winnerPrize">MacBook Pro 14"</div>
+    <div class="winner-session" id="winnerSession">Keynote: El Futuro de la IA</div>
+  </div>
+
+  <div class="shockwave" id="shockwave"></div>
+  <div class="shockwave-2" id="shockwave2"></div>
+</div>
+<div class="confetti-wrap" id="confettiWrap"></div>
+
+<div class="demo-controls">
+  <button class="demo-btn" onclick="resetDemo()">Reset</button>
+  <button class="demo-btn amber" onclick="startCeremony()">Sortear</button>
+</div>
+
+<script>
+const PARTICIPANTS = [
+  { name: 'Carlos Mendoza',   photo: 'https://i.pravatar.cc/200?img=11' },
+  { name: 'Maria Gonzalez',   photo: 'https://i.pravatar.cc/200?img=5'  },
+  { name: 'Andres Ramirez',   photo: 'https://i.pravatar.cc/200?img=12' },
+  { name: 'Sofia Torres',     photo: 'https://i.pravatar.cc/200?img=9'  },
+  { name: 'Juan Herrera',     photo: 'https://i.pravatar.cc/200?img=13' },
+  { name: 'Valentina Cruz',   photo: 'https://i.pravatar.cc/200?img=16' },
+  { name: 'Diego Morales',    photo: 'https://i.pravatar.cc/200?img=14' },
+  { name: 'Camila Rojas',     photo: 'https://i.pravatar.cc/200?img=20' },
+  { name: 'Sebastian Lopez',  photo: 'https://i.pravatar.cc/200?img=33' },
+  { name: 'Isabella Vargas',  photo: 'https://i.pravatar.cc/200?img=25' },
+  { name: 'Mateo Castillo',   photo: 'https://i.pravatar.cc/200?img=51' },
+  { name: 'Lucia Perez',      photo: 'https://i.pravatar.cc/200?img=44' },
+  { name: 'Alejandro Ruiz',   photo: 'https://i.pravatar.cc/200?img=52' },
+  { name: 'Daniela Ortiz',    photo: 'https://i.pravatar.cc/200?img=47' },
+  { name: 'Nicolas Silva',    photo: 'https://i.pravatar.cc/200?img=53' },
+];
+const WINNER = PARTICIPANTS[7];
+const CELL_H = 280;
+
+/* Only 20 cells in the strip — enough visual variety, light on GPU.
+   With 3000 participants we just random-pick 19 + winner at end. */
+const STRIP_SIZE = 20;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function spawnParticles(n = 40) {
+  const c = document.getElementById('particles'); c.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('div'); p.className = 'particle';
+    p.style.left = Math.random()*100+'%'; p.style.top = Math.random()*100+'%';
+    c.appendChild(p);
+    gsap.to(p, { y:-(80+Math.random()*250), x:(Math.random()-.5)*60,
+      opacity:Math.random()*.15+.05, duration:5+Math.random()*7, repeat:-1, ease:'none', delay:Math.random()*5 });
+  }
+}
+
+function startAmbient() {
+  gsap.to('#ambient', { scale:1.2, opacity:.9, duration:3, repeat:-1, yoyo:true, ease:'sine.inOut' });
+}
+
+function spawnConfetti() {
+  const c = document.getElementById('confettiWrap'); c.innerHTML = '';
+  const sh = ['#E8A93E','#F0B84E','#D4962E','#C8882A','#FFD080','rgba(255,255,255,.5)'];
+  for (let i = 0; i < 80; i++) {
+    const p = document.createElement('div'); p.className = 'confetti-piece';
+    const w = 6+Math.random()*14;
+    p.style.width = w+'px'; p.style.height = (w*(.3+Math.random()*.7))+'px';
+    p.style.left = Math.random()*100+'%';
+    p.style.background = sh[Math.floor(Math.random()*sh.length)];
+    p.style.borderRadius = Math.random()>.5?'2px':'0';
+    c.appendChild(p);
+    gsap.fromTo(p, {y:-30,rotation:0,opacity:1},
+      {y:window.innerHeight+40,x:(Math.random()-.5)*400,rotation:300+Math.random()*600,
+       opacity:0,duration:2.5+Math.random()*2.5,delay:Math.random()*2,ease:'power1.in'});
+  }
+  setTimeout(()=>c.innerHTML='',7000);
+}
+
+function buildNameLetters(name) {
+  const w = document.getElementById('winnerNameWrap'); w.innerHTML = '';
+  name.split('').forEach(ch => {
+    const s = document.createElement('span');
+    s.className = 'winner-letter' + (ch===' '?' space':'');
+    s.textContent = ch===' '?'':ch;
+    w.appendChild(s);
+  });
+}
+
+/* ══════════════════════════════════════════
+   CEREMONY
+   Strip approach (smooth scroll) but only 20 cells.
+   Random picks from participants pool + winner last.
+   Works with any number of participants.
+   ══════════════════════════════════════════ */
+let masterTL = null;
+
+function startCeremony() {
+  if (masterTL && masterTL.isActive()) return;
+
+  const strip = document.getElementById('reelStrip');
+  const nameEl = document.getElementById('reelName');
+  strip.innerHTML = '';
+  document.getElementById('confettiWrap').innerHTML = '';
+
+  // Reset
+  gsap.set(strip, { y: 0 });
+  gsap.set('#reelWindow', { opacity:1, scale:1 });
+  gsap.set('#winnerArea', { opacity:0 });
+  gsap.set('#overline', { opacity:1 });
+  gsap.set('#glowRing', { opacity:0, borderColor:'rgba(232,169,62,.06)', boxShadow:'none' });
+  gsap.set('#reelName', { opacity:0 });
+  gsap.set('#participantCount', { opacity:1 });
+  gsap.set('.top-info', { opacity:1 });
+  document.getElementById('participantCount').textContent = PARTICIPANTS.length + ' participantes';
+  nameEl.textContent = '';
+
+  // Build sequence: random picks + winner at end
+  const others = PARTICIPANTS.filter(p => p !== WINNER);
+  const seq = [];
+  for (let i = 0; i < STRIP_SIZE - 1; i++) {
+    seq.push(others[Math.floor(Math.random() * others.length)]);
+  }
+  seq.push(WINNER);
+
+  // Create cells
+  const fallback = name => 'https://hostedboringavatars.vercel.app/api/beam?name=' + encodeURIComponent(name) + '&size=260';
+  seq.forEach(p => {
+    const cell = document.createElement('div');
+    cell.className = 'reel-cell';
+    cell.innerHTML = `<img src="${p.photo}" alt="${p.name}" onerror="this.onerror=null;this.src='${fallback(p.name)}'">`;
+    strip.appendChild(cell);
+  });
+
+  const targetY = (seq.length - 1) * CELL_H;
+  const spinDuration = 8;
+
+  // Name tracker
+  let lastIdx = -1;
+  function onReelUpdate() {
+    const y = Math.abs(parseFloat(gsap.getProperty(strip, 'y')));
+    const idx = Math.round(y / CELL_H);
+    if (idx !== lastIdx && idx < seq.length) {
+      lastIdx = idx;
+      nameEl.textContent = seq[idx].name;
+    }
+  }
+
+  // ── Timeline ──
+  masterTL = gsap.timeline();
+
+  // Ambient
+  masterTL.to('#ambient', { scale:1.8, opacity:1, duration:1.5, ease:'power2.out' }, 0);
+  masterTL.to('#scanlines', { opacity:1, duration:.8 }, 0);
+  masterTL.to('#prizeLabel', { opacity:1, duration:.8 }, 0);
+  masterTL.to('#glowRing', { opacity:1, duration:1 }, 0);
+  masterTL.to('#reelName', { opacity:1, duration:.5 }, spinDuration * 0.4);
+
+  // THE SPIN — single tween, 20 cells, smooth as butter
+  masterTL.to(strip, {
+    y: -targetY,
+    duration: spinDuration,
+    ease: 'power4.out',
+    onUpdate: onReelUpdate
+  }, 0.5);
+
+  // Glow ring
+  masterTL.to('#glowRing', {
+    borderColor: 'rgba(232,169,62,.4)',
+    boxShadow: '0 0 60px rgba(232,169,62,.12)',
+    duration: spinDuration * 0.4,
+    ease: 'power2.in'
+  }, spinDuration * 0.5);
+
+  // ── LOCK ──
+  const lockTime = 0.5 + spinDuration;
+  const shockTime = lockTime + 1.2;
+
+  masterTL.to('#reelName', { opacity:0, duration:.3 }, lockTime);
+
+  masterTL.set('#shockwave', { scale:0, opacity:1 }, shockTime);
+  masterTL.to('#shockwave', { scale:40, opacity:0, duration:1.4, ease:'power2.out' }, shockTime);
+  masterTL.set('#shockwave2', { scale:0, opacity:.6 }, shockTime + 0.1);
+  masterTL.to('#shockwave2', { scale:30, opacity:0, duration:1.2, ease:'power2.out' }, shockTime + 0.1);
+
+  masterTL.to('.top-info', { opacity:.05, duration:.4 }, shockTime);
+  masterTL.to('#participantCount', { opacity:.05, duration:.4 }, shockTime);
+  masterTL.to('#glowRing', { opacity:0, duration:.5 }, shockTime);
+
+  // ── Transition: reel GROWS into winner reveal ──
+  const transTime = shockTime + 1.5;
+
+  // Reel photo scales up and cross-fades into winner photo
+  masterTL.to('#reelWindow', {
+    scale: 1.35,
+    opacity: 0,
+    duration: 1,
+    ease: 'power2.inOut'
+  }, transTime);
+
+  const revealTime = transTime + 0.6;
+
+  masterTL.call(() => {
+    const wp = document.getElementById('winnerPhoto');
+    wp.onerror = () => { wp.onerror=null; wp.src='https://hostedboringavatars.vercel.app/api/beam?name='+encodeURIComponent(WINNER.name)+'&size=480'; };
+    wp.src = WINNER.photo;
+    buildNameLetters(WINNER.name.toUpperCase());
+  }, [], revealTime - 0.1);
+
+  masterTL.set('#winnerArea', { opacity:1 }, revealTime);
+
+  // Winner photo
+  masterTL.fromTo('#winnerPhoto',
+    { scale:0.7, opacity:0 },
+    { scale:1, opacity:1, duration:1, ease:'back.out(1.4)' },
+    revealTime
+  );
+
+  masterTL.to('#winnerGlow', { opacity:1, duration:2, ease:'power1.out' }, revealTime + 0.4);
+  masterTL.to('#winnerPhoto', {
+    boxShadow:'0 0 100px rgba(232,169,62,.5), 0 0 200px rgba(232,169,62,.18)',
+    duration:2, ease:'power1.out'
+  }, revealTime + 0.5);
+
+  // GANADOR
+  masterTL.fromTo('#winnerOverline',
+    { opacity:0, y:12 },
+    { opacity:1, y:0, duration:.7, ease:'power3.out' },
+    revealTime + 0.9
+  );
+
+  // Letters
+  masterTL.call(() => {
+    gsap.to('.winner-letter', {
+      opacity:1, y:0, duration:.45, stagger:.035, ease:'back.out(1.8)'
+    });
+  }, [], revealTime + 1.3);
+
+  // Prize
+  masterTL.fromTo('#winnerPrize',
+    { opacity:0, y:14 },
+    { opacity:1, y:0, duration:.7, ease:'power3.out' },
+    revealTime + 2
+  );
+
+  // Session
+  masterTL.fromTo('#winnerSession',
+    { opacity:0 },
+    { opacity:1, duration:.6, ease:'power2.out' },
+    revealTime + 2.4
+  );
+
+  // Confetti
+  masterTL.call(() => spawnConfetti(), [], revealTime + 1.4);
+
+  // Ambient golden
+  masterTL.to('#ambient', {
+    background:'radial-gradient(circle, rgba(232,169,62,.12) 0%, transparent 70%)',
+    scale:2.2, opacity:1, duration:2.5, ease:'power1.out'
+  }, revealTime + 0.8);
+}
+
+/* ── Reset ── */
+function resetDemo() {
+  if (masterTL) { masterTL.kill(); masterTL = null; }
+  gsap.killTweensOf('*');
+  document.getElementById('reelStrip').innerHTML = '';
+  document.getElementById('confettiWrap').innerHTML = '';
+  document.getElementById('winnerNameWrap').innerHTML = '';
+  gsap.set('#reelWindow', { opacity:1, scale:1 });
+  gsap.set('#reelStrip', { y:0 });
+  gsap.set('#winnerArea', { opacity:0 });
+  gsap.set('#overline', { opacity:1 });
+  gsap.set('#prizeLabel', { opacity:0 });
+  gsap.set('.top-info', { opacity:1 });
+  gsap.set('#scanlines', { opacity:0 });
+  gsap.set('#glowRing', { opacity:0, borderColor:'rgba(232,169,62,.06)', boxShadow:'none' });
+  gsap.set('#reelName', { opacity:0 });
+  gsap.set('#participantCount', { opacity:0 });
+  gsap.set('#ambient', {
+    background:'radial-gradient(circle,rgba(232,169,62,.05) 0%,transparent 70%)',
+    scale:1, opacity:.8
+  });
+  spawnParticles();
+  startAmbient();
+}
+
+spawnParticles();
+startAmbient();
+</script>
+</body>
+</html>

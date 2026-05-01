@@ -1,0 +1,56 @@
+/* ============================================================
+   Event Pulse — Navigation (Pill bar)
+   ============================================================ */
+
+.section-nav {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  z-index: 15;
+  pointer-events: auto;
+}
+
+.nav-pill {
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--ink-10);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-50);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-pill:hover {
+  background: white;
+  color: var(--ink);
+  border-color: var(--ink-20);
+}
+
+.nav-pill.active {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
+
+.nav-pill .pip {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.nav-pill.active .pip {
+  background: var(--green);
+}

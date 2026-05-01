@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Event Pulse — Opcion A: Editorial Viva</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Urbanist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#F6F8FA;--ink:#1A1A1A;--ink70:rgba(26,26,26,.7);--ink50:rgba(26,26,26,.5);--ink35:rgba(26,26,26,.35);--ink20:rgba(26,26,26,.18);--ink10:rgba(26,26,26,.1);--ink05:rgba(26,26,26,.05);--teal:#0D9488;--tealS:rgba(13,148,136,.1);--plat:#B5A68B;--platS:rgba(181,166,139,.12);--green:#16A34A;--red:#EF4444;--blue:#2563EB;--purple:#7C3AED;--surface:#FFF;--dsp:'Plus Jakarta Sans',system-ui,sans-serif;--body:'Urbanist',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;--sh1:0 1px 3px rgba(0,0,0,.04);--sh2:0 4px 16px rgba(0,0,0,.06);--sh3:0 8px 32px rgba(0,0,0,.08)}
+*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
+body{background:#0B0E13;font-family:var(--body);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+.stage{position:fixed;inset:0;display:grid;place-items:center;background:#0B0E13}
+.canvas{width:1920px;height:1080px;transform-origin:center;background:var(--bg);position:relative;overflow:hidden;display:grid;grid-template-columns:1fr 420px;grid-template-rows:auto 1fr auto}
+
+/* ═══ HEADER ═══ */
+.header{grid-column:1/-1;padding:24px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--ink05)}
+.h-left{display:flex;align-items:center;gap:14px}
+.h-dot{width:9px;height:9px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.6}}
+.h-brand{font-family:var(--dsp);font-weight:800;font-size:16px}
+.h-pipe{color:var(--ink20);font-size:18px}
+.h-event{font-family:var(--dsp);font-weight:600;font-size:14px;color:var(--ink70)}
+.h-center{display:flex;align-items:baseline;gap:12px}
+.h-clock{font-family:var(--dsp);font-weight:800;font-size:48px;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.h-clock .colon{color:var(--ink35);animation:blink 1s steps(2) infinite}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:.2}}
+.h-sec{font-size:20px;color:var(--ink35);font-weight:500;margin-left:4px}
+.h-right{display:flex;align-items:center;gap:20px}
+.h-weather{font-family:var(--body);font-size:14px;color:var(--ink50);display:flex;align-items:center;gap:6px}
+.h-weather b{color:var(--ink);font-weight:700}
+.h-date{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink50)}
+
+/* ═══ KPIS ═══ */
+.kpis{grid-column:1/-1;display:flex;gap:2px;padding:0 40px;background:var(--ink05)}
+.kpi{flex:1;padding:14px 20px;background:var(--bg);display:flex;align-items:center;gap:14px;cursor:pointer;transition:background .2s}
+.kpi:hover{background:var(--surface)}
+.kpi:first-child{border-radius:0}
+.kpi-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:18px;flex-shrink:0}
+.kpi-val{font-family:var(--dsp);font-weight:800;font-size:28px;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.kpi-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink50);margin-top:2px}
+.kpi-delta{font-family:var(--body);font-weight:700;font-size:11px;color:var(--teal);margin-left:6px}
+
+/* ═══ HERO (left) ═══ */
+.hero-zone{padding:32px 40px;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.hero-label{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink50);margin-bottom:16px;flex-shrink:0}
+.hero-content{flex:1;display:grid;place-items:center;position:relative}
+.hero-moment{position:absolute;inset:0;display:grid;place-items:center;opacity:0;pointer-events:none}
+.hero-moment.show{animation:heroIn 5s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes heroIn{0%{opacity:0;transform:scale(1.02);filter:blur(4px)}8%{opacity:1;transform:scale(1);filter:blur(0)}82%{opacity:1}100%{opacity:0;filter:blur(3px)}}
+
+/* Hero moment types */
+.hm-checkin{display:flex;align-items:center;gap:40px}
+.hm-avatar{width:180px;height:180px;border-radius:50%;background-size:cover;background-position:center;box-shadow:0 20px 50px -15px rgba(0,0,0,.25),0 0 0 4px #fff,0 0 0 5px var(--ink10);animation:avPop .6s cubic-bezier(.2,.7,.2,1);flex-shrink:0}
+@keyframes avPop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.hm-info{}
+.hm-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
+.hm-name{font-family:var(--dsp);font-weight:800;font-size:72px;letter-spacing:-.04em;line-height:1}
+.hm-sub{font-family:var(--body);font-size:18px;color:var(--ink50);margin-top:8px}
+.hm-sub b{color:var(--ink);font-weight:600}
+
+.hm-lead{display:flex;align-items:center;gap:60px;justify-content:center;width:100%}
+.hm-lead .side{display:flex;flex-direction:column;align-items:center}
+.hm-lead .hm-avatar{width:140px;height:140px}
+.hm-lead .badge{width:140px;height:140px;border-radius:50%;background:var(--ink);display:grid;place-items:center;font-family:var(--dsp);font-weight:800;font-size:36px;color:#fff;box-shadow:0 20px 40px -10px rgba(0,0,0,.3)}
+.hm-lead .badge.teal{background:var(--teal)}
+.hm-lead .badge.plat{background:var(--plat)}
+.hm-lead .person-name{font-family:var(--dsp);font-weight:700;font-size:20px;margin-top:12px}
+.hm-lead .person-role{font-size:12px;color:var(--ink50);margin-top:2px}
+.hm-lead .center{display:flex;flex-direction:column;align-items:center;position:relative}
+.hm-lead .line{position:absolute;top:70px;left:-120px;right:-120px;height:2px;background:linear-gradient(90deg,transparent,var(--teal),transparent);animation:lineIn .8s ease-out}
+@keyframes lineIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hm-lead .plus{font-family:var(--dsp);font-weight:800;font-size:100px;color:var(--teal);line-height:.9;letter-spacing:-.04em}
+.hm-lead .plus span{color:var(--ink)}
+.hm-lead .plus-label{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink50);margin-top:8px}
+
+.hm-match{display:flex;flex-direction:column;align-items:center}
+.hm-match .pair{display:flex;align-items:center;gap:50px;margin-bottom:24px;position:relative}
+.hm-match .av{width:140px;height:140px;border-radius:50%;background-size:cover;background-position:center;box-shadow:0 20px 40px -10px rgba(0,0,0,.25),0 0 0 4px #fff}
+.hm-match .av.l{animation:mL .8s cubic-bezier(.2,.7,.2,1)}
+.hm-match .av.r{animation:mR .8s cubic-bezier(.2,.7,.2,1)}
+@keyframes mL{from{transform:translateX(-120px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes mR{from{transform:translateX(120px);opacity:0}to{transform:translateX(0);opacity:1}}
+.hm-match .spark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;background:var(--teal);box-shadow:0 0 20px var(--teal)}
+.hm-match .names{font-family:var(--dsp);font-weight:800;font-size:48px;letter-spacing:-.03em}
+.hm-match .names .amp{color:var(--teal);margin:0 10px;font-weight:500}
+
+.hm-social{display:flex;align-items:center;gap:32px}
+.hm-social .photo{width:280px;height:210px;border-radius:18px;overflow:hidden;box-shadow:0 20px 50px -15px rgba(0,0,0,.2),0 0 0 3px #fff;flex-shrink:0;animation:avPop .7s cubic-bezier(.2,.7,.2,1)}
+.hm-social .photo img{width:100%;height:100%;object-fit:cover}
+.hm-social .caption{font-family:var(--dsp);font-weight:700;font-size:28px;letter-spacing:-.01em;line-height:1.2}
+.hm-social .author{font-size:14px;color:var(--ink50);margin-top:8px;display:flex;align-items:center;gap:8px}
+.hm-social .author-av{width:24px;height:24px;border-radius:50%;background-size:cover;background-position:center}
+.hm-social .likes{display:flex;align-items:center;gap:5px;margin-top:10px;font-family:var(--dsp);font-weight:700;font-size:15px;color:var(--red)}
+
+.hm-poll{width:100%}
+.hm-poll .question{font-family:var(--dsp);font-weight:800;font-size:28px;letter-spacing:-.01em;margin-bottom:24px;line-height:1.15}
+.hm-poll .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.hm-poll .bar-label{font-family:var(--body);font-weight:600;font-size:13px;width:160px;text-align:right;color:var(--ink70)}
+.hm-poll .bar-track{flex:1;height:28px;background:var(--ink05);border-radius:6px;overflow:hidden}
+.hm-poll .bar-fill{height:100%;border-radius:6px;transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
+.hm-poll .bar-fill.win{background:var(--teal)}
+.hm-poll .bar-fill.norm{background:var(--ink20)}
+.hm-poll .bar-pct{font-family:var(--dsp);font-weight:800;font-size:18px;width:50px}
+
+.hm-points{display:flex;flex-direction:column;align-items:center;text-align:center}
+.hm-points .burst{font-family:var(--dsp);font-weight:800;font-size:160px;letter-spacing:-.06em;color:var(--teal);line-height:.9;animation:burstIn .6s cubic-bezier(.2,.8,.2,1)}
+@keyframes burstIn{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+.hm-points.gold .burst{color:var(--plat)}
+.hm-points .who{font-family:var(--dsp);font-weight:700;font-size:32px;margin-top:16px}
+.hm-points .reason{font-size:14px;color:var(--ink50);margin-top:6px}
+
+/* ═══ FEED (right) ═══ */
+.feed-zone{border-left:1px solid var(--ink05);display:flex;flex-direction:column;overflow:hidden}
+.feed-header{padding:16px 20px;border-bottom:1px solid var(--ink05);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.feed-title{font-family:var(--dsp);font-weight:700;font-size:14px}
+.feed-count{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink50)}
+.feed-list{flex:1;overflow-y:auto;padding:4px 0}
+.feed-list::-webkit-scrollbar{width:0}
+
+.feed-item{display:flex;gap:12px;padding:10px 20px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--ink05);align-items:flex-start}
+.feed-item:hover{background:var(--ink05)}
+.feed-item.highlight{animation:feedHighlight 3s ease-out}
+@keyframes feedHighlight{0%{background:var(--tealS)}100%{background:transparent}}
+.fi-avatar{width:36px;height:36px;border-radius:50%;background-size:cover;background-position:center;flex-shrink:0;box-shadow:var(--sh1)}
+.fi-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;font-size:16px}
+.fi-body{flex:1;min-width:0}
+.fi-text{font-size:13px;color:var(--ink70);line-height:1.35}
+.fi-text b{color:var(--ink);font-weight:700}
+.fi-text .sponsor{color:var(--teal);font-weight:700}
+.fi-meta{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--ink35);margin-top:3px;text-transform:uppercase}
+.fi-photo{width:100%;height:120px;border-radius:10px;margin-top:6px;object-fit:cover;box-shadow:var(--sh1)}
+
+/* ═══ ROOMS FOOTER ═══ */
+.rooms-bar{grid-column:1/-1;display:flex;gap:8px;padding:12px 40px;border-top:1px solid var(--ink05);background:var(--surface);overflow-x:auto;flex-shrink:0}
+.room-pill{display:flex;align-items:center;gap:10px;padding:8px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--ink05);cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.room-pill:hover{background:var(--surface);box-shadow:var(--sh2);transform:translateY(-1px)}
+.rp-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.rp-dot.off{background:var(--ink20)}
+.rp-name{font-family:var(--dsp);font-weight:600;font-size:12px;color:var(--ink70)}
+.rp-count{font-family:var(--dsp);font-weight:800;font-size:16px}
+.rp-session{font-size:11px;color:var(--ink50);max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.rp-avs{display:flex}
+.rp-av{width:18px;height:18px;border-radius:50%;margin-left:-5px;border:1.5px solid var(--surface);background-size:cover;background-position:center}
+.rp-av:first-child{margin-left:0}
+
+.hint{position:fixed;bottom:6px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.2);pointer-events:none}
+</style>
+</head>
+<body>
+<div class="stage"><div class="canvas" id="canvas">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="h-left">
+    <div class="h-dot"></div>
+    <div class="h-brand">Event Pulse</div>
+    <div class="h-pipe">|</div>
+    <div class="h-event">Summit Empresarial 2026 — Dia 2</div>
+  </div>
+  <div class="h-center">
+    <div class="h-clock"><span id="hh">10</span><span class="colon">:</span><span id="mm">42</span><span class="h-sec" id="ss">18</span></div>
+  </div>
+  <div class="h-right">
+    <div class="h-weather">Parcialmente nublado &middot; <b>24C</b></div>
+    <div class="h-date">Jueves 23 Abril &middot; Bogota</div>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpis">
+  <div class="kpi" style="border-radius:0">
+    <div class="kpi-icon" style="background:var(--tealS);color:var(--teal)">&#9899;</div>
+    <div><div class="kpi-val"><span id="k-checkin">347</span><span class="kpi-delta">+12</span></div><div class="kpi-label">Check-ins</div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-icon" style="background:rgba(37,99,235,.08);color:var(--blue)">&#9673;</div>
+    <div><div class="kpi-val"><span id="k-online">189</span></div><div class="kpi-label">En linea ahora</div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-icon" style="background:rgba(124,58,237,.08);color:var(--purple)">&#9993;</div>
+    <div><div class="kpi-val"><span id="k-msgs">1,204</span></div><div class="kpi-label">Mensajes</div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-icon" style="background:rgba(239,68,68,.06);color:var(--red)">&#9829;</div>
+    <div><div class="kpi-val"><span id="k-conn">42</span></div><div class="kpi-label">Conexiones</div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-icon" style="background:var(--platS);color:var(--plat)">&#9733;</div>
+    <div><div class="kpi-val"><span id="k-leads">78</span><span class="kpi-delta" style="color:var(--plat)">+3</span></div><div class="kpi-label">Leads</div></div>
+  </div>
+</div>
+
+<!-- HERO ZONE -->
+<div class="hero-zone">
+  <div class="hero-label">Actividad destacada</div>
+  <div class="hero-content" id="heroContent"></div>
+</div>
+
+<!-- FEED ZONE -->
+<div class="feed-zone">
+  <div class="feed-header">
+    <div class="feed-title">En vivo</div>
+    <div class="feed-count" id="feedCount">0 eventos</div>
+  </div>
+  <div class="feed-list" id="feedList"></div>
+</div>
+
+<!-- ROOMS -->
+<div class="rooms-bar" id="roomsBar"></div>
+
+</div></div>
+<div class="hint">Opcion A — Editorial Viva &middot; Hero + Feed lateral</div>
+
+<script>
+function scale(){var c=document.querySelector('.canvas');var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);c.style.transform='scale('+s+')';}
+window.addEventListener('resize',scale);scale();
+
+var AV=function(n){return'https://i.pravatar.cc/280?img='+n;};
+var SOCIAL=['https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80','https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=600&q=80','https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&q=80','https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=600&q=80','https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600&q=80'];
+var NAMES=['Lucia Reyes','Carlos Morales','Sofia Herrera','Juan Perez','Maria Garcia','Pedro Lopez','Laura Diaz','Andres Gil','Camila Rojas','Elena Castillo','Diego Ramirez','Isabella Cruz','Mateo Alvarez','Valentina Torres','Nicolas Vargas','Paula Mendez'];
+var ROLES=['Product Lead','Head of Growth','Founder','CTO','Design Director','VP Engineering'];
+var SPONSORS=[{name:'AWS',leads:23,mark:'AWS',color:'teal'},{name:'Google Cloud',leads:18,mark:'GC',color:''},{name:'Microsoft',leads:14,mark:'Ms',color:'plat'},{name:'Stripe',leads:12,mark:'St',color:''},{name:'Datadog',leads:11,mark:'Dd',color:''}];
+var ROOMS=[{name:'Auditorio Principal',title:'Growth Hacking: metricas que importan',speaker:'Laura Diaz',count:67,live:true},{name:'Sala A',title:'React Native a fondo',speaker:'Andres Gil',count:34,live:true},{name:'Sala B',title:'IA en la empresa moderna',speaker:'Maria Garcia',count:28,live:true},{name:'Sala C',title:'DevOps para startups',speaker:'Carlos Morales',count:0,live:false},{name:'Networking Lounge',title:'Networking libre',speaker:'',count:41,live:true},{name:'Zona Sponsors',title:'Stands abiertos',speaker:'',count:19,live:true}];
+var CAPTIONS=['Increible keynote','Networking on fire','AWS demo impresionante','Panel IA, que nivel','La mejor conferencia'];
+var QUESTIONS=['Cual es la herramienta mas impactante que descubrieron?','Como miden el ROI de la innovacion?','Cual es el mayor reto de escalar cultura?'];
+var QUOTES=['La verdadera restriccion no es compute, es el apetito por la ambiguedad.','Zero-downtime es un resultado cultural.','Si no lo puedes medir, no lo puedes mejorar.'];
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function randAv(){return 1+Math.floor(Math.random()*70);}
+var state={checkins:347,online:189,msgs:1204,conn:42,leads:78};
+var feedCount=0;
+
+// Clock
+var lastMM=null;
+function tickClock(){var d=new Date();var p=function(n){return String(n).padStart(2,'0');};document.getElementById('hh').textContent=p(d.getHours());var mm=p(d.getMinutes());if(mm!==lastMM){document.getElementById('mm').textContent=mm;lastMM=mm;}document.getElementById('ss').textContent=p(d.getSeconds());}
+tickClock();setInterval(tickClock,1000);
+
+// Rooms
+function renderRooms(){var bar=document.getElementById('roomsBar');bar.innerHTML=ROOMS.map(function(r){var avs='';for(var i=0;i<Math.min(3,r.count>0?3:0);i++){avs+='<div class="rp-av" style="background-image:url(\''+AV(randAv())+'\')"></div>';}return'<div class="room-pill"><div class="rp-dot'+(r.live?'':' off')+'"></div><div class="rp-name">'+r.name+'</div><div class="rp-count">'+(r.count||'-')+'</div><div class="rp-session">'+r.title+'</div><div class="rp-avs">'+avs+'</div></div>';}).join('');}
+renderRooms();
+
+// Metrics
+function setK(id,val){document.getElementById(id).textContent=typeof val==='number'?val.toLocaleString():val;}
+setInterval(function(){if(Math.random()<.5){state.checkins++;setK('k-checkin',state.checkins);}state.msgs+=Math.floor(Math.random()*3)+1;setK('k-msgs',state.msgs);state.online+=Math.random()<.5?1:-1;state.online=Math.max(175,Math.min(210,state.online));setK('k-online',state.online);},3000);
+setInterval(function(){if(Math.random()<.45){var s=pick(SPONSORS);s.leads++;state.leads++;setK('k-leads',state.leads);}if(Math.random()<.3){state.conn++;setK('k-conn',state.conn);}},5500);
+
+// ═══ FEED ═══
+var feedList=document.getElementById('feedList');
+var feedCountEl=document.getElementById('feedCount');
+
+function addFeed(html,highlight){
+  feedCount++;
+  var div=document.createElement('div');
+  div.className='feed-item'+(highlight?' highlight':'');
+  div.innerHTML=html;
+  feedList.insertBefore(div,feedList.firstChild);
+  while(feedList.children.length>50)feedList.removeChild(feedList.lastChild);
+  feedCountEl.textContent=feedCount+' eventos';
+}
+
+var FEED_TYPES=[
+  {w:3,fn:function(){var n=pick(NAMES);var r=pick(ROOMS.filter(function(x){return x.live;}));return{html:'<div class="fi-avatar" style="background-image:url(\''+AV(randAv())+'\')"></div><div class="fi-body"><div class="fi-text"><b>'+n+'</b> hizo check-in en <b>'+r.name+'</b></div><div class="fi-meta">Check-in &middot; Ahora</div></div>',hero:'checkin',name:n,room:r.name};}},
+  {w:2.5,fn:function(){var s=pick(SPONSORS);var n=pick(NAMES);return{html:'<div class="fi-icon" style="background:var(--platS);color:var(--plat)">&#9733;</div><div class="fi-body"><div class="fi-text"><span class="sponsor">'+s.name+'</span> capturo lead de <b>'+n+'</b></div><div class="fi-meta">Lead &middot; Ahora</div></div>',hero:'lead',sponsor:s,name:n};}},
+  {w:2,fn:function(){var a=pick(NAMES),b=pick(NAMES);return{html:'<div class="fi-icon" style="background:rgba(124,58,237,.08);color:var(--purple)">&#9829;</div><div class="fi-body"><div class="fi-text"><b>'+a.split(' ')[0]+'</b> y <b>'+b.split(' ')[0]+'</b> hicieron match en networking</div><div class="fi-meta">Conexion &middot; Ahora</div></div>',hero:'match',a:a,b:b};}},
+  {w:1.5,fn:function(){var n=pick(NAMES);var img=pick(SOCIAL);var cap=pick(CAPTIONS);return{html:'<div class="fi-avatar" style="background-image:url(\''+AV(randAv())+'\')"></div><div class="fi-body"><div class="fi-text"><b>'+n+'</b> publico en Social Wall</div><img class="fi-photo" src="'+img+'" alt=""><div class="fi-meta">Social &middot; Ahora</div></div>',hero:'social',name:n,img:img,cap:cap};}},
+  {w:1.2,fn:function(){var r=pick(ROOMS.filter(function(x){return x.speaker&&x.live;}));var score=(4.5+Math.random()*.5).toFixed(1);return{html:'<div class="fi-icon" style="background:var(--platS);color:var(--plat)">&#9733;</div><div class="fi-body"><div class="fi-text">Sesion <b>'+r.title+'</b> evaluada con <b>'+score+'/5</b></div><div class="fi-meta">Rating &middot; Ahora</div></div>',hero:'rating',room:r,score:score};}},
+  {w:1,fn:function(){var n=pick(NAMES);var pts=pick([25,50,75,100]);return{html:'<div class="fi-icon" style="background:var(--tealS);color:var(--teal)">+'+pts+'</div><div class="fi-body"><div class="fi-text"><b>'+n+'</b> gano <b>+'+pts+' pts</b> en gamificacion</div><div class="fi-meta">Puntos &middot; Ahora</div></div>',hero:'points',name:n,pts:pts};}},
+  {w:1,fn:function(){var q=pick(QUESTIONS);var n=pick(NAMES);var votes=Math.floor(Math.random()*20)+8;return{html:'<div class="fi-icon" style="background:rgba(37,99,235,.08);color:var(--blue)">?</div><div class="fi-body"><div class="fi-text">Pregunta popular: <b>"'+q.substring(0,60)+'..."</b> — '+votes+' votos</div><div class="fi-meta">Q&A &middot; '+n+'</div></div>',hero:'qa',q:q,votes:votes};}},
+  {w:1,fn:function(){var n=pick(NAMES);var r=pick(ROOMS.filter(function(x){return x.live;}));var quote=pick(QUOTES);return{html:'<div class="fi-avatar" style="background-image:url(\''+AV(randAv())+'\')"></div><div class="fi-body"><div class="fi-text"><b>'+n+'</b>: "'+quote.substring(0,80)+'..."</div><div class="fi-meta">Chat &middot; '+r.name+'</div></div>',hero:'message',name:n,quote:quote,room:r.name};}},
+  {w:.8,fn:function(){var q=pick(QUESTIONS);return{html:'<div class="fi-icon" style="background:var(--tealS);color:var(--teal)">&#9632;</div><div class="fi-body"><div class="fi-text">Encuesta: <b>"'+q.substring(0,50)+'..."</b> — resultados en vivo</div><div class="fi-meta">Encuesta &middot; Auditorio</div></div>',hero:'poll',q:q};}},
+];
+
+function wPickFeed(){var total=FEED_TYPES.reduce(function(s,t){return s+t.w;},0);var r=Math.random()*total;for(var i=0;i<FEED_TYPES.length;i++){r-=FEED_TYPES[i].w;if(r<=0)return FEED_TYPES[i];}return FEED_TYPES[0];}
+
+// ═══ HERO MOMENTS ═══
+var heroEl=document.getElementById('heroContent');
+var showing=false;
+
+function playHero(html){
+  if(showing)return;showing=true;
+  var n=document.createElement('div');n.className='hero-moment show';n.innerHTML=html;
+  heroEl.appendChild(n);
+  setTimeout(function(){heroEl.removeChild(n);showing=false;},5000);
+}
+
+function heroFromFeed(data){
+  if(data.hero==='checkin'){
+    return'<div class="hm-checkin"><div class="hm-avatar" style="background-image:url(\''+AV(randAv())+'\')"></div><div class="hm-info"><div class="hm-eyebrow">Nuevo check-in</div><div class="hm-name">'+data.name.split(' ')[0]+'</div><div class="hm-sub">acaba de llegar a <b>'+data.room+'</b></div></div></div>';
+  }
+  if(data.hero==='lead'){
+    var s=data.sponsor;
+    return'<div class="hm-lead"><div class="hm-eyebrow" style="text-align:center;width:100%;margin-bottom:20px">Lead capturado</div><div class="side"><div class="hm-avatar" style="background-image:url(\''+AV(randAv())+'\')"></div><div class="person-name">'+data.name+'</div><div class="person-role">'+pick(ROLES)+'</div></div><div class="center"><div class="line"></div><div class="plus"><span>+</span>1</div><div class="plus-label">Nuevo lead</div></div><div class="side"><div class="badge '+s.color+'">'+s.mark+'</div><div class="person-name">'+s.name+'</div><div class="person-role">Sponsor</div></div></div>';
+  }
+  if(data.hero==='match'){
+    return'<div class="hm-match"><div class="hm-eyebrow">Conexion networking</div><div class="pair"><div class="av l" style="background-image:url(\''+AV(randAv())+'\')"></div><div class="spark"></div><div class="av r" style="background-image:url(\''+AV(randAv())+'\')"></div></div><div class="names">'+data.a.split(' ')[0]+'<span class="amp">&</span>'+data.b.split(' ')[0]+'</div></div>';
+  }
+  if(data.hero==='social'){
+    return'<div class="hm-social"><div class="hm-eyebrow" style="margin-bottom:20px">Social Wall</div><div class="photo"><img src="'+data.img+'" alt=""></div><div><div class="caption">'+data.cap+'</div><div class="author"><div class="author-av" style="background-image:url(\''+AV(randAv())+'\')"></div>'+data.name+'</div><div class="likes"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> '+Math.floor(Math.random()*15+3)+' likes</div></div></div>';
+  }
+  if(data.hero==='points'){
+    return'<div class="hm-points"><div class="hm-eyebrow">Gamificacion</div><div class="burst">+'+data.pts+'</div><div class="who">'+data.name+'</div><div class="reason">'+pick(['circuito sponsors','trivia correcta','badge escaneado'])+'</div></div>';
+  }
+  if(data.hero==='poll'){
+    var opts=['Totalmente de acuerdo','De acuerdo','Neutral','En desacuerdo'];var vals=[42,31,18,9];var total=100;var max=42;
+    var bars=opts.map(function(o,i){var pct=vals[i];var w=Math.round(vals[i]/max*100);return'<div class="bar-row"><div class="bar-label">'+o+'</div><div class="bar-track"><div class="bar-fill '+(i===0?'win':'norm')+'" style="width:'+w+'%"></div></div><div class="bar-pct">'+pct+'%</div></div>';}).join('');
+    return'<div class="hm-poll"><div class="hm-eyebrow">Encuesta en vivo</div><div class="question">'+data.q+'</div>'+bars+'</div>';
+  }
+  // Default: simple text
+  return'<div class="hm-checkin"><div class="hm-avatar" style="background-image:url(\''+AV(randAv())+'\')"></div><div class="hm-info"><div class="hm-eyebrow">Actividad</div><div class="hm-name">'+pick(NAMES).split(' ')[0]+'</div><div class="hm-sub">interactuando en el evento</div></div></div>';
+}
+
+// ═══ Main loop ═══
+// Feed adds every 2s, hero plays every 5s from the last feed item
+var lastFeedData=null;
+
+function tick(){
+  var type=wPickFeed();
+  var data=type.fn();
+  addFeed(data.html,true);
+  lastFeedData=data;
+}
+
+// Feed: every 2s
+setInterval(tick,2000);
+// Seed initial
+for(var i=0;i<8;i++){var t=wPickFeed();var d=t.fn();addFeed(d.html,false);lastFeedData=d;}
+
+// Hero: every 5s, takes from last feed item
+setInterval(function(){
+  if(lastFeedData){playHero(heroFromFeed(lastFeedData));}
+},5000);
+// First hero
+setTimeout(function(){if(lastFeedData)playHero(heroFromFeed(lastFeedData));},1500);
+</script>
+</body>
+</html>

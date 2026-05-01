@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission Control — EventOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="mc" id="mc">
+
+  <!-- ===== DISCONNECT BANNER ===== -->
+  <div class="mc-disconnect" id="disconnectBanner" hidden>
+    <span class="icon">wifi_off</span>
+    Conexion perdida — reconectando...
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="mc-header">
+    <div class="mc-brand">
+      <div class="mc-brand-mark"></div>
+      <span>Mission Control</span>
+    </div>
+    <nav class="mc-crumbs">
+      <span class="mc-sep">/</span>
+      <span>Bancolombia Summit 2026</span>
+      <span class="mc-sep">/</span>
+      <span class="mc-crumb-active">Keynote Principal</span>
+    </nav>
+    <div style="flex:1"></div>
+    <div class="mc-live-badge">
+      <span class="mc-live-dot"></span>
+      EN VIVO
+      <span class="mc-live-sep"></span>
+      <span class="mc-live-time" id="liveTime">01:24:08</span>
+    </div>
+    <div class="mc-avatar">KS</div>
+  </header>
+
+  <!-- ===== PROJECTION INDICATOR ===== -->
+  <div class="mc-projection" id="projectionBar" hidden>
+    <span class="icon">cast</span>
+    <span>Proyectando: <b id="projectionLabel">—</b></span>
+    <div style="flex:1"></div>
+    <button class="mc-projection-stop" onclick="stopProjection()">Detener</button>
+  </div>
+
+  <!-- ===== BODY ===== -->
+  <div class="mc-body">
+    <div class="mc-main">
+
+      <!-- STREAM COLUMN -->
+      <section class="mc-stream-col">
+        <!-- Stream 16:9 -->
+        <div class="mc-stream">
+          <div class="mc-stream-top">
+            <span class="mc-chip">YouTube &middot; 1080p</span>
+            <div class="mc-stream-ctrls">
+              <button class="mc-stream-btn"><span class="icon">volume_up</span></button>
+              <button class="mc-stream-btn"><span class="icon">fullscreen</span></button>
+            </div>
+          </div>
+          <div class="mc-stream-video">
+            <iframe src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1" allow="autoplay;fullscreen" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <!-- About: speaker + session info -->
+        <div class="mc-about">
+          <div class="mc-about-speaker">
+            <div class="mc-about-avatar"><img src="https://i.pravatar.cc/96?img=12" alt=""></div>
+            <div>
+              <div class="mc-about-name">Carlos Raul Yepes</div>
+              <div class="mc-about-role">CEO Bancolombia</div>
+            </div>
+            <span class="mc-about-type">Keynote</span>
+          </div>
+          <div class="mc-about-title">El futuro de la banca conversacional en Colombia</div>
+          <div class="mc-about-meta">
+            <span class="mc-about-item"><span class="icon">calendar_today</span> Dia 2 — Abril 18, 2026</span>
+            <span class="mc-about-item"><span class="icon">schedule</span> 10:00 — 11:30 <span class="mc-about-dur">1h 30m</span></span>
+            <span class="mc-about-item"><span class="icon">location_on</span> Escenario Principal</span>
+          </div>
+        </div>
+
+        <!-- Metrics -->
+        <div class="mc-metrics">
+          <div class="mc-metric mc-m-blue">
+            <div class="mc-metric-lbl">Audiencia</div>
+            <div class="mc-metric-val">8,214</div>
+            <div class="mc-metric-sub up">+4.2%</div>
+          </div>
+          <div class="mc-metric mc-m-green">
+            <div class="mc-metric-lbl">Mensajes</div>
+            <div class="mc-metric-val">1,238</div>
+            <div class="mc-metric-sub"><span id="mpmVal">42</span>/min</div>
+          </div>
+          <div class="mc-metric mc-m-amber">
+            <div class="mc-metric-lbl">Preguntas</div>
+            <div class="mc-metric-val">47</div>
+            <div class="mc-metric-sub">9 pendientes</div>
+          </div>
+          <div class="mc-metric mc-m-teal">
+            <div class="mc-metric-lbl">Engagement</div>
+            <div class="mc-metric-val">73%</div>
+            <div class="mc-metric-sub up">+8%</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="mc-divider"></div>
+
+      <!-- CONTROL COLUMN -->
+      <section class="mc-ctrl">
+        <div class="mc-ctrl-head">
+          <div class="mc-tabs">
+            <button class="mc-tab on" data-tab="chat"><span class="icon">chat_bubble</span>Chat <span class="mc-badge">1.2k</span></button>
+            <button class="mc-tab" data-tab="qna"><span class="icon">help</span>Q&A <span class="mc-badge warn">9</span></button>
+            <button class="mc-tab" data-tab="polls"><span class="icon">bar_chart</span>Polls <span class="mc-badge">3</span></button>
+            <button class="mc-tab" data-tab="custom"><span class="icon">web</span>Custom</button>
+          </div>
+          <button class="mc-save" id="saveBtn" onclick="doSave()">
+            <span class="icon">bolt</span> Guardar
+          </button>
+        </div>
+
+        <div class="mc-ctrl-sep"></div>
+
+        <!-- CHAT -->
+        <div class="mc-pnl" data-panel="chat">
+          <div class="mc-pin" id="pinBar">
+            <span class="icon fill" style="font-size:13px">push_pin</span>
+            <div class="mc-pin-body"><b>Moderador</b> Bienvenidos a la keynote. Preguntas al final.</div>
+            <button class="mc-pin-edit" title="Editar" onclick="promptPin()"><span class="icon">edit</span></button>
+            <button class="mc-pin-rm" onclick="unpin()">Quitar</button>
+          </div>
+          <div class="mc-queue">
+            <span class="mc-tg-label">Emoji</span>
+            <div class="mc-sw" id="swEmoji"></div>
+            <div class="mc-tg-sep"></div>
+            <span class="mc-tg-label">Slow</span>
+            <select class="mc-sel" id="selSlow">
+              <option value="0">Off</option><option value="5">5s</option><option value="10">10s</option><option value="30">30s</option><option value="60">60s</option>
+            </select>
+            <div class="mc-tg-sep"></div>
+            <button class="mc-qspd on">Directo</button>
+            <button class="mc-qspd">0.5s</button>
+            <button class="mc-qspd">1s</button>
+            <button class="mc-qspd">2s</button>
+            <span class="mc-qcount" id="qBadge"></span>
+            <div style="flex:1"></div>
+            <button class="mc-pause" id="btnPause"><span class="icon">pause</span> Pausar</button>
+          </div>
+          <div class="mc-chat">
+            <div class="mc-feed-w">
+              <div class="mc-feed" id="feed"></div>
+              <button class="mc-scroll-btn" id="scrollBtn" style="display:none">Nuevos mensajes</button>
+            </div>
+            <div class="mc-banned-side">
+              <div class="mc-banned-h">Baneados (<span id="banCt">2</span>)</div>
+              <div class="mc-banned-l" id="banList"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q&A -->
+        <div class="mc-pnl" data-panel="qna" hidden>
+          <div class="mc-qna-bar">
+            <button class="mc-qf on" data-f="pending">Pendientes <span class="ct">9</span></button>
+            <button class="mc-qf" data-f="approved">Aprobadas <span class="ct">14</span></button>
+            <button class="mc-qf" data-f="answered">Respondidas <span class="ct">23</span></button>
+            <button class="mc-qf" data-f="dismissed">Descartadas <span class="ct">4</span></button>
+          </div>
+          <div class="mc-qna-list" id="qnaList"></div>
+        </div>
+
+        <!-- POLLS -->
+        <div class="mc-pnl" data-panel="polls" hidden>
+          <div class="mc-poll-top">
+            <button class="mc-btn-w" id="pollNewBtn"><span class="icon">add</span> Nueva encuesta</button>
+          </div>
+          <div class="mc-polls" id="pollsList"></div>
+          <!-- Create form overlay -->
+          <div class="mc-poll-overlay" id="pollOverlay" hidden>
+            <div class="mc-poll-card-form">
+              <div class="mc-poll-card-head">
+                <span>Nueva encuesta</span>
+                <button class="mc-poll-card-close" id="pollCloseBtn"><span class="icon">close</span></button>
+              </div>
+              <input type="text" class="mc-inp" placeholder="Titulo de la encuesta">
+              <select class="mc-sel full" id="pollType">
+                <option value="mc_single">Seleccion unica</option><option value="mc_multi">Multi-seleccion</option><option value="star">Calificacion 1-5</option><option value="text">Respuesta abierta</option>
+              </select>
+              <div id="pollOptsContainer">
+                <input type="text" class="mc-inp sm" placeholder="Opcion 1">
+                <input type="text" class="mc-inp sm" placeholder="Opcion 2">
+              </div>
+              <div class="mc-poll-card-foot">
+                <button class="mc-btn-g" id="pollAddOpt">+ Opcion</button>
+                <div style="flex:1"></div>
+                <button class="mc-btn-g" onclick="closePollForm()">Cancelar</button>
+                <button class="mc-btn-w" onclick="closePollForm();toast('Encuesta creada')">Crear</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CUSTOM -->
+        <div class="mc-pnl" data-panel="custom" hidden>
+          <div class="mc-custom">
+            <div class="mc-custom-row">
+              <input class="mc-inp mono full" value="https://slides.com/bancolombia/summit-2026/live">
+              <button class="mc-btn-g"><span class="icon">link</span> Validar</button>
+              <button class="mc-btn-w"><span class="icon">visibility</span> Preview</button>
+            </div>
+            <div class="mc-custom-chips">
+              <span class="mc-cchip ok"><span class="icon">verified</span> HTTPS</span>
+              <span class="mc-cchip">slides.com, docs.google.com, miro.com, youtube.com, figma.com</span>
+            </div>
+            <div class="mc-custom-frame"><span class="icon" style="font-size:28px">web</span>Preview del embed</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- SIDEBAR: projection preview + timeline -->
+    <aside class="mc-side">
+      <!-- Mini LED preview -->
+      <div class="mc-led" id="ledPreview">
+        <div class="mc-led-h"><span class="icon">tv</span> Pantalla LED</div>
+        <div class="mc-led-body" id="ledBody">
+          <span class="mc-led-standby">Standby</span>
+        </div>
+      </div>
+      <div class="mc-side-sep"></div>
+      <div class="mc-side-h"><span class="icon">timeline</span> Timeline</div>
+      <div class="mc-tl" id="timeline"></div>
+    </aside>
+  </div>
+
+  <!-- STATUS BAR -->
+  <footer class="mc-status">
+    <span class="mc-st"><span class="mc-st-dot ok"></span><b>Socket.IO</b> conectado</span>
+    <span class="mc-st"><b>sesion:</b> <span id="sbTime">01:24:08</span></span>
+    <div style="flex:1"></div>
+    <span class="mc-st">EventOS — Lumina Noir</span>
+  </footer>
+</div>
+
+<!-- TOAST -->
+<div class="mc-toast" id="toast"></div>
+
+<!-- BAN CONFIRM -->
+<div class="mc-confirm" id="banConfirm" hidden>
+  <div class="mc-confirm-box">
+    <span>Banear a <b id="banWho"></b>?</span>
+    <div class="mc-confirm-acts">
+      <button class="mc-btn-g" onclick="cancelBan()">Cancelar</button>
+      <button class="mc-btn-w" onclick="confirmBan()">Banear</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

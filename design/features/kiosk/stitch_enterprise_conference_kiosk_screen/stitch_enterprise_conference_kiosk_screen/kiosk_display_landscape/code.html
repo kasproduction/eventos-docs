@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#393844",
+                    "on-surface": "#e4e1f0",
+                    "tertiary-container": "#08a56e",
+                    "on-surface-variant": "#bdcac0",
+                    "on-tertiary-fixed": "#002112",
+                    "on-primary-container": "#282a2a",
+                    "error-container": "#93000a",
+                    "primary": "#c6c6c7",
+                    "tertiary-fixed": "#7bfabb",
+                    "outline-variant": "#3e4942",
+                    "surface-dim": "#12121d",
+                    "on-tertiary": "#003823",
+                    "on-primary": "#2f3131",
+                    "on-error-container": "#ffdad6",
+                    "error": "#ffb4ab",
+                    "outline": "#87948b",
+                    "primary-fixed-dim": "#c6c6c7",
+                    "on-secondary": "#003824",
+                    "on-tertiary-container": "#00311d",
+                    "on-secondary-fixed": "#002113",
+                    "on-primary-fixed-variant": "#454747",
+                    "inverse-on-surface": "#302f3b",
+                    "inverse-primary": "#5d5f5f",
+                    "background": "#12121d",
+                    "secondary": "#6edba7",
+                    "surface-container-low": "#1b1b25",
+                    "secondary-fixed": "#8bf8c2",
+                    "on-background": "#e4e1f0",
+                    "surface-container-high": "#292934",
+                    "surface-tint": "#c6c6c7",
+                    "tertiary": "#5ddda1",
+                    "surface-variant": "#34343f",
+                    "surface-container-highest": "#34343f",
+                    "on-secondary-fixed-variant": "#005235",
+                    "surface-container-lowest": "#0d0d17",
+                    "secondary-fixed-dim": "#6edba7",
+                    "tertiary-fixed-dim": "#5ddda1",
+                    "primary-container": "#909191",
+                    "primary-fixed": "#e2e2e2",
+                    "on-secondary-container": "#00311e",
+                    "secondary-container": "#30a374",
+                    "inverse-surface": "#e4e1f0",
+                    "surface-container": "#1f1f29",
+                    "on-error": "#690005",
+                    "surface": "#12121d",
+                    "on-tertiary-fixed-variant": "#005234",
+                    "on-primary-fixed": "#1a1c1c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #0c0c16;
+            color: #e4e1f0;
+            overflow: hidden;
+        }
+        .glass-panel {
+            background: rgba(41, 41, 52, 0.4);
+            backdrop-filter: blur(40px);
+        }
+        .ambient-glow {
+            box-shadow: 0 0 80px 10px rgba(110, 219, 167, 0.08);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body selection:bg-secondary selection:text-on-secondary">
+<!-- Top Navigation Bar (Shared Component) -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-12 py-8 bg-gradient-to-b from-[#12121d] to-transparent">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-sm bg-surface-container-highest flex items-center justify-center border border-outline-variant/10">
+<div class="text-xs font-bold font-headline text-primary tracking-tighter">L4</div>
+</div>
+<h1 class="font-headline tracking-[0.05em] uppercase text-sm font-semibold text-primary">CONFERENCE ROOM 402</h1>
+</div>
+<div class="flex gap-12">
+<div class="flex flex-col items-center gap-1 group cursor-pointer hover:opacity-80 transition-opacity">
+<span class="font-headline tracking-[0.1em] text-[11px] font-bold text-secondary">SCHEDULE</span>
+</div>
+<div class="flex flex-col items-center gap-1 group cursor-pointer hover:opacity-80 transition-opacity">
+<span class="font-headline tracking-[0.1em] text-[11px] font-bold text-primary/70">RESERVE</span>
+</div>
+</div>
+</header>
+<main class="h-screen w-full flex">
+<!-- Left Column: Hero Session Info -->
+<section class="w-7/12 h-full relative flex flex-col justify-end p-16 pb-24">
+<!-- Background Image with Gradient Overlay -->
+<div class="absolute inset-0 z-0">
+<img alt="Speaker background" class="w-full h-full object-cover opacity-30 grayscale" data-alt="Cinematic wide shot of a professional speaker on a dimly lit stage with dramatic theatrical blue and green spotlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA73xP5GOT6RwlmmYu7LCX5sMjr-vLMXNAfLvcmKJxWVpqOi_xoWNLY4hSO00LcT2nGttnVh514I6U9hWpn3oVh_94AE59C1_Rfp_M3ih2Sm2J8-9060Izx8HvijQ-Y8D1sAvHlc2mKnzQtziJwQ2Bi0KU5_RCObxFX7KiclPWW9emPGtQwdVqit--w6R94qhiL5I8VB8h_bGYGHTKK41QH71MqMhX4YoUP0c5QmWBUjVN_cMM81GWP3xpUymvzX--i1hVDScwJiTna"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#0c0c16] via-[#0c0c16]/60 to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-[#0c0c16] via-transparent to-transparent"></div>
+</div>
+<!-- Content Area -->
+<div class="relative z-10 space-y-12">
+<!-- Live Pulse -->
+<div class="flex items-center gap-4">
+<div class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-secondary"></span>
+</div>
+<span class="font-headline font-bold text-secondary tracking-[0.2em] text-xs uppercase">Live Now</span>
+</div>
+<div class="space-y-4">
+<span class="font-label text-on-surface-variant tracking-widest uppercase text-sm font-medium">10:00 — 11:30 AM</span>
+<h2 class="font-headline text-7xl font-extrabold tracking-tight text-on-surface leading-tight max-w-3xl">
+                        AI-Driven Sustainability in Modern Architecture
+                    </h2>
+</div>
+<div class="flex items-center gap-6 pt-4">
+<img alt="Speaker" class="w-20 h-20 rounded-full border-2 border-outline-variant/30 object-cover" data-alt="Professional corporate headshot of a woman with a confident smile, wearing a modern gray blazer, clean studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDC-xqLPJyQvqW7vDGXqivOe07m1WH7wom4KRE2AS5WZEI7awHmxFzT76e4EYd4sV2ACsKElmSZPrkb_JzxbiWrmMtSlOEM2KnRRlgGPWsVcZUidwVwkY8FLRvMct7sFOd2ArOaN1N9DMivuoJFyj7-kvsnFHYLMKx5fXf6HJXtWigjh2gcAMNQLYly6KWi_uxQ33-5JwauN3Y2gCVIo6wctv-gC8WcibdnShd1JCnIyiXalXlkfO4PM-0E2iMeeB42idVRrDL_QcMb"/>
+<div class="space-y-1">
+<p class="font-headline text-xl font-bold text-on-surface">Dr. Elena Sterling</p>
+<p class="font-label text-on-surface-variant tracking-wide text-sm">Principal Architect, Nexus Design</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column: Schedule & Details -->
+<section class="w-5/12 h-full bg-surface-container-lowest flex flex-col p-16 pt-32 gap-16 relative">
+<!-- Scan Status Ambient Glow -->
+<div class="absolute top-0 right-0 p-12 flex flex-col items-end gap-2">
+<div class="text-[10px] font-headline font-bold tracking-[0.2em] text-on-surface-variant/40 uppercase">Scanner Status</div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_12px_rgba(110,219,167,0.6)]"></div>
+<span class="font-label text-xs font-bold text-secondary tracking-widest">READY</span>
+</div>
+</div>
+<!-- Next Session Card -->
+<div class="space-y-6">
+<h3 class="font-headline text-[11px] font-bold tracking-[0.2em] text-on-surface-variant uppercase">Coming Up Next</h3>
+<div class="glass-panel rounded-xl p-8 border border-outline-variant/10 space-y-4 ambient-glow">
+<div class="flex justify-between items-start">
+<span class="font-label text-xs font-bold text-on-surface-variant tracking-wider">12:00 PM</span>
+<div class="px-3 py-1 rounded-sm bg-surface-container-high border border-outline-variant/20 text-[10px] font-bold text-primary tracking-widest uppercase">30 MIN BREAK</div>
+</div>
+<h4 class="font-headline text-2xl font-bold text-on-surface leading-snug">The Future of Decentralized Infrastructure</h4>
+<p class="font-label text-sm text-on-surface-variant/80">With Marcus Chen, CTO of GlobalNodes</p>
+</div>
+</div>
+<!-- Mini Timeline Schedule -->
+<div class="space-y-8 flex-grow">
+<h3 class="font-headline text-[11px] font-bold tracking-[0.2em] text-on-surface-variant uppercase">Full Day Timeline</h3>
+<div class="relative space-y-10">
+<!-- Timeline Vertical Line -->
+<div class="absolute left-[3px] top-2 bottom-2 w-[1px] bg-outline-variant/20"></div>
+<!-- Timeline Item 1 -->
+<div class="relative pl-10 flex flex-col gap-1">
+<div class="absolute left-0 top-1.5 w-1.5 h-1.5 rounded-full bg-on-surface-variant/40"></div>
+<div class="flex items-center justify-between">
+<span class="font-label text-xs font-bold text-on-surface-variant tracking-wider">01:30 PM</span>
+<span class="font-label text-[10px] font-medium text-on-surface-variant/40 uppercase">Workshop</span>
+</div>
+<p class="font-headline text-lg font-semibold text-on-surface/90">Urban Re-wilding Strategies</p>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative pl-10 flex flex-col gap-1">
+<div class="absolute left-0 top-1.5 w-1.5 h-1.5 rounded-full bg-on-surface-variant/40"></div>
+<div class="flex items-center justify-between">
+<span class="font-label text-xs font-bold text-on-surface-variant tracking-wider">03:00 PM</span>
+<span class="font-label text-[10px] font-medium text-on-surface-variant/40 uppercase">Panel Discussion</span>
+</div>
+<p class="font-headline text-lg font-semibold text-on-surface/90">Materials for the Next Century</p>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative pl-10 flex flex-col gap-1 opacity-40">
+<div class="absolute left-0 top-1.5 w-1.5 h-1.5 rounded-full bg-outline-variant/20"></div>
+<div class="flex items-center justify-between">
+<span class="font-label text-xs font-bold text-on-surface-variant tracking-wider">04:30 PM</span>
+<span class="font-label text-[10px] font-medium text-on-surface-variant/40 uppercase">Closing</span>
+</div>
+<p class="font-headline text-lg font-semibold text-on-surface/90">Wrap-up &amp; Networking</p>
+</div>
+</div>
+</div>
+<!-- Footer Action Area -->
+<div class="mt-auto flex gap-4">
+<button class="flex-1 bg-primary text-on-primary font-headline font-bold text-xs py-5 rounded-sm tracking-[0.2em] uppercase hover:opacity-90 transition-opacity">
+                    RESERVE SEAT
+                </button>
+<button class="px-8 glass-panel border border-outline-variant/20 text-on-surface font-headline font-bold text-xs py-5 rounded-sm tracking-[0.2em] uppercase hover:bg-surface-container-high transition-all">
+                    DETAILS
+                </button>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Shared Component - Web Context) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-center gap-24 items-center pb-10 bg-[#0d0d17]/80 backdrop-blur-xl">
+<a class="flex flex-col items-center justify-center text-secondary border-t-2 border-secondary pt-4 transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">calendar_today</span>
+<span class="font-headline tracking-[0.05em] text-[10px] font-bold">SCHEDULE</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/40 pt-4 transition-all duration-300 hover:text-primary" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">add_box</span>
+<span class="font-headline tracking-[0.05em] text-[10px] font-bold">RESERVE</span>
+</a>
+</nav>
+</body></html>

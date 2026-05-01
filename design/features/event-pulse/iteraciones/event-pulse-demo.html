@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Pulse — EventOS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #F6F8FA;
+    --surface: #FFFFFF;
+    --surface-hover: #F0F2F5;
+    --border: rgba(0,0,0,0.06);
+    --ink: #1A1A1A;
+    --ink-secondary: rgba(26,26,26,0.6);
+    --ink-muted: rgba(26,26,26,0.35);
+    --ink-placeholder: rgba(26,26,26,0.2);
+    --teal: #0D9488;
+    --teal-soft: rgba(13,148,136,0.08);
+    --green: #16A34A;
+    --green-soft: rgba(22,163,74,0.08);
+    --blue: #2563EB;
+    --blue-soft: rgba(37,99,235,0.06);
+    --amber: #B5A68B;
+    --amber-soft: rgba(181,166,139,0.08);
+    --red: #DC2626;
+    --red-soft: rgba(220,38,38,0.06);
+    --purple: #7C3AED;
+    --purple-soft: rgba(124,58,237,0.06);
+    --fh: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --fb: 'Urbanist', system-ui, sans-serif;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 20px rgba(0,0,0,0.08);
+    --r: 16px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--fb);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .icon {
+    font-family: 'Material Symbols Rounded';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+  }
+
+  .icon.filled { font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24; }
+
+  /* ═══ HEADER ═══ */
+  .pulse-header {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .pulse-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pulse-logo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: livePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(22,163,74,0.4); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(22,163,74,0); }
+  }
+
+  .pulse-logo-text {
+    font-family: var(--fh);
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: -0.3px;
+  }
+
+  .pulse-logo-sub {
+    font-size: 11px;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+
+  .pulse-event-name {
+    font-family: var(--fh);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink-secondary);
+    flex: 1;
+  }
+
+  /* Header widgets */
+  .pulse-widgets {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .pulse-widget {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--bg);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-secondary);
+  }
+
+  .pulse-widget .icon { font-size: 16px; color: var(--ink-muted); }
+
+  .pulse-clock {
+    font-family: var(--fh);
+    font-weight: 700;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ═══ KPI BAR ═══ */
+  .pulse-kpis {
+    display: flex;
+    gap: 12px;
+    padding: 12px 24px;
+    flex-shrink: 0;
+  }
+
+  .pulse-kpi {
+    flex: 1;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px 18px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .pulse-kpi-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pulse-kpi-icon .icon { font-size: 20px; }
+
+  .pulse-kpi-data {}
+
+  .pulse-kpi-value {
+    font-family: var(--fh);
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1;
+    letter-spacing: -0.5px;
+  }
+
+  .pulse-kpi-label {
+    font-size: 11px;
+    color: var(--ink-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  /* ═══ MAIN CONTENT ═══ */
+  .pulse-main {
+    flex: 1;
+    display: flex;
+    gap: 16px;
+    padding: 0 24px 24px;
+    overflow: hidden;
+  }
+
+  /* ═══ VENUE MAP ═══ */
+  .pulse-venue {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pulse-venue-title {
+    font-family: var(--fh);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 4px 0;
+  }
+
+  .pulse-rooms {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  /* Room card */
+  .pulse-room {
+    background: var(--surface);
+    border-radius: var(--r);
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pulse-room:hover {
+    box-shadow: var(--shadow-md);
+    border-color: rgba(13,148,136,0.15);
+    transform: translateY(-1px);
+  }
+
+  .pulse-room.active {
+    border-color: rgba(13,148,136,0.3);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .pulse-room-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .pulse-room-name {
+    font-family: var(--fh);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.2px;
+  }
+
+  .pulse-room-status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  .pulse-room-status.live {
+    background: var(--green-soft);
+    color: var(--green);
+  }
+
+  .pulse-room-status.live::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: livePulse 2s ease-in-out infinite;
+  }
+
+  .pulse-room-status.upcoming {
+    background: var(--blue-soft);
+    color: var(--blue);
+  }
+
+  .pulse-room-status.finished {
+    background: var(--bg);
+    color: var(--ink-muted);
+  }
+
+  .pulse-room-session {
+    font-size: 12px;
+    color: var(--ink-secondary);
+    font-weight: 500;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pulse-room-speaker {
+    font-size: 11px;
+    color: var(--ink-muted);
+    margin-bottom: 12px;
+  }
+
+  /* Bubble area */
+  .pulse-room-bubbles {
+    flex: 1;
+    min-height: 80px;
+    position: relative;
+    background: var(--bg);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .pulse-bubble {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--surface);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 1;
+  }
+
+  .pulse-bubble img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .pulse-bubble.entering {
+    animation: bubbleEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes bubbleEnter {
+    0% { transform: scale(0) translateY(20px); opacity: 0; }
+    50% { transform: scale(1.2) translateY(-5px); opacity: 1; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  .pulse-room-count {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+
+  .pulse-room-count-num {
+    font-family: var(--fh);
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .pulse-room-count-label {
+    font-size: 10px;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .pulse-room-count-cap {
+    font-size: 10px;
+    color: var(--ink-placeholder);
+    font-weight: 500;
+  }
+
+  /* ═══ RIGHT PANEL ═══ */
+  .pulse-sidebar {
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  /* Detail panel (when room clicked) */
+  .pulse-detail {
+    background: var(--surface);
+    border-radius: var(--r);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+  }
+
+  .pulse-detail.visible {
+    display: flex;
+  }
+
+  .pulse-detail-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pulse-detail-title {
+    font-family: var(--fh);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .pulse-detail-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: none;
+    background: var(--bg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-muted);
+    font-size: 18px;
+  }
+
+  .pulse-detail-people {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    max-height: 300px;
+  }
+
+  .pulse-person-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 10px;
+    animation: personSlideIn 0.4s ease-out;
+  }
+
+  .pulse-person-row:hover {
+    background: var(--bg);
+  }
+
+  @keyframes personSlideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .pulse-person-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .pulse-person-name {
+    font-weight: 600;
+    font-size: 13px;
+    flex: 1;
+  }
+
+  .pulse-person-time {
+    font-size: 10px;
+    color: var(--ink-muted);
+  }
+
+  /* Sponsors panel */
+  .pulse-sponsors {
+    background: var(--surface);
+    border-radius: var(--r);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+
+  .pulse-sponsors-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--fh);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pulse-sponsor-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .pulse-sponsor-row:hover { background: var(--bg); }
+  .pulse-sponsor-row:last-child { border-bottom: none; }
+
+  .pulse-sponsor-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--fh);
+    font-weight: 800;
+    font-size: 12px;
+    color: var(--ink-muted);
+    flex-shrink: 0;
+  }
+
+  .pulse-sponsor-name {
+    font-weight: 600;
+    font-size: 13px;
+    flex: 1;
+  }
+
+  .pulse-sponsor-leads {
+    font-family: var(--fh);
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--teal);
+    min-width: 30px;
+    text-align: right;
+  }
+
+  .pulse-lead-pop {
+    position: absolute;
+    right: 50px;
+    font-family: var(--fh);
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--teal);
+    animation: leadPop 1.5s ease-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes leadPop {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    50% { opacity: 1; transform: translateY(-16px) scale(1.1); }
+    100% { opacity: 0; transform: translateY(-30px) scale(0.8); }
+  }
+
+  /* ═══ ACTIVITY FEED ═══ */
+  .pulse-feed {
+    background: var(--surface);
+    border-radius: var(--r);
+    box-shadow: var(--shadow-sm);
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .pulse-feed-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--fh);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .pulse-feed-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 8px;
+  }
+
+  .pulse-feed-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 10px;
+    animation: feedSlideIn 0.5s ease-out;
+    font-size: 12px;
+    color: var(--ink-secondary);
+  }
+
+  @keyframes feedSlideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .pulse-feed-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .pulse-feed-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .pulse-feed-icon .icon { font-size: 14px; }
+
+  .pulse-feed-text {
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .pulse-feed-text b {
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .pulse-feed-time {
+    font-size: 10px;
+    color: var(--ink-placeholder);
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Networking match */
+  .pulse-feed-match {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .pulse-feed-match img {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--surface);
+  }
+
+  .pulse-feed-match .match-line {
+    width: 20px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--purple), var(--teal));
+    border-radius: 1px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="pulse-header">
+  <div class="pulse-logo">
+    <div class="pulse-logo-dot"></div>
+    <div>
+      <div class="pulse-logo-text">Event Pulse</div>
+      <div class="pulse-logo-sub">En vivo</div>
+    </div>
+  </div>
+
+  <div class="pulse-event-name">Summit Empresarial 2026 — Dia 2</div>
+
+  <div class="pulse-widgets">
+    <div class="pulse-widget">
+      <span class="icon">cloud</span>
+      24C Parcialmente nublado
+    </div>
+    <div class="pulse-widget">
+      <span class="icon filled">schedule</span>
+      <span class="pulse-clock" id="clock">10:42 AM</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ KPIs ═══ -->
+<div class="pulse-kpis">
+  <div class="pulse-kpi">
+    <div class="pulse-kpi-icon" style="background:var(--teal-soft)">
+      <span class="icon" style="color:var(--teal)">group</span>
+    </div>
+    <div class="pulse-kpi-data">
+      <div class="pulse-kpi-value" id="kpiCheckin">347</div>
+      <div class="pulse-kpi-label">Check-in</div>
+    </div>
+  </div>
+  <div class="pulse-kpi">
+    <div class="pulse-kpi-icon" style="background:var(--green-soft)">
+      <span class="icon" style="color:var(--green)">visibility</span>
+    </div>
+    <div class="pulse-kpi-data">
+      <div class="pulse-kpi-value" id="kpiOnline">189</div>
+      <div class="pulse-kpi-label">En linea</div>
+    </div>
+  </div>
+  <div class="pulse-kpi">
+    <div class="pulse-kpi-icon" style="background:var(--blue-soft)">
+      <span class="icon" style="color:var(--blue)">chat_bubble</span>
+    </div>
+    <div class="pulse-kpi-data">
+      <div class="pulse-kpi-value" id="kpiMessages">1,204</div>
+      <div class="pulse-kpi-label">Mensajes</div>
+    </div>
+  </div>
+  <div class="pulse-kpi">
+    <div class="pulse-kpi-icon" style="background:var(--purple-soft)">
+      <span class="icon" style="color:var(--purple)">handshake</span>
+    </div>
+    <div class="pulse-kpi-data">
+      <div class="pulse-kpi-value" id="kpiConnections">42</div>
+      <div class="pulse-kpi-label">Conexiones</div>
+    </div>
+  </div>
+  <div class="pulse-kpi">
+    <div class="pulse-kpi-icon" style="background:var(--amber-soft)">
+      <span class="icon" style="color:var(--amber)">trending_up</span>
+    </div>
+    <div class="pulse-kpi-data">
+      <div class="pulse-kpi-value" id="kpiLeads">78</div>
+      <div class="pulse-kpi-label">Leads</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="pulse-main">
+
+  <!-- VENUE MAP -->
+  <div class="pulse-venue">
+    <div class="pulse-venue-title">Salones</div>
+    <div class="pulse-rooms" id="roomsGrid">
+      <!-- Rooms rendered by JS -->
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="pulse-sidebar">
+    <!-- Detail panel (hidden until click) -->
+    <div class="pulse-detail" id="detailPanel">
+      <div class="pulse-detail-header">
+        <div class="pulse-detail-title" id="detailTitle">Sala A</div>
+        <button class="pulse-detail-close" onclick="closeDetail()">&times;</button>
+      </div>
+      <div class="pulse-detail-people" id="detailPeople"></div>
+    </div>
+
+    <!-- Sponsors -->
+    <div class="pulse-sponsors">
+      <div class="pulse-sponsors-header">
+        <span class="icon" style="font-size:16px;color:var(--amber)">storefront</span>
+        Sponsors — Leads RT
+      </div>
+      <div id="sponsorsList"></div>
+    </div>
+
+    <!-- Activity Feed -->
+    <div class="pulse-feed">
+      <div class="pulse-feed-header">
+        <span class="icon" style="font-size:16px;color:var(--ink-muted)">bolt</span>
+        Actividad en vivo
+      </div>
+      <div class="pulse-feed-list" id="feedList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Fake data ─────────────────────────────────────────────────
+
+var NAMES = ['Ana Martinez','Carlos Ruiz','Sofia Herrera','Juan Perez','Maria Garcia','Pedro Lopez','Laura Diaz','Andres Gil','Camila Rojas','Dmitri Volkov','Marcus Johnson','Olivia Chen','Santiago Mora','Valentina Torres','Diego Ramirez','Isabella Cruz','Mateo Alvarez','Daniela Reyes','Nicolas Vargas','Paula Mendez','Ricardo Soto','Elena Castillo','Fernando Ortiz','Gabriela Rios','Hugo Navarro','Lucia Romero','Miguel Salazar','Andrea Gomez','Sebastian Parra','Mariana Flores'];
+
+var SPONSORS = [
+  { name: 'AWS', leads: 23, color: '#FF9900' },
+  { name: 'Google Cloud', leads: 18, color: '#4285F4' },
+  { name: 'Microsoft', leads: 14, color: '#00A4EF' },
+  { name: 'Stripe', leads: 12, color: '#635BFF' },
+  { name: 'Datadog', leads: 11, color: '#632CA6' },
+];
+
+var ROOMS = [
+  { id: 1, name: 'Auditorio Principal', session: 'Growth Hacking: metricas que importan', speaker: 'Laura Diaz, Marcus Johnson', status: 'live', capacity: 200, people: [] },
+  { id: 2, name: 'Sala A', session: 'Mobile-first: React Native a fondo', speaker: 'Andres Gil', status: 'live', capacity: 80, people: [] },
+  { id: 3, name: 'Sala B', session: 'Panel: IA en la empresa moderna', speaker: 'Maria Garcia, Dmitri Volkov', status: 'live', capacity: 80, people: [] },
+  { id: 4, name: 'Sala C', session: 'DevOps para startups', speaker: 'Carlos Ruiz', status: 'upcoming', capacity: 60, people: [] },
+  { id: 5, name: 'Networking Lounge', session: 'Networking libre', speaker: '', status: 'live', capacity: 100, people: [] },
+  { id: 6, name: 'Zona Sponsors', session: 'Stands abiertos', speaker: '', status: 'live', capacity: 150, people: [] },
+];
+
+function avatarUrl(name, i) {
+  return 'https://i.pravatar.cc/56?img=' + ((i % 70) + 1);
+}
+
+// Initialize rooms with random people
+ROOMS.forEach(function(room) {
+  var count = Math.floor(Math.random() * 15) + 5;
+  for (var i = 0; i < count; i++) {
+    var idx = Math.floor(Math.random() * NAMES.length);
+    room.people.push({ name: NAMES[idx], avatar: avatarUrl(NAMES[idx], idx), time: '10:' + (10 + Math.floor(Math.random() * 30)) + ' AM' });
+  }
+});
+
+// ── Render rooms ────────────────────────────────────────────────
+
+function renderRooms() {
+  var grid = document.getElementById('roomsGrid');
+  grid.innerHTML = '';
+  ROOMS.forEach(function(room) {
+    var statusClass = room.status;
+    var statusLabel = room.status === 'live' ? 'En vivo' : room.status === 'upcoming' ? 'Proximo' : 'Finalizado';
+
+    var bubblesHtml = '';
+    var max = Math.min(room.people.length, 12);
+    for (var i = 0; i < max; i++) {
+      var x = 8 + (i % 4) * 30 + Math.random() * 10;
+      var y = 6 + Math.floor(i / 4) * 28 + Math.random() * 8;
+      bubblesHtml += '<div class="pulse-bubble" style="left:' + x + 'px;top:' + y + 'px"><img src="' + room.people[i].avatar + '" alt=""></div>';
+    }
+    if (room.people.length > max) {
+      bubblesHtml += '<div style="position:absolute;right:8px;bottom:6px;font-size:10px;font-weight:700;color:var(--ink-muted)">+' + (room.people.length - max) + '</div>';
+    }
+
+    var html = '<div class="pulse-room" data-room="' + room.id + '" onclick="openDetail(' + room.id + ')">' +
+      '<div class="pulse-room-header">' +
+        '<div class="pulse-room-name">' + room.name + '</div>' +
+        '<div class="pulse-room-status ' + statusClass + '">' + statusLabel + '</div>' +
+      '</div>' +
+      '<div class="pulse-room-session">' + room.session + '</div>' +
+      (room.speaker ? '<div class="pulse-room-speaker">' + room.speaker + '</div>' : '') +
+      '<div class="pulse-room-bubbles" id="bubbles-' + room.id + '">' + bubblesHtml + '</div>' +
+      '<div class="pulse-room-count">' +
+        '<div><div class="pulse-room-count-num" id="roomCount-' + room.id + '">' + room.people.length + '</div><div class="pulse-room-count-label">personas</div></div>' +
+        '<div class="pulse-room-count-cap">/ ' + room.capacity + '</div>' +
+      '</div>' +
+    '</div>';
+
+    grid.insertAdjacentHTML('beforeend', html);
+  });
+}
+
+// ── Detail panel ────────────────────────────────────────────────
+
+var activeRoom = null;
+
+function openDetail(roomId) {
+  var room = ROOMS.find(function(r) { return r.id === roomId; });
+  if (!room) return;
+
+  activeRoom = roomId;
+
+  // Highlight room
+  document.querySelectorAll('.pulse-room').forEach(function(el) { el.classList.remove('active'); });
+  var roomEl = document.querySelector('[data-room="' + roomId + '"]');
+  if (roomEl) roomEl.classList.add('active');
+
+  var panel = document.getElementById('detailPanel');
+  panel.classList.add('visible');
+  document.getElementById('detailTitle').textContent = room.name + ' — ' + room.people.length + ' personas';
+
+  var list = document.getElementById('detailPeople');
+  list.innerHTML = '';
+  room.people.forEach(function(p, i) {
+    list.insertAdjacentHTML('beforeend',
+      '<div class="pulse-person-row" style="animation-delay:' + (i * 30) + 'ms">' +
+        '<img class="pulse-person-avatar" src="' + p.avatar + '" alt="">' +
+        '<div class="pulse-person-name">' + p.name + '</div>' +
+        '<div class="pulse-person-time">' + p.time + '</div>' +
+      '</div>'
+    );
+  });
+}
+
+function closeDetail() {
+  activeRoom = null;
+  document.getElementById('detailPanel').classList.remove('visible');
+  document.querySelectorAll('.pulse-room').forEach(function(el) { el.classList.remove('active'); });
+}
+
+// ── Sponsors ────────────────────────────────────────────────────
+
+function renderSponsors() {
+  var list = document.getElementById('sponsorsList');
+  list.innerHTML = '';
+  SPONSORS.forEach(function(sp, i) {
+    list.insertAdjacentHTML('beforeend',
+      '<div class="pulse-sponsor-row" style="position:relative">' +
+        '<div class="pulse-sponsor-logo" style="background:' + sp.color + '15;color:' + sp.color + '">' + sp.name.charAt(0) + '</div>' +
+        '<div class="pulse-sponsor-name">' + sp.name + '</div>' +
+        '<div class="pulse-sponsor-leads" id="sponsorLeads-' + i + '">' + sp.leads + '</div>' +
+      '</div>'
+    );
+  });
+}
+
+// ── Activity feed ───────────────────────────────────────────────
+
+var FEED_TEMPLATES = [
+  { type: 'checkin', icon: 'login', iconBg: 'var(--teal-soft)', iconColor: 'var(--teal)', text: function(n) { return '<b>' + n + '</b> hizo check-in'; } },
+  { type: 'enter', icon: 'meeting_room', iconBg: 'var(--blue-soft)', iconColor: 'var(--blue)', text: function(n) { return '<b>' + n + '</b> entro a <b>' + ROOMS[Math.floor(Math.random() * 3)].name + '</b>'; } },
+  { type: 'chat', icon: 'chat', iconBg: 'var(--green-soft)', iconColor: 'var(--green)', text: function(n) { return '<b>' + n + '</b> envio mensaje en chat'; } },
+  { type: 'lead', icon: 'person_add', iconBg: 'var(--amber-soft)', iconColor: 'var(--amber)', text: function(n) { var sp = SPONSORS[Math.floor(Math.random() * SPONSORS.length)]; return '<b>' + sp.name + '</b> capturo lead de <b>' + n + '</b>'; } },
+  { type: 'points', icon: 'star', iconBg: 'var(--purple-soft)', iconColor: 'var(--purple)', text: function(n) { return '<b>' + n + '</b> gano <b>+50 pts</b> en la ruleta'; } },
+  { type: 'rate', icon: 'thumb_up', iconBg: 'var(--blue-soft)', iconColor: 'var(--blue)', text: function(n) { return '<b>' + n + '</b> evaluo sesion con 5 estrellas'; } },
+  { type: 'match', icon: 'handshake', iconBg: 'var(--purple-soft)', iconColor: 'var(--purple)', text: function(n) { var n2 = NAMES[Math.floor(Math.random() * NAMES.length)]; return '<b>' + n + '</b> y <b>' + n2 + '</b> hicieron match'; } },
+];
+
+function addFeedItem() {
+  var tmpl = FEED_TEMPLATES[Math.floor(Math.random() * FEED_TEMPLATES.length)];
+  var nameIdx = Math.floor(Math.random() * NAMES.length);
+  var name = NAMES[nameIdx];
+  var now = new Date();
+  var time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+  var list = document.getElementById('feedList');
+
+  var html = '<div class="pulse-feed-item">' +
+    '<div class="pulse-feed-icon" style="background:' + tmpl.iconBg + '">' +
+      '<span class="icon" style="color:' + tmpl.iconColor + ';font-size:14px">' + tmpl.icon + '</span>' +
+    '</div>' +
+    '<div class="pulse-feed-text">' + tmpl.text(name) + '</div>' +
+    '<div class="pulse-feed-time">' + time + '</div>' +
+  '</div>';
+
+  list.insertAdjacentHTML('afterbegin', html);
+
+  // Keep max 30 items
+  while (list.children.length > 30) {
+    list.removeChild(list.lastChild);
+  }
+
+  // Side effects
+  if (tmpl.type === 'lead') {
+    var si = Math.floor(Math.random() * SPONSORS.length);
+    SPONSORS[si].leads++;
+    var el = document.getElementById('sponsorLeads-' + si);
+    if (el) {
+      el.textContent = SPONSORS[si].leads;
+      // Pop animation
+      var row = el.parentElement;
+      var pop = document.createElement('span');
+      pop.className = 'pulse-lead-pop';
+      pop.textContent = '+1';
+      row.appendChild(pop);
+      setTimeout(function() { pop.remove(); }, 1500);
+    }
+  }
+
+  if (tmpl.type === 'checkin' || tmpl.type === 'enter') {
+    // Add bubble to random room
+    var roomIdx = Math.floor(Math.random() * ROOMS.length);
+    var room = ROOMS[roomIdx];
+    room.people.push({ name: name, avatar: avatarUrl(name, nameIdx), time: time });
+    var countEl = document.getElementById('roomCount-' + room.id);
+    if (countEl) countEl.textContent = room.people.length;
+
+    // Add visual bubble
+    var bubblesEl = document.getElementById('bubbles-' + room.id);
+    if (bubblesEl && bubblesEl.children.length < 12) {
+      var x = 8 + Math.random() * 100;
+      var y = 6 + Math.random() * 60;
+      var bubble = document.createElement('div');
+      bubble.className = 'pulse-bubble entering';
+      bubble.style.left = x + 'px';
+      bubble.style.top = y + 'px';
+      bubble.innerHTML = '<img src="' + avatarUrl(name, nameIdx) + '" alt="">';
+      bubblesEl.appendChild(bubble);
+    }
+
+    // Update detail if open
+    if (activeRoom === room.id) {
+      openDetail(room.id);
+    }
+  }
+}
+
+// ── KPI counter animation ───────────────────────────────────────
+
+function incrementKpi(id, amount) {
+  var el = document.getElementById(id);
+  var current = parseInt(el.textContent.replace(/,/g, ''));
+  var target = current + amount;
+  el.textContent = target.toLocaleString();
+}
+
+// ── Clock ───────────────────────────────────────────────────────
+
+function updateClock() {
+  var now = new Date();
+  var h = now.getHours();
+  var m = now.getMinutes().toString().padStart(2, '0');
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('clock').textContent = h + ':' + m + ' ' + ampm;
+}
+
+// ── Init ────────────────────────────────────────────────────────
+
+renderRooms();
+renderSponsors();
+
+// Seed initial feed
+for (var i = 0; i < 8; i++) addFeedItem();
+
+// Live simulation
+setInterval(function() {
+  addFeedItem();
+  // Randomly increment KPIs
+  if (Math.random() > 0.5) incrementKpi('kpiMessages', Math.floor(Math.random() * 3) + 1);
+  if (Math.random() > 0.7) incrementKpi('kpiOnline', 1);
+  if (Math.random() > 0.8) incrementKpi('kpiConnections', 1);
+  if (Math.random() > 0.85) incrementKpi('kpiLeads', 1);
+  if (Math.random() > 0.9) incrementKpi('kpiCheckin', 1);
+}, 3000);
+
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+</body>
+</html>

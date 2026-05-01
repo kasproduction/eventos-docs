@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Room Kiosk — Salón Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c16;
+    --bg-2: #12121f;
+    --ink: #ffffff;
+    --ink-70: rgba(255,255,255,0.70);
+    --ink-50: rgba(255,255,255,0.50);
+    --ink-35: rgba(255,255,255,0.35);
+    --ink-20: rgba(255,255,255,0.20);
+    --ink-10: rgba(255,255,255,0.10);
+    --border: rgba(255,255,255,0.06);
+    --border-strong: rgba(255,255,255,0.10);
+    --emerald: oklch(0.78 0.17 155);
+    --emerald-soft: oklch(0.78 0.17 155 / 0.12);
+    --green-tint: oklch(0.42 0.13 155);
+    --blue-tint: oklch(0.42 0.13 245);
+    --red-tint: oklch(0.45 0.17 25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: #000;
+    color: var(--ink);
+    font-family: 'Urbanist', system-ui, sans-serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Stage — scales a fixed-size canvas to fit viewport, letterboxed */
+  .stage {
+    position: fixed; inset: 0;
+    background: #000;
+  }
+  .stage-inner {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .canvas {
+    position: relative;
+    background: var(--bg);
+    transform-origin: 0 0;
+    overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0,0,0,0.6);
+  }
+  .canvas.landscape { width: 1920px; height: 1080px; }
+  .canvas.portrait  { width: 1080px; height: 1920px; }
+
+  /* Subtle ambient vignette */
+  .canvas::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 1200px 600px at 50% -10%, rgba(255,255,255,0.03), transparent 60%),
+      radial-gradient(ellipse 900px 500px at 50% 110%, rgba(255,255,255,0.025), transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ============== GRID ============== */
+  .layout {
+    position: absolute; inset: 0;
+    display: grid;
+    gap: 0;
+  }
+  .canvas.landscape .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 96px 1fr 260px 120px;
+    padding: 0 96px;
+  }
+  .canvas.portrait .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 120px 1fr 1fr 320px 140px;
+    padding: 0 80px;
+  }
+
+  /* ============== TOP BAR ============== */
+  .top {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-top: 36px; padding-bottom: 28px;
+  }
+  .room {
+    display: flex; align-items: baseline; gap: 18px;
+  }
+  .room-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-35);
+  }
+  .room-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    color: var(--ink-70);
+  }
+  .top-right {
+    display: flex; align-items: center; gap: 32px;
+  }
+  .clock {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 300;
+    font-size: 28px;
+    letter-spacing: 0.02em;
+    color: var(--ink-70);
+    font-variant-numeric: tabular-nums;
+  }
+  .clock-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-35);
+  }
+  .clock-wrap { text-align: right; }
+
+  /* Ambient scan indicator — single breathing dot */
+  .scan-amb {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+  }
+  .scan-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--emerald);
+    box-shadow: 0 0 12px var(--emerald);
+    animation: breathe 2.4s ease-in-out infinite;
+  }
+  .scan-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-50);
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.35; transform: scale(0.9); }
+    50%      { opacity: 1;    transform: scale(1.1); }
+  }
+
+  /* ============== HERO ============== */
+  .hero {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    align-items: center;
+    gap: 80px;
+    padding: 80px 0 60px;
+  }
+  .canvas.portrait .hero {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    gap: 48px;
+    padding: 72px 0 48px;
+    align-content: start;
+  }
+
+  .hero-meta {
+    display: flex; align-items: center; gap: 18px;
+    margin-bottom: 32px;
+  }
+  .live-pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 14px 8px 12px;
+    border: 1px solid var(--emerald);
+    background: var(--emerald-soft);
+    border-radius: 999px;
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--emerald);
+    position: relative;
+  }
+  .live-dot::after {
+    content: ""; position: absolute; inset: -4px;
+    border-radius: 50%;
+    border: 1px solid var(--emerald);
+    animation: pulse 2s ease-out infinite;
+  }
+  @keyframes pulse {
+    0%   { transform: scale(0.8); opacity: 0.9; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  .live-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--emerald);
+    font-weight: 500;
+  }
+  .track-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-50);
+  }
+  .track-sep {
+    width: 1px; height: 14px; background: var(--border-strong);
+  }
+
+  .hero-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 88px;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    color: var(--ink);
+    text-wrap: pretty;
+    margin-bottom: 40px;
+  }
+  .canvas.portrait .hero-title { font-size: 92px; }
+
+  .hero-meta-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 40px 56px;
+    max-width: 720px;
+  }
+  .meta-cell { display: flex; flex-direction: column; gap: 10px; }
+  .meta-k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-35);
+  }
+  .meta-v {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
+    font-size: 26px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Speaker */
+  .speaker {
+    display: flex; align-items: center; gap: 28px;
+  }
+  .speaker-photo {
+    width: 148px; height: 148px;
+    border-radius: 50%;
+    background:
+      linear-gradient(135deg, oklch(0.55 0.08 280), oklch(0.35 0.05 320)),
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 6px);
+    background-blend-mode: overlay;
+    border: 1px solid var(--border-strong);
+    position: relative;
+    display: grid; place-items: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .speaker-photo::after {
+    content: "EC";
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
+    font-size: 48px;
+    letter-spacing: -0.02em;
+    color: rgba(255,255,255,0.75);
+  }
+  .speaker-photo.lg {
+    width: 180px; height: 180px;
+  }
+  .speaker-photo.lg::after { font-size: 60px; }
+  .speaker-info { display: flex; flex-direction: column; gap: 8px; }
+  .speaker-k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-35);
+  }
+  .speaker-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: 36px;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .canvas.portrait .speaker-name { font-size: 44px; }
+  .speaker-role {
+    font-size: 18px;
+    color: var(--ink-50);
+    font-weight: 400;
+    letter-spacing: -0.005em;
+  }
+
+  /* Progress bar */
+  .progress {
+    margin-top: 36px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .progress-track {
+    height: 2px;
+    background: var(--ink-10);
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-fill {
+    position: absolute; inset: 0;
+    width: 38%;
+    background: linear-gradient(90deg, var(--emerald), oklch(0.78 0.17 155 / 0.3));
+  }
+  .progress-meta {
+    display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-35);
+  }
+
+  /* ============== NEXT SESSION ============== */
+  .next {
+    border-top: 1px solid var(--border);
+    padding: 36px 0 32px;
+    display: grid;
+    grid-template-columns: 180px 1fr auto;
+    align-items: center;
+    gap: 56px;
+  }
+  .canvas.portrait .next {
+    grid-template-columns: 140px 1fr auto;
+    gap: 40px;
+    padding: 40px 0;
+  }
+  .next-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-35);
+  }
+  .next-body { display: flex; flex-direction: column; gap: 10px; }
+  .next-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
+    font-size: 30px;
+    letter-spacing: -0.015em;
+    color: var(--ink-70);
+    line-height: 1.1;
+  }
+  .canvas.portrait .next-title { font-size: 40px; }
+  .next-speaker {
+    font-size: 16px;
+    color: var(--ink-50);
+    letter-spacing: 0;
+  }
+  .next-time {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--ink-70);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+    text-align: right;
+  }
+  .next-in {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-35);
+    margin-top: 4px;
+  }
+
+  /* ============== TIMELINE ============== */
+  .timeline {
+    border-top: 1px solid var(--border);
+    padding: 28px 0 32px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .tl-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .tl-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-35);
+  }
+  .tl-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-35);
+  }
+  .tl-track {
+    position: relative;
+    height: 56px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+  }
+  .tl-slot {
+    flex: 1;
+    border-right: 1px solid var(--border);
+    position: relative;
+    padding: 8px 12px;
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+  }
+  .tl-slot:last-child { border-right: none; }
+  .tl-slot.past { opacity: 0.35; }
+  .tl-slot.live {
+    background: var(--emerald-soft);
+    border-left: 1px solid var(--emerald);
+    border-right: 1px solid var(--emerald);
+  }
+  .tl-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-50);
+    font-variant-numeric: tabular-nums;
+  }
+  .tl-slot.live .tl-time { color: var(--emerald); }
+  .tl-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-70);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    letter-spacing: -0.005em;
+  }
+  .tl-slot.live .tl-name { color: var(--ink); }
+
+  .tl-now {
+    position: absolute;
+    top: -6px; bottom: -6px;
+    width: 1px;
+    background: var(--emerald);
+    box-shadow: 0 0 12px var(--emerald);
+  }
+  .tl-now::before {
+    content: ""; position: absolute;
+    top: -3px; left: -3px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--emerald);
+  }
+
+  /* ============== FOOTER ============== */
+  .footer {
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 0;
+  }
+  .foot-left {
+    display: flex; align-items: center; gap: 32px;
+  }
+  .foot-brand {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-50);
+  }
+  .foot-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-20);
+  }
+  .foot-right {
+    display: flex; align-items: center; gap: 18px;
+  }
+
+  /* ============== OVERLAY ============== */
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 260ms ease;
+    z-index: 20;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .overlay.show { opacity: 1; pointer-events: auto; }
+  .overlay::before {
+    content: ""; position: absolute; inset: 0;
+    background: rgba(12,12,22,0.82);
+  }
+  .overlay.in::before {
+    background:
+      radial-gradient(ellipse at center, oklch(0.42 0.13 155 / 0.55), rgba(12,12,22,0.9) 70%),
+      rgba(12,12,22,0.86);
+  }
+  .overlay.out::before {
+    background:
+      radial-gradient(ellipse at center, oklch(0.42 0.13 245 / 0.55), rgba(12,12,22,0.9) 70%),
+      rgba(12,12,22,0.86);
+  }
+  .overlay.err::before {
+    background:
+      radial-gradient(ellipse at center, oklch(0.45 0.17 25 / 0.55), rgba(12,12,22,0.9) 70%),
+      rgba(12,12,22,0.86);
+  }
+
+  .ov-card {
+    position: relative;
+    width: 72%;
+    max-width: 1200px;
+    display: flex; flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+    padding: 72px 80px;
+    border: 1px solid var(--border-strong);
+    background: rgba(18,18,31,0.55);
+    transform: translateY(8px);
+    transition: transform 260ms ease;
+  }
+  .overlay.show .ov-card { transform: translateY(0); }
+  .canvas.portrait .ov-card { width: 84%; padding: 64px 56px; }
+
+  .ov-eyebrow {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .ov-status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .overlay.in  .ov-status-dot { background: oklch(0.82 0.18 155); box-shadow: 0 0 14px oklch(0.82 0.18 155); }
+  .overlay.out .ov-status-dot { background: oklch(0.78 0.14 245); box-shadow: 0 0 14px oklch(0.78 0.14 245); }
+  .overlay.err .ov-status-dot { background: oklch(0.72 0.2 25);   box-shadow: 0 0 14px oklch(0.72 0.2 25); }
+  .ov-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-70);
+  }
+
+  .ov-greeting {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 300;
+    font-size: 44px;
+    color: var(--ink-70);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .ov-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 104px;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .canvas.portrait .ov-name { font-size: 96px; }
+  .ov-session {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--ink-50);
+    letter-spacing: -0.005em;
+    max-width: 80%;
+  }
+
+  .ov-stats {
+    display: flex; gap: 64px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    width: 100%;
+  }
+  .ov-stat-k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-35);
+    margin-bottom: 8px;
+  }
+  .ov-stat-v {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
+    font-size: 28px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .ov-timer {
+    position: absolute;
+    top: 24px; right: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--ink-35);
+  }
+
+  /* ============== TWEAKS PANEL ============== */
+  #tweaks {
+    position: fixed;
+    right: 16px; bottom: 16px;
+    width: 280px;
+    background: rgba(18,18,31,0.92);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 16px;
+    font-family: 'Urbanist', sans-serif;
+    color: #fff;
+    z-index: 1000;
+    display: none;
+    backdrop-filter: blur(10px);
+  }
+  #tweaks.on { display: block; }
+  #tweaks h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-50);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  #tweaks .row {
+    display: flex; flex-direction: column; gap: 6px;
+    margin-bottom: 14px;
+  }
+  #tweaks label {
+    font-size: 11px; color: var(--ink-50);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  #tweaks .segs {
+    display: flex; gap: 4px;
+  }
+  #tweaks .segs button {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--ink-70);
+    padding: 8px 6px;
+    font-family: 'Urbanist', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 120ms;
+  }
+  #tweaks .segs button:hover { color: var(--ink); border-color: var(--ink-35); }
+  #tweaks .segs button.active {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--ink-35);
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+   <div class="stage-inner" id="stageInner">
+    <div class="canvas landscape" id="canvas">
+
+      <div class="layout" id="layout">
+
+        <!-- TOP -->
+        <header class="top">
+          <div class="room">
+            <span class="room-eyebrow">Room · Sala</span>
+            <span class="room-name">Atlas · Level 3 · North Wing</span>
+          </div>
+          <div class="top-right">
+            <div class="scan-amb">
+              <span class="scan-dot"></span>
+              <span class="scan-label">Ready</span>
+            </div>
+            <div class="clock-wrap">
+              <div class="clock" id="clock">14:32</div>
+              <div class="clock-date">Mon · 20 Apr 2026</div>
+            </div>
+          </div>
+        </header>
+
+        <!-- HERO -->
+        <section class="hero">
+          <div class="hero-left">
+            <div class="hero-meta">
+              <div class="live-pill">
+                <span class="live-dot"></span>
+                <span class="live-label">Live Now</span>
+              </div>
+              <span class="track-tag">Track 02 · Platform</span>
+              <span class="track-sep"></span>
+              <span class="track-tag">ES / EN</span>
+            </div>
+
+            <h1 class="hero-title">Designing for Trust: How Enterprise AI Earns the Room</h1>
+
+            <div class="hero-meta-grid">
+              <div class="meta-cell">
+                <span class="meta-k">Time</span>
+                <span class="meta-v">14:00 — 14:45</span>
+              </div>
+              <div class="meta-cell">
+                <span class="meta-k">Format</span>
+                <span class="meta-v">Keynote · 45 min</span>
+              </div>
+            </div>
+
+            <div class="progress">
+              <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+              <div class="progress-meta">
+                <span>Started 14:00</span>
+                <span id="progMeta">17 of 45 min</span>
+              </div>
+            </div>
+          </div>
+
+          <aside class="hero-right">
+            <div class="speaker">
+              <div class="speaker-photo lg"></div>
+              <div class="speaker-info">
+                <span class="speaker-k">Speaker</span>
+                <span class="speaker-name">Elena<br/>Castellanos</span>
+                <span class="speaker-role">VP Product · Meridian Labs</span>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <!-- NEXT -->
+        <section class="next">
+          <span class="next-eyebrow">Up Next · Siguiente</span>
+          <div class="next-body">
+            <span class="next-title">Observability at Scale: Lessons from 10B Events/Day</span>
+            <span class="next-speaker">Marcus Okafor · Staff Engineer, Paloma</span>
+          </div>
+          <div>
+            <div class="next-time">15:00 — 15:30</div>
+            <div class="next-in">In 28 min</div>
+          </div>
+        </section>
+
+        <!-- TIMELINE -->
+        <section class="timeline">
+          <div class="tl-head">
+            <span class="tl-title">Today · Atlas Room</span>
+            <span class="tl-date">Day 02 of 03</span>
+          </div>
+          <div class="tl-track" id="tlTrack">
+            <div class="tl-slot past"><span class="tl-time">09:00</span><span class="tl-name">Opening Remarks</span></div>
+            <div class="tl-slot past"><span class="tl-time">10:00</span><span class="tl-name">State of the Platform</span></div>
+            <div class="tl-slot past"><span class="tl-time">11:15</span><span class="tl-name">Panel · Scaling Teams</span></div>
+            <div class="tl-slot past"><span class="tl-time">13:00</span><span class="tl-name">Hands-on · Workshop A</span></div>
+            <div class="tl-slot live"><span class="tl-time">14:00</span><span class="tl-name">Designing for Trust</span></div>
+            <div class="tl-slot"><span class="tl-time">15:00</span><span class="tl-name">Observability at Scale</span></div>
+            <div class="tl-slot"><span class="tl-time">16:00</span><span class="tl-name">Fireside · Founders</span></div>
+            <div class="tl-slot"><span class="tl-time">17:30</span><span class="tl-name">Closing + Reception</span></div>
+            <div class="tl-now" id="tlNow" style="left: 52%"></div>
+          </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+          <div class="foot-left">
+            <span class="foot-brand">Cumbre Atlas · 2026</span>
+            <span class="foot-meta">Kiosk 04 · Atlas North</span>
+          </div>
+          <div class="foot-right">
+            <span class="foot-meta" id="syncMeta">Synced 14:30</span>
+          </div>
+        </footer>
+
+      </div>
+
+      <!-- OVERLAY -->
+      <div class="overlay" id="overlay">
+        <div class="ov-card">
+          <span class="ov-timer" id="ovTimer">Closing in 4s</span>
+          <div class="ov-eyebrow">
+            <span class="ov-status-dot"></span>
+            <span class="ov-status" id="ovStatus">Check-in · Entrada</span>
+          </div>
+          <div class="ov-greeting" id="ovGreeting">Bienvenido,</div>
+          <div class="ov-name" id="ovName">Sofía Ramírez</div>
+          <div class="ov-session" id="ovSession">Designing for Trust: How Enterprise AI Earns the Room</div>
+          <div class="ov-stats" id="ovStats">
+            <div>
+              <div class="ov-stat-k">Seat</div>
+              <div class="ov-stat-v">General · Row 04</div>
+            </div>
+            <div>
+              <div class="ov-stat-k">Badge</div>
+              <div class="ov-stat-v">#A-2481</div>
+            </div>
+            <div>
+              <div class="ov-stat-k">Entry</div>
+              <div class="ov-stat-v" id="ovTime">14:17</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+   </div>
+  </div>
+
+  <!-- Tweaks -->
+  <div id="tweaks">
+    <h3>Tweaks</h3>
+    <div class="row">
+      <label>Orientation</label>
+      <div class="segs" id="segOrient">
+        <button data-v="landscape" class="active">Landscape</button>
+        <button data-v="portrait">Portrait</button>
+      </div>
+    </div>
+    <div class="row">
+      <label>Overlay</label>
+      <div class="segs" id="segOverlay">
+        <button data-v="none" class="active">None</button>
+        <button data-v="in">IN</button>
+        <button data-v="out">OUT</button>
+        <button data-v="err">Error</button>
+      </div>
+    </div>
+    <div class="row">
+      <label>Clock</label>
+      <div class="segs" id="segClock">
+        <button data-v="static" class="active">Static</button>
+        <button data-v="live">Live</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ============ PERSISTED TWEAKS ============ */
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "orientation": "portrait",
+  "overlay": "none",
+  "clock": "live"
+}/*EDITMODE-END*/;
+
+let state = { ...TWEAK_DEFAULTS };
+
+/* ============ STAGE SCALING ============ */
+function applyScale() {
+  const canvas = document.getElementById('canvas');
+  const inner = document.getElementById('stageInner');
+  const w = canvas.offsetWidth;
+  const h = canvas.offsetHeight;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const s = Math.min(vw / w, vh / h);
+  canvas.style.transform = `scale(${s})`;
+  inner.style.width = (w * s) + 'px';
+  inner.style.height = (h * s) + 'px';
+}
+window.addEventListener('resize', applyScale);
+
+/* ============ ORIENTATION ============ */
+function setOrientation(v) {
+  const canvas = document.getElementById('canvas');
+  canvas.classList.toggle('landscape', v === 'landscape');
+  canvas.classList.toggle('portrait', v === 'portrait');
+  applyScale();
+}
+
+/* ============ OVERLAY ============ */
+const overlayPresets = {
+  in: {
+    cls: 'in',
+    status: 'Check-in · Entrada',
+    greeting: 'Bienvenido,',
+    name: 'Sofía Ramírez',
+    session: 'Designing for Trust: How Enterprise AI Earns the Room',
+    stats: [
+      ['Seat', 'General · Row 04'],
+      ['Badge', '#A-2481'],
+      ['Entry', '14:17']
+    ]
+  },
+  out: {
+    cls: 'out',
+    status: 'Check-out · Salida',
+    greeting: 'Hasta luego,',
+    name: 'Daniel Okonkwo',
+    session: 'Designing for Trust — You stayed 23 minutes',
+    stats: [
+      ['Time in', '23 min'],
+      ['Arrived', '14:09'],
+      ['Left', '14:32']
+    ]
+  },
+  err: {
+    cls: 'err',
+    status: 'Error · No válido',
+    greeting: 'Scan unrecognized',
+    name: 'Badge not found',
+    session: 'Please visit the registration desk at the main foyer.',
+    stats: [
+      ['Code', 'ERR_BADGE_404'],
+      ['Retry', 'OK'],
+      ['Time', '14:32']
+    ]
+  }
+};
+
+function setOverlay(v) {
+  const el = document.getElementById('overlay');
+  el.classList.remove('in','out','err','show');
+  if (v === 'none') return;
+  const p = overlayPresets[v];
+  el.classList.add(p.cls, 'show');
+  document.getElementById('ovStatus').textContent = p.status;
+  document.getElementById('ovGreeting').textContent = p.greeting;
+  document.getElementById('ovName').innerHTML = p.name;
+  document.getElementById('ovSession').textContent = p.session;
+  const stats = document.getElementById('ovStats');
+  stats.innerHTML = p.stats.map(([k,val]) => `
+    <div>
+      <div class="ov-stat-k">${k}</div>
+      <div class="ov-stat-v">${val}</div>
+    </div>
+  `).join('');
+}
+
+/* ============ CLOCK ============ */
+let clockTimer = null;
+function setClock(v) {
+  if (clockTimer) { clearInterval(clockTimer); clockTimer = null; }
+  const clockEl = document.getElementById('clock');
+  if (v === 'live') {
+    const tick = () => {
+      const d = new Date();
+      clockEl.textContent = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    };
+    tick();
+    clockTimer = setInterval(tick, 1000);
+  } else {
+    clockEl.textContent = '14:32';
+  }
+}
+
+/* ============ PROGRESS COUNTDOWN for overlay timer ============ */
+let overlayTimer = null;
+function startOverlayCountdown() {
+  const el = document.getElementById('ovTimer');
+  if (overlayTimer) clearInterval(overlayTimer);
+  let t = 4;
+  el.textContent = `Closing in ${t}s`;
+  overlayTimer = setInterval(() => {
+    t -= 1;
+    if (t <= 0) {
+      el.textContent = 'Closing…';
+      clearInterval(overlayTimer);
+    } else {
+      el.textContent = `Closing in ${t}s`;
+    }
+  }, 1000);
+}
+
+/* ============ APPLY ============ */
+function apply() {
+  setOrientation(state.orientation);
+  setOverlay(state.overlay);
+  setClock(state.clock);
+  if (state.overlay !== 'none') startOverlayCountdown();
+  // Mark active buttons
+  document.querySelectorAll('#segOrient button').forEach(b =>
+    b.classList.toggle('active', b.dataset.v === state.orientation));
+  document.querySelectorAll('#segOverlay button').forEach(b =>
+    b.classList.toggle('active', b.dataset.v === state.overlay));
+  document.querySelectorAll('#segClock button').forEach(b =>
+    b.classList.toggle('active', b.dataset.v === state.clock));
+}
+
+function update(partial) {
+  state = { ...state, ...partial };
+  apply();
+  try {
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: partial }, '*');
+  } catch (e) {}
+}
+
+document.getElementById('segOrient').addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON') update({ orientation: e.target.dataset.v });
+});
+document.getElementById('segOverlay').addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON') update({ overlay: e.target.dataset.v });
+});
+document.getElementById('segClock').addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON') update({ clock: e.target.dataset.v });
+});
+
+/* ============ EDIT MODE HOST ============ */
+window.addEventListener('message', (e) => {
+  const d = e.data || {};
+  if (d.type === '__activate_edit_mode') {
+    document.getElementById('tweaks').classList.add('on');
+  } else if (d.type === '__deactivate_edit_mode') {
+    document.getElementById('tweaks').classList.remove('on');
+  }
+});
+try { window.parent.postMessage({ type: '__edit_mode_available' }, '*'); } catch(e) {}
+
+/* ============ INIT ============ */
+apply();
+applyScale();
+</script>
+</body>
+</html>

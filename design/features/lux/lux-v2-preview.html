@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventOS — Lumina Lux v2 "The Gallery"</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"/>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Urbanist:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap');
+
+  :root {
+    /* Lux v2 "The Gallery" tokens */
+    --bg-base: #F6F8FA;
+    --bg-raised: #FAFBFC;
+    --bg-sunken: #EDF0F3;
+    --surface-card: #FFFFFF;
+    --surface-input: #F0F2F5;
+
+    --text-primary: #1A1B1E;
+    --text-secondary: #4A4B50;
+    --text-tertiary: #7C7D82;
+    --text-quaternary: #A8A9AE;
+
+    --icon-primary: #2C2F33;
+    --icon-secondary: #6B6D72;
+    --icon-tertiary: #A8A9AE;
+
+    --border-subtle: rgba(0,0,0,0.04);
+    --border-default: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.14);
+
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 2px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 8px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.10);
+    --shadow-xl: 0 8px 16px rgba(0,0,0,0.06), 0 16px 48px rgba(0,0,0,0.12);
+
+    --accent: #1A1A1A;
+    --accent-soft: rgba(26,26,30,0.08);
+    --accent-text-on: #FFFFFF;
+
+    /* Noir tokens for comparison */
+    --n-bg: #0A0A0A;
+    --n-surface: rgba(255,255,255,0.03);
+    --n-border: rgba(255,255,255,0.06);
+    --n-text: #FFFFFF;
+    --n-text2: rgba(255,255,255,0.55);
+    --n-text3: rgba(255,255,255,0.35);
+
+    /* Category colors (Lux soft fill) */
+    --cat-innovacion-bg: #FFF7ED;
+    --cat-innovacion-text: #C2410C;
+    --cat-networking-bg: #FDF2F8;
+    --cat-networking-text: #BE185D;
+    --cat-tech-bg: #EFF6FF;
+    --cat-tech-text: #1D4ED8;
+    --cat-liderazgo-bg: #F0FDF4;
+    --cat-liderazgo-text: #166534;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #111;
+    color: #fff;
+    font-family: 'Urbanist', sans-serif;
+    padding: 32px 16px;
+    min-height: 100vh;
+  }
+
+  h1 { text-align:center; font-family:'Plus Jakarta Sans'; font-size:26px; font-weight:800; margin-bottom:4px; letter-spacing:-0.5px; }
+  .sub { text-align:center; color:rgba(255,255,255,0.4); font-size:12px; margin-bottom:16px; }
+  .version-badge { display:inline-block; padding:3px 10px; border-radius:9999px; font-size:10px; font-weight:700; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); margin-bottom:20px; text-align:center; }
+  .center { text-align:center; }
+
+  /* Accent picker */
+  .accent-bar { display:flex; justify-content:center; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
+  .accent-dot { width:28px; height:28px; border-radius:14px; border:2px solid rgba(255,255,255,0.12); cursor:pointer; transition:all .2s; }
+  .accent-dot:hover { transform:scale(1.15); }
+  .accent-dot.active { border-color:#fff; box-shadow:0 0 12px rgba(255,255,255,0.25); }
+  .accent-label { text-align:center; font-size:10px; color:rgba(255,255,255,0.3); margin-bottom:24px; }
+
+  /* Screen tabs */
+  .tab-bar { display:flex; justify-content:center; gap:6px; margin-bottom:28px; flex-wrap:wrap; }
+  .tab-btn { padding:8px 16px; border-radius:9999px; border:1px solid rgba(255,255,255,0.10); background:transparent; color:rgba(255,255,255,0.45); font-family:'Urbanist'; font-weight:600; font-size:11px; cursor:pointer; transition:all .2s; }
+  .tab-btn:hover { border-color:rgba(255,255,255,0.25); color:rgba(255,255,255,0.7); }
+  .tab-btn.active { background:#fff; color:#000; border-color:#fff; }
+
+  /* Phone containers */
+  .phones { display:flex; justify-content:center; gap:40px; flex-wrap:wrap; }
+  .phone-wrap { text-align:center; }
+  .phone-wrap h3 { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:11px; letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; }
+  .phone-wrap.noir-wrap h3 { color:rgba(255,255,255,0.5); }
+  .phone-wrap.lux-wrap h3 { color:rgba(255,255,255,0.7); }
+  .phone { width:375px; height:812px; border-radius:44px; overflow:hidden; position:relative; }
+  .phone.noir-phone { border:2px solid rgba(255,255,255,0.06); }
+  .phone.lux-phone { border:2px solid rgba(0,0,0,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+
+  .screen { display:none; height:100%; overflow-y:auto; flex-direction:column; }
+  .screen::-webkit-scrollbar { display:none; }
+  .screen.active { display:flex; }
+
+  .ms { font-family:'Material Symbols Outlined'; font-size:20px; vertical-align:middle; }
+  .ms.sm { font-size:16px; }
+  .ms.xs { font-size:14px; }
+  .ms.lg { font-size:24px; }
+  .ms.fill { font-variation-settings:'FILL' 1; }
+  .jks { font-family:'Plus Jakarta Sans', sans-serif; }
+
+  /* ================================================================
+     NOIR THEME (reference — minimal, same as v2)
+     ================================================================ */
+  .noir-phone { background: var(--n-bg); }
+
+  .n-header { display:flex; align-items:center; justify-content:space-between; padding:56px 20px 10px; }
+  .n-logo { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:20px; letter-spacing:-0.5px; }
+  .n-bell { width:36px; height:36px; border-radius:18px; display:flex; align-items:center; justify-content:center; position:relative; }
+  .n-badge { position:absolute; top:-3px; right:-5px; min-width:14px; height:14px; border-radius:7px; background:#EF4444; font-size:8px; font-weight:800; color:#fff; display:flex; align-items:center; justify-content:center; padding:0 2px; }
+  .n-hero { padding:6px 20px 18px; }
+  .n-hero .kicker { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:2.5px; margin-bottom:8px; }
+  .n-hero h2 { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:30px; letter-spacing:-1.2px; line-height:1.05; }
+
+  /* Happening Now card */
+  .happening { margin:0 20px 14px; border-radius:18px; padding:16px; position:relative; overflow:hidden; }
+  .happening .live-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .live-dot { display:inline-flex; align-items:center; gap:5px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; }
+  .live-dot::before { content:''; width:6px; height:6px; border-radius:3px; background:#4ade80; animation:pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .happening h3 { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:15px; line-height:1.3; margin-bottom:4px; }
+  .happening .meta { font-size:11px; margin-bottom:12px; }
+  .join-btn { display:inline-flex; align-items:center; gap:4px; padding:8px 18px; border-radius:9999px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; border:none; cursor:pointer; }
+
+  /* Module grid */
+  .modules { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 20px 100px; }
+  .mod { border-radius:18px; padding:18px 16px; display:flex; flex-direction:column; justify-content:space-between; min-height:92px; cursor:pointer; transition:all .15s; }
+  .mod:active { transform:scale(0.97); }
+  .mod .mod-top { display:flex; align-items:center; justify-content:space-between; }
+  .mod .name { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13px; margin-top:auto; }
+
+  /* Agenda */
+  .ag-header { display:flex; align-items:center; gap:10px; padding:56px 20px 6px; }
+  .back-btn { width:34px; height:34px; border-radius:17px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .ag-sub { padding:0 20px; font-size:11px; margin-bottom:14px; }
+  .days { display:flex; gap:8px; padding:4px 16px 8px; overflow-x:auto; }
+  .days::-webkit-scrollbar { display:none; }
+  .day { min-width:48px; height:70px; border-radius:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; flex-shrink:0; cursor:pointer; transition:all .2s; }
+  .day .wd { font-size:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+  .day .num { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:21px; }
+  .day .pip { width:4px; height:4px; border-radius:2px; }
+
+  /* Filter pills */
+  .filters { display:flex; gap:6px; padding:4px 20px 12px; overflow-x:auto; }
+  .filters::-webkit-scrollbar { display:none; }
+  .filter-pill { padding:6px 14px; border-radius:9999px; font-size:11px; font-weight:600; white-space:nowrap; cursor:pointer; display:flex; align-items:center; gap:5px; }
+  .filter-pip { width:6px; height:6px; border-radius:3px; }
+
+  /* Timeline + Session cards */
+  .timeline { padding-bottom:100px; }
+  .trow { display:flex; padding:0 14px; }
+  .tleft { width:56px; display:flex; flex-direction:column; align-items:center; padding-top:14px; }
+  .tleft .time { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:9px; margin-bottom:6px; }
+  .tdot { border-radius:50%; }
+  .tconn { width:1.5px; flex:1; margin-top:4px; }
+  .sess { flex:1; border-radius:16px; padding:12px; margin-bottom:10px; }
+  .sess .top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .sess h4 { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; line-height:1.3; margin-bottom:4px; }
+  .sess .loc { font-size:10px; display:flex; align-items:center; gap:3px; margin-bottom:4px; }
+  .sess .speakers-row { display:flex; align-items:center; gap:6px; font-size:10px; margin-bottom:8px; }
+  .speaker-dots { display:flex; }
+  .speaker-dot { width:22px; height:22px; border-radius:11px; margin-right:-6px; }
+  .sess .actions { display:flex; gap:6px; padding-top:8px; }
+  .act { padding:5px 10px; border-radius:9999px; font-size:9px; font-weight:600; display:flex; align-items:center; gap:3px; cursor:pointer; }
+  .cat-pill { padding:3px 9px; border-radius:9999px; font-size:9px; font-weight:700; letter-spacing:0.3px; }
+
+  /* Speakers */
+  .spk-header { padding:56px 20px 12px; display:flex; align-items:center; gap:10px; }
+  .search-bar { margin:0 20px 16px; border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:8px; font-size:13px; }
+  .featured-title { padding:0 20px; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px; margin-bottom:12px; }
+  .featured-scroll { display:flex; gap:12px; padding:0 20px 20px; overflow-x:auto; }
+  .featured-scroll::-webkit-scrollbar { display:none; }
+  .spk-card { min-width:170px; border-radius:18px; overflow:hidden; flex-shrink:0; }
+  .spk-card .photo { height:160px; background-size:cover; background-position:center; position:relative; }
+  .spk-card .photo .keynote-badge { position:absolute; top:8px; left:8px; padding:3px 8px; border-radius:6px; font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .spk-card .info { padding:10px 12px 12px; }
+  .spk-card .info .name { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13px; margin-bottom:2px; }
+  .spk-card .info .role { font-size:10px; }
+  .spk-card .info .sessions { font-size:9px; margin-top:4px; display:flex; align-items:center; gap:3px; }
+  .all-title { padding:0 20px; display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .spk-list-item { display:flex; align-items:center; gap:12px; padding:10px 20px; cursor:pointer; }
+  .spk-list-item .avatar { width:44px; height:44px; border-radius:22px; background-size:cover; background-position:center; flex-shrink:0; }
+  .spk-list-item .info { flex:1; }
+  .spk-list-item .info .name { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13px; }
+  .spk-list-item .info .role { font-size:11px; }
+
+  /* Networking */
+  .net-header { padding:56px 20px 12px; }
+  .net-header h2 { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:24px; letter-spacing:-0.5px; }
+  .net-tabs { display:flex; gap:8px; padding:0 20px 14px; }
+  .net-tab { padding:8px 18px; border-radius:9999px; font-size:12px; font-weight:600; cursor:pointer; transition:all .2s; }
+  .net-count { font-size:10px; font-weight:800; }
+  .suggested-title { padding:0 20px; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:15px; margin-bottom:12px; }
+  .suggested-scroll { display:flex; gap:12px; padding:0 20px 20px; overflow-x:auto; }
+  .suggested-scroll::-webkit-scrollbar { display:none; }
+  .net-card { min-width:165px; border-radius:18px; padding:16px; display:flex; flex-direction:column; align-items:center; text-align:center; flex-shrink:0; }
+  .net-card .net-avatar { width:52px; height:52px; border-radius:26px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .net-card .name { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:12px; margin-bottom:2px; }
+  .net-card .role { font-size:10px; margin-bottom:6px; }
+  .net-card .match { font-size:9px; font-weight:600; margin-bottom:4px; }
+  .net-card .interests { font-size:8px; margin-bottom:10px; line-height:1.4; }
+  .connect-btn { padding:7px 20px; border-radius:9999px; font-size:10px; font-weight:700; border:none; cursor:pointer; width:100%; }
+  .net-list-item { display:flex; align-items:center; gap:12px; padding:10px 20px; }
+  .net-list-item .avatar { width:40px; height:40px; border-radius:20px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .net-list-item .info { flex:1; }
+  .net-list-item .add-btn { width:32px; height:32px; border-radius:16px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+  /* Profile */
+  .prof-header { display:flex; align-items:center; justify-content:space-between; padding:56px 20px 6px; }
+  .prof-header h2 { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:24px; letter-spacing:-0.5px; }
+  .help-btn { display:flex; align-items:center; gap:4px; padding:6px 14px; border-radius:10px; font-size:11px; font-weight:600; cursor:pointer; }
+  .avatar-area { display:flex; flex-direction:column; align-items:center; padding:16px 20px 20px; }
+  .prof-avatar { width:84px; height:84px; border-radius:42px; position:relative; }
+  .cam-badge { position:absolute; bottom:0; right:0; width:26px; height:26px; border-radius:13px; display:flex; align-items:center; justify-content:center; }
+  .prof-name { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:19px; letter-spacing:-0.3px; margin-top:12px; }
+  .prof-role { font-size:12px; margin-top:3px; }
+  .socials { display:flex; gap:10px; margin-top:14px; }
+  .soc { width:36px; height:36px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; cursor:pointer; }
+  .stats { display:flex; gap:8px; padding:0 20px; margin-bottom:18px; }
+  .stat { flex:1; text-align:center; padding:14px 0; border-radius:16px; }
+  .stat .v { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:17px; letter-spacing:-0.3px; }
+  .stat .l { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.8px; margin-top:4px; }
+  .stat .icon { margin-bottom:4px; }
+  .data-section { margin:0 20px; border-radius:16px; padding:0 16px; margin-bottom:16px; }
+  .sec-head { display:flex; align-items:center; justify-content:space-between; padding:0 20px; margin-bottom:10px; }
+  .drow { display:flex; align-items:center; justify-content:space-between; padding:13px 0; }
+  .drow .label { font-size:12px; }
+  .drow .value { font-size:13px; font-weight:500; }
+  .interest-pills { display:flex; flex-wrap:wrap; gap:6px; padding:0 20px 100px; }
+  .int-pill { padding:6px 14px; border-radius:9999px; font-size:11px; font-weight:600; }
+
+  /* Tab dock */
+  .dock { position:absolute; bottom:16px; left:14px; right:14px; height:58px; border-radius:29px; display:flex; align-items:center; justify-content:space-around; padding:0 6px; z-index:10; }
+  .dock .tab { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:9px; font-weight:600; cursor:pointer; position:relative; }
+  .dock .tab .ms { font-size:20px; }
+  .dock .tab .tab-dot { width:4px; height:4px; border-radius:2px; position:absolute; bottom:-4px; }
+  .dock .tab .notif-badge { position:absolute; top:-4px; right:-8px; min-width:14px; height:14px; border-radius:7px; background:#EF4444; font-size:7px; font-weight:800; color:#fff; display:flex; align-items:center; justify-content:center; }
+
+  /* ================================================================
+     NOIR-SPECIFIC styles
+     ================================================================ */
+  .noir-phone .n-logo { color:#fff; }
+  .noir-phone .n-bell { background:rgba(255,255,255,0.06); }
+  .noir-phone .n-bell .ms { color:rgba(255,255,255,0.7); }
+  .noir-phone .n-badge { border:1.5px solid #0a0a0a; }
+  .noir-phone .n-hero .kicker { color:var(--accent-noir); }
+  .noir-phone .n-hero h2 { color:#fff; }
+  .noir-phone .n-hero h2 .hl { color:var(--accent-noir); }
+  .noir-phone .happening { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); }
+  .noir-phone .happening .live-dot { color:rgba(255,255,255,0.45); }
+  .noir-phone .happening h3 { color:#fff; }
+  .noir-phone .happening .meta { color:rgba(255,255,255,0.4); }
+  .noir-phone .join-btn { background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.6); border:1px solid rgba(255,255,255,0.12); }
+  .noir-phone .mod { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); }
+  .noir-phone .mod .ms { color:rgba(255,255,255,0.5); }
+  .noir-phone .mod .name { color:rgba(255,255,255,0.8); }
+  .noir-phone .mod .ms.chevron { color:rgba(255,255,255,0.2); }
+  .noir-phone .ag-header h2 { color:#fff; }
+  .noir-phone .back-btn { background:rgba(255,255,255,0.06); }
+  .noir-phone .back-btn .ms { color:#fff; }
+  .noir-phone .ag-sub { color:rgba(255,255,255,0.5); }
+  .noir-phone .day { background:#141414; }
+  .noir-phone .day .wd { color:rgba(255,255,255,0.5); }
+  .noir-phone .day .num { color:#fff; }
+  .noir-phone .day.active { background:var(--accent-noir); box-shadow:0 4px 12px color-mix(in srgb,var(--accent-noir) 30%,transparent); }
+  .noir-phone .day.active .wd { color:rgba(255,255,255,0.85); }
+  .noir-phone .filter-pill { background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.55); border:1px solid rgba(255,255,255,0.06); }
+  .noir-phone .filter-pill.active { background:rgba(255,255,255,0.08); color:#fff; border-color:rgba(255,255,255,0.12); }
+  .noir-phone .tleft .time { color:rgba(255,255,255,0.4); }
+  .noir-phone .tleft .time.now { color:var(--accent-noir); }
+  .noir-phone .tdot { background:#494847; }
+  .noir-phone .tdot.now { background:var(--accent-noir); }
+  .noir-phone .tconn { background:rgba(73,72,71,0.3); }
+  .noir-phone .sess { background:rgba(38,38,38,0.4); border:0.5px solid rgba(255,255,255,0.06); }
+  .noir-phone .sess h4 { color:#fff; }
+  .noir-phone .sess .loc { color:rgba(255,255,255,0.45); }
+  .noir-phone .sess .speakers-row { color:rgba(255,255,255,0.45); }
+  .noir-phone .cat-pill { background:rgba(255,255,255,0.06); }
+  .noir-phone .act { background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.55); }
+  .noir-phone .sess.past { opacity:0.4; }
+  .noir-phone .sess.past h4 { text-decoration:line-through; }
+  .noir-phone .dock { background:rgba(20,20,22,0.55); border:0.5px solid rgba(255,255,255,0.08); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
+  .noir-phone .dock .tab { color:rgba(255,255,255,0.3); }
+  .noir-phone .dock .tab.active { color:var(--accent-noir); }
+  .noir-phone .dock .tab.active .tab-dot { background:var(--accent-noir); }
+
+  /* Noir speakers */
+  .noir-phone .search-bar { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); color:rgba(255,255,255,0.35); }
+  .noir-phone .featured-title { color:#fff; }
+  .noir-phone .spk-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); }
+  .noir-phone .spk-card .keynote-badge { background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.7); }
+  .noir-phone .spk-card .info .name { color:#fff; }
+  .noir-phone .spk-card .info .role { color:rgba(255,255,255,0.45); }
+  .noir-phone .spk-card .info .sessions { color:rgba(255,255,255,0.35); }
+  .noir-phone .all-title .t { color:#fff; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px; }
+  .noir-phone .all-title .count { color:rgba(255,255,255,0.35); font-size:12px; }
+  .noir-phone .spk-list-item .info .name { color:#fff; }
+  .noir-phone .spk-list-item .info .role { color:rgba(255,255,255,0.45); }
+  .noir-phone .spk-list-item .ms { color:rgba(255,255,255,0.2); }
+
+  /* Noir networking */
+  .noir-phone .net-header h2 { color:#fff; }
+  .noir-phone .net-tab { background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.06); }
+  .noir-phone .net-tab.active { background:var(--accent-noir); color:#fff; border-color:transparent; }
+  .noir-phone .net-count { background:rgba(255,255,255,0.15); color:#fff; padding:1px 6px; border-radius:9999px; margin-left:4px; }
+  .noir-phone .suggested-title { color:#fff; }
+  .noir-phone .net-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); }
+  .noir-phone .net-card .name { color:#fff; }
+  .noir-phone .net-card .role { color:rgba(255,255,255,0.45); }
+  .noir-phone .net-card .match { color:var(--accent-noir); }
+  .noir-phone .net-card .interests { color:rgba(255,255,255,0.35); }
+  .noir-phone .connect-btn { background:var(--accent-noir); color:#fff; }
+  .noir-phone .net-list-item .info .name { color:#fff; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13px; }
+  .noir-phone .net-list-item .info .role { color:rgba(255,255,255,0.45); font-size:11px; }
+  .noir-phone .net-list-item .add-btn { background:rgba(255,255,255,0.06); }
+  .noir-phone .net-list-item .add-btn .ms { color:rgba(255,255,255,0.5); font-size:16px; }
+  .noir-phone .net-list-item + .net-list-item { border-top:0.5px solid rgba(255,255,255,0.04); }
+
+  /* Noir profile */
+  .noir-phone .prof-header h2 { color:#fff; }
+  .noir-phone .help-btn { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); color:rgba(255,255,255,0.45); }
+  .noir-phone .prof-avatar { background:linear-gradient(135deg,#2a2a4a,#1a3a2a,#3a2a1a); border:2px solid rgba(255,255,255,0.08); }
+  .noir-phone .cam-badge { background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.12); }
+  .noir-phone .cam-badge .ms { color:rgba(255,255,255,0.7); font-size:13px; }
+  .noir-phone .prof-name { color:#fff; }
+  .noir-phone .prof-role { color:rgba(255,255,255,0.5); }
+  .noir-phone .soc { background:rgba(255,255,255,0.04); border:0.5px solid rgba(255,255,255,0.08); }
+  .noir-phone .stat { background:rgba(255,255,255,0.025); border:0.5px solid rgba(255,255,255,0.04); }
+  .noir-phone .stat .icon { color:rgba(255,255,255,0.35); }
+  .noir-phone .stat .v { color:#fff; }
+  .noir-phone .stat .l { color:rgba(255,255,255,0.4); }
+  .noir-phone .sec-head .t { color:#fff; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; }
+  .noir-phone .sec-head .edit { color:var(--accent-noir); font-size:12px; font-weight:600; }
+  .noir-phone .data-section { background:rgba(255,255,255,0.025); border:0.5px solid rgba(255,255,255,0.04); }
+  .noir-phone .drow .label { color:rgba(255,255,255,0.45); }
+  .noir-phone .drow .value { color:rgba(255,255,255,0.85); }
+  .noir-phone .drow + .drow { border-top:0.5px solid rgba(255,255,255,0.04); }
+  .noir-phone .int-pill { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); color:rgba(255,255,255,0.6); }
+
+  /* ================================================================
+     LUX V2 "THE GALLERY" — new design
+     ================================================================ */
+  .lux-phone { background:var(--bg-base); }
+
+  .lux-phone .n-logo { color:var(--text-primary); }
+  .lux-phone .n-bell { background:var(--surface-card); box-shadow:var(--shadow-md); }
+  .lux-phone .n-bell .ms { color:var(--icon-primary); }
+  .lux-phone .n-badge { border:2px solid var(--bg-base); }
+
+  .lux-phone .n-hero .kicker { color:var(--text-tertiary); letter-spacing:3px; }
+  .lux-phone .n-hero h2 { color:var(--text-primary); }
+  .lux-phone .n-hero h2 .hl { color:var(--accent); }
+
+  /* HappeningNow — DARK card on light = focal point (Designer Jobs trick) */
+  .lux-phone .happening { background:#1A1B1E; border:none; box-shadow:var(--shadow-lg); }
+  .lux-phone .happening .live-dot { color:rgba(255,255,255,0.6); }
+  .lux-phone .happening h3 { color:#FFFFFF; }
+  .lux-phone .happening .meta { color:rgba(255,255,255,0.5); }
+  .lux-phone .join-btn { background:#FFFFFF; color:#1A1B1E; font-weight:800; border:none; }
+
+  /* Module cards — white with shadow */
+  .lux-phone .mod { background:var(--surface-card); border:none; box-shadow:var(--shadow-md); }
+  .lux-phone .mod:hover { box-shadow:var(--shadow-lg); }
+  .lux-phone .mod .ms { color:var(--icon-secondary); }
+  .lux-phone .mod .name { color:var(--text-primary); }
+  .lux-phone .mod .ms.chevron { color:var(--icon-tertiary); }
+
+  /* Agenda */
+  .lux-phone .ag-header h2 { color:var(--text-primary); }
+  .lux-phone .back-btn { background:var(--surface-card); box-shadow:var(--shadow-sm); }
+  .lux-phone .back-btn .ms { color:var(--icon-primary); }
+  .lux-phone .ag-sub { color:var(--text-tertiary); }
+  .lux-phone .day { background:var(--surface-card); box-shadow:var(--shadow-sm); }
+  .lux-phone .day .wd { color:var(--text-tertiary); }
+  .lux-phone .day .num { color:var(--text-primary); }
+  .lux-phone .day.active { background:var(--accent); box-shadow:0 4px 12px rgba(26,26,30,0.2); }
+  .lux-phone .day.active .wd { color:rgba(255,255,255,0.7); }
+  .lux-phone .day.active .num { color:#FFFFFF; }
+  .lux-phone .filter-pill { background:var(--surface-card); color:var(--text-secondary); border:1px solid var(--border-default); }
+  .lux-phone .filter-pill.active { background:var(--accent); color:#fff; border-color:transparent; }
+  .lux-phone .tleft .time { color:var(--text-tertiary); }
+  .lux-phone .tleft .time.now { color:var(--accent); font-weight:800; }
+  .lux-phone .tdot { background:var(--bg-sunken); }
+  .lux-phone .tdot.now { background:var(--accent); box-shadow:0 0 8px rgba(26,26,30,0.2); }
+  .lux-phone .tconn { background:var(--border-default); }
+  .lux-phone .sess { background:var(--surface-card); border:none; box-shadow:var(--shadow-sm); }
+  .lux-phone .sess h4 { color:var(--text-primary); }
+  .lux-phone .sess .loc { color:var(--text-tertiary); }
+  .lux-phone .sess .speakers-row { color:var(--text-tertiary); }
+  .lux-phone .cat-pill.cat-innovacion { background:var(--cat-innovacion-bg); color:var(--cat-innovacion-text); }
+  .lux-phone .cat-pill.cat-networking { background:var(--cat-networking-bg); color:var(--cat-networking-text); }
+  .lux-phone .cat-pill.cat-tech { background:var(--cat-tech-bg); color:var(--cat-tech-text); }
+  .lux-phone .cat-pill.cat-liderazgo { background:var(--cat-liderazgo-bg); color:var(--cat-liderazgo-text); }
+  .lux-phone .act { background:var(--surface-input); color:var(--text-secondary); }
+  .lux-phone .act.primary { background:var(--accent); color:#fff; font-weight:800; }
+  .lux-phone .sess.past { opacity:0.5; }
+  .lux-phone .sess.past h4 { text-decoration:line-through; color:var(--text-tertiary); }
+
+  /* Lux tab dock — solid white + shadow (NO glass) */
+  .lux-phone .dock { background:#FFFFFF; border:none; box-shadow:var(--shadow-lg); }
+  .lux-phone .dock .tab { color:var(--icon-tertiary); }
+  .lux-phone .dock .tab.active { color:var(--accent); }
+  .lux-phone .dock .tab.active .tab-dot { background:var(--accent); }
+
+  /* Lux speakers */
+  .lux-phone .search-bar { background:var(--surface-input); border:none; color:var(--text-quaternary); }
+  .lux-phone .featured-title { color:var(--text-primary); }
+  .lux-phone .spk-card { background:var(--surface-card); box-shadow:var(--shadow-md); border:none; }
+  .lux-phone .spk-card .keynote-badge { background:rgba(0,0,0,0.6); color:#fff; backdrop-filter:blur(8px); }
+  .lux-phone .spk-card .info .name { color:var(--text-primary); }
+  .lux-phone .spk-card .info .role { color:var(--text-tertiary); }
+  .lux-phone .spk-card .info .sessions { color:var(--text-quaternary); }
+  .lux-phone .all-title .t { color:var(--text-primary); font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px; }
+  .lux-phone .all-title .count { color:var(--text-quaternary); font-size:12px; }
+  .lux-phone .spk-list-item .info .name { color:var(--text-primary); }
+  .lux-phone .spk-list-item .info .role { color:var(--text-tertiary); }
+  .lux-phone .spk-list-item .ms { color:var(--icon-tertiary); }
+  .lux-phone .spk-list-item + .spk-list-item { border-top:1px solid var(--border-subtle); }
+
+  /* Lux networking */
+  .lux-phone .net-header h2 { color:var(--text-primary); }
+  .lux-phone .net-tab { background:var(--surface-card); color:var(--text-tertiary); border:1px solid var(--border-default); }
+  .lux-phone .net-tab.active { background:var(--accent); color:#fff; border-color:transparent; box-shadow:var(--shadow-sm); }
+  .lux-phone .net-count { background:#EF4444; color:#fff; padding:1px 6px; border-radius:9999px; margin-left:4px; font-size:10px; }
+  .lux-phone .suggested-title { color:var(--text-primary); }
+  .lux-phone .net-card { background:var(--surface-card); border:none; box-shadow:var(--shadow-md); }
+  .lux-phone .net-card .name { color:var(--text-primary); }
+  .lux-phone .net-card .role { color:var(--text-tertiary); }
+  .lux-phone .net-card .match { color:var(--accent); }
+  .lux-phone .net-card .interests { color:var(--text-quaternary); }
+  .lux-phone .connect-btn { background:var(--accent); color:#fff; }
+  .lux-phone .net-list-item .info .name { color:var(--text-primary); font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13px; }
+  .lux-phone .net-list-item .info .role { color:var(--text-tertiary); font-size:11px; }
+  .lux-phone .net-list-item .add-btn { background:var(--surface-input); }
+  .lux-phone .net-list-item .add-btn .ms { color:var(--icon-secondary); font-size:16px; }
+  .lux-phone .net-list-item + .net-list-item { border-top:1px solid var(--border-subtle); }
+
+  /* Lux profile */
+  .lux-phone .prof-header h2 { color:var(--text-primary); }
+  .lux-phone .help-btn { background:var(--surface-card); border:none; color:var(--text-tertiary); box-shadow:var(--shadow-sm); }
+  .lux-phone .prof-avatar { background:linear-gradient(135deg,#E8E0F0,#D8ECE4,#F0E4D8); border:2px solid var(--border-subtle); box-shadow:var(--shadow-md); }
+  .lux-phone .cam-badge { background:var(--surface-card); border:none; box-shadow:var(--shadow-sm); }
+  .lux-phone .cam-badge .ms { color:var(--icon-secondary); font-size:13px; }
+  .lux-phone .prof-name { color:var(--text-primary); }
+  .lux-phone .prof-role { color:var(--text-tertiary); }
+  .lux-phone .soc { background:var(--surface-card); border:none; box-shadow:var(--shadow-sm); }
+  .lux-phone .stat { background:var(--surface-card); border:none; box-shadow:var(--shadow-sm); }
+  .lux-phone .stat .icon { color:var(--icon-tertiary); }
+  .lux-phone .stat .v { color:var(--text-primary); }
+  .lux-phone .stat .l { color:var(--text-tertiary); }
+  .lux-phone .sec-head .t { color:var(--text-primary); font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; }
+  .lux-phone .sec-head .edit { color:var(--accent); font-size:12px; font-weight:600; }
+  .lux-phone .data-section { background:var(--surface-card); border:none; box-shadow:var(--shadow-md); }
+  .lux-phone .drow .label { color:var(--text-tertiary); }
+  .lux-phone .drow .value { color:var(--text-primary); }
+  .lux-phone .drow + .drow { border-top:1px solid var(--border-subtle); }
+  .lux-phone .int-pill { background:var(--surface-card); border:1px solid var(--border-default); color:var(--text-secondary); box-shadow:var(--shadow-sm); }
+  .lux-phone .int-pill.selected { background:var(--accent); border-color:transparent; color:#fff; box-shadow:var(--shadow-sm); }
+
+  /* ================================================================
+     GAMIFICATION HUD
+     ================================================================ */
+  .carousel-area { position:relative; margin:0 20px 14px; overflow:hidden; border-radius:18px; }
+  .carousel-track { display:flex; transition:transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+  .carousel-slide { min-width:100%; }
+  .carousel-dots { display:flex; justify-content:center; gap:6px; padding:8px 0 0; }
+  .carousel-dot { width:6px; height:6px; border-radius:3px; cursor:pointer; transition:all .2s; }
+  .carousel-dot.active { width:18px; }
+
+  /* GamificationHud — always dark (Dark Island) */
+  .gam-hud { border-radius:18px; padding:16px; position:relative; overflow:hidden; background:#1A1B1E; }
+  .gam-hud::before {
+    content:'';
+    position:absolute; inset:-2px;
+    border-radius:20px;
+    background: linear-gradient(135deg, #ff6b9d, #c084fc, #60a5fa, #34d399, #fbbf24, #ff6b9d);
+    background-size:300% 300%;
+    animation:rgbwave 4s ease infinite;
+    z-index:-1;
+  }
+  .gam-hud::after {
+    content:'';
+    position:absolute; inset:0;
+    border-radius:18px;
+    background:#1A1B1E;
+    z-index:-1;
+  }
+  @keyframes rgbwave { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+  .gam-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .gam-label { display:flex; align-items:center; gap:5px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; color:rgba(255,255,255,0.5); }
+  .gam-label .ms { color:#39d2c0; font-size:16px; }
+  .gam-rank { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:20px; color:#39d2c0; }
+
+  .gam-points { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:36px; color:#FFFFFF; line-height:1; margin-bottom:2px; }
+  .gam-pts-label { font-size:10px; color:rgba(255,255,255,0.4); margin-bottom:12px; }
+
+  .gam-progress-row { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .gam-progress-track { flex:1; height:6px; border-radius:3px; background:rgba(255,255,255,0.08); overflow:hidden; }
+  .gam-progress-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#39d2c0,#5eead4); transition:width 0.6s ease; }
+  .gam-progress-pct { font-size:10px; font-weight:700; color:#5eead4; }
+
+  .gam-stats { display:flex; gap:12px; margin-bottom:12px; }
+  .gam-stat { display:flex; align-items:center; gap:4px; font-size:10px; color:rgba(255,255,255,0.45); }
+  .gam-stat .ms { font-size:14px; }
+  .gam-stat .ms.teal { color:#39d2c0; }
+  .gam-stat .ms.gold { color:#FFD700; }
+
+  .gam-play-btn { display:inline-flex; align-items:center; gap:5px; padding:9px 22px; border-radius:9999px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; border:none; cursor:pointer; }
+
+  /* Noir-specific gam */
+  .noir-phone .gam-hud { background:#0e0e0e; }
+  .noir-phone .gam-hud::after { background:#0e0e0e; }
+  .noir-phone .gam-play-btn { background:rgba(57,210,192,0.15); color:#39d2c0; border:1px solid rgba(57,210,192,0.2); }
+  .noir-phone .carousel-dot { background:rgba(255,255,255,0.2); }
+  .noir-phone .carousel-dot.active { background:#fff; }
+
+  /* Lux-specific gam — Dark Island with shadow.lg */
+  .lux-phone .gam-hud { background:#1A1B1E; box-shadow:var(--shadow-lg); }
+  .lux-phone .gam-hud::after { background:#1A1B1E; }
+  .lux-phone .gam-play-btn { background:#FFFFFF; color:#1A1B1E; }
+  .lux-phone .carousel-dot { background:var(--border-default); }
+  .lux-phone .carousel-dot.active { background:var(--accent); }
+
+  /* Lux happening inside carousel needs shadow too */
+  .lux-phone .carousel-area .happening { margin:0; box-shadow:var(--shadow-lg); }
+  .noir-phone .carousel-area .happening { margin:0; }
+
+  /* Responsive */
+  @media (max-width:820px) {
+    .phones { gap:24px; }
+    .phone { width:340px; height:740px; border-radius:38px; }
+  }
+  @media (max-width:720px) {
+    .phones { flex-direction:column; align-items:center; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Lumina Lux v2 — "The Gallery"</h1>
+<p class="sub">Cool gray #F6F8FA + Ink accent #1A1A1A. Comparativa con Noir.</p>
+<div class="center"><span class="version-badge">v2.0 — 2026-04-17</span></div>
+
+<div class="accent-bar">
+  <div class="accent-dot active" style="background:#FFFFFF;border:2px solid rgba(255,255,255,0.4)" data-noir="#FFFFFF" data-lux="#1A1A1A" title="Default (Blanco/Ink)"></div>
+  <div class="accent-dot" style="background:#7C5CFC" data-noir="#7C5CFC" data-lux="#5B3FD4" title="Violeta"></div>
+  <div class="accent-dot" style="background:#3B82F6" data-noir="#3B82F6" data-lux="#2563EB" title="Azul"></div>
+  <div class="accent-dot" style="background:#EF4444" data-noir="#EF4444" data-lux="#DC2626" title="Rojo"></div>
+  <div class="accent-dot" style="background:#F59E0B" data-noir="#F59E0B" data-lux="#D97706" title="Amber"></div>
+  <div class="accent-dot" style="background:#10B981" data-noir="#10B981" data-lux="#059669" title="Verde"></div>
+  <div class="accent-dot" style="background:#EC4899" data-noir="#EC4899" data-lux="#DB2777" title="Pink"></div>
+</div>
+<p class="accent-label">Accent dual: Noir recibe el color vibrante, Lux recibe una version ligeramente desaturada</p>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="show('home')">Home</button>
+  <button class="tab-btn" onclick="show('agenda')">Agenda</button>
+  <button class="tab-btn" onclick="show('speakers')">Speakers</button>
+  <button class="tab-btn" onclick="show('networking')">Networking</button>
+  <button class="tab-btn" onclick="show('profile')">Perfil</button>
+</div>
+
+<div class="phones">
+
+<!-- ══════════════════════════════════════════
+     NOIR PHONE
+     ══════════════════════════════════════════ -->
+<div class="phone-wrap noir-wrap">
+<h3>Lumina Noir</h3>
+<div class="phone noir-phone">
+
+  <!-- HOME -->
+  <div class="screen active" data-screen="home">
+    <div class="n-header">
+      <span class="n-logo">EventOS Summit</span>
+      <div class="n-bell"><span class="ms">notifications</span><div class="n-badge">3</div></div>
+    </div>
+    <div class="n-hero">
+      <div class="kicker">VIVE Y SUENA PARA VIVIRLO</div>
+      <h2>The Future<br>of Creative<br><span class="hl">Intelligence</span></h2>
+    </div>
+    <div class="carousel-area" data-carousel>
+      <div class="carousel-track">
+        <div class="carousel-slide">
+          <div class="happening">
+            <div class="live-row">
+              <div class="live-dot">EN VIVO</div>
+              <span class="join-btn">UNIRTE</span>
+            </div>
+            <h3>Workshop: Cloud Native en 90 minutos</h3>
+            <div class="meta">Sala A</div>
+          </div>
+        </div>
+        <div class="carousel-slide">
+          <div class="gam-hud">
+            <div class="gam-top">
+              <div class="gam-label"><span class="ms fill">emoji_events</span>DESAFIO</div>
+              <div class="gam-rank">#25</div>
+            </div>
+            <div class="gam-points">100</div>
+            <div class="gam-progress-row">
+              <div class="gam-progress-track"><div class="gam-progress-fill" style="width:43%"></div></div>
+              <span class="gam-progress-pct">43%</span>
+            </div>
+            <div class="gam-stats">
+              <div class="gam-stat"><span class="ms teal fill">target</span>6/14 retos</div>
+              <div class="gam-stat"><span class="ms gold fill">workspace_premium</span>6 logros</div>
+            </div>
+            <button class="gam-play-btn">JUGAR <span class="ms" style="font-size:14px">chevron_right</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-dots">
+        <div class="carousel-dot active"></div>
+        <div class="carousel-dot"></div>
+      </div>
+    </div>
+    <div class="modules">
+      <div class="mod"><div class="mod-top"><span class="ms">calendar_month</span><span class="ms chevron" style="font-size:16px">chevron_right</span></div><span class="name">Agenda</span></div>
+      <div class="mod"><div class="mod-top"><span class="ms">record_voice_over</span><span class="ms chevron" style="font-size:16px">chevron_right</span></div><span class="name">Speakers</span></div>
+      <div class="mod"><div class="mod-top"><span class="ms">photo_library</span><span class="ms chevron" style="font-size:16px">chevron_right</span></div><span class="name">Social</span></div>
+      <div class="mod"><div class="mod-top"><span class="ms">domain</span><span class="ms chevron" style="font-size:16px">chevron_right</span></div><span class="name">Sponsors</span></div>
+    </div>
+    <div class="dock">
+      <div class="tab active"><span class="ms fill">home</span>Inicio</div>
+      <div class="tab"><span class="ms">calendar_today</span>Agenda</div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab"><span class="ms">people</span>Red<span class="notif-badge">1</span></div>
+      <div class="tab"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="screen" data-screen="agenda">
+    <div class="ag-header">
+      <div class="back-btn"><span class="ms">arrow_back</span></div>
+      <h2 class="jks" style="font-weight:800;font-size:24px">Agenda</h2>
+    </div>
+    <div class="ag-sub">miercoles, 8 de abril</div>
+    <div class="days">
+      <div class="day"><span class="wd">MAR</span><span class="num">7</span></div>
+      <div class="day active"><span class="wd">MIE</span><span class="num">8</span></div>
+      <div class="day"><span class="wd">JUE</span><span class="num">9</span><span class="pip" style="background:var(--accent-noir)"></span></div>
+      <div class="day"><span class="wd">VIE</span><span class="num">10</span><span class="pip" style="background:var(--accent-noir)"></span></div>
+      <div class="day"><span class="wd">SAB</span><span class="num">11</span></div>
+    </div>
+    <div class="filters">
+      <div class="filter-pill active">Todos</div>
+      <div class="filter-pill"><span class="filter-pip" style="background:#F59E0B"></span>Innovacion</div>
+      <div class="filter-pill"><span class="filter-pip" style="background:#EC4899"></span>Networking</div>
+      <div class="filter-pill"><span class="filter-pip" style="background:#3B82F6"></span>Tecnologia</div>
+    </div>
+    <div class="timeline">
+      <div class="trow">
+        <div class="tleft"><span class="time">9:30</span><div class="tdot" style="width:6px;height:6px"></div><div class="tconn"></div></div>
+        <div class="sess past">
+          <div class="top"><span class="cat-pill" style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5)">Innovacion</span><span class="ms sm" style="color:rgba(255,255,255,0.3)">favorite_border</span></div>
+          <h4>The State of AI: from hype to production</h4>
+          <div class="loc"><span class="ms xs">location_on</span>Sala B</div>
+        </div>
+      </div>
+      <div class="trow">
+        <div class="tleft"><span class="time now">11:30</span><div class="tdot now" style="width:8px;height:8px"></div><div class="tconn"></div></div>
+        <div class="sess" style="border:1px solid color-mix(in srgb,var(--accent-noir) 30%,transparent)">
+          <div class="top"><span class="cat-pill" style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5)">Networking</span><span class="ms sm fill" style="color:var(--accent-noir)">favorite</span></div>
+          <h4>Almuerzo y Networking</h4>
+          <div class="loc"><span class="ms xs">location_on</span>Terraza Norte</div>
+          <div class="actions" style="border-top:0.5px solid rgba(255,255,255,0.06)">
+            <span class="act"><span class="ms xs">star_border</span>Evaluar</span>
+          </div>
+        </div>
+      </div>
+      <div class="trow">
+        <div class="tleft"><span class="time">6:00</span><div class="tdot" style="width:6px;height:6px"></div></div>
+        <div class="sess">
+          <div class="top"><span class="cat-pill" style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5)">Innovacion</span><span class="ms sm" style="color:rgba(255,255,255,0.3)">favorite_border</span></div>
+          <h4>IA Generativa: del hype a la produccion</h4>
+          <div class="loc"><span class="ms xs">location_on</span>Auditorio Principal</div>
+          <div class="speakers-row"><span>Sofia Chen</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="dock">
+      <div class="tab"><span class="ms">home</span>Inicio</div>
+      <div class="tab active"><span class="ms fill">calendar_today</span>Agenda</div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab"><span class="ms">people</span>Red<span class="notif-badge">1</span></div>
+      <div class="tab"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- SPEAKERS -->
+  <div class="screen" data-screen="speakers">
+    <div class="spk-header">
+      <div class="back-btn"><span class="ms">arrow_back</span></div>
+      <h2 class="jks" style="font-weight:800;font-size:24px;color:#fff">Speakers</h2>
+    </div>
+    <div class="search-bar"><span class="ms sm">search</span>Buscar por nombre, empresa o cargo...</div>
+    <div class="featured-title">Destacados</div>
+    <div class="featured-scroll">
+      <div class="spk-card">
+        <div class="photo" style="background:linear-gradient(135deg,#2a1a3a,#1a2a3a);display:flex;align-items:center;justify-content:center"><span style="font-size:48px;opacity:0.3">A</span></div>
+        <div class="info"><div class="keynote-badge" style="position:static;display:inline-block;margin-bottom:6px">KEYNOTE</div><div class="name">Anastasia Petrova</div><div class="role">Developer Advocate - JetBrains</div><div class="sessions"><span class="ms xs">calendar_month</span>3 sesiones</div></div>
+      </div>
+      <div class="spk-card">
+        <div class="photo" style="background:linear-gradient(135deg,#3a2a1a,#1a3a2a);display:flex;align-items:center;justify-content:center"><span style="font-size:48px;opacity:0.3">A</span></div>
+        <div class="info"><div class="keynote-badge" style="position:static;display:inline-block;margin-bottom:6px">KEYNOTE</div><div class="name">Andres Gil</div><div class="role">VP Engineering - Rappi</div><div class="sessions"><span class="ms xs">calendar_month</span>4 sesiones</div></div>
+      </div>
+    </div>
+    <div class="all-title"><span class="t">Todos</span><span class="count">18 speakers</span></div>
+    <div class="spk-list-item"><div class="avatar" style="background:linear-gradient(135deg,#2a2a3a,#3a2a2a)"></div><div class="info"><div class="name">Alex Rivera</div><div class="role">Student & Startup Founder - MIT</div></div><span class="ms">chevron_right</span></div>
+    <div class="spk-list-item"><div class="avatar" style="background:linear-gradient(135deg,#2a3a2a,#2a2a3a)"></div><div class="info"><div class="name">Carlos Rodriguez</div><div class="role">CTO - TechCorp</div></div><span class="ms">chevron_right</span></div>
+    <div class="spk-list-item"><div class="avatar" style="background:linear-gradient(135deg,#3a2a3a,#2a3a1a)"></div><div class="info"><div class="name">Sofia Chen</div><div class="role">AI Research Lead - DeepMind</div></div><span class="ms">chevron_right</span></div>
+    <div class="dock" style="padding-bottom:0">
+      <div class="tab"><span class="ms">home</span>Inicio</div>
+      <div class="tab active"><span class="ms fill">calendar_today</span>Agenda</div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab"><span class="ms">people</span>Red</div>
+      <div class="tab"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- NETWORKING -->
+  <div class="screen" data-screen="networking">
+    <div class="net-header"><h2>Networking</h2></div>
+    <div class="net-tabs">
+      <div class="net-tab active">Directorio</div>
+      <div class="net-tab">Contactos</div>
+      <div class="net-tab">Solicitudes<span class="net-count">1</span></div>
+    </div>
+    <div class="search-bar"><span class="ms sm">search</span>Buscar por nombre, empresa o cargo...</div>
+    <div style="padding:0 20px;text-align:right;font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:12px">57 asistentes</div>
+    <div class="suggested-title">Sugeridos para ti</div>
+    <div class="suggested-scroll">
+      <div class="net-card">
+        <div class="net-avatar" style="background:linear-gradient(135deg,#1a3a3a,#2a2a4a)">V</div>
+        <div class="name">Valentina R.</div>
+        <div class="role">VP Innovacion - NovaTech</div>
+        <div class="match">5 intereses en comun</div>
+        <div class="interests">Networking, Innovacion, Liderazgo</div>
+        <button class="connect-btn">+ Conectar</button>
+      </div>
+      <div class="net-card">
+        <div class="net-avatar" style="background:linear-gradient(135deg,#3a1a2a,#1a2a3a)">S</div>
+        <div class="name">Santiago M.</div>
+        <div class="role">Head of Product - Globant</div>
+        <div class="match">3 intereses en comun</div>
+        <div class="interests">Networking, Tecnologia</div>
+        <button class="connect-btn">+ Conectar</button>
+      </div>
+    </div>
+    <div class="net-list-item"><div class="avatar" style="background:linear-gradient(135deg,#2a2a3a,#3a2a2a);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5)">A</div><div class="info"><div class="name">Admin Evento</div><div class="role">Organizador - Kasproduction</div></div><div class="add-btn"><span class="ms">person_add</span></div></div>
+    <div class="net-list-item"><div class="avatar" style="background:linear-gradient(135deg,#1a3a2a,#2a3a3a);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5)">A</div><div class="info"><div class="name">Ahmed Hassan</div><div class="role">Engineering Lead - Careem</div></div><div class="add-btn"><span class="ms">person_add</span></div></div>
+    <div class="net-list-item"><div class="avatar" style="background:linear-gradient(135deg,#3a2a1a,#1a2a3a);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5)">A</div><div class="info"><div class="name">Alejandra Ruiz</div><div class="role">VP de Operaciones - MediTech</div></div><div class="add-btn"><span class="ms" style="color:rgba(255,255,255,0.35)">check</span></div></div>
+    <div class="dock">
+      <div class="tab"><span class="ms">home</span>Inicio</div>
+      <div class="tab"><span class="ms">calendar_today</span>Agenda</div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab active"><span class="ms fill">people</span>Red<span class="notif-badge">1</span></div>
+      <div class="tab"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="screen" data-screen="profile">
+    <div class="prof-header">
+      <h2>Perfil</h2>
+      <div class="help-btn"><span class="ms sm">help</span>Ayuda</div>
+    </div>
+    <div class="avatar-area">
+      <div class="prof-avatar"><div class="cam-badge"><span class="ms">photo_camera</span></div></div>
+      <div class="prof-name">Carlos Lopez</div>
+      <div class="prof-role">Ceo - Stand Tech Solutions</div>
+      <div class="socials">
+        <div class="soc" style="color:#0A66C2">in</div>
+        <div class="soc" style="color:#1DA1F2">X</div>
+        <div class="soc" style="color:#E4405F">ig</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="icon"><span class="ms sm">star</span></div><div class="v">100</div><div class="l">Puntos</div></div>
+      <div class="stat"><div class="icon"><span class="ms sm">target</span></div><div class="v">6/14</div><div class="l">Retos</div></div>
+      <div class="stat"><div class="icon"><span class="ms sm">bolt</span></div><div class="v">6</div><div class="l">Logros</div></div>
+    </div>
+    <div class="sec-head"><span class="t">Mis datos</span><span class="edit">Editar</span></div>
+    <div class="data-section">
+      <div class="drow"><span class="label">Telefono</span><span class="value">3213259689</span></div>
+      <div class="drow"><span class="label">Email</span><span class="value">vendedor@eventos.test</span></div>
+      <div class="drow"><span class="label">Cargo</span><span class="value">Ceo</span></div>
+      <div class="drow"><span class="label">Empresa</span><span class="value">Stand Tech Solutions</span></div>
+    </div>
+    <div class="sec-head" style="margin-top:4px"><span class="t">Mis intereses</span><span class="edit">Editar</span></div>
+    <div class="interest-pills">
+      <span class="int-pill">Networking</span>
+      <span class="int-pill">Innovacion</span>
+      <span class="int-pill">Liderazgo</span>
+      <span class="int-pill">Datos</span>
+      <span class="int-pill">Marketing</span>
+      <span class="int-pill">Finanzas</span>
+    </div>
+    <div class="dock">
+      <div class="tab"><span class="ms">home</span>Inicio</div>
+      <div class="tab"><span class="ms">calendar_today</span>Agenda</div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab"><span class="ms">people</span>Red</div>
+      <div class="tab active"><span class="ms fill">person</span>Perfil</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     LUX V2 PHONE
+     ══════════════════════════════════════════ -->
+<div class="phone-wrap lux-wrap">
+<h3>Lumina Lux v2</h3>
+<div class="phone lux-phone">
+
+  <!-- HOME -->
+  <div class="screen active" data-screen="home">
+    <div class="n-header">
+      <span class="n-logo">EventOS Summit</span>
+      <div class="n-bell"><span class="ms">notifications</span><div class="n-badge">3</div></div>
+    </div>
+    <div class="n-hero">
+      <div class="kicker">VIVE Y SUENA PARA VIVIRLO</div>
+      <h2>The Future<br>of Creative<br><span class="hl">Intelligence</span></h2>
+    </div>
+    <div class="carousel-area" data-carousel>
+      <div class="carousel-track">
+        <div class="carousel-slide">
+          <div class="happening">
+            <div class="live-row">
+              <div class="live-dot">EN VIVO</div>
+              <span class="join-btn">UNIRTE</span>
+            </div>
+            <h3>Workshop: Cloud Native en 90 minutos</h3>
+            <div class="meta">Sala A</div>
+          </div>
+        </div>
+        <div class="carousel-slide">
+          <div class="gam-hud">
+            <div class="gam-top">
+              <div class="gam-label"><span class="ms fill">emoji_events</span>DESAFIO</div>
+              <div class="gam-rank">#25</div>
+            </div>
+            <div class="gam-points">100</div>
+            <div class="gam-progress-row">
+              <div class="gam-progress-track"><div class="gam-progress-fill" style="width:43%"></div></div>
+              <span class="gam-progress-pct">43%</span>
+            </div>
+            <div class="gam-stats">
+              <div class="gam-stat"><span class="ms teal fill">target</span>6/14 retos</div>
+              <div class="gam-stat"><span class="ms gold fill">workspace_premium</span>6 logros</div>
+            </div>
+            <button class="gam-play-btn">JUGAR <span class="ms" style="font-size:14px">chevron_right</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-dots">
+        <div class="carousel-dot active"></div>
+        <div class="carousel-dot"></div>
+      </div>
+    </div>
+    <div class="modules">
+      <div class="mod"><div class="mod-top"><span class="ms">calendar_month</span><span class="ms chevron" style="font-size:16px">chevron_right</span></div><span class="name">Agenda</span></div>
+      <div class="mod"><div class="mod-top"><span class="ms">record_voice_over</span><span class="ms chevron" style="font-size:16px">chevron_right</span></div><span class="name">Speakers</span></div>
+      <div class="mod"><div class="mod-top"><span class="ms">photo_library</span><span class="ms chevron" style="font-size:16px">chevron_right</span></div><span class="name">Social</span></div>
+      <div class="mod"><div class="mod-top"><span class="ms">domain</span><span class="ms chevron" style="font-size:16px">chevron_right</span></div><span class="name">Sponsors</span></div>
+    </div>
+    <div class="dock">
+      <div class="tab active"><span class="ms fill">home</span>Inicio<span class="tab-dot"></span></div>
+      <div class="tab"><span class="ms">calendar_today</span>Agenda</div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab"><span class="ms">people</span>Red<span class="notif-badge">1</span></div>
+      <div class="tab"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="screen" data-screen="agenda">
+    <div class="ag-header">
+      <div class="back-btn"><span class="ms">arrow_back</span></div>
+      <h2 class="jks" style="font-weight:800;font-size:24px">Agenda</h2>
+    </div>
+    <div class="ag-sub">miercoles, 8 de abril</div>
+    <div class="days">
+      <div class="day"><span class="wd">MAR</span><span class="num">7</span></div>
+      <div class="day active"><span class="wd">MIE</span><span class="num">8</span></div>
+      <div class="day"><span class="wd">JUE</span><span class="num">9</span><span class="pip" style="background:var(--accent)"></span></div>
+      <div class="day"><span class="wd">VIE</span><span class="num">10</span><span class="pip" style="background:var(--accent)"></span></div>
+      <div class="day"><span class="wd">SAB</span><span class="num">11</span></div>
+    </div>
+    <div class="filters">
+      <div class="filter-pill active">Todos</div>
+      <div class="filter-pill"><span class="filter-pip" style="background:#F59E0B"></span>Innovacion</div>
+      <div class="filter-pill"><span class="filter-pip" style="background:#EC4899"></span>Networking</div>
+      <div class="filter-pill"><span class="filter-pip" style="background:#3B82F6"></span>Tecnologia</div>
+    </div>
+    <div class="timeline">
+      <div class="trow">
+        <div class="tleft"><span class="time">9:30</span><div class="tdot" style="width:6px;height:6px"></div><div class="tconn"></div></div>
+        <div class="sess past">
+          <div class="top"><span class="cat-pill cat-innovacion">Innovacion</span><span class="ms sm" style="color:var(--icon-tertiary)">favorite_border</span></div>
+          <h4>The State of AI: from hype to production</h4>
+          <div class="loc"><span class="ms xs">location_on</span>Sala B</div>
+        </div>
+      </div>
+      <div class="trow">
+        <div class="tleft"><span class="time now">11:30</span><div class="tdot now" style="width:8px;height:8px"></div><div class="tconn"></div></div>
+        <div class="sess" style="box-shadow:var(--shadow-md),0 0 0 1px rgba(26,26,30,0.08)">
+          <div class="top"><span class="cat-pill cat-networking">Networking</span><span class="ms sm fill" style="color:var(--accent)">favorite</span></div>
+          <h4>Almuerzo y Networking</h4>
+          <div class="loc"><span class="ms xs">location_on</span>Terraza Norte</div>
+          <div class="actions" style="border-top:1px solid var(--border-subtle)">
+            <span class="act"><span class="ms xs">star_border</span>Evaluar</span>
+          </div>
+        </div>
+      </div>
+      <div class="trow">
+        <div class="tleft"><span class="time">6:00</span><div class="tdot" style="width:6px;height:6px"></div></div>
+        <div class="sess">
+          <div class="top"><span class="cat-pill cat-innovacion">Innovacion</span><span class="ms sm" style="color:var(--icon-tertiary)">favorite_border</span></div>
+          <h4>IA Generativa: del hype a la produccion</h4>
+          <div class="loc"><span class="ms xs">location_on</span>Auditorio Principal</div>
+          <div class="speakers-row"><span>Sofia Chen</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="dock">
+      <div class="tab"><span class="ms">home</span>Inicio</div>
+      <div class="tab active"><span class="ms fill">calendar_today</span>Agenda<span class="tab-dot"></span></div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab"><span class="ms">people</span>Red<span class="notif-badge">1</span></div>
+      <div class="tab"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- SPEAKERS -->
+  <div class="screen" data-screen="speakers">
+    <div class="spk-header">
+      <div class="back-btn"><span class="ms">arrow_back</span></div>
+      <h2 class="jks" style="font-weight:800;font-size:24px">Speakers</h2>
+    </div>
+    <div class="search-bar"><span class="ms sm">search</span>Buscar por nombre, empresa o cargo...</div>
+    <div class="featured-title">Destacados</div>
+    <div class="featured-scroll">
+      <div class="spk-card">
+        <div class="photo" style="background:linear-gradient(135deg,#E8E0F0,#D8ECE4);display:flex;align-items:center;justify-content:center"><span style="font-size:48px;color:var(--text-quaternary)">A</span></div>
+        <div class="info"><div class="keynote-badge" style="position:static;display:inline-block;margin-bottom:6px">KEYNOTE</div><div class="name">Anastasia Petrova</div><div class="role">Developer Advocate - JetBrains</div><div class="sessions"><span class="ms xs">calendar_month</span>3 sesiones</div></div>
+      </div>
+      <div class="spk-card">
+        <div class="photo" style="background:linear-gradient(135deg,#F0E4D8,#D8E8E0);display:flex;align-items:center;justify-content:center"><span style="font-size:48px;color:var(--text-quaternary)">A</span></div>
+        <div class="info"><div class="keynote-badge" style="position:static;display:inline-block;margin-bottom:6px">KEYNOTE</div><div class="name">Andres Gil</div><div class="role">VP Engineering - Rappi</div><div class="sessions"><span class="ms xs">calendar_month</span>4 sesiones</div></div>
+      </div>
+    </div>
+    <div class="all-title"><span class="t">Todos</span><span class="count">18 speakers</span></div>
+    <div class="spk-list-item"><div class="avatar" style="background:linear-gradient(135deg,#E8E4F0,#F0E8E4)"></div><div class="info"><div class="name">Alex Rivera</div><div class="role">Student & Startup Founder - MIT</div></div><span class="ms">chevron_right</span></div>
+    <div class="spk-list-item"><div class="avatar" style="background:linear-gradient(135deg,#E4F0E8,#E4E8F0)"></div><div class="info"><div class="name">Carlos Rodriguez</div><div class="role">CTO - TechCorp</div></div><span class="ms">chevron_right</span></div>
+    <div class="spk-list-item"><div class="avatar" style="background:linear-gradient(135deg,#F0E4E8,#E4F0EC)"></div><div class="info"><div class="name">Sofia Chen</div><div class="role">AI Research Lead - DeepMind</div></div><span class="ms">chevron_right</span></div>
+    <div class="dock">
+      <div class="tab"><span class="ms">home</span>Inicio</div>
+      <div class="tab active"><span class="ms fill">calendar_today</span>Agenda<span class="tab-dot"></span></div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab"><span class="ms">people</span>Red</div>
+      <div class="tab"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- NETWORKING -->
+  <div class="screen" data-screen="networking">
+    <div class="net-header"><h2>Networking</h2></div>
+    <div class="net-tabs">
+      <div class="net-tab active">Directorio</div>
+      <div class="net-tab">Contactos</div>
+      <div class="net-tab">Solicitudes<span class="net-count">1</span></div>
+    </div>
+    <div class="search-bar"><span class="ms sm">search</span>Buscar por nombre, empresa o cargo...</div>
+    <div style="padding:0 20px;text-align:right;font-size:11px;color:var(--text-quaternary);margin-bottom:12px">57 asistentes</div>
+    <div class="suggested-title">Sugeridos para ti</div>
+    <div class="suggested-scroll">
+      <div class="net-card">
+        <div class="net-avatar" style="background:linear-gradient(135deg,#D8ECE4,#E0D8F0);color:var(--text-quaternary)">V</div>
+        <div class="name">Valentina R.</div>
+        <div class="role">VP Innovacion - NovaTech</div>
+        <div class="match">5 intereses en comun</div>
+        <div class="interests">Networking, Innovacion, Liderazgo</div>
+        <button class="connect-btn">+ Conectar</button>
+      </div>
+      <div class="net-card">
+        <div class="net-avatar" style="background:linear-gradient(135deg,#F0E0D8,#D8E0F0);color:var(--text-quaternary)">S</div>
+        <div class="name">Santiago M.</div>
+        <div class="role">Head of Product - Globant</div>
+        <div class="match">3 intereses en comun</div>
+        <div class="interests">Networking, Tecnologia</div>
+        <button class="connect-btn">+ Conectar</button>
+      </div>
+    </div>
+    <div class="net-list-item"><div class="avatar" style="background:var(--surface-input);display:flex;align-items:center;justify-content:center;color:var(--text-quaternary)">A</div><div class="info"><div class="name">Admin Evento</div><div class="role">Organizador - Kasproduction</div></div><div class="add-btn"><span class="ms">person_add</span></div></div>
+    <div class="net-list-item"><div class="avatar" style="background:var(--surface-input);display:flex;align-items:center;justify-content:center;color:var(--text-quaternary)">A</div><div class="info"><div class="name">Ahmed Hassan</div><div class="role">Engineering Lead - Careem</div></div><div class="add-btn"><span class="ms">person_add</span></div></div>
+    <div class="net-list-item"><div class="avatar" style="background:var(--surface-input);display:flex;align-items:center;justify-content:center;color:var(--text-quaternary)">A</div><div class="info"><div class="name">Alejandra Ruiz</div><div class="role">VP de Operaciones - MediTech</div></div><div class="add-btn"><span class="ms" style="color:#059669">check</span></div></div>
+    <div class="dock">
+      <div class="tab"><span class="ms">home</span>Inicio</div>
+      <div class="tab"><span class="ms">calendar_today</span>Agenda</div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab active"><span class="ms fill">people</span>Red<span class="notif-badge">1</span><span class="tab-dot"></span></div>
+      <div class="tab"><span class="ms">person</span>Perfil</div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="screen" data-screen="profile">
+    <div class="prof-header">
+      <h2>Perfil</h2>
+      <div class="help-btn"><span class="ms sm">help</span>Ayuda</div>
+    </div>
+    <div class="avatar-area">
+      <div class="prof-avatar"><div class="cam-badge"><span class="ms">photo_camera</span></div></div>
+      <div class="prof-name">Carlos Lopez</div>
+      <div class="prof-role">Ceo - Stand Tech Solutions</div>
+      <div class="socials">
+        <div class="soc" style="color:#0A66C2">in</div>
+        <div class="soc" style="color:#1DA1F2">X</div>
+        <div class="soc" style="color:#E4405F">ig</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="icon"><span class="ms sm">star</span></div><div class="v">100</div><div class="l">Puntos</div></div>
+      <div class="stat"><div class="icon"><span class="ms sm">target</span></div><div class="v">6/14</div><div class="l">Retos</div></div>
+      <div class="stat"><div class="icon"><span class="ms sm">bolt</span></div><div class="v">6</div><div class="l">Logros</div></div>
+    </div>
+    <div class="sec-head"><span class="t">Mis datos</span><span class="edit">Editar</span></div>
+    <div class="data-section">
+      <div class="drow"><span class="label">Telefono</span><span class="value">3213259689</span></div>
+      <div class="drow"><span class="label">Email</span><span class="value">vendedor@eventos.test</span></div>
+      <div class="drow"><span class="label">Cargo</span><span class="value">Ceo</span></div>
+      <div class="drow"><span class="label">Empresa</span><span class="value">Stand Tech Solutions</span></div>
+    </div>
+    <div class="sec-head" style="margin-top:4px"><span class="t">Mis intereses</span><span class="edit">Editar</span></div>
+    <div class="interest-pills">
+      <span class="int-pill selected">Networking</span>
+      <span class="int-pill selected">Innovacion</span>
+      <span class="int-pill selected">Liderazgo</span>
+      <span class="int-pill selected">Datos</span>
+      <span class="int-pill selected">Marketing</span>
+      <span class="int-pill selected">Finanzas</span>
+    </div>
+    <div class="dock">
+      <div class="tab"><span class="ms">home</span>Inicio</div>
+      <div class="tab"><span class="ms">calendar_today</span>Agenda</div>
+      <div class="tab"><span class="ms">qr_code_2</span>Mi QR</div>
+      <div class="tab"><span class="ms">people</span>Red</div>
+      <div class="tab active"><span class="ms fill">person</span>Perfil<span class="tab-dot"></span></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+</div><!-- /phones -->
+
+<!-- Token reference -->
+<div style="max-width:800px;margin:48px auto 0;padding:24px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px">
+  <h2 style="font-family:'Plus Jakarta Sans';font-size:16px;margin-bottom:16px;color:rgba(255,255,255,0.7)">Token Reference — Lux v2</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11px">
+    <div>
+      <div style="color:rgba(255,255,255,0.35);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;font-size:9px">Backgrounds</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:4px;background:#F6F8FA;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:rgba(255,255,255,0.5)">#F6F8FA base</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:4px;background:#FAFBFC;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:rgba(255,255,255,0.5)">#FAFBFC raised</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:4px;background:#EDF0F3;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:rgba(255,255,255,0.5)">#EDF0F3 sunken</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:4px;background:#FFFFFF;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:rgba(255,255,255,0.5)">#FFFFFF card</span></div>
+      <div style="display:flex;align-items:center;gap:8px"><span style="width:20px;height:20px;border-radius:4px;background:#F0F2F5;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:rgba(255,255,255,0.5)">#F0F2F5 input</span></div>
+    </div>
+    <div>
+      <div style="color:rgba(255,255,255,0.35);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;font-size:9px">Text</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:4px;background:#1A1B1E;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:rgba(255,255,255,0.5)">#1A1B1E primary</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:4px;background:#4A4B50;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:rgba(255,255,255,0.5)">#4A4B50 secondary</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:4px;background:#7C7D82;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:rgba(255,255,255,0.5)">#7C7D82 tertiary</span></div>
+      <div style="display:flex;align-items:center;gap:8px"><span style="width:20px;height:20px;border-radius:4px;background:#A8A9AE;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:rgba(255,255,255,0.5)">#A8A9AE quaternary</span></div>
+    </div>
+    <div>
+      <div style="color:rgba(255,255,255,0.35);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;font-size:9px">Categories (Lux)</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:4px;background:#FFF7ED;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:#C2410C">Innovacion</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:4px;background:#FDF2F8;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:#BE185D">Networking</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:20px;height:20px;border-radius:4px;background:#EFF6FF;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:#1D4ED8">Tecnologia</span></div>
+      <div style="display:flex;align-items:center;gap:8px"><span style="width:20px;height:20px;border-radius:4px;background:#F0FDF4;border:1px solid rgba(255,255,255,0.1)"></span><span style="color:#166534">Liderazgo</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Screen switching
+  function show(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll(`[data-screen="${name}"]`).forEach(s => s.classList.add('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  // Accent switching (dual: noir gets vibrant, lux gets desaturated)
+  document.querySelectorAll('.accent-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      document.querySelectorAll('.accent-dot').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+
+      const noirAccent = dot.dataset.noir;
+      const luxAccent = dot.dataset.lux;
+
+      // Apply noir accent
+      document.documentElement.style.setProperty('--accent-noir', noirAccent);
+
+      // Apply lux accent
+      document.documentElement.style.setProperty('--accent', luxAccent);
+
+      // Update lux join button for dark happening card
+      const luxHappening = document.querySelector('.lux-phone .join-btn');
+      if (luxAccent === '#1A1A1A') {
+        // Default ink: white button on dark card
+        luxHappening.style.background = '#FFFFFF';
+        luxHappening.style.color = '#1A1B1E';
+      } else {
+        luxHappening.style.background = luxAccent;
+        luxHappening.style.color = '#FFFFFF';
+      }
+    });
+  });
+
+  // Initialize with default
+  document.documentElement.style.setProperty('--accent-noir', '#FFFFFF');
+  document.documentElement.style.setProperty('--accent', '#1A1A1A');
+
+  // Carousel logic
+  document.querySelectorAll('[data-carousel]').forEach(area => {
+    const track = area.querySelector('.carousel-track');
+    const dots = area.querySelectorAll('.carousel-dot');
+    let current = 0;
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        current = i;
+        track.style.transform = `translateX(-${i * 100}%)`;
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    // Auto-advance every 5s
+    setInterval(() => {
+      current = (current + 1) % dots.length;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach(d => d.classList.remove('active'));
+      dots[current].classList.add('active');
+    }, 5000);
+  });
+</script>
+
+</body>
+</html>

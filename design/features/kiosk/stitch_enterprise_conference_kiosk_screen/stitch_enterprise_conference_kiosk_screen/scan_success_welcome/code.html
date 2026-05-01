@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;700;800&amp;family=Manrope:wght@300;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "surface-bright": "#393844",
+                  "on-surface": "#e4e1f0",
+                  "tertiary-container": "#08a56e",
+                  "on-surface-variant": "#bdcac0",
+                  "on-tertiary-fixed": "#002112",
+                  "on-primary-container": "#282a2a",
+                  "error-container": "#93000a",
+                  "primary": "#c6c6c7",
+                  "tertiary-fixed": "#7bfabb",
+                  "outline-variant": "#3e4942",
+                  "surface-dim": "#12121d",
+                  "on-tertiary": "#003823",
+                  "on-primary": "#2f3131",
+                  "on-error-container": "#ffdad6",
+                  "error": "#ffb4ab",
+                  "outline": "#87948b",
+                  "primary-fixed-dim": "#c6c6c7",
+                  "on-secondary": "#003824",
+                  "on-tertiary-container": "#00311d",
+                  "on-secondary-fixed": "#002113",
+                  "on-primary-fixed-variant": "#454747",
+                  "inverse-on-surface": "#302f3b",
+                  "inverse-primary": "#5d5f5f",
+                  "background": "#12121d",
+                  "secondary": "#6edba7",
+                  "surface-container-low": "#1b1b25",
+                  "secondary-fixed": "#8bf8c2",
+                  "on-background": "#e4e1f0",
+                  "surface-container-high": "#292934",
+                  "surface-tint": "#c6c6c7",
+                  "tertiary": "#5ddda1",
+                  "surface-variant": "#34343f",
+                  "surface-container-highest": "#34343f",
+                  "on-secondary-fixed-variant": "#005235",
+                  "surface-container-lowest": "#0d0d17",
+                  "secondary-fixed-dim": "#6edba7",
+                  "tertiary-fixed-dim": "#5ddda1",
+                  "primary-container": "#909191",
+                  "primary-fixed": "#e2e2e2",
+                  "on-secondary-container": "#00311e",
+                  "secondary-container": "#30a374",
+                  "inverse-surface": "#e4e1f0",
+                  "surface-container": "#1f1f29",
+                  "on-error": "#690005",
+                  "surface": "#12121d",
+                  "on-tertiary-fixed-variant": "#005234",
+                  "on-primary-fixed": "#1a1c1c"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.125rem",
+                  "lg": "0.25rem",
+                  "xl": "0.5rem",
+                  "full": "0.75rem"
+          },
+          "fontFamily": {
+                  "headline": ["Plus Jakarta Sans"],
+                  "body": ["Manrope"],
+                  "label": ["Manrope"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .text-glow {
+      text-shadow: 0 0 30px rgba(110, 219, 167, 0.3);
+    }
+    .bg-green-tint {
+      background-color: #062a1e;
+    }
+    .emerald-radial {
+      background: radial-gradient(circle at center, rgba(110, 219, 167, 0.08) 0%, transparent 70%);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface overflow-hidden">
+<!-- Main Canvas -->
+<main class="relative h-screen w-full flex flex-col items-center justify-between overflow-hidden bg-green-tint">
+<!-- Ambient Glow Background Layer -->
+<div class="absolute inset-0 emerald-radial pointer-events-none"></div>
+<!-- Top Navigation Anchor (Manual implementation of TopAppBar style for this specific overlay) -->
+<header class="flex justify-between items-center w-full px-12 py-10 z-10">
+<div class="font-headline tracking-[0.05em] uppercase text-sm font-semibold text-[#c6c6c7]">
+        CONFERENCE ROOM 402
+      </div>
+<div class="text-lg font-bold tracking-tight text-[#c6c6c7]">
+        ACCESS GRANTED
+      </div>
+</header>
+<!-- Focused Content Canvas -->
+<div class="flex-grow flex flex-col items-center justify-center text-center px-8 z-10">
+<!-- Session Name -->
+<p class="font-label text-secondary tracking-[0.2em] font-medium text-sm mb-12 opacity-80">
+        The Future of Enterprise AI
+      </p>
+<!-- Welcome String -->
+<h2 class="font-headline text-on-surface text-6xl md:text-8xl font-extralight tracking-tight mb-8">
+        BIENVENIDO
+      </h2>
+<!-- Personal Name -->
+<h1 class="font-headline text-on-surface font-extrabold text-5xl md:text-7xl tracking-[-0.03em] text-glow uppercase">
+        MARCUS HOLLOWAY
+      </h1>
+<!-- Status Indicator -->
+<div class="mt-16 flex flex-col items-center gap-4">
+<div class="w-24 h-[1px] bg-secondary opacity-30"></div>
+<span class="font-label text-secondary tracking-[0.4em] text-[10px] font-bold">CHECK-IN CONFIRMED</span>
+</div>
+</div>
+<!-- Bottom Metadata Section -->
+<footer class="w-full px-12 py-12 flex justify-between items-end z-10">
+<div class="flex flex-col gap-1">
+<span class="font-label text-[10px] tracking-widest text-on-surface-variant opacity-40">TIMESTAMP</span>
+<span class="font-headline text-xl font-bold tracking-tighter text-on-surface">09:42 AM</span>
+</div>
+<!-- Asymmetric Balance Element -->
+<div class="flex flex-col items-end gap-1">
+<span class="font-label text-[10px] tracking-widest text-on-surface-variant opacity-40">LEVEL</span>
+<span class="font-headline text-xl font-bold tracking-tighter text-on-surface">EXECUTIVE</span>
+</div>
+</footer>
+<!-- Glass Texture Overlay -->
+<div class="absolute inset-0 pointer-events-none mix-blend-overlay opacity-20" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCM4EeDT3vIrKkeMFQaVvdPGbBRshnJ6K_vBd4QPj375lc2QSpBlwKtv7mi9fmfPnRJytVqjjer-TOtlI3l01Bi6zHcfuTTE0CM2_JBwMohw771EqB0jAr-u3BjCPEllGjmpwmJp5DyKg5QIccrPshNBKIFcBYNbbma7PNefQr_w6_leUG72QwwBUCgfLmK4jD4Mlx53c_t0SXY9Hj757Jbyk02WNnxwLi9sq8vi6Sud5k4SnBb7uSKj6wj8pK23B9mJ5kUlx8wBPs');">
+</div>
+<!-- Decorative Corner Accents -->
+<div class="absolute top-0 left-0 w-32 h-32 border-l border-t border-secondary opacity-20 m-8"></div>
+<div class="absolute bottom-0 right-0 w-32 h-32 border-r border-b border-secondary opacity-20 m-8"></div>
+</main>
+<!-- Background Imagery (Hidden but present for descriptive context) -->
+<div class="hidden">
+<img data-alt="Microscopic view of dark emerald crystal formations with sharp geometric edges and deep shadows with soft green light leaks" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChoypYzB5ahNWZb3ahj338-lluFLgtrj3JuCYDZwhsRpg1abmqQMYpsbGo6thx32VZQpTKXIJqIZYk93QAQhN8N9pT92VN6zUvjjo1mDxT3kjvUMTS5flyerCDKub9CrZ8XJ7IwN1lA3cDMINMcw3Kej4AJj_eEPLMIwax6VMlytRJRvO3sqZHl5_wINeK8qyN1K31PxhG9nZf49tKz2blW7g3RgxbeNBhy3ZZdPXtdzeNdmFVqTyImG7tJB8RodKZCW8r-ZLPHeME"/>
+</div>
+</body></html>

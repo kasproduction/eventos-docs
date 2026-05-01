@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Event Pulse — Summit Empresarial 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/tokens.css"/>
+<link rel="stylesheet" href="css/layout.css"/>
+<link rel="stylesheet" href="css/moments.css"/>
+<link rel="stylesheet" href="css/sections.css"/>
+<link rel="stylesheet" href="css/nav.css"/>
+</head>
+<body>
+<div class="stage">
+<div class="canvas" id="canvas">
+
+  <!-- Editorial frame -->
+  <div class="frame-top">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>
+        <div class="brand-name">Event Pulse</div>
+        <div class="brand-sub">En vivo</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="eyebrow">Ubicacion</div>
+      <div class="where">Bogota &middot; Centro de Convenciones</div>
+      <div class="live"><span class="dot"></span>Transmitiendo &middot; Dia 02</div>
+    </div>
+  </div>
+
+  <div class="frame-bot" id="frameBot">
+    <div class="bot-left">
+      Summit Empresarial <em style="color:var(--teal);font-style:normal">2026</em>
+      <small>24C &middot; Parcialmente nublado</small>
+    </div>
+    <div class="bot-right">Sesion 04 / 12 &middot; Proximo keynote 11:15</div>
+  </div>
+
+  <!-- Ambient (clock + event info) -->
+  <div class="ambient" id="ambient">
+    <div class="ambient-inner">
+      <div class="clock" id="clock">
+        <span id="hh">10</span>
+        <span class="colon">:</span>
+        <span id="mm">42</span>
+        <span class="sec" id="ss">18</span>
+      </div>
+      <div class="event-name">Summit Empresarial <em>2026</em></div>
+      <div class="event-meta">
+        <span>Day 02</span> &middot; <span>Bogota</span> &middot; <span id="dateline">Thursday 23 April</span>
+      </div>
+      <div class="weather-line">Parcialmente nublado &middot; <b>24&deg;C</b> &middot; brisa suave</div>
+    </div>
+  </div>
+
+  <!-- Corner metrics -->
+  <div class="corner tl" onclick="showSection('checkins')">
+    <div class="k">Check-ins</div>
+    <div class="v"><span class="num" id="m-ci">347</span><span class="d">+12</span></div>
+    <div class="s">desde apertura</div>
+  </div>
+  <div class="corner tr" onclick="showSection('charlas')">
+    <div class="k">En linea</div>
+    <div class="v"><span class="num" id="m-on">189</span></div>
+    <div class="s">en 4 salones</div>
+  </div>
+  <div class="corner bl" onclick="showSection('social')">
+    <div class="k">Mensajes</div>
+    <div class="v"><span class="num" id="m-msg">1,204</span></div>
+    <div class="s">social wall &middot; hoy</div>
+  </div>
+  <div class="corner br" onclick="showSection('leads')">
+    <div class="k">Leads</div>
+    <div class="v"><span class="num" id="m-ld">78</span><span class="d" style="color:var(--platinum)">+3</span></div>
+    <div class="s">5 sponsors</div>
+  </div>
+
+  <!-- Bottom center metrics -->
+  <div class="bottom-center" id="bottomCenter">
+    <div class="bcm" onclick="showSection('networking')">
+      <div class="k">Conexiones</div>
+      <div class="v"><span id="m-conn">42</span></div>
+      <div class="s">matches networking</div>
+    </div>
+    <div class="bcm" onclick="showSection('ratings')">
+      <div class="k">Evaluaciones</div>
+      <div class="v"><span id="m-ratings">156</span></div>
+      <div class="s">sesiones evaluadas</div>
+    </div>
+    <div class="bcm" onclick="showSection('leaderboard')">
+      <div class="k">Gamificacion</div>
+      <div class="v"><span id="m-gam">1,204</span></div>
+      <div class="s">puntos repartidos</div>
+    </div>
+  </div>
+
+  <!-- Moment stage -->
+  <div class="moment-stage" id="momentStage"></div>
+
+  <!-- Sections -->
+  <div class="section" id="sec-charlas">
+    <div class="section-head"><div><div class="section-eyebrow">En vivo ahora</div><div class="section-title">Charlas</div></div><div class="section-stat">189 <span>personas en 4 salones</span></div></div>
+    <div class="section-body"><div class="rooms-grid" id="roomsGrid"></div></div>
+  </div>
+
+  <div class="section" id="sec-checkins">
+    <div class="section-head"><div><div class="section-eyebrow">Registro</div><div class="section-title">Llegadas</div></div><div class="section-stat">347 <span>registrados hoy</span></div></div>
+    <div class="section-body"><div class="checkin-layout" id="checkinLayout"></div></div>
+  </div>
+
+  <div class="section" id="sec-leads">
+    <div class="section-head"><div><div class="section-eyebrow">Sponsors</div><div class="section-title">Leads en vivo</div></div><div class="section-stat">78 <span>capturados hoy</span></div></div>
+    <div class="section-body"><div class="leads-layout" id="leadsLayout"></div></div>
+  </div>
+
+  <div class="section" id="sec-networking">
+    <div class="section-head"><div><div class="section-eyebrow">Networking</div><div class="section-title">Conexiones</div></div><div class="section-stat">42 <span>matches hoy</span></div></div>
+    <div class="section-body"><div class="net-layout" id="netLayout"></div></div>
+  </div>
+
+  <div class="section" id="sec-social">
+    <div class="section-head"><div><div class="section-eyebrow">Comunidad</div><div class="section-title">Social Wall</div></div><div class="section-stat">89 <span>publicaciones hoy</span></div></div>
+    <div class="section-body"><div class="social-grid" id="socialGrid"></div></div>
+  </div>
+
+  <div class="section" id="sec-leaderboard">
+    <div class="section-head"><div><div class="section-eyebrow">Gamificacion</div><div class="section-title">Leaderboard</div></div><div class="section-stat">1,204 <span>pts repartidos</span></div></div>
+    <div class="section-body"><div class="lb-layout" id="lbLayout"></div></div>
+  </div>
+
+  <div class="section" id="sec-ratings">
+    <div class="section-head"><div><div class="section-eyebrow">Evaluaciones</div><div class="section-title">Ratings</div></div><div class="section-stat">156 <span>evaluaciones</span></div></div>
+    <div class="section-body"><div class="ratings-layout" id="ratingsLayout"></div></div>
+  </div>
+
+  <!-- Nav pills -->
+  <div class="section-nav" id="sectionNav">
+    <div class="nav-pill active" data-sec="ambient" onclick="showSection('ambient')"><span class="pip"></span>Inicio</div>
+    <div class="nav-pill" data-sec="charlas" onclick="showSection('charlas')">Charlas</div>
+    <div class="nav-pill" data-sec="checkins" onclick="showSection('checkins')">Llegadas</div>
+    <div class="nav-pill" data-sec="leads" onclick="showSection('leads')">Sponsors</div>
+    <div class="nav-pill" data-sec="networking" onclick="showSection('networking')">Networking</div>
+    <div class="nav-pill" data-sec="social" onclick="showSection('social')">Social</div>
+    <div class="nav-pill" data-sec="leaderboard" onclick="showSection('leaderboard')">Ranking</div>
+    <div class="nav-pill" data-sec="ratings" onclick="showSection('ratings')">Ratings</div>
+  </div>
+
+</div>
+</div>
+
+<div class="hint">Event Pulse &middot; Click en metricas o secciones &middot; Esc = inicio</div>
+
+<!-- JS: order matters (data before consumers) -->
+<script src="js/app.js"></script>
+<script src="js/data.js"></script>
+<script src="js/clock.js"></script>
+<script src="js/sections.js"></script>
+<script src="js/moments.js"></script>
+<script src="js/counters.js"></script>
+</body>
+</html>

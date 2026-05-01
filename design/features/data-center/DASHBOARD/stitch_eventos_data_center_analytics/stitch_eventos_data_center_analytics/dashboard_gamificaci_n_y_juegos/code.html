@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EventOS - Gamificación</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Urbanist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#c9d8ff",
+                        "on-secondary-fixed-variant": "#504530",
+                        "on-secondary": "#392f1b",
+                        "on-primary-fixed-variant": "#005048",
+                        "inverse-surface": "#e5e2e1",
+                        "primary-fixed": "#6af9e6",
+                        "inverse-primary": "#006a60",
+                        "tertiary-fixed-dim": "#aec6ff",
+                        "outline-variant": "#3c4947",
+                        "primary-fixed-dim": "#47dcca",
+                        "on-secondary-container": "#c6b79b",
+                        "surface-variant": "#353534",
+                        "tertiary-fixed": "#d8e2ff",
+                        "outline": "#859490",
+                        "surface-dim": "#131313",
+                        "secondary-container": "#534832",
+                        "on-tertiary-fixed": "#001a43",
+                        "on-secondary-fixed": "#231a08",
+                        "inverse-on-surface": "#313030",
+                        "surface-container-high": "#2a2a2a",
+                        "on-background": "#e5e2e1",
+                        "secondary-fixed": "#f2e0c3",
+                        "secondary": "#d5c5a8",
+                        "secondary-fixed-dim": "#d5c5a8",
+                        "surface-bright": "#3a3939",
+                        "on-surface-variant": "#bbcac6",
+                        "primary": "#5fefdc",
+                        "on-primary": "#003731",
+                        "on-primary-fixed": "#00201c",
+                        "background": "#131313",
+                        "on-primary-container": "#00564e",
+                        "surface-tint": "#47dcca",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-tertiary": "#002e6b",
+                        "on-error-container": "#ffdad6",
+                        "surface": "#131313",
+                        "surface-container-highest": "#353534",
+                        "surface-container-low": "#1c1b1b",
+                        "on-tertiary-fixed-variant": "#004397",
+                        "tertiary-container": "#9fbcff",
+                        "on-tertiary-container": "#0048a1",
+                        "error-container": "#93000a",
+                        "on-error": "#690005",
+                        "primary-container": "#39d2c0",
+                        "surface-container": "#201f1f",
+                        "on-surface": "#e5e2e1",
+                        "error": "#ffb4ab"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin": "24px",
+                        "2xl": "48px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-sm": ["Urbanist"],
+                        "metric-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Urbanist"],
+                        "data-label": ["JetBrains Mono"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-md": ["Urbanist"],
+                        "display-xl": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+                        "body-sm": ["13px", { "lineHeight": "1.5", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "metric-lg": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "500" }],
+                        "data-label": ["12px", { "lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "data-mono": ["11px", { "lineHeight": "1.4", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "body-md": ["15px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "display-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="bg-neutral-950 flex items-center justify-between px-6 w-full max-w-full docked full-width top-0 h-[48px] border-b border-white/10 z-50 sticky">
+<div class="flex items-center gap-8">
+<div class="font-bold text-lg text-white flex items-center gap-2 after:content-[''] after:w-2 after:h-2 after:bg-[#39D2C0] after:rounded-full after:animate-pulse">
+                EventOS
+            </div>
+<nav class="hidden md:flex items-center gap-6 h-full pt-[13px]">
+<a class="font-['Plus_Jakarta_Sans'] font-medium text-sm tracking-tight text-neutral-400 hover:text-neutral-200 transition-colors duration-200 ease-in-out" href="#">Overview</a>
+<a class="font-['Plus_Jakarta_Sans'] font-medium text-sm tracking-tight text-[#39D2C0] border-b-2 border-[#39D2C0] pb-[13px] duration-200 ease-in-out" href="#">Traffic</a>
+<a class="font-['Plus_Jakarta_Sans'] font-medium text-sm tracking-tight text-neutral-400 hover:text-neutral-200 transition-colors duration-200 ease-in-out" href="#">Security</a>
+<a class="font-['Plus_Jakarta_Sans'] font-medium text-sm tracking-tight text-neutral-400 hover:text-neutral-200 transition-colors duration-200 ease-in-out" href="#">Real-time</a>
+<a class="font-['Plus_Jakarta_Sans'] font-medium text-sm tracking-tight text-neutral-400 hover:text-neutral-200 transition-colors duration-200 ease-in-out" href="#">Logs</a>
+<a class="font-['Plus_Jakarta_Sans'] font-medium text-sm tracking-tight text-neutral-400 hover:text-neutral-200 transition-colors duration-200 ease-in-out" href="#">Nodes</a>
+<a class="font-['Plus_Jakarta_Sans'] font-medium text-sm tracking-tight text-neutral-400 hover:text-neutral-200 transition-colors duration-200 ease-in-out" href="#">Metrics</a>
+<a class="font-['Plus_Jakarta_Sans'] font-medium text-sm tracking-tight text-neutral-400 hover:text-neutral-200 transition-colors duration-200 ease-in-out" href="#">Clusters</a>
+<a class="font-['Plus_Jakarta_Sans'] font-medium text-sm tracking-tight text-neutral-400 hover:text-neutral-200 transition-colors duration-200 ease-in-out" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-neutral-400 hover:text-white transition-colors duration-200 ease-in-out">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="professional headshot of a person with short hair against a dark neutral background, low key lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNaT50svUoRggqlnG8KlQEAjlyV4INtVnsmimqL6lgRMYq4CBahLGcF8ClBSCpy3FrbElIUkUupmjIUnHIMtbWDzsOPdg6ONb_ETieUW3Qng2tfHyatqdr80rKRabm_9sSIRkFJOXPcOejHOvASF2Wl-WhKUPe_OBrkZnv5AL3YBFsL6-HnA-E4QGBouA0lIamqxRQ_7sfKvFIjBG33YrrxEHRciC7INgehQTwLzzcPu50i8m2o66nGNHZ2MXX0wGU3we_G0SCj_kq"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col w-full px-lg py-lg gap-lg pb-[48px] max-w-[1600px] mx-auto">
+<!-- Hero Metrics -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-md">
+<div class="bg-white/[0.03] border border-surface-container p-lg rounded-DEFAULT flex flex-col gap-sm hover:bg-white/[0.05] hover:border-outline-variant transition-all duration-300">
+<div class="flex items-center justify-between">
+<span class="font-data-label text-data-label text-on-surface-variant uppercase">Total Attendance</span>
+<span class="material-symbols-outlined text-outline text-[16px]">groups</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface">14,285</span>
+<span class="font-data-mono text-data-mono text-primary">+12%</span>
+</div>
+</div>
+<div class="bg-white/[0.03] border border-surface-container p-lg rounded-DEFAULT flex flex-col gap-sm hover:bg-white/[0.05] hover:border-outline-variant transition-all duration-300">
+<div class="flex items-center justify-between">
+<span class="font-data-label text-data-label text-on-surface-variant uppercase">Active Sessions</span>
+<span class="material-symbols-outlined text-outline text-[16px]">bolt</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface">3,492</span>
+<span class="font-data-mono text-data-mono text-tertiary-fixed-dim">-2%</span>
+</div>
+</div>
+<div class="bg-white/[0.03] border border-surface-container p-lg rounded-DEFAULT flex flex-col gap-sm hover:bg-white/[0.05] hover:border-outline-variant transition-all duration-300">
+<div class="flex items-center justify-between">
+<span class="font-data-label text-data-label text-on-surface-variant uppercase">Engagement Score</span>
+<span class="material-symbols-outlined text-outline text-[16px]">trending_up</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface">94.2</span>
+<span class="font-data-mono text-data-mono text-primary">+5.4</span>
+</div>
+</div>
+<div class="bg-white/[0.03] border border-surface-container p-lg rounded-DEFAULT flex flex-col gap-sm hover:bg-white/[0.05] hover:border-outline-variant transition-all duration-300">
+<div class="flex items-center justify-between">
+<span class="font-data-label text-data-label text-on-surface-variant uppercase">Network Health</span>
+<span class="material-symbols-outlined text-outline text-[16px]">router</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg text-on-surface">99.9%</span>
+<span class="font-data-mono text-data-mono text-outline">Stable</span>
+</div>
+</div>
+</section>
+<!-- Tab Bar -->
+<nav class="flex items-center gap-6 border-b border-surface-container overflow-x-auto no-scrollbar pb-xs">
+<button class="font-data-label text-data-label text-on-surface-variant hover:text-on-surface transition-colors pb-sm flex items-center gap-2 whitespace-nowrap"><span class="material-symbols-outlined text-[16px]">dashboard</span> Dashboard</button>
+<button class="font-data-label text-data-label text-on-surface-variant hover:text-on-surface transition-colors pb-sm flex items-center gap-2 whitespace-nowrap"><span class="material-symbols-outlined text-[16px]">group</span> Attendees</button>
+<button class="font-data-label text-data-label text-on-surface-variant hover:text-on-surface transition-colors pb-sm flex items-center gap-2 whitespace-nowrap"><span class="material-symbols-outlined text-[16px]">calendar_today</span> Schedule</button>
+<button class="font-data-label text-data-label text-on-surface-variant hover:text-on-surface transition-colors pb-sm flex items-center gap-2 whitespace-nowrap"><span class="material-symbols-outlined text-[16px]">map</span> Map</button>
+<button class="font-data-label text-data-label text-primary border-b-2 border-primary pb-sm flex items-center gap-2 whitespace-nowrap"><span class="material-symbols-outlined text-[16px]">emoji_events</span> Gamificacion <span class="bg-primary/20 text-primary px-1.5 rounded-sm ml-1 text-[10px]">10</span></button>
+<button class="font-data-label text-data-label text-on-surface-variant hover:text-on-surface transition-colors pb-sm flex items-center gap-2 whitespace-nowrap"><span class="material-symbols-outlined text-[16px]">campaign</span> Announcements</button>
+<button class="font-data-label text-data-label text-on-surface-variant hover:text-on-surface transition-colors pb-sm flex items-center gap-2 whitespace-nowrap"><span class="material-symbols-outlined text-[16px]">forum</span> Social</button>
+<button class="font-data-label text-data-label text-on-surface-variant hover:text-on-surface transition-colors pb-sm flex items-center gap-2 whitespace-nowrap"><span class="material-symbols-outlined text-[16px]">storefront</span> Sponsors</button>
+<button class="font-data-label text-data-label text-on-surface-variant hover:text-on-surface transition-colors pb-sm flex items-center gap-2 whitespace-nowrap"><span class="material-symbols-outlined text-[16px]">settings</span> Config</button>
+</nav>
+<!-- Main Dashboard Area -->
+<div class="flex flex-col gap-md">
+<!-- Row 1: Podium & Leaderboard -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-md h-[400px]">
+<!-- Podium (Left 8 cols) -->
+<div class="lg:col-span-8 bg-white/[0.03] border border-surface-container rounded-DEFAULT p-lg flex flex-col relative overflow-hidden group hover:bg-white/[0.04] transition-colors duration-500">
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent pointer-events-none z-0"></div>
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-background/0 to-background/0 pointer-events-none z-0"></div>
+<header class="flex justify-between items-center mb-auto relative z-10">
+<h2 class="font-data-label text-data-label text-on-surface uppercase tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">military_tech</span>
+                            Event Pulse DNA Top 3
+                        </h2>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+</header>
+<div class="flex items-end justify-center gap-4 h-full relative z-10 pb-4">
+<!-- #2 Teal Med -->
+<div class="flex flex-col items-center w-1/4 relative group/podium">
+<div class="relative mb-4 z-20 transform translate-y-2 group-hover/podium:-translate-y-1 transition-transform duration-300">
+<div class="w-16 h-16 rounded-full p-[2px] bg-gradient-to-b from-primary to-transparent">
+<img class="w-full h-full rounded-full object-cover border-2 border-background" data-alt="portrait of a man with glasses looking directly at camera, dark studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC97QOZDIG_o1l1U8EfiGwkhmuEmt2eUfOak7p5p9ZOVWn3kzBym4KAxP06BBq5RKNSI_AWwofa-FI1nz9wiolt-ZzIvFyutn37xvNBMPqjWkPtnvP2fbAT6iZASP5mm7mAvEzJnYb5A6lMFSfhbW5V86Wisxz8uHv2Q-v8eo4APwGANovukNjKo9OvhmGzEytTaVdbnTEqJowuhq9n2MtrL1FXTc-795iPWD9CzKctB2OX3TWOFgvOiTiBJeTJGYfe435si3wgcSIL"/>
+</div>
+<div class="absolute -bottom-2 -right-2 w-6 h-6 bg-surface-container-high border border-outline-variant rounded-full flex items-center justify-center font-data-mono text-[10px] text-primary">2</div>
+</div>
+<div class="text-center mb-2 z-20">
+<p class="font-body-md text-on-surface font-medium truncate w-full px-2">Alex C.</p>
+<p class="font-data-mono text-data-mono text-primary">12.4k</p>
+</div>
+<div class="w-full h-[120px] bg-gradient-to-t from-primary/20 to-primary/5 border-t border-x border-primary/30 rounded-t-sm relative overflow-hidden">
+<div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:4px_100%] opacity-20"></div>
+</div>
+</div>
+<!-- #1 Platinum Tall -->
+<div class="flex flex-col items-center w-1/3 relative group/podium -mt-8">
+<div class="relative mb-4 z-20 transform translate-y-2 group-hover/podium:-translate-y-2 transition-transform duration-300">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 text-tertiary-fixed drop-shadow-[0_0_8px_rgba(216,226,255,0.5)] animate-pulse">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="w-20 h-20 rounded-full p-[2px] bg-gradient-to-b from-tertiary-fixed to-surface-variant shadow-[0_0_20px_rgba(216,226,255,0.2)]">
+<img class="w-full h-full rounded-full object-cover border-2 border-background" data-alt="portrait of a young woman smiling subtly, dramatic lighting from one side, dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASS6_3bWj57guaeNDk3XbPbAV8YZ1lnwwFNuqIkOxHitoJo9VtJpp6xTBtKPXEX43nfRJ9hfK2KjF9Q-6s4SYzrC9sSh3d4qc_i6aPSpRzloUEw_jIpTKDZSLDJRdTrga1yHd-LxFqflN_CJrLKf4ieIksSo3ub8D3HL5jwjv5p2i-Saix7dCzEXwytIae77YBDsrZzwALHgOvvcEL0k_eXaqOVGDhM_Mk7lkRPRKxxAUkh5E5cLiynsTJlPJ7d4cqpf8CBK41MQHz"/>
+</div>
+<div class="absolute -bottom-2 -right-2 w-8 h-8 bg-tertiary-fixed border border-tertiary-fixed-dim rounded-full flex items-center justify-center font-data-mono text-[12px] text-on-tertiary-fixed font-bold">1</div>
+</div>
+<div class="text-center mb-2 z-20">
+<p class="font-body-lg text-on-surface font-bold truncate w-full px-2">Sarah W.</p>
+<p class="font-data-mono text-data-mono text-tertiary-fixed-dim text-[14px]">15.8k pts</p>
+</div>
+<div class="w-full h-[180px] bg-gradient-to-t from-tertiary-fixed/20 to-tertiary-fixed/5 border-t border-x border-tertiary-fixed/30 rounded-t-sm relative overflow-hidden">
+<div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:4px_100%] opacity-30"></div>
+</div>
+</div>
+<!-- #3 Ink Short -->
+<div class="flex flex-col items-center w-1/4 relative group/podium">
+<div class="relative mb-4 z-20 transform translate-y-2 group-hover/podium:-translate-y-1 transition-transform duration-300">
+<div class="w-16 h-16 rounded-full p-[2px] bg-gradient-to-b from-surface-variant to-transparent">
+<img class="w-full h-full rounded-full object-cover border-2 border-background grayscale hover:grayscale-0 transition-all" data-alt="headshot of a person looking thoughtful, dark cinematic lighting, moody atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnbXbo4Su7FJ907KRRPS6aLIq3s7C2EIEy03yegRT-0NEYum6Ds2O3s5B_LCFktYQmbFP940lzcuB_2mmkmbIwQLEVbUYUUje_I8gOWZ_Txy_k6rt5KAwVPNYs7OSd0mUN9EO6TkEk2Sm9XxuUm6JM9gEMpzfRPj24M4G6003kNQn5yHNrmkol6sDznhVVxk1XhqkPZbU5rOFrqINsADexNLHrfcj4IYRRpTo2yKzw3xx34xYWBlwvnWniR-UkqGJG-3m9ztYEIesK"/>
+</div>
+<div class="absolute -bottom-2 -right-2 w-6 h-6 bg-surface-container-high border border-outline-variant rounded-full flex items-center justify-center font-data-mono text-[10px] text-on-surface-variant">3</div>
+</div>
+<div class="text-center mb-2 z-20">
+<p class="font-body-md text-on-surface font-medium truncate w-full px-2">David M.</p>
+<p class="font-data-mono text-data-mono text-on-surface-variant">11.1k</p>
+</div>
+<div class="w-full h-[80px] bg-gradient-to-t from-surface-variant/40 to-surface-variant/10 border-t border-x border-surface-variant rounded-t-sm relative overflow-hidden">
+<div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4px_100%] opacity-20"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Vertical List (Right 4 cols) -->
+<div class="lg:col-span-4 bg-white/[0.03] border border-surface-container rounded-DEFAULT p-0 flex flex-col overflow-hidden">
+<header class="p-4 border-b border-surface-container bg-surface/50">
+<h3 class="font-data-label text-data-label text-on-surface-variant uppercase">Global Rank</h3>
+</header>
+<div class="flex-1 overflow-y-auto no-scrollbar p-2 flex flex-col gap-1">
+<!-- List Item 4 -->
+<div class="flex items-center gap-3 p-2 rounded-sm hover:bg-white/[0.05] transition-colors group">
+<span class="font-data-mono text-data-mono text-outline w-4 text-right">4</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="small avatar of a person, dark lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC--BRClWy--aADjbI3IVUiBZC4OT5KhQxuZS1KOc_YtyHq4e2xVTKK-1hlmfTmmc5HAixAiiZCpBKTS4YAKxpBdXz9vjHVMYHwKzzo-xtN0QiuqrnODHW38Cjkbl9tcefUqbKorBgPjjJi_iYpqMUlnIstuRgGS--P0HNOXdXN9lSNl32b4wAmyLr5lJxvsRACHxMkeCoq5-itb9uewwYCve1e163jbrTNtshn_AuHzqcSoPJ5fsSTw6zy1kTT7A_tDfwHd5_gQaXr"/>
+</div>
+<span class="font-body-md text-on-surface flex-1 truncate">Elena R.</span>
+<span class="font-data-mono text-data-mono text-primary-fixed-dim">9,840</span>
+</div>
+<!-- List Item 5 -->
+<div class="flex items-center gap-3 p-2 rounded-sm hover:bg-white/[0.05] transition-colors group">
+<span class="font-data-mono text-data-mono text-outline w-4 text-right">5</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-data-label text-on-surface">MJ</div>
+<span class="font-body-md text-on-surface flex-1 truncate">Marcus J.</span>
+<span class="font-data-mono text-data-mono text-primary-fixed-dim">9,120</span>
+</div>
+<!-- List Item 6 -->
+<div class="flex items-center gap-3 p-2 rounded-sm hover:bg-white/[0.05] transition-colors group">
+<span class="font-data-mono text-data-mono text-outline w-4 text-right">6</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="small avatar of a person, dark lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1qGG-h1JyZP6lzCmINsggSu4NHJ3iSkdUbWTRRtuXdkn7A-v62MeZ16RYlkH9kcMgbcP_7x1bXtfpNdiFapPy4iQu2X_u_OTZVjlTT1Ffx229oSiXMMBSIdkyCHkGJuEy6TxDhl70wDVCLM2hAH4ZnPfjjjQdyIP-MyWZjWJKr4zfkyxRvRkARmBoLzJzERtk2rtDZsxWZel7gmYYuZxqEnoMVlN44M9UUIfyOTeLJuWXh94op-yrSbq8O36QDEU4-Nw_OZnyUjBl"/>
+</div>
+<span class="font-body-md text-on-surface flex-1 truncate">Tom K.</span>
+<span class="font-data-mono text-data-mono text-primary-fixed-dim">8,950</span>
+</div>
+<!-- List Item 7 -->
+<div class="flex items-center gap-3 p-2 rounded-sm hover:bg-white/[0.05] transition-colors group">
+<span class="font-data-mono text-data-mono text-outline w-4 text-right">7</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover grayscale" data-alt="small avatar of a person, dark lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCD7NgJqLby4aGxG1xpVNz88VpQw6osrrWJ06tzRjDbi6eci1LD_NveNHDOgpq8wee-6K1nmrsWcGye9UDVZjvaJd9ozhTYKtTnUvQGDPGXAp7ROefvgxC4YRVuagi5w7_CvDAWMGYUhxR-3TIapCaPRGqo3-YdNCxHx9KpvmDr_0wSXvEBZpXl0JmgKDDLEjoTycP5Co38CqsC7rHPTslKuAPQxelpPDqQdZsRfG-YYGN86ONc28sLA15rrIvvoJRjB-FIBcV-v-UI"/>
+</div>
+<span class="font-body-md text-on-surface flex-1 truncate">Nina S.</span>
+<span class="font-data-mono text-data-mono text-outline-variant group-hover:text-primary-fixed-dim transition-colors">8,400</span>
+</div>
+<!-- List Item 8 -->
+<div class="flex items-center gap-3 p-2 rounded-sm hover:bg-white/[0.05] transition-colors group">
+<span class="font-data-mono text-data-mono text-outline w-4 text-right">8</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-data-label text-on-surface">PR</div>
+<span class="font-body-md text-on-surface flex-1 truncate">Paul R.</span>
+<span class="font-data-mono text-data-mono text-outline-variant group-hover:text-primary-fixed-dim transition-colors">8,100</span>
+</div>
+<!-- List Item 9 -->
+<div class="flex items-center gap-3 p-2 rounded-sm hover:bg-white/[0.05] transition-colors group opacity-70">
+<span class="font-data-mono text-data-mono text-outline w-4 text-right">9</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-data-label text-on-surface">LW</div>
+<span class="font-body-md text-on-surface flex-1 truncate">Liza W.</span>
+<span class="font-data-mono text-data-mono text-outline-variant">7,920</span>
+</div>
+<!-- List Item 10 -->
+<div class="flex items-center gap-3 p-2 rounded-sm hover:bg-white/[0.05] transition-colors group opacity-50">
+<span class="font-data-mono text-data-mono text-outline w-4 text-right">10</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-data-label text-on-surface">??</div>
+<span class="font-body-md text-on-surface flex-1 truncate text-on-surface-variant italic">Hidden</span>
+<span class="font-data-mono text-data-mono text-outline-variant">7,500</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 2: 50/50 -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md h-[300px]">
+<!-- Card J: Donut -->
+<div class="bg-white/[0.03] border border-surface-container rounded-DEFAULT p-lg flex flex-col hover:bg-white/[0.05] hover:border-surface-variant transition-all duration-300">
+<header class="flex justify-between items-center mb-6">
+<h3 class="font-data-label text-data-label text-on-surface-variant uppercase">Distribucion de Puntos por Accion</h3>
+<span class="material-symbols-outlined text-[16px] text-outline">pie_chart</span>
+</header>
+<div class="flex-1 flex items-center justify-center relative">
+<!-- CSS Donut Approximation -->
+<div class="w-[180px] h-[180px] rounded-full border-[20px] border-surface-container relative" style="background: conic-gradient(#39d2c0 0% 35%, #9fbcff 35% 60%, #ffb4ab 60% 75%, #d5c5a8 75% 85%, #859490 85% 95%, #2a2a2a 95% 100%); mask: radial-gradient(transparent 55%, black 56%); -webkit-mask: radial-gradient(transparent 55%, black 56%);"></div>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-data-mono text-[10px] text-on-surface-variant">Total</span>
+<span class="font-['Plus_Jakarta_Sans'] font-extrabold text-[24px] text-on-surface tracking-tighter">48,920</span>
+</div>
+<!-- Legend -->
+<div class="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col gap-2">
+<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-primary-container"></div><span class="font-data-mono text-[10px] text-on-surface">Sessions (35%)</span></div>
+<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-tertiary-container"></div><span class="font-data-mono text-[10px] text-on-surface">Booths (25%)</span></div>
+<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-error"></div><span class="font-data-mono text-[10px] text-on-surface">Photos (15%)</span></div>
+<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-secondary"></div><span class="font-data-mono text-[10px] text-on-surface">Social (10%)</span></div>
+<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-outline"></div><span class="font-data-mono text-[10px] text-outline-variant">Other (15%)</span></div>
+</div>
+</div>
+</div>
+<!-- Card K: Mixed Games -->
+<div class="bg-white/[0.03] border border-surface-container rounded-DEFAULT p-lg flex flex-col hover:bg-white/[0.05] hover:border-surface-variant transition-all duration-300">
+<header class="flex justify-between items-center mb-4">
+<h3 class="font-data-label text-data-label text-on-surface-variant uppercase">Juegos del Evento</h3>
+<button class="text-primary hover:text-primary-fixed-dim font-data-mono text-[10px] uppercase">Ver Todos</button>
+</header>
+<div class="flex-1 flex flex-col gap-3">
+<div class="flex items-center justify-between p-3 border border-surface-variant bg-surface/30 rounded-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-sm bg-tertiary-container/10 flex items-center justify-center text-tertiary-fixed"><span class="material-symbols-outlined">quiz</span></div>
+<div>
+<h4 class="font-body-md text-on-surface font-medium leading-none mb-1">Tech Trivia Sprint</h4>
+<p class="font-data-mono text-[10px] text-outline-variant">1,240 Participants</p>
+</div>
+</div>
+<span class="px-2 py-1 bg-surface-container-high border border-outline-variant rounded-full font-data-mono text-[9px] uppercase text-on-surface-variant">Finalizado</span>
+</div>
+<div class="flex items-center justify-between p-3 border border-primary/20 bg-primary/5 rounded-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-sm bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined">casino</span></div>
+<div>
+<h4 class="font-body-md text-on-surface font-medium leading-none mb-1">Ruleta de Patrocinadores</h4>
+<p class="font-data-mono text-[10px] text-primary">Live Now • 45m left</p>
+</div>
+</div>
+<span class="px-2 py-1 bg-primary/10 border border-primary/30 rounded-full font-data-mono text-[9px] uppercase text-primary animate-pulse">Active</span>
+</div>
+<div class="flex items-center justify-between p-3 border border-surface-variant bg-surface/30 rounded-sm opacity-60">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-sm bg-surface-container flex items-center justify-center text-outline"><span class="material-symbols-outlined">monetization_on</span></div>
+<div>
+<h4 class="font-body-md text-on-surface font-medium leading-none mb-1">Mega Jackpot</h4>
+<p class="font-data-mono text-[10px] text-outline-variant">Opens at 17:00</p>
+</div>
+</div>
+<span class="px-2 py-1 bg-transparent border border-outline-variant border-dashed rounded-full font-data-mono text-[9px] uppercase text-outline-variant">Locked</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 3: 50/50 -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md h-[280px]">
+<!-- Card L: Grid Premios -->
+<div class="bg-white/[0.03] border border-surface-container rounded-DEFAULT p-lg flex flex-col hover:bg-white/[0.05] hover:border-surface-variant transition-all duration-300">
+<header class="flex justify-between items-center mb-4">
+<h3 class="font-data-label text-data-label text-on-surface-variant uppercase">Premios Canjeados</h3>
+</header>
+<div class="flex-1 grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2 p-3 bg-surface-container-low border border-surface-variant rounded-sm">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-tertiary-fixed text-[20px]">laptop_mac</span>
+<span class="font-data-mono text-[10px] text-on-surface bg-surface-container-high px-1 rounded-sm">4/5</span>
+</div>
+<p class="font-body-sm text-on-surface mt-auto">MacBook Pro M3</p>
+<div class="w-full h-1 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-fixed w-[80%]"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 p-3 bg-surface-container-low border border-surface-variant rounded-sm">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary text-[20px]">headphones</span>
+<span class="font-data-mono text-[10px] text-on-surface bg-surface-container-high px-1 rounded-sm">12/20</span>
+</div>
+<p class="font-body-sm text-on-surface mt-auto">Sony WH-1000XM5</p>
+<div class="w-full h-1 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[60%]"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 p-3 bg-surface-container-low border border-surface-variant rounded-sm">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-secondary text-[20px]">coffee_maker</span>
+<span class="font-data-mono text-[10px] text-on-surface bg-surface-container-high px-1 rounded-sm">45/50</span>
+</div>
+<p class="font-body-sm text-on-surface mt-auto">Premium Coffee Kit</p>
+<div class="w-full h-1 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[90%]"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 p-3 bg-surface-container-low border border-surface-variant rounded-sm opacity-50">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-outline text-[20px]">confirmation_number</span>
+<span class="font-data-mono text-[10px] text-outline-variant bg-surface-container-high px-1 rounded-sm">0/100</span>
+</div>
+<p class="font-body-sm text-on-surface mt-auto line-through text-outline-variant">VIP Afterparty</p>
+<div class="w-full h-1 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-outline w-[100%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card M: Stacked Bar -->
+<div class="bg-white/[0.03] border border-surface-container rounded-DEFAULT p-lg flex flex-col hover:bg-white/[0.05] hover:border-surface-variant transition-all duration-300">
+<header class="flex justify-between items-center mb-6">
+<h3 class="font-data-label text-data-label text-on-surface-variant uppercase">Passport Stamps Completados</h3>
+<span class="font-data-mono text-[10px] text-primary">Live</span>
+</header>
+<div class="flex-1 flex flex-col justify-center gap-6">
+<div class="w-full h-8 flex rounded-sm overflow-hidden border border-outline-variant/30">
+<div class="h-full bg-primary-container w-[45%] flex items-center px-2 border-r border-background"><span class="font-data-mono text-[10px] text-on-primary-container">Dev Stage (45%)</span></div>
+<div class="h-full bg-tertiary-container w-[30%] flex items-center px-2 border-r border-background"><span class="font-data-mono text-[10px] text-on-tertiary-container">Expo (30%)</span></div>
+<div class="h-full bg-surface-container-high w-[25%] flex items-center px-2"><span class="font-data-mono text-[10px] text-outline-variant">Pending</span></div>
+</div>
+<div class="flex justify-between items-center px-2">
+<div class="flex flex-col">
+<span class="font-['Plus_Jakarta_Sans'] font-bold text-[20px] text-on-surface leading-none">8,402</span>
+<span class="font-data-mono text-[10px] text-on-surface-variant mt-1">Total Stamps Issued</span>
+</div>
+<div class="flex flex-col text-right">
+<span class="font-['Plus_Jakarta_Sans'] font-bold text-[20px] text-primary leading-none">62%</span>
+<span class="font-data-mono text-[10px] text-primary mt-1">Completion Rate</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-neutral-950 fixed bottom-0 w-full flex justify-between items-center px-6 docked full-width h-[24px] border-t border-white/5 z-50">
+<div class="font-['JetBrains_Mono'] text-[9px] uppercase tracking-widest text-neutral-500">
+            EventOS Enterprise v4.2.0
+        </div>
+<div class="flex gap-4">
+<span class="font-['JetBrains_Mono'] text-[9px] uppercase tracking-widest text-neutral-500 hover:text-neutral-300">Cache Status: Optimized</span>
+<span class="font-['JetBrains_Mono'] text-[9px] uppercase tracking-widest text-neutral-500 hover:text-neutral-300">System Latency: 12ms</span>
+</div>
+</footer>
+</body></html>
