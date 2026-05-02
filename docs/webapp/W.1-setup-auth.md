@@ -217,7 +217,33 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## Fase 6 — Layout shell + middleware (~1.5h) — 0/6 — DESBLOQUEADA (backend listo)
+## Fase 6 — Layout shell + middleware + status gating (~2.5h) — ✅ 10/10 CERRADA
+
+### 6.1 Middleware auth — 1/1
+- [x] `proxy.ts` extendido con auth gate. PUBLIC_PATH_SEGMENTS = [login, verify, set-password]. Sin cookie → redirect `/login?next={originalPath}`. Validacion ligera (no llama backend).
+
+### 6.2 Layout protegido — 2/2
+- [x] `app/[locale]/(app)/layout.tsx` con `getCurrentUser()` server-side. Si bearer revocado → clearAuthCookie + redirect login
+- [x] `AppHeader` sticky con logo evento + LanguageSwitcher + ThemeToggle + UserMenu. Slot center placeholder PillBar (W.0)
+
+### 6.3 UserMenu — 1/1
+- [x] `UserMenu.tsx` con Avatar + DropdownMenu (Perfil, Configuracion, Cerrar sesion). Logout funcional + forgetEmail() + redirect login
+
+### 6.4 Backend extension — 1/1
+- [x] `PublicEventController.show()` expone status + modality + about_* + registered_count + session_count + max_attendees + registration_closes_at (commit eventos-backend `d44ff42`)
+
+### 6.5 Status gating + 4 home variants — 4/4
+- [x] `home/page.tsx` switch por `event.status` (mismo patron app movil `eventos-app/app/(app)/(tabs)/index.tsx`)
+- [x] `PreEventHome` para draft/registration: Hero + Countdown + EventInfoCard + AboutCard
+- [x] `PublishedHome` placeholder W.2 con greeting + slot Module Menu
+- [x] `LiveHome` placeholder W.0/W.2/W.3 con badge "En vivo" + lista pendientes
+- [x] `EndedHome` placeholder W.10 con stats finales + slot Mi Recap
+
+### 6.6 Extras
+- [x] Type `EventStatus` + `EventModality` + `AuthUser`
+- [x] `lib/auth.ts` `getCurrentUser()` con cookie zombie cleanup
+
+**Cierre F6**: typecheck + lint clean, build 19 paginas + 4 API + middleware (529ms). E2E sin auth `/es/home` → 307 `/es/login?next=%2Fes%2Fhome` ✓. E2E con cookie Sanctum real → 200 + render LiveHome correcto ✓. Commits: eventos-web `96fff15` + eventos-backend `d44ff42`.
 
 ### 6.1 Middleware — 0/2
 - [ ] `src/middleware.ts` valida cookie `auth` en rutas protegidas
