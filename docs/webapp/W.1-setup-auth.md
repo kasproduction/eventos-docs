@@ -114,16 +114,34 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## Fase 3 — i18n base (~1h) — 0/5
+## Fase 3 — i18n base (~1h) — 5/5
 
-### 3.1 next-intl — 0/2
-- [ ] `pnpm add next-intl`
-- [ ] Configurar `i18n.ts` + `middleware.ts` para detectar locale + redirect
+### 3.1 next-intl — 2/2
+- [x] `pnpm add next-intl@4.5`
+- [x] Routing prefix-based: `src/i18n/routing.ts` con `[es, en, pt]`, `defaultLocale: es`, `localePrefix: always`. **URL prefix corto** (ADR-008) — sub-locale `es-CO`/`pt-BR` se aplica en formatters Intl
+- [x] `src/i18n/request.ts` con `getRequestConfig` + `hasLocale` validation + timeZone `America/Bogota`
+- [x] `src/i18n/navigation.ts` con `Link`, `redirect`, `usePathname`, `useRouter`, `getPathname` locale-aware
+- [x] `src/proxy.ts` (Next 16 renombro `middleware.ts` → `proxy.ts`) con `createMiddleware(routing)`. matcher excluye api/_next/_vercel/archivos
+- [x] `next.config.ts` con `withNextIntl` plugin
 
-### 3.2 Catalogos — 0/3
-- [ ] `messages/es-CO.json`, `messages/en.json`, `messages/pt-BR.json` con keys base (auth, nav, errors)
-- [ ] Estructura: `auth.login.title`, `auth.login.email`, `auth.errors.invalid`, etc.
-- [ ] Helper `useTranslations()` documentado
+### 3.2 Catalogos — 3/3
+- [x] `messages/{es,en,pt}.json` con 5 namespaces: `common` (9 keys), `nav` (8 keys), `auth.login`/`auth.magicLinkSent`/`auth.verify`/`auth.errors` (24 keys auth), `auth.logoutReason` (2 keys), `tour` (3 keys + 6 escenas)
+- [x] Interpolation: `auth.magicLinkSent.description` con `{email}`, `auth.errors.rateLimit` con `{minutes}`
+- [x] **Type-safe** via `global.d.ts`: `AppConfig.Messages = typeof messages` + `AppConfig.Locale = (typeof routing.locales)[number]`. Cualquier key invalida da error TS
+
+### 3.3 Reorganizacion app router (necesaria para next-intl con i18n routing)
+- [x] `app/layout.tsx` — pass-through (`return children`) per next-intl docs
+- [x] `app/[locale]/layout.tsx` — html/body/fonts/providers/intl con `setRequestLocale`, `generateStaticParams`, `hasLocale` validation + `notFound()`
+- [x] `app/[locale]/page.tsx` — demo movido aca
+- [x] `NextIntlClientProvider` envuelve `<TooltipProvider><ThemeProvider>`
+
+### 3.4 Extras DaVinci
+- [x] `LanguageSwitcher` reutilizable: dropdown shadcn + lucide Languages icon + `useTransition` no bloquea UI durante navegacion. Persistencia via cookie `NEXT_LOCALE`
+- [x] Demo page usa `useTranslations()` extensivamente: login card preview, buttons, tooltip con interpolation, toast con i18n
+
+**Cierre F3**: typecheck + lint clean (despues de borrar cache `.next/` que apuntaba a layout viejo), build con SSG prerender de los 3 locales + middleware/proxy activo. Dev 392ms ready, root `/` → 307 redirect a `/es`, `/es`/`/en`/`/pt` → 200. Strings correctos verificados via curl. Commit `ffd8589`.
+
+**Bug captado**: Next 16 deprecó `src/middleware.ts` → `src/proxy.ts`. Detectado al ver warning en dev server, renombrado y reescrito comentario. Sin warnings tras rename.
 
 ---
 
