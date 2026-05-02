@@ -245,45 +245,13 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 **Cierre F6**: typecheck + lint clean, build 19 paginas + 4 API + middleware (529ms). E2E sin auth `/es/home` → 307 `/es/login?next=%2Fes%2Fhome` ✓. E2E con cookie Sanctum real → 200 + render LiveHome correcto ✓. Commits: eventos-web `96fff15` + eventos-backend `d44ff42`.
 
-### 6.1 Middleware — 0/2
-- [ ] `src/middleware.ts` valida cookie `auth` en rutas protegidas
-- [ ] Si no hay cookie → redirect `/login?next=...`
-
-### 6.2 Layout protegido — 0/2
-- [ ] `src/app/(app)/layout.tsx` con header (logo + theme switcher + user menu) + slot principal
-- [ ] Placeholder de PillBar (W.0 lo construye)
-
-### 6.3 User menu — 0/2
-- [ ] `<UserMenu />` con avatar + nombre + dropdown (Perfil, Configuracion, Cerrar sesion)
-- [ ] Logout: POST `/api/auth/logout` → borra cookie → redirect `/login`
-
 ---
 
 ## Fase 7 — Tour de bienvenida — ⏭️ MOVIDA A W.X (ADR-025)
 
 > **Decision 2026-05-02d**: El WelcomeShowcase se mueve a fase tardia despues de que esten W.3 (Agenda), W.4 (Streaming), W.5 (Speakers), W.7 (Sponsors), W.8 (Networking) y W.9 (Gamification). El showcase reusa componentes reales en miniatura — implementarlo aca con placeholders genera codigo de descarte.
 >
-> Mientras tanto, post-login va directo a `/home` sin showcase. Flag `onboarding_completed` localStorage queda preparado para cuando W.X llegue.
-
-## Fase 7 (legacy plan) — Tour de bienvenida (~1.5h) — DIFERIDA
-
-### 7.1 Componente — 0/3
-- [ ] `<WelcomeTour />` overlay full screen con 4-6 escenas
-- [ ] Cada escena: highlight de un area de la UI + texto explicativo + boton "Siguiente"
-- [ ] Cursor simulado animado (Framer Motion) recorriendo features
-
-### 7.2 Escenas — 0/2
-- [ ] Escena 1: Pill bar / nav (mostrar como navegar)
-- [ ] Escena 2: Happening Now (sesion en vivo)
-- [ ] Escena 3: Agenda + favoritos
-- [ ] Escena 4: Connect (networking + social)
-- [ ] Escena 5: Profile + notificaciones
-- [ ] Escena 6: Cierre con CTA "Empezar"
-
-### 7.3 Logica skip + persist — 0/1
-- [ ] Boton "Saltar" en cualquier momento
-- [ ] Al completar o skip: `localStorage.setItem('onboarding_completed', '1')`
-- [ ] Hook `useFirstTimeUser()` decide si mostrar o no
+> Mientras tanto, post-login va directo a `/home` sin showcase. Flag `onboarding_completed` localStorage queda preparado para cuando W.X llegue. El showcase v6 original (`design/features/onboarding/iteraciones/showcase-onboarding-v6.html`) sirve como referencia FUNCIONAL del concepto cuando se construya W.X — los tokens visuales seran Lumina Noir + accent dinamico (ADR-012, no la paleta del demo).
 
 ---
 
@@ -313,77 +281,114 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ## Edge cases
 
-- [ ] Magic link expirado (>15min) → mensaje claro + CTA "Reenviar"
-- [ ] Magic link usado dos veces → error en segundo intento
-- [ ] Email caido en spam → instrucciones en pantalla post-envio
-- [ ] User sin password (solo magic link) → al intentar login con password muestra "Configura tu contrasena primero"
-- [ ] Cookie corrupta → middleware redirect login + flush cookie
-- [ ] User cambia de pestana durante tour → tour pausa y resume
-- [ ] User refresh durante tour → tour sigue abierto (estado en sessionStorage)
-- [ ] User sin email registrado → mensaje generico anti-enumeration
+- [x] Magic link expirado (>15min) → 410 `token_expired` + UI con CTA "Solicitar nuevo link" (F4)
+- [x] Magic link usado dos veces → 410 `token_used` en segundo intento (F4 + Pest test)
+- [x] Email caido en spam → instrucciones en MagicLinkSent + tip whitelist (F4)
+- [x] User sin email registrado → mensaje generico anti-enumeration (F4 + Pest test)
+- [x] Cookie corrupta / bearer revocado → `getCurrentUser()` 401 → clearAuthCookie + redirect login (F6)
+- [x] Sin auth en ruta protegida → middleware redirect `/login?next={path}` (F6)
+- [ ] Network offline durante verify → banner amber "Tu link sigue valido — reintenta cuando vuelvas" (F4 cubre via `useNetworkStatus`, falta validar)
+- [ ] User sin password (solo magic link) → al intentar login con password muestra "Configura tu contrasena primero" (Fase 2)
 
 ---
 
 ## Cierre de modulo
 
-- [ ] Vitest + Playwright verde
-- [ ] Validado en device real: Pixel + iPhone + iPad + desktop Chrome/Edge
-- [ ] Lighthouse Performance >= 85 desktop, >= 75 mobile
-- [ ] Magic link funciona end-to-end con Mailpit local
-- [ ] Tour cinematico fluido en los 3 viewports
-- [ ] Commit DaVinci + memoria sesion + PENDIENTES.md actualizado
+- [x] Magic link funciona end-to-end con Mailpit local (F4 verificado)
+- [x] Status gating cubre 5 estados Filament (draft/registration/published/live/ended) (F6)
+- [x] Backend Sanctum + httpOnly cookie funcionando (F4+F6)
+- [x] Commits DaVinci + memorias sesion + roadmap maestro v5.7
+- [ ] F8 Sentry frontend (~30min)
+- [ ] F9 Vitest hooks + Playwright happy path (~1h)
+- [ ] Validado en device real: Pixel + iPhone + iPad + desktop Chrome/Edge (F9 + smoke test final)
+- [ ] Lighthouse Performance >= 85 desktop, >= 75 mobile (W.12 polish)
+- [ ] PENDIENTES.md actualizado (al cerrar W.1 completo)
 
 ---
 
-## Archivos creados
+## Archivos creados (real)
 
+**eventos-web**:
 ```
 src/
   app/
-    (auth)/
-      login/page.tsx
-      login/LoginForm.tsx
-      login/MagicLinkSent.tsx
-      verify/page.tsx
-      set-password/page.tsx
-    (app)/
-      layout.tsx
-      home/page.tsx                  // placeholder, W.2 lo termina
-    api/
-      auth/
-        login/route.ts
-        magic-link/route.ts
-        verify/route.ts
-        refresh/route.ts
-        logout/route.ts
-        sessions/route.ts
-      proxy/[...path]/route.ts
-    layout.tsx                        // root layout con fonts, theme, sentry
-    globals.css
+    [locale]/
+      layout.tsx                              // F1+F3 — fonts + intl + providers
+      page.tsx                                // F6 — redirect /home
+      (auth)/
+        login/page.tsx                        // F4
+        verify/page.tsx                       // F4
+      (app)/
+        layout.tsx                            // F6 — protected, AppHeader + slot
+        home/page.tsx                         // F6 — switch por event.status
+    api/auth/
+      magic-link/route.ts                     // F4
+      verify/route.ts                         // F4
+      login/route.ts                          // F4 (password fallback)
+      logout/route.ts                         // F4
+    layout.tsx                                // F0 — pass-through root
+    globals.css                               // F1 — tokens Lumina Noir/Lux
   components/
     auth/
-      LoginForm.tsx
-      MagicLinkSent.tsx
-      UserMenu.tsx
-      WelcomeTour.tsx
-      WelcomeTourScene.tsx
+      LoginCard.tsx                           // F4 — split layout
+      LoginForm.tsx                           // F4 — state machine 4 steps
+      LoginSlideshow.tsx                      // F4 — Ken Burns + video
+      LivePulse.tsx                           // F4
+      EventStatusPill.tsx                     // F4
+      EventLogo.tsx                           // F4 — single/doble
+      TabletRotateOverlay.tsx                 // F4
+      NetworkStatusBanner.tsx                 // F4
+      UserMenu.tsx                            // F6
+    app/
+      AppHeader.tsx                           // F6
+      home/
+        PreEventHome.tsx                      // F6 — draft/registration
+        PublishedHome.tsx                     // F6 — published
+        LiveHome.tsx                          // F6 — live
+        EndedHome.tsx                         // F6 — ended
+    providers/
+      ThemeProvider.tsx                       // F1 — next-themes Noir/Lux
+    ThemeToggle.tsx                           // F1
+    LanguageSwitcher.tsx                      // F3
+    ui/                                       // F2 — 15 shadcn components
   hooks/
-    useAuth.ts
-    useFirstTimeUser.ts
-    useTheme.ts
-    useIdleTimer.ts
+    useMediaQuery.ts                          // F1
+    useReducedMotionPref.ts                   // F1
+    useIsClient.ts                            // F1
+    useLastEmail.ts                           // F4 — Tier 1 cached email
+    useNetworkStatus.ts                       // F4 — Tier 2 offline banner
+  i18n/
+    routing.ts                                // F3
+    request.ts                                // F3
+    navigation.ts                             // F3
   lib/
-    api.ts                            // wrapper fetch con Bearer
-    cookies.ts                        // helpers httpOnly cookies
-  middleware.ts
-  i18n.ts
-  messages/
-    es-CO.json
-    en.json
-    pt-BR.json
-sentry.client.config.ts
-sentry.server.config.ts
-sentry.edge.config.ts
-playwright.config.ts
-vitest.config.ts
+    api.ts                                    // F4 — apiFetch wrapper
+    cookies.ts                                // F4 — httpOnly helpers
+    authValidators.ts                         // F4 — zod schemas
+    mailcheck.ts                              // F4 — Tier 1 typo
+    publicEvent.ts                            // F4 — fetch event + slides
+    auth.ts                                   // F6 — getCurrentUser server-side
+    types/event.ts                            // F4+F6 — types
+    utils.ts                                  // F2 — cn helper
+  proxy.ts                                    // F3+F6 — i18n + auth gate
+  messages/{es,en,pt}.json                    // F3
+global.d.ts                                   // F3 — type-safe i18n
+.github/workflows/ci.yml                      // F0
 ```
+
+**eventos-backend** (W.1B + F6.A):
+- `app/Models/MagicLinkToken.php` (W.1B)
+- `app/Models/EventLoginSlide.php` (W.1B)
+- `app/Mail/MagicLinkMail.php` (W.1B)
+- `app/Http/Controllers/Api/V1/PublicEventController.php` (W.1B + F6.A status)
+- `app/Filament/Resources/LoginSlideResource.php` + 3 Pages (W.1B)
+- `app/Observers/EventLoginSlideObserver.php` (W.1B)
+- `app/Http/Requests/Api/V1/Auth/MagicLinkRequest.php` + `VerifyMagicLinkRequest.php` (W.1B)
+- 4 migrations (`magic_link_tokens`, `email_template_enums`, `event_login_slides`, `events.organizer_logo_url`)
+- `database/seeders/MagicLinkEmailTemplateSeeder.php`
+- `tests/Feature/Auth/MagicLinkTest.php` + `tests/Feature/PublicEvent/LoginSlidesTest.php` (10/10 passing)
+
+**Pendientes F8 + F9** (no creados aun):
+- `sentry.client.config.ts` + `sentry.server.config.ts` + `sentry.edge.config.ts` (F8)
+- `vitest.config.ts` + tests unit hooks (F9)
+- `playwright.config.ts` + happy path E2E (F9)
