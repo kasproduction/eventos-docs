@@ -86,17 +86,31 @@
 
 ---
 
-## Fase 2 — shadcn/ui + componentes base (~1h) — 0/4
+## Fase 2 — shadcn/ui + componentes base (~1h) — 4/4
 
-### 2.1 Setup — 0/2
-- [ ] `pnpm dlx shadcn-ui@latest init` con preset Lumina Noir (overrides en globals.css)
-- [ ] Cherry-pick componentes: Button, Input, Dialog, Sheet, DropdownMenu, Tooltip, Avatar, Badge, Separator, Skeleton, Tabs, Command, Popover
+### 2.1 Setup — 2/2
+- [x] `pnpm dlx shadcn@latest init` con `--template next --base radix --preset nova --css-variables`. **shadcn 2.x** (no shadcn-ui — el package se renombró)
+- [x] **15 componentes** instalados (13 pedidos + 2 deps): Button, Input, Dialog, Sheet, DropdownMenu, Tooltip, Avatar, Badge, Separator, Skeleton, Tabs, Command, Popover, Sonner + textarea, input-group (deps de input)
 
-### 2.2 Sonner — 0/1
-- [ ] `pnpm add sonner` + `<Toaster />` en root layout con tokens Noir
+### 2.2 Sonner — 1/1
+- [x] `<Toaster />` en root layout. Wrapper mapea `theme: noir → dark`, `lux → light`. Position `bottom-right`. Tokens via `--normal-bg/--normal-text/--normal-border/--border-radius`
 
-### 2.3 Lucide — 0/1
-- [ ] `pnpm add lucide-react`
+### 2.3 Lucide — 1/1
+- [x] `lucide-react@1.14` instalado automaticamente por preset radix-nova
+
+### 2.4 Merge tokens shadcn ↔ Lumina (clave)
+shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis tokens. Solucion:
+- Removidos los `:root` y `.dark` shadcn
+- Aliases shadcn (`--background`, `--foreground`, `--card`, `--primary`, `--secondary`, `--muted`, `--accent-foreground`, `--destructive`, `--input`, `--ring`) ahora apuntan a tokens Lumina Noir/Lux via `@theme inline`
+- `--primary` = mi `--accent` (brand). `--secondary` = `--surface-high`. `--muted` = `--surface-medium`
+- Mi `--card` original renombrado a `--card-subtle`, mi `--input` a `--input-bg` para liberar nombres a shadcn semantics
+- Nuevo: `--destructive` + `--destructive-foreground` por theme
+
+### 2.5 Layout updates
+- [x] `TooltipProvider delayDuration={200}` wrappea children en root layout
+- [x] `<Toaster />` montado en root, dentro de TooltipProvider
+
+**Cierre F2**: typecheck + lint clean, build 4 paginas estaticas, dev 410ms, GET / 200 en 357ms. 40905 bytes HTML demo. Commit `e425570`.
 
 ---
 
