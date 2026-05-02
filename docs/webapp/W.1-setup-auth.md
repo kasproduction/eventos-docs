@@ -36,16 +36,24 @@
 
 ---
 
-## Fase 0 — Setup repo (~1h) — 0/5
+## Fase 0 — Setup repo (~1h) — 5/5
 
-### 0.1 Crear repo — 0/2
-- [ ] `git init` en `C:\laragon\www\eventos-web` (o `~\Projects\eventos-web` segun convencion)
-- [ ] `pnpm create next-app@latest .` con: TypeScript, Tailwind, App Router, src dir, alias `@/*`
+### 0.1 Crear repo — 2/2
+- [x] `git init` en `C:\laragon\www\eventos-web` (auto via `pnpm create next-app`)
+- [x] `pnpm create next-app@latest` con: TypeScript, Tailwind, App Router, src dir, alias `@/*`. Latest stable instalado: **Next 16.2.4 + React 19.2 + Tailwind 4** (no Next 15 — downgrade injustificable)
 
-### 0.2 Configuracion — 0/3
-- [ ] `tsconfig.json` strict mode + paths
-- [ ] `tailwind.config.ts` con breakpoints custom (mobile/tablet/desktop)
-- [ ] `.env.local` con: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SOCKET_URL`, `SENTRY_DSN`, `MAGIC_LINK_SECRET` (compartido con backend)
+### 0.2 Configuracion — 3/3
+- [x] `tsconfig.json` strict mode + `noUncheckedIndexedAccess` + `noImplicitOverride` + `forceConsistentCasingInFileNames` + paths
+- [x] **Tailwind 4** breakpoints custom via `@custom-variant` en `globals.css` (Tailwind 4 ya no usa `tailwind.config.ts` para tokens — todo en CSS)
+- [x] `.env.local` + `.env.example` con: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SOCKET_URL`, `SENTRY_DSN`, `MAGIC_LINK_SECRET`, `NEXT_PUBLIC_APP_URL`
+
+### 0.3 Extras DaVinci (sumados sin abrir decisiones)
+- [x] `.github/workflows/ci.yml` desde dia 0 (typecheck + lint + build per ADR-014)
+- [x] Scripts utiles en `package.json`: `typecheck`, `check` (typecheck + lint)
+- [x] `.gitignore` extendido (`.env*` + `!.env.example`, `.turbo`, `.vscode/`, Playwright outputs, Sentry artifacts)
+- [x] Layout root: `lang="es-CO"` (ADR-008) + `data-theme="noir"` (DESIGN-SYSTEM default)
+
+**Cierre F0**: Build production 977ms, dev server 407ms con Turbopack, HTTP 200 en /. Commit `ba2fc24`.
 
 ---
 
