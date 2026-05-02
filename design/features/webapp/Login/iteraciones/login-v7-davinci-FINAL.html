@@ -1,0 +1,1200 @@
+<!doctype html>
+<html lang="es-CO" data-theme="noir" data-viewport="desktop" data-step="email" data-overlay="on" data-status="upcoming" data-cached="off" data-network="online" data-accent="white" data-orglogo="off" data-video="off">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login DaVinci v5 — EventOS Webapp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Urbanist:wght@300;400;500;600;700;800&display=swap">
+<style>
+  /* ================ Lumina Noir tokens ================ */
+  :root, [data-theme="noir"] {
+    --bg: #0a0a0a;
+    --bg-elevated: #161616;
+    --bg-sunken: #030303;
+    --bg-raised: #1a1a1a;
+    --surface-low: rgba(255,255,255,0.03);
+    --surface-medium: rgba(255,255,255,0.05);
+    --surface-high: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.08);
+    --border-light: rgba(255,255,255,0.12);
+    --border-strong: rgba(255,255,255,0.18);
+    --text-primary: rgba(255,255,255,0.92);
+    --text-secondary: rgba(255,255,255,0.6);
+    --text-muted: rgba(255,255,255,0.4);
+    --text-label: rgba(255,255,255,0.3);
+    --text-placeholder: rgba(255,255,255,0.25);
+    --text-on-accent: #000;
+    --gold: #b5a68b;
+    --accent: #ffffff;
+    --accent-text: #000;
+    --shadow-card: 0 48px 96px rgba(0,0,0,0.7), 0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+    --pulse-color: #ef4444;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --success: #10b981;
+  }
+  [data-theme="lux"] {
+    --bg: #f6f8fa;
+    --bg-elevated: #ffffff;
+    --bg-sunken: #e4e8ec;
+    --bg-raised: #fafbfc;
+    --surface-low: rgba(0,0,0,0.02);
+    --surface-medium: rgba(0,0,0,0.04);
+    --surface-high: rgba(0,0,0,0.06);
+    --border: rgba(0,0,0,0.08);
+    --border-light: rgba(0,0,0,0.04);
+    --border-strong: rgba(0,0,0,0.14);
+    --text-primary: #1a1b1e;
+    --text-secondary: #4a4b50;
+    --text-muted: #7c7d82;
+    --text-label: #a8a9ae;
+    --text-placeholder: #a8a9ae;
+    --text-on-accent: #fff;
+    --gold: #8e8170;
+    --accent: #1a1a1a;
+    --accent-text: #fff;
+    --shadow-card: 0 32px 64px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.04);
+    --error: #dc2626;
+    --warning: #d97706;
+    --success: #059669;
+  }
+
+  /* Accent dynamic presets (per evento) */
+  [data-accent="orange"] { --accent: #f97316; --accent-text: #fff; }
+  [data-accent="blue"] { --accent: #3b82f6; --accent-text: #fff; }
+  [data-accent="red"] { --accent: #ef4444; --accent-text: #fff; }
+  [data-accent="purple"] { --accent: #8b5cf6; --accent-text: #fff; }
+  [data-theme="lux"][data-accent="white"] { --accent: #1a1a1a; --accent-text: #fff; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    background: var(--bg-sunken);
+    color: var(--text-primary);
+    font-family: 'Urbanist', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background 250ms ease, color 250ms ease;
+  }
+  .display { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; letter-spacing: -0.02em; }
+  button { font: inherit; }
+
+  /* ================ Toolbar ================ */
+  .toolbar {
+    position: fixed; top: 12px; left: 12px; right: 12px;
+    z-index: 1000;
+    display: flex; gap: 4px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+  .toolbar button {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 8px;
+    padding: 5px 9px;
+    font-size: 10px; font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+    white-space: nowrap;
+  }
+  .toolbar button.active { background: var(--accent); color: var(--accent-text); }
+  .toolbar button:hover:not(.active) { background: var(--surface-high); color: var(--text-primary); }
+  .toolbar .group { display: flex; gap: 1px; padding: 0 4px; border-right: 1px solid var(--border); }
+  .toolbar .group:last-child { border-right: none; }
+  .toolbar .group-label {
+    font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-label); align-self: center; padding: 0 4px; font-weight: 700;
+  }
+
+  /* ================ Network banner (Tier 2 #11) ================ */
+  .network-banner {
+    position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+    z-index: 998;
+    background: var(--warning);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    display: none;
+  }
+  [data-network="offline"] .network-banner { display: flex; align-items: center; gap: 8px; }
+
+  /* ================ Stage ================ */
+  .stage {
+    min-height: 100vh;
+    padding: 110px 24px 24px;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(255,255,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(255,255,255,0.03) 0%, transparent 50%),
+      var(--bg-sunken);
+  }
+  [data-theme="lux"] .stage {
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(0,0,0,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(0,0,0,0.03) 0%, transparent 50%),
+      var(--bg-sunken);
+  }
+
+  /* ================ Login card ================ */
+  .login-card {
+    width: 100%;
+    max-width: 1100px;
+    height: min(720px, calc(100vh - 150px));
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 60% 40%;
+    transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+  [data-viewport="tablet-landscape"] .login-card {
+    max-width: 1000px;
+    height: min(680px, calc(100vh - 150px));
+    grid-template-columns: 55% 45%;
+  }
+  /* Mobile: container fijo iPhone 14 (390x844) — sheet adaptativo fit-content */
+  [data-viewport="mobile"] .login-card {
+    max-width: 390px;
+    height: min(844px, calc(100vh - 150px));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* sheet alineado al fondo, slideshow toma lo que sobra */
+    grid-template-columns: none;
+    grid-template-rows: none;
+    border-radius: 32px;
+    background: #000;
+  }
+
+  /* ================ Slideshow side ================ */
+  .slideshow {
+    position: relative;
+    overflow: hidden;
+    background: #000;
+  }
+  [data-viewport="mobile"] .slideshow {
+    flex: 1; /* toma todo el espacio que sobra arriba del sheet */
+    z-index: 1;
+    min-height: 200px; /* nunca menor que esto */
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: opacity 1500ms ease-in-out;
+  }
+  .slide.active { opacity: 1; }
+
+  .slide-bg {
+    position: absolute; inset: 0;
+    transform: scale(1);
+    transition: transform 8000ms ease-out;
+    background-size: cover;
+    background-position: center;
+  }
+  .slide.active .slide-bg { transform: scale(1.08); }
+
+  .slide-1 .slide-bg {
+    background:
+      radial-gradient(circle at 25% 75%, rgba(99, 102, 241, 0.5) 0%, transparent 55%),
+      radial-gradient(circle at 75% 25%, rgba(168, 85, 247, 0.4) 0%, transparent 55%),
+      linear-gradient(180deg, #1e1b4b 0%, #0a0a0a 100%);
+  }
+  .slide-2 .slide-bg {
+    background:
+      radial-gradient(circle at 50% 30%, rgba(245, 158, 11, 0.4) 0%, transparent 60%),
+      radial-gradient(circle at 30% 70%, rgba(217, 119, 6, 0.5) 0%, transparent 55%),
+      linear-gradient(180deg, #451a03 0%, #0a0a0a 100%);
+  }
+  .slide-3 .slide-bg {
+    background:
+      radial-gradient(circle at 70% 50%, rgba(20, 184, 166, 0.4) 0%, transparent 55%),
+      radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.35) 0%, transparent 55%),
+      linear-gradient(180deg, #134e4a 0%, #0a0a0a 100%);
+  }
+  /* Slide 1 con video simulado (Tier 2 #9) */
+  [data-video="on"] .slide-1 .slide-bg {
+    background:
+      radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.5) 0%, transparent 55%),
+      radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.6) 0%, transparent 55%),
+      radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.4) 0%, transparent 55%),
+      linear-gradient(180deg, #1e1b4b 0%, #0a0a0a 100%);
+    animation: videoLoop 6s ease-in-out infinite;
+  }
+  @keyframes videoLoop {
+    0%, 100% { background-position: 0% 50%; filter: hue-rotate(0deg); }
+    50% { background-position: 100% 50%; filter: hue-rotate(15deg); }
+  }
+  /* Video badge */
+  [data-video="on"] .slide-1::after {
+    content: '';
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    width: 6px; height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+    z-index: 5;
+  }
+
+  .slide-bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: repeating-radial-gradient(circle at 0 0, transparent 0, rgba(255,255,255,0.02) 1px, transparent 2px);
+    opacity: 0.7;
+    mix-blend-mode: overlay;
+  }
+  .slide-scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.65) 100%);
+    transition: background 350ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Mobile sheet expandido: scrim mas oscuro sobre slideshow */
+  [data-viewport="mobile"][data-sheet="expanded"] .slide-scrim {
+    background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+  }
+
+  .slide-overlay {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 40px;
+    color: #fff;
+    transition: opacity 300ms ease;
+    overflow: hidden;
+  }
+  [data-overlay="off"] .slide-overlay { opacity: 0; pointer-events: none; }
+  [data-viewport="tablet-landscape"] .slide-overlay { padding: 32px; }
+  [data-viewport="mobile"] .slide-overlay { padding: 14px 18px; bottom: 60px; }
+  [data-viewport="mobile"][data-sheet="expanded"] .slide-overlay { opacity: 0; }
+
+  .slide-overlay .label {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 8px;
+  }
+  .slide-overlay h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 36px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin-bottom: 6px;
+    max-width: 480px;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+  }
+  [data-viewport="tablet-landscape"] .slide-overlay h2 { font-size: 26px; }
+  [data-viewport="mobile"] .slide-overlay h2 { font-size: 18px; max-width: 280px; }
+  .slide-overlay p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.78);
+    max-width: 460px;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+  }
+  [data-viewport="mobile"] .slide-overlay p { font-size: 11px; }
+
+  /* ============ Slideshow positioned elements ============ */
+
+  /* Logo evento (top-left) — single logo */
+  .event-logo {
+    position: absolute; top: 24px; left: 24px;
+    display: flex; align-items: center; gap: 10px;
+    color: #fff;
+    z-index: 10;
+  }
+  [data-viewport="mobile"] .event-logo { top: 14px; left: 14px; }
+  .event-logo .mark {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #fff 0%, #d4d4d8 100%);
+    display: grid; place-items: center;
+    color: #000;
+    font-weight: 800;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    flex-shrink: 0;
+  }
+  .event-logo .name {
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+  [data-viewport="mobile"] .event-logo .name { font-size: 11px; }
+
+  /* Doble logo: organizador presenta evento (Tier 2 #8) */
+  [data-orglogo="on"] .event-logo {
+    flex-direction: row;
+    gap: 8px;
+  }
+  [data-orglogo="on"] .event-logo .org-block {
+    display: flex; align-items: center; gap: 6px;
+  }
+  [data-orglogo="on"] .event-logo .presenta {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin: 0 2px;
+  }
+  [data-orglogo="on"] .event-logo .org-mark {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #ffd700 0%, #d4a017 100%);
+    display: grid; place-items: center;
+    color: #1a1a1a;
+    font-weight: 800;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    flex-shrink: 0;
+  }
+  [data-orglogo="off"] .org-block { display: none; }
+  [data-orglogo="off"] .presenta { display: none; }
+
+  /* Estado contextual (top-right) */
+  .event-status {
+    position: absolute; top: 24px; right: 24px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 8px 12px;
+    color: var(--text-primary);
+    font-size: 11px;
+    z-index: 10;
+    min-width: 160px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  [data-viewport="mobile"] .event-status { top: 14px; right: 14px; min-width: 0; padding: 6px 10px; }
+  .event-status .status-row { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+  .event-status .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); }
+  [data-status="upcoming"] .event-status .status-dot { background: var(--accent); }
+  [data-status="live_today"] .event-status .status-dot { background: var(--warning); }
+  [data-status="live_now"] .event-status .status-dot {
+    background: var(--pulse-color);
+    box-shadow: 0 0 0 0 rgba(239,68,68,0.7);
+    animation: pulse 2s infinite;
+  }
+  [data-status="ended"] .event-status .status-dot { background: var(--text-muted); }
+  .event-status .status-label {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .event-status .status-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--text-primary);
+  }
+  [data-viewport="mobile"] .event-status .status-value { font-size: 12px; }
+  [data-status="upcoming"] .status-upcoming,
+  [data-status="live_today"] .status-live-today,
+  [data-status="ended"] .status-ended { display: block !important; }
+  [data-status="live_now"] .event-status,
+  [data-status="none"] .event-status { display: none; }
+  .event-status > div { display: none; }
+
+  /* Live Pulse (bottom-right) — accent dynamic glow */
+  .live-pulse {
+    position: absolute; bottom: 24px; right: 24px;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    padding: 7px 12px;
+    color: var(--text-primary);
+    font-size: 11px;
+    font-weight: 500;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  [data-viewport="tablet-landscape"] .live-pulse { bottom: 20px; right: 20px; }
+  [data-viewport="mobile"] .live-pulse {
+    bottom: 80px; right: 14px;
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+  [data-viewport="mobile"] .live-pulse .dot { width: 6px; height: 6px; }
+  [data-status="upcoming"] .live-pulse,
+  [data-status="ended"] .live-pulse,
+  [data-status="none"] .live-pulse { display: none; }
+  .live-pulse .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--pulse-color);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, var(--pulse-color));
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  }
+
+  /* Indicators (bottom-left) */
+  .slide-indicators {
+    position: absolute; bottom: 24px; left: 24px;
+    display: flex; gap: 6px;
+    z-index: 10;
+  }
+  [data-viewport="tablet-landscape"] .slide-indicators { bottom: 20px; left: 20px; }
+  [data-viewport="mobile"] .slide-indicators { bottom: 80px; left: 14px; }
+  [data-viewport="mobile"][data-sheet="expanded"] .slide-indicators { opacity: 0; transition: opacity 200ms; }
+  .slide-indicators .ind {
+    width: 22px; height: 3px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 200ms ease;
+  }
+  .slide-indicators .ind.active { background: #fff; width: 28px; }
+  .slide-indicators[data-count="1"] { display: none; }
+
+  /* ================ Form side (desktop/tablet) ================ */
+  .form-side {
+    position: relative;
+    background: var(--bg-elevated);
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px;
+    overflow: hidden;
+  }
+  [data-viewport="tablet-landscape"] .form-side { padding: 32px; }
+
+  /* ================ Mobile bottom sheet adaptativo (fit-content) ================ */
+  [data-viewport="mobile"] .form-side {
+    z-index: 5;
+    background: var(--bg-elevated);
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+    padding: 0;
+    align-items: stretch;
+    /* sheet se ajusta al contenido, max 78% del viewport (techo, no piso) */
+    max-height: 78%;
+    box-shadow: 0 -16px 48px rgba(0,0,0,0.4);
+    flex-shrink: 0;
+  }
+
+  /* Drag handle visible siempre en mobile */
+  [data-viewport="mobile"] .form-side::before {
+    content: '';
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 36px; height: 4px;
+    background: var(--border-strong);
+    border-radius: 999px;
+    z-index: 2;
+  }
+
+  /* Sheet hint eliminado — el handle drag y el contenido ya implican afford */
+  .sheet-hint { display: none !important; }
+
+  .form-stack {
+    width: 100%;
+    max-width: 320px;
+    position: relative;
+    min-height: 380px;
+  }
+  [data-viewport="tablet-landscape"] .form-stack { max-width: 300px; min-height: 340px; }
+  [data-viewport="mobile"] .form-stack {
+    max-width: 100%;
+    padding: 28px 22px 24px;
+    min-height: auto; /* fit-content — sheet respira con el contenido */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Form step transitions */
+  .form-step {
+    display: flex; flex-direction: column; gap: 22px;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 300ms ease, transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+    position: absolute; inset: 0;
+    pointer-events: none;
+  }
+  [data-viewport="mobile"] .form-step {
+    position: relative; inset: auto;
+    gap: 16px;
+  }
+  [data-viewport="mobile"] .form-step:not(.active-mobile) { display: none; }
+  [data-step="email"][data-viewport="mobile"] .form-step.email,
+  [data-step="sent"][data-viewport="mobile"] .form-step.sent,
+  [data-step="password"][data-viewport="mobile"] .form-step.password,
+  [data-step="verifying"][data-viewport="mobile"] .form-step.verifying {
+    display: flex !important;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  /* SIN margin-top: auto — el contenido fluye natural sin push, cero gap muerto */
+  [data-viewport="mobile"] .form-step.verifying .verifying-content { padding: 16px 0; }
+
+  [data-step="email"]:not([data-viewport="mobile"]) .form-step.email,
+  [data-step="sent"]:not([data-viewport="mobile"]) .form-step.sent,
+  [data-step="password"]:not([data-viewport="mobile"]) .form-step.password,
+  [data-step="verifying"]:not([data-viewport="mobile"]) .form-step.verifying {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+    position: static;
+  }
+
+  /* Step header */
+  .step-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  [data-viewport="tablet-landscape"] .step-header h1 { font-size: 24px; }
+  [data-viewport="mobile"] .step-header h1 { font-size: 22px; }
+  .step-header p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .step-header p strong { color: var(--text-primary); font-weight: 600; }
+
+  /* Welcome back (Tier 1 #7) */
+  .welcome-back { display: none; }
+  [data-cached="on"][data-step="email"] .welcome-back { display: block; }
+  [data-cached="on"][data-step="email"] .step-header.default { display: none; }
+
+  /* Inputs */
+  .field { display: flex; flex-direction: column; gap: 6px; position: relative; }
+  .field-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    font-weight: 600;
+  }
+  .input {
+    width: 100%;
+    background: var(--surface-medium);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--text-primary);
+    font-family: 'Urbanist', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 150ms ease;
+  }
+  .input::placeholder { color: var(--text-placeholder); font-weight: 400; }
+  .input:focus { outline: none; border-color: var(--accent); background: var(--surface-high); }
+
+  /* Typo suggestion (Tier 1 #3) */
+  .typo-hint {
+    display: none;
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 6px 10px;
+    background: var(--surface-low);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 4px;
+  }
+  .typo-hint.show { display: flex; align-items: center; gap: 6px; }
+  .typo-hint button {
+    background: none; border: none; color: var(--accent);
+    text-decoration: underline; cursor: pointer; font-size: 12px;
+    padding: 0;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    width: 100%;
+    height: 46px;
+    background: var(--accent);
+    color: var(--accent-text);
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 200ms ease;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    width: 100%;
+    height: 42px;
+    background: var(--surface-medium);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 200ms ease;
+  }
+  .btn-secondary:hover { background: var(--surface-high); border-color: var(--border-light); }
+
+  .btn-link {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    padding: 4px 0;
+    transition: color 150ms;
+    text-align: left;
+  }
+  .btn-link:hover { color: var(--text-primary); }
+
+  /* Sent step */
+  .sent-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: var(--surface-medium);
+    border: 1px solid var(--border);
+    display: grid; place-items: center;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .countdown-bar {
+    background: var(--surface-low);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .countdown-bar .timer {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.1em;
+    color: var(--text-primary);
+  }
+
+  .sent-actions {
+    display: flex; flex-direction: column; gap: 4px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+
+  /* Email pill */
+  .email-pill {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface-low);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .email-pill .label { color: var(--text-muted); font-size: 11px; }
+  .email-pill .value { color: var(--text-primary); font-weight: 500; flex: 1; }
+  .email-pill button {
+    background: none; border: none; color: var(--text-secondary);
+    font-size: 12px; cursor: pointer;
+  }
+
+  /* Verifying — accent dynamic spinner */
+  .verifying-content {
+    display: flex; flex-direction: column; align-items: center; gap: 18px;
+    padding: 32px 0;
+  }
+  .spinner {
+    width: 44px; height: 44px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 800ms linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .step-footer {
+    text-align: center;
+    padding-top: 4px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .step-footer a { color: var(--text-secondary); text-decoration: none; }
+  .step-footer a:hover { color: var(--text-primary); }
+
+  /* Sent actions inline — agrupados horizontalmente con dots separadores */
+  .sent-actions-inline {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 4px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .sent-actions-inline button {
+    background: none; border: none;
+    color: var(--text-secondary);
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: var(--border-strong);
+    padding: 2px 0;
+    transition: color 150ms;
+  }
+  .sent-actions-inline button:hover { color: var(--text-primary); }
+  .sent-actions-inline .sep { color: var(--text-label); }
+
+  /* Tablet portrait rotation overlay */
+  .rotate-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    z-index: 999;
+    background: var(--bg-sunken);
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    padding: 40px;
+    text-align: center;
+  }
+  [data-viewport="tablet-portrait"] .rotate-overlay { display: flex; }
+  .rotate-icon {
+    width: 72px; height: 72px;
+    color: var(--text-primary);
+    animation: rotateBack 2s ease-in-out infinite;
+  }
+  @keyframes rotateBack {
+    0%, 100% { transform: rotate(0); }
+    50% { transform: rotate(-90deg); }
+  }
+  .rotate-overlay h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+  .rotate-overlay p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    max-width: 380px;
+  }
+  [data-viewport="tablet-portrait"] .stage { display: none; }
+
+  /* ARIA live region (invisible pero presente) */
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap; border: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <span class="group-label">Tema</span>
+  <div class="group">
+    <button data-action="theme" data-value="noir" class="active">Noir</button>
+    <button data-action="theme" data-value="lux">Lux</button>
+  </div>
+  <span class="group-label">Vista</span>
+  <div class="group">
+    <button data-action="viewport" data-value="desktop" class="active">Desktop</button>
+    <button data-action="viewport" data-value="tablet-landscape">Tablet H</button>
+    <button data-action="viewport" data-value="tablet-portrait">Tablet V</button>
+    <button data-action="viewport" data-value="mobile">Mobile</button>
+  </div>
+  <span class="group-label">Step</span>
+  <div class="group">
+    <button data-action="step" data-value="email" class="active">1.Email</button>
+    <button data-action="step" data-value="sent">2.Sent</button>
+    <button data-action="step" data-value="password">2.5 Pwd</button>
+    <button data-action="step" data-value="verifying">3.Verify</button>
+  </div>
+  <span class="group-label">Overlay</span>
+  <div class="group">
+    <button data-action="overlay" data-value="on" class="active">Texto</button>
+    <button data-action="overlay" data-value="off">Sin</button>
+  </div>
+  <span class="group-label">Estado</span>
+  <div class="group">
+    <button data-action="status" data-value="upcoming" class="active">Upcoming</button>
+    <button data-action="status" data-value="live_today">Hoy</button>
+    <button data-action="status" data-value="live_now">Live</button>
+    <button data-action="status" data-value="ended">Ended</button>
+    <button data-action="status" data-value="none">None</button>
+  </div>
+  <span class="group-label">Accent</span>
+  <div class="group">
+    <button data-action="accent" data-value="white" class="active">W</button>
+    <button data-action="accent" data-value="orange">O</button>
+    <button data-action="accent" data-value="blue">B</button>
+    <button data-action="accent" data-value="red">R</button>
+    <button data-action="accent" data-value="purple">P</button>
+  </div>
+  <span class="group-label">Logo</span>
+  <div class="group">
+    <button data-action="orglogo" data-value="off" class="active">1</button>
+    <button data-action="orglogo" data-value="on">Doble</button>
+  </div>
+  <span class="group-label">Video</span>
+  <div class="group">
+    <button data-action="video" data-value="off" class="active">Off</button>
+    <button data-action="video" data-value="on">On</button>
+  </div>
+  <span class="group-label">Cached</span>
+  <div class="group">
+    <button data-action="cached" data-value="off" class="active">No</button>
+    <button data-action="cached" data-value="on">Si</button>
+  </div>
+  <span class="group-label">Net</span>
+  <div class="group">
+    <button data-action="network" data-value="online" class="active">On</button>
+    <button data-action="network" data-value="offline">Off</button>
+  </div>
+</div>
+
+<!-- Network banner (Tier 2 #11) -->
+<div class="network-banner">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.58 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+  Sin conexion. Tu link sigue valido — reintenta cuando vuelvas.
+</div>
+
+<!-- Tablet portrait rotation overlay -->
+<div class="rotate-overlay">
+  <svg class="rotate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="5" y="3" width="14" height="18" rx="2" ry="2"/>
+    <path d="M12 18h.01"/>
+  </svg>
+  <h2 class="display">Gira tu tablet</h2>
+  <p>Para una mejor experiencia con la webapp, te recomendamos usar tu tablet en horizontal.</p>
+</div>
+
+<!-- ARIA live region -->
+<div class="sr-only" aria-live="polite" id="ariaLive"></div>
+
+<!-- Stage -->
+<div class="stage">
+  <div class="login-card">
+    <!-- Slideshow side -->
+    <div class="slideshow">
+      <div class="slide slide-1 active">
+        <div class="slide-bg"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-overlay">
+          <div class="label">Bienvenido</div>
+          <h2 class="display">Bogota recibe a los lideres del cambio</h2>
+          <p>20 y 21 de septiembre · Movistar Arena</p>
+        </div>
+      </div>
+      <div class="slide slide-2">
+        <div class="slide-bg"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-overlay">
+          <div class="label">Speakers</div>
+          <h2 class="display">Voces que estan moviendo la industria</h2>
+          <p>20 lideres internacionales en tres dias intensos</p>
+        </div>
+      </div>
+      <div class="slide slide-3">
+        <div class="slide-bg"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-overlay">
+          <div class="label">Networking</div>
+          <h2 class="display">Conexiones que duran mas alla del evento</h2>
+          <p>Match inteligente con asistentes que comparten tus intereses</p>
+        </div>
+      </div>
+
+      <!-- Logo evento (single o doble) -->
+      <div class="event-logo">
+        <div class="org-block">
+          <div class="org-mark">B</div>
+        </div>
+        <span class="presenta">Presenta</span>
+        <div class="mark">S</div>
+        <div class="name">Summit 2026</div>
+      </div>
+
+      <!-- Estado contextual evento (top-right) -->
+      <div class="event-status">
+        <div class="status-upcoming">
+          <div class="status-row">
+            <span class="status-dot"></span>
+            <span class="status-label">Falta</span>
+          </div>
+          <div class="status-value display">42 dias 7h</div>
+        </div>
+        <div class="status-live-today">
+          <div class="status-row">
+            <span class="status-dot"></span>
+            <span class="status-label">Hoy</span>
+          </div>
+          <div class="status-value display">Comienza 9:00 AM</div>
+        </div>
+        <div class="status-ended">
+          <div class="status-row">
+            <span class="status-dot"></span>
+            <span class="status-label">Finalizado</span>
+          </div>
+          <div class="status-value display">Ver recap →</div>
+        </div>
+      </div>
+
+      <!-- Live Pulse (bottom-right) — solo conectados -->
+      <div class="live-pulse">
+        <span class="dot"></span>
+        <span><b id="liveCount">247</b> conectados ahora</span>
+      </div>
+
+      <!-- Indicators (bottom-left) -->
+      <div class="slide-indicators" data-count="3">
+        <span class="ind active" data-slide="0"></span>
+        <span class="ind" data-slide="1"></span>
+        <span class="ind" data-slide="2"></span>
+      </div>
+    </div>
+
+    <!-- Form side -->
+    <div class="form-side" id="formSide">
+      <div class="form-stack">
+
+        <!-- Step Email -->
+        <div class="form-step email">
+          <div class="step-header default">
+            <h1 class="display">Iniciar sesion</h1>
+            <p>Te mandamos el link a tu correo en menos de 1 minuto. Sin contrasenas.</p>
+          </div>
+          <div class="step-header welcome-back">
+            <h1 class="display">Bienvenido de nuevo</h1>
+            <p>Listo para entrar como <strong>kamilo@bancolombia.com</strong>?</p>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Tu email de trabajo</span>
+            <input
+              class="input"
+              id="emailInput"
+              type="email"
+              inputmode="email"
+              autocomplete="email webauthn"
+              placeholder="tu@empresa.com"
+            >
+            <div class="typo-hint" id="typoHint">
+              <span>¿Quisiste decir</span>
+              <button id="typoSuggest">tu@gmail.com</button>
+              <span>?</span>
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="setStep('sent')">
+            Continuar
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+
+          <div class="step-footer">
+            <a href="#">Soporte 24/7</a>
+          </div>
+        </div>
+
+        <!-- Step Sent -->
+        <div class="form-step sent">
+          <div class="step-header">
+            <h1 class="display">Revisa tu correo</h1>
+            <p>Te enviamos un link a <strong>tu@empresa.com</strong> desde <strong>eventos@eventos.app</strong>. Expira en 15 minutos.</p>
+          </div>
+          <div class="countdown-bar">
+            <span>Reenviar en</span>
+            <span class="timer" id="resendTimer">2:30</span>
+          </div>
+          <button class="btn-secondary" onclick="setStep('password')">Mejor con mi contrasena</button>
+          <div class="sent-actions-inline">
+            <button onclick="setStep('email')">Email incorrecto?</button>
+            <span class="sep">·</span>
+            <button>Contactar soporte</button>
+          </div>
+          <div class="step-footer">
+            Si tu empresa filtra correos, agrega <strong>eventos@eventos.app</strong> a tu whitelist.
+          </div>
+        </div>
+
+        <!-- Step Password -->
+        <div class="form-step password">
+          <div class="step-header">
+            <h1 class="display">Tu contrasena</h1>
+            <p>Si configuraste contrasena, ingresala. Si no, vuelve a intentar el link.</p>
+          </div>
+          <div class="email-pill">
+            <span class="label">Email</span>
+            <span class="value">tu@empresa.com</span>
+            <button onclick="setStep('email')">Cambiar</button>
+          </div>
+          <div class="field">
+            <span class="field-label">Contrasena</span>
+            <input class="input" type="password" placeholder="Tu contrasena" autocomplete="current-password">
+          </div>
+          <button class="btn-primary">Iniciar sesion</button>
+          <div class="sent-actions-inline">
+            <button onclick="setStep('sent')">Volver al link</button>
+            <span class="sep">·</span>
+            <button>Olvide mi contrasena</button>
+          </div>
+        </div>
+
+        <!-- Step Verifying -->
+        <div class="form-step verifying">
+          <div class="verifying-content">
+            <div class="spinner"></div>
+            <div style="text-align: center;">
+              <h1 class="display" style="font-size: 20px; margin-bottom: 4px;">Validando tu link</h1>
+              <p style="color: var(--text-secondary); font-size: 13px;">Estamos preparando tu acceso…</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const root = document.documentElement;
+  const ariaLive = document.getElementById('ariaLive');
+
+  // Toolbar handlers
+  document.querySelectorAll('.toolbar button[data-action]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.action;
+      const value = btn.dataset.value;
+      root.setAttribute(`data-${action}`, value);
+      document.querySelectorAll(`.toolbar button[data-action="${action}"]`).forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      // ARIA announcement on step change
+      if (action === 'step') {
+        const announcements = {
+          email: 'Pantalla de inicio de sesion',
+          sent: 'Link enviado a tu correo, revisa tu bandeja',
+          password: 'Ingresa tu contrasena',
+          verifying: 'Validando tu link de acceso',
+        };
+        ariaLive.textContent = announcements[value] || '';
+      }
+    });
+  });
+
+  function setStep(step) {
+    root.setAttribute('data-step', step);
+    document.querySelectorAll('.toolbar button[data-action="step"]').forEach((b) => b.classList.remove('active'));
+    document.querySelector(`.toolbar button[data-action="step"][data-value="${step}"]`)?.classList.add('active');
+    if (step === 'verifying') setTimeout(() => setStep('email'), 2500);
+  }
+
+  const emailInput = document.getElementById('emailInput');
+
+  // Cached: prefill email
+  function applyCached() {
+    if (root.dataset.cached === 'on') {
+      emailInput.value = 'kamilo@bancolombia.com';
+    } else {
+      emailInput.value = '';
+    }
+  }
+  document.querySelectorAll('.toolbar button[data-action="cached"]').forEach((btn) => {
+    btn.addEventListener('click', () => setTimeout(applyCached, 50));
+  });
+
+  // Typo detection (simulado mailcheck.js)
+  const typoHint = document.getElementById('typoHint');
+  const typoSuggest = document.getElementById('typoSuggest');
+  const commonTypos = {
+    'gmail.con': 'gmail.com',
+    'gmial.com': 'gmail.com',
+    'hotmial.com': 'hotmail.com',
+    'yaho.com': 'yahoo.com',
+    'outlok.com': 'outlook.com',
+  };
+  emailInput.addEventListener('input', () => {
+    const val = emailInput.value;
+    const at = val.lastIndexOf('@');
+    if (at < 0) { typoHint.classList.remove('show'); return; }
+    const domain = val.slice(at + 1).toLowerCase();
+    if (commonTypos[domain]) {
+      const suggested = val.slice(0, at + 1) + commonTypos[domain];
+      typoSuggest.textContent = suggested;
+      typoSuggest.dataset.value = suggested;
+      typoHint.classList.add('show');
+    } else {
+      typoHint.classList.remove('show');
+    }
+  });
+  typoSuggest.addEventListener('click', () => {
+    emailInput.value = typoSuggest.dataset.value || typoSuggest.textContent;
+    typoHint.classList.remove('show');
+  });
+
+  // Slideshow auto-rotate
+  const slides = document.querySelectorAll('.slide');
+  const indicators = document.querySelectorAll('.slide-indicators .ind');
+  let current = 0;
+  function goToSlide(idx) {
+    slides[current].classList.remove('active');
+    indicators[current].classList.remove('active');
+    current = idx % slides.length;
+    slides[current].classList.add('active');
+    indicators[current].classList.add('active');
+  }
+  setInterval(() => goToSlide(current + 1), 5000);
+  indicators.forEach((dot, idx) => dot.addEventListener('click', () => goToSlide(idx)));
+
+  // Live pulse counter
+  const liveCount = document.getElementById('liveCount');
+  setInterval(() => {
+    const cur = parseInt(liveCount.textContent);
+    const change = Math.random() > 0.5 ? 1 : -1;
+    const next = Math.max(200, Math.min(300, cur + change * Math.floor(Math.random() * 3)));
+    liveCount.textContent = next;
+  }, 3000);
+
+  // Resend countdown
+  let secondsLeft = 150;
+  setInterval(() => {
+    if (secondsLeft <= 0) { secondsLeft = 150; return; }
+    secondsLeft--;
+    const m = Math.floor(secondsLeft / 60);
+    const s = String(secondsLeft % 60).padStart(2, '0');
+    const el = document.getElementById('resendTimer');
+    if (el) el.textContent = `${m}:${s}`;
+  }, 1000);
+
+  // Init: set step focus
+  setTimeout(() => emailInput.focus(), 100);
+</script>
+</body>
+</html>
