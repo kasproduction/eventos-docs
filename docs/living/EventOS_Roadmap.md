@@ -1,7 +1,7 @@
 # EventOS — Roadmap
 
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
-_Actualizado: 2026-05-01 | v5.2 — Webapp planeacion completa (18 modulos) + repo reorganizado_
+_Actualizado: 2026-05-02 | v5.3 — Webapp W.1 F0-F3 cerradas + login design phase aprobado v7 + bloqueo F4-F9 hasta backend_
 
 ---
 
@@ -26,7 +26,7 @@ _Actualizado: 2026-05-01 | v5.2 — Webapp planeacion completa (18 modulos) + re
 | **Optimistic UI** | ✅ Audit | 30 acciones auditadas, 10 con optimistic, haptics, retry API. Plan listo |
 | **QA** | ✅ | 150+ endpoints, 20 modulos, 582+ tests backend, 1664+ assertions |
 | **Deploy** | ⏳ | Docker + DO sao1 + CI/CD. Arquitectura HA definida |
-| **Fase 2** — Web app | 📐 Planeacion completa | 18 modulos W.0-W.17, ~132h estimado, 23 docs en `docs/webapp/`. Ejecucion arranca por W.1 (Setup+Auth) |
+| **Fase 2** — Web app | 🚧 W.1 F0-F3 cerradas (4.5h) | F4-F9 diseno aprobado v7, bloqueadas hasta backend (W.1B sesion siguiente, ~4h). Repo `eventos-web` en GitHub local con Next 16 + Tailwind 4 + i18n + tokens Lumina Noir/Lux + shadcn |
 | **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion |
 
 **Que falta:** ver `docs/living/PENDIENTES.md`
@@ -130,7 +130,7 @@ _Actualizado: 2026-05-01 | v5.2 — Webapp planeacion completa (18 modulos) + re
 
 | Documento | Razon |
 |-----------|-------|
-| `docs/archive/ROADMAP-HISTORICO-v3.1.md` | Reemplazado por v5.2 (este doc) |
+| `docs/archive/ROADMAP-HISTORICO-v3.1.md` | Reemplazado por v5.3 (este doc) |
 | `docs/archive/WEB-APP-PLAN.md` | Stub legacy → redirige a `docs/webapp/PLAN.md` |
 
 ---
@@ -794,7 +794,7 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 | Mes | Objetivo | Entregable |
 |-----|----------|------------|
 | **Abril** (hecho) | Diferenciadores + audit + Recap + Data Center + Filament BUG-268 + planeacion webapp | Live Moments, Event Pulse, Concurso Fotos, Golden Ticket, Optimistic UI audit, Kiosk, Room Check-in, Webhooks, Mission Control v4, Recap v6 disenio aprobado, Data Center 9 tabs/44 exports, BUG-268 cerrado, planeacion webapp 18 modulos. 582+ tests |
-| **Mayo** | Webapp cimientos + core | W.1 (Setup+Auth+magic link) + W.0 (Spatial UI) + W.2 Home + W.3 Agenda + W.4 Streaming. Deploy staging DO sao1. ~46h de las 132h |
+| **Mayo** | Webapp cimientos + core | **W.1 F0-F3 cerradas** (scaffold + tokens + shadcn + i18n, 4.5h, repo `eventos-web`). **W.1B backend** (~4h: magic-link endpoints + `event_login_slides` tabla + Mailable + Pest). **W.1 F4-F9** webapp (~5.5h: login slideshow v7 aprobado + Tier 1+2 mejoras + bottom sheet adaptativo). Despues W.0 Spatial + W.2 Home + W.3 Agenda + W.4 Streaming. Deploy staging DO sao1 |
 | **Junio** | Webapp completa + stress test | W.5-W.17 (resto de modulos) + W.12 Polish + PWA. Stress test 10K (9 tests). Optimistic UI chat. ~86h restantes |
 | **Julio** | Demo Bancolombia + pitch Eventos Efectivos | Producto desplegado web + app. Dry run 1 con cliente |
 | **Agosto** | Onboarding clientes + fixes | Dry run 2. Fix rondas. Freeze semana -2 |
@@ -817,8 +817,9 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 
 ---
 
-_EventOS Roadmap v5.2 — Kasproduction_
-_1 mayo 2026_
+_EventOS Roadmap v5.3 — Kasproduction_
+_2 mayo 2026_
+_Cambios v5.2→v5.3 (2026-05-02): Webapp W.1 F0-F3 cerradas en repo `eventos-web` (Next 16 + Tailwind 4 + TS strict + tokens Lumina Noir/Lux portados + shadcn 2.x + i18n next-intl 3 locales + bottom sheet adaptativo). Login design phase completo (7 iteraciones HTML demo, v7 final aprobado en `design/features/webapp/Login/iteraciones/`). ADR-021 login slideshow feature nuevo (NO event_highlights), ADR-022 5 innovaciones DaVinci, ADR-023 bloqueo F4-F9 hasta backend, ADR-024 mobile bottom sheet + Tier 1+2 (12 mejoras: cached email, mailcheck, ARIA live, doble logo organizador, video slot, accent dinamico extendido, network banner, preload). Roadmap nuevo `W.1-backend-magic-link.md` (~4h sesion proxima). 4 commits eventos-web (ba2fc24, 811b7dd, e425570, ffd8589) + 7 commits APP EVENTOS docs/design_
 _Cambios v5.1→v5.2: Webapp planeacion completa (18 modulos W.0-W.17, ~132h, 23 docs en `docs/webapp/`), repo reorganizado por categoria (docs/ y design/), Recap v6 disenio aprobado e implementado, BUG-268 Filament searchable cerrado_
 _Cambios v5.0→v5.1 (2026-04-26): Data Center cerrado (9 tabs, 44 exports, SPA standalone), 19 bugs nuevos (BUG-287 a BUG-305), 29 tests Data Center_
 _Cambios v4.5→v5.0 (2026-04-25): Live Moments/Event Pulse/Concurso completados, audit optimistic UI (4 docs), stack DO sao1, stress test v2.1, haptics+retry+bug fix Q&A, 582+ tests_
