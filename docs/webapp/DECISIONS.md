@@ -435,6 +435,65 @@ Si se construye el showcase en W.1 con datos inventados y componentes placeholde
 
 ---
 
+## ADR-026 — F10 UI/UX foundation con 3 tiers (~6.5h) — 2026-05-02 — aceptado
+
+**Decision**: Despues de F8 Sentry y F9 Tests, agregar **Fase 10 UI/UX foundation** dentro de W.1 con 3 tiers (Foundation + Polish + Premium). Total ~6.5h. W.1 pasa de ~9h a ~15.5h pero queda con cimiento UI completo antes de cualquier modulo de feature.
+
+**Razon**: Cada modulo siguiente (W.0 Spatial, W.2 Home, W.3 Agenda, etc.) necesita el mismo sistema de feedback (toasts, validation, skeletons, empty states, error boundaries). Sin F10, cada modulo improvisa su propio patron → inconsistencia + refactor masivo en W.12. Hacerlo en F10 desde el inicio garantiza coherencia y ahorra ~3-4h netas.
+
+Mismo razonamiento que F6 status gating (ADR-024) — base bien antes de modulos.
+
+**Tier A Foundation (~3h) — base critica para todos los modulos**:
+- A1. `LuminaToast` wrapper sobre Sonner: 5 variantes (success/error/info/calendar/favorite) con iconos custom + haptics web (`navigator.vibrate` en Android Chrome)
+- A2. `<FormField />` reutilizable: shadcn Input wrapper + AnimatePresence error + soporta react-hook-form
+- A3. `<EmptyState />`: 4 variantes (not_found/not_yet/error/success) con icon + title + description + CTA
+- A4. Skeleton patterns: `<SkeletonCard/List/Avatar/Text/Grid />` pre-armados con match exact al loaded
+- A5. Refactor F4 + F6 para usar el sistema (LoginForm + PreEventHome)
+- A6. `useOptimistic` helper hook (prepara W.3+ — agenda favorites, social likes, etc.)
+
+**Tier B Polish (~2.5h) — microinteracciones premium**:
+- B1. `<Button />` Framer Motion wrapper con whileTap + whileHover + haptic mobile
+- B2. Focus rings custom con `--accent` dynamic + shadow ring
+- B3. Page transitions con AnimatePresence (login→home, login step→step, home variants switch)
+- B4. Stagger entrance animations (lista items con delay 100ms)
+- B5. `<AnimatedNumber />` ticker (countdown, live count, stats)
+- B6. Smooth scroll global + scrollIntoView programatico
+- B7. Theme transition cross-fade 250ms (no flash)
+- B8. Reduced motion tier — todos los anteriores respetan `useReducedMotionPref`
+- B9. Gradient breathing en hero pre-event (sutil pulse 8s)
+- B10. Scroll trigger con IntersectionObserver — list items entran cuando entran al viewport
+- B11. Haptics en swipe gestures mobile (drag handles, sheet drag)
+
+**Tier C Premium (~1.5h) — diferenciadores enterprise**:
+- C1. `<ErrorBoundary />` con retry button + Sentry report automatic
+- C2. Custom `not-found.tsx` + `error.tsx` + `offline.tsx` Lumina Noir
+- C3. Keyboard shortcuts globales (`useKeyboardShortcut` hook + Esc + `?` help + Cmd+K prep)
+- C4. `<CopyButton />` con clipboard API + animacion check + toast confirmation
+- C5. Connection status pill (online/slow/offline) con latency check `/api/health` cada 30s
+- C6. Save indicators pattern para autosave (futuros forms)
+- C7. `<SubmittingButton />` con disabled + spinner + texto auto-cambia
+- C8. Cross-tab sync (logout en una tab → otras detectan via storage event)
+- C9. Page exit guard (form unsaved → confirm dialog)
+
+**Mejoras DaVinci propuestas + descartadas**:
+- ✅ B9 gradient breathing, B10 scroll trigger, B11 swipe haptics, A6 useOptimistic, C8 cross-tab, C9 exit guard
+- ❌ Confetti / sound effects / magnetic hover / custom cursors — descartado por ser gimmicky para Bancolombia enterprise
+- ⏭️ Idle detection + session warning — Fase 2 (AUTH-SPEC linea 116)
+
+**Alternativas consideradas**:
+- F10 dispersa en cada modulo (W.0+) — descartado, inconsistencia + refactor
+- F10 en W.12 polish al final — descartado, refactor de N modulos al introducir LuminaToast tarde
+- F10 como modulo separado W.1.5 — descartado, mas claro como fase final de W.1
+
+**Consecuencias**:
+- W.1 estimado revisado: ~9h → ~15.5h
+- Total bloqueante webapp: ~135.5h → ~142h (mas robusto)
+- Cero refactor visual en modulos siguientes
+- Login + home variants existentes refactorizan a usar el sistema en F10.A.5
+- Prepara terreno para optimistic UI plan (`docs/analysis/OPTIMISTIC-UI-PLAN.md`)
+
+---
+
 ## Decisiones pendientes / abiertas
 
 Ninguna actualmente.

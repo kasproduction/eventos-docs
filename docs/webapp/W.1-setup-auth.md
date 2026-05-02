@@ -1,4 +1,4 @@
-# W.1 — Setup + Auth + Tour de bienvenida
+da# W.1 — Setup + Auth + Tour de bienvenida
 
 > Cimiento tecnico: scaffold Next.js 15, auth con magic link como flujo principal, layout shell, i18n base, mini tour cinematico al primer login.
 >
@@ -267,6 +267,7 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 ---
 
 ## Fase 9 — Tests (~1h) — 0/5 — DESBLOQUEADA (backend listo)
+> **Despues de F9 viene F10 UI/UX foundation (~6.5h, ADR-026)** — sistema completo de feedback, microinteracciones, error handling. Cierra W.1 con base solida para todos los modulos siguientes.
 
 ### 9.1 Vitest — 0/2
 - [ ] Test `useAuth` hook: login, logout, refresh
@@ -276,6 +277,138 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 - [ ] Happy path magic link: enviar email → recibir en Mailpit → click link → llegar a /home
 - [ ] Edge case: token invalido muestra error correcto
 - [ ] Edge case: rate limit muestra mensaje + countdown
+
+---
+
+## Fase 10 — UI/UX foundation DaVinci (~6.5h) — 0/26 (ADR-026)
+
+> Cimiento de UI/UX para todos los modulos siguientes. Cero modulos siguientes (W.0/W.2+) hasta tener este sistema. Razon: evitar refactor masivo en W.12.
+
+### F10.A — Foundation (~3h) — 0/6
+
+#### A1. LuminaToast wrapper — 0/1
+- [ ] `src/components/ui/lumina-toast.tsx` wrapper sobre Sonner: 5 variantes (success/error/info/calendar/favorite) con iconos lucide custom + colores Lumina + haptics web (`navigator.vibrate(50)` Android Chrome, falla silente iOS web)
+- API: `lumina.success({ message, description?, haptic? })`
+- Reemplaza usos de `toast.*` en LoginForm
+
+#### A2. FormField reutilizable — 0/1
+- [ ] `src/components/ui/form-field.tsx` wrapper sobre shadcn Input
+- Props: `label`, `error`, `hint`, `register` (react-hook-form pattern)
+- AnimatePresence error con icono `AlertCircle` slide-in
+- Border rojo + ring automatic cuando error
+- Refactor LoginForm email + password fields
+
+#### A3. EmptyState — 0/1
+- [ ] `src/components/ui/empty-state.tsx` con 4 variantes:
+  - `not_found` (SearchX) "Sin resultados"
+  - `not_yet` (Clock) "Aun no hay {X}"
+  - `error` (AlertTriangle) "Hubo un error"
+  - `success` (CheckCheck) "Listo"
+- Props: `variant`, `title`, `description?`, `action?` (button)
+
+#### A4. Skeleton patterns — 0/1
+- [ ] 5 componentes pre-armados en `src/components/ui/skeletons.tsx`:
+  - `<SkeletonCard />`, `<SkeletonList count={n} />`, `<SkeletonAvatar />`, `<SkeletonText lines={n} />`, `<SkeletonGrid cols={n} count={n} />`
+- Match exact al loaded state (no genericos)
+
+#### A5. Refactor F4 + F6 — 0/1
+- [ ] LoginForm usa FormField en email + password
+- [ ] LoginForm `toast.*` → `lumina.*`
+- [ ] PreEventHome stats → SkeletonGrid durante loading
+- [ ] LiveHome / EndedHome usan Skeleton durante hydration
+
+#### A6. useOptimistic helper — 0/1
+- [ ] `src/hooks/useOptimisticMutation.ts` wrapper sobre TanStack Query mutate
+- Toggle local instant + revalidate background
+- Rollback automatic en error + lumina.error toast
+- Prepara W.3 favorites, W.6 likes, W.9 passport stamps
+
+### F10.B — Polish (~2.5h) — 0/11
+
+#### B1. Button micro-feedback — 0/1
+- [ ] `<MotionButton />` wrapper sobre shadcn Button con Framer Motion: `whileTap`, `whileHover`, haptic mobile
+
+#### B2. Focus rings dynamic — 0/1
+- [ ] `:focus-visible` con outline 2px solid `--accent` + offset 3px + shadow ring `0 0 0 4px color-mix(--accent, 20%)`
+- Transicion 150ms
+
+#### B3. Page transitions — 0/1
+- [ ] `<PageTransition />` AnimatePresence en root layout
+- Login → home: fade + slide up subtle (300ms spring)
+- Login step → step: horizontal slide spring
+- Home variants switch: fade
+
+#### B4. Stagger entrance — 0/1
+- [ ] `<StaggerList />` componente — items entran con delay 100ms
+- Aplica a EventInfoCard items, listas futuras
+
+#### B5. AnimatedNumber — 0/1
+- [ ] `<AnimatedNumber value={n} />` anima del valor anterior al nuevo (no salta)
+- Aplica a countdown timer, live pulse counter, stats
+
+#### B6. Smooth scroll — 0/1
+- [ ] CSS `scroll-behavior: smooth` global (con `prefers-reduced-motion: reduce` respeto)
+- Helper `scrollIntoView({ behavior: 'smooth', block: 'start' })`
+
+#### B7. Theme transition cross-fade — 0/1
+- [ ] `* { transition: background-color 250ms, color 250ms, border-color 250ms }` global limited
+- Sin flash al togglear Noir ↔ Lux
+
+#### B8. Reduced motion tier — 0/1
+- [ ] B1-B7 respetan `useReducedMotionPref()` — animaciones se vuelven instantaneas
+
+#### B9. Gradient breathing pre-event — 0/1
+- [ ] Hero PreEventHome con animacion gradient sutil pulse 8s (opacity 0.95 → 1.0)
+
+#### B10. Scroll trigger entrance — 0/1
+- [ ] `useInView` IntersectionObserver — list items entran cuando entran al viewport
+- Performance: solo primera vista, no infinite loop
+
+#### B11. Swipe haptics mobile — 0/1
+- [ ] Swipe gestures en sheets / drag handles disparan `navigator.vibrate(30)` Android Chrome
+
+### F10.C — Premium (~1.5h) — 0/9
+
+#### C1. Error boundaries — 0/1
+- [ ] `<ErrorBoundary />` wrapper en `src/components/error-boundary.tsx`
+- Captura errores render + reporta Sentry + UI bonita "Algo salio mal" + retry button
+- Per-route + global
+
+#### C2. 404/500/offline pages custom — 0/1
+- [ ] `app/not-found.tsx` Lumina Noir con icono SearchX + CTA "Volver"
+- [ ] `app/error.tsx` con retry
+- [ ] `app/offline.tsx` con instrucciones reconnect
+
+#### C3. Keyboard shortcuts globales — 0/1
+- [ ] `useKeyboardShortcut` hook
+- Esc cierra modales/overlays
+- `?` muestra help (placeholder)
+- Cmd+K / Ctrl+K reservado para command palette W.0
+
+#### C4. CopyButton — 0/1
+- [ ] `<CopyButton text="..." />` con `navigator.clipboard` + animacion check verde 1s + lumina.success
+
+#### C5. Connection status pill — 0/1
+- [ ] Mejora del NetworkStatusBanner: pill bottom-right con 3 estados (online/slow/offline)
+- Latency check `/api/health` cada 30s
+- Tooltip "Conexion lenta" cuando >500ms
+
+#### C6. Save indicators — 0/1
+- [ ] Pattern reusable "Guardando..." ↔ "Guardado" con check
+- Para futuros forms con autosave
+
+#### C7. SubmittingButton — 0/1
+- [ ] `<SubmittingButton submitting={bool} idle="Enviar" submitting="Enviando..." />` con spinner inline
+
+#### C8. Cross-tab sync — 0/1
+- [ ] Logout en una tab → otras detectan via `storage` event de `localStorage`
+- Aplica a `eventos:lastEmail` cleanup en logout
+
+#### C9. Page exit guard — 0/1
+- [ ] `useExitGuard(isDirty: boolean)` hook
+- `beforeunload` listener con confirm dialog si form esta dirty
+
+**Cierre F10**: typecheck + lint + build verde, smoke test visual del login + home variants en browser real, demos en `design/features/webapp/UI/` (opcional). Sistema listo para que W.0/W.2+ lo consuman desde dia 1.
 
 ---
 
