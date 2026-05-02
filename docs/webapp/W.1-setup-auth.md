@@ -145,25 +145,42 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## Fase 4 — Auth — Magic link (~2.5h) — 0/8
+## **BLOQUEO** — F4-F9 pausadas hasta backend listo (ADR-023)
 
-### 4.1 Endpoint backend nuevos — 0/3
-- [ ] `POST /api/v1/auth/magic-link` (backend, sesion separada o paralela): genera token, envia email
-- [ ] `POST /api/v1/auth/verify-magic-link` (backend): valida token, devuelve Bearer
-- [ ] Tabla `magic_link_tokens` migration + tests Pest
+> **Decision 2026-05-02**: F4-F9 NO se implementan hasta que `W.1-backend-magic-link.md` cierre. Razon: cero mocks, email deliverability validable temprano, Bancolombia compliance end-to-end. Plan revisado:
+>
+> 1. **Sesion backend** ~4h en `eventos-backend` — endpoints + tabla `event_login_slides` + Mailable + Pest tests
+> 2. **Sesion webapp F4-F9** ~5.5h concentrada despues, con backend real
 
-### 4.2 Frontend pages — 0/3
-- [ ] `src/app/(auth)/login/page.tsx` con form email + boton "Enviar link"
-- [ ] `src/app/(auth)/login/MagicLinkSent.tsx` (estado post-envio: "Revisa tu email")
-- [ ] `src/app/(auth)/verify/page.tsx` recibe `?token=XXX` → POST verify → guarda cookie → redirect
+---
 
-### 4.3 Next API routes — 0/2
+## Fase 4 — Auth — Magic link + Login Slideshow (~3h) — 0/12 — **BLOQUEADA**
+
+### 4.1 Backend bloqueante (W.1-backend-magic-link.md) — 0/3
+- [ ] `POST /api/v1/auth/magic-link` (genera token, envia email branded)
+- [ ] `POST /api/v1/auth/verify-magic-link` (valida token, devuelve Bearer)
+- [ ] Tabla `magic_link_tokens` + Pest tests
+
+### 4.2 Backend feature nuevo — Login Slideshow — 0/2
+- [ ] Tabla `event_login_slides` (id, event_id, image_url, label, title, subtitle, sort_order, enabled, starts_at, expires_at, cta_text, cta_url) — ADR-021
+- [ ] `GET /api/v1/events/{slug}/login-slides` endpoint publico + Filament resource
+
+### 4.3 Frontend pages — 0/3
+- [ ] `src/app/[locale]/(auth)/login/page.tsx` con LoginForm + LoginSlideshow split-screen
+- [ ] `src/app/[locale]/(auth)/login/MagicLinkSent.tsx` (estado post-envio + countdown reenvio)
+- [ ] `src/app/[locale]/(auth)/verify/page.tsx` recibe `?token=XXX` → POST verify → guarda cookie → redirect
+
+### 4.4 Componentes login slideshow — 0/2
+- [ ] `LoginSlideshow.tsx` con Ken Burns (zoom 1.0→1.1 cada 5s) + crossfade Framer Motion
+- [ ] `LivePulse.tsx` socket RT "200 conectados ahora" + welcome_message overlay opcional
+
+### 4.5 Next API routes — 0/2
 - [ ] `src/app/api/auth/magic-link/route.ts` proxy POST al backend
 - [ ] `src/app/api/auth/verify/route.ts` proxy POST al backend + setea httpOnly cookie
 
 ---
 
-## Fase 5 — Auth — Email + password fallback (~1h) — 0/4
+## Fase 5 — Auth — Email + password fallback (~1h) — 0/4 — **BLOQUEADA**
 
 ### 5.1 Frontend — 0/2
 - [ ] `LoginForm.tsx` con tabs: "Magic link" (default) | "Contrasena"
@@ -175,7 +192,7 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## Fase 6 — Layout shell + middleware (~1.5h) — 0/6
+## Fase 6 — Layout shell + middleware (~1.5h) — 0/6 — **BLOQUEADA**
 
 ### 6.1 Middleware — 0/2
 - [ ] `src/middleware.ts` valida cookie `auth` en rutas protegidas
@@ -224,7 +241,7 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## Fase 9 — Tests (~1h) — 0/5
+## Fase 9 — Tests (~1h) — 0/5 — **BLOQUEADA**
 
 ### 9.1 Vitest — 0/2
 - [ ] Test `useAuth` hook: login, logout, refresh

@@ -286,9 +286,71 @@
 
 ---
 
+## ADR-021 — Login slideshow es feature NUEVO (NO reutiliza event_highlights) — 2026-05-02 — aceptado
+
+**Decision**: El slideshow del login en webapp es un **feature 100% nuevo**. Tabla nueva `event_login_slides`, modelo nuevo, Filament resource dedicado, endpoint API publico nuevo. **Cero overlap con `event_highlights` existente** (esa tabla era para banners de la app movil, esta sin uso real).
+
+**Razon**: El slideshow del login tiene proposito narrativo distinto a los highlights del home (carousel rotativo en agenda movil). Mezclarlos confunde organizador (no sabe donde aparece cada imagen) y limita evolucion futura. Tabla dedicada permite agregar campos especificos (subtitle, label, cta_text) sin afectar otros usos.
+
+**Schema propuesto `event_login_slides`**:
+- `id`, `event_id` (FK), `image_url`, `label` (texto chico arriba), `title` (display 800), `subtitle` (texto chico abajo)
+- `sort_order`, `enabled`, `starts_at`/`expires_at` (opcional, puede mostrar slide solo en ventana)
+- `cta_text`, `cta_url` (opcional, click-through al registro publico o info)
+
+**Endpoint publico**: `GET /api/v1/events/{slug}/login-slides` (sin auth, devuelve slides activos ordenados, soporta CDN cache 5min)
+
+**Alternativas consideradas**:
+- Reutilizar `event_highlights` con flag `show_in_login` — descartado, mezcla concerns y limita evolucion
+- Storage JSON inline en `events.branding.login_slides` — descartado, no soporta sort, dificulta i18n futuro
+
+**Consecuencias**: Backend nuevo (~1.5h: migration + model + resource Filament + endpoint + tests). Frontend webapp consume y renderiza con Ken Burns + Live Pulse + welcome_message overlay.
+
+---
+
+## ADR-022 — Login innovaciones DaVinci aprobadas — 2026-05-02 — aceptado
+
+**Decision**: La pantalla login NO es un form generico. Implementa 5 elementos diferenciadores:
+
+1. **Split-screen 55/45** desktop (slideshow izquierda + form derecha). Tablet portrait usa el mismo layout colapsado a 1 col con slideshow como header. Mobile usa imagen del slide activo como background full + form encima con scrim glass
+2. **Slideshow Ken Burns** (zoom 1.0→1.1 cada 5s, crossfade Framer Motion) — imagenes vienen de `event_login_slides` ordenadas
+3. **Live Pulse pill** "200 conectados ahora mismo" en zona slideshow — socket RT, actualiza cada 30s
+4. **welcome_message overlay** opcional — si organizador setea `events.branding.welcome_message`, aparece en top-right del slideshow como tarjeta glass "Mensaje del organizador"
+5. **Magic link como protagonista visual** — input email enorme con tipografia Plus Jakarta, boton primary, "Tengo contrasena" expand-collapse abajo (NO tabs paritarias)
+
+**Razon**: Login es la primera impresion del evento para 10K asistentes. Cada elemento tiene proposito:
+- Slideshow + welcome_message = identidad del evento + branding customizable
+- Live Pulse = urgencia + sensacion de comunidad
+- Magic link protagonista = alinea con compliance Bancolombia + tendencia industria
+
+**Validado visualmente**: demo HTML standalone en `design/features/webapp/Login/iteraciones/login-v1-davinci.html` — toggle Noir/Lux + 3 viewports + annotations.
+
+**Pendiente Fase 2** (NO incluido en F4):
+- Background video opcional (slot 1 puede ser MP4 looped)
+- Preview cascade avatars al tipear email (preview de comunidad)
+- Branding accent dinamico aplicado a todos los componentes (parcial en F4, completo en W.12)
+
+---
+
+## ADR-023 — Bloquear F4-F9 webapp hasta backend magic-link listo — 2026-05-02 — aceptado
+
+**Decision**: Pausar W.1 webapp en F3 (cerrado). Sesion siguiente dedicada a **backend magic-link** en `eventos-backend`. Despues sesion concentrada F4-F9 webapp con backend real, **sin mocks**.
+
+**Razon**: F4 con mock backend = ~2-3h de codigo de descarte cuando llegue backend real. Email deliverability + Bancolombia compliance se valida tarde. F5/F6/F7 dependientes de F4 logged-in. Mejor pausar y volver con flujo end-to-end real (Mailpit local desde dia 1).
+
+**Alternativas consideradas**:
+- Frontend con mock + swap despues — descartado (deuda tecnica)
+- F4 limited (solo UI, sin envio) + F5/F6 con cookie hardcoded dev — descartado (no testea integracion)
+
+**Consecuencias**:
+- W.1 Backend roadmap nuevo: `docs/webapp/W.1-backend-magic-link.md` (~3-4h)
+- W.1 Webapp F4-F9 se hace despues en sesion concentrada (~5.5h)
+- Total ~9h vs ~10h del plan original — ahorro real por cero mocks
+
+---
+
 ## Decisiones pendientes / abiertas
 
-Ninguna actualmente. Todas las decisiones de arranque cerradas el 2026-05-01.
+Ninguna actualmente.
 
 Decisiones que se tomaran durante implementacion:
 - **W.0**: posicion final del pill bar (arriba vs abajo) — confirmar con refs visuales nuevas

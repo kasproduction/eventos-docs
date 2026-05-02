@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="es-CO" data-theme="noir" data-viewport="desktop">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login DaVinci v1 — EventOS Webapp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Urbanist:wght@300;400;500;600;700;800&display=swap">
+<style>
+  /* ================== Lumina Noir tokens (default) ================== */
+  :root, [data-theme="noir"] {
+    --bg: #0a0a0a;
+    --bg-elevated: #141414;
+    --bg-sunken: #050505;
+    --surface-low: rgba(255,255,255,0.03);
+    --surface-medium: rgba(255,255,255,0.04);
+    --surface-high: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.06);
+    --border-light: rgba(255,255,255,0.12);
+    --border-strong: rgba(255,255,255,0.18);
+    --text-primary: rgba(255,255,255,0.9);
+    --text-secondary: rgba(255,255,255,0.55);
+    --text-muted: rgba(255,255,255,0.35);
+    --text-label: rgba(255,255,255,0.25);
+    --text-placeholder: rgba(255,255,255,0.2);
+    --text-on-accent: #000;
+    --glass-sheet: rgba(20,20,22,0.55);
+    --gold: #b5a68b;
+    --gold-soft: rgba(181,166,139,0.35);
+    --accent: #ffffff;
+    --accent-text: #000;
+    --shadow-card: none;
+    --pulse-color: #ef4444;
+  }
+  [data-theme="lux"] {
+    --bg: #f6f8fa;
+    --bg-elevated: #ffffff;
+    --bg-sunken: #edf0f3;
+    --surface-low: rgba(0,0,0,0.02);
+    --surface-medium: rgba(0,0,0,0.04);
+    --surface-high: rgba(0,0,0,0.06);
+    --border: rgba(0,0,0,0.08);
+    --border-light: rgba(0,0,0,0.04);
+    --border-strong: rgba(0,0,0,0.14);
+    --text-primary: #1a1b1e;
+    --text-secondary: #4a4b50;
+    --text-muted: #7c7d82;
+    --text-label: #a8a9ae;
+    --text-placeholder: #a8a9ae;
+    --text-on-accent: #fff;
+    --glass-sheet: rgba(255,255,255,0.95);
+    --gold: #8e8170;
+    --accent: #1a1a1a;
+    --accent-text: #fff;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Urbanist', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background 200ms ease, color 200ms ease;
+  }
+  .display { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; letter-spacing: -0.02em; }
+  .mono { font-family: 'Urbanist', system-ui, sans-serif; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; }
+
+  /* ================== Toolbar (demo controls) ================== */
+  .toolbar {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    z-index: 100;
+    display: flex; gap: 8px;
+    background: var(--glass-sheet);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    padding: 6px;
+  }
+  .toolbar button {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font: inherit; font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+  }
+  .toolbar button.active {
+    background: var(--accent);
+    color: var(--accent-text);
+  }
+  .toolbar button:hover:not(.active) { background: var(--surface-high); color: var(--text-primary); }
+  .toolbar .group { display: flex; gap: 2px; padding: 0 6px; border-right: 1px solid var(--border-light); }
+  .toolbar .group:last-child { border-right: none; }
+
+  /* ================== Viewport frame ================== */
+  .viewport-frame {
+    position: fixed; inset: 70px 16px 16px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  [data-viewport="tablet"] .viewport-frame {
+    inset: 70px max(50vw - 384px, 16px) 16px max(50vw - 384px, 16px);
+    max-width: 768px;
+    margin: 0 auto;
+  }
+  [data-viewport="mobile"] .viewport-frame {
+    inset: 70px max(50vw - 200px, 16px) 16px max(50vw - 200px, 16px);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* ================== Login screen ================== */
+  .login {
+    display: grid;
+    grid-template-columns: 55% 45%;
+    height: 100%;
+    width: 100%;
+  }
+  [data-viewport="tablet"] .login,
+  [data-viewport="mobile"] .login { grid-template-columns: 1fr; }
+
+  /* Slideshow side */
+  .slideshow {
+    position: relative;
+    overflow: hidden;
+    background: #000;
+  }
+  [data-viewport="tablet"] .slideshow,
+  [data-viewport="mobile"] .slideshow {
+    position: absolute; inset: 0;
+    z-index: 0;
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 1500ms ease-in-out;
+  }
+  .slide.active { opacity: 1; }
+
+  .slide-bg {
+    position: absolute; inset: 0;
+    transform: scale(1);
+    transition: transform 8000ms ease-out;
+  }
+  .slide.active .slide-bg { transform: scale(1.1); }
+
+  /* Slide gradients (placeholders cinematicos) */
+  .slide-1 .slide-bg {
+    background:
+      radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.4) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.3) 0%, transparent 50%),
+      linear-gradient(180deg, #1e1b4b 0%, #0a0a0a 100%);
+  }
+  .slide-2 .slide-bg {
+    background:
+      radial-gradient(circle at 50% 30%, rgba(245, 158, 11, 0.3) 0%, transparent 60%),
+      radial-gradient(circle at 30% 70%, rgba(217, 119, 6, 0.4) 0%, transparent 50%),
+      linear-gradient(180deg, #451a03 0%, #0a0a0a 100%);
+  }
+  .slide-3 .slide-bg {
+    background:
+      radial-gradient(circle at 70% 50%, rgba(20, 184, 166, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.25) 0%, transparent 50%),
+      linear-gradient(180deg, #134e4a 0%, #0a0a0a 100%);
+  }
+  .slide-4 .slide-bg {
+    background:
+      radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.3) 0%, transparent 60%),
+      radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.4) 0%, transparent 50%),
+      linear-gradient(180deg, #4a044e 0%, #0a0a0a 100%);
+  }
+
+  /* Texture grain overlay para realismo */
+  .slide-bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      repeating-radial-gradient(circle at 0 0, transparent 0, rgba(255,255,255,0.015) 1px, transparent 2px);
+    opacity: 0.6;
+    mix-blend-mode: overlay;
+  }
+
+  .slide-scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.7) 100%);
+  }
+
+  .slide-content {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 48px;
+    color: #fff;
+  }
+  [data-viewport="mobile"] .slide-content { padding: 24px; }
+
+  .slide-content .label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 12px;
+  }
+  .slide-content h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 48px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin-bottom: 12px;
+    max-width: 480px;
+  }
+  [data-viewport="tablet"] .slide-content h2 { font-size: 36px; }
+  [data-viewport="mobile"] .slide-content h2 { font-size: 28px; }
+
+  .slide-content p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.75);
+    max-width: 460px;
+  }
+
+  /* Logo evento (top-left zona slideshow) */
+  .event-logo {
+    position: absolute; top: 32px; left: 32px;
+    display: flex; align-items: center; gap: 10px;
+    color: #fff;
+    z-index: 10;
+  }
+  .event-logo .mark {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #fff 0%, #d4d4d8 100%);
+    display: grid; place-items: center;
+    color: #000;
+    font-weight: 800;
+    font-size: 16px;
+  }
+  .event-logo .name {
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  /* Live pulse pill (zona slideshow) */
+  .live-pulse {
+    position: absolute; bottom: 32px; right: 32px;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(20,20,22,0.55);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    padding: 8px 14px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 10;
+  }
+  .live-pulse .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--pulse-color);
+    box-shadow: 0 0 0 0 rgba(239,68,68,0.7);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  }
+
+  /* Slideshow indicators (dots) */
+  .slide-indicators {
+    position: absolute; bottom: 32px; left: 48px;
+    display: flex; gap: 8px;
+    z-index: 10;
+  }
+  [data-viewport="mobile"] .slide-indicators { left: 24px; bottom: 24px; }
+  .slide-indicators .dot {
+    width: 24px; height: 3px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 200ms ease;
+  }
+  .slide-indicators .dot.active { background: #fff; width: 32px; }
+
+  /* ================== Form side ================== */
+  .form-side {
+    position: relative;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    padding: 48px;
+    overflow: auto;
+  }
+  [data-viewport="tablet"] .form-side,
+  [data-viewport="mobile"] .form-side {
+    background: transparent;
+    z-index: 1;
+  }
+  [data-viewport="mobile"] .form-side { padding: 24px; }
+
+  /* Mobile/tablet: glass scrim sobre slideshow */
+  [data-viewport="tablet"] .form-side::before,
+  [data-viewport="mobile"] .form-side::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(10,10,10,0.55);
+    backdrop-filter: blur(8px);
+    z-index: -1;
+  }
+  [data-theme="lux"][data-viewport="tablet"] .form-side::before,
+  [data-theme="lux"][data-viewport="mobile"] .form-side::before {
+    background: rgba(246,248,250,0.85);
+  }
+
+  .form-card {
+    width: 100%;
+    max-width: 420px;
+    display: flex; flex-direction: column; gap: 28px;
+  }
+
+  .form-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 40px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+  }
+  [data-viewport="tablet"] .form-header h1 { font-size: 32px; }
+  [data-viewport="mobile"] .form-header h1 { font-size: 28px; }
+
+  .form-header p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+
+  /* Email input enorme tipografia display */
+  .email-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--border-light);
+    padding: 16px 0;
+    color: var(--text-primary);
+    font-family: 'Urbanist', sans-serif;
+    font-size: 22px;
+    font-weight: 500;
+    transition: border-color 200ms ease;
+  }
+  .email-input::placeholder { color: var(--text-placeholder); font-weight: 400; }
+  .email-input:focus { outline: none; border-bottom-color: var(--accent); }
+  [data-viewport="mobile"] .email-input { font-size: 18px; }
+
+  .email-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    margin-bottom: 4px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    height: 56px;
+    background: var(--accent);
+    color: var(--accent-text);
+    border: none;
+    border-radius: 16px;
+    font-family: 'Urbanist', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 200ms ease;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .submit-btn:hover { transform: translateY(-1px); }
+  .submit-btn:active { transform: translateY(0); }
+
+  .password-toggle {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+    padding: 8px;
+    transition: color 150ms;
+  }
+  .password-toggle:hover { color: var(--text-primary); }
+  .password-toggle .arrow { display: inline-block; margin-left: 4px; transition: transform 200ms ease; }
+  .password-toggle.expanded .arrow { transform: rotate(180deg); }
+
+  /* Password section (collapsed by default) */
+  .password-section {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .password-section.expanded { max-height: 200px; }
+  .password-input-wrap { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+  .password-input {
+    width: 100%;
+    height: 48px;
+    background: var(--surface-medium);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    padding: 0 14px;
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 150ms;
+  }
+  .password-input::placeholder { color: var(--text-placeholder); }
+  .password-input:focus { outline: none; border-color: var(--border-strong); }
+
+  .form-footer {
+    display: flex; flex-direction: column; gap: 16px;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .form-footer a { color: var(--text-secondary); text-decoration: none; }
+  .form-footer a:hover { color: var(--text-primary); }
+
+  /* Welcome message overlay (top of slideshow) */
+  .welcome-msg {
+    position: absolute; top: 32px; right: 32px;
+    background: rgba(20,20,22,0.55);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #fff;
+    font-size: 13px;
+    max-width: 280px;
+    z-index: 10;
+  }
+  .welcome-msg .from {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 2px;
+  }
+  [data-viewport="mobile"] .welcome-msg { display: none; }
+
+  /* Annotations (visible solo en demo, toggle) */
+  .annotation {
+    position: absolute;
+    pointer-events: none;
+    z-index: 50;
+    background: rgba(255,107,107,0.95);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(255,107,107,0.35);
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  [data-annotations="on"] .annotation { opacity: 1; }
+  .annotation::after {
+    content: '';
+    position: absolute;
+    width: 8px; height: 8px;
+    background: rgba(255,107,107,0.95);
+    transform: rotate(45deg);
+  }
+  .annotation.right::after { left: -4px; top: 50%; margin-top: -4px; }
+  .annotation.left::after { right: -4px; top: 50%; margin-top: -4px; }
+  .annotation.bottom::after { left: 50%; top: -4px; margin-left: -4px; }
+  .annotation.top::after { left: 50%; bottom: -4px; margin-left: -4px; }
+
+  /* Hide elements per viewport */
+  [data-viewport="mobile"] .welcome-msg,
+  [data-viewport="mobile"] .live-pulse { display: none; }
+  [data-viewport="tablet"] .welcome-msg { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="group">
+    <button data-action="theme" data-value="noir" class="active">Noir</button>
+    <button data-action="theme" data-value="lux">Lux</button>
+  </div>
+  <div class="group">
+    <button data-action="viewport" data-value="desktop" class="active">Desktop</button>
+    <button data-action="viewport" data-value="tablet">Tablet</button>
+    <button data-action="viewport" data-value="mobile">Mobile</button>
+  </div>
+  <div class="group">
+    <button data-action="annotations" data-value="off" class="active">Notes off</button>
+    <button data-action="annotations" data-value="on">Notes on</button>
+  </div>
+</div>
+
+<div class="viewport-frame">
+  <div class="login">
+    <!-- Slideshow side -->
+    <div class="slideshow">
+      <div class="slide slide-1 active">
+        <div class="slide-bg"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-content">
+          <div class="label">Bienvenido</div>
+          <h2 class="display">Bogota recibe a los lideres del cambio</h2>
+          <p>20 y 21 de septiembre · Movistar Arena</p>
+        </div>
+      </div>
+      <div class="slide slide-2">
+        <div class="slide-bg"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-content">
+          <div class="label">Speakers</div>
+          <h2 class="display">Voces que estan moviendo la industria</h2>
+          <p>20 lideres internacionales comparten su vision en tres dias</p>
+        </div>
+      </div>
+      <div class="slide slide-3">
+        <div class="slide-bg"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-content">
+          <div class="label">Networking</div>
+          <h2 class="display">Conexiones que duran mas alla del evento</h2>
+          <p>Match inteligente con asistentes que comparten tus intereses</p>
+        </div>
+      </div>
+      <div class="slide slide-4">
+        <div class="slide-bg"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-content">
+          <div class="label">Tu lugar te espera</div>
+          <h2 class="display">Falta poco para abrir las puertas</h2>
+          <p>Ingresa con tu email y te enviamos el link de acceso</p>
+        </div>
+      </div>
+
+      <!-- Logo del evento (top-left) -->
+      <div class="event-logo">
+        <div class="mark">B</div>
+        <div class="name">Bancolombia Summit 2026</div>
+      </div>
+
+      <!-- Welcome message (top-right) — opcional, viene del backend -->
+      <div class="welcome-msg">
+        <div class="from">Mensaje del organizador</div>
+        Te esperamos. Tu lugar ya esta confirmado.
+      </div>
+
+      <!-- Indicators -->
+      <div class="slide-indicators">
+        <span class="dot active" data-slide="0"></span>
+        <span class="dot" data-slide="1"></span>
+        <span class="dot" data-slide="2"></span>
+        <span class="dot" data-slide="3"></span>
+      </div>
+
+      <!-- Live pulse (bottom-right) -->
+      <div class="live-pulse">
+        <span class="dot"></span>
+        <span><b id="liveCount">247</b> conectados ahora</span>
+      </div>
+
+      <!-- Annotations (toggle Notes on) -->
+      <div class="annotation top" style="top: 90px; left: 32px;">Logo evento — branding.logo_url</div>
+      <div class="annotation bottom" style="top: 90px; right: 32px;">welcome_message backend opcional</div>
+      <div class="annotation top" style="bottom: 60px; right: 32px;">Live Pulse — socket RT</div>
+      <div class="annotation bottom" style="bottom: 60px; left: 60px;">Slideshow Ken Burns 5s/slide</div>
+      <div class="annotation right" style="top: 50%; left: 30%; transform: translateY(-50%);">event_login_slides (feature nuevo)</div>
+    </div>
+
+    <!-- Form side -->
+    <div class="form-side">
+      <div class="form-card">
+        <div class="form-header">
+          <h1>Iniciar sesion</h1>
+          <p>Accede a tu evento con tu email. Te enviamos un link de acceso, sin contrasena.</p>
+        </div>
+
+        <div>
+          <span class="email-label">Email</span>
+          <input class="email-input" type="email" placeholder="tu@empresa.com" autocomplete="email">
+        </div>
+
+        <button class="submit-btn">
+          Enviarme link de acceso
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+
+        <button class="password-toggle" id="pwToggle">
+          Tengo contrasena
+          <span class="arrow">▼</span>
+        </button>
+
+        <div class="password-section" id="pwSection">
+          <div class="password-input-wrap">
+            <input class="password-input" type="password" placeholder="Tu contrasena">
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <a href="#">Soporte 24/7</a>
+          <span style="opacity: 0.4">EventOS · 3 idiomas · accesibilidad WCAG AA</span>
+        </div>
+      </div>
+
+      <!-- Annotations form side -->
+      <div class="annotation right" style="top: 50%; left: 0; transform: translateY(-50%);">Magic link primero (Linear, Cal.com, Vercel pattern)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const root = document.documentElement;
+
+  // Toolbar handlers
+  document.querySelectorAll('.toolbar button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.action;
+      const value = btn.dataset.value;
+      // Update root attribute
+      root.setAttribute(`data-${action}`, value);
+      // Update active state in same group
+      document.querySelectorAll(`.toolbar button[data-action="${action}"]`).forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Password toggle
+  const pwToggle = document.getElementById('pwToggle');
+  const pwSection = document.getElementById('pwSection');
+  pwToggle.addEventListener('click', () => {
+    pwToggle.classList.toggle('expanded');
+    pwSection.classList.toggle('expanded');
+  });
+
+  // Slideshow auto-rotate
+  const slides = document.querySelectorAll('.slide');
+  const indicators = document.querySelectorAll('.slide-indicators .dot');
+  let current = 0;
+
+  function goToSlide(idx) {
+    slides[current].classList.remove('active');
+    indicators[current].classList.remove('active');
+    current = idx % slides.length;
+    slides[current].classList.add('active');
+    indicators[current].classList.add('active');
+  }
+
+  setInterval(() => goToSlide(current + 1), 5000);
+
+  indicators.forEach((dot, idx) => {
+    dot.addEventListener('click', () => goToSlide(idx));
+  });
+
+  // Live pulse counter (mock RT — se mueve sutil cada 3s)
+  const liveCount = document.getElementById('liveCount');
+  setInterval(() => {
+    const current = parseInt(liveCount.textContent);
+    const change = Math.random() > 0.5 ? 1 : -1;
+    const next = Math.max(200, Math.min(300, current + change * Math.floor(Math.random() * 3)));
+    liveCount.textContent = next;
+  }, 3000);
+</script>
+</body>
+</html>

@@ -88,7 +88,8 @@ Lumina Noir solido (no glass de entorno real). Paneles con bordes sutiles + opac
 | Modulo | Roadmap | Detalle | Horas |
 |---|---|---|---|
 | W.0 | `W.0-spatial-ui.md` | PanelManager, PillBar, presets, command palette, drag | ~12h |
-| W.1 | `W.1-setup-auth.md` | Next.js setup + magic link + email/password + i18n + tour | ~10h |
+| W.1 | `W.1-setup-auth.md` | Next.js setup + magic link + email/password + i18n + tour + login slideshow (event_login_slides) | ~10h |
+| W.1B | `W.1-backend-magic-link.md` | **Sesion backend separada bloqueante** — endpoints magic link + tabla event_login_slides + Filament resource + Mailable | ~4h |
 | W.2 | `W.2-home.md` | Hero, countdown, happening now, GamificationHud, recap banner, anuncios mini, sponsors preview, module menu, post-event survey, EventArchive | ~9h |
 | W.3 | `W.3-agenda.md` | Lista, filtros, favoritos, detalle, lifecycle states, conflictos, room-checkin, .ics, ratings post-sesion, recordatorios, session chat | ~11h |
 | W.4 | `W.4-streaming.md` | Vimeo + Q&A + chat + polls + Trivia Kahoot + anuncios in-stream + replay | ~14h |
@@ -209,6 +210,23 @@ Bancolombia podria querer embeber la webapp en su intranet via iframe. Decision 
 - **Hooks adaptados**: `useAgenda`, `useSpeakers`, etc. de la app movil se RE-implementan con TanStack Query web (mismo endpoint, distinta libreria de fetch)
 - **Endpoints existentes**: 150+ endpoints validados con app movil. Antes de cada modulo verificar que el endpoint da lo que la web necesita (ej. agenda paginada vs completa). Si requiere ajuste backend, **es bloqueante del modulo** y se planea aparte
 - **i18n keys compartidas**: nombres de claves alineados con la app movil cuando aplique (ej. `agenda.no_sessions` igual en ambos repos)
+
+---
+
+## Login con identidad visual del evento (feature nuevo)
+
+La pantalla `/login` NO es un form generico. Implementa identidad visual del evento via **slideshow customizable desde Filament**. Tabla nueva `event_login_slides` (NO reutiliza `event_highlights` que era para banners de la app movil sin uso real).
+
+**Innovaciones aprobadas (ADR-022)**:
+1. Split-screen 55/45 desktop, layout dedicado por viewport (RESPONSIVE-SPEC)
+2. Slideshow Ken Burns con crossfade entre slides (~5s c/u)
+3. Live Pulse RT "200 conectados ahora" via socket
+4. welcome_message overlay opcional (`events.branding.welcome_message`)
+5. Magic link como protagonista visual (no tabs paritarias)
+
+**Backend bloqueante** (ADR-023): Login slideshow + endpoints magic link se hacen en sesion separada `W.1-backend-magic-link.md` antes de F4. Cero mocks.
+
+**Demo aprobado**: `design/features/webapp/Login/iteraciones/login-v1-davinci.html` (Lumina Noir + Lux + 3 viewports).
 
 ---
 
