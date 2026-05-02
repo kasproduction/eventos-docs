@@ -1,7 +1,7 @@
 # EventOS — Roadmap
 
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
-_Actualizado: 2026-05-02 | v5.4 — W.1B Backend cerrado (magic link + login slides + 10 Pest), F4-F9 webapp DESBLOQUEADAS_
+_Actualizado: 2026-05-02 | v5.5 — W.1 F4+F5 webapp CERRADAS con backend real (login magic link + slideshow + Tier 1+2 + state machine). E2E verificado_
 
 ---
 
@@ -26,7 +26,7 @@ _Actualizado: 2026-05-02 | v5.4 — W.1B Backend cerrado (magic link + login sli
 | **Optimistic UI** | ✅ Audit | 30 acciones auditadas, 10 con optimistic, haptics, retry API. Plan listo |
 | **QA** | ✅ | 150+ endpoints, 20 modulos, 582+ tests backend, 1664+ assertions |
 | **Deploy** | ⏳ | Docker + DO sao1 + CI/CD. Arquitectura HA definida |
-| **Fase 2** — Web app | 🚧 W.1 F0-F3 + W.1B backend cerrados | F4-F9 webapp **DESBLOQUEADAS**. Backend `eventos-backend` branch `feature/magic-link-auth` con magic link endpoints + tabla event_login_slides + Filament + 10 Pest passing (commit ef24003). Webapp Next 16 + Tailwind 4 + i18n + tokens en repo `eventos-web` |
+| **Fase 2** — Web app | 🚧 W.1 F0-F5 + W.1B cerrados (~7.5h reales) | **F4 webapp cerrada con backend real** — login magic link + slideshow Ken Burns + LivePulse + EventStatusPill + state machine 4 steps + Tier 1+2 (12 mejoras). E2E verificado: form → API proxy → Laravel → Mailpit. Pendientes: F6 middleware/layout, F7 welcome tour, F8 Sentry, F9 tests |
 | **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion |
 
 **Que falta:** ver `docs/living/PENDIENTES.md`
@@ -794,7 +794,7 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 | Mes | Objetivo | Entregable |
 |-----|----------|------------|
 | **Abril** (hecho) | Diferenciadores + audit + Recap + Data Center + Filament BUG-268 + planeacion webapp | Live Moments, Event Pulse, Concurso Fotos, Golden Ticket, Optimistic UI audit, Kiosk, Room Check-in, Webhooks, Mission Control v4, Recap v6 disenio aprobado, Data Center 9 tabs/44 exports, BUG-268 cerrado, planeacion webapp 18 modulos. 582+ tests |
-| **Mayo** | Webapp cimientos + core | **W.1 F0-F3 cerradas** (scaffold + tokens + shadcn + i18n, 4.5h, repo `eventos-web`). **W.1B backend** (~4h: magic-link endpoints + `event_login_slides` tabla + Mailable + Pest). **W.1 F4-F9** webapp (~5.5h: login slideshow v7 aprobado + Tier 1+2 mejoras + bottom sheet adaptativo). Despues W.0 Spatial + W.2 Home + W.3 Agenda + W.4 Streaming. Deploy staging DO sao1 |
+| **Mayo** | Webapp cimientos + core | **W.1 F0-F5 + W.1B cerrados** (~7.5h reales: scaffold + tokens + shadcn + i18n + login magic link + slideshow + Tier 1+2 + backend complete). Restantes en W.1: F6 middleware (~1.5h), F7 welcome tour (~1.5h), F8 Sentry (~30min), F9 tests Vitest+Playwright (~1h). Despues W.0 Spatial + W.2 Home + W.3 Agenda + W.4 Streaming. Deploy staging DO sao1 |
 | **Junio** | Webapp completa + stress test | W.5-W.17 (resto de modulos) + W.12 Polish + PWA. Stress test 10K (9 tests). Optimistic UI chat. ~86h restantes |
 | **Julio** | Demo Bancolombia + pitch Eventos Efectivos | Producto desplegado web + app. Dry run 1 con cliente |
 | **Agosto** | Onboarding clientes + fixes | Dry run 2. Fix rondas. Freeze semana -2 |
@@ -817,8 +817,9 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 
 ---
 
-_EventOS Roadmap v5.4 — Kasproduction_
+_EventOS Roadmap v5.5 — Kasproduction_
 _2 mayo 2026_
+_Cambios v5.4→v5.5 (2026-05-02c): W.1 F4 + F5 webapp CERRADAS con backend real (sin mocks). Repo `eventos-web` commit 6ce5aec. State machine 4 steps email→sent→password→verifying con animaciones spring + Framer Motion. 8 componentes auth (LoginCard, LoginForm, LoginSlideshow Ken Burns + video slot, LivePulse, EventStatusPill contextual, EventLogo single/doble, TabletRotateOverlay, NetworkStatusBanner). Tier 1 (cached email + welcome back, mailcheck typo, ARIA live, autofocus, microcopy humano i18n, inputmode webauthn). Tier 2 (doble logo, video slot, accent dinamico extendido, network banner, preload via state machine). 4 API routes Next.js (magic-link, verify, login, logout) con proxy a Laravel + httpOnly cookie Sanctum. Mobile bottom sheet adaptativo max-height 78% (no height fijo). E2E verificado: GET /es/login → POST /api/auth/magic-link → backend → email Mailpit. typecheck + lint clean, build 16 paginas + 4 API + middleware_
 _Cambios v5.3→v5.4 (2026-05-02b): W.1B Backend cerrado en branch `feature/magic-link-auth`. Migration magic_link_tokens (TTL 15min, SHA-256, single-use). Endpoints POST /auth/magic-link (anti-enumeration, rate limit 3/hora) + POST /auth/verify-magic-link (codes token_invalid/used/expired). MagicLinkMail extends BaseEventosMail customizable Filament. Login slideshow feature nuevo (ADR-021): tabla event_login_slides + LoginSlideResource (drag reorder, has_overlay_text toggle) + endpoint publico GET /events/{slug}/login-slides cache 5min + Observer invalidation. Endpoint publico GET /events/by-slug/{slug} con live_status computado (upcoming/live_today/live_now/ended). organizer_logo_url + organizer_name campos nuevos en events (Tier 2 #8). 10/10 Pest tests passing. Commits: ef24003 backend + 5d5e25d cleanup Recap pendiente_
 _Cambios v5.2→v5.3 (2026-05-02): Webapp W.1 F0-F3 cerradas en repo `eventos-web` (Next 16 + Tailwind 4 + TS strict + tokens Lumina Noir/Lux portados + shadcn 2.x + i18n next-intl 3 locales + bottom sheet adaptativo). Login design phase completo (7 iteraciones HTML demo, v7 final aprobado en `design/features/webapp/Login/iteraciones/`). ADR-021 login slideshow feature nuevo (NO event_highlights), ADR-022 5 innovaciones DaVinci, ADR-023 bloqueo F4-F9 hasta backend, ADR-024 mobile bottom sheet + Tier 1+2 (12 mejoras: cached email, mailcheck, ARIA live, doble logo organizador, video slot, accent dinamico extendido, network banner, preload). Roadmap nuevo `W.1-backend-magic-link.md` (~4h sesion proxima). 4 commits eventos-web (ba2fc24, 811b7dd, e425570, ffd8589) + 7 commits APP EVENTOS docs/design_
 _Cambios v5.1→v5.2: Webapp planeacion completa (18 modulos W.0-W.17, ~132h, 23 docs en `docs/webapp/`), repo reorganizado por categoria (docs/ y design/), Recap v6 disenio aprobado e implementado, BUG-268 Filament searchable cerrado_

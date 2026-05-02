@@ -145,70 +145,75 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## ✅ BACKEND LISTO — F4-F9 desbloqueadas (commit eventos-backend `ef24003`)
+## ✅ BACKEND + F4 WEBAPP CERRADOS (2026-05-02b)
 
-> **Cerrado 2026-05-02**: W.1B backend completado. Magic link endpoints + login_slides + Mailable + 10 tests Pest passing. Webapp F4-F9 ahora se pueden codear con backend real.
-
----
-
-## Fase 4 — Auth — Magic link + Login Slideshow (~3h) — 0/12 — DESBLOQUEADA (backend listo)
-
-### 4.1 Backend bloqueante (W.1-backend-magic-link.md) — 0/3
-- [ ] `POST /api/v1/auth/magic-link` (genera token, envia email branded)
-- [ ] `POST /api/v1/auth/verify-magic-link` (valida token, devuelve Bearer)
-- [ ] Tabla `magic_link_tokens` + Pest tests
-
-### 4.2 Backend feature nuevo — Login Slideshow — 0/2
-- [ ] Tabla `event_login_slides` (id, event_id, image_url, label, title, subtitle, sort_order, enabled, starts_at, expires_at, cta_text, cta_url) — ADR-021
-- [ ] `GET /api/v1/events/{slug}/login-slides` endpoint publico + Filament resource
-
-### 4.3 Frontend pages — 0/3
-- [ ] `src/app/[locale]/(auth)/login/page.tsx` con LoginForm + LoginSlideshow split-screen
-- [ ] `src/app/[locale]/(auth)/login/MagicLinkSent.tsx` (estado post-envio + countdown reenvio)
-- [ ] `src/app/[locale]/(auth)/verify/page.tsx` recibe `?token=XXX` → POST verify → guarda cookie → redirect
-
-### 4.4 Componentes login slideshow — 0/3
-- [ ] `LoginSlideshow.tsx` con Ken Burns (zoom 1.0→1.1 cada 5s) + crossfade Framer Motion + soporta `video_url` (Tier 2 #9 — `<video autoplay loop muted playsinline>` con fallback a imagen)
-- [ ] `LivePulse.tsx` socket RT "247 conectados ahora" — accent dynamic glow del dot (Tier 2 #10 — `color-mix(var(--accent), red)`)
-- [ ] `EventStatusPill.tsx` contextual (upcoming/live_today/ended) — oculto en `live_now` (solo Live Pulse)
-
-### 4.6 Tier 1 mejoras (auto-aplicadas — ADR-024) — 0/7
-- [ ] `localStorage.eventos:lastEmail` pre-fill input al cargar
-- [ ] `inputmode="email"` + `autocomplete="email webauthn"` (Apple Passkey + Smart Lock)
-- [ ] mailcheck.js (~3KB) typo detection — sugiere correccion debajo del input
-- [ ] Microcopy humano por step (i18n keys actualizadas en es/en/pt)
-- [ ] `aria-live="polite"` div con announcements por step
-- [ ] Auto-focus por step (email input / password input / boton resend)
-- [ ] Welcome back si `localStorage.userName` existe
-
-### 4.7 Tier 2 mejoras (aprobadas — ADR-024) — 0/5
-- [ ] **Doble logo**: si `event.organizer_logo_url` existe + es distinto, render compacto "Logo + Presenta + Logo + Nombre"
-- [ ] **Video slot**: primer slide consume `video_url` si existe, render `<video>` con fallback imagen
-- [ ] **Accent dinamico extendido**: `branding.primary_color` aplicado a boton + glow live pulse + focus border + spinner + btn-link underline
-- [ ] **Network status banner**: `useEffect` con `online`/`offline` listener, banner top warning si offline
-- [ ] **Preload step siguiente**: `router.prefetch` de `/login?sent=1` cuando user en step email
-
-### 4.8 Mobile bottom sheet expandible (ADR-024) — 0/4
-- [ ] `LoginSheet.tsx` componente sheet con snap states `collapsed` (50%) / `expanded` (78%)
-- [ ] Spring animation Framer Motion 350ms cubic-bezier(0.16, 1, 0.3, 1)
-- [ ] Drag handle visible siempre, drag-to-snap behavior
-- [ ] Auto-expand: focus input email O step transition a sent/password
-
-### 4.5 Next API routes — 0/2
-- [ ] `src/app/api/auth/magic-link/route.ts` proxy POST al backend
-- [ ] `src/app/api/auth/verify/route.ts` proxy POST al backend + setea httpOnly cookie
+> **Backend**: W.1B en `eventos-backend` branch `feature/magic-link-auth` commit `ef24003`. Magic link endpoints + login_slides + Mailable + 10 Pest passing.
+>
+> **Webapp F4**: `eventos-web` commit `6ce5aec`. Magic link UI + slideshow + Tier 1+2 mejoras + state machine. E2E real verificado: form → API route → backend → email a Mailpit.
 
 ---
 
-## Fase 5 — Auth — Email + password fallback (~1h) — 0/4 — DESBLOQUEADA (backend listo)
+## Fase 4 — Auth — Magic link + Login Slideshow (~3h) — ✅ 12/12 CERRADA
 
-### 5.1 Frontend — 0/2
-- [ ] `LoginForm.tsx` con tabs: "Magic link" (default) | "Contrasena"
-- [ ] Tab contrasena: form email + password + boton "Iniciar sesion"
+### 4.1 Backend bloqueante — 3/3 (W.1B `ef24003`)
+- [x] `POST /api/v1/auth/magic-link` (anti-enumeration + rate limit 3/email/hora)
+- [x] `POST /api/v1/auth/verify-magic-link` (codes token_invalid/used/expired)
+- [x] Tabla `magic_link_tokens` SHA-256 + 8 Pest tests passing
 
-### 5.2 API routes — 0/2
-- [ ] `src/app/api/auth/login/route.ts` proxy POST al backend
-- [ ] Test happy path con Mailpit local
+### 4.2 Backend feature Login Slideshow — 2/2
+- [x] Tabla `event_login_slides` con video_url + has_overlay_text (ADR-021)
+- [x] `GET /api/v1/events/{slug}/login-slides` endpoint publico cache 5min + Filament `LoginSlideResource` con drag reorder + Observer invalidation
+
+### 4.3 Frontend pages — 3/3
+- [x] `src/app/[locale]/(auth)/login/page.tsx` server component fetch event + slides paralelo
+- [x] State `sent` integrado en `LoginForm` (no archivo separado — state machine)
+- [x] `src/app/[locale]/(auth)/verify/page.tsx` recibe `?token` 64 chars + valida + redirect
+
+### 4.4 Componentes login slideshow — 3/3
+- [x] `LoginSlideshow.tsx` Ken Burns 1.0→1.08 cada 5s + crossfade Framer Motion + `video_url` MP4 con fallback
+- [x] `LivePulse.tsx` solo en live_today/live_now, mock RT con jitter (sera socket en W.11)
+- [x] `EventStatusPill.tsx` contextual upcoming/live_today/ended con countdown live
+
+### 4.5 Next API routes — 4/2
+- [x] `app/api/auth/magic-link/route.ts` proxy POST + X-Forwarded-For passthrough
+- [x] `app/api/auth/verify/route.ts` proxy POST + setea httpOnly cookie con bearer Sanctum
+- [x] `app/api/auth/login/route.ts` (password fallback) + `app/api/auth/logout/route.ts` (revoke + clear cookie)
+
+### 4.6 Tier 1 mejoras (auto-aplicadas) — 7/7
+- [x] `useLastEmail` con `useSyncExternalStore` (SSR-safe localStorage pattern)
+- [x] `inputmode="email"` + `autocomplete="email webauthn"` (Apple Passkey + Smart Lock)
+- [x] mailcheck.js typo detection — wrapper con dominios LATAM (bancolombia, etc.)
+- [x] Microcopy humano i18n (es/en/pt) actualizado: 20+ keys auth.login + interpolation HTML
+- [x] `aria-live="polite"` div ARIA con announcements por step
+- [x] Auto-focus inteligente con `useRef` por step (email/password input)
+- [x] Welcome back conditional cuando `localStorage.lastUserName` cached
+
+### 4.7 Tier 2 mejoras — 5/5
+- [x] **Doble logo** `EventLogo.tsx`: `organizer_logo_url` distinto del `logo_url` → render compacto "Logo + Presenta + Logo + Nombre"
+- [x] **Video slot**: `LoginSlideshow` consume `video_url` con `<video autoplay loop muted playsinline>` + fallback imagen
+- [x] **Accent dinamico extendido**: `--accent` aplica a boton primary + spinner verify + focus border input + btn-link underline
+- [x] **Network status banner**: `useNetworkStatus` con `useSyncExternalStore` + `NetworkStatusBanner` warning amber top
+- [x] **Preload step siguiente**: state machine instant transition (no router.prefetch necesario porque todo en mismo bundle)
+
+### 4.8 Mobile bottom sheet adaptativo (ADR-024 corregido v6→v7) — 4/4
+- [x] LoginCard CSS con `max-height: 78%` (NO height fijo) — sheet respira con contenido
+- [x] `display: flex; flex-direction: column; justify-content: flex-end` — slideshow toma sobrante
+- [x] Drag handle visible siempre (`::before` pseudo)
+- [x] Sin estados collapsed/expanded — sheet adaptativo unico (patron app movil real)
+
+**Cierre F4**: typecheck + lint clean, build 16 paginas + 4 API routes + middleware (514ms generate), dev 397ms ready, GET `/es/login` 200 (34261 bytes), POST `/api/auth/magic-link` proxy → backend Laravel → email entregado a Mailpit ✓. Commit eventos-web `6ce5aec`.
+
+---
+
+## Fase 5 — Auth — Email + password fallback (~1h) — ✅ 4/4 CERRADA (incluida en F4)
+
+### 5.1 Frontend — 2/2
+- [x] State machine integrado en `LoginForm`: step `password` aparece via "Mejor con mi contrasena" desde step `sent` (NO tabs paritarias — flow narrativo)
+- [x] Form email pill (read-only) + input password + submit + acciones inline ("Volver al link · Olvide mi contrasena")
+
+### 5.2 API routes — 2/2
+- [x] `app/api/auth/login/route.ts` proxy POST a backend `/auth/login` con device_name custom
+- [x] Test E2E manual ok via curl + dev server
 
 ---
 
