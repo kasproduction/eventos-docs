@@ -145,16 +145,13 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## **BLOQUEO** — F4-F9 pausadas hasta backend listo (ADR-023)
+## ✅ BACKEND LISTO — F4-F9 desbloqueadas (commit eventos-backend `ef24003`)
 
-> **Decision 2026-05-02**: F4-F9 NO se implementan hasta que `W.1-backend-magic-link.md` cierre. Razon: cero mocks, email deliverability validable temprano, Bancolombia compliance end-to-end. Plan revisado:
->
-> 1. **Sesion backend** ~4h en `eventos-backend` — endpoints + tabla `event_login_slides` + Mailable + Pest tests
-> 2. **Sesion webapp F4-F9** ~5.5h concentrada despues, con backend real
+> **Cerrado 2026-05-02**: W.1B backend completado. Magic link endpoints + login_slides + Mailable + 10 tests Pest passing. Webapp F4-F9 ahora se pueden codear con backend real.
 
 ---
 
-## Fase 4 — Auth — Magic link + Login Slideshow (~3h) — 0/12 — **BLOQUEADA**
+## Fase 4 — Auth — Magic link + Login Slideshow (~3h) — 0/12 — DESBLOQUEADA (backend listo)
 
 ### 4.1 Backend bloqueante (W.1-backend-magic-link.md) — 0/3
 - [ ] `POST /api/v1/auth/magic-link` (genera token, envia email branded)
@@ -203,7 +200,7 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## Fase 5 — Auth — Email + password fallback (~1h) — 0/4 — **BLOQUEADA**
+## Fase 5 — Auth — Email + password fallback (~1h) — 0/4 — DESBLOQUEADA (backend listo)
 
 ### 5.1 Frontend — 0/2
 - [ ] `LoginForm.tsx` con tabs: "Magic link" (default) | "Contrasena"
@@ -215,7 +212,7 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## Fase 6 — Layout shell + middleware (~1.5h) — 0/6 — **BLOQUEADA**
+## Fase 6 — Layout shell + middleware (~1.5h) — 0/6 — DESBLOQUEADA (backend listo)
 
 ### 6.1 Middleware — 0/2
 - [ ] `src/middleware.ts` valida cookie `auth` en rutas protegidas
@@ -264,7 +261,7 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## Fase 9 — Tests (~1h) — 0/5 — **BLOQUEADA**
+## Fase 9 — Tests (~1h) — 0/5 — DESBLOQUEADA (backend listo)
 
 ### 9.1 Vitest — 0/2
 - [ ] Test `useAuth` hook: login, logout, refresh

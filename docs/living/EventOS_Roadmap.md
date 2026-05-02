@@ -1,7 +1,7 @@
 # EventOS — Roadmap
 
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
-_Actualizado: 2026-05-02 | v5.3 — Webapp W.1 F0-F3 cerradas + login design phase aprobado v7 + bloqueo F4-F9 hasta backend_
+_Actualizado: 2026-05-02 | v5.4 — W.1B Backend cerrado (magic link + login slides + 10 Pest), F4-F9 webapp DESBLOQUEADAS_
 
 ---
 
@@ -26,7 +26,7 @@ _Actualizado: 2026-05-02 | v5.3 — Webapp W.1 F0-F3 cerradas + login design pha
 | **Optimistic UI** | ✅ Audit | 30 acciones auditadas, 10 con optimistic, haptics, retry API. Plan listo |
 | **QA** | ✅ | 150+ endpoints, 20 modulos, 582+ tests backend, 1664+ assertions |
 | **Deploy** | ⏳ | Docker + DO sao1 + CI/CD. Arquitectura HA definida |
-| **Fase 2** — Web app | 🚧 W.1 F0-F3 cerradas (4.5h) | F4-F9 diseno aprobado v7, bloqueadas hasta backend (W.1B sesion siguiente, ~4h). Repo `eventos-web` en GitHub local con Next 16 + Tailwind 4 + i18n + tokens Lumina Noir/Lux + shadcn |
+| **Fase 2** — Web app | 🚧 W.1 F0-F3 + W.1B backend cerrados | F4-F9 webapp **DESBLOQUEADAS**. Backend `eventos-backend` branch `feature/magic-link-auth` con magic link endpoints + tabla event_login_slides + Filament + 10 Pest passing (commit ef24003). Webapp Next 16 + Tailwind 4 + i18n + tokens en repo `eventos-web` |
 | **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion |
 
 **Que falta:** ver `docs/living/PENDIENTES.md`
@@ -817,8 +817,9 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 
 ---
 
-_EventOS Roadmap v5.3 — Kasproduction_
+_EventOS Roadmap v5.4 — Kasproduction_
 _2 mayo 2026_
+_Cambios v5.3→v5.4 (2026-05-02b): W.1B Backend cerrado en branch `feature/magic-link-auth`. Migration magic_link_tokens (TTL 15min, SHA-256, single-use). Endpoints POST /auth/magic-link (anti-enumeration, rate limit 3/hora) + POST /auth/verify-magic-link (codes token_invalid/used/expired). MagicLinkMail extends BaseEventosMail customizable Filament. Login slideshow feature nuevo (ADR-021): tabla event_login_slides + LoginSlideResource (drag reorder, has_overlay_text toggle) + endpoint publico GET /events/{slug}/login-slides cache 5min + Observer invalidation. Endpoint publico GET /events/by-slug/{slug} con live_status computado (upcoming/live_today/live_now/ended). organizer_logo_url + organizer_name campos nuevos en events (Tier 2 #8). 10/10 Pest tests passing. Commits: ef24003 backend + 5d5e25d cleanup Recap pendiente_
 _Cambios v5.2→v5.3 (2026-05-02): Webapp W.1 F0-F3 cerradas en repo `eventos-web` (Next 16 + Tailwind 4 + TS strict + tokens Lumina Noir/Lux portados + shadcn 2.x + i18n next-intl 3 locales + bottom sheet adaptativo). Login design phase completo (7 iteraciones HTML demo, v7 final aprobado en `design/features/webapp/Login/iteraciones/`). ADR-021 login slideshow feature nuevo (NO event_highlights), ADR-022 5 innovaciones DaVinci, ADR-023 bloqueo F4-F9 hasta backend, ADR-024 mobile bottom sheet + Tier 1+2 (12 mejoras: cached email, mailcheck, ARIA live, doble logo organizador, video slot, accent dinamico extendido, network banner, preload). Roadmap nuevo `W.1-backend-magic-link.md` (~4h sesion proxima). 4 commits eventos-web (ba2fc24, 811b7dd, e425570, ffd8589) + 7 commits APP EVENTOS docs/design_
 _Cambios v5.1→v5.2: Webapp planeacion completa (18 modulos W.0-W.17, ~132h, 23 docs en `docs/webapp/`), repo reorganizado por categoria (docs/ y design/), Recap v6 disenio aprobado e implementado, BUG-268 Filament searchable cerrado_
 _Cambios v5.0→v5.1 (2026-04-26): Data Center cerrado (9 tabs, 44 exports, SPA standalone), 19 bugs nuevos (BUG-287 a BUG-305), 29 tests Data Center_

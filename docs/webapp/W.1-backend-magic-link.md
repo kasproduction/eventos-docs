@@ -1,10 +1,10 @@
-# W.1 Backend — Magic Link + Login Slideshow
+# W.1 Backend — Magic Link + Login Slideshow ✅ CERRADO
 
 > Sesion backend dedicada en `eventos-backend`. Bloqueante de W.1 webapp F4-F9 (ADR-023).
 >
 > **Estimacion:** ~4h. Solo backend Laravel + Pest. Cero frontend.
 > **Dependencias:** Backend Sanctum ya instalado. Mailpit local para test emails.
-> **Estado:** Pendiente — proxima sesion despues de W.1 F3.
+> **Estado:** ✅ **CERRADO 2026-05-02** — commit `ef24003` en `eventos-backend` branch `feature/magic-link-auth`. 10/10 tests Pest passing.
 
 ---
 
