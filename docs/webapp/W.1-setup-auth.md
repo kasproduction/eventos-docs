@@ -327,92 +327,81 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 **Cierre F10.A**: typecheck + lint clean, build production verde, smoke test `/es/login` HTTP 200. Toast/Form/EventStatusPill validados visualmente por usuario (DaVinci).
 
-### F10.B — Polish (~2.5h) — 0/11
+### F10.B — Polish (~2.5h) — ✅ 10/11 (B11 diferido)
 
-#### B1. Button micro-feedback — 0/1
-- [ ] `<MotionButton />` wrapper sobre shadcn Button con Framer Motion: `whileTap`, `whileHover`, haptic mobile
+#### B1. Button micro-feedback — 1/1 ✅
+- [x] Button shadcn base con `active:translate-y-px active:scale-[0.98]` (CSS solo, sin Framer wrapper). Aplica a TODOS los buttons automaticamente. Haptic web (`navigator.vibrate`) revertido por bug crítico SSR (BUG-308) — queda como pendiente para wrapper opt-in `<HapticButton>` cliente puro
 
-#### B2. Focus rings dynamic — 0/1
-- [ ] `:focus-visible` con outline 2px solid `--accent` + offset 3px + shadow ring `0 0 0 4px color-mix(--accent, 20%)`
-- Transicion 150ms
+#### B2. Focus rings dynamic — 1/1 ✅
+- [x] `:focus-visible` con `outline: 2px solid var(--accent)` + `outline-offset: 3px` + `box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent)` + transition 150ms. NO aplica a inputs/textareas/select (esos tienen su propio focus state via border-bottom variant minimal)
 
-#### B3. Page transitions — 0/1
-- [ ] `<PageTransition />` AnimatePresence en root layout
-- Login → home: fade + slide up subtle (300ms spring)
-- Login step → step: horizontal slide spring
-- Home variants switch: fade
+#### B3. Page transitions — 1/1 ✅
+- [x] `[locale]/template.tsx` con motion.div fade + slide-up 8px (300ms ease) en cada navegacion. Respeta `useReducedMotionPref()`. Login step → step usa AnimatePresence con slide horizontal direccional separado (state machine vive en LoginForm)
+- [x] **Slide horizontal direccional entre steps** del LoginForm: `STEP_ORDER` mapea email/sent/password/verifying. Forward (mas alto) → entra de derecha sale a izquierda. Backward → invertido. Spring damping 25 stiffness 220. Aplicado tambien al ForgotPasswordSheet (form → confirmation)
 
-#### B4. Stagger entrance — 0/1
-- [ ] `<StaggerList />` componente — items entran con delay 100ms
-- Aplica a EventInfoCard items, listas futuras
+#### B4. Stagger entrance — 0/1 ⏳ DIFERIDO
+- [ ] `<StaggerList />` — sin uso aun en login. Aplica cuando W.2 traiga listas reales (sponsors, agenda items)
 
-#### B5. AnimatedNumber — 0/1
-- [ ] `<AnimatedNumber value={n} />` anima del valor anterior al nuevo (no salta)
-- Aplica a countdown timer, live pulse counter, stats
+#### B5. AnimatedNumber — 1/1 ✅ (con caveat)
+- [x] `src/components/ui/animated-number.tsx` con framer `animate()` + `useMotionValue`. Reduced motion → render directo. **NO aplicar a countdown timer** (BUG-313: rebote por interpolacion). Usar solo para deltas grandes (live pulse, stats)
 
-#### B6. Smooth scroll — 0/1
-- [ ] CSS `scroll-behavior: smooth` global (con `prefers-reduced-motion: reduce` respeto)
-- Helper `scrollIntoView({ behavior: 'smooth', block: 'start' })`
+#### B6. Smooth scroll — 1/1 ✅
+- [x] `html { scroll-behavior: smooth }` en globals.css + `data-scroll-behavior="smooth"` para evitar warning Next 16 (BUG-312). Reduced motion media query lo apaga
 
-#### B7. Theme transition cross-fade — 0/1
-- [ ] `* { transition: background-color 250ms, color 250ms, border-color 250ms }` global limited
-- Sin flash al togglear Noir ↔ Lux
+#### B7. Theme transition cross-fade — 1/1 ✅
+- [x] `body { transition: background-color 250ms ease, color 250ms ease }` en globals.css. Sin flash al togglear Noir ↔ Lux
 
-#### B8. Reduced motion tier — 0/1
-- [ ] B1-B7 respetan `useReducedMotionPref()` — animaciones se vuelven instantaneas
+#### B8. Reduced motion tier — 1/1 ✅
+- [x] B1 (CSS), B3 (template + step transitions), B5 (animated number), B6 (scroll-behavior), B7 (transitions) — todos respetan `prefers-reduced-motion` via globals.css media query + hook `useReducedMotionPref()` para JS
 
-#### B9. Gradient breathing pre-event — 0/1
-- [ ] Hero PreEventHome con animacion gradient sutil pulse 8s (opacity 0.95 → 1.0)
+#### B9. Gradient breathing pre-event — 1/1 ✅
+- [x] Hero PreEventHome con `motion-safe:animate-[hero-breath_8s_ease-in-out_infinite]` keyframes (opacity 0.95→1.0 + scale 1→1.03). Radial gradient con accent + gold tinte sutil
 
-#### B10. Scroll trigger entrance — 0/1
-- [ ] `useInView` IntersectionObserver — list items entran cuando entran al viewport
-- Performance: solo primera vista, no infinite loop
+#### B10. Scroll trigger entrance — 1/1 ✅
+- [x] `src/hooks/useInView.ts` con IntersectionObserver. `once: true` por default (perfecto para listas largas sin re-trigger). Devuelve `[ref, inView]`. Sin uso aun (preparado para W.2/W.3)
 
-#### B11. Swipe haptics mobile — 0/1
-- [ ] Swipe gestures en sheets / drag handles disparan `navigator.vibrate(30)` Android Chrome
+#### B11. Swipe haptics mobile — 0/1 ⏳ DIFERIDO
+- [ ] El Dialog de Radix no expone gesture lifecycle hooks facilmente. Mejor en W.X cuando tengamos sheets custom con drag (reorder, swipe-to-dismiss)
 
-### F10.C — Premium (~1.5h) — 0/9
+**Cierre F10.B**: typecheck + lint clean. Build production verde. Slide direccional entre steps validado por usuario en `/es/login` (email → sent → password) y modal forgot password (form → confirmation).
 
-#### C1. Error boundaries — 0/1
-- [ ] `<ErrorBoundary />` wrapper en `src/components/error-boundary.tsx`
-- Captura errores render + reporta Sentry + UI bonita "Algo salio mal" + retry button
-- Per-route + global
+### F10.C — Premium (~1.5h) — ✅ 8/9 (C7 absorbido en B1)
 
-#### C2. 404/500/offline pages custom — 0/1
-- [ ] `app/not-found.tsx` Lumina Noir con icono SearchX + CTA "Volver"
-- [ ] `app/error.tsx` con retry
-- [ ] `app/offline.tsx` con instrucciones reconnect
+#### C1. Error boundaries — 1/1 ✅
+- [x] `src/components/error-boundary.tsx` clase ErrorBoundary global con `getDerivedStateFromError` + `componentDidCatch` + Sentry capture (tags: boundary, route + componentStack). Fallback EmptyState con retry button. Disponible para envolver subtrees especificos (no montado en route por default — el `app/error.tsx` cubre el caso global)
 
-#### C3. Keyboard shortcuts globales — 0/1
-- [ ] `useKeyboardShortcut` hook
-- Esc cierra modales/overlays
-- `?` muestra help (placeholder)
-- Cmd+K / Ctrl+K reservado para command palette W.0
+#### C2. 404/500/offline pages custom — 1/1 ✅
+- [x] `app/not-found.tsx` Lumina con EmptyState variant `not_found` + CTA "Volver al inicio"
+- [x] `app/error.tsx` con captureException Sentry + EmptyState variant `error` + retry button
+- [x] Ambos con `<html lang="es">` + `<body>` propios (BUG-306) y `data-scroll-behavior="smooth"` (BUG-312)
+- [ ] `app/offline.tsx` no creado por ahora — el ConnectionStatusPill (C5) cubre el feedback offline ambient
 
-#### C4. CopyButton — 0/1
-- [ ] `<CopyButton text="..." />` con `navigator.clipboard` + animacion check verde 1s + lumina.success
+#### C3. Keyboard shortcuts globales — 1/1 ✅
+- [x] `src/hooks/useKeyboardShortcut.ts` soporta string simple ("Escape", "?") o combinacion ("Mod+K" donde Mod=Cmd Mac/Ctrl Win), array de shortcuts, opcion `allowInInputs` (default false — no interfiere con escritura). NO aplicado a ningun componente aun (ready para W.0 command palette + sheets futuros)
 
-#### C5. Connection status pill — 0/1
-- [ ] Mejora del NetworkStatusBanner: pill bottom-right con 3 estados (online/slow/offline)
-- Latency check `/api/health` cada 30s
-- Tooltip "Conexion lenta" cuando >500ms
+#### C4. CopyButton — 1/1 ✅
+- [x] `src/components/ui/copy-button.tsx` con clipboard.writeText + animacion check verde 1s + lumina.success. Sin uso aun (ready para W.10 Mi QR + W.7 sponsor profile + cualquier "copiar enlace")
 
-#### C6. Save indicators — 0/1
-- [ ] Pattern reusable "Guardando..." ↔ "Guardado" con check
-- Para futuros forms con autosave
+#### C5. Connection status pill — 1/1 ✅
+- [x] `src/components/support/ConnectionStatusPill.tsx` reemplaza al `NetworkStatusBanner` legacy (eliminado). Pill top-center con slide-down spring + WifiOff color `#FF7351`. Solo cubre online/offline (slow detection diferida — `feedback_no_polling.md` prohibe ping `/api/health`. Pendiente: usar TanStack Query observer para latencia real de fetches existentes)
 
-#### C7. SubmittingButton — 0/1
-- [ ] `<SubmittingButton submitting={bool} idle="Enviar" submitting="Enviando..." />` con spinner inline
+#### C6. Save indicators — 1/1 ✅
+- [x] `src/components/ui/save-indicator.tsx` componente con state machine `idle | saving | saved | error`. Iconos Loader2 (saving), Check verde (saved), AlertCircle rojo (error). AnimatePresence fade slide. Sin uso aun (ready para W.X profile edit, settings, drafts autosave)
 
-#### C8. Cross-tab sync — 0/1
-- [ ] Logout en una tab → otras detectan via `storage` event de `localStorage`
-- Aplica a `eventos:lastEmail` cleanup en logout
+#### C7. SubmittingButton — 1/1 ✅ (absorbido en F10.A submit refactor)
+- [x] No es componente separado — el patron quedo integrado en LoginForm + ForgotPasswordSheet con conditional render `{submitting ? <Loader2 spin /> + t("submitting") : <text + ArrowRight>}`. Usa Button base + Loader2 inline. Replica naturalmente cuando se necesite
 
-#### C9. Page exit guard — 0/1
-- [ ] `useExitGuard(isDirty: boolean)` hook
-- `beforeunload` listener con confirm dialog si form esta dirty
+#### C8. Cross-tab sync — 1/1 ✅
+- [x] `src/hooks/useCrossTabSync.ts` + `broadcastCrossTab()` helper. Listener `storage` event en localStorage. UserMenu logout aplica: cierra sesion en una tab → broadcast `eventos:logout` → otras tabs detectan + redirect /login + clear local state
 
-**Cierre F10**: typecheck + lint + build verde, smoke test visual del login + home variants en browser real, demos en `design/features/webapp/UI/` (opcional). Sistema listo para que W.0/W.2+ lo consuman desde dia 1.
+#### C9. Page exit guard — 1/1 ✅
+- [x] `src/hooks/useExitGuard.ts` con `beforeunload` listener (texto custom NO se respeta desde 2017 por Chrome anti-phishing — solo dialog default browser). Sin uso aun (ready para forms futuros con autosave / draft state)
+
+**Cierre F10.C**: typecheck + lint clean. Build production verde. 404 visible en `/es/asdfasdf` (post-fix BUG-307 + BUG-308 + BUG-310). ConnectionStatusPill validado offline/online en DevTools Network throttle.
+
+---
+
+**Cierre F10 GLOBAL**: 26/28 items entregados (24/26 plan original + 2 extras = `lib/apiErrors.ts` + `apiFetch` Retry-After). Diferidos: B4 StaggerList + B11 swipe haptics + C2 offline page (cubierto por C5). 8 bugs corregidos en sesion auditoria visual con usuario (BUG-306 a BUG-313).
 
 ---
 

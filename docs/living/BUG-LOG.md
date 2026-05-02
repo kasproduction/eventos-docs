@@ -3,6 +3,54 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-05-02 — W.1 webapp F10.B + F10.C + auditoria login (8 bugs)
+
+### BUG-313: AnimatedNumber rebote en countdown timer (RESUELTO)
+- **Severidad:** MEDIA — En PreEventHome el countdown mostraba "dos numeros" parpadeando cada segundo. Visualmente parecia que habia 2 timers
+- **Causa:** AnimatedNumber interpola valores intermedios con framer-motion `animate()`. Pasando de 47→46 atraviesa 46.5, donde `Math.round(46.5)` devuelve 47 mientras el target final es 46 → rebote visual entre los dos numeros
+- **Fix:** Quitado AnimatedNumber del CountdownUnit. Vuelve a `String(value).padStart(2, "0")` directo. AnimatedNumber queda disponible solo para deltas grandes (live pulse 247→251, stats finales) donde la animacion suma valor
+- **Archivo:** `eventos-web/src/components/app/home/PreEventHome.tsx`
+
+### BUG-312: Next 16 scroll-behavior warning (RESUELTO)
+- **Severidad:** BAJA — Console warning "Detected scroll-behavior: smooth on `<html>`. To disable smooth scrolling during route transitions, add data-scroll-behavior=smooth"
+- **Fix:** Agregado `data-scroll-behavior="smooth"` al `<html>` en los 3 layouts (`[locale]/layout.tsx`, `not-found.tsx`, `error.tsx`)
+- **Archivo:** `eventos-web/src/app/[locale]/layout.tsx`, `app/not-found.tsx`, `app/error.tsx`
+
+### BUG-311: 422 backend errors.email[0] no llegaba al toast (RESUELTO)
+- **Severidad:** ALTA — Login con credenciales incorrectas mostraba toast generico "Algo salio mal" en lugar del mensaje real "Credenciales incorrectas. X intentos restantes"
+- **Causa:** Laravel `ValidationException::withMessages(['email' => [...]]` devuelve 422 con `{ message: "The given data was invalid", errors: { email: [...] } }`. El frontend leia solo `payload.message` (ingles generico) y la heuristica `looksLocalized` no lo detectaba como localizado → fallback a generic
+- **Fix:** `getApiErrorMessage` ahora extrae `errors.{field}[0]` antes de fallback. Proxies (`login`, `magic-link`, `forgot-password`) propagan `errors` desde el ApiError.payload al cliente
+- **Archivos:** `eventos-web/src/lib/apiErrors.ts`, `app/api/auth/{login,magic-link,forgot-password}/route.ts`, `components/auth/LoginForm.tsx`, `components/auth/ForgotPasswordSheet.tsx`
+
+### BUG-310: Root layout no importa globals.css (RESUELTO)
+- **Severidad:** ALTA — `app/not-found.tsx` y `app/error.tsx` (root pages) no recibian tokens CSS Lumina porque solo `[locale]/layout.tsx` importaba globals.css
+- **Fix:** Importado `./globals.css` en `app/layout.tsx` (root pass-through). Los pages root-level ahora tienen tokens disponibles
+- **Archivo:** `eventos-web/src/app/layout.tsx`
+
+### BUG-309: fontFamily inline en componentes auth (RESUELTO)
+- **Severidad:** MEDIA — `TabletRotateOverlay.tsx` y `LoginSlideshow.tsx` SlideOverlay h2 usaban `style={{ fontFamily: "var(--font-jakarta)" }}` inline en lugar de la utility `font-display`. Inconsistencia con el resto de componentes ya migrados
+- **Fix:** Reemplazado por `className="font-display"` (que mapea a `--font-jakarta` via `@theme inline` de globals.css)
+- **Archivos:** `eventos-web/src/components/auth/TabletRotateOverlay.tsx`, `components/auth/LoginSlideshow.tsx`
+
+### BUG-308: Button onPointerDown rompe SSR para asChild (RESUELTO)
+- **Severidad:** CRITICA — `not-found.tsx` (server component) renderizaba EmptyState con action.href → Button asChild → `<a>`. Yo habia agregado `onPointerDown={handlePointerDown}` automatico al Button base para haptic mobile. Server components NO pueden pasar event handlers (funciones) como props → Next 16 throw "Event handlers cannot be passed to Client Component props" → 500 en cualquier ruta no encontrada
+- **Causa:** F10.B1 implemente haptic en el Button shadcn base, pero shadcn Button NO tiene "use client" (intencional para usar en server components). La funcion handler que agregue rompio el contrato server-friendly
+- **Fix:** Revertido el haptic del Button base. Solo se conserva el feedback visual via CSS (`active:scale-[0.98]` + `translateY 1px`) que funciona en server o client sin diferencia. Haptic mobile (navigator.vibrate) queda como pendiente para wrapper opt-in `<HapticButton>` cliente puro
+- **Archivo:** `eventos-web/src/components/ui/button.tsx`
+
+### BUG-307: Auth gate middleware bloqueaba la pantalla 404 (RESUELTO)
+- **Severidad:** ALTA — Cualquier ruta inexistente (`/es/asdfasdf`, etc) era interceptada por el middleware proxy.ts y redirigida a `/login` en lugar de mostrar la pantalla 404. El usuario nunca veia el `not-found.tsx` Lumina
+- **Causa:** El middleware tenia auth gate que redirigia TODAS las rutas no publicas a `/login` si no habia cookie auth. Como middleware no sabe si una ruta existe, bloqueaba antes del rendering
+- **Fix:** Movido auth gate al server layout `[locale]/(app)/layout.tsx` (que ya hacia `getCurrentUser()` + `redirect('/login')`). Middleware ahora solo hace routing i18n. Trade-off: requests no autenticadas a rutas protegidas ejecutan el server layout (1 fetch backend) antes de redirect — costo aceptable para la 404 correcta
+- **Archivo:** `eventos-web/src/proxy.ts`
+
+### BUG-306: not-found.tsx y error.tsx faltan html/body tags (RESUELTO)
+- **Severidad:** ALTA — Next 16 reportaba "Missing `<html>` and `<body>` tags in the root layout" cuando se renderizaba la 404 o el error global. Pages root-level (`app/not-found.tsx`, `app/error.tsx`) NO heredan del `[locale]/layout.tsx` que tiene los tags
+- **Fix:** Agregado `<html lang="es">` + `<body className="font-sans antialiased bg-[var(--bg-sunken)]">` propios a ambas pages. Sin i18n (texto fijo) porque puede llegar antes del routing de locale
+- **Archivos:** `eventos-web/src/app/not-found.tsx`, `app/error.tsx`
+
+---
+
 ## 2026-04-26 — Mission Control + Data Center cierre (19 bugs)
 
 ### BUG-305: Ruleta MC muestra resultado antes de fin de animacion (RESUELTO)

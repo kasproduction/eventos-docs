@@ -26,7 +26,7 @@ _Actualizado: 2026-05-02 | v5.8 — ADR-026: F10 UI/UX foundation (~6.5h) agrega
 | **Optimistic UI** | ✅ Audit | 30 acciones auditadas, 10 con optimistic, haptics, retry API. Plan listo |
 | **QA** | ✅ | 150+ endpoints, 20 modulos, 582+ tests backend, 1664+ assertions |
 | **Deploy** | ⏳ | Docker + DO sao1 + CI/CD. Arquitectura HA definida |
-| **Fase 2** — Web app | 🚧 W.1 F0-F6 + F8 + F9 + W.1B cerrados (~12h reales) | **F8 Sentry + F9 tests cerradas** (commits `d615bcf` + `4e8e588`): Sentry frontend con 3 configs + scrub PII + sourcemaps CI; Vitest 22 unit (mailcheck/validators/api) + Playwright 12 E2E (auth-gate/login-form/verify-page) — 34/34 verde. F7 movido a W.X (ADR-025). Pendiente unico para cerrar W.1: **F10 UI/UX foundation** (~6.5h, ADR-026) |
+| **Fase 2** — Web app | 🚧 W.1 COMPLETA (F0-F6 + F8 + F9 + F10 + W.1B) — ~18h reales | **F10 UI/UX foundation cerrada** (~6.5h plan, 26/28 items + 2 extras): F10.A Foundation 6/6 (LuminaToast port app movil, FormField minimal, EmptyState, Skeletons, useOptimisticMutation + extras `lib/apiErrors.ts` mapper i18n + `apiFetch` Retry-After), F10.B Polish 10/11 (button micro-feedback, focus rings dynamic, page transitions con slide direccional entre steps, AnimatedNumber, smooth scroll, theme cross-fade, gradient breathing, useInView), F10.C Premium 8/9 (ErrorBoundary, 404/error pages, useKeyboardShortcut, CopyButton, ConnectionStatusPill, SaveIndicator, useCrossTabSync logout, useExitGuard). Diferidos: B4 StaggerList + B11 swipe haptics + C2 offline page. 8 bugs corregidos auditoria visual usuario (BUG-306 a BUG-313). |
 | **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion |
 
 **Que falta:** ver `docs/living/PENDIENTES.md`
@@ -794,7 +794,7 @@ En produccion: Supervisor (queue:work) + crontab (schedule:run).
 | Mes | Objetivo | Entregable |
 |-----|----------|------------|
 | **Abril** (hecho) | Diferenciadores + audit + Recap + Data Center + Filament BUG-268 + planeacion webapp | Live Moments, Event Pulse, Concurso Fotos, Golden Ticket, Optimistic UI audit, Kiosk, Room Check-in, Webhooks, Mission Control v4, Recap v6 disenio aprobado, Data Center 9 tabs/44 exports, BUG-268 cerrado, planeacion webapp 18 modulos. 582+ tests |
-| **Mayo** | Webapp cimientos + core | **W.1 F0-F6 + F8 + F9 + W.1B cerrados** (~12h reales). Unico restante en W.1: **F10 UI/UX foundation** (~6.5h, ADR-026 — toasts/forms/skeletons/microinteracciones/error boundaries). F7 tour movido a W.X (ADR-025). Despues W.0 Spatial + W.2 Home + W.3 Agenda + W.4 Streaming. Deploy staging DO sao1 |
+| **Mayo** | Webapp cimientos + core | **W.1 COMPLETA** (~18h reales — F0-F6 + F8 + F9 + F10 + W.1B). F7 tour movido a W.X (ADR-025). Auditoria visual login con usuario: 8 bugs corregidos (BUG-306 a BUG-313) + 10 pendientes documentados (CapsLock, welcome-back avatar, etc) para post-F10 polish. Despues W.0 Spatial + W.2 Home + W.3 Agenda + W.4 Streaming. Deploy staging DO sao1 |
 | **Junio** | Webapp completa + stress test | W.5-W.17 (resto de modulos) + W.12 Polish + PWA. Stress test 10K (9 tests). Optimistic UI chat. ~86h restantes |
 | **Julio** | Demo Bancolombia + pitch Eventos Efectivos | Producto desplegado web + app. Dry run 1 con cliente |
 | **Agosto** | Onboarding clientes + fixes | Dry run 2. Fix rondas. Freeze semana -2 |
