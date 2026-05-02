@@ -57,19 +57,32 @@
 
 ---
 
-## Fase 1 — Tokens + fonts + globals (~1.5h) — 0/6
+## Fase 1 — Tokens + fonts + globals (~1.5h) — 6/6
 
-### 1.1 Fonts — 0/2
-- [ ] `app/layout.tsx` con `next/font/google` para Urbanist + Plus Jakarta Sans
-- [ ] CSS variables `--font-urbanist`, `--font-jakarta` aplicadas a body
+### 1.1 Fonts — 2/2
+- [x] `app/layout.tsx` con `next/font/google` para Urbanist (300-800) + Plus Jakarta Sans (600-900)
+- [x] CSS variables `--font-urbanist`, `--font-jakarta` expuestas via @theme y aplicadas a body
 
-### 1.2 Tokens CSS — 0/2
-- [ ] `app/globals.css` con tokens Noir + Lux como CSS variables (segun `DESIGN-SYSTEM.md`)
-- [ ] Theme switching via `data-theme="noir"` o `data-theme="lux"` en `<html>`
+### 1.2 Tokens CSS — 2/2
+- [x] `app/globals.css` con tokens Noir + Lux completos como CSS variables (portados literal de `eventos-app/lib/theme-noir.ts` y `theme-lux.ts`). Genericos sin prefijo (`--surface-low`, `--text-primary`, `--gold`, etc.) — alinea con shadcn/ui standard
+- [x] Theme switching via `data-theme="lux"` override de `[data-theme="lux"]` selector. Default Noir en `:root`. **next-themes 0.4** maneja persistencia localStorage + hydration
 
-### 1.3 Tailwind extension — 0/2
-- [ ] `tailwind.config.ts` extiende colors usando `rgb(from var(--token))` o color-mix
-- [ ] `dark:` prefix configurado para que Lumina Noir sea default y Lux sea opt-in
+### 1.3 Tailwind 4 extension — 2/2
+- [x] `@theme inline` en globals.css expone tokens como utilities (Tailwind 4 reemplaza `tailwind.config.ts` para tokens)
+- [x] **NO se usa `dark:` prefix** — el switch es Noir/Lux explicito, no light/dark del sistema. `enableSystem={false}` en ThemeProvider
+
+### 1.4 Extras DaVinci sumados
+- [x] `useMediaQuery` con `useSyncExternalStore` (pasa `react-hooks/set-state-in-effect` de Next 16)
+- [x] `useIsMobile/useIsTablet/useIsDesktop` con breakpoints RESPONSIVE-SPEC
+- [x] `useReducedMotionPref` (DESIGN-SYSTEM 376) + CSS `@media (prefers-reduced-motion)` cubren JS y CSS
+- [x] `useIsClient` hook compartido para mounted-only components (hydration-safe pattern)
+- [x] `ThemeToggle` reutilizable
+- [x] `ThemeProvider` wrapper con default Noir, attribute `data-theme`
+- [x] `:focus-visible` con outline accent (DESIGN-SYSTEM accessibility)
+- [x] `color-scheme` declarado por theme
+- [x] Demo page `/` que valida tokens visualmente (sera reemplazada en F4 por LoginForm)
+
+**Cierre F1**: Typecheck + lint + build 1049ms + dev 396ms + GET / 200 (255ms first hit, 29ms cached). Sin warnings hydration. Commit `811b7dd`.
 
 ---
 
