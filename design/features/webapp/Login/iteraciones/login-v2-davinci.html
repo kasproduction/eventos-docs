@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="es-CO" data-theme="noir" data-viewport="desktop" data-step="email" data-overlay="on" data-status="upcoming">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login DaVinci v2 — EventOS Webapp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Urbanist:wght@300;400;500;600;700;800&display=swap">
+<style>
+  /* ================ Lumina Noir tokens (default) ================ */
+  :root, [data-theme="noir"] {
+    --bg: #0a0a0a;
+    --bg-elevated: #141414;
+    --bg-sunken: #050505;
+    --bg-raised: #1a1a1a;
+    --surface-low: rgba(255,255,255,0.03);
+    --surface-medium: rgba(255,255,255,0.05);
+    --surface-high: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.08);
+    --border-light: rgba(255,255,255,0.12);
+    --border-strong: rgba(255,255,255,0.18);
+    --text-primary: rgba(255,255,255,0.92);
+    --text-secondary: rgba(255,255,255,0.6);
+    --text-muted: rgba(255,255,255,0.4);
+    --text-label: rgba(255,255,255,0.3);
+    --text-placeholder: rgba(255,255,255,0.25);
+    --text-on-accent: #000;
+    --gold: #b5a68b;
+    --accent: #ffffff;
+    --accent-text: #000;
+    --shadow-card: 0 32px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+    --pulse-color: #ef4444;
+    --error: #ef4444;
+    --success: #10b981;
+  }
+  [data-theme="lux"] {
+    --bg: #f6f8fa;
+    --bg-elevated: #ffffff;
+    --bg-sunken: #edf0f3;
+    --bg-raised: #fafbfc;
+    --surface-low: rgba(0,0,0,0.02);
+    --surface-medium: rgba(0,0,0,0.04);
+    --surface-high: rgba(0,0,0,0.06);
+    --border: rgba(0,0,0,0.08);
+    --border-light: rgba(0,0,0,0.04);
+    --border-strong: rgba(0,0,0,0.14);
+    --text-primary: #1a1b1e;
+    --text-secondary: #4a4b50;
+    --text-muted: #7c7d82;
+    --text-label: #a8a9ae;
+    --text-placeholder: #a8a9ae;
+    --text-on-accent: #fff;
+    --gold: #8e8170;
+    --accent: #1a1a1a;
+    --accent-text: #fff;
+    --shadow-card: 0 24px 48px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.08);
+    --error: #dc2626;
+    --success: #059669;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    background: var(--bg-sunken);
+    color: var(--text-primary);
+    font-family: 'Urbanist', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background 250ms ease, color 250ms ease;
+  }
+  .display { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; letter-spacing: -0.02em; }
+  button { font: inherit; }
+
+  /* ================ Toolbar (demo controls) ================ */
+  .toolbar {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    z-index: 1000;
+    display: flex; gap: 6px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    flex-wrap: wrap;
+    max-width: calc(100vw - 32px);
+  }
+  .toolbar button {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-size: 11px; font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+    white-space: nowrap;
+  }
+  .toolbar button.active {
+    background: var(--accent);
+    color: var(--accent-text);
+  }
+  .toolbar button:hover:not(.active) { background: var(--surface-high); color: var(--text-primary); }
+  .toolbar .group { display: flex; gap: 2px; padding: 0 4px; border-right: 1px solid var(--border); }
+  .toolbar .group:last-child { border-right: none; }
+  .toolbar .group-label {
+    font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-label); align-self: center; padding: 0 6px;
+  }
+
+  /* ================ Stage (viewport bg sunken) ================ */
+  .stage {
+    min-height: 100vh;
+    padding: 90px 24px 24px;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(circle at 20% 30%, var(--surface-low) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, var(--surface-low) 0%, transparent 50%),
+      var(--bg-sunken);
+  }
+
+  /* ================ Login card ================ */
+  .login-card {
+    width: 100%;
+    max-width: 1100px;
+    height: min(720px, calc(100vh - 130px));
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 60% 40%;
+    transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  [data-viewport="tablet-landscape"] .login-card {
+    max-width: 95vw;
+    height: min(640px, calc(100vh - 130px));
+  }
+  [data-viewport="mobile"] .login-card {
+    max-width: 400px;
+    height: min(720px, calc(100vh - 130px));
+    grid-template-columns: 1fr;
+    grid-template-rows: 280px 1fr;
+    border-radius: 24px;
+  }
+
+  /* ================ Slideshow side ================ */
+  .slideshow {
+    position: relative;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 1500ms ease-in-out;
+  }
+  .slide.active { opacity: 1; }
+
+  .slide-bg {
+    position: absolute; inset: 0;
+    transform: scale(1);
+    transition: transform 8000ms ease-out;
+    background-size: cover;
+    background-position: center;
+  }
+  .slide.active .slide-bg { transform: scale(1.1); }
+
+  /* Slide gradients (placeholders cinematicos — backend reemplaza con event_login_slides.image_url) */
+  .slide-1 .slide-bg {
+    background:
+      radial-gradient(circle at 25% 75%, rgba(99, 102, 241, 0.5) 0%, transparent 55%),
+      radial-gradient(circle at 75% 25%, rgba(168, 85, 247, 0.4) 0%, transparent 55%),
+      linear-gradient(180deg, #1e1b4b 0%, #0a0a0a 100%);
+  }
+  .slide-2 .slide-bg {
+    background:
+      radial-gradient(circle at 50% 30%, rgba(245, 158, 11, 0.4) 0%, transparent 60%),
+      radial-gradient(circle at 30% 70%, rgba(217, 119, 6, 0.5) 0%, transparent 55%),
+      linear-gradient(180deg, #451a03 0%, #0a0a0a 100%);
+  }
+  .slide-3 .slide-bg {
+    background:
+      radial-gradient(circle at 70% 50%, rgba(20, 184, 166, 0.4) 0%, transparent 55%),
+      radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.35) 0%, transparent 55%),
+      linear-gradient(180deg, #134e4a 0%, #0a0a0a 100%);
+  }
+
+  /* Texture grain para realismo cinematico */
+  .slide-bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: repeating-radial-gradient(circle at 0 0, transparent 0, rgba(255,255,255,0.02) 1px, transparent 2px);
+    opacity: 0.7;
+    mix-blend-mode: overlay;
+  }
+
+  .slide-scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.65) 100%);
+  }
+
+  /* Overlay text (solo si has_overlay_text=true via [data-overlay="on"]) */
+  .slide-overlay {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 48px;
+    color: #fff;
+    transition: opacity 300ms ease;
+  }
+  [data-overlay="off"] .slide-overlay { opacity: 0; pointer-events: none; }
+  [data-viewport="mobile"] .slide-overlay { padding: 20px; }
+
+  .slide-overlay .label {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 10px;
+  }
+  .slide-overlay h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 40px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin-bottom: 8px;
+    max-width: 480px;
+  }
+  [data-viewport="tablet-landscape"] .slide-overlay h2 { font-size: 32px; }
+  [data-viewport="mobile"] .slide-overlay h2 { font-size: 22px; }
+
+  .slide-overlay p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.78);
+    max-width: 460px;
+  }
+
+  /* ============ Slideshow positioned elements ============ */
+
+  /* Logo evento — top-left */
+  .event-logo {
+    position: absolute; top: 28px; left: 28px;
+    display: flex; align-items: center; gap: 10px;
+    color: #fff;
+    z-index: 10;
+  }
+  [data-viewport="mobile"] .event-logo { top: 16px; left: 16px; }
+  .event-logo .mark {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #fff 0%, #d4d4d8 100%);
+    display: grid; place-items: center;
+    color: #000;
+    font-weight: 800;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .event-logo .name {
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  /* Estado contextual del evento — top-right (solido, no glass) */
+  .event-status {
+    position: absolute; top: 28px; right: 28px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    padding: 10px 14px;
+    color: var(--text-primary);
+    font-size: 12px;
+    z-index: 10;
+    min-width: 180px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  [data-viewport="mobile"] .event-status { display: none; }
+
+  .event-status .status-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 4px;
+  }
+  .event-status .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-muted);
+  }
+  [data-status="upcoming"] .event-status .status-dot { background: var(--accent); }
+  [data-status="live_today"] .event-status .status-dot { background: #f59e0b; }
+  [data-status="live_now"] .event-status .status-dot {
+    background: var(--pulse-color);
+    box-shadow: 0 0 0 0 rgba(239,68,68,0.7);
+    animation: pulse 2s infinite;
+  }
+  [data-status="ended"] .event-status .status-dot { background: var(--text-muted); }
+
+  .event-status .status-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .event-status .status-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.2;
+    color: var(--text-primary);
+  }
+
+  /* Hide states based on data-status */
+  .event-status[data-show] { display: none; }
+  [data-status="upcoming"] .status-upcoming,
+  [data-status="live_today"] .status-live-today,
+  [data-status="live_now"] .status-live-now,
+  [data-status="ended"] .status-ended { display: block !important; }
+  [data-status="none"] .event-status { display: none; }
+
+  .event-status > div { display: none; }
+
+  /* Live Pulse — bottom-right (solido, no glass) */
+  .live-pulse {
+    position: absolute; bottom: 28px; right: 28px;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    padding: 8px 14px;
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  [data-viewport="mobile"] .live-pulse { display: none; }
+  [data-status="upcoming"] .live-pulse,
+  [data-status="ended"] .live-pulse,
+  [data-status="none"] .live-pulse { display: none; }
+
+  .live-pulse .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--pulse-color);
+    box-shadow: 0 0 0 0 rgba(239,68,68,0.7);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  }
+
+  /* Slideshow indicators — bottom-left */
+  .slide-indicators {
+    position: absolute; bottom: 28px; left: 28px;
+    display: flex; gap: 6px;
+    z-index: 10;
+  }
+  [data-viewport="mobile"] .slide-indicators { bottom: 16px; left: 16px; }
+  .slide-indicators .ind {
+    width: 24px; height: 3px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 200ms ease;
+  }
+  .slide-indicators .ind.active { background: #fff; width: 32px; }
+  .slide-indicators[data-count="1"] { display: none; }
+
+  /* ================ Form side ================ */
+  .form-side {
+    position: relative;
+    background: var(--bg-elevated);
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px;
+    overflow: hidden;
+  }
+  [data-viewport="mobile"] .form-side {
+    padding: 28px 24px;
+    background: var(--bg-elevated);
+  }
+
+  .form-stack {
+    width: 100%;
+    max-width: 320px;
+    position: relative;
+  }
+
+  /* State machine: 4 estados, transicion horizontal */
+  .form-step {
+    display: flex; flex-direction: column; gap: 24px;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 300ms ease, transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+    position: absolute; inset: 0;
+    pointer-events: none;
+  }
+  [data-step="email"] .form-step.email,
+  [data-step="sent"] .form-step.sent,
+  [data-step="password"] .form-step.password,
+  [data-step="verifying"] .form-step.verifying {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+    position: static;
+  }
+
+  /* Step header */
+  .step-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 30px;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  [data-viewport="mobile"] .step-header h1 { font-size: 24px; }
+  .step-header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .step-header p strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* Inputs */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    font-weight: 600;
+  }
+  .input {
+    width: 100%;
+    background: var(--surface-medium);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--text-primary);
+    font-family: 'Urbanist', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 150ms ease;
+  }
+  .input::placeholder { color: var(--text-placeholder); font-weight: 400; }
+  .input:focus { outline: none; border-color: var(--text-primary); background: var(--surface-high); }
+  .input.error { border-color: var(--error); }
+
+  .field-error {
+    font-size: 12px;
+    color: var(--error);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    width: 100%;
+    height: 48px;
+    background: var(--accent);
+    color: var(--accent-text);
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 200ms ease;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary[disabled] { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 10px 14px;
+    border-radius: 8px;
+    transition: all 150ms;
+  }
+  .btn-ghost:hover { background: var(--surface-high); color: var(--text-primary); }
+
+  .btn-link {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--border-strong);
+    padding: 4px 0;
+    transition: color 150ms;
+  }
+  .btn-link:hover { color: var(--text-primary); }
+
+  /* Sent step — countdown + actions */
+  .sent-icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    background: var(--surface-medium);
+    border: 1px solid var(--border);
+    display: grid; place-items: center;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .countdown-bar {
+    margin-top: 4px;
+    background: var(--surface-low);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .countdown-bar .timer {
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.1em;
+    color: var(--text-primary);
+  }
+
+  .sent-actions {
+    display: flex; flex-direction: column; gap: 4px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    margin-top: 4px;
+  }
+  .sent-actions .btn-link {
+    text-align: left; padding: 8px 0;
+  }
+
+  /* Password fallback step — email pill (read-only) */
+  .email-pill {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface-low);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .email-pill .label { color: var(--text-muted); font-size: 11px; }
+  .email-pill .value { color: var(--text-primary); font-weight: 500; flex: 1; }
+  .email-pill button { background: none; border: none; color: var(--text-secondary); font-size: 12px; cursor: pointer; }
+
+  /* Verifying step — spinner */
+  .verifying-content {
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+    padding: 40px 0;
+  }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 800ms linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Step footer */
+  .step-footer {
+    text-align: center;
+    padding-top: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .step-footer a { color: var(--text-secondary); text-decoration: none; }
+  .step-footer a:hover { color: var(--text-primary); }
+
+  /* ================ Tablet portrait rotation overlay ================ */
+  .rotate-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    z-index: 999;
+    background: var(--bg-sunken);
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+    padding: 40px;
+    text-align: center;
+  }
+  [data-viewport="tablet-portrait"] .rotate-overlay { display: flex; }
+
+  .rotate-icon {
+    width: 80px; height: 80px;
+    color: var(--text-primary);
+    animation: rotateBack 2s ease-in-out infinite;
+  }
+  @keyframes rotateBack {
+    0%, 100% { transform: rotate(0); }
+    50% { transform: rotate(-90deg); }
+  }
+  .rotate-overlay h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+  .rotate-overlay p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    max-width: 400px;
+  }
+
+  /* Hide login card when tablet portrait */
+  [data-viewport="tablet-portrait"] .stage { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Toolbar (controls) -->
+<div class="toolbar">
+  <span class="group-label">Tema</span>
+  <div class="group">
+    <button data-action="theme" data-value="noir" class="active">Noir</button>
+    <button data-action="theme" data-value="lux">Lux</button>
+  </div>
+  <span class="group-label">Viewport</span>
+  <div class="group">
+    <button data-action="viewport" data-value="desktop" class="active">Desktop</button>
+    <button data-action="viewport" data-value="tablet-landscape">Tablet H</button>
+    <button data-action="viewport" data-value="tablet-portrait">Tablet V</button>
+    <button data-action="viewport" data-value="mobile">Mobile</button>
+  </div>
+  <span class="group-label">Step</span>
+  <div class="group">
+    <button data-action="step" data-value="email" class="active">1. Email</button>
+    <button data-action="step" data-value="sent">2. Sent</button>
+    <button data-action="step" data-value="password">2.5 Password</button>
+    <button data-action="step" data-value="verifying">3. Verifying</button>
+  </div>
+  <span class="group-label">Slide overlay</span>
+  <div class="group">
+    <button data-action="overlay" data-value="on" class="active">Con texto</button>
+    <button data-action="overlay" data-value="off">Sin texto</button>
+  </div>
+  <span class="group-label">Estado evento</span>
+  <div class="group">
+    <button data-action="status" data-value="upcoming" class="active">Upcoming</button>
+    <button data-action="status" data-value="live_today">Hoy</button>
+    <button data-action="status" data-value="live_now">Live</button>
+    <button data-action="status" data-value="ended">Ended</button>
+    <button data-action="status" data-value="none">None</button>
+  </div>
+</div>
+
+<!-- Tablet portrait rotation overlay -->
+<div class="rotate-overlay">
+  <svg class="rotate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="5" y="3" width="14" height="18" rx="2" ry="2"/>
+    <path d="M12 18h.01"/>
+  </svg>
+  <h2 class="display">Gira tu tablet</h2>
+  <p>Para una mejor experiencia con la webapp, te recomendamos usar tu tablet en horizontal.</p>
+</div>
+
+<!-- Stage -->
+<div class="stage">
+  <div class="login-card">
+    <!-- ================ Slideshow side (60%) ================ -->
+    <div class="slideshow">
+      <div class="slide slide-1 active">
+        <div class="slide-bg"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-overlay">
+          <div class="label">Bienvenido</div>
+          <h2 class="display">Bogota recibe a los lideres del cambio</h2>
+          <p>20 y 21 de septiembre · Movistar Arena</p>
+        </div>
+      </div>
+      <div class="slide slide-2">
+        <div class="slide-bg"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-overlay">
+          <div class="label">Speakers</div>
+          <h2 class="display">Voces que estan moviendo la industria</h2>
+          <p>20 lideres internacionales en tres dias intensos</p>
+        </div>
+      </div>
+      <div class="slide slide-3">
+        <div class="slide-bg"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-overlay">
+          <div class="label">Networking</div>
+          <h2 class="display">Conexiones que duran mas alla del evento</h2>
+          <p>Match inteligente con asistentes que comparten tus intereses</p>
+        </div>
+      </div>
+
+      <!-- Logo evento (top-left) -->
+      <div class="event-logo">
+        <div class="mark">B</div>
+        <div class="name">Bancolombia Summit 2026</div>
+      </div>
+
+      <!-- Estado contextual del evento (top-right) -->
+      <div class="event-status">
+        <div class="status-upcoming">
+          <div class="status-row">
+            <span class="status-dot"></span>
+            <span class="status-label">Falta</span>
+          </div>
+          <div class="status-value display">42 dias 7h</div>
+        </div>
+        <div class="status-live-today">
+          <div class="status-row">
+            <span class="status-dot"></span>
+            <span class="status-label">Hoy</span>
+          </div>
+          <div class="status-value display">Comienza 9:00 AM</div>
+        </div>
+        <div class="status-live-now">
+          <div class="status-row">
+            <span class="status-dot"></span>
+            <span class="status-label">En vivo</span>
+          </div>
+          <div class="status-value display">Sesion principal</div>
+        </div>
+        <div class="status-ended">
+          <div class="status-row">
+            <span class="status-dot"></span>
+            <span class="status-label">Finalizado</span>
+          </div>
+          <div class="status-value display">Ver recap →</div>
+        </div>
+      </div>
+
+      <!-- Live Pulse (bottom-right) -->
+      <div class="live-pulse">
+        <span class="dot"></span>
+        <span><b id="liveCount">247</b> conectados ahora</span>
+      </div>
+
+      <!-- Indicators (bottom-left) -->
+      <div class="slide-indicators" data-count="3">
+        <span class="ind active" data-slide="0"></span>
+        <span class="ind" data-slide="1"></span>
+        <span class="ind" data-slide="2"></span>
+      </div>
+    </div>
+
+    <!-- ================ Form side (40%) ================ -->
+    <div class="form-side">
+      <div class="form-stack">
+
+        <!-- Step 1: Email -->
+        <div class="form-step email">
+          <div class="step-header">
+            <h1 class="display">Iniciar sesion</h1>
+            <p>Te enviamos un link a tu correo para que entres sin contrasena.</p>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Email</span>
+            <input class="input" type="email" placeholder="tu@empresa.com" autocomplete="email">
+          </div>
+
+          <button class="btn-primary" onclick="setStep('sent')">
+            Continuar
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+
+          <div class="step-footer">
+            <a href="#">Soporte 24/7</a>
+          </div>
+        </div>
+
+        <!-- Step 2: Sent -->
+        <div class="form-step sent">
+          <div class="step-header">
+            <div class="sent-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <path d="m22 7-10 5L2 7"/>
+              </svg>
+            </div>
+            <h1 class="display">Revisa tu correo</h1>
+            <p>Te enviamos un link a <strong>tu@empresa.com</strong>. Expira en 15 minutos.</p>
+          </div>
+
+          <div class="countdown-bar">
+            <span>Reenviar en</span>
+            <span class="timer" id="resendTimer">2:30</span>
+          </div>
+
+          <div class="sent-actions">
+            <button class="btn-link" onclick="setStep('email')">Email incorrecto?</button>
+            <button class="btn-link" onclick="setStep('password')">No me llego — tengo contrasena</button>
+            <button class="btn-link"><a href="#" style="color: inherit; text-decoration: inherit;">Contactar soporte</a></button>
+          </div>
+
+          <div class="step-footer">
+            Si tu empresa filtra correos externos, agrega <strong>eventos@eventos.app</strong> a remitentes confiables.
+          </div>
+        </div>
+
+        <!-- Step 2.5: Password fallback -->
+        <div class="form-step password">
+          <div class="step-header">
+            <h1 class="display">Tu contrasena</h1>
+            <p>Si configuraste contrasena, ingresala. Si no, vuelve a intentar el link.</p>
+          </div>
+
+          <div class="email-pill">
+            <span class="label">Email</span>
+            <span class="value">tu@empresa.com</span>
+            <button onclick="setStep('email')">Cambiar</button>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Contrasena</span>
+            <input class="input" type="password" placeholder="Tu contrasena" autocomplete="current-password">
+          </div>
+
+          <button class="btn-primary">
+            Iniciar sesion
+          </button>
+
+          <div class="sent-actions">
+            <button class="btn-link" onclick="setStep('sent')">Volver al link</button>
+            <button class="btn-link">Olvide mi contrasena</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Verifying -->
+        <div class="form-step verifying">
+          <div class="verifying-content">
+            <div class="spinner"></div>
+            <div style="text-align: center;">
+              <h1 class="display" style="font-size: 22px; margin-bottom: 4px;">Validando tu link</h1>
+              <p style="color: var(--text-secondary); font-size: 13px;">Estamos preparando tu acceso…</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const root = document.documentElement;
+
+  // Toolbar handlers
+  document.querySelectorAll('.toolbar button[data-action]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.action;
+      const value = btn.dataset.value;
+      root.setAttribute(`data-${action}`, value);
+      document.querySelectorAll(`.toolbar button[data-action="${action}"]`).forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Step transition (custom — sync with toolbar)
+  function setStep(step) {
+    root.setAttribute('data-step', step);
+    document.querySelectorAll('.toolbar button[data-action="step"]').forEach((b) => b.classList.remove('active'));
+    document.querySelector(`.toolbar button[data-action="step"][data-value="${step}"]`)?.classList.add('active');
+    if (step === 'verifying') setTimeout(() => setStep('email'), 2500);
+  }
+
+  // Slideshow auto-rotate
+  const slides = document.querySelectorAll('.slide');
+  const indicators = document.querySelectorAll('.slide-indicators .ind');
+  let current = 0;
+
+  function goToSlide(idx) {
+    slides[current].classList.remove('active');
+    indicators[current].classList.remove('active');
+    current = idx % slides.length;
+    slides[current].classList.add('active');
+    indicators[current].classList.add('active');
+  }
+  setInterval(() => goToSlide(current + 1), 5000);
+  indicators.forEach((dot, idx) => dot.addEventListener('click', () => goToSlide(idx)));
+
+  // Live pulse counter (mock RT)
+  const liveCount = document.getElementById('liveCount');
+  setInterval(() => {
+    const cur = parseInt(liveCount.textContent);
+    const change = Math.random() > 0.5 ? 1 : -1;
+    const next = Math.max(200, Math.min(300, cur + change * Math.floor(Math.random() * 3)));
+    liveCount.textContent = next;
+  }, 3000);
+
+  // Resend countdown (mock — solo visual)
+  let secondsLeft = 150; // 2:30
+  setInterval(() => {
+    if (secondsLeft <= 0) { secondsLeft = 150; return; }
+    secondsLeft--;
+    const m = Math.floor(secondsLeft / 60);
+    const s = String(secondsLeft % 60).padStart(2, '0');
+    const el = document.getElementById('resendTimer');
+    if (el) el.textContent = `${m}:${s}`;
+  }, 1000);
+</script>
+</body>
+</html>

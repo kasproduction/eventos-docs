@@ -129,9 +129,11 @@
 - Schema:
   - `id`, `event_id` foreign constrained cascade delete
   - `image_url` string 500 (R2 storage)
+  - `video_url` string 500 nullable (Tier 2 #9 — MP4 looped mute si esta seteado, fallback imagen)
   - `label` string 100 nullable (texto chico arriba)
   - `title` string 255 nullable (display headline)
   - `subtitle` string 500 nullable (texto chico abajo)
+  - `has_overlay_text` boolean default true (ADR-021 — toggle si imagen ya trae texto)
   - `cta_text` string 100 nullable, `cta_url` string 500 nullable
   - `sort_order` smallInteger default 0
   - `enabled` boolean default true
@@ -157,10 +159,20 @@
 - [ ] Reorderable via drag (Filament soporta nativo)
 - [ ] NavigationGroup "Webapp" o "Login" (nuevo group)
 
-### 4.5 Campo `welcome_message` en branding — 0/1
-- [ ] Migration: si `events.branding` ya es JSON, agregar key. Si no, columna nueva `welcome_message` string 280 nullable
-- [ ] Filament: campo Textarea max 280 chars en EventResource seccion Branding
-- [ ] API: incluir en response de evento existente (no requiere endpoint nuevo)
+### 4.5 Campo `organizer_logo_url` en events (Tier 2 #8) — 0/1
+- [ ] Migration: agregar columna `organizer_logo_url` string 500 nullable en `events` (organizador distinto del evento, ej Bancolombia presenta Summit)
+- [ ] Filament: ImageUploadField en EventResource seccion Branding, helper "Logo del organizador (opcional, si distinto del evento)"
+- [ ] API: incluir en response de evento existente
+- [ ] **Reemplaza el campo `welcome_message`** que estaba en plan original (descartado en ADR-024 por estado contextual del evento)
+
+### 4.6 Resolver event status contextual — 0/1
+- [ ] Backend computa `event.live_status` automatico en serializer:
+  - `upcoming` si `start_date > now`
+  - `live_today` si `start_date <= now < (start_date + 12h)` (dia del evento, antes que arranque)
+  - `live_now` si hay sesiones activas en `event_sessions` con `started_at AND NOT ended_at`
+  - `ended` si `end_date < now`
+- [ ] Endpoint publico `GET /api/v1/events/{slug}` incluye `live_status` + `countdown_seconds` (segundos hasta start)
+- [ ] Test: fixtures con cada estado, assert serializer correcto
 
 ---
 

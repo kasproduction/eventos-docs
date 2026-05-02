@@ -348,6 +348,60 @@
 
 ---
 
+## ADR-024 — Mobile bottom sheet expandible + 12 mejoras Tier 1+2 — 2026-05-02 — aceptado
+
+**Decision**: Login mobile usa **bottom sheet con snap collapsed/expanded**, mismo patron que Apple Maps, Google Maps, Notion mobile, Linear mobile. Plus 12 mejoras curadas distribuidas en Tier 1 (auto-aplicadas) y Tier 2 (aprobadas).
+
+### Mobile bottom sheet pattern
+- Container fijo iPhone 14 (390×844) base de diseno. Cubre 75% market mobile. Funciona desde iPhone SE 375×667 hasta Pro Max 430×932
+- Sheet **collapsed** 50% del altura (default step email)
+- Sheet **expanded** 78% del altura (auto-snap al focus input o submit)
+- Step verifying: 50% (centrado, no expanded)
+- Animacion spring 350ms cubic-bezier(0.16, 1, 0.3, 1)
+- Drag handle visible siempre arriba del sheet
+- Sheet hint "Toca para empezar" cuando collapsed
+- Slide overlay text se oculta cuando sheet expanded (no compite)
+- Slideshow scrim mas oscuro cuando sheet expanded
+
+### Tier 1 — auto-aplicado en F4 (zero scope creep)
+1. **Email recordado** — `localStorage.eventos:lastEmail` pre-fill al volver
+2. **Mobile keyboard optimizado** — `inputmode="email"` + `autocomplete="email webauthn"` activa Apple Passkey + Google Smart Lock
+3. **Typo email detection** — mailcheck.js style, sugiere `gmail.com` si user tipea `gmail.con`
+4. **Microcopy humano**:
+   - "Email" → "Tu email de trabajo"
+   - "Te enviamos un link" → "Te mandamos el link en menos de 1 minuto. Sin contrasenas."
+   - "Tengo contrasena" → "Mejor con mi contrasena"
+   - Email firma explicita: "Te enviamos un link a {email} desde **eventos@eventos.app**"
+5. **ARIA live regions** — `aria-live="polite"` anuncia transiciones de step (Bancolombia WCAG)
+6. **Auto-focus inteligente** — focus gestionado por step (email input / password input / boton reenviar)
+7. **Welcome back** — si hay `localStorage.userName`, header "Bienvenido de nuevo" en lugar de "Iniciar sesion"
+
+### Tier 2 — aprobado en F4 (sumar a backend roadmap)
+8. **Doble logo organizador + evento** — campo nuevo `events.organizer_logo_url` (organizador distinto del evento, ej Bancolombia presenta Summit). Render compacto "Logo + Presenta + Logo + Nombre"
+9. **Video como primer slot** — campo nuevo `event_login_slides.video_url` nullable. Si esta seteado, renderiza `<video autoplay loop muted playsinline>`. Fallback a imagen si falla. Broadcast feel premium
+10. **Accent dinamico extendido** — `branding.primary_color` aplica a:
+    - Boton primary (default)
+    - Glow del live pulse dot (`color-mix` con red)
+    - Border focus del input
+    - Spinner verify
+    - Underline btn-link 30% opacity
+11. **Network status banner** — `navigator.onLine` listener. Si offline durante verify, banner top warning "Sin conexion. Tu link sigue valido — reintenta cuando vuelvas."
+12. **Preload step siguiente** — `router.prefetch('/login?sent=1')` cuando user en step email. Transicion 0ms al submit
+
+### Tier 3 — Fase 2 (cuando Bancolombia pida)
+- Codigo numerico 6 digitos como fallback (mas resistente a filtros corp)
+- Passkey WebAuthn (login sin password ni link via biometric)
+- WebOTP API (auto-fill SMS code)
+
+**Validado en demo**: `design/features/webapp/Login/iteraciones/login-v5-davinci.html` con toolbar exhaustivo (10 grupos de controles).
+
+### Backend bloqueante actualizado (W.1-backend-magic-link.md)
+- `events.organizer_logo_url` string 500 nullable (Tier 2 #8)
+- `event_login_slides.video_url` string 500 nullable (Tier 2 #9)
+- API endpoint event response: agregar campos nuevos en serializer
+
+---
+
 ## Decisiones pendientes / abiertas
 
 Ninguna actualmente.

@@ -170,9 +170,32 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 - [ ] `src/app/[locale]/(auth)/login/MagicLinkSent.tsx` (estado post-envio + countdown reenvio)
 - [ ] `src/app/[locale]/(auth)/verify/page.tsx` recibe `?token=XXX` → POST verify → guarda cookie → redirect
 
-### 4.4 Componentes login slideshow — 0/2
-- [ ] `LoginSlideshow.tsx` con Ken Burns (zoom 1.0→1.1 cada 5s) + crossfade Framer Motion
-- [ ] `LivePulse.tsx` socket RT "200 conectados ahora" + welcome_message overlay opcional
+### 4.4 Componentes login slideshow — 0/3
+- [ ] `LoginSlideshow.tsx` con Ken Burns (zoom 1.0→1.1 cada 5s) + crossfade Framer Motion + soporta `video_url` (Tier 2 #9 — `<video autoplay loop muted playsinline>` con fallback a imagen)
+- [ ] `LivePulse.tsx` socket RT "247 conectados ahora" — accent dynamic glow del dot (Tier 2 #10 — `color-mix(var(--accent), red)`)
+- [ ] `EventStatusPill.tsx` contextual (upcoming/live_today/ended) — oculto en `live_now` (solo Live Pulse)
+
+### 4.6 Tier 1 mejoras (auto-aplicadas — ADR-024) — 0/7
+- [ ] `localStorage.eventos:lastEmail` pre-fill input al cargar
+- [ ] `inputmode="email"` + `autocomplete="email webauthn"` (Apple Passkey + Smart Lock)
+- [ ] mailcheck.js (~3KB) typo detection — sugiere correccion debajo del input
+- [ ] Microcopy humano por step (i18n keys actualizadas en es/en/pt)
+- [ ] `aria-live="polite"` div con announcements por step
+- [ ] Auto-focus por step (email input / password input / boton resend)
+- [ ] Welcome back si `localStorage.userName` existe
+
+### 4.7 Tier 2 mejoras (aprobadas — ADR-024) — 0/5
+- [ ] **Doble logo**: si `event.organizer_logo_url` existe + es distinto, render compacto "Logo + Presenta + Logo + Nombre"
+- [ ] **Video slot**: primer slide consume `video_url` si existe, render `<video>` con fallback imagen
+- [ ] **Accent dinamico extendido**: `branding.primary_color` aplicado a boton + glow live pulse + focus border + spinner + btn-link underline
+- [ ] **Network status banner**: `useEffect` con `online`/`offline` listener, banner top warning si offline
+- [ ] **Preload step siguiente**: `router.prefetch` de `/login?sent=1` cuando user en step email
+
+### 4.8 Mobile bottom sheet expandible (ADR-024) — 0/4
+- [ ] `LoginSheet.tsx` componente sheet con snap states `collapsed` (50%) / `expanded` (78%)
+- [ ] Spring animation Framer Motion 350ms cubic-bezier(0.16, 1, 0.3, 1)
+- [ ] Drag handle visible siempre, drag-to-snap behavior
+- [ ] Auto-expand: focus input email O step transition a sent/password
 
 ### 4.5 Next API routes — 0/2
 - [ ] `src/app/api/auth/magic-link/route.ts` proxy POST al backend
