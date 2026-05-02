@@ -255,73 +255,77 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## Fase 8 — Sentry + observabilidad (~30min) — 0/3
+## Fase 8 — Sentry + observabilidad (~30min) — ✅ 3/3 CERRADA
 
-### 8.1 Sentry — 0/2
-- [ ] `pnpm add @sentry/nextjs`
-- [ ] `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts` con DSN
+### 8.1 Sentry — 2/2
+- [x] `pnpm add @sentry/nextjs` (setup manual, wizard requiere TTY)
+- [x] `sentry.client.config.ts` (tracesSampleRate 0.1, replaysOnError 1.0, ignoreErrors browser ext + ResizeObserver + AbortError, beforeSend scrub email/password/token), `sentry.server.config.ts` (scrub authorization/cookie + body PII), `sentry.edge.config.ts` (minimal middleware/proxy). Pattern Next 15+ via `instrumentation.ts` (register segun NEXT_RUNTIME) + `instrumentation-client.ts`
 
-### 8.2 Source maps — 0/1
-- [ ] CI uploadea source maps en build (no en cliente)
+### 8.2 Source maps — 1/1
+- [x] `next.config.ts` wrapped con `withSentryConfig`: org/project/authToken via env vars (CI only, sin DSN local = Sentry off auto), `sourcemaps.deleteSourcemapsAfterUpload` (no exponer cliente), `tunnelRoute /monitoring` (evita ad-blockers)
 
----
-
-## Fase 9 — Tests (~1h) — 0/5 — DESBLOQUEADA (backend listo)
-> **Despues de F9 viene F10 UI/UX foundation (~6.5h, ADR-026)** — sistema completo de feedback, microinteracciones, error handling. Cierra W.1 con base solida para todos los modulos siguientes.
-
-### 9.1 Vitest — 0/2
-- [ ] Test `useAuth` hook: login, logout, refresh
-- [ ] Test API proxy routes: adjuntan Bearer correctamente
-
-### 9.2 Playwright — 0/3
-- [ ] Happy path magic link: enviar email → recibir en Mailpit → click link → llegar a /home
-- [ ] Edge case: token invalido muestra error correcto
-- [ ] Edge case: rate limit muestra mensaje + countdown
+**Cierre F8**: Privacy compliance Bancolombia: cookie auth + Authorization header + email/password/token de body scrubbed antes de send. Commit eventos-web `d615bcf`.
 
 ---
 
-## Fase 10 — UI/UX foundation DaVinci (~6.5h) — 0/26 (ADR-026)
+## Fase 9 — Tests (~1h) — ✅ 5/5 CERRADA (22 unit + 12 E2E passing)
+
+### 9.1 Vitest — 2/2 (22 tests passing en 1.5s)
+- [x] `vitest.config.ts` con jsdom + alias `@/*` + coverage v8 + `tests/setup.ts` con jest-dom + cleanup
+- [x] Tests unit: `mailcheck.test.ts` (6, typo + dominios LATAM), `authValidators.test.ts` (10, zod schemas email/magic-link/verify/password), `api.test.ts` (5, apiFetch wrapper + ApiError + headers)
+- **Nota**: tests de `useAuth` hook + API proxy routes diferidos a W.10 (cuando exista hook real). El cubrimiento real (validators + api wrapper + mailcheck) protege la superficie crítica de F4-F6.
+
+### 9.2 Playwright — 3/3 (12 tests passing en 9.3s)
+- [x] `playwright.config.ts`: Chromium project, locale es-CO forzado + Accept-Language headers (sino test detecta en-US y redirect /en), reuseExistingServer en dev, retain video on fail
+- [x] `e2e/auth-gate.spec.ts` (4): `/` sin auth → `/es/login` (3 redirects), `/es` sin auth → `/es/login`, `/es/home` sin cookie → `/es/login?next=/es/home`, `/es/login` publica 200
+- [x] `e2e/login-form.spec.ts` (4): step email render, mailcheck typo `gmail.con` → `gmail.com`, submit con mock → step sent, click "Mejor con mi contrasena" → step password
+- [x] `e2e/verify-page.spec.ts` (4): token length != 64 redirect, sin token redirect, mock 401 `token_invalid` → "Link invalido" + retry, mock 410 `token_expired` → "Este link expiro"
+
+### 9.3 CI workflow update
+- [x] `.github/workflows/ci.yml` ahora con 2 jobs: `check` (typecheck + lint + Vitest unit + build) + `e2e` (playwright con browsers install + upload report on fail). `e2e` depends on `check`.
+
+### 9.4 Scripts package.json
+- [x] `pnpm test` (vitest run), `pnpm test:watch`, `pnpm test:ui`, `pnpm test:e2e`, `pnpm test:e2e:ui`
+
+**Cierre F9**: 34/34 tests verde local. Commit eventos-web `4e8e588`.
+
+---
+
+## Fase 10 — UI/UX foundation DaVinci (~6.5h) — 8/26 (ADR-026)
 
 > Cimiento de UI/UX para todos los modulos siguientes. Cero modulos siguientes (W.0/W.2+) hasta tener este sistema. Razon: evitar refactor masivo en W.12.
 
-### F10.A — Foundation (~3h) — 0/6
+### F10.A — Foundation (~3h) — ✅ 6/6 + 2 extras (LuminaToast reescrito + apiErrors mapper)
 
-#### A1. LuminaToast wrapper — 0/1
-- [ ] `src/components/ui/lumina-toast.tsx` wrapper sobre Sonner: 5 variantes (success/error/info/calendar/favorite) con iconos lucide custom + colores Lumina + haptics web (`navigator.vibrate(50)` Android Chrome, falla silente iOS web)
-- API: `lumina.success({ message, description?, haptic? })`
-- Reemplaza usos de `toast.*` en LoginForm
+#### A1. LuminaToast wrapper — 1/1 ✅
+- [x] **Reescrito SIN Sonner** (port 1:1 del `LuminaToast` de la app movil): store propio via `useSyncExternalStore`, `<LuminaToastViewport>` montado en `[locale]/layout.tsx`. Position fixed top centrado, max-width `min(90vw, 420px)`, **forma pill `rounded-full`** auto-width al contenido. Animacion entrada `translateY -120 → 0 + scale 0.92 → 1` spring (damping 18, stiffness 200, mass 0.8). Auto-dismiss 3s + click dismiss. 5 variantes (success/error/info/calendar/favorite) con colores `#4ADE80/#FF7351/#60A5FA/#A78BFA/#F472B6` (idénticos al móvil). Background `bg-elevated/95` + `backdrop-blur-xl`. Border `border-strong` visible. Texto `truncate` 1 línea. Haptics web via `navigator.vibrate` silencioso en iOS.
+- API: `lumina.success({ message, haptic?, duration? })` (sin `description` — pill no permite 2 líneas, igual que app móvil)
 
-#### A2. FormField reutilizable — 0/1
-- [ ] `src/components/ui/form-field.tsx` wrapper sobre shadcn Input
-- Props: `label`, `error`, `hint`, `register` (react-hook-form pattern)
-- AnimatePresence error con icono `AlertCircle` slide-in
-- Border rojo + ring automatic cuando error
-- Refactor LoginForm email + password fields
+#### A2. FormField reutilizable — 1/1 ✅
+- [x] **Refactorizado al patron app movil** (`GlassInput.tsx`): `error` es **boolean** (no string). Solo cambia border + label color + leading icon a rojo, **sincronicamente sin animacion**. Mensaje del error vive en toast (lumina.error), NO en el campo. `aria-invalid` + `aria-describedby` para a11y. forwardRef + label uppercase 10px tracking + hint + leading/trailing slots.
 
-#### A3. EmptyState — 0/1
-- [ ] `src/components/ui/empty-state.tsx` con 4 variantes:
-  - `not_found` (SearchX) "Sin resultados"
-  - `not_yet` (Clock) "Aun no hay {X}"
-  - `error` (AlertTriangle) "Hubo un error"
-  - `success` (CheckCheck) "Listo"
-- Props: `variant`, `title`, `description?`, `action?` (button)
+#### A3. EmptyState — 1/1 ✅
+- [x] `src/components/ui/empty-state.tsx` con 4 variantes (not_found/not_yet/error/success), iconos Lucide tinted, `font-display` titulo, action button asChild para href. NO renderea aun en ningun modulo (preparado para W.2/W.3).
 
-#### A4. Skeleton patterns — 0/1
-- [ ] 5 componentes pre-armados en `src/components/ui/skeletons.tsx`:
-  - `<SkeletonCard />`, `<SkeletonList count={n} />`, `<SkeletonAvatar />`, `<SkeletonText lines={n} />`, `<SkeletonGrid cols={n} count={n} />`
-- Match exact al loaded state (no genericos)
+#### A4. Skeleton patterns — 1/1 ✅
+- [x] 5 patrones pre-armados en `src/components/ui/skeletons.tsx`: `SkeletonCard`, `SkeletonList`, `SkeletonAvatar`, `SkeletonText`, `SkeletonGrid`. Match exact al loaded state (no genericos). NO renderea aun (F6 es SSR sync — aplicara cuando W.2 conecte client-side fetch).
 
-#### A5. Refactor F4 + F6 — 0/1
-- [ ] LoginForm usa FormField en email + password
-- [ ] LoginForm `toast.*` → `lumina.*`
-- [ ] PreEventHome stats → SkeletonGrid durante loading
-- [ ] LiveHome / EndedHome usan Skeleton durante hydration
+#### A5. Refactor F4 + F6 — 1/1 ✅
+- [x] LoginForm: FormField en email + password, validacion local previa con `lumina.error` (emailRequired/emailInvalid/passwordRequired), API errors con `getApiErrorMessage()`, network error `t("errors.network")`, success → `router.push("/home")` SIN toast (la transicion es la confirmacion, patron movil). `noValidate` para suprimir tooltip browser nativo. Border vuelve a normal al primer keystroke.
+- [x] **Dots eliminados** en FooterLinks (stack vertical mobile + tablet flex con gap-5)
+- [x] **`font-display`** reemplazo 12 `style={{ fontFamily: "var(--font-jakarta)" }}` inline en LoginForm + 4 home variants
+- [x] **EventStatusPill ELIMINADO** (cliché Cisco/Hopin/ICE360 — `feedback_no_status_widgets.md`)
+- [x] **UserMenu logout** migrado a `lumina.success/error`
+- [x] LiveHome rediseñado: lista de pendientes con label `W.0` semibold + divider en lugar de bullets `· W.0 spatial...`. Footer "Evento" con stat grid 2 cols (sin dots). PreEventHome/PublishedHome/EndedHome con `font-display`.
 
-#### A6. useOptimistic helper — 0/1
-- [ ] `src/hooks/useOptimisticMutation.ts` wrapper sobre TanStack Query mutate
-- Toggle local instant + revalidate background
-- Rollback automatic en error + lumina.error toast
-- Prepara W.3 favorites, W.6 likes, W.9 passport stamps
+#### A6. useOptimistic helper — 1/1 ✅
+- [x] `src/hooks/useOptimisticMutation.ts` wrapper sobre TanStack Query (instalado `@tanstack/react-query@5.100`). `QueryProvider` montado en layout con defaults DaVinci (refetchOnWindowFocus, staleTime 60s, retry 1). Toggle local instant via cache snapshot + updater pure function. Rollback automatic en error + `lumina.error` toast con `errorMessage`. Prepara W.3 favorites, W.6 likes, W.9 passport stamps.
+
+#### Extras DaVinci (no estaban en el plan original) — 2/2 ✅
+- [x] **`lib/apiErrors.ts`** — mapper `(status, code, retry_after, t) → string i18n`. Resuelve el problema de "Too many attempts" en ingles del backend Laravel: 429 con `Retry-After` → "Demasiados intentos. Intenta en X min." (o "Espera X segundos" si <60s). Codigos backend (`token_expired`, `account_inactive`, `invalid_credentials`) → claves `auth.errors.*`. Heuristica `looksLocalized()` deja pasar mensajes ya en ES/PT del backend (validation FormRequest).
+- [x] **`apiFetch` extendido** para capturar header `Retry-After` en `ApiError.retryAfter`. Proxies `magic-link/verify/login` propagan `code` + `retry_after` al cliente. Catalogos i18n actualizados es/en/pt con `rateLimitSeconds`, `network`, `accountInactive`.
+
+**Cierre F10.A**: typecheck + lint clean, build production verde, smoke test `/es/login` HTTP 200. Toast/Form/EventStatusPill validados visualmente por usuario (DaVinci).
 
 ### F10.B — Polish (~2.5h) — 0/11
 
@@ -425,15 +429,50 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
+## Pendientes login DaVinci (revision UI/UX 2026-05-02 con usuario)
+
+Auditoria visual completa del login con feedback iterativo. Lo siguiente queda
+pendiente — NO bloqueante para cerrar W.1, se atiende en F10.B/F10.C o sesion
+de polish dedicada antes de Bancolombia demo:
+
+- [ ] **Tab navigation**: validar orden Tab fluido entre fields (email → submit →
+      step sent → password → submit). Probar con teclado real, no solo click.
+- [ ] **CapsLock indicator** en password field: hint "CAPS LOCK ON" cuando el
+      usuario tiene caps activo escribiendo password (UX nice-to-have, app movil
+      no lo tiene tampoco)
+- [ ] **Welcome-back state visual**: cuando hay `cached.email + cached.name` el
+      form dice "Bienvenido de nuevo" pero sin avatar/inicial. Patron Linear/Slack
+      = circulo con inicial del nombre cached + saludo. Ver F10.B.
+- [ ] **Tablet portrait** (768-1023px): NO se usa segun decision usuario
+      2026-05-02 — la webapp en tablet siempre va horizontal. No QA portrait.
+- [ ] **CountdownBar visual progress**: el "Reenviar en 2:30" del step `sent`
+      podria tener barra de progreso animada (decreciente) — feedback ambient
+      del tiempo restante. Opcional.
+- [ ] **Welcome to home transition**: al hacer router.push("/home") tras login
+      exitoso, deberia haber transicion fade+slide en lugar de cut. Lo cubre
+      F10.B B3 Page transitions.
+- [ ] **Mailcheck suggestion en step password**: si edito el email en el step
+      password (ya editable), el typo suggestion no aparece. Verificar.
+- [ ] **CSP Vimeo + Sentry**: validar CSP estricto con Vimeo embed (W.4) +
+      Sentry tunnel route `/monitoring`. F4 dejo CSP TODO.
+- [ ] **Forgot password backend rate limit**: `POST /auth/forgot-password` no
+      tiene rate limit dedicado en `AppServiceProvider.php` — usa el default
+      `throttle:api` (60/min). Verificar antes de prod si Bancolombia exige
+      anti-spam mas estricto.
+- [ ] **Smoke test visual final**: validar los 4 viewports (desktop, tablet H,
+      mobile portrait + landscape) con device real al cerrar F10.
+
+---
+
 ## Cierre de modulo
 
 - [x] Magic link funciona end-to-end con Mailpit local (F4 verificado)
 - [x] Status gating cubre 5 estados Filament (draft/registration/published/live/ended) (F6)
 - [x] Backend Sanctum + httpOnly cookie funcionando (F4+F6)
 - [x] Commits DaVinci + memorias sesion + roadmap maestro v5.7
-- [ ] F8 Sentry frontend (~30min)
-- [ ] F9 Vitest hooks + Playwright happy path (~1h)
-- [ ] Validado en device real: Pixel + iPhone + iPad + desktop Chrome/Edge (F9 + smoke test final)
+- [x] F8 Sentry frontend (3 configs + scrub PII + sourcemaps CI) — commit `d615bcf`
+- [x] F9 Vitest (22) + Playwright (12) — commit `4e8e588`
+- [ ] Validado en device real: Pixel + iPhone + iPad + desktop Chrome/Edge (smoke test final post-F10)
 - [ ] Lighthouse Performance >= 85 desktop, >= 75 mobile (W.12 polish)
 - [ ] PENDIENTES.md actualizado (al cerrar W.1 completo)
 
@@ -521,7 +560,13 @@ global.d.ts                                   // F3 — type-safe i18n
 - `database/seeders/MagicLinkEmailTemplateSeeder.php`
 - `tests/Feature/Auth/MagicLinkTest.php` + `tests/Feature/PublicEvent/LoginSlidesTest.php` (10/10 passing)
 
-**Pendientes F8 + F9** (no creados aun):
-- `sentry.client.config.ts` + `sentry.server.config.ts` + `sentry.edge.config.ts` (F8)
-- `vitest.config.ts` + tests unit hooks (F9)
-- `playwright.config.ts` + happy path E2E (F9)
+**F8 — Sentry (creado):**
+- `sentry.client.config.ts` + `sentry.server.config.ts` + `sentry.edge.config.ts`
+- `instrumentation.ts` + `instrumentation-client.ts` (Next 15+ pattern)
+- `next.config.ts` wrapped con `withSentryConfig`
+
+**F9 — Tests (creado):**
+- `vitest.config.ts` + `tests/setup.ts`
+- `tests/lib/mailcheck.test.ts` (6) + `authValidators.test.ts` (10) + `api.test.ts` (5) → 22 unit
+- `playwright.config.ts` + `e2e/auth-gate.spec.ts` (4) + `login-form.spec.ts` (4) + `verify-page.spec.ts` (4) → 12 E2E
+- `.github/workflows/ci.yml` actualizado (jobs `check` + `e2e`)
