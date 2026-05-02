@@ -1,8 +1,9 @@
 # QA Master — Barrido Completo de Plataforma
 
 > Auditoria endpoint por endpoint de todos los modulos.
-> Actualizado: 2026-04-25 | Metodo: curl real + tests automatizados
-> Tests: 71 archivos, 743 test methods, 1947+ assertions
+> Actualizado: 2026-05-02 | Metodo: curl real + tests automatizados
+> Tests app movil/backend: 71 archivos, 753 test methods (Pest), 1947+ assertions
+> Tests webapp: 22 Vitest unit + 12 Playwright E2E = 34 passing (commit 4e8e588)
 > IMPORTANTE: Socket server debe estar corriendo para real-time. Iniciar con: cd eventos-socket && npx ts-node src/index.ts
 
 ---
@@ -11,7 +12,7 @@
 
 | Modulos probados | Endpoints testados | Tests automatizados | Archivos test | Bugs historicos |
 |-----------------|-------------------|---------------------|---------------|-----------------|
-| 36+ | 193 | 743 | 71 | 286 registrados, todos corregidos |
+| 38+ | 197 | 787 | 77 | 290 registrados, todos corregidos |
 
 ### Cambios desde QA 04-17 (490 tests) a QA 04-25 (712 tests)
 
@@ -34,7 +35,10 @@
 | Photo Contest (lifecycle, anti-gaming, voting) | 25 | 04-24 |
 | Stand Stats (leads, views, favorites, contacts, tier) | 13 | 04-20 |
 | Data Center (API auth, exports, jobs, contract) | 31 | 04-25 |
-| **Total nuevos** | **~251** | 04-18 a 04-25 |
+| W.1B Backend Magic Link (Pest 8) + Login Slides (Pest 2) | 10 | 05-02 |
+| W.1 Webapp Vitest unit (mailcheck/validators/api) | 22 | 05-02 |
+| W.1 Webapp Playwright E2E (auth-gate/login-form/verify-page) | 12 | 05-02 |
+| **Total nuevos** | **~295** | 04-18 a 05-02 |
 
 ---
 
@@ -1041,7 +1045,199 @@ Tests cubren: contest toggle, horario apertura/cierre, 1 entry por attendee, ant
 
 ---
 
-## Estado final QA (2026-04-25)
+## 22. Webapp W.1 (eventos-web) — Sesion 2026-05-02
+
+> Repo nuevo `C:\laragon\www\eventos-web` (Next.js 16 + Tailwind 4 + TS strict + i18n + tokens Lumina Noir/Lux portados).
+> 8 commits W.1: ba2fc24, 811b7dd, e425570, ffd8589, 6ce5aec, 96fff15, d615bcf, 4e8e588.
+> Backend complementario: `feature/magic-link-auth` en eventos-backend con commits 5d5e25d + ef24003 + d44ff42.
+
+### 22.1 W.1B Backend Magic Link (commit eventos-backend `ef24003`)
+
+| Test | Resultado | HTTP | Notas |
+|---|---|---|---|
+| `POST /auth/magic-link` email registrado | OK | 200 | Crea token + dispatch SendEmailJob, response generico anti-enumeration |
+| `POST /auth/magic-link` email NO registrado | OK | 200 | Mismo response generico, sin token creado, sin email queued |
+| Anti-enumeration: registrado vs fake responses identicos | OK | 200 | `expect(r1.status).toBe(r2.status)` + same message |
+| Rate limit: 4ta peticion mismo email/hora NO crea token | OK | 200 | DB hard limit `where created_at >= now()->subHour()->count() >= 3` |
+| `POST /auth/verify-magic-link` token valido | OK | 200 | Devuelve `{token: 'sanctum-XXX', user: UserResource}`, marca `used_at` |
+| Token expirado (>15min) | OK | 410 | `code: token_expired` |
+| Token usado 2x (segundo intento) | OK | 410 | `code: token_used` |
+| Token invalido (random) | OK | 401 | `code: token_invalid` |
+| `GET /events/{slug}/login-slides` filtrado correcto | OK | 200 | Solo enabled + dentro window + ordenados por sort_order |
+| Cache login-slides + Observer invalidation | OK | — | Cache::has post-fetch=true, Observer borra al save() |
+
+**Tests Pest**: `tests/Feature/Auth/MagicLinkTest.php` (8) + `tests/Feature/PublicEvent/LoginSlidesTest.php` (2) = **10/10 passing**.
+
+**Bug captado SQLite**: ALTER ENUM no soportado, type 'magic_link' rechazado. Fix: tests usan `Queue::fake()` (no Mail::fake()) para evitar SendEmailJob → email_logs insert.
+
+**E2E manual con curl + Mailpit**:
+| Caso | Resultado |
+|---|---|
+| Curl POST /auth/magic-link real | 200 + token DB + email Mailpit |
+| Curl POST /auth/verify-magic-link con raw token | 200 + bearer Sanctum |
+| Curl POST /auth/verify-magic-link mismo token 2x | 410 token_used |
+
+### 22.2 W.1 F0 — Scaffold + CI
+
+| Check | Resultado | Notas |
+|---|---|---|
+| pnpm create next-app@latest | OK | Next 16.2.4 + React 19.2 + Tailwind 4 + TS strict |
+| typecheck | OK | `noUncheckedIndexedAccess` + `noImplicitOverride` |
+| lint | OK | eslint 9 + eslint-config-next |
+| Build production | OK | 977ms compile, 4 paginas estaticas |
+| Dev server (Turbopack) | OK | 407ms ready |
+| HTTP GET / | 200 | placeholder page funciona |
+| GitHub Actions CI workflow | OK | typecheck + lint + build + tests |
+
+### 22.3 W.1 F1 — Tokens Lumina Noir + Lux + theme switcher
+
+| Check | Resultado | Notas |
+|---|---|---|
+| Tokens portados de eventos-app/lib/theme-noir.ts y theme-lux.ts | OK | 8 surfaces, 6 textos, 5 glass, 5 categorias, dark island, gold |
+| @theme inline expone como Tailwind utilities | OK | Tailwind 4 sin tailwind.config.ts |
+| next-themes wrapper (Noir default, Lux opcional) | OK | data-theme attribute, localStorage persist |
+| useMediaQuery con useSyncExternalStore (SSR-safe) | OK | mobile/tablet/desktop breakpoints |
+| useReducedMotionPref | OK | CSS @media + JS hook |
+| `:focus-visible` con accent dynamic | OK | outline 2px solid var(--accent) |
+| GET / 200 con tokens aplicados | OK | 255ms first hit, 29ms cached, sin warnings hydration |
+
+**Bug captado**: Next 16 ESLint rule `react-hooks/set-state-in-effect` rechaza setState sincronico. Fix: useSyncExternalStore en useMediaQuery + useIsClient.
+
+### 22.4 W.1 F2 — shadcn/ui + Sonner + tokens merge
+
+| Check | Resultado | Notas |
+|---|---|---|
+| shadcn 2.x init con preset radix-nova | OK | 13 componentes pedidos + 2 deps (textarea, input-group) |
+| Merge tokens shadcn → Lumina | OK | Aliases `--background`, `--foreground`, `--card`, `--primary`, etc. apuntan a tokens Noir/Lux |
+| TooltipProvider en root layout | OK | delayDuration 200 |
+| Sonner Toaster con theme mapping noir→dark, lux→light | OK | position bottom-right |
+| Build production | OK | 4 paginas, 431ms generate |
+| GET / 200 | 200 | 357ms first, 40905 bytes demo |
+
+### 22.5 W.1 F3 — i18n con next-intl
+
+| Check | Resultado | Notas |
+|---|---|---|
+| next-intl 4.5 routing prefix `/es/`, `/en/`, `/pt/` | OK | localePrefix: always |
+| getRequestConfig + hasLocale validation | OK | timeZone America/Bogota |
+| Catalogos messages/{es,en,pt}.json | OK | 5 namespaces, 50+ keys, interpolation |
+| Type-safe via global.d.ts AppConfig.Messages | OK | Cualquier key invalida = error TS |
+| App router reorganizado a `app/[locale]/` | OK | NextIntlClientProvider envuelve providers |
+| LanguageSwitcher dropdown locale-aware | OK | Persistencia cookie NEXT_LOCALE |
+| Build production | OK | 6 paginas (3 locales SSG + middleware) |
+| GET / | 307 | Redirect a /es (default locale) |
+| GET /es, /en, /pt | 200 | Strings correctos por idioma verificados |
+
+**Bug captado**: Next 16 deprecó `middleware.ts` → `proxy.ts`. Renombrado, warning eliminado. Cache `.next/` quedó stale tras mover page → `rm -rf .next` resolvió typecheck.
+
+### 22.6 W.1 F4 + F5 — Magic link + Login Slideshow + Tier 1+2 (commit `6ce5aec`)
+
+| Check | Resultado | Notas |
+|---|---|---|
+| LoginCard layout split 60/40 desktop, 55/45 tablet H, sheet adaptativo mobile | OK | max-height 78%, no height fijo |
+| LoginSlideshow Ken Burns 1.0→1.08 + crossfade | OK | Framer Motion AnimatePresence |
+| Soporta video_url MP4 en primer slot (Tier 2 #9) | OK | `<video autoplay loop muted playsinline>` con fallback imagen |
+| LivePulse mock RT con jitter 3s | OK | Solo en live_today/live_now |
+| EventStatusPill contextual upcoming/live_today/ended | OK | Oculto en live_now (solo Live Pulse) |
+| EventLogo single o doble (organizer + event) | OK | Cuando organizer_logo_url distinto |
+| TabletRotateOverlay portrait detection | OK | matchMedia listener |
+| NetworkStatusBanner offline | OK | navigator.onLine listener via useSyncExternalStore |
+| State machine 4 steps email→sent→password→verifying | OK | useState + setStep |
+| LoginForm con react-hook-form ❌ NO | — | Decidido useState simple, evita 50KB bundle |
+| Mailcheck typo detection (gmail.con → gmail.com) | OK | Wrapper LATAM domains (bancolombia, etc.) |
+| useLastEmail localStorage SSR-safe | OK | useSyncExternalStore + storage event listener |
+| Welcome back conditional | OK | Si lastUserName cached + email coincide |
+| ARIA live regions por step | OK | aria-live="polite" |
+| Auto-focus inteligente por step | OK | useRef email/password input |
+| inputmode="email" + autocomplete="email webauthn" | OK | Apple Passkey + Google Smart Lock |
+| Microcopy humano i18n (es/en/pt) | OK | 20+ keys auth.login con interpolation HTML |
+
+**API routes Next.js (proxy a backend Laravel)**:
+| Endpoint | Test | Resultado |
+|---|---|---|
+| `POST /api/auth/magic-link` | curl con email real | 200 + email Mailpit |
+| `POST /api/auth/magic-link` | email fake (anti-enum) | 200 mismo response, 0 emails |
+| `POST /api/auth/verify` con token raw | curl real | Cookie httpOnly seteada |
+| `POST /api/auth/login` (password) | curl con creds | 200 + cookie |
+| `POST /api/auth/logout` | curl con cookie | Cookie limpiada |
+
+**E2E real verificado**: GET /es/login → submit email → POST /api/auth/magic-link → backend Laravel → email entregado a Mailpit (subject correcto, branded).
+
+### 22.7 W.1 F6 — Layout protegido + Status gating (commit `96fff15`)
+
+| Check | Resultado | Notas |
+|---|---|---|
+| proxy.ts auth gate sin cookie | OK | Redirect /login?next={path} |
+| getCurrentUser server-side validation | OK | Cookie zombie cleanup en 401 |
+| AppHeader sticky con logo + LanguageSwitcher + ThemeToggle + UserMenu | OK | Slot center placeholder PillBar |
+| UserMenu DropdownMenu (Perfil/Settings/Logout) | OK | Logout funcional + forgetEmail() |
+| 4 home variants segun event.status | OK | PreEventHome/PublishedHome/LiveHome/EndedHome |
+| Backend extension PublicEventController.show() | OK | Expone status + 8 campos nuevos (commit eventos-backend d44ff42) |
+| Build production | OK | 19 paginas + 4 API routes + middleware (529ms generate) |
+
+**Auth gate E2E**:
+| Caso | Resultado |
+|---|---|
+| GET /es/home sin cookie | 307 → /es/login?next=%2Fes%2Fhome |
+| GET / sin cookie | 307 → /es (luego cadena hasta /es/login) |
+| GET /es sin cookie | 307 → /es/login |
+| GET /es/login publica | 200 |
+| GET /es/home con cookie Sanctum real | 200 + render LiveHome correcto |
+
+**Bug captado**: Backend `/auth/me` devuelve `{ data: { user, attendee, role } }` no `{ data: ...user }`. Fix `getCurrentUser` extrae `result.data.user`.
+
+### 22.8 W.1 F8 — Sentry frontend (commit `d615bcf`)
+
+| Check | Resultado | Notas |
+|---|---|---|
+| @sentry/nextjs instalado | OK | Setup manual (wizard requiere TTY) |
+| 3 configs: client + server + edge | OK | Cada uno con beforeSend scrub PII |
+| instrumentation.ts (Next 15+ pattern) | OK | onRequestError + register server/edge |
+| withSentryConfig wrapper en next.config.ts | OK | Tunnel /monitoring + sourcemaps deleteAfterUpload |
+| Scrub PII: email/password/token/cookie/Authorization | OK | beforeSend client + server |
+| ignoreErrors browser extensions + ResizeObserver | OK | denyUrls chrome-extension/moz-extension |
+| Build production sin DSN | OK | Sentry inerte (zero overhead), bundle sin cambios |
+| typecheck + lint | OK | sourcemaps.deleteSourcemapsAfterUpload (no hideSourceMaps) |
+
+### 22.9 W.1 F9 — Vitest + Playwright (commit `4e8e588`)
+
+**22 Vitest unit tests passing**:
+| Archivo | Tests | Cubre |
+|---|---|---|
+| `tests/lib/mailcheck.test.ts` | 6 | Typo detection, dominios LATAM (bancolombia.com.co reconocido) |
+| `tests/lib/authValidators.test.ts` | 10 | zod schemas: emailSchema, magicLinkRequestSchema, verifyMagicLinkSchema, passwordLoginSchema |
+| `tests/lib/api.test.ts` | 6 | apiFetch headers, bearer, body JSON, ApiError class con status + code |
+
+**12 Playwright E2E tests passing**:
+| Archivo | Tests | Cubre |
+|---|---|---|
+| `e2e/auth-gate.spec.ts` | 4 | / sin auth → /es/login, /es sin auth → /es/login, /es/home → /login?next=, /es/login publica 200 |
+| `e2e/login-form.spec.ts` | 4 | Render step email, mailcheck typo gmail.con→gmail.com, mock /api/auth/magic-link → step sent, click password → step password con email pill |
+| `e2e/verify-page.spec.ts` | 4 | token length!=64 redirect, sin token redirect, mock 401 token_invalid muestra UI, mock 410 token_expired muestra UI |
+
+**Bugs captados**:
+1. Vitest ApiError test: Response stream consumido al primer .json(). Fix: mockImplementation crea Response nueva.
+2. Playwright "/" expected /es directo, hay cadena 3 redirects. Fix: assert termina en /es/login.
+3. Chrome Playwright detecta en-US Accept-Language → next-intl /en. Fix: locale es-CO + extraHTTPHeaders en playwright.config.
+
+**CI workflow update**: 2 jobs (check con typecheck+lint+vitest+build, e2e con Playwright + upload report on fail).
+
+### 22.10 Visual QA pendiente W.1 (no automatizable — Sprint A futuro)
+
+- [ ] Smoke test login `/es/login` browser real (Chrome/Edge/Safari/Firefox)
+- [ ] Comparar lado-a-lado con `design/features/webapp/Login/iteraciones/login-v7-davinci-FINAL.html`
+- [ ] Validar 4 steps state machine en uso real (transiciones spring fluidas)
+- [ ] Validar 5 estados evento (draft/registration/published/live/ended) en home variants
+- [ ] Mobile real: Pixel + iPhone 14 (bottom sheet adaptativo, no rompe en 360px)
+- [ ] Tablet portrait: overlay rotacion aparece correcto
+- [ ] Tablet landscape: layout escalado correcto
+- [ ] Lighthouse Performance >= 85 desktop / >= 75 mobile
+- [ ] Lighthouse Accessibility >= 95
+- [ ] Seedear 2-3 event_login_slides en backend para ver slideshow con imagenes reales
+
+---
+
+## Estado final QA (2026-05-02)
 
 | Categoria | Tests | OK | Bugs | Notas |
 |-----------|-------|-----|------|-------|
@@ -1070,4 +1266,6 @@ Tests cubren: contest toggle, horario apertura/cierre, 1 entry por attendee, ant
 | Presets/Fields/Theme | 30+ | 30 | 0 | 11 tipos, onboarding, branding |
 | Admin endpoints | 30+ | 30 | 0 | Bans, polls, notifications, uploads, games |
 | Data Center | 31 | 31 | 8 corr. | 44 exports, 7 endpoints, SPA standalone |
-| **TOTAL** | **743** | **743** | **0 activos** | 71 archivos test, 1947+ assertions |
+| **W.1B Backend Magic Link** | 10 | 10 | 1 SQLite | Pest tests + curl + Mailpit. SQLite ENUM bug → fix con Queue::fake |
+| **W.1 Webapp F0-F9 (eventos-web)** | 34 | 34 | 3 corr. | 22 Vitest unit + 12 Playwright E2E. Bugs: Response stream, redirect chain, Chrome locale |
+| **TOTAL** | **787** | **787** | **0 activos** | 71 archivos backend test + 6 webapp test = 77 archivos, ~1990+ assertions |
