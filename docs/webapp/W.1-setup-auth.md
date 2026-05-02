@@ -259,7 +259,13 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 
 ---
 
-## Fase 7 — Tour de bienvenida (~1.5h) — 0/6
+## Fase 7 — Tour de bienvenida — ⏭️ MOVIDA A W.X (ADR-025)
+
+> **Decision 2026-05-02d**: El WelcomeShowcase se mueve a fase tardia despues de que esten W.3 (Agenda), W.4 (Streaming), W.5 (Speakers), W.7 (Sponsors), W.8 (Networking) y W.9 (Gamification). El showcase reusa componentes reales en miniatura — implementarlo aca con placeholders genera codigo de descarte.
+>
+> Mientras tanto, post-login va directo a `/home` sin showcase. Flag `onboarding_completed` localStorage queda preparado para cuando W.X llegue.
+
+## Fase 7 (legacy plan) — Tour de bienvenida (~1.5h) — DIFERIDA
 
 ### 7.1 Componente — 0/3
 - [ ] `<WelcomeTour />` overlay full screen con 4-6 escenas

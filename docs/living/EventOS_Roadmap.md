@@ -1,7 +1,7 @@
 # EventOS — Roadmap
 
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
-_Actualizado: 2026-05-02 | v5.6 — W.1 F6 webapp CERRADA. Middleware auth + layout protegido + status gating con 4 home variants (draft/registration/published/live/ended) — replica logica app movil_
+_Actualizado: 2026-05-02 | v5.7 — ADR-025: WelcomeShowcase movido de W.1 F7 a W.X tardia (post W.3+W.4+W.5+W.7+W.8+W.9). Cero codigo de descarte_
 
 ---
 

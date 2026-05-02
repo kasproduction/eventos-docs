@@ -88,7 +88,7 @@ Lumina Noir solido (no glass de entorno real). Paneles con bordes sutiles + opac
 | Modulo | Roadmap | Detalle | Horas |
 |---|---|---|---|
 | W.0 | `W.0-spatial-ui.md` | PanelManager, PillBar, presets, command palette, drag | ~12h |
-| W.1 | `W.1-setup-auth.md` | Next.js setup + magic link + email/password + i18n + tour + login slideshow (event_login_slides) | ~10h |
+| W.1 | `W.1-setup-auth.md` | Next.js setup + magic link + email/password + i18n + login slideshow (event_login_slides). **Tour movido a W.X (ADR-025)** | ~9h |
 | W.1B | `W.1-backend-magic-link.md` | **Sesion backend separada bloqueante** — endpoints magic link + tabla event_login_slides + Filament resource + Mailable | ~4h |
 | W.2 | `W.2-home.md` | Hero, countdown, happening now, GamificationHud, recap banner, anuncios mini, sponsors preview, module menu, post-event survey, EventArchive | ~9h |
 | W.3 | `W.3-agenda.md` | Lista, filtros, favoritos, detalle, lifecycle states, conflictos, room-checkin, .ics, ratings post-sesion, recordatorios, session chat | ~11h |
@@ -106,6 +106,7 @@ Lumina Noir solido (no glass de entorno real). Paneles con bordes sutiles + opac
 | W.15 | `W.15-vendor-dashboard.md` | Mi Stand, Leads capturados, Stats, Team (OPCIONAL Fase 1) | ~6h |
 | W.16 | `W.16-live-moments.md` | Trivia Kahoot engine, Sorteo Ceremony display, Concurso Fotos display, Golden Ticket reveal, Spin Wheel readonly | ~6h |
 | W.17 | `W.17-soporte.md` | Tickets de soporte, chat staff, RT updates | ~3h |
+| **W.X** | `W.X-welcome-showcase.md` (TBD) | **WelcomeShowcase cinematic post-login** — port de `showcase-onboarding-v6.html` con tokens Lumina Noir + accent dinamico + componentes reales en miniatura. Bloqueado por W.3+W.4+W.5+W.7+W.8+W.9 (ADR-025) | ~3.5h |
 
 ---
 
@@ -266,8 +267,9 @@ Detalle en `W.1-setup-auth.md`. Nota: el demo `design/showcase-onboarding-v6.htm
 | W.15 Vendor Dashboard | ~6h | **Opcional** | Solo si cliente solicita |
 | W.16 Live Moments (subset) | ~6h | Si | Trivia + Sorteo + Concurso fotos display |
 | W.17 Soporte | ~3h | Si | Modulo nuevo |
-| **Total bloqueante** | **~132h** | | **~30-34 dias work** |
-| **Total con W.15 opcional** | **~138h** | | **~31-36 dias work** |
+| W.X WelcomeShowcase | ~3.5h | Si | Cinematic onboarding — bloqueado por W.3+W.4+W.5+W.7+W.8+W.9 (ADR-025). Reusa componentes reales en miniatura |
+| **Total bloqueante** | **~135.5h** | | **~31-35 dias work** |
+| **Total con W.15 opcional** | **~141.5h** | | **~32-37 dias work** |
 
 > **Nota**: estimacion asume backend 100% listo. Cero trabajo backend nuevo previsto excepto endpoints magic link (~3-4h backend, sesion separada). Si algun modulo requiere ajuste backend, **es bloqueante del modulo** y se planea aparte.
 

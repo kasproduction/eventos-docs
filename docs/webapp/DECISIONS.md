@@ -268,11 +268,44 @@
 
 ---
 
-## ADR-019 — Onboarding webapp como "tour" en W.1 (no W.2) — 2026-05-01 — aceptado
+## ADR-019 — Onboarding webapp como "tour" en W.1 (no W.2) — 2026-05-01 — **superseded por ADR-025**
 
-**Decision**: El mini tour de bienvenida vive en **W.1 (Setup + Auth)**, no en W.2 (Home). Razon: el tour aparece despues del primer login y antes de que el usuario interactue con Home.
+**Decision original**: El mini tour de bienvenida vive en **W.1 (Setup + Auth)**, no en W.2 (Home).
 
 **Consecuencias**: W.1 incluye componente `WelcomeTour.tsx` + flag localStorage. Detalle en `W.1-setup-auth.md`.
+
+**Superseded 2026-05-02d**: ver ADR-025. El showcase muestra modulos que aun no existen (W.3 agenda, W.4 streaming, W.5 speakers, W.7 sponsors, W.8 networking, W.9 gamification). Implementarlo en W.1 con placeholders genera codigo de descarte cuando los modulos reales esten.
+
+---
+
+## ADR-025 — WelcomeShowcase movido a fase tardia (W.X post W.9) — 2026-05-02d — aceptado
+
+**Decision**: El **WelcomeShowcase** (cinematic onboarding tipo `showcase-onboarding-v6.html`) se mueve de W.1 F7 a una **fase nueva W.X** despues de que esten construidos W.3 (Agenda), W.4 (Streaming), W.5 (Speakers), W.7 (Sponsors), W.8 (Networking) y W.9 (Gamification).
+
+**Razon**: El showcase es un **trailer cinematico que muestra los 6 features principales** del evento. Cada beat usa un modulo real:
+- Beat 1 SPEAKERS → componentes de W.5
+- Beat 2 AGENDA → componentes de W.3
+- Beat 3 STREAMING → player de W.4
+- Beat 4 CONNECT → networking + social de W.8/W.6
+- Beat 5 GAMIFICATION → leaderboard de W.9
+- Beat 6 SPONSORS → brand wall de W.7
+
+Si se construye el showcase en W.1 con datos inventados y componentes placeholder, cuando los modulos reales lleguen el showcase queda desfasado visual y conceptualmente. Reusar los componentes reales en miniatura (con datos demo si aplica) garantiza coherencia + cero codigo de descarte.
+
+**Razon decision DaVinci**: feedback usuario explicito 2026-05-02d — "yo dejaria esto para el final porque depende de mucho de como se ven el resto de modulos".
+
+**Alternativas consideradas**:
+- W.1 F7 con placeholders (plan original) — descartado, deuda tecnica
+- Showcase opcional en W.12 polish — descartado, merece su propia W
+- Skip showcase completo — descartado, era diferenciador clave del producto
+
+**Consecuencias**:
+- W.1 F7 **removido**. W.1 cierra con F0-F6 + F8 (Sentry) + F9 (tests)
+- Nueva W.X en `PLAN.md` "WelcomeShowcase" entre W.9 y W.10 (o como sub-modulo de W.12)
+- Estimado revisado W.1 total: ~9h (no 10h)
+- Estimado WelcomeShowcase: ~3.5h (cuando llegue)
+- localStorage flag `onboarding_completed` sigue, pero NO se setea desde W.1 (queda no-op hasta W.X)
+- Mientras tanto, post-login → directo a `/home` sin showcase
 
 ---
 
