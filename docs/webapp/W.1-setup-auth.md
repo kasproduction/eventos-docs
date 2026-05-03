@@ -421,35 +421,42 @@ shadcn init agrego `:root` + `.dark` con `oklch(...)` grises que duplicaban mis 
 ## Pendientes login DaVinci (revision UI/UX 2026-05-02 con usuario)
 
 Auditoria visual completa del login con feedback iterativo. Lo siguiente queda
-pendiente — NO bloqueante para cerrar W.1, se atiende en F10.B/F10.C o sesion
-de polish dedicada antes de Bancolombia demo:
+pendiente — NO bloqueante para cerrar W.1, se atiende en sesion de polish
+dedicada antes de Bancolombia demo:
+
+### Pendientes activos
 
 - [ ] **Tab navigation**: validar orden Tab fluido entre fields (email → submit →
       step sent → password → submit). Probar con teclado real, no solo click.
 - [ ] **CapsLock indicator** en password field: hint "CAPS LOCK ON" cuando el
       usuario tiene caps activo escribiendo password (UX nice-to-have, app movil
       no lo tiene tampoco)
-- [ ] **Welcome-back state visual**: cuando hay `cached.email + cached.name` el
-      form dice "Bienvenido de nuevo" pero sin avatar/inicial. Patron Linear/Slack
-      = circulo con inicial del nombre cached + saludo. Ver F10.B.
-- [ ] **Tablet portrait** (768-1023px): NO se usa segun decision usuario
-      2026-05-02 — la webapp en tablet siempre va horizontal. No QA portrait.
 - [ ] **CountdownBar visual progress**: el "Reenviar en 2:30" del step `sent`
       podria tener barra de progreso animada (decreciente) — feedback ambient
       del tiempo restante. Opcional.
-- [ ] **Welcome to home transition**: al hacer router.push("/home") tras login
-      exitoso, deberia haber transicion fade+slide en lugar de cut. Lo cubre
-      F10.B B3 Page transitions.
 - [ ] **Mailcheck suggestion en step password**: si edito el email en el step
       password (ya editable), el typo suggestion no aparece. Verificar.
 - [ ] **CSP Vimeo + Sentry**: validar CSP estricto con Vimeo embed (W.4) +
-      Sentry tunnel route `/monitoring`. F4 dejo CSP TODO.
+      Sentry tunnel route `/monitoring`. F4 dejo CSP TODO. Headers basicos
+      X-Frame-Options + nosniff + HSTS + Referrer-Policy ya aplicados (BUG-317)
 - [ ] **Forgot password backend rate limit**: `POST /auth/forgot-password` no
       tiene rate limit dedicado en `AppServiceProvider.php` — usa el default
       `throttle:api` (60/min). Verificar antes de prod si Bancolombia exige
       anti-spam mas estricto.
-- [ ] **Smoke test visual final**: validar los 4 viewports (desktop, tablet H,
-      mobile portrait + landscape) con device real al cerrar F10.
+- [ ] **Smoke test visual final**: validar los 3 viewports (desktop, tablet H,
+      mobile portrait) con device real al cerrar W.1. Tablet portrait NO
+      aplica (decision usuario 2026-05-02 — webapp tablet siempre horizontal)
+
+### Resueltos en F10.B + F10.C (2026-05-02)
+
+- [x] ~~**Welcome to home transition**~~ → cubierto por F10.B3 `[locale]/template.tsx`
+      con fade + slide-up 8px (300ms ease) en cada navegacion. Login → home
+      anima automaticamente
+- [x] ~~**Tablet portrait QA**~~ → decision usuario: NO se usa, solo horizontal
+- [x] ~~**Welcome-back avatar con inicial del nombre**~~ → OBSOLETO. BUG-316
+      removio `cached.name` por PII (GDPR). Ya solo guardamos email cached.
+      Si se reintroduce saludo personalizado, leer del backend tras login y
+      mantener en memoria (no persistir nombre)
 
 ---
 
