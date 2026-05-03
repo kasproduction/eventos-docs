@@ -3,6 +3,32 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-05-02 — Auditoria seguridad webapp post-F10 (4 bugs)
+
+### BUG-317: Webapp sin headers de seguridad basicos (RESUELTO)
+- **Severidad:** MEDIA — `next.config.ts` no configuraba ningun header de seguridad. Sin `X-Frame-Options` la webapp es embebible en iframes maliciosos (clickjacking). Sin `X-Content-Type-Options: nosniff` browsers pueden inferir MIME types incorrectos (XSS via assets). Sin HSTS, downgrade attacks HTTPS→HTTP posibles
+- **Fix:** `next.config.ts` agrega `headers()` con: `X-Frame-Options: SAMEORIGIN` (override per-evento si Bancolombia pide embed via `events.embed_allowed_origins`), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Strict-Transport-Security: max-age=31536000; includeSubDomains`, `X-DNS-Prefetch-Control: on`. CSP completa diferida a W.4 streaming (necesita whitelisting Vimeo + socket.eventos.app + Sentry tunnel `/monitoring`)
+- **Verificacion:** `curl -I http://localhost:3000/es/login` confirma headers en response
+- **Archivo:** `eventos-web/next.config.ts`
+
+### BUG-316: PII (nombre usuario) en localStorage + cookie (RESUELTO)
+- **Severidad:** MEDIA — `useLastEmail` guardaba `eventos:lastUserName` en localStorage. `login/page.tsx` leia cookie `eventos_last_name`. Email en localStorage es aceptable (low sensitivity, public-ish), pero el nombre + email = PII identificable bajo GDPR. En maquinas compartidas el nombre es visible a otros usuarios via DevTools
+- **Fix:** `useLastEmail` ahora solo expone `{ email }`. `forgetEmail()` limpia la key legacy `eventos:lastUserName`. `LoginForm` props `cached: { email }` (sin name). `login/page.tsx` y `verify/page.tsx` no leen cookie name. Si se necesita saludo personalizado, leer del backend tras login y mantener en memoria
+- **Archivos:** `eventos-web/src/hooks/useLastEmail.ts`, `components/auth/LoginForm.tsx`, `app/[locale]/(auth)/login/page.tsx`, `app/[locale]/(auth)/verify/page.tsx`
+
+### BUG-315: dangerouslySetInnerHTML con email del usuario en step sent (RESUELTO)
+- **Severidad:** ALTA — En `LoginForm` step `sent` el mensaje "Te enviamos un link a {email}" se renderizaba via `dangerouslySetInnerHTML` con email interpolado. Aunque pasaba por `escapeHtml()` (4 caracteres: `&<>"`), la funcion era incompleta (faltaba `'`) y el patron es de alto riesgo XSS por defecto
+- **Causa:** Necesidad de inyectar HTML `<strong>` alrededor del email + interpolar `{fromAddress}` (otra cadena con HTML). El refactor anterior no aprovecho el patron `t.rich()` de next-intl
+- **Fix:** Reemplazado `dangerouslySetInnerHTML` por `t.rich("magicLinkSent.description", { email, emailTag: chunks => <strong>...</strong>, fromTag: ... })`. El email se interpola como ReactNode (escape automatico). Mensajes i18n actualizados (es/en/pt) con tags `<emailTag>{email}</emailTag>` en lugar de placeholders + HTML inline. Funcion `escapeHtml` eliminada del LoginForm
+- **Archivos:** `eventos-web/src/components/auth/LoginForm.tsx`, `messages/{es,en,pt}.json`
+
+### BUG-314: Password schema sin .max() — payload bomb potencial (RESUELTO)
+- **Severidad:** CRITICA — `passwordLoginSchema` validaba password con `z.string().min(1)` sin limite superior. Cliente malicioso puede enviar password de varios MB sin que el frontend lo rechace, aumentando carga al backend (parsing JSON + bcrypt comparison sobre string gigante = DoS por amplificacion)
+- **Fix:** `passwordLoginSchema.password` ahora `z.string().min(1).max(128, { message: "Contrasena demasiado larga" })`. 128 chars cubre passwords razonables de gestores enterprise (KeePass, 1Password) sin permitir abuso
+- **Archivo:** `eventos-web/src/lib/authValidators.ts`
+
+---
+
 ## 2026-05-02 — W.1 webapp F10.B + F10.C + auditoria login (8 bugs)
 
 ### BUG-313: AnimatedNumber rebote en countdown timer (RESUELTO)
