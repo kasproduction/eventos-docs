@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="es" data-theme="noir">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EventOS — Home demo (3 estados)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-elevated: #141414;
+    --bg-sunken: #050505;
+    --bg-raised: #111111;
+    --surface-low: rgba(255,255,255,0.03);
+    --surface-medium: rgba(255,255,255,0.04);
+    --surface-high: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.06);
+    --border-light: rgba(255,255,255,0.12);
+    --border-strong: rgba(255,255,255,0.18);
+    --text-primary: rgba(255,255,255,0.85);
+    --text-secondary: rgba(255,255,255,0.55);
+    --text-muted: rgba(255,255,255,0.35);
+    --text-label: rgba(255,255,255,0.25);
+    --accent: #ffffff;
+    --accent-text: #000000;
+    --gold: #b5a68b;
+    --pulse: #ef4444;
+    --success: #4ADE80;
+    --info: #60A5FA;
+    --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
+    --font-sans: "Urbanist", system-ui, sans-serif;
+    --spring-soft: cubic-bezier(0.34, 1.36, 0.64, 1);
+    --spring-snap: cubic-bezier(0.16, 1.2, 0.3, 1);
+    --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-sunken);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    overflow-y: auto;
+    background-image:
+      radial-gradient(ellipse at 20% 80%, rgba(99,102,241,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 20%, rgba(168,85,247,0.05) 0%, transparent 55%);
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  /* ========== Selector estado (debug) ========== */
+  .state-selector {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    padding: 4px;
+    border-radius: 999px;
+    z-index: 200;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .state-btn {
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 150ms var(--ease-out);
+  }
+  .state-btn:hover { color: var(--text-primary); }
+  .state-btn.active {
+    background: var(--accent);
+    color: var(--accent-text);
+  }
+
+  /* ========== Stage simulando shell ========== */
+  .stage {
+    min-height: 100vh;
+    width: 100vw;
+    padding: 80px 32px 32px 88px;
+  }
+
+  .home-card {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.3),
+      0 8px 16px rgba(0,0,0,0.35),
+      0 24px 48px rgba(0,0,0,0.45),
+      0 56px 96px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  /* Bell flotante top-right de la card */
+  .bell-floating {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 50;
+    width: 38px; height: 38px;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    background: var(--surface-medium);
+    color: var(--text-secondary);
+    backdrop-filter: blur(8px);
+    transition: all 150ms var(--ease-out);
+    border: 1px solid var(--border);
+  }
+  .bell-floating:hover { background: var(--surface-high); color: var(--text-primary); }
+  .bell-floating svg { width: 18px; height: 18px; stroke-width: 2; }
+  .bell-floating .badge {
+    position: absolute;
+    top: -3px; right: -3px;
+    background: var(--pulse);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    min-width: 16px; height: 16px;
+    border-radius: 999px;
+    display: grid; place-items: center;
+    padding: 0 4px;
+    box-shadow: 0 0 0 2px var(--bg-elevated);
+  }
+
+  /* ========== HERO ========== */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 56px 48px 48px;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+  }
+  .hero-bg.pre {
+    background-image:
+      linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.6) 60%, rgba(10,10,10,0.95) 100%),
+      linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4c1d95 100%);
+  }
+  .hero-bg.live {
+    background-image:
+      linear-gradient(180deg, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0.7) 60%, rgba(10,10,10,0.95) 100%),
+      linear-gradient(135deg, #7f1d1d 0%, #991b1b 40%, #450a0a 100%);
+  }
+  .hero-bg.ended {
+    background-image:
+      linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.7) 60%, rgba(10,10,10,0.95) 100%),
+      linear-gradient(135deg, #78716c 0%, #44403c 40%, #292524 100%);
+  }
+  .hero-content { position: relative; z-index: 1; }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+  .hero-eyebrow.live {
+    color: #fca5a5;
+  }
+  .hero-eyebrow.live::before {
+    content: '';
+    width: 8px; height: 8px;
+    background: #ef4444;
+    border-radius: 999px;
+    box-shadow: 0 0 8px #ef4444;
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+  .hero-eyebrow.ended {
+    color: var(--gold);
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin: 0 0 12px;
+    max-width: 800px;
+  }
+  .hero-subtitle {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin: 0 0 24px;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+
+  /* Hero countdown integrado */
+  .hero-countdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(12px);
+    padding: 12px 18px;
+    border-radius: 14px;
+    margin-top: 8px;
+  }
+  .countdown-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .countdown-value {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .countdown-units {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 38px;
+  }
+  .countdown-unit-num {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .countdown-unit-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* Hero LIVE — sesión activa */
+  .hero-live-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(12px);
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-top: 16px;
+    max-width: 560px;
+  }
+  .hero-live-info { flex: 1; min-width: 0; }
+  .hero-live-info .session-meta {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .hero-live-info .session-name {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .hero-live-info .session-speaker {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .hero-cta {
+    background: var(--accent);
+    color: var(--accent-text);
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 150ms var(--ease-out);
+  }
+  .hero-cta:hover { transform: scale(1.03); }
+  .hero-cta svg { width: 14px; height: 14px; stroke-width: 2.5; }
+
+  /* Hero ENDED CTA gigante */
+  .hero-recap-cta {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: rgba(181, 166, 139, 0.12);
+    border: 1px solid rgba(181, 166, 139, 0.3);
+    backdrop-filter: blur(12px);
+    padding: 18px;
+    border-radius: 16px;
+    margin-top: 20px;
+    max-width: 560px;
+    transition: all 200ms var(--ease-out);
+    cursor: pointer;
+  }
+  .hero-recap-cta:hover {
+    background: rgba(181, 166, 139, 0.18);
+    transform: translateY(-2px);
+  }
+  .recap-cover {
+    width: 80px;
+    height: 110px;
+    border-radius: 10px;
+    background:
+      linear-gradient(135deg, var(--gold) 0%, #6a5d49 100%);
+    display: grid;
+    place-items: center;
+    color: #000;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+  }
+  .recap-info { flex: 1; min-width: 0; }
+  .recap-info .label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .recap-info h3 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 0 4px;
+    letter-spacing: -0.02em;
+  }
+  .recap-info p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  .recap-arrow {
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .recap-arrow svg { width: 22px; height: 22px; stroke-width: 2; }
+
+  /* ========== Body grid ========== */
+  .home-body {
+    padding: 32px;
+  }
+  .row {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .row-2 { grid-template-columns: 1fr 1fr; }
+  .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .row-4 { grid-template-columns: repeat(4, 1fr); }
+  .row-60-40 { grid-template-columns: 60% 1fr; }
+
+  .card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    transition: all 200ms var(--ease-out);
+  }
+  .card:hover { border-color: var(--border-light); }
+  .card-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    margin-bottom: 10px;
+  }
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .card-meta { font-size: 12px; color: var(--text-muted); }
+
+  /* Sobre el evento */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .info-item {
+    padding: 12px;
+    background: var(--surface-low);
+    border-radius: 10px;
+  }
+  .info-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    margin-bottom: 4px;
+  }
+  .info-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Sesion inaugural */
+  .featured-session {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .featured-time {
+    flex-shrink: 0;
+    width: 60px;
+    text-align: center;
+  }
+  .featured-time-h {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .featured-time-d {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 4px;
+  }
+  .featured-info { flex: 1; min-width: 0; }
+  .featured-info h3 {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    line-height: 1.2;
+  }
+  .featured-info p { font-size: 12px; color: var(--text-muted); margin: 0; }
+
+  /* HappeningNow grande */
+  .happening-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+  }
+  .happening-card::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -20%;
+    width: 60%;
+    height: 140%;
+    background: radial-gradient(ellipse, rgba(239,68,68,0.18) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .happening-current {
+    flex: 1;
+    z-index: 1;
+    position: relative;
+  }
+  .happening-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(239,68,68,0.18);
+    border: 1px solid rgba(239,68,68,0.4);
+    color: #fca5a5;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+  .happening-live-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #ef4444;
+    border-radius: 999px;
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+  .happening-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .happening-speaker {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+  .happening-progress {
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .happening-progress-fill {
+    height: 100%;
+    width: 35%;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .happening-time-row {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-muted);
+    margin-bottom: 18px;
+  }
+  .happening-next-row {
+    display: flex; align-items: center; gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .happening-next-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    flex-shrink: 0;
+  }
+  .happening-next-info { flex: 1; min-width: 0; }
+  .happening-next-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .happening-next-time { font-size: 11px; color: var(--text-muted); }
+
+  /* GamificationHud */
+  .gam-card {
+    background: var(--bg-raised);
+    border-radius: 18px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+    min-height: 260px;
+  }
+  .gam-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+    padding: 2px;
+    background: conic-gradient(from 0deg,
+      #67E8F9 0deg, #A78BFA 90deg, #F472B6 180deg, #FCD34D 270deg, #67E8F9 360deg);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: gam-rotate 6s linear infinite;
+    opacity: 0.6;
+  }
+  @keyframes gam-rotate { to { transform: rotate(360deg); } }
+  .gam-content { position: relative; z-index: 1; }
+  .gam-rank {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    margin-bottom: 4px;
+  }
+  .gam-points {
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+  .gam-pts-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 22px; }
+  .gam-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .gam-stat-block {
+    padding: 10px 12px;
+    background: var(--surface-low);
+    border-radius: 10px;
+  }
+  .gam-stat-num {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .gam-stat-lbl { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .gam-progress {
+    font-size: 11px; color: var(--text-secondary); margin-bottom: 6px;
+    display: flex; justify-content: space-between;
+  }
+  .gam-progress-bar {
+    height: 5px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .gam-progress-fill {
+    height: 100%;
+    width: 68%;
+    background: linear-gradient(90deg, #A78BFA, #F472B6);
+    border-radius: 3px;
+  }
+
+  /* Anuncios */
+  .anuncio-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(96, 165, 250, 0.08);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    border-radius: 12px;
+    padding: 14px 18px;
+  }
+  .anuncio-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: rgba(96, 165, 250, 0.18);
+    color: var(--info);
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .anuncio-icon svg { width: 18px; height: 18px; }
+  .anuncio-content { flex: 1; min-width: 0; }
+  .anuncio-title { font-size: 13px; font-weight: 600; }
+  .anuncio-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .anuncio-cta {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--info);
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 150ms var(--ease-out);
+  }
+  .anuncio-cta:hover { background: rgba(96, 165, 250, 0.12); }
+
+  /* Sponsors band */
+  .sponsors-band {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+  .sponsors-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-label);
+    flex-shrink: 0;
+  }
+  .sponsors-logos {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .sponsors-logos::-webkit-scrollbar { display: none; }
+  .sponsor-logo {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: all 200ms var(--ease-out);
+    cursor: pointer;
+  }
+  .sponsor-logo:hover { color: var(--text-primary); }
+
+  /* Stats grid (ended) */
+  .stat-card {
+    text-align: center;
+    padding: 24px 16px;
+  }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-lbl {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* Survey card */
+  .survey-card {
+    background: linear-gradient(135deg, rgba(167,139,250,0.12), rgba(244,114,182,0.08));
+    border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .survey-content { flex: 1; min-width: 0; }
+  .survey-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .survey-meta { font-size: 12px; color: var(--text-secondary); }
+  .survey-cta {
+    background: var(--accent);
+    color: var(--accent-text);
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 150ms var(--ease-out);
+  }
+  .survey-cta:hover { transform: scale(1.03); }
+
+  /* Memorias */
+  .memorias-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+  .memoria {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #b5a68b, #6a5d49);
+  }
+  .memoria:nth-child(2) { background: linear-gradient(135deg, #60A5FA, #2563EB); }
+  .memoria:nth-child(3) { background: linear-gradient(135deg, #A78BFA, #6D28D9); }
+  .memoria:nth-child(4) { background: linear-gradient(135deg, #F472B6, #BE185D); }
+  .memoria:nth-child(5) { background: linear-gradient(135deg, #4ADE80, #16A34A); }
+  .memoria:nth-child(6) { background: linear-gradient(135deg, #FBBF24, #D97706); }
+
+  /* Hidden helpers */
+  .state-only { display: none; }
+  body[data-state="pre"] .state-pre,
+  body[data-state="live"] .state-live,
+  body[data-state="ended"] .state-ended { display: block; }
+
+  /* Mobile */
+  @media (max-width: 639px) {
+    .stage { padding: 70px 0 0; min-height: 100vh; }
+    .home-card {
+      max-width: none;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      box-shadow: none;
+    }
+    .hero { padding: 36px 20px 28px; min-height: auto; }
+    .hero-title { font-size: 32px; }
+    .hero-subtitle { font-size: 14px; }
+    .home-body { padding: 16px; }
+    .row-2, .row-3, .row-60-40 { grid-template-columns: 1fr; }
+    .row-4 { grid-template-columns: 1fr 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
+    .gam-points { font-size: 36px; }
+    .memorias-grid { grid-template-columns: repeat(3, 1fr); }
+    .sponsors-band { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .bell-floating { top: 12px; right: 12px; }
+    .state-selector { top: 12px; padding: 3px; }
+    .state-btn { padding: 6px 12px; font-size: 11px; }
+  }
+</style>
+</head>
+<body data-state="pre">
+
+<!-- Selector debug -->
+<div class="state-selector">
+  <button class="state-btn active" onclick="setState('pre')">Pre-event</button>
+  <button class="state-btn" onclick="setState('live')">Live</button>
+  <button class="state-btn" onclick="setState('ended')">Ended</button>
+</div>
+
+<div class="stage">
+
+  <div class="home-card">
+
+    <!-- Bell flotante (siempre visible) -->
+    <button class="bell-floating">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14V11a6 6 0 10-12 0v3a2 2 0 01-.6 1.6L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <span class="badge">5</span>
+    </button>
+
+    <!-- ========== HERO ========== -->
+    <section class="hero">
+      <div class="hero-bg state-only state-pre pre"></div>
+      <div class="hero-bg state-only state-live live"></div>
+      <div class="hero-bg state-only state-ended ended"></div>
+
+      <div class="hero-content">
+
+        <!-- PRE-EVENT -->
+        <div class="state-only state-pre">
+          <div class="hero-eyebrow">Bienvenido, Andrés</div>
+          <h1 class="hero-title">Summit Empresarial 2026</h1>
+          <p class="hero-subtitle">10—12 octubre · Bogotá · Híbrido</p>
+          <div class="hero-countdown">
+            <span class="countdown-label">Faltan</span>
+            <div class="countdown-units">
+              <div class="countdown-unit">
+                <span class="countdown-unit-num">3</span>
+                <span class="countdown-unit-label">días</span>
+              </div>
+              <div class="countdown-unit">
+                <span class="countdown-unit-num">14</span>
+                <span class="countdown-unit-label">hrs</span>
+              </div>
+              <div class="countdown-unit">
+                <span class="countdown-unit-num">22</span>
+                <span class="countdown-unit-label">min</span>
+              </div>
+              <div class="countdown-unit">
+                <span class="countdown-unit-num">18</span>
+                <span class="countdown-unit-label">seg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIVE -->
+        <div class="state-only state-live">
+          <div class="hero-eyebrow live">En vivo · Día 2</div>
+          <h1 class="hero-title">Hola, Andrés</h1>
+          <p class="hero-subtitle">Hay sesión activa en este momento</p>
+          <div class="hero-live-card">
+            <div class="hero-live-info">
+              <div class="session-meta">Sala A · Auditorio principal</div>
+              <div class="session-name">Crisis económica 2026</div>
+              <div class="session-speaker">Carlos Pérez · CEO Banco Nacional</div>
+            </div>
+            <button class="hero-cta">
+              Unirme
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ENDED -->
+        <div class="state-only state-ended">
+          <div class="hero-eyebrow ended">Evento finalizado</div>
+          <h1 class="hero-title">Summit Empresarial 2026</h1>
+          <p class="hero-subtitle">10—12 octubre · 1247 asistentes · 47 sesiones</p>
+          <div class="hero-recap-cta" onclick="alert('Abrir Mi Recap overlay')">
+            <div class="recap-cover">II</div>
+            <div class="recap-info">
+              <div class="label">Tu recap está listo</div>
+              <h3>Activo · 7h en vivo</h3>
+              <p>Tier II · Conoce tus stats y compárte tu pase</p>
+            </div>
+            <div class="recap-arrow">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========== BODY ========== -->
+    <div class="home-body">
+
+      <!-- PRE-EVENT body -->
+      <div class="state-only state-pre">
+        <div class="row row-2">
+          <div class="card">
+            <p class="card-eyebrow">Sobre el evento</p>
+            <h3 class="card-title">3 días · 47 sesiones · 18 speakers</h3>
+            <p class="card-meta">El encuentro empresarial más importante del año en Latam</p>
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Lugar</div>
+                <div class="info-value">Centro Convenciones Cartagena</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Modalidad</div>
+                <div class="info-value">Híbrido (presencial + virtual)</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Horario</div>
+                <div class="info-value">9:00 AM — 7:00 PM</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Asistentes</div>
+                <div class="info-value">1247 confirmados</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <p class="card-eyebrow">Sesión inaugural</p>
+            <div class="featured-session">
+              <div class="featured-time">
+                <div class="featured-time-h">9:00</div>
+                <div class="featured-time-d">Día 1</div>
+              </div>
+              <div class="featured-info">
+                <h3>Bienvenida & keynote inaugural</h3>
+                <p>Carlos Pérez — CEO Banco Nacional</p>
+              </div>
+            </div>
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+              <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 0;">
+                Apertura del Summit con análisis del panorama económico actual y proyecciones para 2026.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="anuncio-banner">
+            <div class="anuncio-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+            </div>
+            <div class="anuncio-content">
+              <div class="anuncio-title">Bienvenida virtual el 9 de octubre</div>
+              <div class="anuncio-meta">El organizador te enviará el link 30 min antes · hace 2h</div>
+            </div>
+            <button class="anuncio-cta">Ver más →</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="sponsors-band">
+            <span class="sponsors-label">Patrocinan</span>
+            <div class="sponsors-logos">
+              <span class="sponsor-logo">Bancolombia</span>
+              <span class="sponsor-logo">Nutresa</span>
+              <span class="sponsor-logo">EPM</span>
+              <span class="sponsor-logo">Avianca</span>
+              <span class="sponsor-logo">ISAGEN</span>
+              <span class="sponsor-logo">Ecopetrol</span>
+              <span class="sponsor-logo">Grupo Sura</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE body -->
+      <div class="state-only state-live">
+        <div class="row row-60-40">
+
+          <div class="happening-card">
+            <p class="card-eyebrow">Pasando ahora</p>
+            <div class="happening-current">
+              <span class="happening-live-badge">EN VIVO</span>
+              <h3 class="happening-title">Crisis económica 2026: análisis y proyección</h3>
+              <p class="happening-speaker">Carlos Pérez · CEO Banco Nacional · Sala A</p>
+              <div class="happening-progress">
+                <div class="happening-progress-fill"></div>
+              </div>
+              <div class="happening-time-row">
+                <span>14:32 transcurridos</span>
+                <span>1h 20min total</span>
+              </div>
+            </div>
+            <div class="happening-next-row">
+              <span class="happening-next-label">Sigue</span>
+              <div class="happening-next-info">
+                <div class="happening-next-name">Diseño UX en eventos virtuales</div>
+                <div class="happening-next-time">Ana López · 11:00 AM · Sala B</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gam-card">
+            <div class="gam-content">
+              <p class="gam-rank">Ranking · Top 12% · Activo</p>
+              <div class="gam-points">340</div>
+              <div class="gam-pts-label">puntos acumulados</div>
+              <div class="gam-stats">
+                <div class="gam-stat-block">
+                  <div class="gam-stat-num">3</div>
+                  <div class="gam-stat-lbl">badges</div>
+                </div>
+                <div class="gam-stat-block">
+                  <div class="gam-stat-num">8</div>
+                  <div class="gam-stat-lbl">sellos pasaporte</div>
+                </div>
+              </div>
+              <div class="gam-progress">
+                <span>Próxima badge: Networker</span>
+                <span>68%</span>
+              </div>
+              <div class="gam-progress-bar">
+                <div class="gam-progress-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="anuncio-banner">
+            <div class="anuncio-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14V11a6 6 0 10-12 0v3a2 2 0 01-.6 1.6L4 17h5"/></svg>
+            </div>
+            <div class="anuncio-content">
+              <div class="anuncio-title">Trivia de Bancolombia abierta · 30 segundos restantes</div>
+              <div class="anuncio-meta">Premio: voucher $200K USD · hace 12 segundos</div>
+            </div>
+            <button class="anuncio-cta">Participar →</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="sponsors-band">
+            <span class="sponsors-label">Patrocinan</span>
+            <div class="sponsors-logos">
+              <span class="sponsor-logo">Bancolombia</span>
+              <span class="sponsor-logo">Nutresa</span>
+              <span class="sponsor-logo">EPM</span>
+              <span class="sponsor-logo">Avianca</span>
+              <span class="sponsor-logo">ISAGEN</span>
+              <span class="sponsor-logo">Ecopetrol</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENDED body -->
+      <div class="state-only state-ended">
+        <div class="row row-4">
+          <div class="card stat-card">
+            <div class="stat-num">1247</div>
+            <div class="stat-lbl">Asistentes</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-num">47</div>
+            <div class="stat-lbl">Sesiones</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-num">3</div>
+            <div class="stat-lbl">Días</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-num">412</div>
+            <div class="stat-lbl">Conexiones</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="survey-card">
+            <div class="survey-content">
+              <div class="survey-title">¿Cómo fue tu experiencia?</div>
+              <div class="survey-meta">Tu encuesta toma menos de 1 minuto y nos ayuda a mejorar</div>
+            </div>
+            <button class="survey-cta">Responder →</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="card">
+            <p class="card-eyebrow">Memorias del evento</p>
+            <h3 class="card-title">Las mejores fotos · 248 publicadas</h3>
+            <p class="card-meta" style="margin-bottom: 18px;">Comunidad y staff compartieron sus momentos favoritos</p>
+            <div class="memorias-grid">
+              <div class="memoria"></div>
+              <div class="memoria"></div>
+              <div class="memoria"></div>
+              <div class="memoria"></div>
+              <div class="memoria"></div>
+              <div class="memoria"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function setState(s) {
+    document.body.dataset.state = s;
+    document.querySelectorAll('.state-btn').forEach(b => {
+      b.classList.toggle('active', b.textContent.toLowerCase().includes(s === 'pre' ? 'pre' : s === 'live' ? 'live' : 'ended'));
+    });
+  }
+</script>
+
+</body>
+</html>

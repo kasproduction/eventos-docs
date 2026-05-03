@@ -1,0 +1,1328 @@
+<!doctype html>
+<html lang="es" data-theme="noir">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EventOS — W.0 Spatial Shell Demo (v3)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* ========== Tokens Lumina Noir ========== */
+  :root {
+    --bg: #0a0a0a;
+    --bg-elevated: #141414;
+    --bg-sunken: #050505;
+    --bg-raised: #111111;
+    --surface-low: rgba(255,255,255,0.03);
+    --surface-medium: rgba(255,255,255,0.04);
+    --surface-high: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.06);
+    --border-light: rgba(255,255,255,0.12);
+    --border-strong: rgba(255,255,255,0.18);
+    --text-primary: rgba(255,255,255,0.85);
+    --text-secondary: rgba(255,255,255,0.5);
+    --text-muted: rgba(255,255,255,0.35);
+    --text-label: rgba(255,255,255,0.25);
+    --text-placeholder: rgba(255,255,255,0.15);
+    --accent: #ffffff;
+    --accent-text: #000000;
+    --gold: #b5a68b;
+    --pulse-color: #ef4444;
+    --success: #4ADE80;
+    --info: #60A5FA;
+    --warning: #FF7351;
+    --radius: 1rem;
+
+    --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
+    --font-sans: "Urbanist", system-ui, sans-serif;
+
+    --spring-soft: cubic-bezier(0.34, 1.36, 0.64, 1);
+    --spring-snap: cubic-bezier(0.16, 1.2, 0.3, 1);
+    --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-sunken);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    background-image:
+      radial-gradient(ellipse at 20% 80%, rgba(99,102,241,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 20%, rgba(168,85,247,0.05) 0%, transparent 55%);
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  ul { list-style: none; padding: 0; margin: 0; }
+
+  /* ========================================================================
+     DESKTOP / TABLET LANDSCAPE — sidebar flotante izquierda + card central
+  ======================================================================== */
+
+  .stage {
+    height: 100vh;
+    height: 100dvh;
+    width: 100vw;
+    padding: 24px 32px 24px 88px; /* left más grande para dejar espacio al sidebar flotante */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ========== Sidebar FLOTANTE (afuera de la card, propio panel) ========== */
+  .sidebar-floating {
+    position: fixed;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 8px;
+    gap: 4px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.3),
+      0 8px 20px rgba(0,0,0,0.4),
+      0 24px 48px rgba(0,0,0,0.45);
+    z-index: 50;
+  }
+  .sidebar-logo {
+    width: 36px; height: 36px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #fff 0%, #d4d4d8 100%);
+    display: grid; place-items: center;
+    color: #000;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .sidebar-divider { width: 22px; height: 1px; background: var(--border-light); margin: 4px 0; }
+  .sidebar-spacer { height: 6px; }
+  .nav-item {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    color: var(--text-secondary);
+    transition: all 180ms var(--ease-out);
+    position: relative;
+  }
+  .nav-item:hover {
+    background: var(--surface-medium);
+    color: var(--text-primary);
+  }
+  .nav-item.active {
+    background: var(--surface-high);
+    color: var(--text-primary);
+  }
+  .nav-item .badge {
+    position: absolute;
+    top: 2px; right: 2px;
+    background: var(--pulse-color);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    min-width: 14px; height: 14px;
+    border-radius: 999px;
+    display: grid; place-items: center;
+    padding: 0 3px;
+    box-shadow: 0 0 0 2px var(--bg-elevated);
+  }
+  .nav-item .live-dot {
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 7px; height: 7px;
+    border-radius: 999px;
+    background: var(--pulse-color);
+    box-shadow: 0 0 8px var(--pulse-color), 0 0 0 2px var(--bg-elevated);
+    animation: live-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes live-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+  }
+  .nav-item svg { width: 20px; height: 20px; stroke-width: 1.75; }
+  .nav-item .tooltip {
+    position: absolute;
+    left: calc(100% + 14px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-4px);
+    background: var(--bg-raised);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 150ms var(--ease-out);
+    z-index: 100;
+  }
+  .nav-item:hover .tooltip { opacity: 1; transform: translateY(-50%) translateX(0); }
+
+  /* ========== Card central (workspace + aux) ========== */
+  .shell-card {
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+    max-height: 820px;
+    display: flex;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.3),
+      0 8px 16px rgba(0,0,0,0.35),
+      0 24px 48px rgba(0,0,0,0.45),
+      0 56px 96px rgba(0,0,0,0.5);
+  }
+
+  /* ========== Workspace ========== */
+  .workspace {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+  }
+  .module {
+    flex: 1;
+    overflow: auto;
+    padding: 28px 32px;
+    display: none;
+    animation: module-enter 380ms var(--spring-snap);
+  }
+  .module.active { display: block; }
+  @keyframes module-enter {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .module.exiting { animation: module-exit 180ms var(--ease-out) forwards; }
+  @keyframes module-exit { to { opacity: 0; transform: translateX(-20px); } }
+
+  .module-header {
+    margin-bottom: 22px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .module-title-block { flex: 1; min-width: 0; }
+  .module-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.05;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.02em;
+  }
+  .module-subtitle { font-size: 13px; color: var(--text-secondary); }
+
+  .module-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px 0 10px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--surface-low);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 12px;
+    transition: all 150ms var(--ease-out);
+    flex-shrink: 0;
+  }
+  .module-search:hover {
+    background: var(--surface-medium);
+    border-color: var(--border-light);
+    color: var(--text-secondary);
+  }
+  .module-search svg { width: 14px; height: 14px; stroke-width: 2; }
+  .module-search .kbd {
+    font-family: var(--font-display);
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-label);
+    background: var(--surface-medium);
+    padding: 2px 5px;
+    border-radius: 4px;
+  }
+
+  /* ========== Aux panel (DENTRO del workspace) ========== */
+  .aux-panel {
+    width: 0;
+    background: var(--bg-raised);
+    border-left: 1px solid var(--border);
+    overflow: hidden;
+    transition: width 320ms var(--spring-snap);
+    flex-shrink: 0;
+  }
+  .aux-panel.open { width: 360px; }
+  .aux-panel-content {
+    width: 360px;
+    height: 100%;
+    overflow: auto;
+    padding: 22px;
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out) 100ms;
+  }
+  .aux-panel.open .aux-panel-content { opacity: 1; }
+  .aux-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .aux-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  /* ========== Cards / componentes comunes ========== */
+  .card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    transition: all 200ms var(--ease-out);
+  }
+  .card:hover { border-color: var(--border-light); transform: translateY(-1px); }
+  .card-clickable { cursor: pointer; }
+  .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+
+  .session-card { display: flex; flex-direction: column; gap: 6px; }
+  .session-time {
+    font-size: 10px; font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .session-title {
+    font-family: var(--font-display);
+    font-size: 16px; font-weight: 700;
+    line-height: 1.2;
+  }
+  .session-speaker { font-size: 12px; color: var(--text-muted); }
+
+  .speaker-card { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 22px 14px; }
+  .speaker-avatar {
+    width: 60px; height: 60px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #b5a68b, #6a5d49);
+    display: grid; place-items: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    color: #000;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  .speaker-name { font-family: var(--font-display); font-weight: 700; font-size: 13px; margin-bottom: 2px; }
+  .speaker-role { font-size: 11px; color: var(--text-muted); }
+
+  .person-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    transition: all 180ms var(--ease-out);
+    cursor: pointer;
+  }
+  .person-row:hover { background: var(--surface-medium); }
+  .person-row.active { background: var(--surface-high); }
+  .person-avatar {
+    width: 38px; height: 38px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #60A5FA, #2563EB);
+    display: grid; place-items: center;
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .person-info { flex: 1; min-width: 0; }
+  .person-name { font-weight: 600; font-size: 13px; margin-bottom: 1px; }
+  .person-meta { font-size: 11px; color: var(--text-muted); }
+
+  /* ========== Streaming ========== */
+  .stream-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    gap: 14px;
+    height: 100%;
+    transition: grid-template-columns 380ms var(--spring-snap);
+  }
+  .stream-layout.with-1 { grid-template-columns: 1fr 320px; }
+  .stream-layout.with-2 { grid-template-columns: 1fr 300px 280px; }
+
+  .player {
+    background: linear-gradient(135deg, #1a1a2e, #0a0a14);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    grid-column: 1;
+    grid-row: 1;
+    display: grid; place-items: center;
+  }
+  .player-fake-video {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 30%, rgba(99,102,241,0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 70%, rgba(168,85,247,0.3) 0%, transparent 50%),
+      linear-gradient(180deg, #1e1b4b 0%, #0a0a0a 100%);
+  }
+  .player-overlay { position: relative; text-align: center; z-index: 1; }
+  .player-overlay .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+  .player-overlay .live-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #ef4444;
+    border-radius: 999px;
+    animation: live-pulse 1.6s ease-in-out infinite;
+  }
+  .player-overlay h2 {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 800;
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+  }
+  .player-overlay p { font-size: 13px; color: rgba(255,255,255,0.7); margin: 0; }
+  .player-controls {
+    position: absolute;
+    bottom: 14px; left: 14px; right: 14px;
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(12px);
+    padding: 8px 12px;
+    border-radius: 10px;
+  }
+  .player-controls .ctrl-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: grid; place-items: center;
+    color: #fff;
+    transition: all 150ms var(--ease-out);
+  }
+  .player-controls .ctrl-btn:hover { background: rgba(255,255,255,0.1); }
+  .player-controls .ctrl-btn svg { width: 14px; height: 14px; }
+  .player-progress { flex: 1; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; }
+  .player-progress-fill { width: 35%; height: 100%; background: var(--accent); }
+  .player-time { font-size: 10px; color: rgba(255,255,255,0.7); font-variant-numeric: tabular-nums; }
+
+  .stream-panel {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    animation: panel-pop-in 300ms var(--spring-soft);
+  }
+  @keyframes panel-pop-in {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-header h3 { font-family: var(--font-display); font-weight: 700; font-size: 13px; margin: 0; }
+  .panel-close {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    display: grid; place-items: center;
+    color: var(--text-muted);
+    transition: all 150ms var(--ease-out);
+  }
+  .panel-close:hover { background: var(--surface-medium); color: var(--text-primary); }
+  .panel-body { flex: 1; overflow: auto; padding: 12px 14px; }
+
+  .stream-toolbar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex; gap: 6px;
+    padding: 8px 12px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    width: fit-content;
+    margin: 0 auto;
+  }
+  .toolbar-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 150ms var(--ease-out);
+  }
+  .toolbar-btn svg { width: 13px; height: 13px; stroke-width: 2; }
+  .toolbar-btn:hover { background: var(--surface-medium); color: var(--text-primary); }
+  .toolbar-btn.active { background: var(--surface-high); color: var(--text-primary); }
+
+  .chat-msg { margin-bottom: 10px; font-size: 12px; }
+  .chat-author { font-weight: 600; color: var(--text-primary); margin-right: 5px; }
+  .chat-text { color: var(--text-secondary); }
+  .trivia-q { font-family: var(--font-display); font-weight: 700; font-size: 14px; margin-bottom: 12px; }
+  .trivia-opt {
+    width: 100%; text-align: left;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+    font-size: 12px;
+    transition: all 150ms var(--ease-out);
+    background: var(--surface-low);
+  }
+  .trivia-opt:hover { background: var(--surface-medium); border-color: var(--border-light); }
+
+  .detail-cover { height: 120px; border-radius: 10px; background: linear-gradient(135deg, #b5a68b, #6a5d49); margin-bottom: 14px; }
+  .detail-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .meta-block { padding: 10px 12px; background: var(--surface-low); border-radius: 9px; }
+  .meta-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-label); margin-bottom: 2px; }
+  .meta-value { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 9px 14px;
+    border-radius: 9px;
+    background: var(--accent);
+    color: var(--accent-text);
+    font-weight: 600;
+    font-size: 12px;
+    transition: all 150ms var(--ease-out);
+  }
+  .btn-primary:hover { transform: scale(1.02); }
+  .btn-secondary {
+    width: 100%;
+    padding: 9px 14px;
+    border-radius: 9px;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 12px;
+    transition: all 150ms var(--ease-out);
+    margin-top: 6px;
+  }
+  .btn-secondary:hover { background: var(--surface-medium); }
+
+  /* ========== Overlays ========== */
+  .overlay-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms var(--ease-out);
+  }
+  .overlay-backdrop.show { opacity: 1; pointer-events: auto; }
+  .overlay-card {
+    position: fixed;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -42%);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
+    padding: 28px;
+    z-index: 201;
+    width: 340px;
+    max-width: 92vw;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 280ms var(--spring-soft);
+    box-shadow: 0 32px 64px rgba(0,0,0,0.6);
+  }
+  .overlay-card.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+  .overlay-card .title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .overlay-card h2 { font-family: var(--font-display); font-size: 20px; font-weight: 800; margin: 0; }
+
+  .qr-box {
+    width: 100%; aspect-ratio: 1; background: #fff;
+    border-radius: 14px; display: grid; place-items: center;
+    color: #000; font-family: var(--font-display); font-weight: 700;
+    background-image:
+      linear-gradient(45deg, #000 25%, transparent 25%),
+      linear-gradient(-45deg, #000 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #000 75%),
+      linear-gradient(-45deg, transparent 75%, #000 75%);
+    background-size: 14px 14px;
+    background-position: 0 0, 0 7px, 7px -7px, -7px 0px;
+  }
+  .qr-caption { margin-top: 14px; text-align: center; color: var(--text-secondary); font-size: 11px; }
+
+  .notif-panel {
+    position: fixed;
+    top: 24px; right: 24px; bottom: 24px;
+    width: 360px;
+    max-width: calc(100vw - 48px);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
+    z-index: 150;
+    transform: translateX(calc(100% + 48px));
+    transition: transform 320ms var(--spring-snap);
+    overflow: auto;
+    padding: 20px;
+    box-shadow: 0 24px 56px rgba(0,0,0,0.5);
+  }
+  .notif-panel.show { transform: translateX(0); }
+  .notif-item { display: flex; gap: 11px; padding: 11px; border-radius: 10px; margin-bottom: 4px; transition: all 150ms var(--ease-out); }
+  .notif-item:hover { background: var(--surface-medium); }
+  .notif-icon { width: 32px; height: 32px; border-radius: 999px; display: grid; place-items: center; flex-shrink: 0; }
+  .notif-content { flex: 1; min-width: 0; }
+  .notif-title { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+  .notif-meta { font-size: 10px; color: var(--text-muted); }
+  .notif-unread { width: 6px; height: 6px; border-radius: 999px; background: var(--accent); margin-top: 12px; flex-shrink: 0; }
+
+  .search-palette {
+    position: fixed;
+    left: 50%; top: 18%;
+    transform: translate(-50%, -16px);
+    width: 540px;
+    max-width: 92vw;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    overflow: hidden;
+    z-index: 201;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 200ms var(--spring-soft);
+    box-shadow: 0 24px 56px rgba(0,0,0,0.6);
+  }
+  .search-palette.show { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+  .search-input-wrap { display: flex; align-items: center; gap: 11px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .search-input-wrap svg { width: 16px; height: 16px; color: var(--text-muted); }
+  .search-input {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--text-primary); font-family: var(--font-sans); font-size: 14px;
+  }
+  .search-input::placeholder { color: var(--text-placeholder); }
+  .search-results { max-height: 340px; overflow: auto; padding: 6px; }
+  .search-section { padding: 7px 11px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-label); }
+  .search-result { display: flex; align-items: center; gap: 11px; padding: 9px 11px; border-radius: 9px; cursor: pointer; }
+  .search-result:hover { background: var(--surface-medium); }
+  .search-result-icon { width: 30px; height: 30px; border-radius: 7px; background: var(--surface-low); display: grid; place-items: center; color: var(--text-secondary); flex-shrink: 0; }
+  .search-result-icon svg { width: 14px; height: 14px; }
+  .search-result-content { flex: 1; min-width: 0; }
+  .search-result-title { font-size: 12px; font-weight: 600; }
+  .search-result-meta { font-size: 10px; color: var(--text-muted); }
+
+  .hidden { display: none !important; }
+  .label-eyebrow { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; color: var(--text-label); margin-bottom: 5px; }
+
+  /* ========================================================================
+     MOBILE — patron app movil (replicar eventos-app)
+     - SIN sidebar floating
+     - SIN card central, full-screen
+     - Tab bar bottom 5 items
+     - Headers contextual por modulo
+  ======================================================================== */
+  @media (max-width: 639px) {
+    body {
+      background-image: none;
+    }
+    .stage {
+      padding: 0;
+      align-items: stretch;
+      justify-content: stretch;
+    }
+    .sidebar-floating {
+      display: none; /* sidebar desaparece en mobile */
+    }
+    .shell-card {
+      max-width: none;
+      max-height: none;
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+      background: var(--bg);
+    }
+    .workspace { background: var(--bg); }
+    .module {
+      padding: 16px 16px calc(16px + 76px); /* deja espacio para tab bar bottom */
+    }
+    .module-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      padding-top: max(env(safe-area-inset-top, 0px), 12px);
+    }
+    .module-search { width: 100%; }
+    .module-title { font-size: 24px; }
+    .grid-cards { grid-template-columns: 1fr; }
+    .aux-panel.open { width: 100%; position: absolute; inset: 0; z-index: 30; }
+
+    /* Tab bar mobile */
+    .tab-bar-mobile {
+      display: flex;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border);
+      padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+      gap: 4px;
+      justify-content: space-around;
+      z-index: 100;
+    }
+    .tab-item {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 3px;
+      padding: 6px 4px;
+      color: var(--text-muted);
+      transition: color 150ms var(--ease-out);
+      position: relative;
+    }
+    .tab-item.active { color: var(--text-primary); }
+    .tab-item svg { width: 22px; height: 22px; stroke-width: 1.75; }
+    .tab-item span { font-size: 10px; font-weight: 600; }
+    .tab-item .live-dot {
+      position: absolute;
+      top: 4px; right: calc(50% - 16px);
+      width: 6px; height: 6px;
+      border-radius: 999px;
+      background: var(--pulse-color);
+      animation: live-pulse 1.6s ease-in-out infinite;
+    }
+
+    /* Streaming mobile: layout vertical */
+    .stream-layout {
+      grid-template-columns: 1fr !important;
+      grid-template-rows: 240px auto auto;
+    }
+    .stream-toolbar { grid-row: 2; }
+    .stream-panel { grid-row: 3; }
+    .player-overlay h2 { font-size: 22px; }
+
+    /* Notif mobile: full-width sheet */
+    .notif-panel { top: 0; right: 0; bottom: 0; left: 0; width: 100%; max-width: none; border-radius: 0; padding: calc(20px + env(safe-area-inset-top, 0px)) 16px 16px; }
+    .overlay-card { width: 90vw; }
+  }
+
+  /* Desktop / tablet H: oculta tab bar */
+  @media (min-width: 640px) {
+    .tab-bar-mobile { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ========== SIDEBAR FLOTANTE (DESKTOP/TABLET H) ========== -->
+  <aside class="sidebar-floating">
+    <div class="sidebar-logo">E</div>
+
+    <button class="nav-item active" data-module="home">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+      <span class="tooltip">Inicio</span>
+    </button>
+    <button class="nav-item" data-module="agenda">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <span class="tooltip">Agenda</span>
+    </button>
+    <button class="nav-item" data-module="streaming">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4" fill="currentColor"/></svg>
+      <span class="live-dot"></span>
+      <span class="tooltip">En vivo · Crisis económica 2026</span>
+    </button>
+    <button class="nav-item" data-module="speakers">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M4 21v-1a8 8 0 0116 0v1"/></svg>
+      <span class="tooltip">Speakers</span>
+    </button>
+    <button class="nav-item" data-module="networking">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2h-2M7 16H5a2 2 0 01-2-2v-4a2 2 0 012-2h2m4-4h2m-2 0v16m-2-2h4"/></svg>
+      <span class="badge">3</span>
+      <span class="tooltip">Networking</span>
+    </button>
+    <button class="nav-item" data-module="sponsors">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 21V11h6v10"/></svg>
+      <span class="tooltip">Sponsors</span>
+    </button>
+    <button class="nav-item" data-module="social">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+      <span class="tooltip">Social</span>
+    </button>
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-divider"></div>
+
+    <button class="nav-item" id="bell-btn">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14V11a6 6 0 10-12 0v3a2 2 0 01-.6 1.6L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <span class="badge">5</span>
+      <span class="tooltip">Notificaciones</span>
+    </button>
+    <button class="nav-item" id="me-btn">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M4 21v-1a8 8 0 0116 0v1"/></svg>
+      <span class="tooltip">Yo · Mi QR</span>
+    </button>
+  </aside>
+
+  <!-- ========== Card central (workspace + aux) ========== -->
+  <div class="shell-card">
+    <main class="workspace">
+
+      <!-- HOME -->
+      <section class="module active" data-module="home">
+        <div class="module-header">
+          <div class="module-title-block">
+            <p class="label-eyebrow">Bienvenido</p>
+            <h1 class="module-title">Summit Empresarial 2026</h1>
+            <p class="module-subtitle">Hoy · Sala principal · Empieza en 4h 23min</p>
+          </div>
+          <button class="module-search" onclick="openOverlay('search')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.3-4.3"/></svg>
+            <span>Buscar</span>
+            <span class="kbd">⌘K</span>
+          </button>
+        </div>
+        <div class="grid-cards">
+          <div class="card">
+            <p class="label-eyebrow">Próxima sesión</p>
+            <h3 style="font-family: var(--font-display); font-weight: 700; font-size: 16px; margin: 0 0 4px;">Crisis económica 2026</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 0;">Carlos Pérez · 9:00 AM</p>
+          </div>
+          <div class="card">
+            <p class="label-eyebrow">Conectados ahora</p>
+            <h3 style="font-family: var(--font-display); font-weight: 700; font-size: 22px; margin: 0;">247</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 0;">Asistentes en vivo</p>
+          </div>
+          <div class="card">
+            <p class="label-eyebrow">Tu progreso</p>
+            <h3 style="font-family: var(--font-display); font-weight: 700; font-size: 22px; margin: 0;">340 pts</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 0;">3 badges desbloqueadas</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- AGENDA -->
+      <section class="module" data-module="agenda">
+        <div class="module-header">
+          <div class="module-title-block">
+            <h1 class="module-title">Agenda</h1>
+            <p class="module-subtitle">29 sesiones · Hoy</p>
+          </div>
+          <button class="module-search" onclick="openOverlay('search')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.3-4.3"/></svg>
+            <span>Buscar</span>
+            <span class="kbd">⌘K</span>
+          </button>
+        </div>
+        <div class="grid-cards">
+          <div class="card session-card card-clickable" onclick="openAuxPanel('session-detail', 'Crisis económica 2026')">
+            <span class="session-time">9:00 — 10:30 · Sala A</span>
+            <span class="session-title">Crisis económica 2026</span>
+            <span class="session-speaker">Carlos Pérez</span>
+          </div>
+          <div class="card session-card card-clickable" onclick="openAuxPanel('session-detail', 'Diseño UX en eventos')">
+            <span class="session-time">11:00 — 12:00 · Sala B</span>
+            <span class="session-title">Diseño UX en eventos virtuales</span>
+            <span class="session-speaker">Ana López</span>
+          </div>
+          <div class="card session-card card-clickable" onclick="openAuxPanel('session-detail', 'IA y generación de contenido')">
+            <span class="session-time">14:00 — 15:30 · Sala A</span>
+            <span class="session-title">IA y generación de contenido</span>
+            <span class="session-speaker">Diego Ramírez</span>
+          </div>
+          <div class="card session-card card-clickable" onclick="openAuxPanel('session-detail', 'Networking estratégico')">
+            <span class="session-time">16:00 — 17:00 · Sala C</span>
+            <span class="session-title">Networking estratégico para founders</span>
+            <span class="session-speaker">María Restrepo</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- STREAMING -->
+      <section class="module" data-module="streaming" style="padding: 22px 26px;">
+        <div class="stream-layout" id="stream-layout">
+          <div class="player">
+            <div class="player-fake-video"></div>
+            <div class="player-overlay">
+              <span class="live-badge">EN VIVO</span>
+              <h2>Crisis económica 2026</h2>
+              <p>Carlos Pérez · CEO Banco Nacional</p>
+            </div>
+            <div class="player-controls">
+              <button class="ctrl-btn"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5l-7 7 7 7m4-14l7 7-7 7"/></svg></button>
+              <button class="ctrl-btn"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg></button>
+              <span class="player-time">14:32 / 1:20:00</span>
+              <div class="player-progress"><div class="player-progress-fill"></div></div>
+              <button class="ctrl-btn"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z"/></svg></button>
+            </div>
+          </div>
+
+          <div class="stream-panel hidden" id="chat-panel">
+            <div class="panel-header">
+              <h3>Chat de la sesión</h3>
+              <button class="panel-close" onclick="toggleStreamPanel('chat')">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div class="panel-body">
+              <div class="chat-msg"><span class="chat-author">Ana</span><span class="chat-text">Excelente análisis 👏</span></div>
+              <div class="chat-msg"><span class="chat-author">Diego</span><span class="chat-text">¿Habrá Q&A al final?</span></div>
+              <div class="chat-msg"><span class="chat-author">María</span><span class="chat-text">Comparto la idea del minuto 12</span></div>
+              <div class="chat-msg"><span class="chat-author">Pedro</span><span class="chat-text">Muy buen contenido</span></div>
+            </div>
+          </div>
+
+          <div class="stream-panel hidden" id="trivia-panel">
+            <div class="panel-header">
+              <h3>Trivia · 30s</h3>
+              <button class="panel-close" onclick="toggleStreamPanel('trivia')">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div class="panel-body">
+              <p class="trivia-q">¿Qué año tuvo la mayor inflación en Colombia?</p>
+              <button class="trivia-opt">A · 1990</button>
+              <button class="trivia-opt">B · 1999</button>
+              <button class="trivia-opt">C · 2008</button>
+              <button class="trivia-opt">D · 2022</button>
+            </div>
+          </div>
+
+          <div class="stream-toolbar">
+            <button class="toolbar-btn" id="btn-toggle-chat" onclick="toggleStreamPanel('chat')">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              Chat
+            </button>
+            <button class="toolbar-btn" id="btn-toggle-trivia" onclick="toggleStreamPanel('trivia')">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/></svg>
+              Trivia
+            </button>
+            <button class="toolbar-btn">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Q&A
+            </button>
+            <button class="toolbar-btn">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 19V6l12-3v13M9 19a3 3 0 11-6 0 3 3 0 016 0zm12-3a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Polls
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SPEAKERS -->
+      <section class="module" data-module="speakers">
+        <div class="module-header">
+          <div class="module-title-block">
+            <h1 class="module-title">Speakers</h1>
+            <p class="module-subtitle">18 expositores</p>
+          </div>
+          <button class="module-search" onclick="openOverlay('search')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.3-4.3"/></svg>
+            <span>Buscar</span>
+            <span class="kbd">⌘K</span>
+          </button>
+        </div>
+        <div class="grid-cards" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">
+          <div class="card speaker-card card-clickable" onclick="openAuxPanel('speaker-profile', 'Carlos Pérez')">
+            <div class="speaker-avatar">CP</div>
+            <div class="speaker-name">Carlos Pérez</div>
+            <div class="speaker-role">CEO · Banco Nacional</div>
+          </div>
+          <div class="card speaker-card card-clickable" onclick="openAuxPanel('speaker-profile', 'Ana López')">
+            <div class="speaker-avatar" style="background: linear-gradient(135deg, #A78BFA, #6D28D9);">AL</div>
+            <div class="speaker-name">Ana López</div>
+            <div class="speaker-role">Director Design · Globant</div>
+          </div>
+          <div class="card speaker-card card-clickable" onclick="openAuxPanel('speaker-profile', 'Diego Ramírez')">
+            <div class="speaker-avatar" style="background: linear-gradient(135deg, #60A5FA, #2563EB);">DR</div>
+            <div class="speaker-name">Diego Ramírez</div>
+            <div class="speaker-role">CTO · Rappi</div>
+          </div>
+          <div class="card speaker-card card-clickable" onclick="openAuxPanel('speaker-profile', 'María Restrepo')">
+            <div class="speaker-avatar" style="background: linear-gradient(135deg, #F472B6, #BE185D);">MR</div>
+            <div class="speaker-name">María Restrepo</div>
+            <div class="speaker-role">Founder · Habi</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NETWORKING -->
+      <section class="module" data-module="networking" style="padding: 0;">
+        <div style="display: grid; grid-template-columns: 320px 1fr; height: 100%;">
+          <div style="border-right: 1px solid var(--border); padding: 24px 18px; overflow: auto;">
+            <h1 class="module-title" style="font-size: 22px;">Networking</h1>
+            <p class="module-subtitle" style="margin-bottom: 14px;">247 personas conectadas</p>
+            <div class="person-row" onclick="selectPerson(this, 'Andrés Gómez')">
+              <div class="person-avatar">AG</div>
+              <div class="person-info"><div class="person-name">Andrés Gómez</div><div class="person-meta">PM · Bancolombia</div></div>
+            </div>
+            <div class="person-row" onclick="selectPerson(this, 'Valentina Ríos')">
+              <div class="person-avatar" style="background: linear-gradient(135deg, #F472B6, #BE185D);">VR</div>
+              <div class="person-info"><div class="person-name">Valentina Ríos</div><div class="person-meta">Designer · Auteco</div></div>
+            </div>
+            <div class="person-row" onclick="selectPerson(this, 'Luis Calle')">
+              <div class="person-avatar" style="background: linear-gradient(135deg, #4ADE80, #16A34A);">LC</div>
+              <div class="person-info"><div class="person-name">Luis Calle</div><div class="person-meta">CMO · Nutresa</div></div>
+            </div>
+            <div class="person-row" onclick="selectPerson(this, 'Sofía Vergara')">
+              <div class="person-avatar" style="background: linear-gradient(135deg, #A78BFA, #6D28D9);">SV</div>
+              <div class="person-info"><div class="person-name">Sofía Vergara</div><div class="person-meta">CEO · Pereira Tech</div></div>
+            </div>
+          </div>
+          <div style="padding: 50px 32px; display: grid; place-items: center; color: var(--text-muted);">
+            <div style="text-align: center; font-size: 13px;">
+              <p>Selecciona una persona para ver su perfil</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SPONSORS -->
+      <section class="module" data-module="sponsors">
+        <div class="module-header">
+          <div class="module-title-block">
+            <h1 class="module-title">Sponsors</h1>
+            <p class="module-subtitle">12 patrocinadores</p>
+          </div>
+          <button class="module-search" onclick="openOverlay('search')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.3-4.3"/></svg>
+            <span>Buscar</span>
+            <span class="kbd">⌘K</span>
+          </button>
+        </div>
+        <div class="grid-cards">
+          <div class="card" style="display: grid; place-items: center; padding: 36px 18px;">
+            <div style="font-family: var(--font-display); font-weight: 800; font-size: 20px;">Bancolombia</div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Patrocinador principal</p>
+          </div>
+          <div class="card" style="display: grid; place-items: center; padding: 36px 18px;">
+            <div style="font-family: var(--font-display); font-weight: 800; font-size: 20px;">Nutresa</div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Gold</p>
+          </div>
+          <div class="card" style="display: grid; place-items: center; padding: 36px 18px;">
+            <div style="font-family: var(--font-display); font-weight: 800; font-size: 20px;">EPM</div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Silver</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SOCIAL -->
+      <section class="module" data-module="social">
+        <div class="module-header">
+          <div class="module-title-block">
+            <h1 class="module-title">Social Wall</h1>
+            <p class="module-subtitle">142 publicaciones en vivo</p>
+          </div>
+          <button class="module-search" onclick="openOverlay('search')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.3-4.3"/></svg>
+            <span>Buscar</span>
+            <span class="kbd">⌘K</span>
+          </button>
+        </div>
+        <div class="grid-cards" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));">
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 9px;">
+              <div class="speaker-avatar" style="width: 32px; height: 32px; font-size: 12px; margin-bottom: 0;">JR</div>
+              <div><div style="font-weight: 600; font-size: 12px;">Juan Restrepo</div><div style="font-size: 10px; color: var(--text-muted);">hace 2 min</div></div>
+            </div>
+            <p style="font-size: 13px; line-height: 1.5; margin: 0;">Excelente apertura del evento. Energía increíble desde el primer minuto 🚀</p>
+          </div>
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 9px;">
+              <div class="speaker-avatar" style="width: 32px; height: 32px; font-size: 12px; margin-bottom: 0; background: linear-gradient(135deg, #F472B6, #BE185D);">MS</div>
+              <div><div style="font-weight: 600; font-size: 12px;">Mariana Soto</div><div style="font-size: 10px; color: var(--text-muted);">hace 5 min</div></div>
+            </div>
+            <p style="font-size: 13px; line-height: 1.5; margin: 0;">Pregunta para los speakers: ¿cómo manejan la inflación en sus operaciones?</p>
+          </div>
+        </div>
+      </section>
+
+      <aside class="aux-panel" id="aux-panel">
+        <div class="aux-panel-content">
+          <div class="aux-header">
+            <h2 class="aux-title" id="aux-title">Detalle</h2>
+            <button class="panel-close" onclick="closeAuxPanel()">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div id="aux-body"></div>
+        </div>
+      </aside>
+
+    </main>
+  </div>
+
+  <!-- ========== TAB BAR MOBILE (oculto en desktop) ========== -->
+  <nav class="tab-bar-mobile">
+    <button class="tab-item active" data-module="home">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+      <span>Inicio</span>
+    </button>
+    <button class="tab-item" data-module="agenda">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <span>Agenda</span>
+    </button>
+    <button class="tab-item" data-module="streaming">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4" fill="currentColor"/></svg>
+      <span class="live-dot"></span>
+      <span>En vivo</span>
+    </button>
+    <button class="tab-item" data-module="networking">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M4 21v-1a8 8 0 0116 0v1"/></svg>
+      <span>Conectar</span>
+    </button>
+    <button class="tab-item" id="more-btn-mobile">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+      <span>Más</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- ========== Overlays ========== -->
+<div class="overlay-backdrop" id="overlay-backdrop" onclick="closeAllOverlays()"></div>
+
+<div class="overlay-card" id="qr-overlay">
+  <div class="title-row">
+    <h2>Mi QR</h2>
+    <button class="panel-close" onclick="closeAllOverlays()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="qr-box">QR</div>
+  <p class="qr-caption">Andrés Gómez · andres@bancolombia.com<br/>Caduca en 4h 23min</p>
+  <button class="btn-secondary" style="margin-top: 14px;">Compartir QR</button>
+</div>
+
+<div class="notif-panel" id="notif-panel">
+  <div class="aux-header" style="margin-bottom: 14px;">
+    <h2 class="aux-title">Notificaciones</h2>
+    <button class="panel-close" onclick="closeAllOverlays()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="notif-item">
+    <div class="notif-icon" style="background: color-mix(in srgb, var(--pulse-color) 14%, transparent); color: var(--pulse-color);">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><polyline points="6 12 10 16 18 8" fill="none" stroke="currentColor"/></svg>
+    </div>
+    <div class="notif-content">
+      <div class="notif-title">Sesión empezando: Crisis económica 2026</div>
+      <div class="notif-meta">Carlos Pérez · ahora</div>
+    </div>
+    <div class="notif-unread"></div>
+  </div>
+  <div class="notif-item">
+    <div class="notif-icon" style="background: color-mix(in srgb, var(--info) 14%, transparent); color: var(--info);">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    </div>
+    <div class="notif-content">
+      <div class="notif-title">Andrés Gómez te envió un mensaje</div>
+      <div class="notif-meta">"Hola, vi tu perfil…" · hace 8 min</div>
+    </div>
+    <div class="notif-unread"></div>
+  </div>
+  <div class="notif-item">
+    <div class="notif-icon" style="background: color-mix(in srgb, var(--gold) 16%, transparent); color: var(--gold);">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="8" r="6"/><path stroke-linecap="round" d="M15 13l1 7-4-2-4 2 1-7"/></svg>
+    </div>
+    <div class="notif-content">
+      <div class="notif-title">Desbloqueaste el badge "Madrugador"</div>
+      <div class="notif-meta">+50 puntos · hace 15 min</div>
+    </div>
+  </div>
+</div>
+
+<div class="search-palette" id="search-palette">
+  <div class="search-input-wrap">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.3-4.3"/></svg>
+    <input class="search-input" placeholder="Buscar sesiones, personas, sponsors…" />
+  </div>
+  <div class="search-results">
+    <div class="search-section">Sesiones</div>
+    <div class="search-result">
+      <div class="search-result-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+      <div class="search-result-content"><div class="search-result-title">Crisis económica 2026</div><div class="search-result-meta">Carlos Pérez · hoy 9:00 AM</div></div>
+    </div>
+    <div class="search-section">Personas</div>
+    <div class="search-result">
+      <div class="search-result-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M4 21v-1a8 8 0 0116 0v1"/></svg></div>
+      <div class="search-result-content"><div class="search-result-title">Carlos Pérez</div><div class="search-result-meta">Speaker · CEO Banco Nacional</div></div>
+    </div>
+    <div class="search-section">Sponsors</div>
+    <div class="search-result">
+      <div class="search-result-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" d="M3 21h18M5 21V7l7-4 7 4v14"/></svg></div>
+      <div class="search-result-content"><div class="search-result-title">Bancolombia</div><div class="search-result-meta">Patrocinador principal</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const state = {
+    activeModule: 'home',
+    auxOpen: false,
+    streamPanels: { chat: false, trivia: false },
+    overlay: null,
+  };
+
+  function switchModule(name) {
+    if (name === state.activeModule) return;
+    closeAuxPanel();
+    const current = document.querySelector('.module.active');
+    const next = document.querySelector(`.module[data-module="${name}"]`);
+    if (current) {
+      current.classList.add('exiting');
+      setTimeout(() => {
+        current.classList.remove('active', 'exiting');
+        next.classList.add('active');
+        state.activeModule = name;
+        updateNavActive();
+      }, 180);
+    } else {
+      next.classList.add('active');
+      state.activeModule = name;
+      updateNavActive();
+    }
+  }
+
+  function updateNavActive() {
+    document.querySelectorAll('.nav-item[data-module], .tab-item[data-module]').forEach(b => {
+      b.classList.toggle('active', b.dataset.module === state.activeModule);
+    });
+  }
+
+  document.querySelectorAll('.nav-item[data-module], .tab-item[data-module]').forEach(btn => {
+    btn.addEventListener('click', () => switchModule(btn.dataset.module));
+  });
+
+  function openAuxPanel(type, label) {
+    const panel = document.getElementById('aux-panel');
+    const titleEl = document.getElementById('aux-title');
+    const bodyEl = document.getElementById('aux-body');
+    titleEl.textContent = label || 'Detalle';
+    if (type === 'session-detail') {
+      bodyEl.innerHTML = `
+        <div class="detail-cover"></div>
+        <h3 style="font-family: var(--font-display); font-weight: 800; font-size: 18px; margin: 0 0 4px;">${label}</h3>
+        <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 14px;">Sesión principal · Auditorio A</p>
+        <div class="detail-meta">
+          <div class="meta-block"><div class="meta-label">Hora</div><div class="meta-value">9:00 — 10:30</div></div>
+          <div class="meta-block"><div class="meta-label">Duración</div><div class="meta-value">90 min</div></div>
+          <div class="meta-block"><div class="meta-label">Speaker</div><div class="meta-value">Carlos Pérez</div></div>
+          <div class="meta-block"><div class="meta-label">Sala</div><div class="meta-value">Auditorio A</div></div>
+        </div>
+        <p style="font-size: 12px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 14px;">Análisis del impacto económico global en mercados emergentes.</p>
+        <button class="btn-primary">Agregar a mi agenda</button>
+        <button class="btn-secondary">Recordar 10 min antes</button>
+      `;
+    } else if (type === 'speaker-profile') {
+      bodyEl.innerHTML = `
+        <div style="display: grid; place-items: center; padding: 14px 0 20px;">
+          <div class="speaker-avatar" style="width: 80px; height: 80px; font-size: 26px; margin-bottom: 10px;">${label.split(' ').map(w => w[0]).join('').slice(0,2)}</div>
+          <h3 style="font-family: var(--font-display); font-weight: 800; font-size: 18px; margin: 0 0 3px;">${label}</h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin: 0;">Speaker en este evento</p>
+        </div>
+        <p style="font-size: 12px; line-height: 1.6; color: var(--text-secondary);">Lider con más de 15 años de experiencia en transformación digital y estrategia corporativa.</p>
+        <button class="btn-primary" style="margin-top: 18px;">Ver sus sesiones</button>
+        <button class="btn-secondary">Conectar</button>
+      `;
+    }
+    panel.classList.add('open');
+    state.auxOpen = true;
+  }
+
+  function closeAuxPanel() {
+    document.getElementById('aux-panel').classList.remove('open');
+    state.auxOpen = false;
+  }
+
+  function toggleStreamPanel(name) {
+    const panelEl = document.getElementById(name + '-panel');
+    const btnEl = document.getElementById('btn-toggle-' + name);
+    state.streamPanels[name] = !state.streamPanels[name];
+    panelEl.classList.toggle('hidden', !state.streamPanels[name]);
+    if (btnEl) btnEl.classList.toggle('active', state.streamPanels[name]);
+    updateStreamLayout();
+  }
+
+  function updateStreamLayout() {
+    const layout = document.getElementById('stream-layout');
+    layout.classList.remove('with-1', 'with-2');
+    const open = Object.values(state.streamPanels).filter(Boolean).length;
+    if (open === 1) layout.classList.add('with-1');
+    if (open >= 2) layout.classList.add('with-2');
+  }
+
+  function selectPerson(el, name) {
+    document.querySelectorAll('.person-row').forEach(r => r.classList.remove('active'));
+    el.classList.add('active');
+    openAuxPanel('speaker-profile', name);
+  }
+
+  function openOverlay(type) {
+    closeAllOverlays();
+    state.overlay = type;
+    document.getElementById('overlay-backdrop').classList.add('show');
+    if (type === 'qr') document.getElementById('qr-overlay').classList.add('show');
+    if (type === 'notif') document.getElementById('notif-panel').classList.add('show');
+    if (type === 'search') {
+      document.getElementById('search-palette').classList.add('show');
+      setTimeout(() => document.querySelector('.search-input').focus(), 50);
+    }
+  }
+
+  function closeAllOverlays() {
+    document.getElementById('overlay-backdrop').classList.remove('show');
+    document.getElementById('qr-overlay').classList.remove('show');
+    document.getElementById('notif-panel').classList.remove('show');
+    document.getElementById('search-palette').classList.remove('show');
+    state.overlay = null;
+  }
+
+  document.getElementById('me-btn').addEventListener('click', () => openOverlay('qr'));
+  document.getElementById('bell-btn').addEventListener('click', () => openOverlay('notif'));
+  document.getElementById('more-btn-mobile').addEventListener('click', () => openOverlay('notif'));
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      openOverlay('search');
+    }
+    if (e.key === 'Escape') closeAllOverlays();
+  });
+
+  document.querySelectorAll('.kbd').forEach(el => {
+    if (!/Mac|iPhone|iPod|iPad/i.test(navigator.platform)) {
+      el.textContent = 'Ctrl K';
+    }
+  });
+</script>
+
+</body>
+</html>
