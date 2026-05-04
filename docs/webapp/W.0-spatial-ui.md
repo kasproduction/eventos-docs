@@ -1,10 +1,18 @@
-# W.0 — Spatial Shell (DaVinci redesign 2026-05-02)
+# W.0 — Spatial Shell (DaVinci redesign 2026-05-02 → 2026-05-03)
 
 > **Cimiento estructural de toda la webapp.** Define como se ven, navegan y conviven los modulos. Filosofia visionOS-inspired adaptada a 2D web, NO drag manual ni paneles arrastrables.
 >
 > **Estimacion:** ~10h (revisada — antes 12h). Bloqueante de W.2-W.17.
 > **Dependencias:** W.1 cerrado.
-> **Estado:** Concepto VALIDADO en demos HTML (2026-05-02). Pendiente codear React.
+> **Estado:** **IMPLEMENTADO** en `eventos-web` (Next 16 + React 19 + Tailwind 4) el 2026-05-04.
+>
+> **Actualizacion 2026-05-04:** Shell W.0 IMPLEMENTADO en codigo:
+> - `src/components/shell/SpatialShell.tsx` (wrapper raiz)
+> - `src/components/shell/SidebarPill.tsx` (con bell + perfil adentro)
+> - `src/components/shell/CanvasCard.tsx` (16/9 con clamp — base universal)
+> - `src/components/shell/AmbientBackground.tsx`, `Stage.tsx`, `EventThemeProvider.tsx`, `ThemeTogglePill.tsx`, `ProfilePopover.tsx`
+> - Bell INTEGRADO en sidebar (decision final), no flotante separado.
+> - Sistema de accent dinamico per-tema (Noir + Lux) con primary_color + primary_color_light desde Filament.
 
 ---
 
@@ -84,9 +92,9 @@ MANTENEMOS:
 ```
 
 - Sidebar: `position: fixed`, ~52px ancho, border + shadow + radius 28px (pill alargada vertical), iconos verticales, accent rail al lado del activo
-- Card central: `max-width: 1200px / max-height: 820px`, border-radius 24px, elevation 4-layer Material/Apple
+- **Card central (canvas raiz):** ver seccion "Patron del card raiz universal" abajo. Formulas exactas con `clamp` + aspect 16/9 + centrado vertical real.
 - Aux panel: dentro de la card, slide-in desde derecha (~360px), border-left
-- Bell: flotante esquina top-right de la card, siempre visible aunque cambies modulo
+- **Bell-pill** top-right: rounded-rect (border-radius 16, NO circulo) con padding 6 e icono 38x38 adentro. Vive como "app solita", surface glass igual al sidebar. Siempre visible aunque cambies modulo
 
 ### Mobile (replica patron app movil — `eventos-app/app/(app)/(tabs)/index.tsx`)
 
@@ -114,6 +122,140 @@ MANTENEMOS:
 
 ---
 
+## Patron del card raiz universal (validado 2026-05-03)
+
+**Por que importa:** cuando el usuario navega Home → Agenda → Networking → Sponsors, **el canvas no debe saltar**. Misma forma, mismo tamano, misma posicion. Solo cambia lo que hay adentro. Esto es lo que hace que el shell se sienta spatial/visionOS y no una coleccion de paginas inconexas.
+
+### Reglas del card raiz (DEFINITIVAS — 2026-05-04)
+
+```css
+.card {
+  width: min(
+    1600px,                          /* cap absoluto: legibilidad >1600 sufre */
+    calc(100vw - 150px),             /* margen lateral (sidebar 88 + 36 right + holgura) */
+    calc((100vh - 80px) * 16 / 9)   /* altura disponible (stage padding 28+28 + chrome) */
+  );
+  aspect-ratio: 16 / 9;
+  border-radius: 26px;
+  overflow: hidden;
+  background: var(--bg-elevated);    /* Noir #141414 / Lux #ffffff — opaco */
+  border: 1px solid var(--border);
+  box-shadow: var(--canvas-card-shadow); /* adapta theme */
+}
+
+.stage {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px 36px 28px 88px;     /* vert 28/28 minimal, left 88 sidebar, right 36 */
+}
+```
+
+### Dimensiones verificadas (estandar para TODOS los modulos)
+
+| Viewport     | Card        | Aspect | Notas                        |
+|--------------|-------------|--------|------------------------------|
+| 1280×720     | ~1130×636   | 16/9   |                              |
+| 1366×768     | **1216×684**| 16/9   | resolucion base mas comun    |
+| 1920×1080    | 1600×900    | 16/9   | hits cap absoluto            |
+| 2560×1440+   | 1600×900    | 16/9   | cap mantiene legibilidad     |
+| <900 px wide | stack vert  | auto   | break a vertical, scroll OK  |
+
+**Estas dimensiones son ESTANDAR.** Cualquier nuevo modulo (Agenda, Networking, Sponsors, etc.) reusa el `<CanvasCard>` componente — NO se ajustan formulas. La consistencia visual entre modulos depende de eso.
+
+### Tipografia escalable
+
+Usar `clamp()` para que escale con el viewport, NO media queries duras:
+- Display protagonista: `clamp(32px, 3.4vw, 60px)`
+- Numerico grande (countdown, timers): `clamp(42px, 4.2vw, 78px)`
+- Stat cards num: `clamp(22px, 2.2vw, 36px)`
+- Titulo de seccion: `clamp(18px, 1.6vw, 28px)`
+- Padding del contenedor: `clamp(26px, 2.6vw, 56px)`
+
+### Como aplicarlo a otro modulo
+
+1. Copia el shell (sidebar + bell-pill + stage) tal cual.
+2. Reemplaza el contenido del `.card` con tu modulo. El card es el contenedor; tu modulo es lo de adentro.
+3. Si tu modulo necesita scroll interno (lista larga de Agenda, grid de Networking), pon `overflow-y: auto` dentro del card, NO en el card mismo.
+4. Si necesitas split (poster + sidebar interno), usa grid `7fr 3fr` o `6fr 4fr` (probados en LIVE/ENDED del home).
+5. Si tu modulo es un grid (Networking de personas, Sponsors), usa grid responsive con `clamp` en gaps y card sizes.
+
+### Reglas duras del shell (VisionOS)
+
+- Nada flota sobre el ambient sin surface (regla VisionOS — ver `feedback_glass_rule`)
+- Bell NO va en circulo aislado (se ve "anadido")
+- Perfil va en sidebar, NO duplicado en toolbar
+- Sin strip footers sueltos debajo del card
+- Si necesitas info adicional, va dentro del card o en una pill propia con surface
+
+**Demo de referencia activa:** `design/features/webapp/W0-spatial/home-v2-C-cinematic-MUTE.html`
+
+---
+
+## Estrategia responsive — 3 viewports activos + 1 bloqueado
+
+### Los 3 viewports que SI disenamos
+
+**1. Desktop + Laptop (≥1100 px wide)**
+- Patron completo del shell W.0 (canvas raiz + sidebar pill + bell-pill)
+- Tipografia con `clamp()` escala 1280→1920+
+- Cap absoluto card 1600×900
+
+**2. Tablet horizontal (≈900-1100 px wide)**
+- Mismo patron del shell W.0 con ajustes menores
+- Sidebar pill puede comprimirse (52→44 px)
+- Card formula sigue funcionando (escala automatica)
+- Splits internos pueden pasar de 7/3 a 6/4 segun necesidad
+
+**3. Mobile / celular (<640 px wide)**
+- **Adaptamos lo de la app nativa Expo, NO inventamos layout web propio**
+- Bottom tab bar (no sidebar pill)
+- Stack vertical, sin splits laterales
+- Cards full-width con paddings mobile (16-20 px)
+- Mismo lenguaje visual de la app: tabs, modales, sheets
+- Aqui SI va el QR del asistente (ver `feedback_qr_only_mobile`)
+
+### El viewport BLOQUEADO
+
+**Tablet vertical (portrait, 640-900 px wide)**
+**NO se disena.** Bloqueado con overlay "Voltee la tablet". Patron ya implementado en login (`design/features/webapp/Login/iteraciones/login-v7-davinci-FINAL.html` lineas 772-806).
+
+Componente reusable:
+
+```css
+.rotate-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 999;
+  background: var(--bg-sunken);
+  align-items: center; justify-content: center;
+  flex-direction: column;
+  gap: 20px; padding: 40px;
+  text-align: center;
+}
+[data-viewport="tablet-portrait"] .rotate-overlay { display: flex; }
+[data-viewport="tablet-portrait"] .stage { display: none; }
+```
+
+Con SVG de tablet rotando (animacion `rotateBack 2s` toggle 0deg ↔ -90deg) + h2 "Voltea tu tablet" + p explicativo.
+
+**Por que:** las cards 16/9 + el sidebar lateral + los splits requieren width. Tablet portrait (768 wide) es demasiado angosto para la composicion desktop pero demasiado ancho para la composicion mobile. Forzar al usuario a horizontal es mejor que servir un layout malo en ambos sentidos.
+
+### Flujo de trabajo por modulo
+
+1. **PRIMERO** disenar para **Desktop + Tablet H** usando el patron canvas raiz. Aqui se valida la composicion principal y la estetica cinematic/spatial.
+2. **DESPUES** adaptar para **Mobile** tomando como referencia la app nativa Expo (`apps/eventos-app/`). El layout web mobile debe sentirse igual que la app — mismas tabs, mismas cards, mismo flujo. NO inventar un mobile-web propio.
+3. **Tablet portrait** queda automaticamente cubierto con el overlay reusable.
+
+### Deteccion de viewport en prod
+
+Hoy en demos usamos `data-viewport` attribute manual (botones de testing). En prod necesitamos:
+- Hook `useViewport()` que detecte width + orientation
+- Retorna: `'mobile' | 'tablet-portrait' | 'tablet-landscape' | 'desktop'`
+- Aplica el `data-viewport` al body
+- En tablet-portrait: monta el `<RotateOverlay />` y oculta el resto
+
+---
+
 ## Sidebar pill — items y comportamientos
 
 ```
@@ -131,7 +273,9 @@ MANTENEMOS:
 [👤] Mi perfil (overlay con avatar, mis stands, mis prizes, mi recap, settings, logout)
 ```
 
-**Nota — campana NO va en sidebar:** vive en el LAYOUT (botón flotante top-right de la card central), siempre visible aunque cambies modulo. Click → notif panel slide derecho.
+**Nota — campana SI va en sidebar (decision 2026-05-04):** vive **dentro del sidebar pill** abajo del separador, antes del perfil. Misma forma que los demas items (size-9 rounded-xl). Badge accent cuando hay unread. Click → notif panel slide derecho.
+
+Iteracion descartada: bell como pill flotante separada top-right ("se sentia improvisado, anadido al canvas"). Razon final: el sidebar es LA zona de control del shell — bell + perfil + nav todos juntos = una sola pieza coherente. Top-right queda limpio para que el card respire.
 
 **Nota — "Mi perfil" NO "Mi QR":** el QR del asistente solo aplica en mobile (ver `feedback_qr_only_mobile.md`). En desktop/tablet H el overlay "Mi perfil" tiene avatar + datos + mis stands/prizes/recap + settings + logout, SIN QR.
 
@@ -215,14 +359,16 @@ Reduced motion respetado en TODOS via `useReducedMotionPref()`.
 
 ---
 
-## Demos HTML de referencia (validados con usuario 2026-05-02)
+## Demos HTML de referencia (validados con usuario 2026-05-02 → 2026-05-03)
 
 `design/features/webapp/W0-spatial/`:
 
 - **`index.html`** — Demo del shell completo (sidebar flotante + card central + 7 modulos navegables + Streaming con player + chat + trivia + Mi perfil overlay + Notif panel + Search Cmd+K). Mobile responsive con tab bar bottom replica app
-- **`home.html`** — Demo del modulo Home en sus 3 estados (selector arriba para alternar pre-event/live/ended)
+- **`home-v2-C-cinematic-MUTE.html`** — **Demo activo del Home + base validada del canvas raiz** (mute por estado: PRE/LIVE/ENDED). Aqui viven las formulas exactas del card raiz, bell-pill, sidebar pill, tipografia clamp. Punto de partida para codear cualquier modulo nuevo.
+- **`home-v2-C-cinematic-OPTIONS.html`** — Historico de comparacion de las 4 opciones de layout (split / overlay drawer / picture-in-picture / mute por estado). Mute fue la elegida.
+- ~~`home.html`~~ — Demo original 3 estados, eliminado por usuario el 2026-05-03 (replicaba la app movil escalada, no aprovechaba desktop).
 
-Ambos son HTML+CSS+JS vanilla (sin React) — referencia visual para codear el W.0 React real con confianza.
+Todos son HTML+CSS+JS vanilla (sin React) — referencia visual para codear el W.0 React real con confianza.
 
 ---
 
@@ -246,10 +392,17 @@ Ambos son HTML+CSS+JS vanilla (sin React) — referencia visual para codear el W
 4. **Routing:** cada modulo top-level es una ruta `[locale]/(app)/[modulo]/`. Aux panels NO son rutas (state interno). Overlays NO son rutas.
 
 5. **Pendiente UI/UX para ajustar despues del primer build:**
-   - **Consistencia tamano paneles entre estados Home** (pre/live/ended deben tener altura visual similar)
-   - Hero background: integracion con `event.cover_image` real (no gradient placeholder)
+   - ~~**Consistencia tamano paneles entre estados Home**~~ — RESUELTO 2026-05-03 con mute por estado dentro del canvas raiz (las 3 vistas miden identico, solo cambia composicion interna)
+   - Hero background: integracion con `event.cover_image` real (no gradient placeholder en demo)
    - Pre-carga modulos vecinos via TanStack Query `prefetchQuery`
    - Atmosfera del shell cambia segun estado evento (sutil)
+   - Hook `useViewport()` para detectar viewport + montar `<RotateOverlay />` en tablet portrait
+
+6. **Modulos pendientes para aplicar el patron canvas raiz:**
+   - W.2 Home — DONE (cinematic + mute por estado)
+   - W.3 Agenda — pendiente (lista interna scrollable dentro del card)
+   - W.8 Networking — pendiente (grid 3-4 cols con cards de personas dentro del card)
+   - W.7 Sponsors, W.6 Social, W.4 Streaming, W.5 Speakers, etc. — pendientes
 
 ---
 

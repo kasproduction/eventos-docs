@@ -3,8 +3,43 @@
 > Pantalla principal post-login. Hero del evento + countdown + happening now + GamificationHud + Recap banner + Highlights carousel + Anuncios mini + Sponsors brand wall preview + Module menu compacto + Post-event survey prompt + EventArchive (eventos pasados) + Atajos a modulos.
 >
 > **Estimacion:** ~9h (expandida de 6h por submodulos faltantes).
-> **Dependencias:** W.0 (spatial), W.1 (auth + layout shell), W.9 (gamification para Hud), W.14 (anuncios mini).
-> **Estado:** Pendiente.
+> **Dependencias:** W.0 (spatial + canvas raiz validado), W.1 (auth + layout shell), W.9 (gamification para Hud), W.14 (anuncios mini).
+> **Estado:** **IMPLEMENTADO base 2026-05-04** en `eventos-web/src/components/app/home/` (cinematic + mute por estado, 3 estados PRE/LIVE/ENDED, feed scrolleable de salas conectado al backend via `/api/v1/events/{id}/happening-now`). Pendientes UI/UX: simultaneas multi-sede, recap stats endpoint, panel notif overlay del bell.
+
+---
+
+## Diseno final (validado 2026-05-03)
+
+**Direccion:** cinematic + **mute por estado** dentro del canvas raiz universal del shell W.0 (ver `W.0-spatial-ui.md` seccion "Patron del card raiz universal").
+
+**Demo activo:** `design/features/webapp/W0-spatial/home-v2-C-cinematic-MUTE.html`
+
+### Composicion por estado
+
+Las 3 vistas miden **identico footprint** (mismo card raiz 16/9), pero su layout interno cambia segun el contenido pide:
+
+- **PRE**: poster full + wordmark del evento (`SUMMIT 2026` accent en el ano) bottom-left + countdown firma bottom-right. SIN CTAs. La unica accion es esperar.
+- **LIVE**: split `7fr 3fr`. Poster izq con wordmark + meta del dia. Happening-col 30% derecha = **feed scrolleable de salas activas (patron app movil)**: header dinamico `EN VIVO · N SALAS`, lista vertical de `.room-card` con scroll interno (avatar speaker 38px + sala + timer + titulo line-clamp 2 + speaker), 1 card featured con tinte accent. Click en card = abre stream. Sin CTA "Unirme" separado — cada card es el tap target. Footer `.next` con proximo cambio de slot.
+- **ENDED**: split `6fr 4fr`. Poster apagado (`filter: brightness(0.72)`) izq con wordmark del evento. Recap-col derecha con stats 2x2 (horas/sesiones/conexiones/seguimientos), tier-row Gold con `Top 18%`, **unico CTA "Ver mi recap"**, certificado como link sutil.
+
+### Decisiones cerradas
+
+1. **Card raiz universal** — formulas en `W.0-spatial-ui.md`. Aplica a TODOS los modulos.
+2. **Mute por estado** elegido sobre 3 alternativas (Split, Overlay, PiP). Razon: cada estado tiene contenido distinto y requiere composicion distinta.
+3. **Wordmark del evento** display 44px (`SUMMIT 2026` con accent en `2026`). NO tipografia CSS gigante (regla `feedback_keyvisual_not_typography`). El keyvisual real del cliente (en prod `<img>`) sigue siendo protagonista.
+4. **Sin strip footer suelto** debajo del card — regla VisionOS: si necesitas info adicional, va dentro del card o en una pill propia con surface.
+5. **CTAs reducidos al minimo** (PRE: 0, LIVE: 1, ENDED: 1). Cualquier secundario va como link sutil, no boton paralelo.
+6. **Sin "Mi entrada · QR" en desktop** — regla `feedback_qr_only_mobile`. En PRE el countdown habla solo.
+7. **Bell-pill rounded-rect top-right** (no circulo) como "app solita". Perfil en sidebar abajo. NO duplicar perfil en toolbar.
+8. **Sin "Itinerario sugerido" en PRE** — el countdown + fecha + sede ya dicen todo.
+9. **Sesiones simultaneas LIVE = feed scrolleable como app movil**. Lista vertical de `.room-card` con scroll interno. Sala **featured** (tinte accent): regla `(a) favorita del usuario activa, fallback (b) keynote/track principal del organizador`. NO usar `(c) sala con mas asistentes` (metrica tipo Cisco, no aporta al asistente). Sin CTA "Unirme al stream" separado — cada card es el tap target.
+
+### Pendientes de diseno (abiertos)
+
+1. **Multi-sede (Bancolombia)**: pill selector de sede en eyebrow del poster + chip "Tambien en MED·CAL".
+3. **Foto real del speaker**: hoy es placeholder gradient. En prod va `<img>` con `object-fit: cover` y halo accent.
+4. **Proximos eventos del organizador en ENDED**: hoy no aparecen. Si los queremos, van como mini-card adentro del recap-col.
+5. **Atmosfera dinamica por estado**: hoy igual en los 3. Idea: LIVE mas oscuro (apagaron luces), PRE mas luminoso.
 
 ---
 

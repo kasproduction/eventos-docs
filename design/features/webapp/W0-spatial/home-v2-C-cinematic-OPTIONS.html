@@ -1,0 +1,1205 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EventOS — Home v2 · Cinematic · 4 opciones de layout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  /* ===== Lumina Noir — chrome neutral ===== */
+  --bg: #050403;
+  --surface: #121110;
+  --surface-2: #1a1816;
+  --surface-3: #211e1b;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.16);
+  --fg: #f3efe7;
+  --fg-muted: rgba(255,255,255,0.62);
+  --fg-dim: rgba(255,255,255,0.4);
+  --fg-faint: rgba(255,255,255,0.22);
+
+  /* ===== Accent del evento — definido por el cliente ===== */
+  --accent: #ff4d6d;
+  --accent-soft: #ff7a8e;
+  --accent-deep: #c12745;
+  --accent-2: #a78bfa;
+  --accent-on: #1a0810;
+
+  --display: "Plus Jakarta Sans", system-ui, sans-serif;
+  --body: "Urbanist", system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+/* ===== Atmósfera ===== */
+.ambient {
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 25% 30%, color-mix(in srgb, var(--accent) 45%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 60% at 80% 75%, color-mix(in srgb, var(--accent-2) 38%, transparent) 0%, transparent 60%),
+    linear-gradient(135deg, #1a1110 0%, #14110f 40%, #050403 100%);
+  filter: blur(95px) saturate(1.05);
+  transform: scale(1.18);
+  opacity: 0.55;
+  z-index: 0;
+}
+.vignette {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse 110% 90% at 50% 50%, transparent 35%, rgba(5,4,3,0.7) 78%, var(--bg) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ===== Sidebar pill ===== */
+.sidebar {
+  position: fixed;
+  left: 18px; top: 50%; transform: translateY(-50%);
+  width: 52px;
+  background: rgba(20,18,16,0.55);
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 28px;
+  padding: 10px 0;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+  z-index: 50;
+}
+.sidebar .brand { width: 32px; height: 32px; display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--accent); margin-bottom: 6px; }
+.sidebar .ico { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; color: var(--fg-dim); position: relative; transition: all 200ms ease; }
+.sidebar .ico:hover { color: var(--fg-muted); background: rgba(255,255,255,0.04); }
+.sidebar .ico.active { color: var(--fg); background: rgba(255,255,255,0.08); }
+.sidebar .ico.active::before { content: ""; position: absolute; left: -7px; top: 8px; bottom: 8px; width: 2px; background: var(--accent); border-radius: 2px; }
+.sidebar .ico.live::after { content: ""; position: absolute; top: 8px; right: 8px; width: 6px; height: 6px; background: var(--accent); border-radius: 999px; box-shadow: 0 0 6px var(--accent); }
+.sidebar .div { width: 24px; height: 1px; background: var(--border); margin: 6px 0; }
+
+/* ===== Bell ===== */
+.bell {
+  position: fixed; top: 18px; right: 24px;
+  width: 44px; height: 44px;
+  border-radius: 999px;
+  background: rgba(20,18,16,0.65);
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  border: 1px solid var(--border-strong);
+  display: grid; place-items: center;
+  z-index: 60;
+  color: var(--fg);
+  transition: all 200ms ease;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  cursor: pointer;
+}
+.bell:hover { background: rgba(255,255,255,0.08); transform: translateY(-1px); }
+.bell .badge {
+  position: absolute; top: -3px; right: -3px;
+  min-width: 18px; height: 18px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--display);
+  font-size: 10px; font-weight: 800;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  border: 2px solid var(--bg);
+  padding: 0 4px;
+}
+
+/* ===== Top controls (option + state selectors) ===== */
+.top-controls {
+  position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 10px; align-items: center;
+  z-index: 100;
+}
+.selector {
+  display: flex; gap: 4px;
+  background: rgba(20,18,16,0.65);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--border-strong);
+  padding: 4px; border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+.selector .btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-family: var(--display);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--fg-muted); transition: all 150ms ease;
+}
+.selector .btn:hover { color: var(--fg); }
+.selector .btn.active { background: rgba(255,255,255,0.95); color: #0a0908; }
+.selector .lbl {
+  padding: 0 12px 0 14px;
+  font-family: var(--display);
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--fg-faint);
+  align-self: center;
+}
+
+/* ===== Stage ===== */
+.stage {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 88px 32px 110px 110px;
+}
+.stage-inner { width: 100%; max-width: 1040px; }
+
+/* ===== Caption (razonamiento) ===== */
+.caption {
+  position: fixed;
+  bottom: 18px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 20px;
+  background: rgba(20,18,16,0.78);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+  z-index: 90;
+  max-width: min(880px, calc(100vw - 220px));
+}
+.caption .tag {
+  font-family: var(--display);
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+  padding-right: 16px;
+  border-right: 1px solid var(--border);
+}
+.caption .txt { font-size: 12px; color: var(--fg-muted); line-height: 1.45; }
+.caption .txt b { color: var(--fg); font-weight: 600; }
+
+/* =========================================================
+   POSTER COMMON (background, capas, info corporativa)
+   ========================================================= */
+.poster {
+  position: relative;
+  overflow: hidden;
+  background:
+    /* simula keyvisual del cliente — en prod va <img>/background-image url() */
+    radial-gradient(ellipse 75% 55% at 30% 38%, color-mix(in srgb, var(--accent) 55%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 55% at 78% 75%, color-mix(in srgb, var(--accent-2) 42%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 50%, color-mix(in srgb, var(--accent-deep) 30%, transparent) 0%, transparent 70%),
+    linear-gradient(135deg, #1a0810 0%, #14110f 40%, #050403 100%);
+}
+.poster::before {
+  /* grain sutil para que parezca foto, no CSS plano */
+  content: "";
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.07 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity: 0.6;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* poster info marca pequeña (no tipografía CSS gigante) */
+.poster-mark {
+  font-family: var(--display);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.poster-mark .dot { width: 6px; height: 6px; background: var(--accent); border-radius: 999px; box-shadow: 0 0 10px var(--accent); }
+.poster-mark.live .dot { animation: pulse 1.6s ease-in-out infinite; }
+.poster-mark.gold { color: rgba(255,255,255,0.85); }
+@keyframes pulse { 50% { opacity: 0.5; transform: scale(1.4); } }
+
+.poster-bottom-info {
+  display: flex; gap: 36px; align-items: flex-end;
+}
+.poster-bottom-info .pair { display: flex; flex-direction: column; gap: 2px; font-family: var(--display); }
+.poster-bottom-info .pair .lbl { font-size: 9px; letter-spacing: 0.22em; color: rgba(255,255,255,0.55); text-transform: uppercase; font-weight: 700; }
+.poster-bottom-info .pair .val { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.95); letter-spacing: 0.02em; }
+.poster-bottom-info .pair .val em { font-style: normal; color: var(--accent-soft); }
+
+/* nombre del cliente como wordmark discreto, NO display gigante */
+.poster-wordmark {
+  font-family: var(--display);
+  font-size: 14px; font-weight: 800;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(255,255,255,0.95);
+  display: flex; align-items: center; gap: 10px;
+}
+.poster-wordmark .sep { width: 18px; height: 1px; background: rgba(255,255,255,0.4); }
+.poster-wordmark em { font-style: normal; color: var(--accent-soft); font-weight: 800; }
+
+/* =========================================================
+   COMMON ACTION ELEMENTS (avatar, meta, cta)
+   ========================================================= */
+.action-visual {
+  border-radius: 999px;
+  background:
+    radial-gradient(ellipse 80% 80% at 50% 32%, rgba(255,215,185,0.6) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 50% 70%, rgba(120,60,50,0.5) 0%, transparent 60%),
+    linear-gradient(180deg, #5a3024 0%, #2a1410 60%, #150a08 100%);
+  border: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent),
+    0 8px 22px color-mix(in srgb, var(--accent) 28%, transparent);
+  position: relative;
+  flex-shrink: 0;
+}
+.action-visual::after {
+  content: ""; position: absolute; bottom: 4px; right: 4px;
+  width: 12px; height: 12px;
+  background: var(--accent); border: 2px solid var(--surface-2);
+  border-radius: 999px;
+  box-shadow: 0 0 8px var(--accent);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.action-visual.ended {
+  background: linear-gradient(135deg, var(--accent-2) 0%, color-mix(in srgb, var(--accent-2) 60%, var(--accent)) 100%);
+  border: none;
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--accent-2) 30%, transparent);
+  display: grid; place-items: center;
+  color: #fff;
+}
+.action-visual.ended::after { display: none; }
+
+.meta-eyebrow {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.meta-eyebrow .live-dot {
+  width: 6px; height: 6px; background: var(--accent); border-radius: 999px;
+  box-shadow: 0 0 8px var(--accent);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.meta-eyebrow .sep { width: 14px; height: 1px; background: var(--border-strong); }
+
+.session-title {
+  font-family: var(--display);
+  font-weight: 700;
+  letter-spacing: -0.015em; line-height: 1.2;
+  color: var(--fg);
+}
+
+.session-sub {
+  font-size: 13px; color: var(--fg-muted);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.session-sub b { color: var(--fg); font-weight: 600; }
+.session-sub .sep { width: 4px; height: 4px; background: var(--fg-dim); border-radius: 999px; }
+
+.timer-block {
+  display: flex; flex-direction: column;
+  font-family: var(--display);
+}
+.timer-block .lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-dim); }
+.timer-block .num { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.timer-block .sub { font-size: 11px; color: var(--fg-muted); }
+
+.cta {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px 22px;
+  background: var(--accent);
+  color: var(--accent-on);
+  border-radius: 12px;
+  font-family: var(--display);
+  font-weight: 700; font-size: 13px;
+  letter-spacing: 0.02em;
+  transition: all 200ms ease;
+  box-shadow:
+    0 12px 28px color-mix(in srgb, var(--accent) 35%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 50%, transparent) inset;
+}
+.cta:hover { background: var(--accent-soft); transform: translateY(-1px); }
+.cta .ico { width: 14px; height: 14px; }
+.cta-secondary {
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.05);
+  color: var(--fg);
+  border-radius: 12px;
+  font-family: var(--display);
+  font-weight: 600; font-size: 12px;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--border);
+  transition: all 200ms ease;
+}
+.cta-secondary:hover { background: rgba(255,255,255,0.08); border-color: var(--border-strong); }
+
+/* countdown shared */
+.cd {
+  display: flex; align-items: baseline; gap: 18px;
+  font-family: var(--display);
+  font-variant-numeric: tabular-nums;
+}
+.cd .cell { display: flex; flex-direction: column; align-items: center; min-width: 76px; }
+.cd .cell .num { font-size: 56px; font-weight: 800; line-height: 1; color: var(--fg); letter-spacing: -0.04em; }
+.cd .cell .lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: var(--fg-dim); margin-top: 6px; }
+.cd .sep { color: var(--fg-faint); font-size: 38px; font-weight: 200; transform: translateY(-6px); }
+.cd-caption {
+  font-family: var(--display);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-top: 12px;
+}
+.cd-caption b { color: var(--accent); font-weight: 800; }
+
+/* =========================================================
+   OPCIÓN 1 — SPLIT HORIZONTAL (poster izquierda, action derecha)
+   ========================================================= */
+.opt[data-opt="1"] .card {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--surface);
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.7),
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 0 100px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.opt[data-opt="1"] .poster { min-height: 480px; }
+.opt[data-opt="1"] .poster {
+  position: relative;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 36px 40px;
+}
+.opt[data-opt="1"] .poster::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+}
+.opt[data-opt="1"] .poster > * { position: relative; z-index: 2; }
+.opt[data-opt="1"] .action-col {
+  display: flex; flex-direction: column;
+  padding: 36px 36px 32px;
+  gap: 24px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  justify-content: center;
+}
+.opt[data-opt="1"] .action-visual { width: 84px; height: 84px; }
+.opt[data-opt="1"] .session-title { font-size: 24px; }
+.opt[data-opt="1"] .timer-block .num { font-size: 36px; }
+.opt[data-opt="1"] .cta-row { display: flex; gap: 10px; flex-direction: column; }
+.opt[data-opt="1"] .cta-row .cta { width: 100%; }
+.opt[data-opt="1"] .cta-row .cta-secondary { width: 100%; text-align: center; }
+.opt[data-opt="1"] .stat-row { display: flex; gap: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+.opt[data-opt="1"] .stat-row .stat { display: flex; flex-direction: column; }
+.opt[data-opt="1"] .stat-row .stat .num { font-family: var(--display); font-size: 28px; font-weight: 800; color: var(--fg); letter-spacing: -0.02em; line-height: 1; }
+.opt[data-opt="1"] .stat-row .stat .lbl { font-family: var(--display); font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-dim); margin-top: 6px; }
+
+/* =========================================================
+   OPCIÓN 2 — OVERLAY DRAWER (action absolute dentro del poster)
+   ========================================================= */
+.opt[data-opt="2"] .card {
+  position: relative;
+  border-radius: 26px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.7),
+    0 0 100px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.opt[data-opt="2"] .poster {
+  aspect-ratio: 16/9;
+  padding: 32px 40px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.opt[data-opt="2"] .poster-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
+.opt[data-opt="2"] .action-overlay {
+  position: absolute;
+  left: 24px; right: 24px; bottom: 24px;
+  background: rgba(15,13,11,0.55);
+  backdrop-filter: blur(28px) saturate(1.3);
+  -webkit-backdrop-filter: blur(28px) saturate(1.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px;
+  padding: 22px 28px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: center;
+  z-index: 3;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+}
+.opt[data-opt="2"] .action-overlay .left { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.opt[data-opt="2"] .action-overlay .text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.opt[data-opt="2"] .action-visual { width: 64px; height: 64px; }
+.opt[data-opt="2"] .session-title { font-size: 19px; }
+.opt[data-opt="2"] .right { display: flex; align-items: center; gap: 18px; }
+.opt[data-opt="2"] .timer-block { align-items: flex-end; padding-right: 18px; border-right: 1px solid var(--border); }
+.opt[data-opt="2"] .pre-cd-overlay { justify-content: center; }
+.opt[data-opt="2"] .pre-cd-overlay .cd { gap: 14px; }
+.opt[data-opt="2"] .pre-cd-overlay .cd .cell { min-width: 64px; }
+.opt[data-opt="2"] .pre-cd-overlay .cd .cell .num { font-size: 44px; }
+.opt[data-opt="2"] .pre-cd-overlay .cd .sep { font-size: 30px; }
+.opt[data-opt="2"] .ended-overlay .left .text .session-title { font-size: 18px; }
+
+/* =========================================================
+   OPCIÓN 3 — PICTURE-IN-PICTURE
+   ========================================================= */
+.opt[data-opt="3"] .card {
+  position: relative;
+  border-radius: 26px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.7),
+    0 0 100px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.opt[data-opt="3"] .poster {
+  aspect-ratio: 16/9;
+  padding: 32px 40px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.opt[data-opt="3"] .poster-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
+.opt[data-opt="3"] .poster-bottom { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+.opt[data-opt="3"] .pip {
+  position: absolute;
+  bottom: 28px; right: 28px;
+  width: 380px;
+  background: rgba(15,13,11,0.6);
+  backdrop-filter: blur(28px) saturate(1.3);
+  -webkit-backdrop-filter: blur(28px) saturate(1.3);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  padding: 18px 18px 16px;
+  display: flex; flex-direction: column; gap: 14px;
+  z-index: 4;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+}
+.opt[data-opt="3"] .pip .top-row { display: flex; align-items: center; gap: 12px; }
+.opt[data-opt="3"] .action-visual { width: 48px; height: 48px; }
+.opt[data-opt="3"] .pip .session-title { font-size: 15px; line-height: 1.25; }
+.opt[data-opt="3"] .pip .speaker-line { font-size: 11px; color: var(--fg-muted); margin-top: 2px; }
+.opt[data-opt="3"] .pip .speaker-line b { color: var(--fg); font-weight: 600; }
+.opt[data-opt="3"] .pip .bottom-row { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+.opt[data-opt="3"] .pip .timer-inline { font-family: var(--display); font-size: 18px; font-weight: 800; color: var(--accent); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.opt[data-opt="3"] .pip .timer-inline .lbl { font-size: 9px; font-weight: 700; color: var(--fg-dim); letter-spacing: 0.18em; margin-right: 6px; }
+.opt[data-opt="3"] .pip .cta { padding: 8px 14px; font-size: 11px; }
+
+/* PRE en opción 3: poster con countdown overlay esquina inferior izquierda en pip-style */
+.opt[data-opt="3"] .pip.pre-pip { padding: 20px 22px; }
+.opt[data-opt="3"] .pip.pre-pip .cd { gap: 10px; }
+.opt[data-opt="3"] .pip.pre-pip .cd .cell { min-width: 50px; }
+.opt[data-opt="3"] .pip.pre-pip .cd .cell .num { font-size: 32px; }
+.opt[data-opt="3"] .pip.pre-pip .cd .sep { font-size: 22px; }
+
+/* =========================================================
+   OPCIÓN 4 — MUTE POR ESTADO
+   ========================================================= */
+.opt[data-opt="4"] .card {
+  position: relative;
+  border-radius: 26px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--surface);
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.7),
+    0 0 100px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* PRE: poster full 16/9, countdown dentro como firma del poster */
+body[data-state="pre"] .opt[data-opt="4"] .card { display: block; min-height: unset; }
+body[data-state="pre"] .opt[data-opt="4"] .poster {
+  aspect-ratio: 16/9;
+  padding: 36px 44px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+body[data-state="pre"] .opt[data-opt="4"] .poster::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+}
+body[data-state="pre"] .opt[data-opt="4"] .poster > * { position: relative; z-index: 2; }
+body[data-state="pre"] .opt[data-opt="4"] .pre-signature {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+}
+body[data-state="pre"] .opt[data-opt="4"] .pre-signature .cd { gap: 16px; }
+body[data-state="pre"] .opt[data-opt="4"] .pre-signature .cd .cell { min-width: 70px; }
+body[data-state="pre"] .opt[data-opt="4"] .pre-signature .cd .cell .num { font-size: 64px; }
+body[data-state="pre"] .opt[data-opt="4"] .pre-signature .cd .sep { font-size: 44px; }
+body[data-state="pre"] .opt[data-opt="4"] .pre-signature .right-stack { display: flex; flex-direction: column; align-items: flex-end; gap: 16px; }
+body[data-state="pre"] .opt[data-opt="4"] .pre-signature .cta { padding: 14px 22px; }
+
+/* LIVE: split, idéntico patrón a opción 1 (donde brilla) */
+body[data-state="live"] .opt[data-opt="4"] .card {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+}
+body[data-state="live"] .opt[data-opt="4"] .poster { min-height: 480px; }
+body[data-state="live"] .opt[data-opt="4"] .poster {
+  position: relative;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 36px 40px;
+}
+body[data-state="live"] .opt[data-opt="4"] .poster::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+}
+body[data-state="live"] .opt[data-opt="4"] .poster > * { position: relative; z-index: 2; }
+body[data-state="live"] .opt[data-opt="4"] .action-col {
+  display: flex; flex-direction: column;
+  padding: 36px 36px 32px;
+  gap: 24px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  justify-content: center;
+}
+body[data-state="live"] .opt[data-opt="4"] .action-visual { width: 84px; height: 84px; }
+body[data-state="live"] .opt[data-opt="4"] .session-title { font-size: 24px; }
+body[data-state="live"] .opt[data-opt="4"] .timer-block .num { font-size: 36px; }
+body[data-state="live"] .opt[data-opt="4"] .upcoming-list { display: flex; flex-direction: column; gap: 10px; padding-top: 18px; border-top: 1px solid var(--border); }
+body[data-state="live"] .opt[data-opt="4"] .upcoming-list .row { display: grid; grid-template-columns: 56px 1fr; gap: 14px; align-items: baseline; }
+body[data-state="live"] .opt[data-opt="4"] .upcoming-list .row .when { font-family: var(--display); font-size: 11px; font-weight: 700; letter-spacing: 0.16em; color: var(--fg-dim); text-transform: uppercase; }
+body[data-state="live"] .opt[data-opt="4"] .upcoming-list .row .info { font-size: 12px; color: var(--fg-muted); line-height: 1.35; }
+body[data-state="live"] .opt[data-opt="4"] .upcoming-list .row .info b { color: var(--fg); font-weight: 600; display: block; font-size: 13px; }
+
+/* ENDED: split apagado con recap-band */
+body[data-state="ended"] .opt[data-opt="4"] .card {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+}
+body[data-state="ended"] .opt[data-opt="4"] .poster { min-height: 480px; }
+body[data-state="ended"] .opt[data-opt="4"] .poster {
+  position: relative;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 36px 40px;
+  filter: brightness(0.7) saturate(0.8);
+}
+body[data-state="ended"] .opt[data-opt="4"] .poster > * { position: relative; z-index: 2; filter: none; }
+body[data-state="ended"] .opt[data-opt="4"] .action-col {
+  display: flex; flex-direction: column;
+  padding: 36px 36px 32px;
+  gap: 22px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  justify-content: center;
+}
+body[data-state="ended"] .opt[data-opt="4"] .stat-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+body[data-state="ended"] .opt[data-opt="4"] .stat-cards .stat { padding: 14px 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border); }
+body[data-state="ended"] .opt[data-opt="4"] .stat-cards .stat .num { font-family: var(--display); font-size: 26px; font-weight: 800; color: var(--fg); letter-spacing: -0.02em; line-height: 1; }
+body[data-state="ended"] .opt[data-opt="4"] .stat-cards .stat .num em { font-style: normal; color: var(--accent); font-weight: 800; }
+body[data-state="ended"] .opt[data-opt="4"] .stat-cards .stat .lbl { font-family: var(--display); font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--fg-dim); margin-top: 6px; }
+body[data-state="ended"] .opt[data-opt="4"] .tier-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: linear-gradient(135deg, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent); border: 1px solid color-mix(in srgb, var(--accent-2) 28%, transparent); border-radius: 12px; }
+body[data-state="ended"] .opt[data-opt="4"] .tier-row .tier-name { font-family: var(--display); font-size: 22px; font-weight: 800; font-style: italic; color: var(--fg); letter-spacing: -0.01em; }
+body[data-state="ended"] .opt[data-opt="4"] .tier-row .tier-meta { font-size: 11px; color: var(--fg-muted); }
+body[data-state="ended"] .opt[data-opt="4"] .tier-row .tier-meta b { color: var(--fg); font-weight: 600; }
+body[data-state="ended"] .opt[data-opt="4"] .cta-row { display: flex; gap: 10px; }
+
+/* =========================================================
+   STRIP SECUNDARIA (anuncios + próxima sesión)
+   ========================================================= */
+.strip-secondary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+  padding: 0 4px;
+  gap: 24px;
+}
+.strip-secondary .item {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 12px; color: var(--fg-muted);
+  min-width: 0;
+}
+.strip-secondary .item .when {
+  font-family: var(--display);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--fg-dim);
+  padding-right: 12px;
+  border-right: 1px solid var(--border);
+  white-space: nowrap;
+}
+.strip-secondary .item .when.live-when { color: var(--accent); }
+.strip-secondary .item b { color: var(--fg); font-weight: 600; }
+.strip-secondary .more {
+  font-family: var(--display);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--fg-muted);
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  transition: all 200ms ease;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.strip-secondary .more:hover { color: var(--fg); border-color: var(--border-strong); background: rgba(255,255,255,0.03); }
+
+/* =========================================================
+   VISIBILITY GATES
+   ========================================================= */
+.opt { display: none; }
+body[data-option="1"] .opt[data-opt="1"] { display: block; }
+body[data-option="2"] .opt[data-opt="2"] { display: block; }
+body[data-option="3"] .opt[data-opt="3"] { display: block; }
+body[data-option="4"] .opt[data-opt="4"] { display: block; }
+
+[data-state="pre"] .show-live, [data-state="pre"] .show-ended { display: none !important; }
+[data-state="live"] .show-pre, [data-state="live"] .show-ended { display: none !important; }
+[data-state="ended"] .show-pre, [data-state="ended"] .show-live { display: none !important; }
+
+/* responsive básico */
+@media (max-width: 1100px) {
+  .opt[data-opt="1"] .card,
+  body[data-state="live"] .opt[data-opt="4"] .card,
+  body[data-state="ended"] .opt[data-opt="4"] .card { grid-template-columns: 1fr; min-height: unset; }
+  .opt[data-opt="1"] .poster,
+  body[data-state="live"] .opt[data-opt="4"] .poster,
+  body[data-state="ended"] .opt[data-opt="4"] .poster { aspect-ratio: 16/9; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .stage { padding: 88px 16px 130px 88px; }
+  .opt[data-opt="3"] .pip { width: calc(100% - 56px); right: 28px; left: 28px; }
+}
+</style>
+</head>
+<body data-option="1" data-state="live">
+
+<div class="ambient"></div>
+<div class="vignette"></div>
+
+<aside class="sidebar">
+  <div class="brand">E</div>
+  <button class="ico active" title="Home"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8l6-5 6 5v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8z"/></svg></button>
+  <button class="ico" title="Agenda"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="12" height="11" rx="1.5"/><path d="M3 7h12M6 2v3M12 2v3"/></svg></button>
+  <button class="ico live" title="En vivo"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="6"/><circle cx="9" cy="9" r="2" fill="currentColor"/></svg></button>
+  <button class="ico" title="Networking"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="6" cy="7" r="2.5"/><circle cx="12" cy="7" r="2.5"/><path d="M2 15c0-2.5 2-4 4-4s4 1.5 4 4M8 15c0-2.5 2-4 4-4s4 1.5 4 4"/></svg></button>
+  <button class="ico" title="Social"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 13V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H7l-4 3z"/></svg></button>
+  <button class="ico" title="Sponsors"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7v8h12V7M3 7l6-4 6 4M7 15v-4h4v4"/></svg></button>
+  <div class="div"></div>
+  <button class="ico" title="Perfil"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="6" r="3"/><path d="M3 16c0-3 3-5 6-5s6 2 6 5"/></svg></button>
+</aside>
+
+<button class="bell" title="Notificaciones">
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 2.5a4.5 4.5 0 0 0-4.5 4.5v3l-1.2 2.5h11.4l-1.2-2.5V7A4.5 4.5 0 0 0 9 2.5z"/>
+    <path d="M7.2 13.5a1.8 1.8 0 0 0 3.6 0"/>
+  </svg>
+  <span class="badge">3</span>
+</button>
+
+<div class="top-controls">
+  <div class="selector">
+    <span class="lbl">Layout</span>
+    <button class="btn active" data-go-option="1">1 · Split</button>
+    <button class="btn" data-go-option="2">2 · Overlay</button>
+    <button class="btn" data-go-option="3">3 · PiP</button>
+    <button class="btn" data-go-option="4">4 · Mute</button>
+  </div>
+  <div class="selector">
+    <span class="lbl">Estado</span>
+    <button class="btn" data-go-state="pre">Pre</button>
+    <button class="btn active" data-go-state="live">Live</button>
+    <button class="btn" data-go-state="ended">Ended</button>
+  </div>
+</div>
+
+<main class="stage">
+  <div class="stage-inner">
+
+    <!-- ============================================================
+         OPCIÓN 1 — SPLIT HORIZONTAL
+         ============================================================ -->
+    <section class="opt" data-opt="1">
+      <div class="card">
+
+        <!-- POSTER (col izq) -->
+        <div class="poster">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div class="poster-mark show-pre">FALTAN 12 DÍAS</div>
+            <div class="poster-mark live show-live"><span class="dot"></span>EN VIVO · DAY 02 / 03</div>
+            <div class="poster-mark gold show-ended">EVENTO CONCLUIDO</div>
+            <div class="poster-mark" style="color:rgba(255,255,255,0.45)">EVENTO N.<b style="color:rgba(255,255,255,0.8)">26</b></div>
+          </div>
+          <div>
+            <div class="poster-wordmark"><em>SUMMIT</em><span class="sep"></span>2026</div>
+            <div class="poster-bottom-info" style="margin-top: 18px;">
+              <div class="pair"><span class="lbl">Fecha</span><span class="val">06—08 NOV</span></div>
+              <div class="pair"><span class="lbl">Sede</span><span class="val">BOGOTÁ</span></div>
+              <div class="pair"><span class="lbl">Asistentes</span><span class="val">2.847</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTION (col der) -->
+        <div class="action-col">
+
+          <!-- PRE -->
+          <div class="show-pre" style="display:flex; flex-direction:column; gap: 26px;">
+            <div>
+              <span class="meta-eyebrow" style="color: var(--fg-dim);">CUENTA REGRESIVA</span>
+            </div>
+            <div class="cd">
+              <div class="cell"><span class="num">12</span><span class="lbl">Días</span></div>
+              <span class="sep">:</span>
+              <div class="cell"><span class="num">04</span><span class="lbl">Hrs</span></div>
+              <span class="sep">:</span>
+              <div class="cell"><span class="num">38</span><span class="lbl">Min</span></div>
+            </div>
+            <div class="cd-caption">APERTURA · <b>06 NOV 09:30</b> · BOGOTÁ</div>
+            <div class="cta-row">
+              <button class="cta">Mi itinerario sugerido</button>
+              <button class="cta-secondary">Cómo llegar al venue</button>
+            </div>
+          </div>
+
+          <!-- LIVE -->
+          <div class="show-live" style="display:flex; flex-direction:column; gap: 22px;">
+            <div style="display:flex; align-items:center; gap: 18px;">
+              <div class="action-visual"></div>
+              <div style="display:flex; flex-direction:column; gap: 6px; min-width:0;">
+                <span class="meta-eyebrow"><span class="live-dot"></span>SUCEDIENDO AHORA <span class="sep"></span> SALA MAGNA</span>
+                <h3 class="session-title">The Compounding Edge of Small Teams</h3>
+                <span class="session-sub"><b>Joaquín Decker</b><span class="sep"></span>Founder, Northbeam</span>
+              </div>
+            </div>
+            <div class="timer-block">
+              <span class="lbl">Restan</span>
+              <span class="num">23:14</span>
+              <span class="sub">Q&amp;A al final · Track 01 · Founders &amp; Capital</span>
+            </div>
+            <div class="cta-row">
+              <button class="cta">
+                <svg class="ico" viewBox="0 0 16 16" fill="currentColor"><polygon points="4,3 13,8 4,13"/></svg>
+                Unirme al stream
+              </button>
+              <button class="cta-secondary">Agenda del día</button>
+            </div>
+          </div>
+
+          <!-- ENDED -->
+          <div class="show-ended" style="display:flex; flex-direction:column; gap: 22px;">
+            <div>
+              <span class="meta-eyebrow" style="color: var(--accent-soft);">TU PASO POR EL EVENTO</span>
+              <h3 class="session-title" style="margin-top: 8px;">Tier <em style="font-style:italic; color: var(--accent-soft); font-weight:800;">Gold</em> alcanzado</h3>
+            </div>
+            <div class="stat-row">
+              <div class="stat"><span class="num">14h</span><span class="lbl">En vivo</span></div>
+              <div class="stat"><span class="num">8</span><span class="lbl">Sesiones</span></div>
+              <div class="stat"><span class="num">32</span><span class="lbl">Conexiones</span></div>
+            </div>
+            <div class="cta-row">
+              <button class="cta">
+                <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="3,2 13,8 3,14" fill="currentColor"/></svg>
+                Ver mi recap
+              </button>
+              <button class="cta-secondary">Descargar certificado</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- strip secundaria -->
+      <div class="strip-secondary">
+        <div class="item show-pre">
+          <span class="when">PUBLICADO HOY</span>
+          <span><b>Agenda final disponible.</b> Revisa tu itinerario sugerido.</span>
+        </div>
+        <div class="item show-live">
+          <span class="when live-when">SIGUIENTE 12:30</span>
+          <span><b>Postgres at Founder-Scale</b> · Mira Rashidi · Sala B</span>
+        </div>
+        <div class="item show-ended">
+          <span class="when">PRÓXIMO EVENTO</span>
+          <span><b>Lumina Winter Lab</b> · marzo 2027 · CDMX · early access abierto</span>
+        </div>
+        <button class="more">Ver todo</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         OPCIÓN 2 — OVERLAY DRAWER
+         ============================================================ -->
+    <section class="opt" data-opt="2">
+      <div class="card">
+        <div class="poster">
+          <div class="poster-top">
+            <div class="poster-mark show-pre">FALTAN 12 DÍAS</div>
+            <div class="poster-mark live show-live"><span class="dot"></span>EN VIVO · DAY 02 / 03</div>
+            <div class="poster-mark gold show-ended">EVENTO CONCLUIDO</div>
+            <div class="poster-wordmark" style="text-align:right;"><em>SUMMIT</em><span class="sep"></span>2026</div>
+          </div>
+
+          <!-- PRE OVERLAY -->
+          <div class="action-overlay pre-cd-overlay show-pre" style="grid-template-columns: 1fr;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap: 12px;">
+              <div class="cd">
+                <div class="cell"><span class="num">12</span><span class="lbl">Días</span></div>
+                <span class="sep">:</span>
+                <div class="cell"><span class="num">04</span><span class="lbl">Hrs</span></div>
+                <span class="sep">:</span>
+                <div class="cell"><span class="num">38</span><span class="lbl">Min</span></div>
+                <span class="sep">:</span>
+                <div class="cell"><span class="num">22</span><span class="lbl">Seg</span></div>
+              </div>
+              <div class="cd-caption" style="margin-top: 0;">APERTURA · <b>06 NOV 09:30</b> · BOGOTÁ</div>
+            </div>
+          </div>
+
+          <!-- LIVE OVERLAY -->
+          <div class="action-overlay show-live">
+            <div class="left">
+              <div class="action-visual"></div>
+              <div class="text">
+                <span class="meta-eyebrow"><span class="live-dot"></span>SUCEDIENDO AHORA <span class="sep"></span> SALA MAGNA</span>
+                <h3 class="session-title">The Compounding Edge of Small Teams</h3>
+                <span class="session-sub"><b>Joaquín Decker</b><span class="sep"></span>Founder, Northbeam<span class="sep"></span>Track 01</span>
+              </div>
+            </div>
+            <div class="right">
+              <div class="timer-block" style="align-items:flex-end;">
+                <span class="lbl">Restan</span>
+                <span class="num">23:14</span>
+                <span class="sub">Q&amp;A al final</span>
+              </div>
+              <button class="cta">
+                <svg class="ico" viewBox="0 0 16 16" fill="currentColor"><polygon points="4,3 13,8 4,13"/></svg>
+                Stream
+              </button>
+            </div>
+          </div>
+
+          <!-- ENDED OVERLAY -->
+          <div class="action-overlay ended-overlay show-ended">
+            <div class="left">
+              <div class="action-visual ended">
+                <svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M8 6h16v6a8 8 0 0 1-16 0V6z"/>
+                  <path d="M8 9H4v3a4 4 0 0 0 4 4M24 9h4v3a4 4 0 0 1-4 4"/>
+                  <path d="M16 20v6M11 26h10"/>
+                </svg>
+              </div>
+              <div class="text">
+                <span class="meta-eyebrow" style="color: var(--accent-soft);">TIER GOLD ALCANZADO</span>
+                <h3 class="session-title">14h en vivo · 8 sesiones · 32 conexiones</h3>
+                <span class="session-sub">Tu recap personal está listo</span>
+              </div>
+            </div>
+            <div class="right">
+              <button class="cta-secondary">Certificado</button>
+              <button class="cta">Ver mi recap</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="strip-secondary">
+        <div class="item show-pre">
+          <span class="when">PUBLICADO HOY</span>
+          <span><b>Agenda final disponible.</b> Revisa tu itinerario sugerido.</span>
+        </div>
+        <div class="item show-live">
+          <span class="when live-when">SIGUIENTE 12:30</span>
+          <span><b>Postgres at Founder-Scale</b> · Mira Rashidi · Sala B</span>
+        </div>
+        <div class="item show-ended">
+          <span class="when">PRÓXIMO EVENTO</span>
+          <span><b>Lumina Winter Lab</b> · marzo 2027 · CDMX · early access abierto</span>
+        </div>
+        <button class="more">Ver todo</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         OPCIÓN 3 — PICTURE-IN-PICTURE
+         ============================================================ -->
+    <section class="opt" data-opt="3">
+      <div class="card">
+        <div class="poster">
+          <div class="poster-top">
+            <div class="poster-mark show-pre">FALTAN 12 DÍAS</div>
+            <div class="poster-mark live show-live"><span class="dot"></span>EN VIVO · DAY 02 / 03</div>
+            <div class="poster-mark gold show-ended">EVENTO CONCLUIDO</div>
+            <div class="poster-wordmark" style="text-align:right;"><em>SUMMIT</em><span class="sep"></span>2026</div>
+          </div>
+          <div class="poster-bottom">
+            <div class="poster-bottom-info">
+              <div class="pair"><span class="lbl">Fecha</span><span class="val">06—08 NOV</span></div>
+              <div class="pair"><span class="lbl">Sede</span><span class="val">BOGOTÁ</span></div>
+              <div class="pair"><span class="lbl">Asistentes</span><span class="val">2.847</span></div>
+            </div>
+          </div>
+
+          <!-- PIP PRE -->
+          <div class="pip pre-pip show-pre">
+            <span class="meta-eyebrow" style="color: var(--fg-dim);">CUENTA REGRESIVA</span>
+            <div class="cd">
+              <div class="cell"><span class="num">12</span><span class="lbl">Días</span></div>
+              <span class="sep">:</span>
+              <div class="cell"><span class="num">04</span><span class="lbl">Hrs</span></div>
+              <span class="sep">:</span>
+              <div class="cell"><span class="num">38</span><span class="lbl">Min</span></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08);">
+              <span style="font-family: var(--display); font-size: 10px; font-weight: 700; letter-spacing: 0.18em; color: var(--fg-dim); text-transform: uppercase;">06 NOV 09:30</span>
+              <button class="cta" style="padding: 8px 14px; font-size: 11px;">Itinerario</button>
+            </div>
+          </div>
+
+          <!-- PIP LIVE -->
+          <div class="pip show-live">
+            <div class="top-row">
+              <div class="action-visual"></div>
+              <div style="min-width:0;">
+                <span class="meta-eyebrow"><span class="live-dot"></span>AHORA · SALA MAGNA</span>
+                <h3 class="session-title">The Compounding Edge of Small Teams</h3>
+                <div class="speaker-line"><b>Joaquín Decker</b> · Founder, Northbeam</div>
+              </div>
+            </div>
+            <div class="bottom-row">
+              <span class="timer-inline"><span class="lbl">RESTAN</span>23:14</span>
+              <button class="cta">Unirme</button>
+            </div>
+          </div>
+
+          <!-- PIP ENDED -->
+          <div class="pip show-ended">
+            <div class="top-row">
+              <div class="action-visual ended" style="width:48px; height:48px;">
+                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M8 6h16v6a8 8 0 0 1-16 0V6z"/>
+                  <path d="M8 9H4v3a4 4 0 0 0 4 4M24 9h4v3a4 4 0 0 1-4 4"/>
+                </svg>
+              </div>
+              <div style="min-width:0;">
+                <span class="meta-eyebrow" style="color: var(--accent-soft);">TIER GOLD</span>
+                <h3 class="session-title">Tu recap está listo</h3>
+                <div class="speaker-line">14h en vivo · 32 conexiones nuevas</div>
+              </div>
+            </div>
+            <div class="bottom-row">
+              <span style="font-family: var(--display); font-size: 11px; font-weight: 700; letter-spacing: 0.16em; color: var(--fg-muted); text-transform: uppercase;">90 SEG</span>
+              <button class="cta">Ver recap</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="strip-secondary">
+        <div class="item show-pre">
+          <span class="when">PUBLICADO HOY</span>
+          <span><b>Agenda final disponible.</b> Revisa tu itinerario sugerido.</span>
+        </div>
+        <div class="item show-live">
+          <span class="when live-when">SIGUIENTE 12:30</span>
+          <span><b>Postgres at Founder-Scale</b> · Mira Rashidi · Sala B</span>
+        </div>
+        <div class="item show-ended">
+          <span class="when">PRÓXIMO EVENTO</span>
+          <span><b>Lumina Winter Lab</b> · marzo 2027 · CDMX · early access abierto</span>
+        </div>
+        <button class="more">Ver todo</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         OPCIÓN 4 — MUTE POR ESTADO
+         ============================================================ -->
+    <section class="opt" data-opt="4">
+      <div class="card">
+
+        <!-- ====== PRE: poster full + countdown firma adentro ====== -->
+        <div class="poster show-pre">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div class="poster-mark">FALTAN 12 DÍAS</div>
+            <div class="poster-wordmark"><em>SUMMIT</em><span class="sep"></span>2026</div>
+          </div>
+          <div class="pre-signature">
+            <div>
+              <div class="cd">
+                <div class="cell"><span class="num">12</span><span class="lbl">Días</span></div>
+                <span class="sep">:</span>
+                <div class="cell"><span class="num">04</span><span class="lbl">Hrs</span></div>
+                <span class="sep">:</span>
+                <div class="cell"><span class="num">38</span><span class="lbl">Min</span></div>
+              </div>
+              <div class="cd-caption" style="margin-top: 14px;">APERTURA · <b>06 NOV 09:30</b> · BOGOTÁ · 2.847 ASISTENTES</div>
+            </div>
+            <div class="right-stack">
+              <button class="cta">Mi itinerario sugerido</button>
+              <button class="cta-secondary">Cómo llegar al venue</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== LIVE: split poster + happening-col ====== -->
+        <div class="show-live" style="display: contents;">
+          <div class="poster">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div class="poster-mark live"><span class="dot"></span>EN VIVO · DAY 02 / 03</div>
+              <div class="poster-mark" style="color:rgba(255,255,255,0.45)">EVENTO N.<b style="color:rgba(255,255,255,0.8)">26</b></div>
+            </div>
+            <div>
+              <div class="poster-wordmark"><em>SUMMIT</em><span class="sep"></span>2026</div>
+              <div class="poster-bottom-info" style="margin-top: 18px;">
+                <div class="pair"><span class="lbl">Sede</span><span class="val">BOGOTÁ</span></div>
+                <div class="pair"><span class="lbl">Asistentes</span><span class="val">2.847</span></div>
+                <div class="pair"><span class="lbl">Hoy</span><span class="val">DAY 02</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="action-col">
+            <div style="display:flex; align-items:center; gap: 18px;">
+              <div class="action-visual"></div>
+              <div style="display:flex; flex-direction:column; gap: 6px; min-width:0;">
+                <span class="meta-eyebrow"><span class="live-dot"></span>SUCEDIENDO AHORA <span class="sep"></span> SALA MAGNA</span>
+                <h3 class="session-title">The Compounding Edge of Small Teams</h3>
+                <span class="session-sub"><b>Joaquín Decker</b><span class="sep"></span>Founder, Northbeam</span>
+              </div>
+            </div>
+            <div style="display:flex; gap: 18px; align-items:center;">
+              <div class="timer-block">
+                <span class="lbl">Restan</span>
+                <span class="num">23:14</span>
+                <span class="sub">Q&amp;A al final</span>
+              </div>
+              <button class="cta" style="margin-left:auto;">
+                <svg class="ico" viewBox="0 0 16 16" fill="currentColor"><polygon points="4,3 13,8 4,13"/></svg>
+                Unirme al stream
+              </button>
+            </div>
+            <div class="upcoming-list">
+              <div style="font-family: var(--display); font-size: 9px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg-faint); margin-bottom: 4px;">A continuación</div>
+              <div class="row">
+                <span class="when">12:30</span>
+                <span class="info"><b>Postgres at Founder-Scale</b>Mira Rashidi · Sala B</span>
+              </div>
+              <div class="row">
+                <span class="when">14:30</span>
+                <span class="info"><b>Design Engineering as a Discipline</b>Saori Okada · Sala Magna</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ====== ENDED: split apagado + recap stats ====== -->
+        <div class="show-ended" style="display: contents;">
+          <div class="poster">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div class="poster-mark gold">EVENTO CONCLUIDO</div>
+              <div class="poster-mark" style="color:rgba(255,255,255,0.45)">06—08 NOV · BOGOTÁ</div>
+            </div>
+            <div>
+              <div class="poster-wordmark"><em>SUMMIT</em><span class="sep"></span>2026</div>
+              <div class="poster-bottom-info" style="margin-top: 18px;">
+                <div class="pair"><span class="lbl">Asistentes</span><span class="val">2.847</span></div>
+                <div class="pair"><span class="lbl">Sesiones</span><span class="val">61</span></div>
+                <div class="pair"><span class="lbl">Días</span><span class="val">3</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="action-col">
+            <div>
+              <span class="meta-eyebrow" style="color: var(--accent-soft);">TU PASO POR EL EVENTO</span>
+              <h3 class="session-title" style="margin-top: 8px; font-size: 22px;">Tu recap está listo</h3>
+            </div>
+            <div class="stat-cards">
+              <div class="stat"><span class="num">14<em>h</em></span><span class="lbl">En vivo</span></div>
+              <div class="stat"><span class="num">8</span><span class="lbl">Sesiones</span></div>
+              <div class="stat"><span class="num">32</span><span class="lbl">Conexiones</span></div>
+              <div class="stat"><span class="num">12</span><span class="lbl">Seguimientos</span></div>
+            </div>
+            <div class="tier-row">
+              <div style="flex:1;">
+                <div class="tier-name">Gold</div>
+                <div class="tier-meta">Top <b>18%</b> · asistencia + engagement</div>
+              </div>
+              <button class="cta-secondary">Certificado</button>
+            </div>
+            <div class="cta-row">
+              <button class="cta" style="flex:1;">
+                <svg class="ico" viewBox="0 0 16 16" fill="currentColor"><polygon points="3,2 13,8 3,14"/></svg>
+                Ver mi recap
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="strip-secondary">
+        <div class="item show-pre">
+          <span class="when">PUBLICADO HOY</span>
+          <span><b>Agenda final disponible.</b> Revisa tu itinerario sugerido.</span>
+        </div>
+        <div class="item show-live">
+          <span class="when live-when">SIGUIENTE 12:30</span>
+          <span><b>Postgres at Founder-Scale</b> · Mira Rashidi · Sala B</span>
+        </div>
+        <div class="item show-ended">
+          <span class="when">PRÓXIMO EVENTO</span>
+          <span><b>Lumina Winter Lab</b> · marzo 2027 · CDMX · early access abierto</span>
+        </div>
+        <button class="more">Ver todo</button>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- caption con razonamiento -->
+<aside class="caption">
+  <span class="tag" id="cap-tag">Opción 1 · Split</span>
+  <span class="txt" id="cap-txt"></span>
+</aside>
+
+<script>
+const CAPTIONS = {
+  "1": {
+    tag: "Opción 1 · Split horizontal",
+    txt: "Card grid 2 columnas: <b>poster izquierda 60%</b>, action derecha 40%. Cero scroll en los tres estados, jerarquía pareja entre keyvisual y decisión accionable. Pierde el formato wide cinematográfico del poster pero gana el formato póster de cine real (4/5 vertical). El más predecible y robusto."
+  },
+  "2": {
+    tag: "Opción 2 · Overlay drawer",
+    txt: "Poster 16/9 cinematográfico full. La action vive <b>flotante glass en el tercio inferior</b> del poster, con backdrop-blur sobre máscara oscura. El keyvisual sigue siendo protagonista absoluto. Riesgo: la legibilidad depende del keyvisual del cliente — imágenes claras o complicadas exigen máscara más fuerte."
+  },
+  "3": {
+    tag: "Opción 3 · Picture-in-picture",
+    txt: "Poster 16/9 limpio + <b>mini-card glass esquina inferior derecha</b>, lenguaje broadcast. Máximo poder visual del keyvisual del cliente. Action más compacta — speaker name, título y CTA caben pero sin densidad. Funciona bien en LIVE, los otros estados quedan menos naturales."
+  },
+  "4": {
+    tag: "Opción 4 · Mute por estado",
+    txt: "Cada estado tiene su composición óptima. <b>PRE</b>: poster 16/9 full con countdown firma adentro (no hay decisión accionable, solo esperar). <b>LIVE</b>: split horizontal porque hay sesión activa con CTA. <b>ENDED</b>: split apagado con stats + tier + recap. Más trabajo de diseño pero la composición sirve al contenido."
+  }
+};
+
+function setOption(o) {
+  document.body.dataset.option = o;
+  document.querySelectorAll('[data-go-option]').forEach(b => b.classList.toggle('active', b.dataset.goOption === o));
+  document.getElementById('cap-tag').textContent = CAPTIONS[o].tag;
+  document.getElementById('cap-txt').innerHTML = CAPTIONS[o].txt;
+}
+function setState(s) {
+  document.body.dataset.state = s;
+  document.querySelectorAll('[data-go-state]').forEach(b => b.classList.toggle('active', b.dataset.goState === s));
+}
+
+document.querySelectorAll('[data-go-option]').forEach(b => b.addEventListener('click', () => setOption(b.dataset.goOption)));
+document.querySelectorAll('[data-go-state]').forEach(b => b.addEventListener('click', () => setState(b.dataset.goState)));
+
+setOption("1");
+</script>
+
+</body>
+</html>
