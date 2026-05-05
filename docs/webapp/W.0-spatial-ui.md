@@ -126,41 +126,53 @@ MANTENEMOS:
 
 **Por que importa:** cuando el usuario navega Home → Agenda → Networking → Sponsors, **el canvas no debe saltar**. Misma forma, mismo tamano, misma posicion. Solo cambia lo que hay adentro. Esto es lo que hace que el shell se sienta spatial/visionOS y no una coleccion de paginas inconexas.
 
-### Reglas del card raiz (DEFINITIVAS — 2026-05-04)
+### Reglas del card raiz (DEFINITIVAS — actualizadas 2026-05-05)
 
 ```css
 .card {
   width: min(
     1600px,                          /* cap absoluto: legibilidad >1600 sufre */
-    calc(100vw - 150px),             /* margen lateral (sidebar 88 + 36 right + holgura) */
-    calc((100vh - 80px) * 16 / 9)   /* altura disponible (stage padding 28+28 + chrome) */
+    calc(100vw - 150px)              /* margen lateral (sidebar 88 + 36 right + holgura) */
   );
-  aspect-ratio: 16 / 9;
+  height: min(
+    calc(100vh - 56px),              /* alto disponible (stage padding 28+28) */
+    920px                            /* cap altura para no exagerar en pantallas 4K */
+  );
+  /* SIN aspect-ratio: el canvas usa todo el alto disponible. La altura ya no se
+     calcula a partir del width × 9/16. Razon: en tablet horizontal (1024×768)
+     el aspect-ratio rigido creaba ~35% espacio muerto vertical (canvas 874×491
+     sobre pantalla 768 alta). Ahora se adapta. */
+  container-type: inline-size;       /* habilita cqw en hijos */
   border-radius: 26px;
   overflow: hidden;
   background: var(--bg-elevated);    /* Noir #141414 / Lux #ffffff — opaco */
   border: 1px solid var(--border);
-  box-shadow: var(--canvas-card-shadow); /* adapta theme */
+  box-shadow: var(--canvas-card-shadow);
 }
 
 .stage {
   min-height: 100vh;
   display: flex; align-items: center; justify-content: center;
-  padding: 28px 36px 28px 88px;     /* vert 28/28 minimal, left 88 sidebar, right 36 */
+  padding: 28px 36px 28px 88px;     /* vert 28/28, left 88 sidebar, right 36 */
 }
 ```
 
 ### Dimensiones verificadas (estandar para TODOS los modulos)
 
-| Viewport     | Card        | Aspect | Notas                        |
-|--------------|-------------|--------|------------------------------|
-| 1280×720     | ~1130×636   | 16/9   |                              |
-| 1366×768     | **1216×684**| 16/9   | resolucion base mas comun    |
-| 1920×1080    | 1600×900    | 16/9   | hits cap absoluto            |
-| 2560×1440+   | 1600×900    | 16/9   | cap mantiene legibilidad     |
-| <900 px wide | stack vert  | auto   | break a vertical, scroll OK  |
+| Viewport            | Card antes (16/9) | Card ahora       | Espacio muerto Vert |
+|---------------------|-------------------|------------------|---------------------|
+| 1280×720            | 1130×636          | **1130×664**     | 28px sup+inf        |
+| 1366×768            | 1216×684          | **1216×712**     | 28px sup+inf        |
+| 1920×1080           | 1600×900          | **1600×920**     | 80px sup+inf        |
+| 2560×1440+          | 1600×900          | 1600×920 (cap)   | crece con viewport  |
+| iPad 1024×768 H     | 874×491 ❌ 35%    | **874×712**      | 28px sup+inf        |
+| iPad Pro 11" 1194×834 H | 1044×587 ❌ 30% | **1044×778**    | 28px sup+inf        |
+| iPad Pro 12.9" 1366×1024 H | 1216×684 ❌ 33% | **1216×920** (cap) | 52px sup+inf  |
+| <900 px wide        | stack vert        | stack vert       | break a vertical    |
 
 **Estas dimensiones son ESTANDAR.** Cualquier nuevo modulo (Agenda, Networking, Sponsors, etc.) reusa el `<CanvasCard>` componente — NO se ajustan formulas. La consistencia visual entre modulos depende de eso.
+
+**Migracion 2026-05-05**: el cambio NO requiere ajustes en modulos existentes (Home W.2). Layout interior es flex-column, se adapta al alto. Se gana 18%-35% de altura util en tablet horizontal sin afectar laptop 16:9.
 
 ### Tipografia escalable
 
@@ -425,11 +437,18 @@ Todos son HTML+CSS+JS vanilla (sin React) — referencia visual para codear el W
 
 ## Cierre de modulo
 
-- [ ] Shell completo desktop + tablet H + mobile validado en device real
-- [ ] Cada modulo top-level navegable con slide direccional
-- [ ] Bell + Mi perfil + Search overlays funcionando
+- [x] Shell desktop validado (Next 16 + React 19 + Tailwind 4) — 2026-05-04
+- [ ] Tablet H validado en device real
+- [ ] Mobile validado en device real
+- [x] Sidebar pill + CanvasCard 16/9 + bell integrado en sidebar — 2026-05-04
+- [x] EventThemeProvider con accent dinamico per-tema (Noir + Lux) — 2026-05-04
+- [ ] Cada modulo top-level navegable con slide direccional (pendiente: solo W.2 implementado, faltan W.3-W.17)
+- [x] Mi perfil overlay (ProfilePopover) — 2026-05-04
+- [ ] Search palette Cmd+K
+- [ ] Bell con Notif panel slide-derecho
 - [ ] Streaming con player + apertura/cierre paneles aux validado
 - [ ] Networking con perfil + chat 1:1 conviviendo
 - [ ] Reduced motion respetado en todas las animaciones
 - [ ] TanStack Query prefetch vecinos
+- [ ] Hook `useViewport()` + RotateOverlay tablet portrait
 - [ ] PENDIENTES.md actualizado al cerrar

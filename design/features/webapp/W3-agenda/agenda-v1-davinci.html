@@ -1,0 +1,1936 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>W.3 Agenda — DaVinci v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Noir (default) */
+  --bg-sunken:#0a0a0a;
+  --bg-elevated:#141414;
+  --bg-raised:#1c1c1c;
+  --bg-overlay:#222222;
+  --surface-low:#1a1a1a;
+  --surface-medium:#212121;
+  --surface-high:#2a2a2a;
+  --border:rgba(255,255,255,0.08);
+  --border-strong:rgba(255,255,255,0.14);
+  --fg:#f5f5f4;
+  --fg-dim:#a8a8a3;
+  --fg-mute:#6b6b66;
+  --fg-label:#5a5a55;
+
+  /* Accent (per-evento) */
+  --accent:#7CFFB2;
+  --accent-soft:rgba(124,255,178,0.14);
+  --accent-glow:rgba(124,255,178,0.28);
+  --accent-shadow:rgba(124,255,178,0.55);
+  --accent-on:#0a0a0a;
+
+  /* Track palette */
+  --tech:#a8a8ff;       --tech-bg:rgba(124,124,255,0.16);
+  --business:#5eead4;   --business-bg:rgba(52,211,153,0.16);
+  --innovation:#f5c66c; --innovation-bg:rgba(245,198,108,0.16);
+  --leadership:#ff8a96; --leadership-bg:rgba(255,93,108,0.16);
+  --culture:#c084fc;    --culture-bg:rgba(192,132,252,0.16);
+
+  --warning:#f5b041;
+  --warning-bg:rgba(245,176,65,0.14);
+  --rose:#ff5d6c;
+
+  --canvas-card-shadow: 0 30px 80px -20px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.04) inset;
+  --module-card-shadow: 0 16px 40px -16px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.04) inset;
+
+  /* Animation curves (W0-spatial system) */
+  --spring-soft: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --spring-snap: cubic-bezier(0.16, 1.2, 0.3, 1);
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body[data-theme="lux"]{
+  --bg-sunken:#f4f3ee;
+  --bg-elevated:#ffffff;
+  --bg-raised:#f7f6f1;
+  --bg-overlay:#eeede7;
+  --surface-low:#f7f6f1;
+  --surface-medium:#efeee8;
+  --surface-high:#e8e6df;
+  --border:rgba(0,0,0,0.08);
+  --border-strong:rgba(0,0,0,0.16);
+  --fg:#0d0d0c;
+  --fg-dim:#5a5a55;
+  --fg-mute:#9b9b95;
+  --fg-label:#a8a8a3;
+  --canvas-card-shadow: 0 30px 80px -20px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.6) inset;
+  --module-card-shadow: 0 16px 40px -16px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.6) inset;
+}
+
+*{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+html,body{margin:0;padding:0;background:var(--bg-sunken);color:var(--fg);font-family:'Urbanist',system-ui,sans-serif;height:100%;overflow:hidden}
+body{
+  background:
+    radial-gradient(1200px 700px at 20% 10%, color-mix(in oklab, var(--accent) 5%, transparent), transparent 60%),
+    radial-gradient(900px 600px at 90% 90%, rgba(124,124,255,0.04), transparent 60%),
+    var(--bg-sunken);
+  transition: background .35s var(--ease-out);
+}
+button{font-family:inherit;color:inherit;background:transparent;border:none;cursor:pointer}
+
+.stage{
+  min-height:100vh;width:100%;
+  display:flex;align-items:center;justify-content:center;
+  padding:28px 36px 28px 96px;
+}
+
+/* ==================== SIDEBAR PILL (W.0) ==================== */
+.sidebar{
+  position:fixed; left:18px; top:50%; transform:translateY(-50%);
+  width:52px; padding:10px 6px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+  border:1px solid var(--border);
+  border-radius:28px;
+  backdrop-filter:blur(22px) saturate(1.2);
+  -webkit-backdrop-filter:blur(22px) saturate(1.2);
+  box-shadow:0 12px 32px rgba(0,0,0,0.4);
+  z-index:50;
+}
+.sb-logo{
+  width:32px;height:32px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:4px;
+  font-family:'Plus Jakarta Sans';font-weight:800;font-size:13px;
+  color:var(--accent);
+}
+.sb-item{
+  width:36px;height:36px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--fg-mute); cursor:pointer; position:relative;
+  transition:color 200ms var(--ease-out), background 200ms var(--ease-out);
+}
+.sb-item:hover{color:var(--fg)}
+.sb-item.active{color:var(--fg);background:var(--surface-high)}
+.sb-item.active::before{
+  content:""; position:absolute; left:-7px; top:8px; bottom:8px;
+  width:2px; border-radius:2px; background:var(--accent);
+}
+.sb-live{
+  position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;
+  background:var(--accent); box-shadow:0 0 8px var(--accent);
+  animation:pulse-live 1.6s ease-in-out infinite;
+}
+.sb-badge{
+  position:absolute;top:6px;right:6px;
+  height:14px;min-width:14px;padding:0 3px;border-radius:99px;
+  background:var(--accent);color:var(--accent-on);
+  font-family:'Plus Jakarta Sans';font-size:8px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--bg-elevated);
+}
+.sb-sep{width:24px;height:1px;background:var(--border);margin:4px 0}
+
+@keyframes pulse-live{
+  0%,100%{transform:scale(1);opacity:1}
+  50%{transform:scale(1.4);opacity:.55}
+}
+
+/* ==================== CARD RAIZ ==================== */
+.card-root{
+  width: min(1600px, calc(100vw - 150px), calc((100vh - 80px) * 16 / 9));
+  aspect-ratio: 16/9;
+  border-radius:26px;
+  background:
+    radial-gradient(800px 500px at 20% 20%, color-mix(in oklab, var(--accent) 5%, transparent), transparent 65%),
+    radial-gradient(700px 500px at 80% 90%, rgba(124,124,255,0.04), transparent 60%),
+    var(--bg-elevated);
+  border:1px solid var(--border);
+  box-shadow:var(--canvas-card-shadow);
+  overflow:hidden;
+  position:relative;
+}
+
+/* ==================== MODULE STAGE ==================== */
+.module-stage{
+  position:absolute; inset:0;
+  padding: clamp(16px, 1.6vw, 26px);
+  display:grid;
+  grid-template-columns: minmax(0, 40%) minmax(0, 30%) minmax(0, 30%);
+  gap: clamp(14px, 1.4vw, 22px);
+  align-items:stretch;
+  transition: grid-template-columns 380ms var(--spring-snap);
+}
+/* Solo agenda + 60% empty */
+.module-stage.solo{
+  grid-template-columns: minmax(0, 40%) minmax(0, 60%);
+}
+
+.module-card{
+  background:var(--bg-raised);
+  border:1px solid var(--border);
+  border-radius:20px;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  min-height:0;min-width:0;
+  box-shadow:var(--module-card-shadow);
+}
+
+/* ==================== AGENDA CARD ==================== */
+.agenda-card{position:relative}
+
+.ag-header{
+  padding: clamp(14px,1.4vw,20px) clamp(16px,1.6vw,22px) 0;
+  display:flex;flex-direction:column;gap: clamp(10px,1vw,14px);
+}
+.ag-toprow{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
+}
+.ag-titleblock{flex:1;min-width:0}
+.ag-title{
+  font-family:'Plus Jakarta Sans';font-weight:800;letter-spacing:-0.02em;
+  font-size:clamp(20px,1.7vw,28px);line-height:1;margin:0;
+}
+.ag-subtitle{
+  margin-top:5px;font-size:clamp(11px,0.78vw,12.5px);color:var(--fg-dim);
+  letter-spacing:0.01em;
+}
+.ag-todaybadge{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-left:8px;padding:2px 7px;border-radius:99px;
+  background:var(--accent-soft);color:var(--accent);
+  font-family:'Plus Jakarta Sans';font-weight:700;
+  font-size:9px;letter-spacing:0.16em;text-transform:uppercase;
+}
+.ag-tools{display:flex;align-items:center;gap:6px}
+.ag-tool{
+  width:32px;height:32px;border-radius:10px;
+  background:var(--surface-low);border:1px solid var(--border);color:var(--fg-dim);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all 150ms var(--ease-out);
+}
+.ag-tool:hover{color:var(--fg);border-color:var(--border-strong)}
+.ag-tool.active{background:var(--surface-high);color:var(--fg)}
+.ag-search{
+  display:flex;align-items:center;gap:7px;
+  height:32px;padding:0 11px 0 9px;
+  border-radius:10px;
+  background:var(--surface-low);border:1px solid var(--border);color:var(--fg-mute);
+  font-size:11.5px;cursor:pointer;
+  transition:all 150ms var(--ease-out);
+  width:32px;justify-content:center;
+}
+.ag-search:hover,.ag-search.expanded{
+  width:auto;padding:0 11px;background:var(--surface-medium);color:var(--fg);border-color:var(--border-strong);
+}
+.ag-search.expanded{justify-content:flex-start;flex:0 1 200px}
+.ag-search input{
+  background:transparent;border:none;outline:none;color:var(--fg);
+  font-family:inherit;font-size:11.5px;width:100%;
+}
+.ag-search .kbd{
+  font-family:'JetBrains Mono';font-size:9px;color:var(--fg-label);
+  background:var(--surface-medium);padding:2px 5px;border-radius:4px;border:1px solid var(--border);
+}
+
+/* Tabs Todas / Mi Agenda */
+.ag-tabs{
+  display:flex;gap:2px;padding:3px;border-radius:12px;
+  background:var(--surface-low);border:1px solid var(--border);
+  width:fit-content;
+}
+.ag-tab{
+  padding:6px 14px;border-radius:9px;
+  font-family:'Urbanist';font-weight:600;font-size:12px;
+  color:var(--fg-dim);display:flex;align-items:center;gap:7px;
+  transition:all 200ms var(--ease-out);
+}
+.ag-tab:hover{color:var(--fg)}
+.ag-tab.active{background:var(--fg);color:var(--bg-elevated)}
+.ag-tab .count{
+  font-size:10px;padding:1px 6px;border-radius:99px;font-weight:700;
+  background:rgba(255,255,255,0.06);color:var(--fg-dim);
+}
+.ag-tab.active .count{background:rgba(0,0,0,0.18);color:var(--bg-elevated)}
+
+/* DayStrip */
+.daystrip-wrap{
+  position:relative;margin: 0 calc(-1 * clamp(16px,1.6vw,22px));
+  padding: 0 clamp(16px,1.6vw,22px);
+}
+.daystrip{
+  display:flex;gap:8px;overflow-x:auto;scroll-behavior:smooth;
+  padding:6px 0;scrollbar-width:none;
+}
+.daystrip::-webkit-scrollbar{display:none}
+.daypill{
+  flex:0 0 auto;width:50px;height:62px;border-radius:16px;
+  background:var(--surface-low);border:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;cursor:pointer;color:var(--fg-mute);
+  transition:all 250ms var(--ease-out);
+  font-family:'Plus Jakarta Sans';
+}
+.daypill:hover:not(.empty):not(.active){border-color:var(--border-strong);color:var(--fg)}
+.daypill .dp-dow{font-size:9px;font-weight:700;letter-spacing:0.12em;opacity:.7}
+.daypill .dp-day{font-size:18px;font-weight:800;margin-top:1px;color:var(--fg-dim);transition:color 200ms}
+.daypill:hover .dp-day{color:var(--fg)}
+.daypill .dp-dot{
+  position:absolute;bottom:7px;width:4px;height:4px;border-radius:50%;
+  background:var(--accent);opacity:.85;
+}
+.daypill .dp-livedot{
+  position:absolute;bottom:7px;width:6px;height:6px;border-radius:50%;
+  background:var(--accent);
+  animation:pulse-live 1.6s ease-in-out infinite;
+}
+.daypill.empty{opacity:.32;cursor:default}
+.daypill.empty .dp-dot{display:none}
+.daypill.active{
+  background:var(--accent);border-color:transparent;color:var(--accent-on);
+  box-shadow:0 8px 20px -6px var(--accent-shadow);
+}
+.daypill.active .dp-dow{opacity:1}
+.daypill.active .dp-day{color:var(--accent-on)}
+.daypill.active .dp-dot,.daypill.active .dp-livedot{background:var(--accent-on);opacity:.55}
+.daypill.today::before{
+  content:"HOY";
+  position:absolute;top:-7px;left:50%;transform:translateX(-50%);
+  font-size:8px;font-weight:800;letter-spacing:0.14em;
+  background:var(--fg);color:var(--bg-elevated);
+  padding:1px 5px;border-radius:99px;
+  white-space:nowrap;
+}
+
+/* Track legend + chips */
+.legend-row{
+  display:flex;gap:12px;flex-wrap:wrap;align-items:center;
+  padding:0 0 4px;
+}
+.legend-row .lg-item{
+  display:flex;align-items:center;gap:5px;
+  font-size:10.5px;color:var(--fg-mute);font-weight:600;
+}
+.legend-row .lg-dot{width:7px;height:7px;border-radius:50%}
+.chip-row{
+  display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap;
+  padding-bottom:2px;
+  margin: 0 calc(-1 * clamp(16px,1.6vw,22px));
+  padding-left:clamp(16px,1.6vw,22px);
+  padding-right:clamp(16px,1.6vw,22px);
+}
+.chip-row::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;
+  padding:5px 11px;font-size:11.5px;font-weight:600;
+  border-radius:99px;background:var(--surface-low);border:1px solid var(--border);
+  color:var(--fg-dim);cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  transition:all 200ms var(--ease-out);
+}
+.chip:hover{color:var(--fg);border-color:var(--border-strong)}
+.chip.active{background:var(--fg);color:var(--bg-elevated);border-color:transparent}
+.chip-dot{width:6px;height:6px;border-radius:50%}
+
+/* "Ahora" jump button (floating) */
+.jump-now{
+  position:absolute;top:clamp(14px,1.4vw,20px);right:clamp(16px,1.6vw,22px);
+  display:none;align-items:center;gap:6px;
+  padding:7px 13px 7px 9px;border-radius:99px;
+  background:var(--accent);color:var(--accent-on);
+  font-family:'Urbanist';font-weight:700;font-size:11.5px;
+  box-shadow:0 8px 24px -8px var(--accent-shadow);
+  cursor:pointer;z-index:5;
+  transition:transform 220ms var(--spring-soft), box-shadow 200ms;
+}
+.jump-now:hover{transform:translateY(-1px);box-shadow:0 12px 26px -8px var(--accent-shadow)}
+.jump-now.show{display:inline-flex;animation:pop-in 320ms var(--spring-soft)}
+.jump-now .live-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--accent-on);
+  animation:pulse-live 1.4s ease-in-out infinite;
+}
+
+@keyframes pop-in{
+  from{opacity:0;transform:scale(.94)}
+  to{opacity:1;transform:scale(1)}
+}
+
+/* ==================== TIMELINE ==================== */
+.ag-body{
+  flex:1;min-height:0;
+  padding: clamp(8px,0.9vw,14px) clamp(16px,1.6vw,22px) clamp(14px,1.4vw,20px);
+  overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;
+  position:relative;
+}
+.ag-body::-webkit-scrollbar{width:6px}
+.ag-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+body[data-theme="lux"] .ag-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08)}
+
+.day-slide{
+  display:flex;flex-direction:column;gap:0;
+  animation:day-slide-in 380ms var(--spring-snap);
+}
+.day-slide.exiting{animation:day-slide-out 180ms var(--ease-out) forwards}
+@keyframes day-slide-in{
+  from{opacity:0;transform:translateX(20px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes day-slide-out{
+  to{opacity:0;transform:translateX(-20px)}
+}
+
+/* Time gap indicator */
+.gap{
+  display:flex;align-items:center;gap:10px;
+  margin: 4px 0 4px 64px;
+  font-family:'JetBrains Mono';font-size:10px;color:var(--fg-label);
+  letter-spacing:0.04em;
+}
+.gap::before,.gap::after{
+  content:"";flex:1;height:1px;background:var(--border);max-width:40px;
+}
+.gap svg{opacity:.6}
+
+/* Timeline item */
+.tl-item{
+  display:grid;grid-template-columns:60px 1fr;gap:10px;
+  padding:5px 0;position:relative;
+}
+.tl-time{
+  padding-top:14px;
+  color:var(--fg-mute);font-size:11px;font-family:'JetBrains Mono';letter-spacing:-0.02em;
+  position:relative;text-align:right;padding-right:8px;
+}
+.tl-time .timecol-label{
+  display:block;font-family:'Urbanist';font-size:9px;color:var(--fg-label);
+  letter-spacing:0.1em;text-transform:uppercase;font-weight:600;margin-top:2px;
+}
+.tl-dot-wrap{
+  position:absolute;right:-3px;top:20px;width:8px;height:8px;
+  display:flex;align-items:center;justify-content:center;
+}
+.tl-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--fg-mute);
+  position:relative;z-index:1;
+}
+.tl-dot-pulse{
+  position:absolute;width:14px;height:14px;border-radius:50%;
+  background:var(--accent-glow);
+  animation:dot-pulse 1.6s ease-out infinite;
+}
+.tl-item.live .tl-dot{background:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
+.tl-item.live .tl-time{color:var(--accent)}
+.tl-item.past .tl-dot{background:var(--fg-mute);opacity:.45}
+.tl-item.past .tl-time{color:var(--fg-mute);opacity:.55}
+
+@keyframes dot-pulse{
+  0%{transform:scale(.6);opacity:.85}
+  100%{transform:scale(2);opacity:0}
+}
+
+/* Pre-banner: empieza en X min */
+.pre-banner{
+  margin-bottom:6px;padding:6px 12px;border-radius:11px;
+  background:var(--accent-soft);color:var(--accent);
+  font-family:'Plus Jakarta Sans';font-weight:700;font-size:11px;
+  letter-spacing:0.04em;
+  display:flex;align-items:center;gap:7px;
+  border:1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  animation:pop-in 280ms var(--spring-soft);
+}
+.pre-banner svg{flex-shrink:0}
+
+/* Conflict warning */
+.conflict-banner{
+  margin-bottom:6px;padding:7px 12px;border-radius:11px;
+  background:var(--warning-bg);color:var(--warning);
+  font-family:'Urbanist';font-weight:600;font-size:11.5px;
+  display:flex;align-items:center;gap:8px;
+  border:1px solid color-mix(in srgb, var(--warning) 28%, transparent);
+}
+.conflict-banner svg{flex-shrink:0}
+.conflict-banner .resolve{
+  margin-left:auto;font-size:10.5px;font-weight:700;
+  text-decoration:underline;cursor:pointer;
+}
+
+/* Session card */
+.sess-card{
+  background:var(--surface-low);border:1px solid var(--border);
+  border-radius:16px;padding:13px 14px;cursor:pointer;
+  transition: background 250ms var(--ease-out), border-color 250ms var(--ease-out), transform 250ms var(--spring-soft);
+  position:relative;
+}
+.sess-card:hover{
+  background:var(--surface-medium);border-color:var(--border-strong);
+  transform:translateX(2px);
+}
+.sess-card.selected{
+  background:color-mix(in srgb, var(--accent) 6%, var(--surface-medium));
+  border-color:color-mix(in srgb, var(--accent) 38%, transparent);
+  box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent), 0 12px 28px -10px rgba(0,0,0,0.5);
+}
+.sess-card.live{
+  border-color:color-mix(in srgb, var(--accent) 36%, transparent);
+  background:color-mix(in srgb, var(--accent) 4%, var(--surface-low));
+}
+.tl-item.past .sess-card{opacity:.5}
+.tl-item.past .sess-card .sc-title{
+  text-decoration:line-through;text-decoration-thickness:1px;
+  text-decoration-color:rgba(255,255,255,0.35);
+}
+body[data-theme="lux"] .tl-item.past .sess-card .sc-title{
+  text-decoration-color:rgba(0,0,0,0.35);
+}
+
+.sc-row1{display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+.sc-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:99px;
+  font-family:'Urbanist';font-weight:700;font-size:10px;letter-spacing:0.04em;
+}
+.sc-tag.tech{background:var(--tech-bg);color:var(--tech)}
+.sc-tag.business{background:var(--business-bg);color:var(--business)}
+.sc-tag.innovation{background:var(--innovation-bg);color:var(--innovation)}
+.sc-tag.leadership{background:var(--leadership-bg);color:var(--leadership)}
+.sc-tag.culture{background:var(--culture-bg);color:var(--culture)}
+.sc-tag.live{
+  background:var(--accent-soft);color:var(--accent);
+}
+.sc-tag.live::before{
+  content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);
+  animation:pulse-live 1.6s ease-in-out infinite;
+}
+.sc-tag.recommend{
+  background:rgba(124,255,178,0.12);
+  color:var(--accent);
+  font-style:italic;
+}
+.sc-checkmark{
+  width:16px;height:16px;border-radius:50%;
+  border:1.5px solid var(--fg-mute);
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.tl-item.past .sc-checkmark{
+  border-color:var(--accent);background:var(--accent);color:var(--accent-on);
+}
+.sc-rated{
+  display:inline-flex;align-items:center;gap:3px;font-size:10.5px;color:var(--accent);font-weight:700;
+}
+.sc-rated svg{fill:var(--accent)}
+
+.sc-title{
+  font-family:'Plus Jakarta Sans';font-weight:700;font-size:13.5px;line-height:1.32;
+  margin:0 0 6px;letter-spacing:-0.005em;color:var(--fg);
+  padding-right:64px; /* room for actions */
+}
+.sc-desc{
+  color:var(--fg-dim);font-size:12px;line-height:1.5;margin:0 0 6px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.sc-meta{
+  display:flex;align-items:center;gap:5px;color:var(--fg-dim);font-size:11.5px;margin:4px 0;
+}
+.sc-meta svg{flex-shrink:0;opacity:.75}
+.sc-capacity{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-left:6px;padding:1px 7px;border-radius:99px;
+  background:var(--warning-bg);color:var(--warning);
+  font-size:10px;font-weight:700;letter-spacing:0.02em;
+}
+
+.sc-speakers{
+  display:flex;align-items:center;gap:9px;margin-top:7px;
+}
+.avatar-stack{display:flex}
+.avatar{
+  width:24px;height:24px;border-radius:50%;
+  background-size:cover;background-position:center;
+  border:2px solid var(--surface-low);
+  margin-left:-7px;flex-shrink:0;position:relative;
+}
+.avatar:first-child{margin-left:0}
+.avatar.ring-tech{box-shadow:0 0 0 1.5px var(--tech)}
+.avatar.ring-business{box-shadow:0 0 0 1.5px var(--business)}
+.avatar.ring-innovation{box-shadow:0 0 0 1.5px var(--innovation)}
+.avatar.ring-leadership{box-shadow:0 0 0 1.5px var(--leadership)}
+.avatar.ring-culture{box-shadow:0 0 0 1.5px var(--culture)}
+.sess-card.selected .avatar{border-color:color-mix(in srgb, var(--accent) 6%, var(--surface-medium))}
+.sc-speakers-text{color:var(--fg-dim);font-size:11.5px}
+
+.sc-actions{
+  position:absolute;top:11px;right:11px;
+  display:flex;gap:2px;align-items:center;
+}
+.sc-action{
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--fg-mute);transition:all 200ms var(--ease-out);
+  position:relative;
+}
+.sc-action:hover{background:rgba(255,255,255,0.06);color:var(--fg)}
+body[data-theme="lux"] .sc-action:hover{background:rgba(0,0,0,0.06)}
+.sc-action.fav.active{color:var(--accent)}
+.sc-action.fav.active svg{fill:currentColor}
+
+/* Heart particles + ring */
+.heart-ring{
+  position:absolute;width:30px;height:30px;border-radius:50%;
+  border:2px solid var(--accent);pointer-events:none;
+  opacity:0;
+}
+.heart-ring.go{animation:heart-ring 500ms var(--ease-out) forwards}
+@keyframes heart-ring{
+  0%{transform:scale(.5);opacity:.7}
+  100%{transform:scale(2.4);opacity:0}
+}
+.heart-particle{
+  position:absolute;left:14px;top:14px;
+  width:4px;height:4px;border-radius:50%;
+  background:var(--accent);pointer-events:none;
+  opacity:0;
+}
+.heart-particle.go{animation:heart-particle 600ms var(--ease-out) forwards}
+@keyframes heart-particle{
+  0%{transform:translate(0,0) scale(1);opacity:1}
+  100%{transform:translate(var(--tx,0),var(--ty,0)) scale(0);opacity:0}
+}
+.sc-action.fav.popping svg{animation:heart-pop 400ms var(--spring-soft)}
+@keyframes heart-pop{
+  0%{transform:scale(1)}
+  20%{transform:scale(0)}
+  60%{transform:scale(1.35)}
+  100%{transform:scale(1)}
+}
+
+/* LIVE specific bottom row (countdown + JOIN) */
+.sc-livefoot{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-top:10px;padding-top:9px;border-top:1px solid var(--border);
+}
+.sc-countdown{
+  display:flex;align-items:center;gap:6px;
+  font-family:'JetBrains Mono';font-weight:600;font-size:12px;
+  color:var(--accent);
+}
+.sc-countdown .num{font-variant-numeric:tabular-nums;letter-spacing:-0.02em}
+.sc-join{
+  padding:6px 13px;border-radius:99px;
+  background:var(--accent);color:var(--accent-on);
+  font-family:'Urbanist';font-weight:700;font-size:11px;letter-spacing:0.04em;
+  display:inline-flex;align-items:center;gap:5px;
+  transition:transform 200ms var(--spring-soft);
+}
+.sc-join:hover{transform:scale(1.04)}
+
+/* Past: ver grabacion */
+.sc-recording{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:8px;padding:5px 10px;border-radius:99px;
+  background:var(--surface-medium);color:var(--fg);border:1px solid var(--border);
+  font-family:'Urbanist';font-weight:600;font-size:10.5px;
+  transition:all 150ms var(--ease-out);
+}
+.sc-recording:hover{background:var(--surface-high);border-color:var(--border-strong)}
+
+/* Hover preview tooltip (desktop) */
+.hover-preview{
+  position:absolute;left:calc(100% + 12px);top:0;
+  width:240px;padding:12px 14px;border-radius:13px;
+  background:var(--bg-overlay);border:1px solid var(--border-strong);
+  box-shadow:0 16px 40px -12px rgba(0,0,0,0.6);
+  font-size:11.5px;color:var(--fg-dim);line-height:1.45;
+  opacity:0;pointer-events:none;transform:translateX(-6px);
+  transition:opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+  z-index:20;
+}
+.hover-preview .hp-name{
+  font-family:'Plus Jakarta Sans';font-weight:700;font-size:11.5px;color:var(--fg);
+  margin-bottom:5px;letter-spacing:-0.005em;
+}
+.sess-card:hover .hover-preview{opacity:1;transform:translateX(0)}
+
+/* ==================== DETAIL CARD ==================== */
+.detail-card{
+  display:flex;flex-direction:column;
+  opacity:0;transform:translateX(20px) scale(.94);pointer-events:none;
+  transition: opacity 380ms var(--ease-out), transform 380ms var(--spring-snap);
+}
+.detail-card.open{opacity:1;transform:translateX(0) scale(1);pointer-events:auto}
+.detail-card.swap-out{
+  opacity:0;transform:translateX(-16px) scale(.96);
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
+}
+
+.dp-header{
+  display:flex;align-items:center;gap:10px;
+  padding:clamp(13px,1.3vw,18px) clamp(14px,1.4vw,20px) 10px;
+  border-bottom:1px solid var(--border);
+}
+.dp-back{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--surface-medium);color:var(--fg);
+  display:flex;align-items:center;justify-content:center;
+  transition:all 200ms var(--ease-out);
+}
+.dp-back:hover{background:var(--surface-high)}
+.dp-headtitle{
+  flex:1;text-align:center;font-size:11.5px;color:var(--fg-mute);
+  letter-spacing:0.16em;text-transform:uppercase;font-weight:700;
+  font-family:'Plus Jakarta Sans';
+}
+.dp-headspace{width:32px}
+
+.dp-body{
+  flex:1;overflow-y:auto;
+  padding:clamp(14px,1.4vw,20px) clamp(14px,1.4vw,20px);
+}
+.dp-body::-webkit-scrollbar{width:6px}
+.dp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+body[data-theme="lux"] .dp-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08)}
+
+.dp-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 11px;border-radius:99px;
+  font-family:'Urbanist';font-weight:700;font-size:10.5px;letter-spacing:0.06em;
+}
+.dp-tag .dot{width:6px;height:6px;border-radius:50%}
+.dp-title{
+  font-family:'Plus Jakarta Sans';font-weight:800;
+  font-size:clamp(17px,1.4vw,22px);line-height:1.15;letter-spacing:-0.02em;
+  margin:11px 0 13px;
+}
+
+.dp-conflict{
+  margin-bottom:13px;padding:9px 11px;border-radius:11px;
+  background:var(--warning-bg);color:var(--warning);
+  font-family:'Urbanist';font-weight:600;font-size:11.5px;
+  display:flex;align-items:flex-start;gap:8px;line-height:1.4;
+  border:1px solid color-mix(in srgb, var(--warning) 28%, transparent);
+}
+.dp-conflict svg{flex-shrink:0;margin-top:1px}
+.dp-conflict .resolve{
+  font-weight:700;text-decoration:underline;cursor:pointer;display:block;margin-top:4px;
+}
+
+.dp-meta-card{
+  background:var(--surface-low);border:1px solid var(--border);
+  border-radius:13px;padding:11px 13px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.dp-meta-row{display:flex;align-items:center;gap:9px;color:var(--fg);font-size:12px}
+.dp-meta-row svg{color:var(--fg-mute);flex-shrink:0}
+
+.dp-action-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:11px;
+}
+.dp-action{
+  padding:9px;border-radius:11px;
+  background:var(--surface-low);border:1px solid var(--border);
+  color:var(--fg);font-family:'Urbanist';font-weight:600;font-size:11px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  transition:all 200ms var(--ease-out);
+}
+.dp-action:hover{border-color:var(--border-strong);background:var(--surface-medium)}
+.dp-action.fav.active{
+  background:var(--accent-soft);border-color:color-mix(in srgb, var(--accent) 36%, transparent);
+  color:var(--accent);
+}
+.dp-action.fav.active svg{fill:currentColor}
+.dp-action svg{width:16px;height:16px}
+
+.dp-section-title{
+  text-transform:uppercase;letter-spacing:0.14em;
+  font-family:'Plus Jakarta Sans';font-weight:700;
+  font-size:9.5px;color:var(--fg-label);
+  margin:16px 0 7px;
+}
+.dp-about{
+  background:var(--surface-low);border:1px solid var(--border);
+  border-radius:11px;padding:11px 13px;
+  color:var(--fg-dim);font-size:12px;line-height:1.5;
+}
+
+.dp-speaker-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 11px;
+  background:var(--surface-low);border:1px solid var(--border);
+  border-radius:11px;margin-bottom:5px;cursor:pointer;
+  transition:all 200ms var(--ease-out);
+}
+.dp-speaker-row:hover{background:var(--surface-medium);border-color:var(--border-strong)}
+.dp-speaker-row .avatar{width:34px;height:34px;margin:0;border:none;flex-shrink:0}
+.dp-sp-info{flex:1;min-width:0}
+.dp-sp-name{font-family:'Plus Jakarta Sans';font-weight:700;font-size:12.5px;margin:0;color:var(--fg)}
+.dp-sp-role{color:var(--fg-dim);font-size:10.5px;margin-top:2px}
+.dp-speaker-row svg.chev{color:var(--fg-mute);flex-shrink:0}
+
+.dp-attendees{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:11px 13px;
+  background:var(--surface-low);border:1px solid var(--border);
+  border-radius:11px;cursor:pointer;
+  transition:all 200ms var(--ease-out);
+}
+.dp-attendees:hover{background:var(--surface-medium);border-color:var(--border-strong)}
+.dp-attendees-left{display:flex;align-items:center;gap:10px}
+.dp-attendees .avatar-stack .avatar{width:24px;height:24px;border:2px solid var(--surface-low)}
+.dp-attendees:hover .avatar-stack .avatar{border-color:var(--surface-medium)}
+.dp-att-text{font-size:11.5px;color:var(--fg);font-weight:600}
+.dp-att-text small{display:block;color:var(--fg-dim);font-weight:400;font-size:10px;margin-top:2px}
+.dp-attendees svg{color:var(--fg-mute)}
+
+.dp-recording{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:11px;border-radius:13px;
+  background:var(--surface-low);border:1px solid var(--border-strong);
+  color:var(--fg);font-family:'Urbanist';font-weight:600;font-size:12px;
+  transition:all 200ms var(--ease-out);
+  margin-top:11px;
+}
+.dp-recording:hover{background:var(--surface-medium)}
+
+.dp-share-pop{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%) translateY(8px);
+  background:var(--bg-overlay);border:1px solid var(--border-strong);
+  border-radius:14px;padding:7px;display:flex;gap:4px;
+  box-shadow:0 12px 32px -10px rgba(0,0,0,0.6);
+  opacity:0;pointer-events:none;
+  transition:all 250ms var(--spring-soft);
+  z-index:30;
+}
+.dp-share-pop.open{
+  opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);
+}
+.dp-share-btn{
+  width:34px;height:34px;border-radius:9px;
+  background:var(--surface-low);
+  display:flex;align-items:center;justify-content:center;color:var(--fg);
+}
+.dp-share-btn:hover{background:var(--surface-medium)}
+.dp-share-btn svg{width:16px;height:16px}
+
+/* ==================== EMPTY HINT (cuando no hay session selected) ==================== */
+.empty-hint{
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:14px;text-align:center;
+  padding:40px;color:var(--fg-mute);opacity:.7;
+  grid-column: span 2;
+}
+.module-stage:not(.solo) .empty-hint{display:none}
+.empty-hint .glyph{
+  width:64px;height:64px;border-radius:18px;
+  border:1.5px dashed var(--border-strong);
+  display:flex;align-items:center;justify-content:center;
+}
+.empty-hint h3{font-family:'Plus Jakarta Sans';font-weight:700;font-size:16px;margin:0;color:var(--fg-dim);letter-spacing:-0.01em}
+.empty-hint p{font-size:11.5px;color:var(--fg-mute);max-width:280px;line-height:1.5;margin:0}
+.empty-hint .kbd{
+  display:inline-block;font-family:'JetBrains Mono';font-size:10px;
+  background:var(--surface-low);padding:2px 6px;border-radius:5px;
+  border:1px solid var(--border);color:var(--fg-dim);
+  margin:0 2px;
+}
+
+/* ==================== ATTENDEES SUB-PANEL (third level) ==================== */
+.attendees-pop{
+  position:absolute;inset:0;
+  background:color-mix(in srgb, var(--bg-elevated) 75%, transparent);
+  backdrop-filter:blur(14px) saturate(1.2);
+  -webkit-backdrop-filter:blur(14px) saturate(1.2);
+  display:flex;align-items:flex-end;justify-content:flex-end;
+  padding:16px;
+  opacity:0;pointer-events:none;
+  transition:opacity 280ms var(--ease-out);
+  z-index:25;
+}
+.attendees-pop.open{opacity:1;pointer-events:auto}
+.attendees-pop-inner{
+  width:100%;max-width:340px;height:100%;
+  background:var(--bg-raised);border:1px solid var(--border-strong);border-radius:18px;
+  display:flex;flex-direction:column;overflow:hidden;
+  transform:translateX(20px) scale(.94);opacity:0;
+  transition:opacity 380ms var(--ease-out), transform 380ms var(--spring-snap);
+  box-shadow:0 24px 60px -12px rgba(0,0,0,0.7);
+}
+.attendees-pop.open .attendees-pop-inner{opacity:1;transform:translateX(0) scale(1)}
+.att-head{
+  padding:14px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.att-head h3{font-family:'Plus Jakarta Sans';font-weight:700;font-size:13px;margin:0;flex:1}
+.att-list{flex:1;overflow-y:auto;padding:10px}
+.att-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;border-radius:10px;cursor:pointer;
+  transition:background 200ms var(--ease-out);
+}
+.att-item:hover{background:var(--surface-medium)}
+.att-item .avatar{width:30px;height:30px;margin:0;border:none}
+.att-item .att-info{flex:1;min-width:0}
+.att-item .att-name{font-family:'Plus Jakarta Sans';font-weight:600;font-size:12px;margin:0;color:var(--fg)}
+.att-item .att-org{color:var(--fg-dim);font-size:10.5px;margin-top:1px}
+.att-item .att-cta{
+  font-size:10px;color:var(--accent);font-weight:700;letter-spacing:0.04em;
+  text-transform:uppercase;padding:4px 8px;border-radius:99px;
+  border:1px solid color-mix(in srgb, var(--accent) 36%, transparent);
+}
+
+/* ==================== TWEAKS PANEL ==================== */
+.tweaks{
+  position:fixed;top:18px;right:18px;
+  background:color-mix(in srgb, var(--bg-elevated) 92%, transparent);
+  border:1px solid var(--border);border-radius:16px;
+  padding:11px 13px;backdrop-filter:blur(20px);
+  font-size:10.5px;color:var(--fg-dim);
+  font-family:'JetBrains Mono';display:flex;align-items:center;gap:10px;
+  z-index:60;
+}
+.tweaks-row{display:flex;align-items:center;gap:6px}
+.tweaks .swatch{
+  width:18px;height:18px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;
+  transition:transform 180ms var(--spring-soft);
+}
+.tweaks .swatch:hover{transform:scale(1.12)}
+.tweaks .swatch.active{border-color:var(--fg)}
+.tweaks select,.tweaks .seg{
+  background:var(--surface-low);color:var(--fg);
+  border:1px solid var(--border);border-radius:8px;
+  padding:3px 8px;font-family:inherit;font-size:10px;
+}
+.seg{display:flex;gap:2px;padding:2px}
+.seg button{padding:3px 9px;border-radius:6px;font-size:9.5px;font-weight:600;color:var(--fg-mute)}
+.seg button.active{background:var(--surface-high);color:var(--fg)}
+
+.hint{
+  position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
+  font-family:'JetBrains Mono';font-size:10px;color:var(--fg-mute);
+  letter-spacing:0.04em;pointer-events:none;z-index:1;
+}
+.hint kbd{
+  background:var(--surface-low);padding:1px 5px;border-radius:4px;
+  border:1px solid var(--border);color:var(--fg-dim);
+}
+</style>
+</head>
+<body data-theme="noir">
+
+<!-- ==================== TWEAKS ==================== -->
+<div class="tweaks">
+  <div class="tweaks-row">
+    <span style="opacity:.7">tema</span>
+    <div class="seg" id="seg-mode">
+      <button data-mode="noir" class="active">Noir</button>
+      <button data-mode="lux">Lux</button>
+    </div>
+  </div>
+  <div class="tweaks-row">
+    <span style="opacity:.7">accent</span>
+    <span class="swatch active" data-accent="lime" style="background:#7CFFB2"></span>
+    <span class="swatch" data-accent="amber" style="background:#F5C66C"></span>
+    <span class="swatch" data-accent="rose" style="background:#FF3D55"></span>
+    <span class="swatch" data-accent="violet" style="background:#A78BFA"></span>
+    <span class="swatch" data-accent="cyan" style="background:#22D3EE"></span>
+  </div>
+</div>
+
+<div class="stage">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-logo">S</div>
+    <div class="sb-item" title="Inicio">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+    </div>
+    <div class="sb-item active" title="Agenda">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+    </div>
+    <div class="sb-item" title="En vivo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M5 12a7 7 0 0114 0M2 12a10 10 0 0120 0"/></svg>
+      <span class="sb-live"></span>
+    </div>
+    <div class="sb-item" title="Networking">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+      <span class="sb-badge">3</span>
+    </div>
+    <div class="sb-item" title="Social">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-1 4 8.5 8.5 0 01-7.5 4.5 8.4 8.4 0 01-4-1L3 21l2-5a8.4 8.4 0 01-1-4 8.5 8.5 0 014.5-7.5 8.4 8.4 0 014-1h.5a8.5 8.5 0 018 8z"/></svg>
+    </div>
+    <div class="sb-item" title="Sponsors">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-8h6v8"/></svg>
+    </div>
+    <div class="sb-sep"></div>
+    <div class="sb-item" title="Notificaciones">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+    </div>
+    <div class="sb-item" title="Mi perfil" style="margin-top:auto">
+      <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#7c7cff)"></div>
+    </div>
+  </aside>
+
+  <!-- Card raiz -->
+  <div class="card-root">
+    <div class="module-stage solo" id="moduleStage">
+
+      <!-- ==================== AGENDA CARD ==================== -->
+      <section class="module-card agenda-card">
+        <header class="ag-header">
+          <div class="ag-toprow">
+            <div class="ag-titleblock">
+              <h1 class="ag-title">
+                <span id="title">Agenda</span>
+                <span class="ag-todaybadge" id="todayBadge" style="display:none">EN VIVO HOY</span>
+              </h1>
+              <div class="ag-subtitle" id="subtitle">jueves, 23 de abril</div>
+            </div>
+            <div class="ag-tools">
+              <div class="ag-search" id="searchBox">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input id="searchInput" placeholder="Buscar sesion, speaker, sala..." style="display:none" />
+                <span class="kbd" id="searchKbd">⌘K</span>
+              </div>
+              <button class="ag-tool" id="filtersBtn" title="Filtros">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="ag-tabs">
+            <button class="ag-tab active" data-tab="all">Todas <span class="count" id="cnt-all">12</span></button>
+            <button class="ag-tab" data-tab="mine">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-7-10a4.5 4.5 0 018-3 4.5 4.5 0 018 3c0 5.5-7 10-7 10h-2z"/></svg>
+              Mi Agenda <span class="count" id="cnt-mine">3</span>
+            </button>
+          </div>
+
+          <div class="daystrip-wrap">
+            <div class="daystrip" id="daystrip"></div>
+          </div>
+
+          <div class="legend-row" id="legendRow"></div>
+          <div class="chip-row" id="chipRow"></div>
+        </header>
+
+        <button class="jump-now" id="jumpNow">
+          <span class="live-dot"></span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Ir a sesion en vivo
+        </button>
+
+        <div class="ag-body" id="agendaBody"></div>
+      </section>
+
+      <!-- ==================== DETAIL CARD ==================== -->
+      <aside class="module-card detail-card" id="detailCard">
+        <header class="dp-header">
+          <button class="dp-back" id="dpClose" aria-label="Cerrar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <div class="dp-headtitle">SESION</div>
+          <div class="dp-headspace"></div>
+        </header>
+        <div class="dp-body" id="dpBody"></div>
+        <div class="dp-share-pop" id="sharePop">
+          <button class="dp-share-btn" title="Copiar link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07L11 4.93"/><path d="M14 11a5 5 0 00-7.07 0L4.1 13.83a5 5 0 007.07 7.07L13 19.07"/></svg></button>
+          <button class="dp-share-btn" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.34 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></button>
+          <button class="dp-share-btn" title="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></button>
+        </div>
+      </aside>
+
+      <!-- Empty hint -->
+      <div class="empty-hint" id="emptyHint">
+        <div class="glyph">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="opacity:.6"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+        </div>
+        <div>
+          <h3>Selecciona una sesion</h3>
+          <p>El detalle aparece aqui · usa <span class="kbd">↑↓</span> para navegar · <span class="kbd">Esc</span> cierra</p>
+        </div>
+      </div>
+
+      <!-- Attendees sub-panel (third level) -->
+      <div class="attendees-pop" id="attendeesPop">
+        <div class="attendees-pop-inner" id="attendeesPopInner">
+          <div class="att-head">
+            <h3 id="attHeadTitle">Asistentes confirmados</h3>
+            <button class="dp-back" id="attClose" style="width:28px;height:28px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+          <div class="att-list" id="attList"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="hint">click en una sesion · <kbd>⌘K</kbd> buscar · <kbd>Esc</kbd> cerrar · <kbd>↑↓</kbd> navegar</div>
+</div>
+
+<script>
+/* ====================================================================
+   DATA
+==================================================================== */
+const EVENT_DAYS = [
+  { key:'2026-04-21', dow:'MAR', day:21, label:'martes, 21 de abril', has:false, isToday:false, hasLive:false },
+  { key:'2026-04-22', dow:'MIE', day:22, label:'miercoles, 22 de abril', has:true, isToday:false, hasLive:false },
+  { key:'2026-04-23', dow:'JUE', day:23, label:'jueves, 23 de abril', has:true, isToday:true, hasLive:true },
+  { key:'2026-04-24', dow:'VIE', day:24, label:'viernes, 24 de abril', has:true, isToday:false, hasLive:false },
+  { key:'2026-04-25', dow:'SAB', day:25, label:'sabado, 25 de abril', has:false, isToday:false, hasLive:false },
+];
+
+const SPEAKERS = {
+  andres:{name:'Andres Gil', role:'Senior Engineer', org:'Mercado Libre', avatar:'https://i.pravatar.cc/100?img=12'},
+  maria:{name:'Maria Garcia', role:'CTO', org:'Rappi', avatar:'https://i.pravatar.cc/100?img=47'},
+  dmitri:{name:'Dmitri Volkov', role:'VP Engineering', org:'Globant', avatar:'https://i.pravatar.cc/100?img=33'},
+  sofia:{name:'Sofia Restrepo', role:'Product Director', org:'Nubank', avatar:'https://i.pravatar.cc/100?img=45'},
+  laura:{name:'Laura Diaz', role:'Growth Lead', org:'Bold', avatar:'https://i.pravatar.cc/100?img=49'},
+  marcus:{name:'Marcus Johnson', role:'Founder', org:'Y Combinator W22', avatar:'https://i.pravatar.cc/100?img=14'},
+  felipe:{name:'Felipe Torres', role:'Engineering Lead', org:'Mercado Libre', avatar:'https://i.pravatar.cc/100?img=11'},
+  james:{name:'James Wilson', role:'General Partner', org:'Horizon Ventures', avatar:'https://i.pravatar.cc/100?img=15'},
+  emma:{name:'Emma Thompson', role:'Head of Design', org:'Spotify', avatar:'https://i.pravatar.cc/100?img=44'},
+  natasha:{name:'Natasha Kozlova', role:'ML Engineer', org:'Anthropic', avatar:'https://i.pravatar.cc/100?img=48'},
+  carlos:{name:'Carlos Mendoza', role:'CPO', org:'Platzi', avatar:'https://i.pravatar.cc/100?img=13'},
+  ana:{name:'Ana Beltran', role:'CMO', org:'Tul', avatar:'https://i.pravatar.cc/100?img=42'},
+};
+
+const ATTENDEES = [
+  {name:'Camila Rios', org:'Bancolombia', avatar:'https://i.pravatar.cc/100?img=41'},
+  {name:'Jorge Henao', org:'Globant', avatar:'https://i.pravatar.cc/100?img=22'},
+  {name:'Valentina Lopez', org:'Rappi', avatar:'https://i.pravatar.cc/100?img=43'},
+  {name:'Daniel Espinosa', org:'Mercado Libre', avatar:'https://i.pravatar.cc/100?img=18'},
+  {name:'Sofia Castro', org:'Nubank', avatar:'https://i.pravatar.cc/100?img=46'},
+  {name:'Andres Mejia', org:'Bold', avatar:'https://i.pravatar.cc/100?img=8'},
+  {name:'Lucia Mora', org:'Tul', avatar:'https://i.pravatar.cc/100?img=40'},
+  {name:'Pablo Restrepo', org:'Platzi', avatar:'https://i.pravatar.cc/100?img=33'},
+  {name:'Maria Jose Diaz', org:'Habi', avatar:'https://i.pravatar.cc/100?img=39'},
+  {name:'Felipe Garcia', org:'Tpaga', avatar:'https://i.pravatar.cc/100?img=7'},
+];
+
+/* state state of past/live/upcoming is computed against a fake "now" = 11:00 AM jueves 23 */
+const SESSIONS = {
+  '2026-04-22': [
+    { id:'w1', start:'09:00', end:'10:00', state:'past', cat:'tech', track:'Tecnologia',
+      title:'Apertura: el futuro de las plataformas LATAM', room:'Auditorio Principal',
+      speakers:['maria','dmitri'], evaluable:true, rated:5, fav:false,
+      about:'Vision general del primer dia: como esta evolucionando el ecosistema tech en la region.', recording:true },
+    { id:'w2', start:'10:30', end:'11:30', state:'past', cat:'business', track:'Negocios',
+      title:'Estrategia de crecimiento post-Series B', room:'Sala A',
+      speakers:['marcus','laura'], evaluable:true, rated:0, fav:false,
+      about:'Casos de empresas que escalaron de Series B a Series D en LATAM.', recording:false },
+  ],
+  '2026-04-23': [
+    { id:'s1', start:'09:00', end:'10:00', state:'past', cat:'tech', track:'Tecnologia',
+      title:'Mobile-first: React Native a fondo', room:'Sala A',
+      speakers:['andres'], evaluable:true, rated:4, fav:false,
+      about:'Patrones avanzados para apps moviles que se sienten nativas. Animations API, gesture handlers, navigation stacks y performance profiling con Hermes.', recording:true },
+    { id:'s2', start:'09:30', end:'10:30', state:'past', cat:'business', track:'Negocios',
+      title:'Panel: IA en la empresa moderna', room:'Auditorio Principal',
+      speakers:['maria','dmitri','sofia'], evaluable:true, rated:0, fav:true,
+      about:'Lideres de tecnologia de Latam discuten como estan integrando IA generativa en operaciones, producto y soporte. Casos reales, costos y aprendizajes.', recording:true },
+    /* GAP de 30min entre 10:30 y 11:00 */
+    { id:'s3', start:'11:00', end:'12:00', state:'live', cat:'innovation', track:'Innovacion',
+      title:'Growth Hacking: metricas que importan', room:'Sala B',
+      speakers:['laura','marcus'], live:true, fav:false,
+      about:'Mas alla de vanity metrics: como medir y optimizar crecimiento real con product-led growth. North star, activation funnels y experimentacion.',
+      capacity:120, attending:108, recommended:true },
+    { id:'s4', start:'11:00', end:'12:00', state:'live', cat:'leadership', track:'Liderazgo',
+      title:'Women in Tech Leadership', room:'Auditorio Principal',
+      speakers:['maria','emma'], live:true, fav:true,
+      about:'Conversacion honesta sobre liderazgo, sponsorship y como construir equipos donde todas las voces se escuchan.',
+      capacity:200, attending:185 },
+    { id:'s5', start:'12:30', end:'13:30', state:'soon', cat:'tech', track:'Tecnologia',
+      title:'Blockchain & Web3: reality check', room:'Sala A',
+      speakers:['felipe','james'], fav:true,
+      about:'Que proyectos Web3 generan valor real y cuales son humo. Smart contracts, DeFi y tokenizacion con casos concretos del mercado latinoamericano.',
+      conflict:'s4-overlap-resolved' },
+    /* GAP de 1h 15min para almuerzo */
+    { id:'s6', start:'14:45', end:'15:45', state:'upcoming', cat:'tech', track:'Tecnologia',
+      title:'ML in Production: pipelines that actually work', room:'Sala A',
+      speakers:['dmitri','natasha'], fav:true, recommended:true,
+      about:'De notebook a produccion: feature stores, model registries, monitoring de drift y rollouts seguros. Lo que nadie te cuenta hasta que rompes algo.',
+      capacity:80, attending:80 },
+    { id:'s7', start:'16:00', end:'17:00', state:'upcoming', cat:'innovation', track:'Innovacion',
+      title:'Diseno espacial: del movil al inmersivo', room:'Sala B',
+      speakers:['emma','sofia'], fav:false,
+      about:'Principios de UX que sobreviven el salto de pantallas planas a interfaces espaciales.' },
+    { id:'s8', start:'17:30', end:'18:30', state:'upcoming', cat:'business', track:'Negocios',
+      title:'Fundraising en LATAM 2026', room:'Auditorio Principal',
+      speakers:['marcus','james'], fav:false,
+      about:'El estado real del venture capital en la region. Series A, B y por que los founders estan volviendo a fundamentals.' },
+    { id:'s9', start:'19:00', end:'20:00', state:'upcoming', cat:'culture', track:'Cultura',
+      title:'Networking dinner & ceremony', room:'Terraza',
+      speakers:['carlos','ana'], fav:false,
+      about:'Cierre del dia con cena, premiacion y networking abierto.' },
+  ],
+  '2026-04-24': [
+    { id:'f1', start:'09:00', end:'10:00', state:'upcoming', cat:'tech', track:'Tecnologia',
+      title:'Cloud-native architectures at scale', room:'Sala A',
+      speakers:['felipe','natasha'], fav:false,
+      about:'Microservicios reales, observabilidad y resiliencia.' },
+    { id:'f2', start:'10:30', end:'11:30', state:'upcoming', cat:'leadership', track:'Liderazgo',
+      title:'Construyendo cultura remoto-first', room:'Auditorio Principal',
+      speakers:['emma','sofia','ana'], fav:true,
+      about:'Lecciones de empresas distribuidas en LATAM.' },
+  ],
+};
+
+const TRACKS = [
+  { id:'tech', name:'Tecnologia', color:'var(--tech)' },
+  { id:'business', name:'Negocios', color:'var(--business)' },
+  { id:'innovation', name:'Innovacion', color:'var(--innovation)' },
+  { id:'leadership', name:'Liderazgo', color:'var(--leadership)' },
+  { id:'culture', name:'Cultura', color:'var(--culture)' },
+];
+
+const ALL_SPEAKERS_LIST = Object.entries(SPEAKERS).map(([id,s])=>({id, ...s}));
+
+/* ====================================================================
+   STATE
+==================================================================== */
+const state = {
+  tab: 'all',                        // all | mine
+  date: '2026-04-23',
+  selectedTracks: new Set(),         // empty = all
+  selectedSpeakers: new Set(),
+  search: '',
+  selectedId: null,
+  panelOpen: false,
+  attendeesOpen: false,
+  searchExpanded:false,
+  showFilters:false,
+};
+
+/* ====================================================================
+   HELPERS
+==================================================================== */
+const $ = (s, ctx=document) => ctx.querySelector(s);
+const $$ = (s, ctx=document) => Array.from(ctx.querySelectorAll(s));
+
+function timeToMinutes(t){
+  const [h,m] = t.split(':').map(Number);
+  return h*60+m;
+}
+
+function formatTime(t){
+  const [h,m] = t.split(':').map(Number);
+  const pm = h>=12;
+  const h12 = h%12 || 12;
+  return `${h12}:${m.toString().padStart(2,'0')} ${pm?'p.m.':'a.m.'}`;
+}
+
+function formatGap(min){
+  if(min < 60) return `Pausa de ${min} min`;
+  const h = Math.floor(min/60), m = min%60;
+  return m>0 ? `${h}h ${m}min libre` : `${h}h libre`;
+}
+
+function visibleSessionsForDay(){
+  const list = SESSIONS[state.date] || [];
+  return list.filter(s => {
+    if(state.tab==='mine' && !s.fav) return false;
+    if(state.selectedTracks.size>0 && !state.selectedTracks.has(s.cat)) return false;
+    if(state.selectedSpeakers.size>0 && !s.speakers.some(sp => state.selectedSpeakers.has(sp))) return false;
+    if(state.search){
+      const q = state.search.toLowerCase();
+      const hay = (s.title + ' ' + s.room + ' ' + s.speakers.map(sp=>SPEAKERS[sp].name).join(' ')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function totalCount(filterFav){
+  let n = 0;
+  Object.values(SESSIONS).forEach(arr => arr.forEach(s => { if(filterFav ? s.fav : true) n++; }));
+  return n;
+}
+
+/* ====================================================================
+   RENDER · DAYSTRIP
+==================================================================== */
+function renderDayStrip(){
+  const el = $('#daystrip');
+  el.innerHTML = EVENT_DAYS.map(d => {
+    const active = d.key===state.date;
+    const cls = ['daypill', !d.has && 'empty', active && 'active', d.isToday && 'today'].filter(Boolean).join(' ');
+    const dotEl = d.has && d.hasLive ? '<span class="dp-livedot"></span>' : (d.has ? '<span class="dp-dot"></span>' : '');
+    return `<div class="${cls}" data-day="${d.key}" data-label="${d.label}">
+      <span class="dp-dow">${d.dow}</span>
+      <span class="dp-day">${d.day}</span>
+      ${dotEl}
+    </div>`;
+  }).join('');
+  $$('.daypill').forEach(p => {
+    p.onclick = () => {
+      if(p.classList.contains('empty')){
+        p.animate([{transform:'translateX(0)'},{transform:'translateX(-3px)'},{transform:'translateX(3px)'},{transform:'translateX(0)'}],{duration:240});
+        return;
+      }
+      state.date = p.dataset.day;
+      $('#subtitle').textContent = p.dataset.label;
+      renderDayStrip();
+      animateDayChange();
+      autoScrollDayStrip();
+      maybeClosePanel();
+    };
+  });
+  autoScrollDayStrip();
+  // today badge
+  const today = EVENT_DAYS.find(d=>d.key===state.date);
+  $('#todayBadge').style.display = today?.hasLive ? 'inline-flex' : 'none';
+}
+
+function autoScrollDayStrip(){
+  const strip = $('#daystrip');
+  const active = strip.querySelector('.daypill.active');
+  if(!active) return;
+  const sw = strip.clientWidth;
+  const ar = active.getBoundingClientRect();
+  const sr = strip.getBoundingClientRect();
+  const offset = (ar.left - sr.left) - (sw/2) + (ar.width/2);
+  strip.scrollTo({left: strip.scrollLeft + offset, behavior:'smooth'});
+}
+
+/* ====================================================================
+   RENDER · LEGEND + CHIPS (track + speaker)
+==================================================================== */
+function renderLegend(){
+  const el = $('#legendRow');
+  // Solo tracks con sesiones en cualquier dia
+  const used = new Set();
+  Object.values(SESSIONS).forEach(arr => arr.forEach(s => used.add(s.cat)));
+  el.innerHTML = TRACKS.filter(t=>used.has(t.id)).map(t =>
+    `<span class="lg-item"><span class="lg-dot" style="background:${t.color}"></span>${t.name}</span>`
+  ).join('');
+}
+
+function renderChips(){
+  const el = $('#chipRow');
+  const tChips = TRACKS.map(t => {
+    const active = state.selectedTracks.has(t.id);
+    return `<button class="chip ${active?'active':''}" data-type="track" data-id="${t.id}">
+      <span class="chip-dot" style="background:${t.color}"></span>${t.name}
+    </button>`;
+  }).join('');
+  // Top 3 speakers in this event
+  const usedSp = new Set();
+  Object.values(SESSIONS).forEach(arr => arr.forEach(s => s.speakers.forEach(sp=>usedSp.add(sp))));
+  const topSp = ALL_SPEAKERS_LIST.filter(s=>usedSp.has(s.id)).slice(0,5);
+  const sChips = topSp.map(s => {
+    const active = state.selectedSpeakers.has(s.id);
+    return `<button class="chip ${active?'active':''}" data-type="speaker" data-id="${s.id}">
+      <span class="chip-dot" style="background-image:url('${s.avatar}');background-size:cover;width:14px;height:14px;border-radius:50%"></span>${s.name.split(' ')[0]}
+    </button>`;
+  }).join('');
+  const sep = `<span style="width:1px;background:var(--border);margin:0 4px;align-self:stretch"></span>`;
+  el.innerHTML = tChips + sep + sChips;
+  $$('.chip', el).forEach(c => {
+    c.onclick = () => {
+      const t = c.dataset.type, id = c.dataset.id;
+      const set = t==='track' ? state.selectedTracks : state.selectedSpeakers;
+      if(set.has(id)) set.delete(id); else set.add(id);
+      renderChips();
+      renderList();
+    };
+  });
+}
+
+/* ====================================================================
+   RENDER · TABS
+==================================================================== */
+function renderTabs(){
+  $('#cnt-all').textContent = totalCount(false);
+  $('#cnt-mine').textContent = totalCount(true);
+  $$('.ag-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab===state.tab);
+    t.onclick = () => {
+      state.tab = t.dataset.tab;
+      $('#title').textContent = state.tab==='mine' ? 'Mi Agenda' : 'Agenda';
+      renderTabs();
+      renderList();
+      maybeClosePanel();
+    };
+  });
+}
+
+/* ====================================================================
+   RENDER · LIST (timeline)
+==================================================================== */
+function renderList(){
+  const body = $('#agendaBody');
+  const items = visibleSessionsForDay();
+  // Determine if there is a LIVE session
+  const hasLive = items.some(s=>s.state==='live');
+  $('#jumpNow').classList.toggle('show', hasLive && state.tab==='all');
+
+  if(items.length===0){
+    body.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:30px;color:var(--fg-mute)">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="opacity:.4;margin-bottom:10px">
+        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+      </svg>
+      <h3 style="font-family:'Plus Jakarta Sans';font-weight:700;color:var(--fg-dim);margin:4px 0 6px;font-size:14px">${state.tab==='mine'?'Sin favoritas este dia':'Sin sesiones'}</h3>
+      <p style="font-size:11px;max-width:240px;line-height:1.5;margin:0">${state.tab==='mine'?'Toca el corazon en cualquier sesion para guardarla aqui':'Prueba con otra fecha o cambia los filtros'}</p>
+    </div>`;
+    return;
+  }
+
+  // Build list with time-gap separators
+  const slidewrap = document.createElement('div');
+  slidewrap.className = 'day-slide';
+  slidewrap.id = 'daySlide';
+
+  let prev = null;
+  items.forEach((s, i) => {
+    if(prev){
+      const gapMin = timeToMinutes(s.start) - timeToMinutes(prev.end);
+      if(gapMin >= 25){
+        const gapEl = document.createElement('div');
+        gapEl.className = 'gap';
+        gapEl.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> ${formatGap(gapMin)}`;
+        slidewrap.appendChild(gapEl);
+      }
+    }
+    slidewrap.appendChild(buildSessionItem(s));
+    prev = s;
+  });
+
+  body.innerHTML = '';
+  body.appendChild(slidewrap);
+  attachListEvents();
+}
+
+function buildSessionItem(s){
+  const wrap = document.createElement('div');
+  const stateClass = s.state;
+  wrap.className = `tl-item ${stateClass}`;
+  wrap.dataset.id = s.id;
+
+  const isLive = s.state==='live';
+  const isPast = s.state==='past';
+  const isSoon = s.state==='soon';
+
+  // Pre-banner: empieza en X min
+  const preBannerHTML = isSoon ? `
+    <div class="pre-banner">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      Empieza en ${Math.floor(Math.random()*9)+3} min
+    </div>` : '';
+
+  // Conflict
+  const hasConflict = !!s.conflict;
+  const conflictHTML = hasConflict ? `
+    <div class="conflict-banner">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Choca con "Women in Tech Leadership"
+      <span class="resolve">Decidir</span>
+    </div>` : '';
+
+  // Tags row
+  const trackInfo = TRACKS.find(t=>t.id===s.cat);
+  const tagsHTML = `
+    <div class="sc-row1">
+      ${isPast ? `<span class="sc-checkmark"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>` : ''}
+      ${isLive ? `<span class="sc-tag live">EN VIVO</span>` : ''}
+      <span class="sc-tag ${s.cat}">${trackInfo.name}</span>
+      ${s.recommended ? `<span class="sc-tag recommend">✦ Recomendado</span>` : ''}
+      ${(isPast && s.rated>0) ? `<span class="sc-rated"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27l5.18 3.13-1.37-5.9 4.55-3.95-5.99-.51L12 4.5 9.63 10.04 3.64 10.55l4.55 3.95-1.37 5.9z"/></svg>${s.rated}</span>` : ''}
+      ${(isPast && !s.rated) ? `<span style="font-size:10.5px;color:var(--accent);font-weight:700;cursor:pointer;letter-spacing:0.04em" data-rate="${s.id}">⭐ Calificar</span>` : ''}
+    </div>`;
+
+  // Speakers
+  const speakers = s.speakers.map(id=>SPEAKERS[id]);
+  const spStack = speakers.slice(0,3).map(p =>
+    `<div class="avatar ring-${s.cat}" style="background-image:url('${p.avatar}')"></div>`
+  ).join('');
+  const spText = speakers.length===1 ? speakers[0].name : `${speakers[0].name} · +${speakers.length-1}`;
+
+  // Capacity warning
+  const capacityHTML = (s.capacity && s.attending && s.attending >= s.capacity) ? `
+    <span class="sc-capacity">
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Sala llena
+    </span>` : '';
+
+  // Live foot countdown + JOIN
+  const liveFootHTML = isLive ? `
+    <div class="sc-livefoot">
+      <span class="sc-countdown" data-countdown="${s.id}">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span class="num">23:14</span> restantes
+      </span>
+      <button class="sc-join" onclick="event.stopPropagation()">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Unirme
+      </button>
+    </div>` : '';
+
+  // Past recording CTA
+  const recordingHTML = (isPast && s.recording) ? `
+    <button class="sc-recording" onclick="event.stopPropagation()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Ver grabacion
+    </button>` : '';
+
+  // Description if live (preview)
+  const descHTML = isLive ? `<p class="sc-desc">${s.about}</p>` : '';
+
+  // Actions corner: heart + calendar
+  const actionsHTML = `
+    <div class="sc-actions">
+      <button class="sc-action ${s.fav?'fav active':'fav'}" data-fav="${s.id}" aria-label="Favorita">
+        <span class="heart-ring"></span>
+        ${[0,1,2,3,4,5].map(i=>`<span class="heart-particle" data-i="${i}"></span>`).join('')}
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="${s.fav?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      </button>
+      <button class="sc-action" data-cal="${s.id}" aria-label="Calendario">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg>
+      </button>
+    </div>`;
+
+  // Hover preview tooltip (desktop only)
+  const hoverPreviewHTML = `
+    <div class="hover-preview">
+      <div class="hp-name">${spText}</div>
+      <div style="margin-bottom:6px;line-height:1.4">${s.about.slice(0,120)}${s.about.length>120?'…':''}</div>
+      <div style="display:flex;gap:5px;font-family:'JetBrains Mono';font-size:10px;color:var(--fg-mute)">
+        <span>${formatTime(s.start)}</span> · <span>${s.room}</span>
+      </div>
+    </div>`;
+
+  wrap.innerHTML = `
+    <div class="tl-time">
+      ${formatTime(s.start)}
+      <span class="timecol-label">${s.end}</span>
+      <span class="tl-dot-wrap">
+        ${isLive ? `<span class="tl-dot-pulse"></span>` : ''}
+        <span class="tl-dot"></span>
+      </span>
+    </div>
+    <div>
+      ${preBannerHTML}
+      ${conflictHTML}
+      <div class="sess-card ${stateClass} ${state.selectedId===s.id?'selected':''}" data-id="${s.id}">
+        ${actionsHTML}
+        ${tagsHTML}
+        <h3 class="sc-title">${s.title}</h3>
+        ${descHTML}
+        <div class="sc-meta">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${s.room}
+          ${capacityHTML}
+        </div>
+        <div class="sc-speakers">
+          <div class="avatar-stack">${spStack}</div>
+          <span class="sc-speakers-text">${spText}</span>
+        </div>
+        ${liveFootHTML}
+        ${recordingHTML}
+        ${hoverPreviewHTML}
+      </div>
+    </div>`;
+  return wrap;
+}
+
+function attachListEvents(){
+  $$('.sess-card').forEach(c => {
+    c.onclick = (e) => {
+      if(e.target.closest('.sc-action') || e.target.closest('.sc-join') || e.target.closest('.sc-recording') || e.target.closest('[data-rate]')) return;
+      openPanel(c.dataset.id);
+    };
+  });
+  $$('.sc-action[data-fav]').forEach(b => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      const id = b.dataset.fav;
+      toggleFav(id, b);
+    };
+  });
+  $$('.conflict-banner .resolve').forEach(b => {
+    b.onclick = e => { e.stopPropagation(); alert('Modal: Decidir conflicto entre 2 sesiones favoritas'); };
+  });
+  $$('[data-rate]').forEach(b => {
+    b.onclick = e => { e.stopPropagation(); alert('Modal de calificacion (rating 1-5 + comentario)'); };
+  });
+}
+
+function toggleFav(id, btn){
+  const s = findSession(id);
+  if(!s) return;
+  const wasFav = s.fav;
+  s.fav = !s.fav;
+  // animation
+  if(s.fav){
+    btn.classList.add('popping');
+    const ring = btn.querySelector('.heart-ring');
+    ring.classList.remove('go'); void ring.offsetWidth; ring.classList.add('go');
+    btn.querySelectorAll('.heart-particle').forEach((p,i)=>{
+      const ang = (i/6)*Math.PI*2;
+      p.style.setProperty('--tx', `${Math.cos(ang)*22}px`);
+      p.style.setProperty('--ty', `${Math.sin(ang)*22}px`);
+      p.classList.remove('go'); void p.offsetWidth; p.classList.add('go');
+    });
+    setTimeout(()=>btn.classList.remove('popping'),420);
+  }
+  btn.classList.toggle('active', s.fav);
+  const svg = btn.querySelector('svg');
+  svg.setAttribute('fill', s.fav?'currentColor':'none');
+  renderTabs();
+  // if mi-agenda tab and unfaved, re-render list
+  if(state.tab==='mine' && wasFav) renderList();
+  // refresh detail if open
+  if(state.selectedId===id) renderDetail(id);
+}
+
+function findSession(id){
+  for(const arr of Object.values(SESSIONS)){
+    const f = arr.find(s=>s.id===id);
+    if(f) return f;
+  }
+  return null;
+}
+
+function animateDayChange(){
+  const slide = $('#daySlide');
+  if(slide){
+    slide.classList.add('exiting');
+    setTimeout(()=>renderList(), 180);
+  } else {
+    renderList();
+  }
+}
+
+/* ====================================================================
+   PANEL DETAIL
+==================================================================== */
+const detailCard = $('#detailCard');
+const dpBody = $('#dpBody');
+const moduleStage = $('#moduleStage');
+
+function openPanel(id){
+  // Same one already open: close
+  if(state.selectedId===id && state.panelOpen){
+    closePanel(); return;
+  }
+  // Another open: swap-out then in
+  if(state.panelOpen){
+    detailCard.classList.add('swap-out');
+    setTimeout(()=>{
+      state.selectedId = id;
+      renderDetail(id);
+      renderList();
+      detailCard.classList.remove('swap-out');
+      // re-trigger animation
+      detailCard.classList.remove('open');
+      void detailCard.offsetWidth;
+      detailCard.classList.add('open');
+    }, 200);
+  } else {
+    state.selectedId = id;
+    state.panelOpen = true;
+    renderDetail(id);
+    renderList();
+    moduleStage.classList.remove('solo');
+    requestAnimationFrame(()=>detailCard.classList.add('open'));
+  }
+}
+
+function closePanel(){
+  state.panelOpen = false;
+  detailCard.classList.remove('open');
+  setTimeout(()=>{
+    state.selectedId=null;
+    moduleStage.classList.add('solo');
+    renderList();
+  }, 200);
+}
+
+function maybeClosePanel(){
+  if(state.panelOpen) closePanel();
+}
+
+function renderDetail(id){
+  const s = findSession(id);
+  if(!s) return;
+  const trackInfo = TRACKS.find(t=>t.id===s.cat);
+  const dayLabel = EVENT_DAYS.find(d=>d.key===state.date)?.label || '';
+  const speakers = s.speakers.map(sid=>SPEAKERS[sid]);
+  const isLive = s.state==='live';
+  const isPast = s.state==='past';
+  const fullCapacity = s.capacity && s.attending >= s.capacity;
+  const attendingCount = s.attending || (s.capacity ? Math.floor(s.capacity*0.6) : Math.floor(Math.random()*40)+15);
+
+  dpBody.innerHTML = `
+    <span class="dp-tag" style="background:${trackInfo.id==='tech'?'var(--tech-bg)':trackInfo.id==='business'?'var(--business-bg)':trackInfo.id==='innovation'?'var(--innovation-bg)':trackInfo.id==='leadership'?'var(--leadership-bg)':'var(--culture-bg)'};color:${trackInfo.color}">
+      <span class="dot" style="background:${trackInfo.color}"></span>${trackInfo.name}
+    </span>
+    <h2 class="dp-title">${s.title}</h2>
+
+    ${s.conflict ? `
+      <div class="dp-conflict">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>
+          Choca con otra favorita en tu agenda
+          <span class="resolve" onclick="alert('Resolver conflicto')">Decidir cual prefiero</span>
+        </div>
+      </div>` : ''}
+
+    <div class="dp-meta-card">
+      <div class="dp-meta-row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+        ${dayLabel}
+      </div>
+      <div class="dp-meta-row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        ${formatTime(s.start)} - ${formatTime(s.end)}
+      </div>
+      <div class="dp-meta-row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        ${s.room}
+        ${fullCapacity ? `<span class="sc-capacity" style="margin-left:auto">Sala llena · 8 en cola</span>`:''}
+      </div>
+    </div>
+
+    ${isLive ? `
+      <button class="dp-recording" style="background:var(--accent);color:var(--accent-on);border-color:transparent;margin-top:13px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Unirme al stream en vivo
+      </button>` : ''}
+
+    ${isPast && s.recording ? `
+      <button class="dp-recording">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Ver grabacion
+      </button>` : ''}
+
+    <div class="dp-action-row">
+      <button class="dp-action fav ${s.fav?'active':''}" id="dpFav">
+        <svg viewBox="0 0 24 24" fill="${s.fav?'currentColor':'none'}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        ${s.fav?'Guardada':'Guardar'}
+      </button>
+      <button class="dp-action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg>
+        Calendario
+      </button>
+      <button class="dp-action" id="dpShare">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Compartir
+      </button>
+    </div>
+
+    <div class="dp-section-title">Acerca de</div>
+    <div class="dp-about">${s.about}</div>
+
+    <div class="dp-section-title">Asistencia</div>
+    <div class="dp-attendees" id="dpAttendees">
+      <div class="dp-attendees-left">
+        <div class="avatar-stack">
+          ${ATTENDEES.slice(0,4).map(a=>`<div class="avatar" style="background-image:url('${a.avatar}')"></div>`).join('')}
+        </div>
+        <div class="dp-att-text">
+          ${attendingCount} asistentes confirmados
+          <small>Click para ver quien va y conectar</small>
+        </div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </div>
+
+    <div class="dp-section-title">Speakers</div>
+    ${speakers.map(p=>`
+      <div class="dp-speaker-row">
+        <div class="avatar ring-${s.cat}" style="background-image:url('${p.avatar}')"></div>
+        <div class="dp-sp-info">
+          <p class="dp-sp-name">${p.name}</p>
+          <div class="dp-sp-role">${p.role} · ${p.org}</div>
+        </div>
+        <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    `).join('')}
+  `;
+
+  $('#dpFav').onclick = () => {
+    const card = document.querySelector(`.sc-action[data-fav="${id}"]`);
+    if(card) toggleFav(id, card);
+    else { s.fav = !s.fav; renderTabs(); renderDetail(id); }
+  };
+  $('#dpShare').onclick = (e) => {
+    e.stopPropagation();
+    $('#sharePop').classList.toggle('open');
+  };
+  $('#dpAttendees').onclick = () => openAttendees(id);
+}
+
+/* ====================================================================
+   ATTENDEES SUB-PANEL
+==================================================================== */
+function openAttendees(id){
+  const s = findSession(id);
+  $('#attHeadTitle').textContent = `Asistentes · ${s.title}`;
+  const list = $('#attList');
+  list.innerHTML = ATTENDEES.map(a=>`
+    <div class="att-item">
+      <div class="avatar" style="background-image:url('${a.avatar}')"></div>
+      <div class="att-info">
+        <p class="att-name">${a.name}</p>
+        <div class="att-org">${a.org}</div>
+      </div>
+      <span class="att-cta">Conectar</span>
+    </div>
+  `).join('');
+  state.attendeesOpen = true;
+  $('#attendeesPop').classList.add('open');
+}
+
+function closeAttendees(){
+  state.attendeesOpen = false;
+  $('#attendeesPop').classList.remove('open');
+}
+
+$('#attClose').onclick = closeAttendees;
+$('#attendeesPop').onclick = (e) => { if(e.target.id==='attendeesPop') closeAttendees(); };
+$('#dpClose').onclick = closePanel;
+
+/* ====================================================================
+   SEARCH
+==================================================================== */
+$('#searchBox').onclick = (e) => {
+  if(state.searchExpanded) return;
+  state.searchExpanded = true;
+  const box = $('#searchBox');
+  box.classList.add('expanded');
+  $('#searchInput').style.display='block';
+  $('#searchKbd').style.display='none';
+  setTimeout(()=>$('#searchInput').focus(),50);
+};
+$('#searchInput').oninput = (e) => {
+  state.search = e.target.value;
+  renderList();
+};
+$('#searchInput').onblur = () => {
+  if(!state.search){
+    state.searchExpanded=false;
+    $('#searchBox').classList.remove('expanded');
+    $('#searchInput').style.display='none';
+    $('#searchKbd').style.display='block';
+  }
+};
+
+/* ====================================================================
+   JUMP TO LIVE
+==================================================================== */
+$('#jumpNow').onclick = () => {
+  const items = visibleSessionsForDay();
+  const live = items.find(s=>s.state==='live');
+  if(live){
+    openPanel(live.id);
+    const card = document.querySelector(`.sess-card[data-id="${live.id}"]`);
+    if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+};
+
+/* ====================================================================
+   KEYBOARD
+==================================================================== */
+document.addEventListener('keydown', (e) => {
+  if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){
+    e.preventDefault();
+    $('#searchBox').click();
+    return;
+  }
+  if(e.key==='Escape'){
+    if(state.attendeesOpen){closeAttendees(); return;}
+    if(state.panelOpen){closePanel(); return;}
+    if(state.searchExpanded){
+      $('#searchInput').value=''; state.search=''; $('#searchInput').blur(); renderList();
+    }
+    return;
+  }
+  if(!state.panelOpen) return;
+  if(!['ArrowDown','ArrowUp'].includes(e.key)) return;
+  e.preventDefault();
+  const items = visibleSessionsForDay();
+  if(items.length===0) return;
+  const idx = items.findIndex(s=>s.id===state.selectedId);
+  let next = idx;
+  if(e.key==='ArrowDown') next = idx<0 ? 0 : Math.min(items.length-1, idx+1);
+  if(e.key==='ArrowUp')   next = idx<0 ? 0 : Math.max(0, idx-1);
+  if(items[next]){
+    openPanel(items[next].id);
+    const card = document.querySelector(`.sess-card[data-id="${items[next].id}"]`);
+    if(card){
+      const body = $('#agendaBody');
+      const r = card.getBoundingClientRect();
+      const br = body.getBoundingClientRect();
+      if(r.top < br.top || r.bottom > br.bottom){
+        card.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+    }
+  }
+});
+
+/* ====================================================================
+   COUNTDOWN — actualiza el live numero cada 1s (cosmetico)
+==================================================================== */
+setInterval(()=>{
+  $$('.sc-countdown .num').forEach(n => {
+    const [m,s] = n.textContent.split(':').map(Number);
+    let total = m*60+s-1;
+    if(total<0) total = 23*60+14;
+    n.textContent = `${Math.floor(total/60).toString().padStart(2,'0')}:${(total%60).toString().padStart(2,'0')}`;
+  });
+}, 1000);
+
+/* ====================================================================
+   THEME (TWEAKS)
+==================================================================== */
+const ACCENT_PRESETS = {
+  lime:    { c:'#7CFFB2', on:'#0a0a0a' },
+  amber:   { c:'#F5C66C', on:'#0a0a0a' },
+  rose:    { c:'#FF3D55', on:'#ffffff' },
+  violet:  { c:'#A78BFA', on:'#0a0a0a' },
+  cyan:    { c:'#22D3EE', on:'#0a0a0a' },
+};
+
+function hexToRgba(hex,a){
+  const h=hex.replace('#','');
+  const r=parseInt(h.substring(0,2),16);
+  const g=parseInt(h.substring(2,4),16);
+  const b=parseInt(h.substring(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function applyAccent(name){
+  const p = ACCENT_PRESETS[name] || ACCENT_PRESETS.lime;
+  const r = document.documentElement.style;
+  r.setProperty('--accent', p.c);
+  r.setProperty('--accent-on', p.on);
+  r.setProperty('--accent-soft', hexToRgba(p.c, 0.14));
+  r.setProperty('--accent-glow', hexToRgba(p.c, 0.28));
+  r.setProperty('--accent-shadow', hexToRgba(p.c, 0.55));
+}
+$$('.swatch').forEach(sw => {
+  sw.onclick = () => {
+    $$('.swatch').forEach(x=>x.classList.remove('active'));
+    sw.classList.add('active');
+    applyAccent(sw.dataset.accent);
+  };
+});
+$$('#seg-mode button').forEach(b => {
+  b.onclick = () => {
+    $$('#seg-mode button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.body.dataset.theme = b.dataset.mode;
+  };
+});
+
+/* ====================================================================
+   INIT
+==================================================================== */
+renderTabs();
+renderDayStrip();
+renderLegend();
+renderChips();
+renderList();
+applyAccent('lime');
+</script>
+</body>
+</html>

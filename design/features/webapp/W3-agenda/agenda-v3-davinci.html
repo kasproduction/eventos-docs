@@ -1,0 +1,1785 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>W.3 Agenda — DaVinci v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-sunken:#0a0a0a;
+  --bg-elevated:#141414;
+  --surface-low:#1a1a1a;
+  --surface-medium:#1f1f1f;
+  --surface-high:#262626;
+  --surface-card:#181818;
+  --border:rgba(255,255,255,0.06);
+  --border-strong:rgba(255,255,255,0.12);
+  --fg:#f5f5f4;
+  --fg-dim:#a8a8a3;
+  --fg-mute:#6b6b66;
+  --fg-label:#5a5a55;
+
+  --accent:#7CFFB2;
+  --accent-soft:rgba(124,255,178,0.10);
+  --accent-glow:rgba(124,255,178,0.20);
+  --accent-on:#0a0a0a;
+
+  --heart:#FF5D6C;
+  --gold:#B5A68B;
+  --gold-bg:rgba(181,166,139,0.14);
+
+  --tech:#a8a8ff;       --tech-bg:rgba(168,168,255,0.10);
+  --business:#5eead4;   --business-bg:rgba(94,234,212,0.10);
+  --innovation:#f5c66c; --innovation-bg:rgba(245,198,108,0.10);
+  --leadership:#ff8a96; --leadership-bg:rgba(255,138,150,0.10);
+  --culture:#c084fc;    --culture-bg:rgba(192,132,252,0.10);
+
+  --canvas-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+
+  --spring-soft: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --spring-snap: cubic-bezier(0.16, 1.2, 0.3, 1);
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body[data-theme="lux"]{
+  /* "Cool Linen" palette — replica exacta de theme-lux.ts del app */
+  --bg-sunken:#F6F8FA;          /* cool gray base, NO beige */
+  --bg-elevated:#FFFFFF;         /* canvas, modals */
+  --surface-low:#FFFFFF;         /* cards puras */
+  --surface-medium:rgba(0,0,0,0.03);  /* hover SUTIL (luxStates.hover) */
+  --surface-high:rgba(0,0,0,0.06);    /* press */
+  --surface-card:#FFFFFF;
+  --border:rgba(0,0,0,0.08);     /* luxSurface.border */
+  --border-strong:rgba(0,0,0,0.14); /* luxSurface.borderStrong */
+  --fg:#1A1B1E;                  /* luxText.primary — negro suave */
+  --fg-dim:#4A4B50;              /* luxText.secondary */
+  --fg-mute:#7C7D82;             /* luxText.muted */
+  --fg-label:#A8A9AE;            /* luxText.label */
+  --canvas-shadow: 0 16px 48px rgba(0,0,0,0.12);
+
+  /* Shadows con elevacion notable (multi-layer para profundidad real) */
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 8px 20px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 16px 36px rgba(0,0,0,0.12), 0 6px 12px rgba(0,0,0,0.06);
+  --shadow-xl: 0 24px 60px rgba(0,0,0,0.14), 0 8px 18px rgba(0,0,0,0.07);
+
+  /* Gold rating (luxSemantic.gold) */
+  --gold:#8E8170;
+  --gold-bg:rgba(142,129,112,0.12);
+}
+
+/* En LUX las cards flotan con shadow real (replica app movil) */
+body[data-theme="lux"] .agenda-card{ box-shadow: var(--shadow-md) }
+body[data-theme="lux"] .sess-card{
+  border-color: transparent;
+  background: var(--surface-card);
+  box-shadow: var(--shadow-sm);
+}
+/* Hover en lux: NO cambia bg (no crema feo), solo eleva con shadow + scale sutil */
+body[data-theme="lux"] .sess-card:hover{
+  background: var(--surface-card);  /* mantiene blanco puro */
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+body[data-theme="lux"] .sess-card.live{
+  box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--accent) 32%, transparent), var(--shadow-sm);
+}
+body[data-theme="lux"] .daypill{
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+body[data-theme="lux"] .daypill.empty{
+  background: rgba(255,255,255,0.6);
+  box-shadow: none;
+}
+body[data-theme="lux"] .daypill.active{
+  background: var(--accent);
+  box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+body[data-theme="lux"] .ag-back,
+body[data-theme="lux"] .ag-tool,
+body[data-theme="lux"] .ag-todas{
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+body[data-theme="lux"] .ag-tabs{
+  background: #f0efea;
+  box-shadow: none;
+}
+body[data-theme="lux"] .ag-tab.active{
+  background: var(--fg); color: #ffffff;
+  box-shadow: 0 2px 8px -1px rgba(0,0,0,0.15);
+}
+body[data-theme="lux"] .chip{
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+body[data-theme="lux"] .chip.active{
+  background: var(--fg); color: #ffffff;
+  box-shadow: 0 2px 8px -1px rgba(0,0,0,0.15);
+}
+body[data-theme="lux"] .detail{
+  border-color: transparent;
+  box-shadow: var(--shadow-lg);
+}
+body[data-theme="lux"] .dp-meta-card,
+body[data-theme="lux"] .dp-about,
+body[data-theme="lux"] .dp-attendees-card,
+body[data-theme="lux"] .dp-speaker,
+body[data-theme="lux"] .dp-action{
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+body[data-theme="lux"] .sc-action-btn{
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+body[data-theme="lux"] .empty-hint{
+  background: #ffffff;
+  border: 1px dashed var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Track tags lux — paleta pastel del app movil (luxCategories) */
+body[data-theme="lux"] .sc-tag.tech,        body[data-theme="lux"] .dp-badge.tech       { background:#EFF6FF; color:#1D4ED8 }
+body[data-theme="lux"] .sc-tag.business,    body[data-theme="lux"] .dp-badge.business   { background:#F0FDF4; color:#166534 }
+body[data-theme="lux"] .sc-tag.innovation,  body[data-theme="lux"] .dp-badge.innovation { background:#FFF7ED; color:#C2410C }
+body[data-theme="lux"] .sc-tag.leadership,  body[data-theme="lux"] .dp-badge.leadership { background:#FDF2F8; color:#BE185D }
+body[data-theme="lux"] .sc-tag.culture,     body[data-theme="lux"] .dp-badge.culture    { background:#FDF4FF; color:#7E22CE }
+
+*{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+html,body{margin:0;padding:0;background:var(--bg-sunken);color:var(--fg);
+  font-family:'Urbanist',system-ui,sans-serif;height:100%;overflow:hidden}
+button{font-family:inherit;color:inherit;background:transparent;border:none;cursor:pointer;padding:0}
+
+.stage{
+  min-height:100vh; width:100%;
+  display:flex;align-items:center;justify-content:center;
+  padding:28px 36px 28px 96px;
+}
+
+/* ==================== SIDEBAR ==================== */
+.sidebar{
+  position:fixed; left:18px; top:50%; transform:translateY(-50%);
+  width:52px; padding:10px 6px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:28px;
+  box-shadow:0 12px 32px rgba(0,0,0,0.4);
+  z-index:50;
+}
+.sb-logo{
+  width:32px;height:32px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:4px;
+  font-family:'Plus Jakarta Sans';font-weight:800;font-size:13px;color:var(--accent);
+}
+.sb-item{
+  width:36px;height:36px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--fg-mute); cursor:pointer; position:relative;
+  transition:color 200ms var(--ease-out), background 200ms var(--ease-out);
+}
+.sb-item:hover{color:var(--fg)}
+.sb-item.active{color:var(--fg);background:var(--surface-high)}
+.sb-item.active::before{
+  content:""; position:absolute; left:-7px; top:8px; bottom:8px;
+  width:2px; border-radius:2px; background:var(--accent);
+}
+.sb-live{
+  position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;
+  background:var(--accent);
+  animation:pulse-live 1.6s ease-in-out infinite;
+}
+.sb-badge{
+  position:absolute;top:6px;right:6px;
+  height:14px;min-width:14px;padding:0 3px;border-radius:99px;
+  background:var(--accent);color:var(--accent-on);
+  font-family:'Plus Jakarta Sans';font-size:8px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--bg-elevated);
+}
+.sb-sep{width:24px;height:1px;background:var(--border);margin:4px 0}
+
+@keyframes pulse-live{
+  0%,100%{opacity:1}
+  50%{opacity:.45}
+}
+
+/* ==================== CANVAS RAIZ ==================== */
+.canvas{
+  width: min(1600px, calc(100vw - 150px));
+  height: min(calc(100vh - 56px), 920px);
+  /* Sin aspect-ratio rigido: usa todo el alto disponible. Cap 920 para no
+     volverse demasiado alto en pantallas 4K. En tablet horizontal (1024×768)
+     antes el canvas era 874×491 (35% espacio muerto). Ahora 874×712 */
+  border-radius:26px;
+  container-type: inline-size;
+  background:var(--bg-elevated);
+  border:1px solid var(--border-strong);
+  box-shadow:var(--canvas-shadow);
+  overflow:hidden;
+  position:relative;
+  display:flex; flex-direction:column;
+}
+
+/* ==================== HEADER (limitado al ancho del card — alineado izq) ==================== */
+.ag-header{
+  flex-shrink:0;
+  width: 60%;
+  min-width: 460px;
+  max-width: 920px;
+  margin-left: clamp(20px, 2vw, 32px);
+  padding: clamp(20px, 2vw, 32px) clamp(20px, 2vw, 32px) 0;
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+}
+.ag-titleblock{display:flex;align-items:center;gap:14px;min-width:0}
+.ag-back{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--surface-low);color:var(--fg);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0; transition: background 200ms var(--ease-out);
+}
+.ag-back:hover{background:var(--surface-medium)}
+.ag-titles{min-width:0}
+.ag-title{
+  font-family:'Plus Jakarta Sans';font-weight:800;letter-spacing:-0.022em;
+  font-size:clamp(26px, 2.2vw, 38px);line-height:1;margin:0;
+  color:var(--fg); white-space: nowrap;
+}
+.ag-subtitle{
+  margin-top:4px;font-size:clamp(11px, 0.78vw, 13px);
+  color:var(--fg-dim);
+}
+.ag-tools{display:flex;align-items:center;gap:6px;flex-shrink:0;position:relative}
+.ag-tool{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--surface-low);color:var(--fg-dim);
+  display:flex;align-items:center;justify-content:center;
+  transition:all 180ms var(--ease-out);
+}
+.ag-tool:hover{color:var(--fg);background:var(--surface-medium)}
+.ag-tool:active{ transform: scale(0.92) }
+/* ==================== TABS Agenda | Mi Agenda (inline en el header) ==================== */
+.ag-tabs{
+  display:inline-flex; gap:3px;
+  padding:3px;
+  background:var(--surface-low);
+  border-radius:11px;
+}
+.ag-tab{
+  padding:6px 12px;
+  border-radius:8px;
+  font-family:'Urbanist';font-weight:600;font-size:11.5px;
+  color:var(--fg-dim);
+  display:inline-flex;align-items:center;gap:6px;
+  transition: all 200ms var(--ease-out);
+}
+.ag-tab:hover{ color:var(--fg) }
+.ag-tab:active{ transform: scale(0.97) }
+.ag-tab.active{
+  background:var(--fg); color:var(--bg-elevated);
+  font-weight:700;
+}
+.ag-tab .count{
+  font-size:10px; font-weight:700; padding:1px 6px; border-radius:99px;
+  background:rgba(255,255,255,0.06); color:var(--fg-dim); min-width:18px; text-align:center;
+}
+.ag-tab.active .count{ background: rgba(0,0,0,0.18); color: var(--bg-elevated) }
+.ag-tab.fav-icon{ display:inline-flex; align-items:center; gap:7px }
+.ag-tab.fav-icon.active svg{ fill:var(--heart); stroke:var(--heart) }
+
+.ag-todas{
+  height:32px;border-radius:99px;padding:0 12px;
+  display:none;align-items:center;gap:6px;
+  background:var(--surface-low);color:var(--fg);
+  font-family:'Urbanist';font-weight:600;font-size:11px;
+  transition: background 200ms var(--ease-out);
+}
+.ag-todas:hover{background:var(--surface-medium)}
+.ag-todas.show{display:inline-flex}
+
+/* search */
+.ag-search-wrap{
+  position:absolute; top:50%; right:0; transform:translateY(-50%);
+  display:none; align-items:center;
+  height:38px; padding: 0 12px 0 36px;
+  background: var(--surface-medium);
+  border-radius:14px;
+  width: 280px;
+  z-index:5;
+}
+.ag-search-wrap.open{display:flex; animation: pop-in 240ms var(--spring-soft)}
+.ag-search-wrap svg.icon{
+  position:absolute; left:13px; color:var(--fg-mute);
+}
+.ag-search-wrap input{
+  background:transparent;border:none;outline:none;color:var(--fg);
+  font-family:inherit;font-size:13px;width:100%;
+}
+
+@keyframes pop-in{
+  from{opacity:0;transform:scale(.94) translateY(-4px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+
+/* ==================== DAY PILLS (ovaladas verticales — centradas respecto al card) ==================== */
+.daystrip{
+  display:flex; gap:10px; justify-content:center;
+  width: 60%;
+  min-width: 460px;
+  max-width: 920px;
+  padding: clamp(18px, 1.6vw, 26px) clamp(20px, 2vw, 32px) clamp(14px, 1.2vw, 18px);
+  margin-left: clamp(20px, 2vw, 32px);
+  flex-shrink:0;
+}
+.daypill{
+  width:42px; height:60px;
+  border-radius:999px;
+  background:var(--surface-low);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;cursor:pointer;
+  font-family:'Plus Jakarta Sans';
+  transition: background 250ms var(--ease-out);
+}
+.daypill:hover:not(.empty):not(.active){background:var(--surface-medium)}
+.daypill:active:not(.empty){ transform: scale(0.94) }
+.daypill .dp-dow{
+  font-size:8.5px;font-weight:700;letter-spacing:0.14em;
+  color:var(--fg-mute); margin-bottom:1px;
+}
+.daypill .dp-day{
+  font-size:17px;font-weight:800;color:var(--fg);
+  line-height:1;
+}
+.daypill .dp-dot{
+  position:absolute;bottom:8px;width:3.5px;height:3.5px;border-radius:50%;
+  background:var(--accent);
+}
+.daypill.empty{ opacity:.32; cursor:default; }
+.daypill.empty .dp-day{ color:var(--fg-mute) }
+.daypill.active{ background:var(--accent); }
+.daypill.active .dp-dow{ color:var(--accent-on); opacity:.7 }
+.daypill.active .dp-day{ color:var(--accent-on) }
+.daypill.active .dp-dot{ background:var(--accent-on); opacity:.5 }
+
+/* ==================== CHIPS — centrados respecto al card ==================== */
+.chip-row{
+  display:flex; gap:8px; justify-content:center;
+  width: 60%;
+  min-width: 460px;
+  max-width: 920px;
+  padding: 0 clamp(20px, 2vw, 32px) clamp(18px, 1.6vw, 22px);
+  margin-left: clamp(20px, 2vw, 32px);
+  flex-shrink:0; flex-wrap:wrap;
+}
+.chip{
+  padding:5px 11px;font-size:11px;font-weight:600;
+  border-radius:99px;background:var(--surface-low);
+  color:var(--fg-dim);
+  display:flex;align-items:center;gap:6px;
+  font-family:'Urbanist';
+  transition:all 180ms var(--ease-out);
+}
+.chip:hover{color:var(--fg);background:var(--surface-medium)}
+.chip:active{ transform: scale(0.96) }
+.chip.active{background:var(--fg);color:var(--bg-elevated)}
+.chip.active .chip-dot{background:var(--bg-elevated);opacity:.4}
+.chip-dot{width:7px;height:7px;border-radius:50%}
+
+/* ==================== AGENDA WRAP — SIEMPRE IGUAL (no se anima al abrir detail) ==================== */
+.agenda-wrap{
+  flex:1; min-height:0;
+  display:flex;
+  justify-content: flex-start;
+  padding: 0 clamp(20px, 2vw, 32px) clamp(20px, 2vw, 32px);
+}
+.agenda-card{
+  width: 60%;
+  min-width: 460px;
+  max-width: 920px;
+  background: var(--surface-card);
+  border-radius: 24px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+/* El detail aparece flotante encima del lado derecho del canvas — no afecta el layout de la agenda */
+
+/* HEADER tambien alineado a la izquierda con misma anchura */
+.ag-header,
+.daystrip,
+.chip-row{
+  align-self: flex-start;
+}
+
+.ag-body{
+  flex:1; min-height:0;
+  overflow-y: auto; overflow-x: hidden;
+  padding: clamp(18px, 1.6vw, 26px) clamp(20px, 2vw, 30px);
+  scroll-behavior: smooth;
+}
+.ag-body::-webkit-scrollbar{width:5px}
+.ag-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:3px}
+body[data-theme="lux"] .ag-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.06)}
+
+.day-slide{ animation: day-slide-in 420ms var(--spring-snap); }
+.day-slide.exiting{ animation: day-slide-out 180ms var(--ease-out) forwards }
+@keyframes day-slide-in{
+  from{opacity:0;transform:translateX(40px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes day-slide-out{
+  to{opacity:0;transform:translateX(-30px)}
+}
+
+/* ==================== TIMELINE — replica móvil exacta ==================== */
+/* timelineRow: [time-col 56px] [card-col 1fr] */
+.tl-row{
+  display:grid;
+  grid-template-columns: 52px 1fr;
+  gap: 10px;
+  align-items:stretch;
+}
+.tl-time-col{
+  position:relative;
+  display:flex; flex-direction:column; align-items:center;
+  padding-top:10px;
+}
+.tl-time{
+  font-family:'Plus Jakarta Sans'; font-weight:700;
+  font-size:11.5px; letter-spacing:-0.01em;
+  color:var(--fg);
+  text-align:center;
+  margin-bottom:6px;
+}
+.tl-row.live .tl-time{ color: var(--accent) }
+.tl-row.past .tl-time{ color: var(--fg-mute); opacity:.55 }
+
+.tl-dot-wrap{
+  width:14px; height:14px;
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+  flex-shrink:0;
+}
+.tl-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--fg-mute);
+  z-index:2; position:relative;
+}
+.tl-row.live .tl-dot{
+  background:var(--accent);
+  width:12px;height:12px;
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.tl-row.past .tl-dot{ background:var(--fg-mute); opacity:.45 }
+
+/* connector vertical entre dots */
+.tl-connector{
+  flex:1;
+  width:1.5px;
+  background: var(--border-strong);
+  margin-top:4px;
+  min-height: 30px;
+}
+.tl-row.past .tl-connector{ opacity:.5 }
+
+.tl-card-col{
+  padding-bottom: clamp(10px, 1vw, 16px);
+}
+
+/* SESSION CARD — todas mismo tamaño */
+.sess-card{
+  background:var(--surface-low);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:0;
+  cursor:pointer;
+  transition: background 250ms var(--ease-out), transform 250ms var(--spring-soft), border-color 250ms var(--ease-out);
+}
+.sess-card:hover{
+  background:var(--surface-medium);
+  transform: translateY(-1px);
+}
+.sess-card.live{
+  border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+/* Selected: sin glow accent. El detail panel a la derecha indica seleccion. */
+/* Active press: feedback haptic visual (replica luxOverrides.pressedScale 0.98) */
+.sess-card:active{ transform: scale(0.985) }
+
+/* card top row: badges + heart */
+.sc-top{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:8px;
+  padding: 10px 11px 6px;
+}
+.sc-badges{
+  display:flex; align-items:center; gap:5px; flex-wrap:wrap; min-width:0;
+}
+.sc-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:7px;
+  font-family:'Urbanist';font-weight:700;font-size:9.5px;letter-spacing:0.04em;
+}
+.sc-tag.live{
+  background: var(--accent-soft); color: var(--accent);
+  border:1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+}
+.sc-tag.live::before{
+  content:""; width:5px; height:5px; border-radius:50%;
+  background:var(--accent);
+  animation: pulse-live 1.6s ease-in-out infinite;
+}
+.sc-tag.tech{background:var(--tech-bg);color:var(--tech)}
+.sc-tag.business{background:var(--business-bg);color:var(--business)}
+.sc-tag.innovation{background:var(--innovation-bg);color:var(--innovation)}
+.sc-tag.leadership{background:var(--leadership-bg);color:var(--leadership)}
+.sc-tag.culture{background:var(--culture-bg);color:var(--culture)}
+
+.sc-checkmark-icon{ color: var(--fg-mute); flex-shrink:0 }
+
+.sc-heart{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--fg-mute);
+  position:relative;
+  flex-shrink:0;
+  transition: color 200ms var(--ease-out), background 200ms var(--ease-out);
+}
+.sc-heart:hover{ background:rgba(255,255,255,0.05); color:var(--fg) }
+body[data-theme="lux"] .sc-heart:hover{ background:rgba(0,0,0,0.05) }
+.sc-heart:active{ transform: scale(0.88) }
+.sc-heart.active{ color:var(--heart) }
+.sc-heart.active svg{ fill: currentColor }
+.sc-heart.popping svg{ animation: heart-pop 400ms var(--spring-soft) }
+@keyframes heart-pop{
+  0%{transform:scale(1)} 20%{transform:scale(0)}
+  60%{transform:scale(1.35)} 100%{transform:scale(1)}
+}
+.heart-ring{
+  position:absolute; inset:0; border-radius:50%;
+  border:2px solid var(--heart); pointer-events:none; opacity:0;
+}
+.heart-ring.go{ animation: heart-ring 500ms var(--ease-out) forwards }
+@keyframes heart-ring{
+  0%{transform:scale(.5);opacity:.7}
+  100%{transform:scale(2.4);opacity:0}
+}
+.heart-particle{
+  position:absolute; left:50%; top:50%;
+  width:3px; height:3px; border-radius:50%;
+  background:var(--heart); pointer-events:none; opacity:0;
+}
+.heart-particle.go{ animation: heart-particle 600ms var(--ease-out) forwards }
+@keyframes heart-particle{
+  0%{transform:translate(0,0) scale(1);opacity:1}
+  100%{transform:translate(var(--tx,0),var(--ty,0)) scale(0);opacity:0}
+}
+
+/* card info */
+.sc-info{
+  padding: 0 11px 9px;
+}
+.tl-row.past .sc-info{ opacity:.45 }
+.sc-title{
+  font-family:'Plus Jakarta Sans';font-weight:700;
+  font-size:13px;line-height:1.3;
+  margin:0 0 4px; letter-spacing:-0.01em;
+  color:var(--fg);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  min-height: calc(2 * 1.3em);  /* reserva 2 lineas para uniformidad */
+}
+.tl-row.past .sc-title{
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(255,255,255,0.5);
+  color:var(--fg-mute);
+}
+body[data-theme="lux"] .tl-row.past .sc-title{ text-decoration-color:rgba(0,0,0,0.5) }
+
+.sc-desc{ display:none } /* todas las cards uniformes — descripcion solo en detail */
+
+.sc-loc{
+  display:flex;align-items:center;gap:5px;
+  color:var(--fg-dim);font-size:11px;margin-top:6px;
+}
+.sc-loc svg{flex-shrink:0;opacity:.7}
+
+.sc-speakers{
+  display:flex;align-items:center;gap:8px;margin-top:7px;
+}
+.avatar-stack{display:flex}
+.avatar{
+  width:20px;height:20px;border-radius:50%;
+  background-size:cover;background-position:center;
+  border:1.5px solid var(--surface-low);
+  margin-left:-6px;flex-shrink:0;
+}
+.avatar:first-child{margin-left:0}
+.sess-card.live .avatar{ border-color: var(--accent) }
+.sess-card:hover .avatar{ border-color:var(--surface-medium) }
+.sc-speaker-names{
+  flex:1; min-width:0;
+  color:var(--fg-dim);font-size:11px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* card actions row con border-top */
+.sc-actions{
+  display:flex;gap:5px;align-items:center;
+  padding: 7px 11px;
+  border-top: 1px solid var(--border);
+}
+.sc-action-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:5px 9px; border-radius:7px;
+  background: var(--surface-medium);
+  font-family:'Urbanist';font-weight:600;font-size:10px;
+  color:var(--fg-dim);
+  transition: background 180ms var(--ease-out);
+}
+.sc-action-btn:hover{ background:var(--surface-high); color:var(--fg) }
+.sc-action-btn:active{ transform: scale(0.94) }
+.sc-action-btn.evaluate{ background: var(--gold-bg); color: var(--gold) }
+.sc-action-btn.evaluate:hover{ background: color-mix(in srgb, var(--gold) 22%, transparent) }
+.sc-action-btn.rated{ background: transparent; color:var(--gold); opacity:.6; gap:1px }
+.sc-action-btn.join{
+  margin-left:auto;
+  background: var(--accent); color: var(--accent-on);
+  font-weight:800; letter-spacing:0.05em; font-size:10px;
+  padding: 5px 11px;
+}
+
+/* ==================== DETAIL PANEL (FLOATING) ==================== */
+.detail{
+  position:absolute;
+  top: clamp(18px, 1.8vw, 28px);
+  bottom: clamp(18px, 1.8vw, 28px);
+  right: clamp(20px, 2vw, 32px);
+  width: clamp(320px, 28vw, 520px);
+  background: var(--surface-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 22px;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+  opacity:0; pointer-events:none;
+  transform: translateX(80px);
+  transition:
+    opacity 380ms var(--ease-out),
+    transform 480ms var(--spring-snap);
+  box-shadow: 0 24px 60px -16px rgba(0,0,0,0.55);
+  z-index:10;
+}
+.detail.open{ opacity:1; pointer-events:auto; transform: translateX(0) }
+.detail.swap-out{
+  opacity:0; transform: translateX(-60px);
+  transition: opacity 220ms var(--ease-out), transform 260ms var(--ease-out);
+}
+
+.dp-header{
+  display:flex;align-items:center;gap:10px;
+  padding: 16px 18px 12px;
+  flex-shrink:0;
+}
+.dp-back{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--surface-medium);color:var(--fg);
+  display:flex;align-items:center;justify-content:center;
+  transition: background 200ms var(--ease-out);
+}
+.dp-back:hover{background:var(--surface-high)}
+.dp-headtitle{
+  flex:1;text-align:center;font-family:'Plus Jakarta Sans';
+  font-size:14px;color:var(--fg);font-weight:700;letter-spacing:-0.01em;
+}
+.dp-headspace{width:32px}
+
+.dp-body{
+  flex:1;overflow-y:auto;
+  padding: 6px 22px 22px;
+}
+.dp-body::-webkit-scrollbar{width:5px}
+.dp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:3px}
+body[data-theme="lux"] .dp-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.06)}
+
+/* dp-badges row */
+.dp-badges{
+  display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+  margin-top:8px;
+}
+.dp-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 10px; border-radius:8px;
+  font-family:'Urbanist';font-weight:700;font-size:11px;letter-spacing:0.04em;
+}
+.dp-badge.live{
+  background: var(--accent-soft); color: var(--accent);
+  border:1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+}
+.dp-badge.live::before{
+  content:""; width:5px; height:5px; border-radius:50%;
+  background:var(--accent);
+  animation: pulse-live 1.6s ease-in-out infinite;
+}
+.dp-badge.tech{background:var(--tech-bg);color:var(--tech)}
+.dp-badge.business{background:var(--business-bg);color:var(--business)}
+.dp-badge.innovation{background:var(--innovation-bg);color:var(--innovation)}
+.dp-badge.leadership{background:var(--leadership-bg);color:var(--leadership)}
+.dp-badge.culture{background:var(--culture-bg);color:var(--culture)}
+
+.dp-title{
+  font-family:'Plus Jakarta Sans';font-weight:800;
+  font-size: clamp(20px, 1.7vw, 26px); line-height:1.2;
+  letter-spacing:-0.022em;
+  margin: 14px 0 0;
+}
+
+.dp-rated{
+  display:flex; align-items:center; gap:8px;
+  margin-top:12px; color: var(--fg-mute);
+  font-size:12px; font-family:'Urbanist'; font-weight:500;
+}
+.dp-stars{ display:flex; gap:2px; color: var(--gold) }
+
+/* meta card */
+.dp-meta-card{
+  background:var(--surface-medium);
+  border-radius:14px;padding:14px 16px;
+  display:flex;flex-direction:column;gap:11px;
+  margin-top:18px;
+}
+.dp-meta-row{display:flex;align-items:center;gap:10px;color:var(--fg);font-size:13px}
+.dp-meta-row svg{color:var(--fg-mute);flex-shrink:0}
+
+/* action buttons row */
+.dp-actions{
+  display:grid; gap:8px; margin-top:14px;
+  grid-template-columns: 1fr 1fr;
+}
+.dp-actions.three{ grid-template-columns: 1fr 1fr 1fr }
+.dp-action{
+  padding:11px 8px;border-radius:12px;
+  background:var(--surface-medium);color:var(--fg);
+  font-family:'Urbanist';font-weight:600;font-size:12px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition: background 200ms var(--ease-out);
+}
+.dp-action:hover{background:var(--surface-high)}
+.dp-action:active{ transform: scale(0.96) }
+.dp-action.fav.active{ color:var(--heart) }
+.dp-action.fav.active svg{ fill:currentColor }
+.dp-action.evaluate{ background:var(--gold-bg); color:var(--gold) }
+.dp-action.evaluate:hover{ background:rgba(181,166,139,0.22) }
+.dp-action svg{width:15px;height:15px}
+
+.dp-stream{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px;border-radius:13px;margin-top:10px;
+  background:var(--accent);color:var(--accent-on);
+  font-family:'Urbanist';font-weight:800;font-size:12.5px;letter-spacing:0.06em;
+  transition:transform 200ms var(--spring-soft);
+}
+.dp-stream:hover{ transform: translateY(-1px) }
+.dp-stream.glass{
+  background: var(--surface-medium); color: var(--fg); font-weight:600;
+}
+.dp-stream.glass:hover{ background: var(--surface-high) }
+
+.dp-section{
+  text-transform:uppercase;letter-spacing:0.18em;
+  font-family:'Plus Jakarta Sans';font-weight:700;
+  font-size:10.5px;color:var(--fg-mute);
+  margin:22px 0 10px;
+}
+.dp-about{
+  background:var(--surface-medium);
+  border-radius:13px;padding:14px 16px;
+  color:var(--fg-dim);font-size:13px;line-height:1.55;
+}
+
+.dp-speaker{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 14px;
+  background:var(--surface-medium);
+  border-radius:13px;margin-bottom:6px;cursor:pointer;
+  transition: background 200ms var(--ease-out);
+}
+.dp-speaker:hover{background:var(--surface-high)}
+.dp-speaker .avatar{width:42px;height:42px;margin:0;border:none;flex-shrink:0}
+.dp-sp-info{flex:1;min-width:0}
+.dp-sp-name{font-family:'Plus Jakarta Sans';font-weight:700;font-size:13.5px;margin:0;color:var(--fg)}
+.dp-sp-role{color:var(--fg-dim);font-size:11.5px;margin-top:2px}
+.dp-speaker svg.chev{color:var(--fg-mute);flex-shrink:0}
+
+.dp-helper{
+  text-align:center; margin-top: 10px;
+  font-size: 10.5px; color: var(--fg-mute);
+  font-family:'Urbanist'; font-weight:500;
+}
+
+.dp-attendees-card{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:13px 15px;
+  background:var(--surface-medium);
+  border-radius:13px;cursor:pointer;
+  transition: background 200ms var(--ease-out);
+}
+.dp-attendees-card:hover{background:var(--surface-high)}
+.dp-att-left{display:flex;align-items:center;gap:11px}
+.dp-att-stack .avatar{width:24px;height:24px;border:2px solid var(--surface-medium)}
+.dp-att-text{font-size:12.5px;color:var(--fg);font-weight:600}
+.dp-att-text small{display:block;color:var(--fg-dim);font-weight:400;font-size:11px;margin-top:2px}
+.dp-attendees-card svg{color:var(--fg-mute)}
+
+/* ==================== EMPTY HINT ==================== */
+.empty-hint{
+  position:absolute;
+  top: clamp(18px, 1.8vw, 28px);
+  bottom: clamp(18px, 1.8vw, 28px);
+  right: clamp(20px, 2vw, 32px);
+  width: clamp(320px, 28vw, 520px);
+  background: var(--surface-card);
+  border: 1px dashed var(--border-strong);
+  border-radius:22px;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:14px;text-align:center;
+  padding:40px;color:var(--fg-mute);
+  opacity:0; pointer-events:none;
+  transition: opacity 280ms var(--ease-out);
+  z-index:5;
+}
+.canvas:not(.has-detail) .empty-hint{ opacity:.55 }
+.empty-hint .glyph{
+  width:60px;height:60px;border-radius:18px;
+  background: var(--surface-medium);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--fg-mute);
+}
+.empty-hint h3{font-family:'Plus Jakarta Sans';font-weight:700;font-size:14px;margin:0;color:var(--fg-dim);letter-spacing:-0.01em}
+.empty-hint p{font-size:11px;color:var(--fg-mute);max-width:240px;line-height:1.5;margin:0}
+.empty-hint .kbd{
+  display:inline-block;font-family:'JetBrains Mono';font-size:9.5px;
+  background:var(--surface-medium);padding:2px 6px;border-radius:5px;
+  color:var(--fg-dim);margin:0 2px;
+}
+
+/* ==================== ATTENDEES POP ==================== */
+.attendees-pop{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,0.45);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  opacity:0;pointer-events:none;
+  transition:opacity 280ms var(--ease-out);
+  z-index:25;
+}
+body[data-theme="lux"] .attendees-pop{ background:rgba(0,0,0,0.18) }
+.attendees-pop.open{opacity:1;pointer-events:auto}
+.attendees-pop-inner{
+  width:340px;max-height:85%;
+  background:var(--surface-card);border-radius:20px;
+  display:flex;flex-direction:column;overflow:hidden;
+  transform:translateY(20px) scale(.94);opacity:0;
+  transition:opacity 380ms var(--ease-out), transform 380ms var(--spring-snap);
+  box-shadow:0 24px 60px -12px rgba(0,0,0,0.7);
+}
+.attendees-pop.open .attendees-pop-inner{opacity:1;transform:translateY(0) scale(1)}
+.att-head{
+  padding:14px 16px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--border);
+}
+.att-head h3{font-family:'Plus Jakarta Sans';font-weight:700;font-size:13px;margin:0;flex:1;color:var(--fg)}
+.att-list{flex:1;overflow-y:auto;padding:8px 10px}
+.att-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:11px;cursor:pointer;
+  transition:background 200ms var(--ease-out);
+}
+.att-item:hover{background:var(--surface-medium)}
+.att-item .avatar{width:32px;height:32px;margin:0;border:none}
+.att-info{flex:1;min-width:0}
+.att-name{font-family:'Plus Jakarta Sans';font-weight:600;font-size:12.5px;margin:0;color:var(--fg)}
+.att-org{color:var(--fg-dim);font-size:11px;margin-top:1px}
+.att-cta{
+  font-size:10px;color:var(--accent);font-weight:700;letter-spacing:0.06em;
+  text-transform:uppercase;padding:5px 10px;border-radius:99px;
+  background:var(--accent-soft);
+}
+
+/* ==================== TWEAKS ==================== */
+.tweaks{
+  position:fixed;top:18px;right:18px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);border-radius:16px;
+  padding:10px 12px;
+  font-size:10px;color:var(--fg-dim);
+  font-family:'Urbanist';display:flex;align-items:center;gap:10px;
+  z-index:60;
+}
+.tweaks-row{display:flex;align-items:center;gap:5px}
+.swatch{
+  width:18px;height:18px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;
+  transition:transform 180ms var(--spring-soft);
+}
+.swatch:hover{transform:scale(1.12)}
+.swatch.active{border-color:var(--fg)}
+.seg{display:flex;gap:2px;padding:2px;background:var(--surface-low);border-radius:8px}
+.seg button{padding:3px 9px;border-radius:6px;font-size:9.5px;font-weight:600;color:var(--fg-mute)}
+.seg button.active{background:var(--surface-high);color:var(--fg)}
+
+.hint{
+  position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
+  font-family:'Urbanist';font-size:10px;color:var(--fg-mute);
+  letter-spacing:0.04em;pointer-events:none;z-index:1;
+}
+.hint kbd{
+  background:var(--surface-low);padding:1px 5px;border-radius:4px;
+  color:var(--fg-dim); font-family:inherit;
+}
+
+/* ==================== TOAST (haptic feedback visual) ==================== */
+.toast{
+  position: fixed; top: 70px; left: 50%;
+  transform: translateX(-50%) translateY(-12px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 16px 10px 12px;
+  font-family: 'Urbanist'; font-weight: 600; font-size: 12.5px;
+  color: var(--fg);
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0; pointer-events: none;
+  transition: all 320ms var(--spring-soft);
+  z-index: 100;
+  box-shadow: 0 12px 32px -8px rgba(0,0,0,0.45);
+}
+body[data-theme="lux"] .toast{
+  box-shadow: 0 12px 32px -8px rgba(0,0,0,0.18);
+}
+.toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); pointer-events:auto }
+.toast .toast-icon{
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.toast.favorite .toast-icon{ background: color-mix(in srgb, var(--heart) 16%, transparent); color: var(--heart) }
+.toast.calendar .toast-icon{ background: var(--accent-soft); color: var(--accent) }
+.toast.success .toast-icon{ background: var(--accent-soft); color: var(--accent) }
+.toast.info .toast-icon{ background: rgba(255,255,255,0.06); color: var(--fg-dim) }
+body[data-theme="lux"] .toast.info .toast-icon{ background: rgba(0,0,0,0.05) }
+</style>
+</head>
+<body data-theme="noir">
+
+<div class="tweaks">
+  <div class="tweaks-row">
+    <span style="opacity:.6">tema</span>
+    <div class="seg" id="seg-mode">
+      <button data-mode="noir" class="active">Noir</button>
+      <button data-mode="lux">Lux</button>
+    </div>
+  </div>
+  <div class="tweaks-row">
+    <span style="opacity:.6">accent</span>
+    <span class="swatch active" data-accent="lime" style="background:#7CFFB2"></span>
+    <span class="swatch" data-accent="amber" style="background:#F5C66C"></span>
+    <span class="swatch" data-accent="rose" style="background:#FF3D55"></span>
+    <span class="swatch" data-accent="violet" style="background:#A78BFA"></span>
+    <span class="swatch" data-accent="cyan" style="background:#22D3EE"></span>
+  </div>
+</div>
+
+<div class="stage">
+  <aside class="sidebar">
+    <div class="sb-logo">S</div>
+    <div class="sb-item" title="Inicio"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></div>
+    <div class="sb-item active" title="Agenda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></div>
+    <div class="sb-item" title="En vivo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M5 12a7 7 0 0114 0M2 12a10 10 0 0120 0"/></svg><span class="sb-live"></span></div>
+    <div class="sb-item" title="Networking"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="sb-badge">3</span></div>
+    <div class="sb-item" title="Social"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-1 4 8.5 8.5 0 01-7.5 4.5 8.4 8.4 0 01-4-1L3 21l2-5a8.4 8.4 0 01-1-4 8.5 8.5 0 014.5-7.5 8.4 8.4 0 014-1h.5a8.5 8.5 0 018 8z"/></svg></div>
+    <div class="sb-item" title="Sponsors"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-8h6v8"/></svg></div>
+    <div class="sb-sep"></div>
+    <div class="sb-item" title="Notif"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg></div>
+    <div class="sb-item" title="Mi perfil" style="margin-top:auto"><div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#7c7cff)"></div></div>
+  </aside>
+
+  <div class="canvas" id="canvas">
+
+    <!-- HEADER GLOBAL — todo en una linea -->
+    <header class="ag-header">
+      <div class="ag-titleblock">
+        <div class="ag-titles">
+          <h1 class="ag-title" id="title">Agenda</h1>
+          <div class="ag-subtitle" id="subtitle">jueves, 23 de abril</div>
+        </div>
+      </div>
+      <div class="ag-tools">
+        <div class="ag-tabs">
+          <button class="ag-tab active" data-tab="all">Agenda <span class="count" id="cnt-all">12</span></button>
+          <button class="ag-tab fav-icon" data-tab="mine">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            Mi Agenda <span class="count" id="cnt-mine">3</span>
+          </button>
+        </div>
+        <button class="ag-todas" id="ctaTodas">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg>
+          Todas
+        </button>
+        <button class="ag-tool" id="searchBtn" title="Buscar (⌘K)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+        <div class="ag-search-wrap" id="searchWrap">
+          <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input id="searchInput" placeholder="Buscar sesion, speaker, sala..." />
+        </div>
+      </div>
+    </header>
+
+    <!-- DAY PILLS -->
+    <div class="daystrip" id="daystrip"></div>
+
+    <!-- TRACK CHIPS -->
+    <div class="chip-row" id="chipRow"></div>
+
+    <!-- AGENDA CARD WRAP (60% alineada izq) -->
+    <div class="agenda-wrap">
+      <section class="agenda-card">
+        <div class="ag-body" id="agendaBody"></div>
+      </section>
+    </div>
+
+    <!-- DETAIL FLOATING -->
+    <aside class="detail" id="detailCard">
+      <header class="dp-header">
+        <button class="dp-back" id="dpClose" aria-label="Cerrar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="dp-headtitle">Sesion</div>
+        <div class="dp-headspace"></div>
+      </header>
+      <div class="dp-body" id="dpBody"></div>
+    </aside>
+
+    <!-- EMPTY HINT -->
+    <div class="empty-hint">
+      <div class="glyph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></div>
+      <div>
+        <h3>Selecciona una sesion</h3>
+        <p>El detalle aparece aqui · usa <span class="kbd">↑↓</span> · <span class="kbd">Esc</span> cierra</p>
+      </div>
+    </div>
+
+    <!-- ATTENDEES POP -->
+    <div class="attendees-pop" id="attendeesPop">
+      <div class="attendees-pop-inner">
+        <div class="att-head">
+          <h3>Asistentes confirmados</h3>
+          <button class="dp-back" id="attClose" style="width:28px;height:28px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+        <div class="att-list" id="attList"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="hint">click sesion · <kbd>⌘K</kbd> buscar · <kbd>Esc</kbd> cerrar · <kbd>↑↓</kbd> navegar</div>
+
+  <!-- TOAST notification -->
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="toastIcon"></div>
+    <span id="toastMsg"></span>
+  </div>
+</div>
+
+<script>
+const EVENT_DAYS = [
+  { key:'2026-04-20', dow:'LUN', day:20, label:'lunes, 20 de abril', has:false },
+  { key:'2026-04-21', dow:'MAR', day:21, label:'martes, 21 de abril', has:false },
+  { key:'2026-04-22', dow:'MIE', day:22, label:'miercoles, 22 de abril', has:true },
+  { key:'2026-04-23', dow:'JUE', day:23, label:'jueves, 23 de abril', has:true },
+  { key:'2026-04-24', dow:'VIE', day:24, label:'viernes, 24 de abril', has:true },
+  { key:'2026-04-25', dow:'SAB', day:25, label:'sabado, 25 de abril', has:false },
+  { key:'2026-04-26', dow:'DOM', day:26, label:'domingo, 26 de abril', has:false },
+];
+
+const SPEAKERS = {
+  andres:{name:'Andres Gil', role:'Senior Engineer', org:'Mercado Libre', avatar:'https://i.pravatar.cc/100?img=12'},
+  maria:{name:'Maria Garcia', role:'CTO', org:'Rappi', avatar:'https://i.pravatar.cc/100?img=47'},
+  dmitri:{name:'Dmitri Volkov', role:'VP Engineering', org:'Globant', avatar:'https://i.pravatar.cc/100?img=33'},
+  sofia:{name:'Sofia Restrepo', role:'Product Director', org:'Nubank', avatar:'https://i.pravatar.cc/100?img=45'},
+  laura:{name:'Laura Diaz', role:'Growth Lead', org:'Bold', avatar:'https://i.pravatar.cc/100?img=49'},
+  marcus:{name:'Marcus Johnson', role:'Founder', org:'Y Combinator', avatar:'https://i.pravatar.cc/100?img=14'},
+  felipe:{name:'Felipe Torres', role:'Engineering Lead', org:'Mercado Libre', avatar:'https://i.pravatar.cc/100?img=11'},
+  james:{name:'James Wilson', role:'General Partner', org:'Horizon Ventures', avatar:'https://i.pravatar.cc/100?img=15'},
+  emma:{name:'Emma Thompson', role:'Head of Design', org:'Spotify', avatar:'https://i.pravatar.cc/100?img=44'},
+  natasha:{name:'Natasha Kozlova', role:'ML Engineer', org:'Anthropic', avatar:'https://i.pravatar.cc/100?img=48'},
+  carlos:{name:'Carlos Mendoza', role:'CPO', org:'Platzi', avatar:'https://i.pravatar.cc/100?img=13'},
+  ana:{name:'Ana Beltran', role:'CMO', org:'Tul', avatar:'https://i.pravatar.cc/100?img=42'},
+};
+
+const ATTENDEES = [
+  {name:'Camila Rios', org:'Bancolombia', avatar:'https://i.pravatar.cc/100?img=41'},
+  {name:'Jorge Henao', org:'Globant', avatar:'https://i.pravatar.cc/100?img=22'},
+  {name:'Valentina Lopez', org:'Rappi', avatar:'https://i.pravatar.cc/100?img=43'},
+  {name:'Daniel Espinosa', org:'Mercado Libre', avatar:'https://i.pravatar.cc/100?img=18'},
+  {name:'Sofia Castro', org:'Nubank', avatar:'https://i.pravatar.cc/100?img=46'},
+  {name:'Andres Mejia', org:'Bold', avatar:'https://i.pravatar.cc/100?img=8'},
+  {name:'Lucia Mora', org:'Tul', avatar:'https://i.pravatar.cc/100?img=40'},
+  {name:'Pablo Restrepo', org:'Platzi', avatar:'https://i.pravatar.cc/100?img=33'},
+];
+
+const SESSIONS = {
+  '2026-04-22': [
+    { id:'w1', start:'9:00 a. m.', end:'10:00 a. m.', state:'past', cat:'tech', track:'Tecnologia',
+      title:'Apertura: el futuro de las plataformas LATAM', room:'Auditorio Principal',
+      capacity:200, speakers:['maria','dmitri'], rated:5, fav:false,
+      about:'Vision general del primer dia: como esta evolucionando el ecosistema tech en la region.', recording:true },
+    { id:'w2', start:'10:30 a. m.', end:'11:30 a. m.', state:'past', cat:'business', track:'Negocios',
+      title:'Estrategia de crecimiento post-Series B', room:'Sala A',
+      speakers:['marcus','laura'], rated:0, fav:false,
+      about:'Casos de empresas que escalaron de Series B a Series D.' },
+  ],
+  '2026-04-23': [
+    { id:'s1', start:'9:00 a. m.', end:'10:00 a. m.', state:'past', cat:'tech', track:'Tecnologia',
+      title:'Mobile-first: React Native a fondo', room:'Sala A',
+      capacity:80, speakers:['andres'], rated:4, fav:false,
+      about:'Patrones avanzados para apps moviles. Animations API, gesture handlers, navigation stacks y performance profiling con Hermes.', recording:true },
+    { id:'s2', start:'9:30 a. m.', end:'10:30 a. m.', state:'past', cat:'business', track:'Negocios',
+      title:'Panel: IA en la empresa moderna', room:'Auditorio Principal',
+      capacity:200, speakers:['maria','dmitri','sofia'], rated:0, fav:true,
+      about:'Lideres de tecnologia de Latam discuten como estan integrando IA generativa en operaciones, producto y soporte.' },
+    { id:'s3', start:'10:30 a. m.', end:'11:30 a. m.', state:'live', cat:'innovation', track:'Innovacion',
+      title:'Growth Hacking: metricas que importan', room:'Sala B',
+      capacity:120, speakers:['laura','marcus'], live:true, fav:false,
+      about:'Mas alla de vanity metrics: como medir y optimizar crecimiento real con product-led growth. North star, activation funnels y experimentacion.' },
+    { id:'s5', start:'12:30 p. m.', end:'1:30 p. m.', state:'upcoming', cat:'tech', track:'Tecnologia',
+      title:'Blockchain & Web3: reality check', room:'Sala A',
+      capacity:80, speakers:['felipe','james'], fav:true,
+      about:'Que proyectos Web3 generan valor real y cuales son humo. Smart contracts, DeFi y tokenizacion con casos concretos.' },
+    { id:'s6', start:'2:00 p. m.', end:'3:00 p. m.', state:'upcoming', cat:'tech', track:'Tecnologia',
+      title:'ML in Production: pipelines that work', room:'Sala A',
+      capacity:80, speakers:['dmitri','natasha'], fav:true,
+      about:'De notebook a produccion: feature stores, model registries, monitoring de drift y rollouts seguros.' },
+    { id:'s7', start:'3:30 p. m.', end:'4:30 p. m.', state:'upcoming', cat:'innovation', track:'Innovacion',
+      title:'Diseno espacial: del movil al inmersivo', room:'Sala B',
+      capacity:120, speakers:['emma','sofia'], fav:false,
+      about:'Principios de UX que sobreviven el salto de pantallas planas a interfaces espaciales.' },
+    { id:'s8', start:'5:00 p. m.', end:'6:00 p. m.', state:'upcoming', cat:'business', track:'Negocios',
+      title:'Fundraising en LATAM 2026', room:'Auditorio Principal',
+      capacity:200, speakers:['marcus','james'], fav:false,
+      about:'El estado real del venture capital en la region.' },
+    { id:'s9', start:'7:00 p. m.', end:'8:00 p. m.', state:'upcoming', cat:'culture', track:'Cultura',
+      title:'Networking dinner & ceremony', room:'Terraza',
+      speakers:['carlos','ana'], fav:false,
+      about:'Cierre del dia con cena, premiacion y networking abierto.' },
+  ],
+  '2026-04-24': [
+    { id:'f1', start:'9:00 a. m.', end:'10:00 a. m.', state:'upcoming', cat:'tech', track:'Tecnologia',
+      title:'Cloud-native architectures at scale', room:'Sala A',
+      speakers:['felipe','natasha'], fav:false,
+      about:'Microservicios reales, observabilidad y resiliencia.' },
+    { id:'f2', start:'10:30 a. m.', end:'11:30 a. m.', state:'upcoming', cat:'leadership', track:'Liderazgo',
+      title:'Construyendo cultura remoto-first', room:'Auditorio Principal',
+      speakers:['emma','sofia','ana'], fav:true,
+      about:'Lecciones de empresas distribuidas en LATAM.' },
+  ],
+};
+
+const TRACKS = [
+  { id:'tech', name:'Tecnologia', color:'var(--tech)' },
+  { id:'business', name:'Negocios', color:'var(--business)' },
+  { id:'innovation', name:'Innovacion', color:'var(--innovation)' },
+  { id:'leadership', name:'Liderazgo', color:'var(--leadership)' },
+  { id:'culture', name:'Cultura', color:'var(--culture)' },
+];
+
+const state = {
+  tab:'all', date:'2026-04-23',
+  selectedTracks:new Set(),
+  search:'', selectedId:null, panelOpen:false,
+  attendeesOpen:false, searchOpen:false,
+};
+
+const $ = (s,c=document)=>c.querySelector(s);
+const $$ = (s,c=document)=>Array.from(c.querySelectorAll(s));
+
+function visibleSessionsForDay(){
+  const list = SESSIONS[state.date]||[];
+  return list.filter(s=>{
+    if(state.tab==='mine'&&!s.fav)return false;
+    if(state.selectedTracks.size>0&&!state.selectedTracks.has(s.cat))return false;
+    if(state.search){
+      const q=state.search.toLowerCase();
+      const hay=(s.title+' '+s.room+' '+s.speakers.map(sp=>SPEAKERS[sp].name).join(' ')).toLowerCase();
+      if(!hay.includes(q))return false;
+    }
+    return true;
+  });
+}
+
+function renderDayStrip(){
+  const el = $('#daystrip');
+  el.innerHTML = EVENT_DAYS.map(d=>{
+    const active = d.key===state.date;
+    const cls = ['daypill', !d.has&&'empty', active&&'active'].filter(Boolean).join(' ');
+    return `<div class="${cls}" data-day="${d.key}" data-label="${d.label}">
+      <span class="dp-dow">${d.dow}</span>
+      <span class="dp-day">${d.day}</span>
+      ${d.has && !active ? '<span class="dp-dot"></span>' : ''}
+    </div>`;
+  }).join('');
+  $$('.daypill').forEach(p=>{
+    p.onclick=()=>{
+      if(p.classList.contains('empty')){
+        p.animate([{transform:'translateX(0)'},{transform:'translateX(-3px)'},{transform:'translateX(3px)'},{transform:'translateX(0)'}],{duration:240});
+        return;
+      }
+      state.date=p.dataset.day;
+      $('#subtitle').textContent=p.dataset.label;
+      renderDayStrip();
+      animateDayChange();
+      maybeClosePanel();
+    };
+  });
+}
+
+function renderChips(){
+  const el=$('#chipRow');
+  el.innerHTML = `<button class="chip ${state.selectedTracks.size===0?'active':''}" data-id="">Todos</button>` +
+    TRACKS.map(t=>{
+      const active = state.selectedTracks.has(t.id);
+      return `<button class="chip ${active?'active':''}" data-id="${t.id}">
+        <span class="chip-dot" style="background:${t.color}"></span>${t.name}
+      </button>`;
+    }).join('');
+  $$('.chip',el).forEach(c=>{
+    c.onclick=()=>{
+      const id=c.dataset.id;
+      if(!id){ state.selectedTracks.clear(); }
+      else {
+        if(state.selectedTracks.has(id))state.selectedTracks.delete(id);
+        else state.selectedTracks.add(id);
+      }
+      renderChips(); renderList();
+    };
+  });
+}
+
+function totalCount(filterFav){
+  let n=0; Object.values(SESSIONS).forEach(arr=>arr.forEach(s=>{if(filterFav?s.fav:true)n++}));
+  return n;
+}
+
+function renderTabBtn(){
+  const isMine = state.tab==='mine';
+  $('#cnt-all').textContent = totalCount(false);
+  $('#cnt-mine').textContent = totalCount(true);
+  $$('.ag-tab').forEach(t => t.classList.toggle('active', t.dataset.tab===state.tab));
+  $('#title').textContent = isMine ? 'Mi Agenda' : 'Agenda';
+  $('#ctaTodas').classList.toggle('show', isMine && visibleSessionsForDay().length > 0);
+}
+
+function renderList(){
+  const body=$('#agendaBody');
+  const items=visibleSessionsForDay();
+  renderTabBtn();
+
+  if(items.length===0){
+    body.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:60px 30px;color:var(--fg-mute)">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="opacity:.4;margin-bottom:14px">
+        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+      </svg>
+      <h3 style="font-family:'Plus Jakarta Sans';font-weight:700;color:var(--fg-dim);margin:4px 0 6px;font-size:15px">${state.tab==='mine'?'Sin favoritas este dia':'Sin sesiones'}</h3>
+      <p style="font-size:12px;max-width:260px;line-height:1.5;margin:0">${state.tab==='mine'?'Toca el corazon en cualquier sesion para guardarla aqui':'Prueba con otra fecha'}</p>
+    </div>`;
+    return;
+  }
+
+  const wrap=document.createElement('div');
+  wrap.className='day-slide'; wrap.id='daySlide';
+  items.forEach((s,i)=>{
+    wrap.appendChild(buildItem(s, i===items.length-1));
+  });
+  body.innerHTML=''; body.appendChild(wrap);
+  attachListEvents();
+}
+
+function buildItem(s, isLast){
+  const wrap=document.createElement('div');
+  wrap.className=`tl-row ${s.state}`; wrap.dataset.id=s.id;
+  const isLive=s.state==='live', isPast=s.state==='past';
+  const trackInfo=TRACKS.find(t=>t.id===s.cat);
+  const speakers=s.speakers.map(id=>SPEAKERS[id]);
+  const spStack=speakers.slice(0,3).map(p=>`<div class="avatar" style="background-image:url('${p.avatar}')"></div>`).join('');
+  const spText = speakers.map(p=>p.name).join(', ');
+
+  // badges
+  let badgesHTML = '';
+  if(isLive) badgesHTML += `<span class="sc-tag live">EN VIVO</span>`;
+  if(isPast) badgesHTML += `<svg class="sc-checkmark-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>`;
+  badgesHTML += `<span class="sc-tag ${s.cat}">${trackInfo.name}</span>`;
+
+  // description SOLO si live
+  const descHTML = isLive ? `<p class="sc-desc">${s.about}</p>` : '';
+
+  // location
+  const locHTML = `<div class="sc-loc">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    ${s.room}
+  </div>`;
+
+  // actions row
+  let actionsHTML = '';
+  if(!isPast){
+    actionsHTML += `<button class="sc-action-btn" onclick="event.stopPropagation()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg>
+      Calendario
+    </button>`;
+  }
+  if(isPast && !s.rated){
+    actionsHTML += `<button class="sc-action-btn evaluate" data-rate="${s.id}" onclick="event.stopPropagation()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Evaluar
+    </button>`;
+  }
+  if(isPast && s.rated){
+    actionsHTML += `<span class="sc-action-btn rated">${'★'.repeat(s.rated)}${'☆'.repeat(5-s.rated)}</span>`;
+  }
+  if(isLive){
+    actionsHTML += `<button class="sc-action-btn join" onclick="event.stopPropagation()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      UNIRTE
+    </button>`;
+  }
+  if(isPast && s.recording){
+    actionsHTML += `<button class="sc-action-btn" onclick="event.stopPropagation()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Ver grabacion
+    </button>`;
+  }
+
+  // heart
+  const heartHTML = `<button class="sc-heart ${s.fav?'active':''}" data-fav="${s.id}" aria-label="Favorita">
+    <span class="heart-ring"></span>
+    ${[0,1,2,3,4,5].map(()=>`<span class="heart-particle"></span>`).join('')}
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="${s.fav?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+  </button>`;
+
+  wrap.innerHTML = `
+    <div class="tl-time-col">
+      <span class="tl-time">${s.start.replace(' a. m.','').replace(' p. m.','')}</span>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      ${isLast ? '' : '<div class="tl-connector"></div>'}
+    </div>
+    <div class="tl-card-col">
+      <div class="sess-card ${s.state} ${state.selectedId===s.id?'selected':''}" data-id="${s.id}">
+        <div class="sc-top">
+          <div class="sc-badges">${badgesHTML}</div>
+          ${heartHTML}
+        </div>
+        <div class="sc-info">
+          <h3 class="sc-title">${s.title}</h3>
+          ${descHTML}
+          ${locHTML}
+          <div class="sc-speakers">
+            <div class="avatar-stack">${spStack}</div>
+            <span class="sc-speaker-names">${spText}</span>
+          </div>
+        </div>
+        <div class="sc-actions">${actionsHTML}</div>
+      </div>
+    </div>
+  `;
+  return wrap;
+}
+
+function attachListEvents(){
+  $$('.sess-card').forEach(c=>{
+    c.onclick=(e)=>{
+      if(e.target.closest('.sc-heart')||e.target.closest('.sc-action-btn')||e.target.closest('[data-rate]'))return;
+      openPanel(c.dataset.id);
+    };
+  });
+  $$('.sc-heart[data-fav]').forEach(b=>{
+    b.onclick=(e)=>{e.stopPropagation();toggleFav(b.dataset.fav,b)};
+  });
+  $$('.sc-action-btn').forEach(b=>{
+    b.onclick=(e)=>{
+      e.stopPropagation();
+      const t = b.textContent.trim();
+      if(t.includes('Calendario')) showToast('Agregado a tu calendario', 'calendar');
+      else if(t.includes('Evaluar')) showToast('Modal de calificacion abriria aqui', 'info');
+      else if(t.includes('UNIRTE')) showToast('Abriendo stream en vivo...', 'success');
+      else if(t.includes('grabacion')) showToast('Cargando grabacion...', 'info');
+    };
+  });
+}
+
+function findSession(id){for(const arr of Object.values(SESSIONS)){const f=arr.find(s=>s.id===id);if(f)return f}return null}
+
+/* TOAST helper (haptic feedback visual) */
+const TOAST_ICONS = {
+  favorite: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',
+  calendar: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>',
+  success: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>',
+  info: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>',
+};
+let toastTimer;
+function showToast(message, variant='info'){
+  const t = $('#toast');
+  $('#toastIcon').innerHTML = TOAST_ICONS[variant] || TOAST_ICONS.info;
+  $('#toastMsg').textContent = message;
+  t.className = `toast show ${variant}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+function toggleFav(id,btn){
+  const s=findSession(id); if(!s)return;
+  const wasFav=s.fav; s.fav=!s.fav;
+  if(s.fav){
+    btn.classList.add('popping');
+    const ring=btn.querySelector('.heart-ring');
+    ring.classList.remove('go'); void ring.offsetWidth; ring.classList.add('go');
+    btn.querySelectorAll('.heart-particle').forEach((p,i)=>{
+      const ang=(i/6)*Math.PI*2;
+      p.style.setProperty('--tx',`${Math.cos(ang)*22}px`);
+      p.style.setProperty('--ty',`${Math.sin(ang)*22}px`);
+      p.classList.remove('go'); void p.offsetWidth; p.classList.add('go');
+    });
+    setTimeout(()=>btn.classList.remove('popping'),420);
+    showToast('Guardado en Mi Agenda', 'favorite');
+  } else {
+    showToast('Eliminado de Mi Agenda', 'info');
+  }
+  btn.classList.toggle('active', s.fav);
+  btn.querySelector('svg').setAttribute('fill', s.fav?'currentColor':'none');
+  if(state.tab==='mine' && wasFav) renderList();
+  if(state.selectedId===id) renderDetail(id);
+  renderTabBtn();
+}
+
+function animateDayChange(){
+  const slide=$('#daySlide');
+  if(slide){slide.classList.add('exiting');setTimeout(renderList,180)}
+  else renderList();
+}
+
+const detailCard=$('#detailCard'), dpBody=$('#dpBody'), canvasEl=$('#canvas');
+
+function updateSelectedInList(id){
+  // Solo actualizar la clase .selected en las cards existentes, sin recrear DOM (evita reanimacion)
+  $$('.sess-card').forEach(c=>{
+    c.classList.toggle('selected', c.dataset.id === id);
+  });
+}
+
+function openPanel(id){
+  if(state.selectedId===id && state.panelOpen){closePanel();return}
+  if(state.panelOpen){
+    // Slide-out a la izq, cambia contenido, slide-in desde la derecha
+    detailCard.classList.add('swap-out');
+    setTimeout(()=>{
+      state.selectedId=id;
+      renderDetail(id);
+      updateSelectedInList(id);
+      detailCard.classList.remove('swap-out','open');
+      void detailCard.offsetWidth;
+      detailCard.classList.add('open');
+    },260);
+  } else {
+    state.selectedId=id; state.panelOpen=true;
+    renderDetail(id);
+    updateSelectedInList(id);
+    canvasEl.classList.add('has-detail');
+    requestAnimationFrame(()=>detailCard.classList.add('open'));
+  }
+}
+
+function closePanel(){
+  state.panelOpen=false;
+  detailCard.classList.remove('open');
+  setTimeout(()=>{
+    state.selectedId=null;
+    canvasEl.classList.remove('has-detail');
+    updateSelectedInList(null);  // sin reanimar la lista
+  },240);
+}
+
+function maybeClosePanel(){if(state.panelOpen)closePanel()}
+
+function renderDetail(id){
+  const s=findSession(id); if(!s)return;
+  const trackInfo=TRACKS.find(t=>t.id===s.cat);
+  const dayLabel=EVENT_DAYS.find(d=>d.key===state.date)?.label||'';
+  const speakers=s.speakers.map(sid=>SPEAKERS[sid]);
+  const isLive=s.state==='live', isPast=s.state==='past';
+  const attendingCount = Math.floor(Math.random()*40)+30;
+
+  // badges row
+  let badgesHTML = '';
+  if(isLive) badgesHTML += `<span class="dp-badge live">EN VIVO</span>`;
+  badgesHTML += `<span class="dp-badge ${s.cat}">${trackInfo.name}</span>`;
+
+  // rated info
+  const ratedHTML = (isPast && s.rated) ? `
+    <div class="dp-rated">
+      <div class="dp-stars">${'★'.repeat(s.rated)}${'☆'.repeat(5-s.rated)}</div>
+      <span>Tu evaluacion</span>
+    </div>
+  ` : '';
+
+  // capacity row
+  const capacityHTML = s.capacity ? `
+    <div class="dp-meta-row">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      ${s.capacity} personas
+    </div>` : '';
+
+  // actions
+  let actionsCount = 1;
+  if(!isPast) actionsCount++;
+  if(isPast && !s.rated) actionsCount++;
+  const actionsClass = actionsCount===3 ? 'three' : '';
+
+  let actionsHTML = `<button class="dp-action fav ${s.fav?'active':''}" id="dpFav">
+    <svg viewBox="0 0 24 24" fill="${s.fav?'currentColor':'none'}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+    ${s.fav?'Guardada':'Favorita'}
+  </button>`;
+  if(!isPast){
+    actionsHTML += `<button class="dp-action">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg>
+      Calendario
+    </button>`;
+  }
+  if(isPast && !s.rated){
+    actionsHTML += `<button class="dp-action evaluate">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Evaluar
+    </button>`;
+  }
+
+  // stream
+  let streamHTML = '';
+  if(isLive){
+    streamHTML = `<button class="dp-stream">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      UNIRTE
+    </button>`;
+  } else if(isPast && s.recording){
+    streamHTML = `<button class="dp-stream glass">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Ver grabacion
+    </button>`;
+  }
+
+  dpBody.innerHTML = `
+    <div class="dp-badges">${badgesHTML}</div>
+    <h2 class="dp-title">${s.title}</h2>
+    ${ratedHTML}
+    <div class="dp-meta-card">
+      <div class="dp-meta-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+        ${dayLabel}
+      </div>
+      <div class="dp-meta-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        ${s.start} – ${s.end}
+      </div>
+      <div class="dp-meta-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        ${s.room}
+      </div>
+      ${capacityHTML}
+    </div>
+
+    <div class="dp-actions ${actionsClass}">${actionsHTML}</div>
+    ${streamHTML}
+
+    <div class="dp-section">Acerca de</div>
+    <div class="dp-about">${s.about}</div>
+
+    <div class="dp-section">Asistencia</div>
+    <div class="dp-attendees-card" id="dpAttendees">
+      <div class="dp-att-left">
+        <div class="avatar-stack dp-att-stack">
+          ${ATTENDEES.slice(0,4).map(a=>`<div class="avatar" style="background-image:url('${a.avatar}')"></div>`).join('')}
+        </div>
+        <div class="dp-att-text">
+          ${attendingCount} confirmados
+          <small>Ver quien va y conectar</small>
+        </div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </div>
+
+    <div class="dp-section">${speakers.length===1?'Speaker':'Speakers'}</div>
+    ${speakers.map(p=>`<div class="dp-speaker">
+      <div class="avatar" style="background-image:url('${p.avatar}')"></div>
+      <div class="dp-sp-info">
+        <p class="dp-sp-name">${p.name}</p>
+        <div class="dp-sp-role">${p.role} · ${p.org}</div>
+      </div>
+      <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </div>`).join('')}
+    <div class="dp-helper">Toca un speaker para ver su perfil</div>
+  `;
+  $('#dpFav').onclick=()=>{
+    const card=document.querySelector(`.sc-heart[data-fav="${id}"]`);
+    if(card)toggleFav(id,card);
+    else{
+      const wasFav = s.fav; s.fav=!s.fav; renderTabBtn(); renderDetail(id);
+      showToast(s.fav?'Guardado en Mi Agenda':'Eliminado de Mi Agenda', s.fav?'favorite':'info');
+    }
+  };
+  $('#dpAttendees').onclick=()=>openAttendees(id);
+  // detail action buttons (calendario, evaluar, unirme, ver grabacion)
+  $$('.dp-action').forEach(b => {
+    if(b.id==='dpFav') return;
+    b.onclick = () => {
+      const t = b.textContent.trim();
+      if(t.includes('Calendario')) showToast('Agregado a tu calendario', 'calendar');
+      else if(t.includes('Evaluar')) showToast('Modal de calificacion abriria aqui', 'info');
+    };
+  });
+  const stream = document.querySelector('.dp-stream');
+  if(stream) stream.onclick = () => {
+    const t = stream.textContent.trim();
+    if(t.includes('UNIRTE')) showToast('Abriendo stream en vivo...', 'success');
+    else if(t.includes('grabacion')) showToast('Cargando grabacion...', 'info');
+  };
+}
+
+function openAttendees(id){
+  $('#attList').innerHTML=ATTENDEES.map(a=>`<div class="att-item">
+    <div class="avatar" style="background-image:url('${a.avatar}')"></div>
+    <div class="att-info"><p class="att-name">${a.name}</p><div class="att-org">${a.org}</div></div>
+    <span class="att-cta">Conectar</span>
+  </div>`).join('');
+  state.attendeesOpen=true;
+  $('#attendeesPop').classList.add('open');
+}
+function closeAttendees(){state.attendeesOpen=false;$('#attendeesPop').classList.remove('open')}
+$('#attClose').onclick=closeAttendees;
+$('#attendeesPop').onclick=(e)=>{if(e.target.id==='attendeesPop')closeAttendees()};
+$('#dpClose').onclick=closePanel;
+
+/* TODAS al calendario (mi agenda) */
+$('#ctaTodas').onclick=()=>{
+  const items = visibleSessionsForDay().filter(s=>s.state!=='past');
+  if(items.length===0){
+    showToast('No hay sesiones pendientes', 'info');
+    return;
+  }
+  showToast(`${items.length} sesiones agregadas al calendario`, 'calendar');
+};
+
+/* TABS Agenda | Mi Agenda — si hay panel abierto, cerrar suave primero */
+$$('.ag-tab').forEach(t => {
+  t.onclick = () => {
+    if(state.tab === t.dataset.tab) return;
+    if(state.panelOpen){
+      closePanel();
+      setTimeout(()=>{
+        state.tab = t.dataset.tab;
+        renderList();
+      }, 260);
+    } else {
+      state.tab = t.dataset.tab;
+      renderList();
+    }
+  };
+});
+
+/* SEARCH */
+$('#searchBtn').onclick=()=>{
+  state.searchOpen=true;
+  $('#searchWrap').classList.add('open');
+  setTimeout(()=>$('#searchInput').focus(),50);
+};
+$('#searchInput').oninput=(e)=>{state.search=e.target.value;renderList()};
+$('#searchInput').addEventListener('blur',()=>{
+  if(!state.search){
+    state.searchOpen=false;
+    $('#searchWrap').classList.remove('open');
+  }
+});
+
+/* KEYBOARD */
+document.addEventListener('keydown',(e)=>{
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#searchBtn').click();return}
+  if(e.key==='Escape'){
+    if(state.attendeesOpen){closeAttendees();return}
+    if(state.panelOpen){closePanel();return}
+    if(state.searchOpen){$('#searchInput').value='';state.search='';$('#searchInput').blur();renderList()}
+    return;
+  }
+  if(!state.panelOpen)return;
+  if(!['ArrowDown','ArrowUp'].includes(e.key))return;
+  e.preventDefault();
+  const items=visibleSessionsForDay(); if(items.length===0)return;
+  const idx=items.findIndex(s=>s.id===state.selectedId); let next=idx;
+  if(e.key==='ArrowDown')next=idx<0?0:Math.min(items.length-1,idx+1);
+  if(e.key==='ArrowUp')next=idx<0?0:Math.max(0,idx-1);
+  if(items[next]){
+    openPanel(items[next].id);
+    const card=document.querySelector(`.sess-card[data-id="${items[next].id}"]`);
+    if(card){
+      const body=$('#agendaBody');
+      const r=card.getBoundingClientRect(), br=body.getBoundingClientRect();
+      if(r.top<br.top||r.bottom>br.bottom)card.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  }
+});
+
+/* THEME */
+const PRESETS={
+  lime:{c:'#7CFFB2',on:'#0a0a0a'},
+  amber:{c:'#F5C66C',on:'#0a0a0a'},
+  rose:{c:'#FF3D55',on:'#ffffff'},
+  violet:{c:'#A78BFA',on:'#0a0a0a'},
+  cyan:{c:'#22D3EE',on:'#0a0a0a'},
+};
+function hexToRgba(hex,a){const h=hex.replace('#','');const r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);return `rgba(${r},${g},${b},${a})`}
+function applyAccent(name){
+  const p=PRESETS[name]||PRESETS.lime;
+  const isLux = document.body.dataset.theme === 'lux';
+  const r=document.documentElement.style;
+  r.setProperty('--accent',p.c);
+  r.setProperty('--accent-on',p.on);
+  // En lux subimos opacity para que el accent-soft se vea sobre blanco
+  r.setProperty('--accent-soft',hexToRgba(p.c, isLux ? 0.16 : 0.10));
+  r.setProperty('--accent-glow',hexToRgba(p.c, isLux ? 0.32 : 0.22));
+}
+function getActiveAccent(){
+  const sw = document.querySelector('.swatch.active');
+  return sw ? sw.dataset.accent : 'lime';
+}
+$$('.swatch').forEach(sw=>{
+  sw.onclick=()=>{
+    $$('.swatch').forEach(x=>x.classList.remove('active'));
+    sw.classList.add('active');
+    applyAccent(sw.dataset.accent);
+  };
+});
+$$('#seg-mode button').forEach(b=>{
+  b.onclick=()=>{
+    $$('#seg-mode button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.body.dataset.theme=b.dataset.mode;
+    // Re-aplicar accent para que el accent-soft/glow se ajusten al nuevo modo
+    applyAccent(getActiveAccent());
+  };
+});
+
+renderDayStrip();
+renderChips();
+renderList();
+applyAccent('lime');
+</script>
+</body>
+</html>

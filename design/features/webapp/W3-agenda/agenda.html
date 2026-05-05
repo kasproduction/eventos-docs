@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Agenda — Spatial Shell W.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-sunken:#0a0a0a;
+    --bg-elevated:#141414;
+    --bg-raised:#1c1c1c;
+    --bg-overlay:#222222;
+    --border:rgba(255,255,255,0.08);
+    --border-strong:rgba(255,255,255,0.14);
+    --fg:#f5f5f4;
+    --fg-dim:#a8a8a3;
+    --fg-mute:#6b6b66;
+    /* === ACCENT del tema (per-evento). Se sobrescribe via JS / Tweaks === */
+    --accent:#7CFFB2;
+    --accent-soft:rgba(124,255,178,0.16);
+    --accent-glow:rgba(124,255,178,0.25);
+    --accent-shadow:rgba(124,255,178,0.6);
+    --accent-on:#0a0a0a;       /* texto sobre accent */
+    --indigo:#7C7CFF;
+    --indigo-dim:rgba(124,124,255,0.16);
+    --emerald:#34d399;
+    --rose:#ff5d6c;
+    --gold:#f5c66c;
+    --canvas-card-shadow: 0 30px 80px -20px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.04) inset;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg-sunken);color:var(--fg);font-family:'Urbanist',system-ui,sans-serif;overflow:hidden;height:100%}
+  body{
+    background:
+      radial-gradient(1200px 700px at 20% 10%, rgba(124,255,178,0.05), transparent 60%),
+      radial-gradient(900px 600px at 90% 90%, rgba(124,124,255,0.04), transparent 60%),
+      var(--bg-sunken);
+  }
+  .stage{
+    min-height:100vh; width:100%;
+    display:flex;align-items:center;justify-content:center;
+    padding:28px 36px 28px 96px;
+  }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar{
+    position:fixed; left:18px; top:50%; transform:translateY(-50%);
+    width:52px; padding:10px 6px;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    background:rgba(20,20,20,0.85);
+    border:1px solid var(--border);
+    border-radius:28px;
+    backdrop-filter:blur(20px);
+    box-shadow: 0 20px 50px -10px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.04) inset;
+    z-index:50;
+  }
+  .sb-item{
+    width:40px;height:40px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--fg-mute); cursor:pointer; position:relative;
+    transition:all .2s ease;
+  }
+  .sb-item:hover{color:var(--fg);background:rgba(255,255,255,0.04)}
+  .sb-item.active{color:var(--fg);background:rgba(255,255,255,0.06)}
+  .sb-item.active::before{
+    content:""; position:absolute; left:-9px; top:50%; transform:translateY(-50%);
+    width:3px; height:18px; border-radius:2px; background:var(--accent);
+    box-shadow:0 0 12px var(--accent-shadow);
+  }
+  .sb-logo{
+    width:36px;height:36px;border-radius:10px;
+    background:linear-gradient(135deg,#fff,#cfcfcf);
+    color:#0a0a0a;font-weight:800;font-family:'Plus Jakarta Sans';font-size:15px;
+    display:flex;align-items:center;justify-content:center;margin-bottom:4px;
+  }
+  .sb-sep{width:24px;height:1px;background:var(--border);margin:4px 0}
+  .sb-badge{
+    position:absolute;top:6px;right:6px;
+    width:8px;height:8px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 0 2px var(--bg-elevated), 0 0 8px var(--accent-shadow);
+  }
+  .sb-live{
+    position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;
+    background:var(--accent); box-shadow:0 0 0 3px var(--accent-glow);
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.6}}
+
+  /* ============ CARD RAIZ ============ */
+  .card{
+    width: min(1600px, calc(100vw - 150px), calc((100vh - 80px) * 16 / 9));
+    aspect-ratio: 16/9;
+    border-radius:26px;
+    background:
+      radial-gradient(800px 500px at 20% 20%, color-mix(in oklab, var(--accent) 6%, transparent), transparent 65%),
+      radial-gradient(700px 500px at 80% 90%, rgba(124,124,255,0.04), transparent 60%),
+      var(--bg-elevated);
+    border:1px solid var(--border);
+    box-shadow:var(--canvas-card-shadow);
+    overflow:hidden;
+    position:relative;
+    display:block;
+  }
+
+  /* ============ MODULE STAGE (escenario dentro del card) ============ */
+  .module-stage{
+    position:absolute; inset:0;
+    display:grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(14px, 1.4vw, 22px);
+    padding: clamp(16px, 1.6vw, 26px);
+    align-items:stretch;
+  }
+
+  /* When detail is closed, agenda lives left, right side is empty (with hint) */
+  .module-stage.solo{
+    grid-template-columns: minmax(0, min(540px, 42%)) 1fr;
+  }
+  .module-stage.solo .empty-hint{
+    display:flex; align-items:center; justify-content:center;
+    color:var(--fg-mute); font-size:13px; letter-spacing:0.04em;
+    flex-direction:column; gap:14px; text-align:center; padding:40px;
+    opacity:.6;
+  }
+  .module-stage.solo .empty-hint .glyph{
+    width:60px;height:60px;border-radius:18px;
+    border:1.5px dashed var(--border-strong);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .module-stage:not(.solo) .empty-hint{display:none}
+
+  .module-card{
+    background:var(--bg-elevated);
+    border:1px solid var(--border);
+    border-radius:22px;
+    overflow:hidden;
+    display:flex; flex-direction:column;
+    min-height:0; min-width:0;
+    box-shadow: 0 16px 40px -16px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.04) inset;
+  }
+  body[data-theme="lux"] .module-card{
+    background:#ffffff;
+    box-shadow: 0 16px 40px -16px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.6) inset;
+  }
+
+  /* ============ AGENDA LAYOUT ============ */
+  .agenda-root{
+    flex:1; display:flex; flex-direction:column;
+    min-width:0; min-height:0; position:relative;
+  }
+  .agenda-header{
+    padding: clamp(16px, 1.6vw, 24px) clamp(18px, 1.8vw, 26px) 0;
+    display:flex; flex-direction:column; gap: clamp(10px, 1.1vw, 16px);
+  }
+  .agenda-toprow{
+    display:flex; align-items:flex-end; justify-content:space-between; gap:24px;
+  }
+  .agenda-title{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-weight:800; letter-spacing:-0.02em;
+    font-size:clamp(22px, 1.8vw, 30px); line-height:1; margin:0;
+  }
+  .agenda-sub{ color:var(--fg-dim); font-size:clamp(11px, 0.8vw, 13px); margin-top:5px; letter-spacing:0.01em }
+  .agenda-tabs{
+    display:flex; gap:4px; padding:4px; border-radius:14px;
+    background:var(--bg-raised); border:1px solid var(--border);
+  }
+  .agenda-tab{
+    padding:8px 16px; font-size:13px; font-weight:600; color:var(--fg-dim);
+    background:transparent; border:none; border-radius:10px; cursor:pointer;
+    font-family:'Urbanist',sans-serif; letter-spacing:0.01em;
+    transition:all .2s ease; display:flex; align-items:center; gap:8px;
+  }
+  .agenda-tab:hover{color:var(--fg)}
+  .agenda-tab.active{ background:var(--fg); color:#0a0a0a }
+  .tab-count{
+    font-size:11px; padding:2px 7px; border-radius:99px; font-weight:700;
+    background:rgba(255,255,255,0.06); color:var(--fg-dim);
+  }
+  .agenda-tab.active .tab-count{ background:rgba(0,0,0,0.12); color:#0a0a0a }
+
+  /* ============ DATE STRIP ============ */
+  .date-strip{
+    display:flex; gap:10px; align-items:center; flex-wrap:nowrap;
+  }
+  .date-pill{
+    flex:0 0 auto;
+    width:50px; height:62px; border-radius:18px;
+    background:var(--bg-raised); border:1px solid var(--border);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer; position:relative; overflow:hidden;
+    transition:all .25s ease; color:var(--fg-mute);
+    font-family:'Plus Jakarta Sans';
+  }
+  .date-pill .dp-dow{ font-size:9px; font-weight:700; letter-spacing:0.12em; opacity:.7 }
+  .date-pill .dp-day{ font-size:19px; font-weight:800; margin-top:1px; color:var(--fg-dim) }
+  .date-pill:hover{ border-color:var(--border-strong); color:var(--fg) }
+  .date-pill:hover .dp-day{color:var(--fg)}
+  .date-pill.has-events::after{
+    content:""; position:absolute; bottom:8px; width:5px; height:5px; border-radius:50%; background:var(--accent); opacity:.85;
+  }
+  .date-pill.active{
+    background:var(--accent); border-color:transparent; color:var(--accent-on);
+    box-shadow:0 8px 22px -6px var(--accent-shadow);
+  }
+  .date-pill.active .dp-dow{opacity:1}
+  .date-pill.active .dp-day{color:var(--accent-on)}
+  .date-pill.active::after{background:var(--accent-on); opacity:.45}
+
+  .date-actions{
+    margin-left:auto; display:flex; gap:8px; align-items:center;
+  }
+  .date-btn{
+    width:34px;height:34px;border-radius:11px;
+    background:var(--bg-raised); border:1px solid var(--border); color:var(--fg-dim);
+    display:flex;align-items:center;justify-content:center;cursor:pointer; transition:all .2s ease;
+  }
+  .date-btn:hover{color:var(--fg);border-color:var(--border-strong)}
+  .gear-btn{
+    width:38px;height:38px;border-radius:50%;
+    background:var(--accent); color:var(--accent-on); border:none;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    box-shadow:0 6px 18px -4px var(--accent-shadow);
+    transition:all .25s ease;
+  }
+  .gear-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 22px -4px var(--accent-shadow); }
+
+  /* filter chips */
+  .chip-row{
+    display:flex; gap:8px; flex-wrap:nowrap; overflow-x:auto;
+    padding-bottom:2px; scrollbar-width:none;
+  }
+  .chip-row::-webkit-scrollbar{display:none}
+  .chip{
+    flex:0 0 auto;
+    padding:7px 14px; font-size:12.5px; font-weight:600;
+    border-radius:99px; background:var(--bg-raised); border:1px solid var(--border);
+    color:var(--fg-dim); cursor:pointer; display:flex; align-items:center; gap:7px;
+    font-family:'Urbanist'; transition:all .2s ease;
+  }
+  .chip:hover{color:var(--fg);border-color:var(--border-strong)}
+  .chip.active{ background:var(--fg); color:#0a0a0a; border-color:transparent }
+  .chip-dot{ width:6px;height:6px;border-radius:50%; }
+
+  /* ============ TIMELINE LIST ============ */
+  .agenda-body{
+    flex:1; min-height:0; padding: clamp(12px,1.2vw,18px) clamp(18px,1.8vw,26px) clamp(16px,1.6vw,24px);
+    overflow-y:auto; overflow-x:hidden;
+    scroll-behavior:smooth;
+  }
+  .agenda-body::-webkit-scrollbar{width:6px}
+  .agenda-body::-webkit-scrollbar-track{background:transparent}
+  .agenda-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+
+  .timeline-item{
+    display:grid; grid-template-columns: 64px 1fr; gap:12px;
+    padding:5px 0;
+  }
+  .ti-time{
+    padding-top:16px;
+    color:var(--fg-mute); font-size:11.5px; font-family:'JetBrains Mono'; letter-spacing:-0.02em;
+    position:relative;
+  }
+  .ti-time .dot{
+    position:absolute; right:-3px; top:24px;
+    width:8px;height:8px;border-radius:50%; background:var(--fg-mute);
+  }
+  .timeline-item.live .ti-time{color:var(--accent)}
+  .timeline-item.live .ti-time .dot{
+    background:var(--accent); box-shadow:0 0 0 3px var(--accent-glow);
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  .timeline-item.past .ti-time{color:var(--fg-mute);opacity:.6}
+  .timeline-item.past .ti-time .dot{background:var(--fg-mute);opacity:.5}
+
+  .session-card{
+    background:var(--bg-raised); border:1px solid var(--border);
+    border-radius:18px; padding:14px 16px;
+    cursor:pointer; transition:all .25s cubic-bezier(.2,.8,.2,1);
+    position:relative;
+  }
+  .session-card:hover{
+    background:#212121; border-color:var(--border-strong);
+    transform:translateX(2px);
+  }
+  .session-card.selected{
+    background:#262626; border-color:var(--accent-glow);
+    box-shadow:0 0 0 1px var(--accent-glow), 0 12px 30px -10px rgba(0,0,0,0.5);
+  }
+  .timeline-item.past .session-card{ opacity:0.55 }
+  .timeline-item.past .session-card .sc-title{ text-decoration:line-through; text-decoration-thickness:1px; text-decoration-color:rgba(255,255,255,0.4) }
+
+  .sc-row1{ display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap }
+  .sc-tag{
+    font-size:11px; font-weight:700; padding:4px 10px; border-radius:99px;
+    letter-spacing:0.04em; display:inline-flex; align-items:center; gap:6px;
+    font-family:'Urbanist';
+  }
+  .sc-tag.tech{ background:rgba(124,124,255,0.16); color:#a8a8ff }
+  .sc-tag.business{ background:rgba(52,211,153,0.16); color:#5eead4 }
+  .sc-tag.innovation{ background:rgba(245,198,108,0.16); color:#f5c66c }
+  .sc-tag.leadership{ background:rgba(255,93,108,0.16); color:#ff8a96 }
+  .sc-tag.live{ background:var(--accent-soft); color:var(--accent) }
+  .sc-tag.live::before{
+    content:""; width:6px;height:6px;border-radius:50%;background:var(--accent);
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  .sc-checkmark{
+    width:18px;height:18px;border-radius:50%; border:1.5px solid var(--fg-mute);
+    display:inline-flex;align-items:center;justify-content:center; flex-shrink:0;
+  }
+  .timeline-item.past .sc-checkmark{ border-color:var(--accent); background:var(--accent) }
+  .timeline-item.past .sc-checkmark svg{ stroke:var(--accent-on) }
+
+  .sc-title{
+    font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14.5px; line-height:1.3;
+    margin:0 0 8px 0; letter-spacing:-0.01em;
+  }
+  .sc-meta{ display:flex; align-items:center; gap:6px; color:var(--fg-dim); font-size:12px; margin:5px 0 }
+  .sc-meta svg{ flex-shrink:0; opacity:.8 }
+
+  .sc-speakers{ display:flex; align-items:center; gap:10px; margin-top:8px }
+  .avatar-stack{ display:flex; }
+  .avatar{
+    width:24px;height:24px;border-radius:50%;
+    border:2px solid var(--bg-raised); margin-left:-7px;
+    background-size:cover;background-position:center;
+    flex-shrink:0;
+  }
+  .avatar:first-child{margin-left:0}
+  .session-card.selected .avatar{ border-color:#262626 }
+  .sc-speakers-text{ color:var(--fg-dim); font-size:12px; }
+
+  .sc-actions{ display:flex; align-items:center; gap:10px; margin-top:14px }
+  .sc-btn{
+    padding:8px 14px; border-radius:99px; font-size:12.5px; font-weight:600;
+    background:rgba(245,198,108,0.10); color:var(--gold);
+    border:none; cursor:pointer; display:inline-flex; align-items:center; gap:7px;
+    font-family:'Urbanist'; transition:all .2s ease;
+  }
+  .sc-btn:hover{ background:rgba(245,198,108,0.18) }
+  .sc-btn.cal{ background:rgba(255,255,255,0.06); color:var(--fg) }
+  .sc-btn.cal:hover{ background:rgba(255,255,255,0.10) }
+
+  .sc-fav{
+    position:absolute; top:18px; right:18px;
+    width:32px;height:32px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer; transition:all .2s ease;
+    background:transparent; border:none; color:var(--fg-mute);
+  }
+  .sc-fav:hover{ background:rgba(255,255,255,0.06); color:var(--fg) }
+  .sc-fav.active{ color:var(--rose) }
+
+  /* description preview for live cards */
+  .sc-desc{
+    color:var(--fg-dim); font-size:13.5px; line-height:1.5; margin:0 0 8px;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+
+  /* ============ DETAIL PANEL (module-card) ============ */
+  .detail-panel{
+    display:flex; flex-direction:column;
+    min-height:0; min-width:0;
+    opacity:0; transform: translateX(40px) scale(.98);
+    transition: opacity .35s ease, transform .42s cubic-bezier(.2,.8,.2,1);
+    pointer-events:none;
+  }
+  .detail-panel.open{ opacity:1; transform:translateX(0) scale(1); pointer-events:auto }
+
+  .dp-header{
+    display:flex; align-items:center; gap:10px;
+    padding: clamp(14px,1.4vw,20px) clamp(16px,1.6vw,22px) 10px;
+    border-bottom:1px solid var(--border);
+  }
+  .dp-back{
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(255,255,255,0.06); border:none; cursor:pointer;
+    display:flex;align-items:center;justify-content:center; color:var(--fg);
+    transition:all .2s ease;
+  }
+  .dp-back:hover{ background:rgba(255,255,255,0.10) }
+  .dp-headtitle{ font-size:14px; color:var(--fg-dim); flex:1; text-align:center; letter-spacing:0.04em }
+  .dp-headspace{ width:36px }
+
+  .dp-body{
+    flex:1; overflow-y:auto;
+    padding: clamp(14px,1.5vw,22px) clamp(16px,1.6vw,22px);
+  }
+  .dp-body::-webkit-scrollbar{width:6px}
+  .dp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+
+  .dp-tag{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:99px;
+    background:rgba(124,124,255,0.16); color:#a8a8ff;
+    font-size:12px; font-weight:700;
+  }
+  .dp-tag .dot{ width:6px;height:6px;border-radius:50%;background:#a8a8ff }
+  .dp-title{
+    font-family:'Plus Jakarta Sans'; font-weight:800;
+    font-size:clamp(20px, 1.8vw, 28px); line-height:1.1; letter-spacing:-0.02em;
+    margin:12px 0 14px;
+  }
+
+  .dp-meta-card{
+    background:var(--bg-raised); border:1px solid var(--border);
+    border-radius:14px; padding:14px 16px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .dp-meta-row{ display:flex; align-items:center; gap:10px; color:var(--fg); font-size:13px }
+  .dp-meta-row svg{ color:var(--fg-mute); flex-shrink:0 }
+
+  .dp-action-row{
+    display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:14px;
+  }
+  .dp-action{
+    padding:11px; border-radius:13px;
+    background:var(--bg-raised); border:1px solid var(--border);
+    color:var(--fg); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    font-family:'Urbanist'; font-weight:600; font-size:13px;
+    transition:all .2s ease;
+  }
+  .dp-action:hover{ border-color:var(--border-strong); background:#222 }
+  .dp-action.fav.active{
+    background:rgba(255,93,108,0.10); border-color:rgba(255,93,108,0.35);
+    color:var(--rose);
+  }
+  .dp-action.fav.active svg{ fill:var(--rose); stroke:var(--rose) }
+
+  .dp-section-title{
+    text-transform:uppercase; letter-spacing:0.14em;
+    font-size:10.5px; font-weight:700; color:var(--fg-mute);
+    margin:18px 0 8px;
+  }
+  .dp-about{
+    background:var(--bg-raised); border:1px solid var(--border);
+    border-radius:13px; padding:13px 15px;
+    color:var(--fg-dim); line-height:1.5; font-size:13px;
+  }
+
+  .dp-speaker-row{
+    display:flex; align-items:center; gap:12px;
+    padding:10px 12px;
+    background:var(--bg-raised); border:1px solid var(--border);
+    border-radius:13px; margin-bottom:6px; cursor:pointer;
+    transition:all .2s ease;
+  }
+  .dp-speaker-row:hover{ background:#212121; border-color:var(--border-strong) }
+  .dp-speaker-row .avatar{ width:38px;height:38px; margin:0; border:none; flex-shrink:0 }
+  .dp-speaker-info{ flex:1; min-width:0 }
+  .dp-speaker-name{ font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13.5px; margin:0 }
+  .dp-speaker-role{ color:var(--fg-dim); font-size:11.5px; margin-top:2px }
+  .dp-speaker-row svg.chev{ color:var(--fg-mute); flex-shrink:0 }
+
+  /* Empty state for Mi Agenda */
+  .empty-state{
+    flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column;
+    text-align:center; padding:40px; color:var(--fg-dim);
+  }
+  .empty-state h3{ font-family:'Plus Jakarta Sans'; font-weight:700; color:var(--fg); margin:8px 0 6px; font-size:18px }
+  .empty-state p{ font-size:13px; max-width:300px; line-height:1.5; margin:0 }
+
+  /* ============ TWEAKS toggle hint ============ */
+  .hint{
+    position:fixed; bottom:14px; left:50%; transform:translateX(-50%);
+    font-family:'JetBrains Mono'; font-size:11px; color:var(--fg-mute);
+    letter-spacing:0.04em; pointer-events:none; z-index:1;
+  }
+  .hint kbd{
+    background:var(--bg-raised); padding:2px 6px; border-radius:4px;
+    border:1px solid var(--border); color:var(--fg-dim);
+  }
+
+  /* Theme: Lux (light) */
+  body[data-theme="lux"]{
+    background:
+      radial-gradient(1200px 700px at 20% 10%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 60%),
+      #f4f3ee;
+  }
+  body[data-theme="lux"]{
+    --bg-sunken:#f4f3ee;
+    --bg-elevated:#ffffff;
+    --bg-raised:#f7f6f1;
+    --bg-overlay:#eeede7;
+    --border:rgba(0,0,0,0.08);
+    --border-strong:rgba(0,0,0,0.16);
+    --fg:#0d0d0c;
+    --fg-dim:#5a5a55;
+    --fg-mute:#9b9b95;
+    --canvas-card-shadow: 0 30px 80px -20px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.6) inset;
+  }
+  body[data-theme="lux"] .session-card:hover{ background:#f0eee6 }
+  body[data-theme="lux"] .session-card.selected{ background:#f0eee6 }
+  body[data-theme="lux"] .dp-speaker-row:hover{ background:#f0eee6 }
+
+  /* fade transition for switching session content */
+  .dp-content-wrap{
+    transition: opacity .18s ease, transform .22s ease;
+  }
+  .dp-content-wrap.swap-out{ opacity:0; transform:translateX(-12px) }
+  .dp-content-wrap.swap-in{ opacity:0; transform:translateX(12px) }
+</style>
+</head>
+<body>
+<div class="stage" id="stage" data-screen-label="01 Agenda">
+  <aside class="sidebar" aria-label="Navegación">
+    <div class="sb-logo">E</div>
+    <div class="sb-item" title="Inicio">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+    </div>
+    <div class="sb-item active" title="Agenda">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+    </div>
+    <div class="sb-item" title="En vivo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M5 12a7 7 0 0114 0M2 12a10 10 0 0120 0"/></svg>
+      <span class="sb-live"></span>
+    </div>
+    <div class="sb-item" title="Speakers">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+    </div>
+    <div class="sb-item" title="Networking">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-1 4 8.5 8.5 0 01-7.5 4.5 8.4 8.4 0 01-4-1L3 21l2-5a8.4 8.4 0 01-1-4 8.5 8.5 0 014.5-7.5 8.4 8.4 0 014-1h.5a8.5 8.5 0 018 8z"/></svg>
+      <span class="sb-badge"></span>
+    </div>
+    <div class="sb-item" title="Sponsors">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-8h6v8"/></svg>
+    </div>
+    <div class="sb-sep"></div>
+    <div class="sb-item" title="Notificaciones">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+      <span class="sb-badge"></span>
+    </div>
+    <div class="sb-item" title="Mi perfil" style="margin-top:auto">
+      <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent));filter:saturate(.85)"></div>
+    </div>
+  </aside>
+
+  <div class="card" id="card">
+    <div class="module-stage solo" id="moduleStage">
+      <div class="module-card agenda-root">
+      <header class="agenda-header">
+        <div class="agenda-toprow">
+          <div>
+            <h1 class="agenda-title" id="title">Agenda</h1>
+            <div class="agenda-sub" id="subtitle">jueves, 23 de abril</div>
+          </div>
+          <div class="agenda-tabs">
+            <button class="agenda-tab active" data-tab="all" id="tab-all">
+              Todas <span class="tab-count" id="cnt-all">12</span>
+            </button>
+            <button class="agenda-tab" data-tab="mine" id="tab-mine">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-7-10a4.5 4.5 0 018-3 4.5 4.5 0 018 3c0 5.5-7 10-7 10h-2z"/></svg>
+              Mi Agenda <span class="tab-count" id="cnt-mine">2</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="date-strip" id="dateStrip"></div>
+
+        <div class="chip-row" id="chipRow">
+          <button class="chip active" data-cat="all">Todos</button>
+          <button class="chip" data-cat="tech"><span class="chip-dot" style="background:#a8a8ff"></span>Tecnología</button>
+          <button class="chip" data-cat="business"><span class="chip-dot" style="background:#5eead4"></span>Negocios</button>
+          <button class="chip" data-cat="innovation"><span class="chip-dot" style="background:#f5c66c"></span>Innovación</button>
+          <button class="chip" data-cat="leadership"><span class="chip-dot" style="background:#ff8a96"></span>Liderazgo</button>
+        </div>
+      </header>
+
+      <div class="agenda-body" id="agendaBody"></div>
+      </div>
+
+    <!-- Detail Panel as second module-card -->
+    <aside class="module-card detail-panel" id="detailPanel">
+      <header class="dp-header">
+        <button class="dp-back" id="dpClose" aria-label="Cerrar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="dp-headtitle">Sesión</div>
+        <div class="dp-headspace"></div>
+      </header>
+      <div class="dp-body" id="dpBody"></div>
+    </aside>
+
+    <!-- Empty hint (shown when no session selected) -->
+    <div class="empty-hint" id="emptyHint">
+      <div class="glyph">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.6">
+          <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>
+        </svg>
+      </div>
+      <div>Selecciona una sesión<br/><span style="font-size:11px;opacity:.7">para ver el detalle aquí</span></div>
+    </div>
+    </div>
+  </div>
+
+  <div class="hint">click en una sesión · <kbd>Esc</kbd> cerrar · <kbd>↑↓</kbd> navegar</div>
+</div>
+
+<!-- React + Babel for Tweaks panel -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel">
+  const { useEffect } = React;
+
+  function AppTweaks(){
+    const [tweaks, setTweak] = useTweaks({
+      preset: THEMES.preset,
+      mode: THEMES.mode,
+    });
+
+    useEffect(()=>{
+      THEMES.preset = tweaks.preset;
+      THEMES.mode = tweaks.mode;
+      applyTheme();
+    }, [tweaks.preset, tweaks.mode]);
+
+    return (
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Tema del evento" description="El accent es propio del evento. Cambia el preset y todos los componentes (live dot, fechas, glow, sidebar) se reactualizan.">
+          <TweakRadio
+            label="Modo"
+            value={tweaks.mode}
+            onChange={(v)=>setTweak('mode', v)}
+            options={[
+              { value:'noir', label:'Noir' },
+              { value:'lux',  label:'Lux' },
+            ]}
+          />
+          <TweakSelect
+            label="Accent"
+            value={tweaks.preset}
+            onChange={(v)=>setTweak('preset', v)}
+            options={Object.entries(PRESETS).map(([k,v])=>({ value:k, label:v.label }))}
+          />
+          <div style={{display:'flex',gap:6,flexWrap:'wrap',marginTop:8}}>
+            {Object.entries(PRESETS).map(([k,v])=>(
+              <button
+                key={k}
+                onClick={()=>setTweak('preset', k)}
+                title={v.label}
+                style={{
+                  width:28,height:28,borderRadius:'50%',
+                  background:v.accent,
+                  border: tweaks.preset===k ? '2px solid #fff' : '2px solid rgba(255,255,255,0.1)',
+                  cursor:'pointer', padding:0,
+                  boxShadow: tweaks.preset===k ? `0 0 0 2px ${v.accent}55` : 'none',
+                }}
+              />
+            ))}
+          </div>
+        </TweakSection>
+      </TweaksPanel>
+    );
+  }
+
+  const tweakRoot = document.createElement('div');
+  document.body.appendChild(tweakRoot);
+  ReactDOM.createRoot(tweakRoot).render(<AppTweaks />);
+</script>
+
+<script>
+/* ---------- DATA ---------- */
+const WEEK = [
+  { dow:'MAR', day:21, label:'martes, 21 de abril', has:false },
+  { dow:'MIÉ', day:22, label:'miércoles, 22 de abril', has:true },
+  { dow:'JUE', day:23, label:'jueves, 23 de abril', has:true },
+  { dow:'VIE', day:24, label:'viernes, 24 de abril', has:true },
+  { dow:'SÁB', day:25, label:'sábado, 25 de abril', has:false },
+];
+
+const SPEAKERS = {
+  andres:{name:'Andrés Gil', role:'Senior Engineer · Mercado Libre', avatar:'https://i.pravatar.cc/100?img=12'},
+  maria:{name:'María García', role:'CTO · Rappi', avatar:'https://i.pravatar.cc/100?img=47'},
+  dmitri:{name:'Dmitri Volkov', role:'VP Engineering · Globant', avatar:'https://i.pravatar.cc/100?img=33'},
+  sofia:{name:'Sofía Restrepo', role:'Product Director · Nubank', avatar:'https://i.pravatar.cc/100?img=45'},
+  laura:{name:'Laura Díaz', role:'Growth Lead · Bold', avatar:'https://i.pravatar.cc/100?img=49'},
+  marcus:{name:'Marcus Johnson', role:'Founder · Y Combinator W22', avatar:'https://i.pravatar.cc/100?img=14'},
+  felipe:{name:'Felipe Torres', role:'Engineering Lead · Mercado Libre', avatar:'https://i.pravatar.cc/100?img=11'},
+  james:{name:'James Wilson', role:'General Partner · Horizon Ventures', avatar:'https://i.pravatar.cc/100?img=15'},
+  emma:{name:'Emma Thompson', role:'Head of Design · Spotify', avatar:'https://i.pravatar.cc/100?img=44'},
+  natasha:{name:'Natasha Kozlova', role:'ML Engineer · Anthropic', avatar:'https://i.pravatar.cc/100?img=48'},
+};
+
+const SESSIONS = [
+  { id:'s1', time:'9:00 a. m.', timeEnd:'10:00 a. m.', state:'past',
+    cat:'tech', title:'Mobile-first: React Native a fondo',
+    room:'Sala A', speakers:['andres'], evaluable:true, fav:false,
+    about:'Patrones avanzados para apps móviles que se sienten nativas. Animations API, gesture handlers, navigation stacks y performance profiling con Hermes.'
+  },
+  { id:'s2', time:'9:30 a. m.', timeEnd:'10:30 a. m.', state:'past',
+    cat:'business', title:'Panel: IA en la empresa moderna',
+    room:'Auditorio Principal', speakers:['maria','dmitri','sofia'], evaluable:true, fav:false,
+    about:'Líderes de tecnología de Latam discuten cómo están integrando IA generativa en operaciones, producto y soporte. Casos reales, costos y aprendizajes.'
+  },
+  { id:'s3', time:'10:30 a. m.', timeEnd:'11:30 a. m.', state:'live',
+    cat:'innovation', title:'Growth Hacking: métricas que importan',
+    room:'Sala B', speakers:['laura','marcus'], live:true, fav:false,
+    about:'Más allá de vanity metrics: cómo medir y optimizar crecimiento real con product-led growth. North star, activation funnels y experimentación.'
+  },
+  { id:'s4', time:'11:30 a. m.', timeEnd:'12:30 p. m.', state:'upcoming',
+    cat:'leadership', title:'Women in Tech Leadership',
+    room:'Auditorio Principal', speakers:['maria','emma'], fav:true,
+    about:'Conversación honesta sobre liderazgo, sponsorship y cómo construir equipos donde todas las voces se escuchan. Historias de carrera y consejos prácticos.'
+  },
+  { id:'s5', time:'12:30 p. m.', timeEnd:'1:30 p. m.', state:'upcoming',
+    cat:'tech', title:'Blockchain & Web3: reality check',
+    room:'Sala A', speakers:['felipe','james'], fav:false,
+    about:'Qué proyectos Web3 generan valor real y cuáles son humo. Smart contracts, DeFi y tokenización con casos concretos del mercado latinoamericano.'
+  },
+  { id:'s6', time:'2:00 p. m.', timeEnd:'3:00 p. m.', state:'upcoming',
+    cat:'tech', title:'ML in Production: pipelines that actually work',
+    room:'Sala A', speakers:['dmitri','natasha'], fav:true,
+    about:'De notebook a producción: feature stores, model registries, monitoring de drift y rollouts seguros. Lo que nadie te cuenta hasta que rompes algo.'
+  },
+  { id:'s7', time:'3:30 p. m.', timeEnd:'4:30 p. m.', state:'upcoming',
+    cat:'innovation', title:'Diseño espacial: del móvil al inmersivo',
+    room:'Sala B', speakers:['emma','sofia'], fav:false,
+    about:'Principios de UX que sobreviven el salto de pantallas planas a interfaces espaciales. Jerarquía, profundidad y cómo no perder al usuario en el espacio.'
+  },
+  { id:'s8', time:'5:00 p. m.', timeEnd:'6:00 p. m.', state:'upcoming',
+    cat:'business', title:'Fundraising en Latam 2026',
+    room:'Auditorio Principal', speakers:['marcus','james'], fav:false,
+    about:'El estado real del venture capital en la región. Series A, B y por qué los founders están volviendo a fundamentals: revenue, retention, profitability.'
+  },
+];
+
+/* ---------- STATE ---------- */
+const state = {
+  tab:'all',         // all | mine
+  cat:'all',
+  date:23,
+  selectedId:null,
+};
+
+/* ---------- HELPERS ---------- */
+function escIcon(name){
+  const icons = {
+    location:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>',
+    star:'<path d="M12 17.27l5.18 3.13-1.37-5.9 4.55-3.95-5.99-.51L12 4.5 9.63 10.04 3.64 10.55l4.55 3.95-1.37 5.9z"/>',
+    chev:'<path d="M9 6l6 6-6 6"/>',
+    heart:'<path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>',
+    check:'<path d="M5 12l5 5L20 7"/>',
+  };
+  return icons[name] || '';
+}
+
+function visibleSessions(){
+  return SESSIONS.filter(s=>{
+    if(state.tab==='mine' && !s.fav) return false;
+    if(state.cat!=='all' && s.cat !== state.cat) return false;
+    return true;
+  });
+}
+
+/* ---------- RENDER ---------- */
+function renderDateStrip(){
+  const el = document.getElementById('dateStrip');
+  el.innerHTML = WEEK.map(w => `
+    <div class="date-pill ${w.has?'has-events':''} ${w.day===state.date?'active':''}" data-day="${w.day}" data-label="${w.label}">
+      <div class="dp-dow">${w.dow}</div>
+      <div class="dp-day">${w.day}</div>
+    </div>
+  `).join('') + `
+    <div class="date-actions">
+      <button class="date-btn" title="Semana anterior" aria-label="Semana anterior"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button class="date-btn" title="Semana siguiente" aria-label="Semana siguiente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="gear-btn" title="Filtros" aria-label="Filtros"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82 1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
+    </div>
+  `;
+  el.querySelectorAll('.date-pill').forEach(p=>{
+    p.onclick = ()=>{
+      const d = +p.dataset.day; if(!WEEK.find(w=>w.day===d).has){
+        // wiggle
+        p.animate([{transform:'translateX(0)'},{transform:'translateX(-3px)'},{transform:'translateX(3px)'},{transform:'translateX(0)'}],{duration:240});
+        return;
+      }
+      state.date = d;
+      document.getElementById('subtitle').textContent = p.dataset.label;
+      renderDateStrip();
+      // close panel if open
+      closePanel();
+    };
+  });
+}
+
+function renderChips(){
+  document.querySelectorAll('.chip').forEach(c=>{
+    c.classList.toggle('active', c.dataset.cat === state.cat);
+    c.onclick = ()=>{
+      state.cat = c.dataset.cat;
+      renderChips();
+      renderList();
+    };
+  });
+}
+
+function renderTabs(){
+  document.getElementById('cnt-all').textContent = SESSIONS.length;
+  document.getElementById('cnt-mine').textContent = SESSIONS.filter(s=>s.fav).length;
+  document.querySelectorAll('.agenda-tab').forEach(t=>{
+    t.classList.toggle('active', t.dataset.tab === state.tab);
+    t.onclick = ()=>{
+      state.tab = t.dataset.tab;
+      // titles
+      document.getElementById('title').textContent = state.tab==='mine' ? 'Mi Agenda' : 'Agenda';
+      renderTabs();
+      renderList();
+    };
+  });
+}
+
+function renderList(){
+  const body = document.getElementById('agendaBody');
+  const items = visibleSessions();
+  if(items.length === 0){
+    body.innerHTML = `<div class="empty-state">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.4">
+        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+      </svg>
+      <h3>${state.tab==='mine' ? 'Aún no tienes favoritas' : 'Sin sesiones'}</h3>
+      <p>${state.tab==='mine' ? 'Toca el corazón en cualquier sesión para guardarla aquí y armar tu agenda personalizada.' : 'Prueba con otra fecha o cambia los filtros.'}</p>
+    </div>`;
+    return;
+  }
+  body.innerHTML = items.map(s => sessionCardHTML(s)).join('');
+  body.querySelectorAll('.session-card').forEach(c=>{
+    c.onclick = (e)=>{
+      if(e.target.closest('.sc-fav') || e.target.closest('.sc-btn')) return;
+      openPanel(c.dataset.id);
+    };
+  });
+  body.querySelectorAll('.sc-fav').forEach(b=>{
+    b.onclick = (e)=>{
+      e.stopPropagation();
+      const id = b.dataset.id;
+      const s = SESSIONS.find(x=>x.id===id);
+      s.fav = !s.fav;
+      renderTabs();
+      renderList();
+      // refresh panel header if showing this one
+      if(state.selectedId===id) renderDetail(id);
+    };
+  });
+}
+
+function sessionCardHTML(s){
+  const tagLabel = {tech:'Tecnología', business:'Negocios', innovation:'Innovación', leadership:'Liderazgo'}[s.cat];
+  const isLive = s.state==='live';
+  const isPast = s.state==='past';
+  const speakers = s.speakers.map(id=>SPEAKERS[id]);
+  const speakerNames = speakers.map(p=>p.name.split(' ')[0]+' '+(p.name.split(' ')[1]||'')).join(', ');
+  const truncated = speakers.length>2 ? speakers.slice(0,2).map(p=>p.name).join(', ')+', '+speakers[2].name.split(' ')[0]+' …' : speakers.map(p=>p.name).join(', ');
+
+  return `<div class="timeline-item ${s.state} ${state.selectedId===s.id?'is-selected':''}">
+    <div class="ti-time">${s.time}<span class="dot"></span></div>
+    <div class="session-card ${state.selectedId===s.id?'selected':''}" data-id="${s.id}">
+      <button class="sc-fav ${s.fav?'active':''}" data-id="${s.id}" aria-label="Favorita">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="${s.fav?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${escIcon('heart')}</svg>
+      </button>
+      <div class="sc-row1">
+        ${isPast ? `<span class="sc-checkmark"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>` : ''}
+        ${isLive ? `<span class="sc-tag live">EN VIVO</span>` : ''}
+        <span class="sc-tag ${s.cat}">${tagLabel}</span>
+      </div>
+      <h3 class="sc-title">${s.title}</h3>
+      ${isLive ? `<p class="sc-desc">${s.about}</p>`: ''}
+      <div class="sc-meta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${escIcon('location')}</svg>
+        ${s.room}
+      </div>
+      <div class="sc-speakers">
+        <div class="avatar-stack">
+          ${speakers.slice(0,3).map(p=>`<div class="avatar" style="background-image:url('${p.avatar}')"></div>`).join('')}
+        </div>
+        <span class="sc-speakers-text">${truncated}</span>
+      </div>
+      ${(isPast && s.evaluable) ? `<div class="sc-actions"><button class="sc-btn" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">${escIcon('star')}</svg> Evaluar</button></div>`:''}
+      ${(state.tab==='mine' && !isPast) ? `<div class="sc-actions"><button class="sc-btn cal" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg> Calendario</button></div>`:''}
+    </div>
+  </div>`;
+}
+
+/* ---------- DETAIL PANEL ---------- */
+const panel = document.getElementById('detailPanel');
+const dpBody = document.getElementById('dpBody');
+
+function openPanel(id){
+  const stage = document.getElementById('moduleStage');
+  // if same one already open: close
+  if(state.selectedId===id && panel.classList.contains('open')){
+    closePanel(); return;
+  }
+  // if another one is open: animate swap (slide out then in)
+  if(panel.classList.contains('open')){
+    panel.classList.remove('open');
+    setTimeout(()=>{
+      state.selectedId = id;
+      renderDetail(id);
+      renderList();
+      requestAnimationFrame(()=>panel.classList.add('open'));
+    }, 380);
+  } else {
+    state.selectedId = id;
+    renderDetail(id);
+    renderList();
+    stage.classList.remove('solo');
+    requestAnimationFrame(()=>panel.classList.add('open'));
+  }
+}
+
+function closePanel(){
+  const stage = document.getElementById('moduleStage');
+  panel.classList.remove('open');
+  setTimeout(()=>{ state.selectedId=null; stage.classList.add('solo'); renderList(); }, 380);
+}
+
+function renderDetail(id){
+  const s = SESSIONS.find(x=>x.id===id);
+  if(!s) return;
+  const tagLabel = {tech:'Tecnología', business:'Negocios', innovation:'Innovación', leadership:'Liderazgo'}[s.cat];
+  const tagColor = {tech:'#a8a8ff', business:'#5eead4', innovation:'#f5c66c', leadership:'#ff8a96'}[s.cat];
+  const tagBg = {tech:'rgba(124,124,255,0.16)', business:'rgba(52,211,153,0.16)', innovation:'rgba(245,198,108,0.16)', leadership:'rgba(255,93,108,0.16)'}[s.cat];
+  const dateLabel = WEEK.find(w=>w.day===state.date)?.label || '';
+  const speakers = s.speakers.map(sid=>SPEAKERS[sid]);
+
+  dpBody.innerHTML = `
+    <div class="dp-content-wrap">
+      <span class="dp-tag" style="background:${tagBg};color:${tagColor}">
+        <span class="dot" style="background:${tagColor}"></span>${tagLabel}
+      </span>
+      <h2 class="dp-title">${s.title}</h2>
+      <div class="dp-meta-card">
+        <div class="dp-meta-row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${escIcon('cal')}</svg>
+          ${dateLabel}
+        </div>
+        <div class="dp-meta-row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${escIcon('clock')}</svg>
+          ${s.time} – ${s.timeEnd}
+        </div>
+        <div class="dp-meta-row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${escIcon('location')}</svg>
+          ${s.room}
+        </div>
+      </div>
+
+      <div class="dp-action-row">
+        <button class="dp-action fav ${s.fav?'active':''}" id="dpFav">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="${s.fav?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${escIcon('heart')}</svg>
+          ${s.fav?'Favorita':'Favorita'}
+        </button>
+        <button class="dp-action">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg>
+          Calendario
+        </button>
+      </div>
+
+      <div class="dp-section-title">Acerca de</div>
+      <div class="dp-about">${s.about}</div>
+
+      <div class="dp-section-title">Speakers</div>
+      ${speakers.map(p=>`
+        <div class="dp-speaker-row">
+          <div class="avatar" style="background-image:url('${p.avatar}')"></div>
+          <div class="dp-speaker-info">
+            <div class="dp-speaker-name">${p.name}</div>
+            <div class="dp-speaker-role">${p.role}</div>
+          </div>
+          <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${escIcon('chev')}</svg>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  document.getElementById('dpFav').onclick = ()=>{
+    s.fav = !s.fav;
+    renderTabs();
+    renderList();
+    renderDetail(id);
+  };
+}
+
+document.getElementById('dpClose').onclick = closePanel;
+
+/* ---------- KEYBOARD ---------- */
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape' && panel.classList.contains('open')) { closePanel(); return; }
+  if(!['ArrowDown','ArrowUp'].includes(e.key)) return;
+  const items = visibleSessions();
+  if(items.length===0) return;
+  const idx = state.selectedId ? items.findIndex(s=>s.id===state.selectedId) : -1;
+  let next = idx;
+  if(e.key==='ArrowDown') next = idx<0 ? 0 : Math.min(items.length-1, idx+1);
+  if(e.key==='ArrowUp')   next = idx<0 ? 0 : Math.max(0, idx-1);
+  if(items[next]) {
+    e.preventDefault();
+    openPanel(items[next].id);
+    // scroll into view in list
+    const card = document.querySelector(`.session-card[data-id="${items[next].id}"]`);
+    if(card){
+      const body = document.getElementById('agendaBody');
+      const r = card.getBoundingClientRect();
+      const br = body.getBoundingClientRect();
+      if(r.top < br.top || r.bottom > br.bottom){
+        body.scrollTop += (r.top - br.top) - 80;
+      }
+    }
+  }
+});
+
+/* ---------- INIT ---------- */
+renderTabs();
+renderDateStrip();
+renderChips();
+renderList();
+
+/* ---------- THEME / ACCENT (per-evento) ---------- */
+const THEMES = /*EDITMODE-BEGIN*/{
+  "preset": "rojo",
+  "mode": "noir"
+}/*EDITMODE-END*/;
+
+const PRESETS = {
+  verde:    { accent:'#7CFFB2', on:'#0a0a0a', label:'Verde Lima' },
+  rojo:     { accent:'#FF3D55', on:'#ffffff', label:'Rojo Pasión' },
+  violeta:  { accent:'#A78BFA', on:'#0a0a0a', label:'Violeta' },
+  ambar:    { accent:'#F5C66C', on:'#0a0a0a', label:'Ámbar' },
+  cyan:     { accent:'#22D3EE', on:'#0a0a0a', label:'Cyan' },
+  magenta:  { accent:'#EC4899', on:'#ffffff', label:'Magenta' },
+  indigo:   { accent:'#6366F1', on:'#ffffff', label:'Índigo' },
+};
+
+function hexToRgba(hex, a){
+  const h = hex.replace('#','');
+  const r = parseInt(h.substring(0,2),16);
+  const g = parseInt(h.substring(2,4),16);
+  const b = parseInt(h.substring(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function applyTheme(){
+  const p = PRESETS[THEMES.preset] || PRESETS.verde;
+  const r = document.documentElement.style;
+  r.setProperty('--accent', p.accent);
+  r.setProperty('--accent-on', p.on);
+  r.setProperty('--accent-soft', hexToRgba(p.accent, 0.16));
+  r.setProperty('--accent-glow', hexToRgba(p.accent, 0.28));
+  r.setProperty('--accent-shadow', hexToRgba(p.accent, 0.55));
+  document.body.dataset.theme = THEMES.mode;
+}
+applyTheme();
+</script>
+</body>
+</html>

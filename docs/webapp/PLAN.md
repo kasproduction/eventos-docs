@@ -87,11 +87,11 @@ Lumina Noir solido (no glass de entorno real). Paneles con bordes sutiles + opac
 
 | Modulo | Roadmap | Detalle | Horas |
 |---|---|---|---|
-| W.0 | `W.0-spatial-ui.md` | PanelManager, PillBar, presets, command palette, drag | ~12h |
+| W.0 | `W.0-spatial-ui.md` | SpatialShell + SidebarPill + CanvasCard (sin aspect-ratio rigido — fix tablet 2026-05-05) + bell-pill + overlays. **IMPLEMENTADO 2026-05-04, fix canvas 2026-05-05** | ~10h |
 | W.1 | `W.1-setup-auth.md` | Next.js setup + magic link + email/password + i18n + login slideshow + status gating + Sentry + tests + **F10 UI/UX foundation** (LuminaToast, FormField, EmptyState, Skeletons, microinteracciones, error boundaries — ADR-026). Tour movido a W.X (ADR-025) | ~15.5h |
 | W.1B | `W.1-backend-magic-link.md` | **Sesion backend separada bloqueante** — endpoints magic link + tabla event_login_slides + Filament resource + Mailable | ~4h |
 | W.2 | `W.2-home.md` | Hero, countdown, happening now, GamificationHud, recap banner, anuncios mini, sponsors preview, module menu, post-event survey, EventArchive | ~9h |
-| W.3 | `W.3-agenda.md` | Lista, filtros, favoritos, detalle, lifecycle states, conflictos, room-checkin, .ics, ratings post-sesion, recordatorios, session chat | ~11h |
+| W.3 | `W.3-agenda.md` | Lista, filtros, favoritos, detalle, lifecycle states, conflictos, room-checkin, .ics, ratings post-sesion, recordatorios, session chat. **Demo HTML aprobado 2026-05-05** | ~11h |
 | W.4 | `W.4-streaming.md` | Vimeo + Q&A + chat + polls + Trivia Kahoot + anuncios in-stream + replay | ~14h |
 | W.5 | `W.5-speakers.md` | Directorio, ratings en lista, perfil, favoritos | ~5h |
 | W.6 | `W.6-social-wall.md` | Feed, posts, comentarios, likes, Stories, Photo Contest banner, Hashtags, Memorias | ~10h |
@@ -106,7 +106,7 @@ Lumina Noir solido (no glass de entorno real). Paneles con bordes sutiles + opac
 | W.15 | `W.15-vendor-dashboard.md` | Mi Stand, Leads capturados, Stats, Team (OPCIONAL Fase 1) | ~6h |
 | W.16 | `W.16-live-moments.md` | Trivia Kahoot engine, Sorteo Ceremony display, Concurso Fotos display, Golden Ticket reveal, Spin Wheel readonly | ~6h |
 | W.17 | `W.17-soporte.md` | Tickets de soporte, chat staff, RT updates | ~3h |
-| **W.X** | `W.X-welcome-showcase.md` (TBD) | **WelcomeShowcase cinematic post-login** — port de `showcase-onboarding-v6.html` con tokens Lumina Noir + accent dinamico + componentes reales en miniatura. Bloqueado por W.3+W.4+W.5+W.7+W.8+W.9 (ADR-025) | ~3.5h |
+| **W.X** | `W.X-welcome-showcase.md` | **WelcomeShowcase cinematic post-login** — trailer de 6 beats con componentes reales en miniatura (Speakers/Agenda/Streaming/Connect/Gamification/Sponsors). Bloqueado por W.3+W.4+W.5+W.7+W.8+W.9 (ADR-025) | ~3.5h |
 
 ---
 
@@ -249,7 +249,7 @@ Detalle en `W.1-setup-auth.md`. Nota: el demo `design/showcase-onboarding-v6.htm
 
 | Modulo | Horas | Bloqueante | Notas |
 |---|---|---|---|
-| W.0 Spatial UI base | ~12h | Si | Cimiento |
+| W.0 Spatial UI base | ~10h | Si | Cimiento — IMPLEMENTADO 2026-05-04 |
 | W.1 Setup + Auth + UI Foundation | ~15.5h | Si | Cimiento tecnico + UI sistema completo (F10 ADR-026). Tour movido a W.X (ADR-025) |
 | W.2 Home | ~9h | Si | Expandido por GamificationHud + Recap banner + anuncios mini |
 | W.3 Agenda | ~11h | Si | Expandido por lifecycle + room-checkin + .ics + ratings |
@@ -268,8 +268,8 @@ Detalle en `W.1-setup-auth.md`. Nota: el demo `design/showcase-onboarding-v6.htm
 | W.16 Live Moments (subset) | ~6h | Si | Trivia + Sorteo + Concurso fotos display |
 | W.17 Soporte | ~3h | Si | Modulo nuevo |
 | W.X WelcomeShowcase | ~3.5h | Si | Cinematic onboarding — bloqueado por W.3+W.4+W.5+W.7+W.8+W.9 (ADR-025). Reusa componentes reales en miniatura |
-| **Total bloqueante** | **~141h** | | **~32-36 dias work** |
-| **Total con W.15 opcional** | **~147h** | | **~34-38 dias work** |
+| **Total bloqueante** | **~139h** | | **~31-35 dias work** |
+| **Total con W.15 opcional** | **~145h** | | **~33-37 dias work** |
 
 > **Nota**: estimacion asume backend 100% listo. Cero trabajo backend nuevo previsto excepto endpoints magic link (~3-4h backend, sesion separada). Si algun modulo requiere ajuste backend, **es bloqueante del modulo** y se planea aparte.
 

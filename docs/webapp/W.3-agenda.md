@@ -4,7 +4,67 @@
 >
 > **Estimacion:** ~11h (expandida de 8h por submodulos faltantes).
 > **Dependencias:** W.0, W.1.
-> **Estado:** Pendiente.
+> **Estado:** **Demo HTML aprobado 2026-05-05** en `design/features/webapp/W3-agenda/agenda-v3-davinci.html`. Pendiente codear React.
+
+---
+
+## Demo aprobado (2026-05-05)
+
+`design/features/webapp/W3-agenda/agenda-v3-davinci.html` — demo DaVinci con TODO funcional:
+
+**Layout final:**
+- Canvas raiz universal (sin aspect-ratio rigido — fix tablet 2026-05-05)
+- Header global ancho del card (60%) alineado izquierda: title "Agenda/Mi Agenda" + subtitle dia + tabs + "Todas" (mi agenda) + buscar
+- Sin back button (eliminado por usuario)
+- DayStrip pills ovaladas (52×74 radius 999px) — 7 dias con simetria (2 vacios + 3 evento + 2 vacios)
+- Track chips horizontal (Tecnologia, Negocios, Innovacion, Liderazgo, Cultura)
+- Agenda card 60% width (cap 920px) alineada izquierda
+- Detail panel floating absolute right cuando session selected
+- Empty hint cuando no hay session selected
+
+**SessionCard 1:1 patron app movil:**
+- Layout `[time-col 52px][card-col]` con timeline vertical line (`<View>`, no `::before`)
+- Top row: badges (LIVE/check/Track) + heart top-right
+- Info dimmed si past, title line-through si past
+- Description SOLO live (todas las cards mismo tamaño en upcoming)
+- Location row + speakers stack (border accent solo si live)
+- Action row con border-top: Calendario / Evaluar (gold) / UNIRTE / Ver grabacion
+- Heart particle anim (6 particles + ring + scale-pop)
+
+**Detail panel completo (session/[id].tsx fidel):**
+- Badges row LIVE + Track
+- Title 26pt PJS 800
+- Stars rated si finished + rated + "Tu evaluacion"
+- Meta card (date + time + location + capacity) 4 rows
+- Action grid 2-3 cols (Favorita/Calendario/Evaluar)
+- Stream button full width (UNIRTE accent live / Ver grabacion glass past)
+- Section "Acerca de"
+- Section "Asistencia" (avatar stack + count + "Ver quien va y conectar")
+- Sub-panel attendees (3er nivel) con backdrop blur + lista CTA "Conectar"
+- Section Speakers + cards con foto 42 + name + role · org + chevron + helper "Toca un speaker para ver su perfil"
+
+**Lux mode** (replica `theme-lux.ts` exacto):
+- Cool gray base #F6F8FA (NO beige)
+- Cards bg #FFFFFF puras con multi-layer shadows (sm/md/lg/xl con opacity 0.06-0.14)
+- Sin hover bg crema — solo `transform: translateY(-1px)` + shadow-md
+- Borders rgba(0,0,0,0.08 / 0.14)
+- Text tones #1A1B1E / #4A4B50 / #7C7D82 / #A8A9AE
+- Track tags pastel app movil: tech #EFF6FF/#1D4ED8, business #F0FDF4/#166534, innovation #FFF7ED/#C2410C, leadership #FDF2F8/#BE185D, culture #FDF4FF/#7E22CE
+- Gold rating #8E8170 (luxSemantic.gold)
+
+**Microinteracciones (haptics visuales):**
+- :active scale 0.985 (cards), 0.94 (daypills/action-btns), 0.96 (chips), 0.97 (tabs), 0.92 (tools), 0.88 (heart)
+- Heart particle animation: 6 particles + ring + heart-pop
+- Toast notifications: favorite/calendar/success/info con icono color-coded, anim spring-soft fade+translate auto-dismiss 2.4s
+
+**Animaciones panel detail (W0-spatial system):**
+- Entrada (cerrado→abierto): translateX(80px→0) en 480ms spring-snap
+- Cambio entre sesiones: slide-out izq 260ms + slide-in der 480ms (sin reanimar lista)
+- Sub-panel attendees: scale .94→1 + translateY 380ms spring-snap
+
+**Tweaks panel:** Noir/Lux toggle + 5 swatches accent (lime/amber/rose/violet/cyan). Re-aplica accent al cambiar tema (corrige opacity de accent-soft/glow segun modo).
+
+**Selected sin glow:** sin outline ni barra accent ni shadow tinted. El detail panel a la derecha indica seleccion. Replica app movil donde no hay selected state visual.
 
 ---
 

@@ -51,6 +51,32 @@ Las 3 vistas miden **identico footprint** (mismo card raiz 16/9), pero su layout
 
 ---
 
+## Estado de implementacion (2026-05-04)
+
+El rediseno **cinematic + mute por estado** (validado 2026-05-03) reemplazo la descomposicion original en 9 fases por una composicion por estado de evento. El alcance que SI se entrego en `eventos-web/src/components/app/home/` es:
+
+| Item | Estado |
+|---|---|
+| Hero cinematic + wordmark del evento + 3 estados (PRE/LIVE/ENDED) | DONE |
+| Happening Now como feed scrolleable de salas (patron app movil) | DONE |
+| Conexion backend `/api/v1/events/{id}/happening-now` | DONE |
+| Mute por estado dentro del canvas raiz universal (W.0) | DONE |
+| ENDED: stats 2x2 + tier-row Gold + CTA "Ver mi recap" | DONE (mock data — endpoint pendiente) |
+| Sponsors logo band sutil abajo | NOT YET (originalmente Fase 4) |
+| GamificationHud preview en LIVE | NOT YET (originalmente Fase 5) |
+| Anuncios mini banner | NOT YET (originalmente Fase 6) |
+| Highlights carousel | DESCARTADO en cinematic — vive en W.14 |
+| Module menu + atajos modulares | DESCARTADO — sidebar W.0 cubre nav |
+| EventArchive link | NOT YET (originalmente Fase 8) |
+| Post-event survey prompt | NOT YET (originalmente Fase 7.2) |
+| Multi-sede pill selector (Bancolombia) | NOT YET (pendiente diseno) |
+| Recap stats endpoint backend | NOT YET (bloqueante para datos reales en ENDED) |
+| Panel notif overlay del bell | NOT YET (W.0 lo lista tambien) |
+
+Fases originales 0-9 abajo quedan como **referencia historica**. Los items "NOT YET" arriba son los que sobreviven y deben planearse en una iteracion proxima de W.2.
+
+---
+
 ## Alcance
 
 1. Hero configurable (nombre evento, fecha, branding)
@@ -91,64 +117,68 @@ Las 3 vistas miden **identico footprint** (mismo card raiz 16/9), pero su layout
 
 ---
 
-## Fase 0 — Setup (~30min) — 0/3
+## Fase 0 — Setup (~30min) — 2/3
 
-### 0.1 Hooks — 0/3
-- [ ] `useEvent(eventId)` — TanStack Query
-- [ ] `useHappeningNow(eventId)` — refetchInterval 60s
-- [ ] `useHighlights(eventId)`
-
----
-
-## Fase 1 — Hero (~1h) — 0/4
-
-### 1.1 Componente — 0/2
-- [ ] `<EventHero />` con backdrop branding + nombre + fecha
-- [ ] Si pre-evento: countdown grande
-- [ ] Si live: indicador "EN VIVO" pulsante
-- [ ] Si post-evento: "Evento finalizado" + CTA Recap
-
-### 1.2 Responsive — 0/2
-- [ ] Mobile: hero compacto 200px alto
-- [ ] Tablet/desktop: hero 320-400px alto
+### 0.1 Hooks — 2/3
+- [x] `useEvent(eventId)` — TanStack Query
+- [x] `useHappeningNow(eventId)` — refetchInterval 60s
+- [ ] `useHighlights(eventId)` — DESCARTADO en cinematic (vive en W.14)
 
 ---
 
-## Fase 2 — Happening Now (~1.5h) — 0/4
+## Fase 1 — Hero (~1h) — 4/4 — DONE 2026-05-04
 
-### 2.1 Componente — 0/3
-- [ ] `<HappeningNow />` panel destacado con sesion en vivo
-- [ ] Title sesion + speaker + tiempo restante
-- [ ] CTA "Unirse" → abre Streaming panel (W.4)
+Implementado como **poster cinematic + wordmark + countdown firma** (no como hero clasico con backdrop).
 
-### 2.2 Empty state — 0/1
-- [ ] Si no hay sesion live: "Proxima sesion en X" o "Sin sesiones programadas"
+### 1.1 Componente — 2/2
+- [x] Poster full + wordmark (`SUMMIT 2026` accent en el ano)
+- [x] PRE: countdown firma bottom-right, sin CTAs
+- [x] LIVE: split 7/3 con feed de salas activas
+- [x] ENDED: poster apagado + recap-col con tier Gold + CTA "Ver mi recap"
 
----
-
-## Fase 3 — Highlights carousel (~1h) — 0/3
-
-### 3.1 Componente — 0/2
-- [ ] `<HighlightsCarousel />` con scroll horizontal snap
-- [ ] Cards con imagen + titulo + fecha
-
-### 3.2 Empty state — 0/1
-- [ ] Si no hay highlights: hide carousel completo
+### 1.2 Responsive — 2/2
+- [x] Desktop + tablet H validados (canvas 16/9 universal)
+- [ ] Mobile pendiente (replica patron app movil)
 
 ---
 
-## Fase 4 — Sponsors brand wall preview (~1h) — 0/3
+## Fase 2 — Happening Now (~1.5h) — 4/4 — DONE 2026-05-04
+
+Implementado como **feed scrolleable de salas activas** (patron app movil, NO panel destacado unico).
+
+### 2.1 Componente — 3/3
+- [x] Feed de `.room-card` con scroll interno (avatar 38px + sala + timer + titulo + speaker)
+- [x] Header dinamico `EN VIVO · N SALAS`
+- [x] Sala featured con tinte accent (regla: favorita usuario activa, fallback keynote/track principal)
+- [x] Tap target = card completa (sin CTA "Unirme" separado)
+
+### 2.2 Empty state — 1/1
+- [x] Footer `.next` con proximo cambio de slot cuando aplica
+
+---
+
+## Fase 3 — Highlights carousel (~1h) — DESCARTADO
+
+Carousel removido del Home en el rediseno cinematic. Highlights/boletines viven ahora en W.14 (`W.14-anuncios-boletines.md`).
+
+---
+
+## Fase 4 — Sponsors brand wall preview (~1h) — 0/3 — PENDIENTE iter 2
+
+Logo band sutil abajo del card. Mantener — Bancolombia querra ver sponsors en home. No bloqueante de cierre W.2 base.
 
 ### 4.1 Componente — 0/2
-- [ ] `<SponsorsPreview />` con grid de top sponsors (Platinum + Gold)
+- [ ] `<SponsorsPreview />` con logo band horizontal sutil (NO grid grande, NO canibaliza W.7)
 - [ ] CTA "Ver todos" → abre Sponsors panel (W.7)
 
 ### 4.2 Responsive — 0/1
-- [ ] Mobile: 2 cols, Tablet: 3 cols, Desktop: 4 cols
+- [ ] Logo band escala con clamp (igual que tipografia del card)
 
 ---
 
-## Fase 5 — GamificationHud preview (~1h) — 0/4
+## Fase 5 — GamificationHud preview (~1h) — 0/4 — PENDIENTE iter 2
+
+Va dentro del card en LIVE (no como widget separado). Decidir slot exacto al integrar — candidato: chip pequeno en happening-col arriba o eyebrow del poster.
 
 ### 5.1 Componente — 0/3
 - [ ] `<GamificationHudPreview />` con mis puntos + posicion top X + ultimo badge desbloqueado
@@ -160,53 +190,52 @@ Las 3 vistas miden **identico footprint** (mismo card raiz 16/9), pero su layout
 
 ---
 
-## Fase 6 — Anuncios mini (~30min) — 0/2
+## Fase 6 — Anuncios mini (~30min) — 0/2 — PENDIENTE iter 2
+
+Banner sutil intra-card cuando haya unread urgente. NO strip footer suelto (regla VisionOS).
 
 ### 6.1 Componente — 0/2
-- [ ] `<AnnouncementsMini />` muestra top 3 unread (usa `useAnnouncements` con limit=3)
+- [ ] `<AnnouncementsMini />` muestra top 1-3 unread urgente (usa `useAnnouncements` con limit=3)
 - [ ] Boton "Ver todos" → abre panel W.14
 
 ---
 
-## Fase 7 — Recap banner + Post-event survey (~30min) — 0/3
+## Fase 7 — Recap banner + Post-event survey (~30min) — 1/3
 
-### 7.1 Recap banner — 0/2
-- [ ] Si `event.status === 'ended'` y `user.recap_image_url !== null` → banner "Tu recap esta listo" + CTA
-- [ ] Click → abre recap viewer (Fase 2 webapp; Fase 1 redirect a app movil deeplink)
+### 7.1 Recap banner — 1/2 — DONE base
+- [x] CTA "Ver mi recap" en estado ENDED del cinematic (recap-col derecha) — 2026-05-04
+- [ ] Wiring real: condicional segun `user.recap_image_url !== null`, click abre recap viewer (hoy mock data)
 
-### 7.2 Post-event survey prompt — 0/1
+### 7.2 Post-event survey prompt — 0/1 — PENDIENTE iter 2
 - [ ] Si evento termino y user no respondio survey → banner sutil "Cuentanos como te fue" + CTA W.9
 
 ---
 
-## Fase 8 — EventArchive (~30min) — 0/2
+## Fase 8 — EventArchive (~30min) — 0/2 — PENDIENTE iter 2
+
+NO va como strip footer (regla VisionOS). Candidato: opcion en sidebar pill "Más" o link sutil dentro del card en estado ENDED.
 
 ### 8.1 Link — 0/2
-- [ ] Si user tiene >0 eventos pasados → link en footer Home "Eventos anteriores"
+- [ ] Si user tiene >0 eventos pasados → link sutil "Eventos anteriores" (ubicacion por decidir)
 - [ ] Click → abre lista eventos pasados con cover + nombre + fecha + CTA "Ver recap" si existe
 
 ---
 
-## Fase 9 — Module menu + Atajos modulares (~1h) — 0/3
+## Fase 9 — Module menu + Atajos modulares (~1h) — DESCARTADO
 
-### 9.1 Cards atajos — 0/2
-- [ ] Grid de 6 cards: Speakers, Agenda, Streaming, Connect, Gamification, Notificaciones
-- [ ] Cada card abre el panel correspondiente
-
-### 9.2 Layout responsive — 0/1
-- [ ] Mobile: 2x3, Tablet: 3x2, Desktop: 6x1 horizontal
+Sidebar pill del shell W.0 cubre toda la navegacion entre modulos top-level. Cards atajos en Home eran redundantes y canibalizaban el patron spatial.
 
 ---
 
-## Fase 10 — QA + tests (~1h) — 0/4
+## Fase 10 — QA + tests (~1h) — 0/4 — PENDIENTE
 
 ### 10.1 Vitest — 0/2
-- [ ] `useEvent`, `useHappeningNow`, `useHighlights` con mock TanStack
-- [ ] Empty states + GamificationHud RT
+- [ ] `useEvent`, `useHappeningNow` con mock TanStack
+- [ ] Estados PRE/LIVE/ENDED renderizan composicion correcta + feed de salas con/sin sesiones
 
 ### 10.2 Playwright — 0/2
-- [ ] Happy path: home carga con datos + click en atajo abre panel + RT points actualiza HUD
-- [ ] Edge case: sin happening now muestra empty correcto + recap banner aparece post-evento
+- [ ] Happy path: home carga con datos + click en `.room-card` abre stream + estado cambia segun horario evento
+- [ ] Edge case: sin sesiones live muestra footer `.next` correcto + ENDED muestra recap CTA
 
 ---
 
@@ -228,7 +257,20 @@ Las 3 vistas miden **identico footprint** (mismo card raiz 16/9), pero su layout
 
 ## Cierre
 
-- [ ] Tests verde
-- [ ] Validado en 3 viewports
-- [ ] Lighthouse OK
-- [ ] Commit DaVinci + memoria + PENDIENTES.md
+### Cierre base cinematic (2026-05-04)
+- [x] Hero cinematic + 3 estados PRE/LIVE/ENDED
+- [x] Feed scrolleable de salas LIVE conectado a backend
+- [x] Recap CTA en ENDED (mock data)
+- [x] Validado desktop + tablet H
+- [x] Commit DaVinci + memoria
+
+### Cierre completo (pendiente iter 2)
+- [ ] Tests Vitest + Playwright verde
+- [ ] Validado en mobile (replica patron app movil)
+- [ ] Lighthouse Performance >= 85 desktop / >= 75 mobile
+- [ ] Sponsors logo band + Gamification chip + Anuncios mini integrados
+- [ ] Recap banner wiring real (no mock)
+- [ ] Post-event survey + EventArchive link (ubicacion por decidir)
+- [ ] Multi-sede pill selector (Bancolombia)
+- [ ] Atmosfera dinamica por estado
+- [ ] PENDIENTES.md actualizado
