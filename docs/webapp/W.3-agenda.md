@@ -139,164 +139,166 @@
 
 ---
 
-## Endpoints (verificar)
+## Endpoints (verificados 2026-05-06)
 
-- `GET /api/v1/event/{id}/sessions` — lista completa, filtros via query
-- `GET /api/v1/event/{id}/sessions/{sessionId}` — detalle
-- `POST /api/v1/event/{id}/sessions/{sessionId}/favorite` — toggle favorito
-- `GET /api/v1/event/{id}/tracks` — lista tracks/categorias
-- `POST /api/v1/sessions/{id}/room-checkin` — entrar al room (silent disco / sala fisica)
-- `POST /api/v1/sessions/{id}/room-checkout` — salir del room
-- `GET /api/v1/event/{id}/sessions/{sessionId}/ics` — download .ics individual
-- `GET /api/v1/event/{id}/my-agenda/ics` — download .ics de Mi Agenda completa
-- `POST /api/v1/sessions/{id}/rating` — rating post-sesion (estrella + comentario)
-- `POST /api/v1/sessions/{id}/reminder` — programar recordatorio
-- `GET /api/v1/sessions/{id}/messages` — chat session-specific (distinto a Q&A)
+**Wireados al backend (proxy Next con cookie httpOnly):**
+- ✅ `GET /api/v1/events/{id}/agenda` — lista agrupada por dia + `is_favorite` + `favorites_count`
+- ✅ `POST /api/v1/events/{id}/agenda/{sId}/favorite` — toggle favorito (proxy: `/api/agenda/{id}/favorite/{sId}`)
+- ✅ `GET /api/v1/events/{id}/sessions/{sId}/calendar.ics` — download ICS (proxy: `/api/agenda/{id}/sessions/{sId}/calendar`)
+- ✅ `POST /api/v1/events/{id}/sessions/{sId}/rate` — rating (proxy: `/api/agenda/{id}/sessions/{sId}/rate`). Backend retorna 409 si ya calificado
+- ✅ `GET /api/v1/events/{id}/my-ratings` — map sessionId → rating (proxy: `/api/agenda/{id}/my-ratings`)
 
----
+**No wireados (diferidos a otros modulos):**
+- 🔜 `POST /sessions/{id}/room-checkin` / `room-checkout` — diferido (UX no validada en webapp)
+- 🔜 `POST /sessions/{id}/reminder` — W.10 push notif setup
+- 🔜 `GET /sessions/{id}/chat/messages` — W.4 streaming (vive con el player)
+- ❌ `/my-agenda/ics` (bulk) — endpoint no existe en backend
+- ❌ `/sessions/{id}/attendees` — endpoint no existe; seccion "Asistencia" oculta hasta W.8
 
-## Fase 0 — Setup (~30min) — 0/3
-
-### 0.1 Hooks — 0/3
-- [ ] `useAgenda(eventId, filters)` — TanStack Query con filters como key
-- [ ] `useSession(sessionId)` — detalle
-- [ ] `useFavorite(sessionId)` — mutation toggle
+Doc maestro de TODOS los endpoints: `BACKEND-API-MAP.md`.
 
 ---
 
-## Fase 1 — Lista de sesiones (~2h) — 0/5
+## Fase 0 — Setup — 1/1 ✅
 
-### 1.1 Componente — 0/3
-- [ ] `<AgendaList />` con grupos por dia (sticky headers)
-- [ ] `<SessionRow />` con time + bar color (track) + nombre + speaker preview + heart
-- [ ] Click row → abre `<SessionDetail />` panel secundario o modal
+### 0.1 Tipos + fetcher SSR
+- [x] `lib/types/agenda.ts` (espejo `EventSessionResource`)
+- [x] `lib/agenda.ts` (`fetchAgenda` server-side con bearer cookie)
+- [x] `lib/agendaClient.ts` (mutations client-side: favorite, rate, my-ratings, .ics)
 
-### 1.2 Estados — 0/2
-- [ ] Live: indicador rojo pulsante + CTA "Unirse"
-- [ ] Past: opacity reducida + "Ver grabacion" si hay
-- [ ] Future: countdown si <1h
+> Decision: NO usamos TanStack `useAgenda` hook por ahora. Datos vienen via SSR + state local. Cuando entre W.11 socket invalidation, migrar a TanStack para reactividad RT.
 
 ---
 
-## Fase 2 — Filtros (~1.5h) — 0/4
+## Fase 1 — Lista de sesiones — 5/5 ✅
 
-### 2.1 Filtros UI — 0/3
-- [ ] Tabs por dia (Dia 1, Dia 2, Mi Agenda)
-- [ ] Pills filtro por track (multi-select)
-- [ ] Search input con debounce 300ms
+### 1.1 Componente — 3/3
+- [x] `<SessionList />` agrupa por dia + day-slide animation al cambiar dia
+- [x] `<SessionCard />` 1:1 patron app movil: time-col 52px + card + heart top-right + action row con border-top
+- [x] Click card → abre `<DetailPanel />` floating right (no replace, coexisten)
 
-### 2.2 URL state — 0/1
-- [ ] Filtros persistidos en URL (`?day=1&track=tech&q=ai`) para shareable links
-
----
-
-## Fase 3 — Favoritos (~1h) — 0/3
-
-### 3.1 Toggle — 0/2
-- [ ] Click heart → optimistic update + mutation
-- [ ] Si error → revert + toast error
-
-### 3.2 Tab "Mi Agenda" — 0/1
-- [ ] Filtra solo favoritos del usuario actual
+### 1.2 Estados — 2/2
+- [x] Live: badge `EN VIVO` con pulse + CTA `UNIRTE` accent + border-color tinted
+- [x] Past: title `text-decoration: line-through` + opacity 0.45 + sin description
+- [x] Upcoming: layout neutral, sin countdown (descartado por ruido visual)
 
 ---
 
-## Fase 4 — Detalle de sesion (~1.5h) — 0/4
+## Fase 2 — Filtros — 3/4 (URL state diferido)
 
-### 4.1 Layout — 0/2
-- [ ] Desktop: panel secundario (40% width) cuando se abre desde lista
-- [ ] Mobile: full screen overlay con back button
+### 2.1 Filtros UI — 3/3
+- [x] Tabs Agenda / Mi Agenda (no por dia — los dias son DayStrip aparte)
+- [x] Pills filtro por track (multi-select via Set), `<ChipFilters />`
+- [x] Search input expanded inline (sin debounce — filtra en cliente, OK con poca data)
 
-### 4.2 Contenido — 0/2
-- [ ] Imagen sesion + titulo + speakers + tags + descripcion
-- [ ] CTAs: "Unirse" si live, "Agregar a calendario" (.ics), "Compartir"
-
----
-
-## Fase 4.5 — Lifecycle states + conflictos (~1h) — 0/4
-
-### 4.5.1 Lifecycle badges — 0/2
-- [ ] `<SessionLifecycleBadge />` con 3 estados: ORIGINAL (sin badge) / **AJUSTADA** (badge amarillo + tooltip "Hora cambio") / **CANCELADA** (badge rojo + tachada)
-- [ ] Si AJUSTADA: mostrar `original_start_time` y `adjusted_start_time` en detalle
-
-### 4.5.2 Detector conflictos — 0/2
-- [ ] Si user tiene 2 favoritas con overlap de tiempo → warning amarillo en card + en Mi Agenda tab
-- [ ] Modal "Tienes conflicto entre estas sesiones, cual prefieres?"
+### 2.2 URL state — 0/1 (diferido)
+- [ ] Filtros persistidos en URL → diferido a polish W.12 (no es bloqueante)
 
 ---
 
-## Fase 4.6 — Room check-in + .ics + ratings + recordatorio (~2h) — 0/8
+## Fase 3 — Favoritos — 3/3 ✅
 
-### 4.6.1 Room check-in — 0/3
-- [ ] Si sesion tiene `room_id` y user en horario activo → boton "Check-in al room" en detalle
-- [ ] Click → mutation room-checkin → mostrar "Estas en {room_name}" + boton checkout
-- [ ] Si capacity llena → mostrar "Room lleno, espera tu turno" (queue)
+### 3.1 Toggle — 2/2
+- [x] Click heart → optimistic update local + POST al backend
+- [x] Si error backend → revert state + `lumina.error` toast
 
-### 4.6.2 .ics download — 0/2
-- [ ] Boton "Agregar a calendario" en detalle sesion → download .ics individual
-- [ ] Boton "Descargar Mi Agenda" en tab Mi Agenda → .ics completo
-
-### 4.6.3 Rating post-sesion — 0/2
-- [ ] Cuando sesion termina y user asistio → prompt persistente en tab Mi Agenda
-- [ ] Modal: estrella 1-5 + comentario opcional 280 chars + submit
-
-### 4.6.4 Recordatorio — 0/1
-- [ ] Toggle "Recordarme 10min antes" en detalle → mutation programar push (W.10)
+### 3.2 Tab "Mi Agenda" — 1/1
+- [x] Filtra `s.is_favorite === true` localmente (datos ya vienen con flag del backend)
 
 ---
 
-## Fase 4.7 — Session-specific chat (~30min) — 0/2
+## Fase 4 — Detalle de sesion — 4/4 ✅
 
-### 4.7.1 Distincion Q&A vs Chat — 0/2
-- [ ] En streaming W.4 hay tabs: Q&A (preguntas estructuradas) + Chat (mensajes libres)
-- [ ] En agenda detalle, link "Ver chat de la sesion" → abre W.4 chat tab directamente
+### 4.1 Layout — 2/2
+- [x] Desktop: panel floating right 320-520px width, slide-in 480ms spring + swap-out 260ms
+- [x] Mobile: heredado del shell W.0 (mobile redirige a app movil — no aplica detail panel)
 
----
-
-## Fase 5 — Real-time (~30min) — 0/2
-
-### 5.1 Socket events — 0/2
-- [ ] `session.updated` → invalidate query de sesion + lista
-- [ ] `session.cancelled` → mostrar toast + remover de lista
-- [ ] (Implementacion completa en W.11, aqui solo subscribe basico)
+### 4.2 Contenido — 2/2
+- [x] Badges (LIVE/Track) + title + meta (date/time/location/capacity/interesados) + actions + about + speakers + asistencia (oculta)
+- [x] CTAs: `UNIRTE` accent si live (placeholder W.4), `Calendario` descarga .ics real, `Ver grabacion` glass si recording_url, `Favorita` con cambio de fill
 
 ---
 
-## Fase 6 — QA + tests (~1.5h) — 0/4
+## Fase 4.5 — Lifecycle + conflictos — 0/4 (diferido a W.11)
 
-### 6.1 Vitest — 0/2
-- [ ] `useAgenda` con filters
-- [ ] Optimistic update favoritos
+### 4.5.1 Lifecycle badges — 0/2 (diferido)
+- [ ] `<SessionLifecycleBadge />` ORIGINAL/AJUSTADA/CANCELADA → diferido. Backend YA emite eventos `session:cancelled`, `agenda:delayed` via socket. Pendiente wirear cuando entre W.11.
 
-### 6.2 Playwright — 0/2
-- [ ] Happy path: filtrar por dia + track + favoritar + ver detalle
-- [ ] Edge case: search sin resultados muestra empty correcto
+### 4.5.2 Detector conflictos — 0/2 (diferido)
+- [ ] Conflict detection 2 favoritas overlap → diferido. Calculo puramente cliente (sin backend), mover a polish W.12.
+
+---
+
+## Fase 4.6 — Room check-in + .ics + ratings + recordatorio — 4/8
+
+### 4.6.1 Room check-in — 0/3 (diferido)
+- [ ] Boton "Check-in al room" → diferido. UX no validada en webapp; quizas no tiene sentido (asistente virtual sin presencia fisica).
+- [ ] Mutation room-checkin/checkout → diferido a sesion dedicada
+- [ ] Queue si capacity llena → diferido
+
+### 4.6.2 .ics download — 1/2
+- [x] Boton "Calendario" en card upcoming + DetailPanel → `downloadSessionIcs()` via anchor, respeta Content-Disposition del backend
+- [ ] "Descargar Mi Agenda" completa (.ics bulk) → endpoint `/my-agenda/ics` NO existe en backend; diferido o agregar al backend
+
+### 4.6.3 Rating post-sesion — 2/2 ✅
+- [x] Cards `past` sin rating → boton "Evaluar" gold abre `<RatingModal />`
+- [x] Modal con 5 estrellas (gold pop) + comment opcional 1000 chars + submit POST. Si ya calificado: estrellas readonly en card, boton oculto en detail (backend rechaza re-rate con 409)
+
+### 4.6.4 Recordatorio — 0/1 (diferido a W.10)
+- [ ] Toggle "Recordarme 10min antes" → diferido a W.10 (necesita push notif setup)
+
+---
+
+## Fase 4.7 — Session-specific chat — 0/2 (diferido a W.4)
+
+### 4.7.1 Distincion Q&A vs Chat — 0/2 (diferido)
+- [ ] Tabs Q&A + Chat en streaming → vive en W.4 (no tiene sentido tenerlo en agenda)
+- [ ] Link "Ver chat" desde detalle → diferido a W.4
+
+---
+
+## Fase 5 — Real-time — 0/2 (diferido a W.11)
+
+### 5.1 Socket events — 0/2 (diferido)
+- [ ] `session:started/ended/cancelled/delayed` + `agenda:updated` → invalidate query → diferido a W.11. Backend YA emite todos estos eventos a la room `event:{eventId}` via `broadcastSessionLifecycle()`.
+
+---
+
+## Fase 6 — QA + tests — 2/4
+
+### 6.1 Vitest — 1/2 ✅
+- [x] `tests/components/agenda/agendaDerive.test.ts` — 33 tests cubriendo buildDayStrip, deriveUiState, trackSlug, formatTime, collectTracks, totalSessions, firstDayWithSessions
+- [ ] `useAgenda` hook con filters → no aplica (no creamos hook TanStack en F0)
+
+### 6.2 Playwright — 0/2 (pendiente)
+- [ ] Happy path: filtrar dia + track + favoritar + ver detalle → pendiente sesion E2E dedicada
+- [ ] Edge case: search sin resultados → pendiente
 
 ---
 
 ## Edge cases
 
-- [ ] Sesion sin imagen → placeholder generico (avatar speaker o color track)
-- [ ] Sesion cancelada → mostrar tachada con razon
-- [ ] Conflicto agenda (2 favoritas en mismo horario) → indicador warning + modal
-- [ ] Track sin sesiones → no mostrar pill filtro
-- [ ] Search con 0 caracteres → reset filtros texto pero mantiene dia/track
-- [ ] User no logged → favoritar muestra modal "Inicia sesion para favoritar"
-- [ ] Sesion live > duration esperada → mantiene "EN VIVO" hasta que organizador la cierre
-- [ ] Sesion AJUSTADA pero user ya tenia recordatorio → reagendar push automaticamente
-- [ ] Sesion CANCELADA con asistentes → notif RT + remover de Mi Agenda
-- [ ] Room checkin sin estar en horario → error "Solo puedes ingresar dentro del horario"
-- [ ] Room queue: user en cola, otro sale → notif "Tu turno disponible"
-- [ ] .ics descarga sin fav → permitir solo si esta en Mi Agenda o la propia sesion
-- [ ] Rating con sesion no asistida → no mostrar prompt
-- [ ] Rating ya enviado → muestra rating actual readonly (UNIQUE constraint)
-- [ ] Recordatorio sin permission push → mostrar warning "Activa notificaciones primero"
+- [x] Sesion sin imagen → no aplica (cards no tienen imagen, solo speakers stack)
+- [x] Sesion cancelada → `deriveUiState` retorna `past` + line-through del title
+- [ ] Conflicto agenda (2 favoritas overlap) → diferido a polish W.12
+- [x] Track sin sesiones → `collectTracks` solo devuelve tracks que tienen sesiones
+- [x] Search con 0 caracteres → no filtra por search, mantiene dia/track
+- [x] User no logged → middleware `proxy.ts` redirige a /login antes de llegar a /agenda
+- [x] Sesion live > duration esperada → `deriveUiState` respeta `status: "live"` del backend hasta que organizador la cierre
+- [ ] Sesion AJUSTADA con recordatorio activo → diferido (recordatorios no implementados)
+- [ ] Sesion CANCELADA con favoritos → diferido a W.11 (socket invalidation)
+- [x] Room checkin sin horario → no aplica (room check-in diferido)
+- [x] Room queue → no aplica
+- [x] .ics descarga sin fav → permitido siempre (cualquier sesion puede descargar su .ics)
+- [x] Rating con sesion no asistida → permitido (backend valida via attendee, sin chequeo de asistencia)
+- [x] Rating ya enviado → estrellas readonly + boton oculto (backend retorna 409 — manejado correctamente)
+- [ ] Recordatorio sin permission push → diferido a W.10
 
 ---
 
-## Cierre
+## Cierre — 3/4
 
-- [ ] Tests verde
-- [ ] Validado 3 viewports
-- [ ] Lighthouse OK
-- [ ] Commit DaVinci + memoria + PENDIENTES.md
+- [x] **Tests verde:** Vitest 55/55 + typecheck + lint OK
+- [ ] **Validado 3 viewports:** pendiente sesion QA browser real con `W.3-QA-CHECKLIST.md`
+- [ ] **Lighthouse OK:** pendiente medicion en build de produccion
+- [x] **Commit DaVinci + memoria + PENDIENTES.md:** webapp `00ac800`, docs `1eefe0f`, memoria `project_w3_agenda_react.md` + `project_backend_api_map.md`, PENDIENTES marca W.3 done, COMPLETADO con entrada nueva
