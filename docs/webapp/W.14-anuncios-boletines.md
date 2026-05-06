@@ -122,6 +122,80 @@ Socket events:
 
 ---
 
+## Bell + Announcements popover (sidebar W.0) — pendiente diseñado 2026-05-06
+
+> Documentado para implementar como parte de esta sesion W.14. Hoy el bell
+> en `SidebarPill` esta como `<span>` deshabilitado con tooltip
+> "proximamente" (BUG-328 fix). El comportamiento real es:
+
+### Plan de implementacion
+
+1. **Server-side fetcher** (`lib/announcements.ts`):
+   - `fetchAnnouncements(eventId)` → llama `GET /api/v1/events/{id}/announcements`
+   - Retorna `Announcement[]` con shape: `{id, title, body, action_url, image_url, roles, published_at}`
+   - Filtrar por `roles.includes(user.role)` o vacio (= todos los roles)
+
+2. **Layout integration** (`app/[locale]/(app)/layout.tsx`):
+   - Fetch announcements en paralelo con event + user
+   - Pasar al `SpatialShell` → `SidebarPill` como prop
+
+3. **Componente cliente `BellPopover.tsx`**:
+   - Reemplaza el `<span>` deshabilitado actual
+   - Usa Radix Popover (ya existe en `components/ui/popover.tsx`)
+   - Trigger = bell button con badge cuenta
+   - Content = lista de cards (title + body + tiempo relativo + image opcional + action_url linkeable)
+
+4. **Estado "no leido" sin endpoint backend**:
+   - Backend NO expone `read_at` per usuario en announcements
+   - Workaround: `localStorage.eventos:announcements:lastSeenAt:{eventId}` con timestamp ISO
+   - Badge cuenta items con `published_at > lastSeenAt`
+   - Al abrir popover → `lastSeenAt = now()` → badge → 0
+
+5. **Tiempo relativo:**
+   - `Intl.RelativeTimeFormat("es-CO")` para "hace 2h", "hace 3d"
+   - Built-in, sin lib externa
+
+6. **Click en card:**
+   - Si `action_url` → `window.open(action_url, "_blank")`
+   - Sino → solo cerrar popover
+
+### Endpoints verificados (curl 2026-05-06)
+
+```
+GET /api/v1/events/{id}/announcements
+→ {data: [{id, title, body, action_url, image_url, roles, published_at}]}
+```
+
+Roles default: `["attendee"]`. published_at = ISO8601.
+
+### Razon por la que NO se hizo en W.0 fix
+
+W.0 audit cerro 3 bugs (BUG-326/327/328) con el bell como `<span>`
+"proximamente" para evitar el 404 silencioso. El popover real es
+funcionalidad de W.14 (anuncios) — NO contaminar el shell con feature
+logic. Cuando se ejecute esta seccion W.14, tocar:
+
+- `components/shell/SidebarPill.tsx` → reemplazar `<span>` bell por
+  `<BellPopover />`
+- `components/shell/SpatialShell.tsx` → aceptar y pasar prop
+  `announcements`
+- `app/[locale]/(app)/layout.tsx` → fetch announcements server-side
+
+### Estimacion
+
+~30-40 min (fetcher + popover + localStorage tracking + estilos).
+
+### Decisiones cerradas
+
+- **Sin Web Push** — backend solo tiene Expo (mobile). Para webapp el bell
+  solo lista anuncios via fetch + RT socket en W.11. NO hay notificacion
+  del SO.
+- **Sin endpoint `/me/notifications`** — la app movil tampoco lo tiene;
+  los anuncios son public per-evento, el "no leido" es client-side
+  via localStorage.
+
+---
+
 ## Cierre
 
 - [ ] Tests verde
