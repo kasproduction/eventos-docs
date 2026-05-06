@@ -61,7 +61,7 @@ El rediseno **cinematic + mute por estado** (validado 2026-05-03) reemplazo la d
 | Happening Now como feed scrolleable de salas (patron app movil) | DONE |
 | Conexion backend `/api/v1/events/{id}/happening-now` | DONE |
 | Mute por estado dentro del canvas raiz universal (W.0) | DONE |
-| ENDED: stats 2x2 + tier-row Gold + CTA "Ver mi recap" | DONE (mock data — endpoint pendiente) |
+| ENDED: stats 2x2 + tier-row + CTA "Ver mi recap" wired al backend | **DONE 2026-05-06** (recap real via `/my-recap` + connections via `/me/contacts`. 3 casos manejados: deshabilitado / no cumple threshold / disponible. Tier real `insider/activo/headliner` con labels customizables por organizador. BUG-323/324 fixed) |
 | Sponsors logo band sutil abajo | NOT YET (originalmente Fase 4) |
 | GamificationHud preview en LIVE | NOT YET (originalmente Fase 5) |
 | Anuncios mini banner | NOT YET (originalmente Fase 6) |

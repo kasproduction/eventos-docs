@@ -3,6 +3,25 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-05-06 — W.2 Home audit + wired backend recap (3 bugs)
+
+### BUG-325: :focus-visible global pintaba halo accent gigante en TODOS los modulos (RESUELTO)
+- **Severidad:** MEDIA — `globals.css` linea 455 definia `:focus-visible` con `outline: 2px solid var(--accent)` + `box-shadow: 0 0 0 4px color-mix(--accent 20%)`. Con `primary_color` rojo del cliente (Bancolombia), TODOS los botones de TODOS los modulos al click mostraban un halo rojo de 4px que el usuario interpretaba como animacion errante. El fix de W.3 (BUG-319) solo cubrio `.agenda-root`; W.2 home y demas modulos seguian afectados
+- **Fix:** Override global del `:focus-visible` con outline sutil `color-mix(in srgb, var(--accent) 65%, var(--text-muted))` + outline-offset 2px + SIN box-shadow ring. Mantiene a11y WCAG con outline visible pero sin halo accent. Para CTAs primarios que necesiten ring accent destacado, usar utility `.focus-accent-ring` explicito (TODO crear cuando aplique). El override de `.agenda-root` se mantiene como doble-defensa
+- **Archivo:** `eventos-web/src/app/globals.css` linea 455
+
+### BUG-324: TODO referenciaba endpoint inexistente `/me/recap-stats` (RESUELTO)
+- **Severidad:** BAJA — `EndedState.tsx` tenia comentario `// TODO: stats reales del usuario via /api/v1/event/{id}/me/recap-stats`. Ese endpoint NO existe en el backend. El real es `GET /events/{id}/my-recap` (controlado por `RecapController@myRecap`) y devuelve un shape muy distinto al asumido (discriminated union de 3 casos: not_enabled, threshold_not_met, available)
+- **Fix:** Eliminado TODO obsoleto. Wireado al endpoint real en `lib/recap.ts` con tipo `RecapState` que mapea exactamente los 3 casos. `BACKEND-API-MAP.md` corregido — la entrada anterior decia `{data: {sessions_attended, points_earned, connections_made}}` (inventado por el agent en el barrido inicial), reemplazada con shape real verificado via curl
+- **Archivos:** `eventos-web/src/components/app/home/EndedState.tsx`, `eventos-web/src/lib/recap.ts`, `docs/webapp/BACKEND-API-MAP.md`
+
+### BUG-323: EndedState mostraba stats hardcoded a TODOS los usuarios (CRITICA — produccion)
+- **Severidad:** CRITICA — `EndedState.tsx` linea 24 declaraba `const stats = { hoursLive: 14, sessionsAttended: 8, connections: 32, followUps: 12, tier: "Gold", tierTopPercent: 18 }`. Cualquier usuario que entrara a un evento ENDED veia exactamente "14h, 8 sesiones, 32 conexiones, Gold Top 18%" sin importar su asistencia real. Marcado en roadmap W.2 como "DONE (mock data)" pero quedo como deuda activa olvidada — bug de produccion latente
+- **Fix:** Wireado al endpoint real `/events/{id}/my-recap` + `/me/contacts` para connections count. EndedState ahora maneja 3 casos: (1) recap deshabilitado por organizador → "Gracias por participar", (2) usuario no cumple threshold → mensaje explicativo sin stats, (3) recap disponible → 4 stats reales (hours/sessions/connections/days) + tier real (insider/activo/headliner segun config del organizador) + CTA "Ver mi recap" + "Descargar certificado" condicional al config. Campos inventados eliminados: `followUps` (no existe en backend), `tierTopPercent` (no existe — el ranking percentil no se calcula). `tier` y label vienen de `recap.config.tiers.labels` (customizable per evento)
+- **Archivos:** `eventos-web/src/components/app/home/EndedState.tsx`, `eventos-web/src/components/app/home/HomeView.tsx`, `eventos-web/src/lib/recap.ts` (nuevo), `eventos-web/src/app/[locale]/(app)/home/page.tsx`
+
+---
+
 ## 2026-05-06 — W.3 Agenda webapp implementacion + barrido backend (5 bugs)
 
 ### BUG-322: Re-rate sesion sin manejo del 409 backend (RESUELTO)
@@ -1858,11 +1877,11 @@
 
 | Severidad | Count | Resueltos | Pendientes |
 |-----------|-------|-----------|------------|
-| CRITICA | 31 | 31 | 0 |
+| CRITICA | 32 | 32 | 0 |
 | ALTA | 80 | 80 | 0 |
-| MEDIA | 100 | 98 | 2 (BUG-111, BUG-127) |
-| BAJA | 22 | 22 | 0 |
-| **Total** | **233+** | **231+** | **2** |
+| MEDIA | 101 | 99 | 2 (BUG-111, BUG-127) |
+| BAJA | 23 | 23 | 0 |
+| **Total** | **236+** | **234+** | **2** |
 
 > Nota: BUG-005 a BUG-015 cuentan como 11 bugs individuales en una sola entrada.
 

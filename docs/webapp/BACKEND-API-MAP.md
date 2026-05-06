@@ -622,11 +622,74 @@
 
 ## Recap Post-evento
 
-**Routes:** `routes/api/events.php`
+**Routes:** `routes/api/events.php` | **Controller:** `RecapController@myRecap`
 
 | Metodo | Path | Auth | Body | Response | Notas |
 |---|---|---|---|---|---|
-| GET | `/events/{eventId}/my-recap` | sanctum | — | `{data: {sessions_attended, points_earned, connections_made}}` | Mi resumen |
+| GET | `/events/{eventId}/my-recap` | sanctum | — | Discriminated union (3 casos) — ver shape abajo | Verifica threshold antes de generar; cache 24h |
+
+### Shape `/my-recap` (3 casos)
+
+```ts
+type RecapResponse =
+  // Caso 1: organizador desactivo recap
+  | { enabled: false; reason: "recap_disabled" }
+
+  // Caso 2: enabled pero usuario no cumple threshold (min sesiones + min %
+  //         duracion configurado en `events.certificate_min_sessions` y
+  //         `events.certificate_min_duration_pct`)
+  | { enabled: true; available: false; reason: "threshold_not_met" }
+
+  // Caso 3: enabled + usuario califica
+  | {
+      enabled: true;
+      available: true;
+      recap: {
+        config: {
+          tiers?: {
+            show: boolean;
+            thresholds: { insider_max_h: number; activo_max_h: number };
+            labels: { insider: string; activo: string; headliner: string };
+          };
+          blocks?: {
+            certificate?: { show: boolean; label: string; stats: string[] };
+            // ... otros bloques (header_ig, protagonist, footer, back_side)
+          };
+          cover?: { cta_text: string };
+          share?: { ig_button_text: string };
+          // ... mas config customizable per evento via `events.recap_config` JSON
+        };
+        attendee: {
+          name: string | null;
+          handle: string | null;       // email handle (antes del @)
+          role: string | null;         // user.job_title
+          company: string | null;
+          photo_url: string | null;
+        };
+        stats: {
+          hours: number;
+          minutes: number;
+          sessions_count: number;
+          days_count: number;
+        };
+        tier: "insider" | "activo" | "headliner";
+        serial: string;                // "SUMMITNAME·2026·#1234"
+        verify_code: string;           // HMAC para validar autenticidad
+        sessions_list: Array<{
+          session_id: number;
+          title: string | null;
+          joined_at: string | null;    // ISO8601
+          duration_seconds: number;
+        }>;
+        image_url: string | null;      // URL R2 de la imagen recap (si Browsershot ya genero)
+      };
+    };
+```
+
+> **NO incluye `connections_count`** — para "X conexiones" del recap, llamar
+> en paralelo a `GET /me/contacts?event_id={id}` y usar `data.length`.
+
+> **NO incluye `points_earned`** — usar `GET /me/points?event_id={id}`.
 
 ---
 
