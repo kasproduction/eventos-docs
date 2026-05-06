@@ -3,6 +3,25 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-05-06 — W.0 Shell audit (3 bugs)
+
+### BUG-328: Bell button del sidebar sin onClick (UX confusa) (RESUELTO)
+- **Severidad:** BAJA — `SidebarPill.tsx` renderizaba el bell como `<button type="button">` sin `onClick`. Visualmente clickeable, sin accion. Combinado con BUG-326 (badge "3" hardcoded) sugeria al usuario que hay notifs por leer pero al click no pasa nada
+- **Fix:** Cambiado a `<span>` con `cursor: default` + tooltip "notifications · proximamente". Cuando W.10 wiree el panel notif, restaurar como `<button>` con handler. Color cambiado a `--text-label` para reforzar visualmente el estado coming-soon
+- **Archivo:** `eventos-web/src/components/shell/SidebarPill.tsx`
+
+### BUG-327: Sidebar items navegando a 404 silencioso (RESUELTO)
+- **Severidad:** ALTA — `SidebarPill.tsx` listaba 6 items pero solo `/home` y `/agenda` tienen ruta implementada. Click en `/live`, `/networking`, `/social`, `/sponsors` → Next 404 page (sale del shell spatial, rompe la sensacion de app). Estos modulos viven en W.4/W.6/W.7/W.8 (no implementados)
+- **Fix:** Refactor a componente interno `<NavSlot>` con flag `available: boolean`. Items NO disponibles renderizan `<span aria-disabled>` con opacity 0.55, cursor default + tooltip "{label} · proximamente". El icono `live` mantiene el dot pulse pero atenuado. Cuando los modulos existan, cambiar `available: false` → `true`
+- **Archivo:** `eventos-web/src/components/shell/SidebarPill.tsx`
+
+### BUG-326: unreadNotifications hardcoded a 3 en SpatialShell (RESUELTO)
+- **Severidad:** MEDIA — `SpatialShell.tsx` pasaba `unreadNotifications={3}` literal al SidebarPill. Cualquier usuario en cualquier evento veia el badge "3" en el bell sin importar su estado real de notificaciones. Backend NO tiene endpoint de notif count y la app movil tampoco lo consulta (solo registra push token via `/auth/expo-token`)
+- **Fix:** Eliminado el hardcode. Prop `unreadNotifications` ahora opcional sin default — si no se pasa, NO se muestra badge. Cuando W.10 implemente panel notif con endpoint real (ej. `GET /me/notifications/unread-count`), pasarlo desde el server component
+- **Archivos:** `eventos-web/src/components/shell/SpatialShell.tsx`, `eventos-web/src/components/shell/SidebarPill.tsx`
+
+---
+
 ## 2026-05-06 — W.2 Home audit + wired backend recap (3 bugs)
 
 ### BUG-325: :focus-visible global pintaba halo accent gigante en TODOS los modulos (RESUELTO)
@@ -1878,10 +1897,10 @@
 | Severidad | Count | Resueltos | Pendientes |
 |-----------|-------|-----------|------------|
 | CRITICA | 32 | 32 | 0 |
-| ALTA | 80 | 80 | 0 |
-| MEDIA | 101 | 99 | 2 (BUG-111, BUG-127) |
-| BAJA | 23 | 23 | 0 |
-| **Total** | **236+** | **234+** | **2** |
+| ALTA | 81 | 81 | 0 |
+| MEDIA | 102 | 100 | 2 (BUG-111, BUG-127) |
+| BAJA | 24 | 24 | 0 |
+| **Total** | **239+** | **237+** | **2** |
 
 > Nota: BUG-005 a BUG-015 cuentan como 11 bugs individuales en una sola entrada.
 
