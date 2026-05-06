@@ -3,6 +3,36 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-05-06 — W.3 Agenda webapp implementacion + barrido backend (5 bugs)
+
+### BUG-322: Re-rate sesion sin manejo del 409 backend (RESUELTO)
+- **Severidad:** ALTA — Backend `RatingController@store` valida UNIQUE constraint per user/session y retorna 409 con `{message: "Ya evaluaste esta sesion"}`. La UI permitia reabrir el RatingModal con `initialRating` precargado y al submit el usuario veia toast de error generico
+- **Fix:** Estrellas readonly en `SessionCard` ahora son `<span>` (no `<button>`), no clickeables. En `DetailPanel` se oculta el boton "Evaluar" y se muestra `dp-rated` con las estrellas. El modal precarga `initialRating` solo para casos donde aun se permita editar (pendiente decision producto)
+- **Archivos:** `eventos-web/src/components/app/agenda/{SessionCard,DetailPanel,RatingModal,AgendaView}.tsx`
+
+### BUG-321: Asistencia mostraba "0 confirmados" con avatares de speakers (RESUELTO)
+- **Severidad:** MEDIA — DetailPanel renderizaba seccion "Asistencia" con avatares (mock = primeros 6 speakers) pero el count "X confirmados" usaba `favorites_count` real (a menudo 0). Visualmente: caras visibles + texto "0" → confunde
+- **Fix:** Seccion "Asistencia" oculta hasta que exista endpoint `/sessions/{id}/attendees` (W.8). El count de "interesados" (= `favorites_count`) se muestra como meta-row en el card de info, sin avatares. Markup completo del bloque preservado en codigo con TODO documentado
+- **Archivos:** `eventos-web/src/components/app/agenda/{AgendaView,DetailPanel}.tsx`
+
+### BUG-320: Heart de SessionCard animaba al favoritar desde DetailPanel (RESUELTO)
+- **Severidad:** MEDIA — Patron inicial: `useEffect(() => { if (was=false && now=true) playHeartAnim() }, [is_favorite])`. En spatial UI la lista queda visible al lado del detail; favoritar desde el boton del detail cambia state, dispara effect, anima la card en la lista → doble feedback visual confuso
+- **Fix:** Animacion solo en el `onClick` directo del propio botón (heart card o boton detail). Sin useEffect cross-state. Cuando favoriteas desde detail, la card actualiza su fill pero no anima
+- **Archivos:** `eventos-web/src/components/app/agenda/{SessionCard,DetailPanel}.tsx`
+
+### BUG-319: focus-visible global pintaba ring rojo en botones del agenda (RESUELTO)
+- **Severidad:** MEDIA — `globals.css` define `:focus-visible { outline: 2px solid var(--accent); box-shadow: 0 0 0 4px color-mix(...accent 20%) }` para a11y. En eventos con `primary_color` rojo (Bancolombia), al click en el boton "Favorita" del DetailPanel aparece un halo rojo de 4px que el usuario interpretaba como anim del heart
+- **Fix:** Override en `agenda.css` dentro de `.agenda-root` para botones: outline 2px del `--ag-border-strong` (sutil), `box-shadow: none`. Mantiene a11y WCAG sin el halo accent gigante
+- **Archivos:** `eventos-web/src/components/app/agenda/agenda.css`
+
+### BUG-318: lumina toast dentro del setState updater (CRITICA — React 19 strict)
+- **Severidad:** CRITICA — `toggleFavorite` llamaba `lumina.favorite/info()` dentro de la funcion updater de `setDays((prev) => {...})`. React 19 Strict Mode corre el updater 2x para detectar side effects → toast se disparaba duplicado + setState en `LuminaToastViewport` durante render de `AgendaView` → warning "Cannot update a component (`LuminaToastViewport`) while rendering a different component (`AgendaView`)"
+- **Fix:** Lookup ANTES del setDays (`findSession(days, id)`) → setDays con la mutacion pura → toast despues del setDays. El updater queda 100% puro
+- **Patron a evitar:** NUNCA llamar funciones con side effects (toast, navigation, analytics) dentro de updater functions de useState. Solo cambios al state.
+- **Archivos:** `eventos-web/src/components/app/agenda/AgendaView.tsx`
+
+---
+
 ## 2026-05-02 — Auditoria seguridad webapp post-F10 (4 bugs)
 
 ### BUG-317: Webapp sin headers de seguridad basicos (RESUELTO)
@@ -1828,11 +1858,11 @@
 
 | Severidad | Count | Resueltos | Pendientes |
 |-----------|-------|-----------|------------|
-| CRITICA | 30 | 30 | 0 |
-| ALTA | 79 | 79 | 0 |
-| MEDIA | 97 | 95 | 2 (BUG-111, BUG-127) |
+| CRITICA | 31 | 31 | 0 |
+| ALTA | 80 | 80 | 0 |
+| MEDIA | 100 | 98 | 2 (BUG-111, BUG-127) |
 | BAJA | 22 | 22 | 0 |
-| **Total** | **228+** | **226+** | **2** |
+| **Total** | **233+** | **231+** | **2** |
 
 > Nota: BUG-005 a BUG-015 cuentan como 11 bugs individuales en una sola entrada.
 
