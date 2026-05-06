@@ -63,12 +63,12 @@
 
 ### Modulos core asistente virtual (10 sesiones)
 - [ ] W.2: Home (hero, countdown, happening now, GamificationHud, recap banner, anuncios mini, post-event survey, EventArchive) (~9h)
-- [ ] W.3: Agenda (lista, filtros, favoritos, lifecycle, conflictos, room-checkin, .ics, ratings, recordatorios) (~11h)
+- [x] W.3: Agenda (lista, filtros, favoritos, .ics download, ratings + my-ratings backend wired) (~11h) — **DONE 2026-05-06**
 - [ ] W.4: Streaming (Vimeo + Q&A + chat + polls + Trivia + anuncios in-stream + replay) (~14h)
 - [ ] W.5: Speakers (directorio, ratings en lista, perfil, favoritos) (~5h)
 - [ ] W.6: Social Wall (feed, Stories, Hashtags, Photo Contest, Memorias) (~10h)
 - [ ] W.7: Sponsors (Brand Wall, Profile, lead capture, trivia) (~7h)
-- [ ] W.8: Networking (matchmaking, sent/received, chat 1:1, bookmarks, blocked) (~7h)
+- [ ] W.8: Networking (matchmaking, sent/received, bookmarks, blocked) (~7h) — chat 1:1 descartado 2026-05-06 (WhatsApp/email/LinkedIn cubren)
 - [ ] W.9: Engagement (encuestas, leaderboard, badges, passport, rewards, prizes, streak) (~10h)
 - [ ] W.10: Hub Personal (notif, perfil, settings, Mi QR, Mis Stands, Mis Redenciones, Mis Prizes, Mi Recap, Soporte access, Cambiar evento) (~8h)
 

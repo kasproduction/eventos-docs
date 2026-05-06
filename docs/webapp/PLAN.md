@@ -91,7 +91,7 @@ Lumina Noir solido (no glass de entorno real). Paneles con bordes sutiles + opac
 | W.1 | `W.1-setup-auth.md` | Next.js setup + magic link + email/password + i18n + login slideshow + status gating + Sentry + tests + **F10 UI/UX foundation** (LuminaToast, FormField, EmptyState, Skeletons, microinteracciones, error boundaries — ADR-026). Tour movido a W.X (ADR-025) | ~15.5h |
 | W.1B | `W.1-backend-magic-link.md` | **Sesion backend separada bloqueante** — endpoints magic link + tabla event_login_slides + Filament resource + Mailable | ~4h |
 | W.2 | `W.2-home.md` | Hero, countdown, happening now, GamificationHud, recap banner, anuncios mini, sponsors preview, module menu, post-event survey, EventArchive | ~9h |
-| W.3 | `W.3-agenda.md` | Lista, filtros, favoritos, detalle, lifecycle states, conflictos, room-checkin, .ics, ratings post-sesion, recordatorios, session chat. **Demo HTML aprobado 2026-05-05** | ~11h |
+| W.3 | `W.3-agenda.md` | Lista, filtros, favoritos, detalle, .ics download, ratings + my-ratings backend wired. **IMPLEMENTADO React 2026-05-06** (lifecycle/conflictos/room-checkin/recordatorios/chat session diferidos) | ~11h |
 | W.4 | `W.4-streaming.md` | Vimeo + Q&A + chat + polls + Trivia Kahoot + anuncios in-stream + replay | ~14h |
 | W.5 | `W.5-speakers.md` | Directorio, ratings en lista, perfil, favoritos | ~5h |
 | W.6 | `W.6-social-wall.md` | Feed, posts, comentarios, likes, Stories, Photo Contest banner, Hashtags, Memorias | ~10h |

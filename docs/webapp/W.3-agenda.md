@@ -1,10 +1,48 @@
 # W.3 — Agenda
 
-> Lista completa de sesiones + filtros (dia/track/tipo) + favoritos + detalle + room-checkin + lifecycle states + .ics download + ratings post-sesion + chat session-specific.
+> Lista completa de sesiones + filtros (dia/track) + favoritos + detalle + .ics download + ratings post-sesion + chat session-specific.
 >
-> **Estimacion:** ~11h (expandida de 8h por submodulos faltantes).
+> **Estimacion:** ~11h (real ejecutado).
 > **Dependencias:** W.0, W.1.
-> **Estado:** **Demo HTML aprobado 2026-05-05** en `design/features/webapp/W3-agenda/agenda-v3-davinci.html`. Pendiente codear React.
+> **Estado:** **IMPLEMENTADO React 2026-05-06** — wireado al backend (favoritos POST, .ics download, ratings POST, my-ratings GET). Demo HTML base: `design/features/webapp/W3-agenda/agenda-v3-davinci.html`.
+
+---
+
+## Lo entregado (2026-05-06)
+
+**Componentes** (`eventos-web/src/components/app/agenda/`):
+- `AgendaView.tsx` — root del modulo, ensambla todo + maneja estado + atajos teclado
+- `AgendaHeader.tsx` — title + tabs Agenda|Mi Agenda + buscar (search expanded inline)
+- `DayStrip.tsx` — pills horizontales scrolleables, auto-center selected, min 7 dias
+- `ChipFilters.tsx` — chips por track con multi-select
+- `SessionList.tsx` — timeline + day-slide animation
+- `SessionCard.tsx` — patron movil 1:1, heart con cambio de color, action row con border-top
+- `DetailPanel.tsx` — floating right, slide-in 480ms + swap-out 260ms entre sesiones
+- `AttendeesPop.tsx` — sub-panel modal (oculto hasta endpoint W.8)
+- `RatingModal.tsx` — bottom-sheet con 5 estrellas + comment opcional, precarga rating si ya califico
+- `agendaDerive.ts` — helpers puros (buildDayStrip, deriveUiState, formatTime, trackSlug)
+- `agenda.css` — tokens del demo (--ag-*) + theme overrides Noir/Lux
+
+**Wiring backend** (`eventos-web/src/lib/agendaClient.ts` + `app/api/agenda/...`):
+- Favoritos: POST optimistic + revert si falla + reconciliacion con response real
+- Rating: POST con manejo de 409 (ya calificado), abre modal readonly si UNIQUE
+- My-ratings: GET al mount, alimenta estrellas readonly en cards `past`
+- Calendar.ics: download via anchor invisible que respeta Content-Disposition del backend
+
+**Microinteracciones (todas validadas en app movil):**
+- Day-slide al cambiar dia (CSS keyframes)
+- Slide-in/swap-out del detail panel
+- Heart pop simple en card (sin particulas, sin aro — replica scale del app movil)
+- Star pop al setear rating
+- Toast notifications via lumina (favorite/calendar/success/info/error)
+
+**Decisiones cerradas vs roadmap original:**
+- ❌ Chat 1:1 / DM → descartado (WhatsApp/email/LinkedIn cubren). Solo chat por sesion (W.4).
+- ❌ Conflict detection con modal → calculado en cliente, sin endpoint backend
+- ❌ Asistencia (lista quien va) → endpoint no existe en backend; seccion oculta hasta W.8 networking. Count "interesados" usa `favorites_count`.
+- ❌ Room check-in / .ics de Mi Agenda completa / recordatorios push → fuera de scope W.3, mover a W.10/W.4.
+
+---
 
 ---
 

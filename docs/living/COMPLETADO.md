@@ -8,6 +8,16 @@
 
 ---
 
+## Webapp (Next.js) — fase activa
+
+| Sesion | Feature | Fecha | Notas |
+|--------|---------|-------|-------|
+| W.0 | Spatial Shell + CanvasCard + SidebarPill + ThemeToggle | 2026-05-04 | Fix tablet H 2026-05-05 (canvas sin aspect-ratio rigido) |
+| W.2 | Home cinematic con 3 estados (PreState/LiveState/EndedState) | 2026-05-04 | Wordmark accent, mute por estado |
+| W.3 | **Agenda completa + wired backend** | **2026-05-06** | DayStrip + ChipFilters + SessionCard + DetailPanel + RatingModal + AttendeesPop. POST favoritos optimistic + revert, .ics download, rating + my-ratings, Asistencia oculta hasta W.8. Doc maestro `BACKEND-API-MAP.md` (805 lineas, todos los endpoints + decisiones cerradas). |
+
+---
+
 ## Fase 0 — Setup (2026-03-28)
 
 - [x] Entorno: PHP 8.3, Redis, MySQL 8.4, Node 22, Git, Composer, EAS CLI
