@@ -1,10 +1,10 @@
 # W.8 — Networking
 
-> Perfiles de asistentes + solicitudes de contacto + chat 1:1.
+> Directorio + sugerencias + perfiles + solicitudes de contacto + lista de bloqueados. **Sin chat 1:1 y sin bookmarks** (no existen en backend).
 >
-> **Estimacion:** ~7h.
+> **Estimacion:** ~5h (reducida de 7h tras audit — sin chat DM ni bookmarks).
 > **Dependencias:** W.0, W.1, W.6 (puede compartir UI patterns con Social Wall — pantalla "Connect" agrupa ambos visualmente).
-> **Estado:** Pendiente.
+> **Estado:** Pendiente — backend audit completado 2026-05-07.
 
 ---
 
@@ -13,22 +13,97 @@
 - `PLAN.md`, `DESIGN-SYSTEM.md`, `RESPONSIVE-SPEC.md`
 - `W.0-spatial-ui.md`
 - App movil: `screens/networking/` — RT, glass cards, infinite scroll
+- Backend: `routes/api/networking.php`, `app/Http/Controllers/Api/V1/NetworkingController.php`
 - Memoria: `project_networking_notes.md`, `project_s118_notes.md` (matchmaking)
 
 ---
 
-## Alcance
+## Drift corregido (2026-05-07)
 
-1. Directorio asistentes con filtros (intereses, empresa, rol)
-2. Perfil completo otro asistente
-3. Matchmaking con score (overlap intereses + sesiones comunes)
-4. **Suggested contacts**: top 5 sugerencias rankeadas con razones explicitas
-5. Solicitudes de contacto (enviar/aceptar/rechazar)
-6. **Sent requests tracking**: ver mis solicitudes enviadas + estado pendiente/aceptada/rechazada
-7. Chat 1:1 con conexiones aceptadas
-8. **Bookmarks**: marcar attendee como bookmark (sin enviar solicitud) — para revisar mas tarde
-9. **Blocked list**: bloquear attendee → no aparece en directorio + no puede enviar solicitud
-10. Mi perfil editable (foto, bio, intereses)
+Version previa documentaba **chat 1:1 (DM)** y **bookmarks**, ninguno existe en backend. Tambien usaba paths incorrectos y eventos socket inventados:
+
+- ~~`POST /attendees/{id}/connect`~~ → real `POST /contacts/request {target_attendee_id, message?}`
+- ~~`POST /connections/{id}/accept`~~ → real `PUT /contacts/request/{id} {status: 'accepted'}`
+- ~~`POST /connections/{id}/reject`~~ → real `PUT /contacts/request/{id} {status: 'ignored'}` (no 'rejected')
+- ~~`GET /event/{id}/matchmaking?limit=5`~~ → real `GET /events/{id}/suggested-contacts`
+- ~~`GET /attendees/{id}`~~ → real `GET /attendees/{id}/profile`
+- ~~`GET /connections/{id}/messages`, `POST /connections/{id}/messages`~~ → **NO existe** chat DM
+- ~~`POST /attendees/{id}/bookmark`, `GET /me/bookmarks`~~ → **NO existe** bookmarks
+- ~~`POST /attendees/{id}/block`, `POST /attendees/{id}/unblock`~~ → reales son `POST /contacts/block/{attendeeId}` y `DELETE /contacts/block/{attendeeId}`
+- ~~Sockets `connection.request.new`, `connection.accepted`, `chat.dm.message.new`~~ → reales son `networking:notify {type:'request_received'|'request_accepted', fromName, fromAttendeeId}` (directed event a un attendee, NO room broadcast)
+
+---
+
+## Alcance real
+
+1. **Directorio** asistentes (paginado, con search server-side: `?search=text&role=attendee`)
+2. **Suggested contacts**: top sugerencias (sin "match score %" — el endpoint solo retorna `common_count` y `common_tags`. Si cliente quiere score visible, calcularlo client-side)
+3. **Perfil completo** del otro asistente
+4. **Enviar solicitud** (con mensaje opcional)
+5. **Inbox solicitudes**: recibidas + enviadas (sin cancelar — backend no expone DELETE)
+6. **Aceptar / Ignorar** solicitudes recibidas
+7. **Mis contactos** (aceptados)
+8. **Lista de bloqueados** + bloquear/desbloquear
+9. **Mi perfil editable** (foto, bio, intereses) — endpoint `PUT /me/profile`
+
+NO entra:
+- Chat 1:1 / DM (no existe en backend; chat es solo por sesion en W.4)
+- Bookmarks (no existe)
+- Cancelar solicitud enviada (no hay endpoint)
+- "Match score %" como numero — solo se ven razones (common interests/tags)
+
+---
+
+## Endpoints reales (verificados 2026-05-07)
+
+```
+// Directorio
+GET /api/v1/events/{eventId}/attendees?search={text}&role={role}
+  → {data: [AttendeeResource[]]}
+
+// Sugerencias
+GET /api/v1/events/{eventId}/suggested-contacts
+  → {data: [{...AttendeeResource, common_count: number, common_tags: string[]}]}
+
+// Perfil de otro
+GET /api/v1/attendees/{attendeeId}/profile
+  → {data: AttendeeResource}
+
+// Solicitudes
+POST /api/v1/contacts/request
+  body: {target_attendee_id: number, message?: string}
+  → {data: {id, status: 'pending'}}
+  errores: 409 CONTACT_ALREADY_SENT (ya envio antes)
+
+PUT /api/v1/contacts/request/{id}
+  body: {status: 'accepted' | 'ignored'}
+  → {data: {id, status}}
+  errores: 409 ALREADY_RESPONDED
+
+// Mis listas
+GET /api/v1/me/contacts                           // aceptados
+GET /api/v1/me/contact-requests                   // recibidas pending
+GET /api/v1/me/contact-requests/sent              // enviadas pending
+
+// Bloqueos
+GET    /api/v1/me/blocked
+POST   /api/v1/contacts/block/{attendeeId}
+DELETE /api/v1/contacts/block/{attendeeId}
+
+// Mi perfil
+GET /api/v1/me              // datos mios
+PUT /api/v1/me/profile      // editar
+```
+
+---
+
+## Eventos socket (W.11)
+
+| Evento | Payload | Uso |
+|---|---|---|
+| `networking:notify` | `{type:'request_received'\|'request_accepted', fromName, fromAttendeeId}` | Toast + invalidate `me/contact-requests` o `me/contacts` |
+
+NO existen `connection.*` ni `chat.dm.*`.
 
 ---
 
@@ -36,130 +111,111 @@
 
 - App movil networking (`features/Screenshot 2026-...`)
 - `design/showcase-onboarding-v6.html` `conn-frame` — concepto match cards
+- Memoria: `project_networking_notes.md`
 
 ---
 
-## Endpoints (verificar)
+## Fase 0 — Hooks (~30min) — 0/4
 
-- `GET /api/v1/event/{id}/attendees?intereses&q&cursor`
-- `GET /api/v1/attendees/{id}` — perfil
-- `GET /api/v1/event/{id}/matchmaking?limit=5` — top sugerencias rankeadas con razones
-- `POST /api/v1/attendees/{id}/connect` — solicitud
-- `POST /api/v1/connections/{id}/accept`
-- `POST /api/v1/connections/{id}/reject`
-- `GET /api/v1/me/connections/sent?status=pending` — solicitudes enviadas
-- `GET /api/v1/connections/{id}/messages?cursor`
-- `POST /api/v1/connections/{id}/messages`
-- `POST /api/v1/attendees/{id}/bookmark` — toggle bookmark
-- `GET /api/v1/me/bookmarks` — mis bookmarks
-- `POST /api/v1/attendees/{id}/block` — bloquear
-- `GET /api/v1/me/blocked` — mi blocked list
-- `POST /api/v1/attendees/{id}/unblock`
-
-Socket events:
-- `connection.request.new`, `connection.accepted`
-- `chat.dm.message.new`
+- [ ] `useAttendees(eventId, filters)` — paginated query con search/role
+- [ ] `useSuggestedContacts(eventId)` — top sugerencias con `common_count`/`common_tags`
+- [ ] `useAttendeeProfile(attendeeId)`
+- [ ] `useMyContacts() / useReceivedRequests() / useSentRequests() / useBlocked()`
 
 ---
 
-## Fase 0 — Hooks (~30min) — 0/3
-
-- [ ] `useAttendees(eventId, filters)` — infinite query
-- [ ] `useMatchmaking(eventId)` — sugerencias rankeadas
-- [ ] `useConnection(connectionId)` con mensajes
-
----
-
-## Fase 1 — Directorio (~2h) — 0/4
+## Fase 1 — Directorio (~1.5h) — 0/4
 
 ### 1.1 Grid — 0/2
-- [ ] `<AttendeesGrid />` con cards (avatar + nombre + role + intereses)
+- [ ] `<AttendeesGrid />` con cards (avatar + nombre + role + tags)
 - [ ] Click → perfil
 
 ### 1.2 Filtros — 0/2
-- [ ] Pills intereses (multi-select)
-- [ ] Search + dropdown empresa/rol
+- [ ] Search server-side (`?search=`) con debounce 300ms
+- [ ] Filtro por role (dropdown attendee/speaker/sponsor/etc)
 
 ---
 
-## Fase 2 — Matchmaking (~1.5h) — 0/3
+## Fase 2 — Suggested contacts (~1h) — 0/3
 
 ### 2.1 Sugerencias — 0/2
-- [ ] `<MatchmakingSection />` cards top 5 con badge "Match {score}%"
-- [ ] Hover/tap muestra razones (X intereses comunes, Y sesiones comunes)
+- [ ] `<SuggestedSection />` cards top sugerencias
+- [ ] Hover/tap muestra "X intereses comunes" usando `common_count` y lista de `common_tags`
 
 ### 2.2 CTA — 0/1
-- [ ] Boton "Conectar" directo
+- [ ] Boton "Conectar" → modal "Enviar solicitud" con mensaje opcional → `POST /contacts/request`
 
 ---
 
-## Fase 3 — Perfil (~1h) — 0/3
+## Fase 3 — Perfil otro asistente (~45min) — 0/3
 
 ### 3.1 Layout — 0/2
 - [ ] Desktop: panel secondary 50%
 - [ ] Mobile: full screen
 
 ### 3.2 Contenido — 0/1
-- [ ] Avatar grande + nombre + role + bio + intereses + sesiones favoritas + redes + CTA Conectar
+- [ ] Avatar + nombre + role + tags + bio + intereses + sesiones (si endpoint lo provee) + redes + CTA Conectar (o "Solicitud pendiente" / "Ya conectados")
+- [ ] Menu "..." → opcion "Bloquear" con confirm
 
 ---
 
-## Fase 3.5 — Bookmarks + Blocked list (~1h) — 0/4
+## Fase 4 — Lista bloqueados (~30min) — 0/2
 
-### 3.5.1 Bookmarks — 0/2
-- [ ] Boton "Marcar para despues" en perfil → toggle bookmark
-- [ ] Tab "Mis Bookmarks" con lista de attendees marcados (sin enviar solicitud)
-
-### 3.5.2 Blocked — 0/2
-- [ ] Menu "..." en perfil → opcion "Bloquear" con confirm
-- [ ] Tab "Bloqueados" en settings W.10 con boton "Desbloquear"
+- [ ] Tab "Bloqueados" en settings (W.10) usando `useBlocked()`
+- [ ] Boton "Desbloquear" por item → `DELETE /contacts/block/{attendeeId}`
 
 ---
 
-## Fase 4 — Solicitudes + chat (~2h) — 0/5
+## Fase 5 — Inbox solicitudes (~1.5h) — 0/4
 
-### 4.1 Inbox solicitudes — 0/2
-- [ ] `<ConnectionsInbox />` con tabs: Recibidas / Enviadas / Aceptadas / Bookmarks
-- [ ] Botones aceptar/rechazar inline en Recibidas; Cancelar en Enviadas
+### 5.1 Tabs — 0/2
+- [ ] `<ConnectionsInbox />` tabs: Recibidas / Enviadas / Mis Contactos
+- [ ] Recibidas: aceptar/ignorar inline (`PUT /contacts/request/{id} {status}`)
+- [ ] Enviadas: read-only, badge "Esperando" / "Aceptada" / "Ignorada"
+- [ ] Mis Contactos: lista de aceptados con info basica + link al perfil
 
-### 4.2 Chat 1:1 — 0/3
-- [ ] `<ChatDM />` similar a chat sesion pero 1:1
-- [ ] Optimistic + ack
-- [ ] Indicador "escribiendo..." (W.11 lo agrega)
-
----
-
-## Fase 5 — Mi perfil (~30min) — 0/2
-
-- [ ] Form editable: avatar upload + bio + intereses (multi-select)
-- [ ] Submit → mutation actualiza
+### 5.2 RT — 0/2
+- [ ] Listener `networking:notify` `type=request_received` → toast "{fromName} quiere conectar" + invalidate Recibidas
+- [ ] Listener `networking:notify` `type=request_accepted` → toast "{fromName} acepto tu solicitud" + invalidate Mis Contactos
 
 ---
 
-## Fase 6 — Tests (~30min) — 0/3
+## Fase 6 — Mi perfil editable (~30min) — 0/2
 
-### 6.1 Vitest — 0/1
-- [ ] `useMatchmaking` ranking
+- [ ] Form: avatar upload + bio + intereses (multi-select usando endpoint `/me/interests` si existe en W.9, sino input tags)
+- [ ] Submit → `PUT /me/profile` → optimistic + revert
 
-### 6.2 Playwright — 0/2
-- [ ] Happy path: ver match + conectar + chat
-- [ ] Edge case: solicitud rechazada queda removida
+---
+
+## Fase 7 — Tests (~30min) — 0/3
+
+### 7.1 Vitest — 0/1
+- [ ] `useSuggestedContacts` con `common_count` ordering
+
+### 7.2 Playwright — 0/2
+- [ ] Happy path: ver suggested + enviar solicitud + tab 2 acepta + tab 1 recibe `networking:notify` + lista Mis Contactos actualiza
+- [ ] Edge case: 409 CONTACT_ALREADY_SENT → toast claro
 
 ---
 
 ## Edge cases
 
-- [ ] Asistente sin intereses → no aparece en matchmaking
-- [ ] User intenta conectar dos veces → backend dedupe + toast
-- [ ] User rechazo connection antes → no permitir reenviar
-- [ ] Chat con user banneado → mostrar "Este usuario ya no esta disponible"
-- [ ] Mensaje >1000 chars → error pre-submit
-- [ ] User cambia intereses → recalcular matchmaking en proxima query
-- [ ] Solicitud expirada (>24h sin respuesta) → auto-mover a "Expiradas"
-- [ ] User bloqueado intenta enviar solicitud → backend rechaza (ambos lados)
-- [ ] Cancelar solicitud enviada → backend permite si pending, no si ya aceptada
-- [ ] Bookmark a user que se borra de evento → cleanup automatico
-- [ ] Suggested contacts con scores empatados → ordenar alfabetico
+- [ ] Asistente sin intereses → no aparece en suggested-contacts (backend lo filtra)
+- [ ] User intenta conectar dos veces → 409 CONTACT_ALREADY_SENT, mostrar estado "ya enviada"
+- [ ] User ignoro solicitud antes → puede reenviar (verificar comportamiento backend, default si no hay record reactivable)
+- [ ] User bloqueado intenta enviar solicitud → backend rechaza (ambos lados — verificar)
+- [ ] Mensaje de solicitud >500 chars → bloquear pre-submit (verificar limite backend)
+- [ ] Suggested contacts con `common_count` empatados → ordenar alfabetico secundario
+- [ ] Network change durante mutation → retry button + dont duplicate request
+
+---
+
+## Pendiente backend (nice to have)
+
+- **Endpoint cancelar solicitud enviada** (`DELETE /contacts/request/{id}`) si user se arrepiente. Hoy no existe.
+- **Score numerico de match** en `/suggested-contacts` (si producto lo pide visible). Hoy hay `common_count` pero no porcentaje.
+- **Chat DM** real-time entre conexiones aceptadas. Decision en `BACKEND-API-MAP.md` Decisiones cerradas: NO se implementa, usar contacto registrado o WhatsApp.
+- **Bookmarks** — feature opcional si producto lo pide.
 
 ---
 
@@ -167,4 +223,5 @@ Socket events:
 
 - [ ] Tests verde
 - [ ] Validado 3 viewports
+- [ ] Lighthouse OK
 - [ ] Commit DaVinci + memoria + PENDIENTES.md

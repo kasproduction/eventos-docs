@@ -35,15 +35,16 @@ Importante: **banners NO son patrocinadores** (memoria del usuario lo aclara). L
 
 ---
 
-## Endpoints (verificar)
+## Endpoints (verificados 2026-05-07)
 
-- `GET /api/v1/event/{id}/announcements?cursor` — anuncios paginados
-- `POST /api/v1/announcements/{id}/read` — marcar leido
-- `GET /api/v1/event/{id}/banners` — banners activos
-- `GET /api/v1/event/{id}/highlights` — boletines
+- `GET /api/v1/events/{id}/announcements` — lista completa (no paginado, sin `?cursor`). Shape: `{data: AnnouncementResource[]}` con `{id, title, body, action_url, image_url, roles, published_at}`
+- `GET /api/v1/events/{id}/banners` — banners activos
+- `GET /api/v1/events/{id}/highlights` — boletines
+
+**NO existe** `POST /announcements/{id}/read` — el "leido" es client-side via `localStorage` (ver seccion BellPopover abajo).
 
 Socket events:
-- `announcement.new` — RT push para anuncios urgentes
+- `announcement:new` — RT push (NO `announcement.new`). Payload: `AnnouncementPayload {id, title, body, eventId, createdAt}` (ver `eventos-socket/src/types.ts`)
 
 ---
 
@@ -63,7 +64,7 @@ Socket events:
 
 ### 1.2 Detalle + RT — 0/2
 - [ ] Click anuncio → `<AnnouncementDetail />` modal o panel secundario
-- [ ] Socket `announcement.new` → toast + invalidate lista + badge unread aumenta
+- [ ] Socket `announcement:new` → toast + invalidate lista + badge unread aumenta
 
 ---
 
@@ -97,7 +98,7 @@ Socket events:
 
 ### 4.2 Playwright — 0/2
 - [ ] Happy path: ver lista + leer anuncio + ver banner rotando
-- [ ] Edge case: socket announcement.new → toast aparece + badge actualiza
+- [ ] Edge case: socket `announcement:new` → toast aparece + badge actualiza
 
 ---
 
@@ -110,7 +111,7 @@ Socket events:
 - [ ] Carousel banners pausa al hover (desktop)
 - [ ] Carousel se reduce a 1 sin auto-advance si hay solo 1 banner
 - [ ] Anuncio con HTML malicioso → DOMPurify
-- [ ] Mark as read offline → optimistic + sync al reconectar
+- [ ] Mark as read offline → solo localStorage (sin sync server, no hay endpoint)
 
 ---
 
