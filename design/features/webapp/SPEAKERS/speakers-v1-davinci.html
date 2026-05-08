@@ -1,0 +1,1497 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>W.5 Speakers — DaVinci v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-sunken:#0a0a0a;
+  --bg-elevated:#141414;
+  --surface-low:#1a1a1a;
+  --surface-medium:#1f1f1f;
+  --surface-high:#262626;
+  --surface-card:#181818;
+  --border:rgba(255,255,255,0.06);
+  --border-strong:rgba(255,255,255,0.12);
+  --fg:#f5f5f4;
+  --fg-dim:#a8a8a3;
+  --fg-mute:#6b6b66;
+  --fg-label:#5a5a55;
+
+  --accent:#7CFFB2;
+  --accent-soft:rgba(124,255,178,0.10);
+  --accent-glow:rgba(124,255,178,0.20);
+  --accent-on:#0a0a0a;
+
+  --heart:#FF5D6C;
+  --gold:#B5A68B;
+  --gold-bg:rgba(181,166,139,0.14);
+
+  --tech:#a8a8ff;       --tech-bg:rgba(168,168,255,0.10);
+  --business:#5eead4;   --business-bg:rgba(94,234,212,0.10);
+  --innovation:#f5c66c; --innovation-bg:rgba(245,198,108,0.10);
+  --leadership:#ff8a96; --leadership-bg:rgba(255,138,150,0.10);
+  --culture:#c084fc;    --culture-bg:rgba(192,132,252,0.10);
+
+  --canvas-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+
+  --spring-soft: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --spring-snap: cubic-bezier(0.16, 1.2, 0.3, 1);
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body[data-theme="lux"]{
+  --bg-sunken:#F6F8FA;
+  --bg-elevated:#FFFFFF;
+  --surface-low:#FFFFFF;
+  --surface-medium:rgba(0,0,0,0.03);
+  --surface-high:rgba(0,0,0,0.06);
+  --surface-card:#FFFFFF;
+  --border:rgba(0,0,0,0.08);
+  --border-strong:rgba(0,0,0,0.14);
+  --fg:#1A1B1E;
+  --fg-dim:#4A4B50;
+  --fg-mute:#7C7D82;
+  --fg-label:#A8A9AE;
+  --canvas-shadow: 0 16px 48px rgba(0,0,0,0.12);
+
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 8px 20px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 16px 36px rgba(0,0,0,0.12), 0 6px 12px rgba(0,0,0,0.06);
+
+  --gold:#8E8170;
+  --gold-bg:rgba(142,129,112,0.12);
+}
+
+body[data-theme="lux"] .speakers-card{ box-shadow: var(--shadow-md) }
+body[data-theme="lux"] .sp-row{
+  background: var(--surface-card);
+  border-color: transparent;
+  box-shadow: var(--shadow-sm);
+}
+body[data-theme="lux"] .sp-row:hover{
+  background: var(--surface-card);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+/* Lux glass blur en featured cards — replica BlurView intensity={30} del movil */
+body[data-theme="lux"] .feat-card{
+  background: rgba(255,255,255,0.55);
+  -webkit-backdrop-filter: blur(30px) saturate(140%);
+  backdrop-filter: blur(30px) saturate(140%);
+  border: 1px solid rgba(255,255,255,0.75);
+  box-shadow: var(--shadow-lg);
+}
+body[data-theme="lux"] .feat-card:hover{
+  background: rgba(255,255,255,0.65);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+body[data-theme="lux"] .feat-card.selected{
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-lg);
+}
+/* En Lux la sub-tabla del speakers-card no necesita box bg solido — deja que las cards floten */
+body[data-theme="lux"] .speakers-card{ background: transparent; border:0; box-shadow:none }
+body[data-theme="lux"] .ag-back,
+body[data-theme="lux"] .ag-tool{
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+body[data-theme="lux"] .ag-tabs{
+  background: #f0efea;
+  box-shadow: none;
+}
+body[data-theme="lux"] .ag-tab.active{
+  background: var(--fg); color: #ffffff;
+  box-shadow: 0 2px 8px -1px rgba(0,0,0,0.15);
+}
+body[data-theme="lux"] .chip{
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+body[data-theme="lux"] .chip.active{
+  background: var(--fg); color: #ffffff;
+  box-shadow: 0 2px 8px -1px rgba(0,0,0,0.15);
+}
+body[data-theme="lux"] .detail{
+  border-color: transparent;
+  box-shadow: var(--shadow-lg);
+}
+body[data-theme="lux"] .dp-meta-card,
+body[data-theme="lux"] .dp-about,
+body[data-theme="lux"] .dp-session{
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+body[data-theme="lux"] .empty-hint{
+  background: #ffffff;
+  border: 1px dashed var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+body[data-theme="lux"] .feat-tag.tech,        body[data-theme="lux"] .dp-badge.tech       { background:#EFF6FF; color:#1D4ED8 }
+body[data-theme="lux"] .feat-tag.business,    body[data-theme="lux"] .dp-badge.business   { background:#F0FDF4; color:#166534 }
+body[data-theme="lux"] .feat-tag.innovation,  body[data-theme="lux"] .dp-badge.innovation { background:#FFF7ED; color:#C2410C }
+body[data-theme="lux"] .feat-tag.leadership,  body[data-theme="lux"] .dp-badge.leadership { background:#FDF2F8; color:#BE185D }
+body[data-theme="lux"] .feat-tag.culture,     body[data-theme="lux"] .dp-badge.culture    { background:#FDF4FF; color:#7E22CE }
+
+*{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+html,body{margin:0;padding:0;background:var(--bg-sunken);color:var(--fg);
+  font-family:'Urbanist',system-ui,sans-serif;height:100%;overflow:hidden}
+button{font-family:inherit;color:inherit;background:transparent;border:none;cursor:pointer;padding:0}
+
+.stage{
+  min-height:100vh; width:100%;
+  display:flex;align-items:center;justify-content:center;
+  padding:28px 36px 28px 96px;
+}
+
+/* ==================== SIDEBAR ==================== */
+.sidebar{
+  position:fixed; left:18px; top:50%; transform:translateY(-50%);
+  width:52px; padding:10px 6px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:28px;
+  box-shadow:0 12px 32px rgba(0,0,0,0.4);
+  z-index:50;
+}
+body[data-theme="lux"] .sidebar{ box-shadow: var(--shadow-md) }
+.sb-logo{
+  width:32px;height:32px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:4px;
+  font-family:'Plus Jakarta Sans';font-weight:800;font-size:13px;color:var(--accent);
+}
+.sb-item{
+  width:36px;height:36px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--fg-mute); cursor:pointer; position:relative;
+  transition:color 200ms var(--ease-out), background 200ms var(--ease-out);
+}
+.sb-item:hover{color:var(--fg)}
+.sb-item.active{color:var(--fg);background:var(--surface-high)}
+.sb-item.active::before{
+  content:""; position:absolute; left:-7px; top:8px; bottom:8px;
+  width:2px; border-radius:2px; background:var(--accent);
+}
+.sb-live{
+  position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;
+  background:var(--accent);
+  animation:pulse-live 1.6s ease-in-out infinite;
+}
+.sb-badge{
+  position:absolute;top:6px;right:6px;
+  height:14px;min-width:14px;padding:0 3px;border-radius:99px;
+  background:var(--accent);color:var(--accent-on);
+  font-family:'Plus Jakarta Sans';font-size:8px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--bg-elevated);
+}
+.sb-sep{width:24px;height:1px;background:var(--border);margin:4px 0}
+
+@keyframes pulse-live{
+  0%,100%{opacity:1}
+  50%{opacity:.45}
+}
+
+/* ==================== CANVAS RAIZ ==================== */
+.canvas{
+  width: min(1600px, calc(100vw - 150px));
+  height: min(calc(100vh - 56px), 920px);
+  border-radius:26px;
+  container-type: inline-size;
+  background:var(--bg-elevated);
+  border:1px solid var(--border-strong);
+  box-shadow:var(--canvas-shadow);
+  overflow:hidden;
+  position:relative;
+  display:flex; flex-direction:column;
+}
+
+/* ==================== HEADER ==================== */
+.ag-header{
+  flex-shrink:0;
+  width: 60%;
+  min-width: 460px;
+  max-width: 920px;
+  margin-left: clamp(20px, 2vw, 32px);
+  padding: clamp(20px, 2vw, 32px) clamp(20px, 2vw, 32px) 0;
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+}
+.ag-titleblock{display:flex;align-items:center;gap:14px;min-width:0}
+.ag-back{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--surface-low);color:var(--fg);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0; transition: background 200ms var(--ease-out);
+}
+.ag-back:hover{background:var(--surface-medium)}
+.ag-titles{min-width:0}
+.ag-title{
+  font-family:'Plus Jakarta Sans';font-weight:800;letter-spacing:-0.022em;
+  font-size:clamp(26px, 2.2vw, 38px);line-height:1;margin:0;
+  color:var(--fg); white-space: nowrap;
+}
+.ag-subtitle{
+  margin-top:4px;font-size:clamp(11px, 0.78vw, 13px);
+  color:var(--fg-dim);
+}
+.ag-tools{display:flex;align-items:center;gap:6px;flex-shrink:0;position:relative}
+.ag-tool{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--surface-low);color:var(--fg-dim);
+  display:flex;align-items:center;justify-content:center;
+  transition:all 180ms var(--ease-out);
+}
+.ag-tool:hover{color:var(--fg);background:var(--surface-medium)}
+.ag-tool:active{ transform: scale(0.92) }
+
+.ag-tabs{
+  display:inline-flex; gap:3px;
+  padding:3px;
+  background:var(--surface-low);
+  border-radius:11px;
+}
+.ag-tab{
+  padding:6px 12px;
+  border-radius:8px;
+  font-family:'Urbanist';font-weight:600;font-size:11.5px;
+  color:var(--fg-dim);
+  display:inline-flex;align-items:center;gap:6px;
+  transition: all 200ms var(--ease-out);
+}
+.ag-tab:hover{ color:var(--fg) }
+.ag-tab:active{ transform: scale(0.97) }
+.ag-tab.active{
+  background:var(--fg); color:var(--bg-elevated);
+  font-weight:700;
+}
+.ag-tab .count{
+  font-size:10px; font-weight:700; padding:1px 6px; border-radius:99px;
+  background:rgba(255,255,255,0.06); color:var(--fg-dim); min-width:18px; text-align:center;
+}
+.ag-tab.active .count{ background: rgba(0,0,0,0.18); color: var(--bg-elevated) }
+
+.ag-search-wrap{
+  position:absolute; top:50%; right:0; transform:translateY(-50%);
+  display:none; align-items:center;
+  height:38px; padding: 0 12px 0 36px;
+  background: var(--surface-medium);
+  border-radius:14px;
+  width: 280px;
+  z-index:5;
+}
+.ag-search-wrap.open{display:flex; animation: pop-in 240ms var(--spring-soft)}
+.ag-search-wrap svg.icon{
+  position:absolute; left:13px; color:var(--fg-mute);
+}
+.ag-search-wrap input{
+  background:transparent;border:none;outline:none;color:var(--fg);
+  font-family:inherit;font-size:13px;width:100%;
+}
+@keyframes pop-in{
+  from{opacity:0;transform:scale(.94) translateY(-4px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+
+/* ==================== TRACK CHIPS ==================== */
+.chip-row{
+  display:flex; gap:8px; justify-content:flex-start;
+  width: 60%;
+  min-width: 460px;
+  max-width: 920px;
+  padding: clamp(14px, 1.4vw, 20px) clamp(20px, 2vw, 32px) clamp(14px, 1.2vw, 18px);
+  margin-left: clamp(20px, 2vw, 32px);
+  flex-shrink:0; flex-wrap:wrap;
+}
+.chip{
+  padding:5px 11px;font-size:11px;font-weight:600;
+  border-radius:99px;background:var(--surface-low);
+  color:var(--fg-dim);
+  display:flex;align-items:center;gap:6px;
+  font-family:'Urbanist';
+  transition:all 180ms var(--ease-out);
+}
+.chip:hover{color:var(--fg);background:var(--surface-medium)}
+.chip:active{ transform: scale(0.96) }
+.chip.active{background:var(--fg);color:var(--bg-elevated)}
+.chip.active .chip-dot{background:var(--bg-elevated);opacity:.4}
+.chip-dot{width:7px;height:7px;border-radius:50%}
+
+/* ==================== SPEAKERS WRAP ==================== */
+.speakers-wrap{
+  flex:1; min-height:0;
+  display:flex;
+  justify-content: flex-start;
+  padding: 0 clamp(20px, 2vw, 32px) clamp(20px, 2vw, 32px);
+}
+.speakers-card{
+  width: 60%;
+  min-width: 460px;
+  max-width: 920px;
+  background: var(--surface-card);
+  border-radius: 24px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.ag-header,
+.chip-row{
+  align-self: flex-start;
+}
+
+.sp-body{
+  flex:1; min-height:0;
+  overflow-y: auto; overflow-x: hidden;
+  padding: clamp(18px, 1.6vw, 26px) clamp(20px, 2vw, 30px);
+  scroll-behavior: smooth;
+}
+.sp-body::-webkit-scrollbar{width:5px}
+.sp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:3px}
+body[data-theme="lux"] .sp-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.06)}
+
+/* ==================== SECTION HEADER ==================== */
+.sp-section-head{
+  display:flex; align-items:baseline; justify-content:space-between;
+  margin: 0 0 14px;
+}
+.sp-section-head:not(:first-child){ margin-top: 28px }
+.sp-section-title{
+  font-family:'Plus Jakarta Sans';font-weight:800;
+  font-size: clamp(16px, 1.2vw, 20px);
+  letter-spacing:-0.018em;
+  color: var(--fg);
+  margin:0;
+}
+.sp-section-meta{
+  font-family:'Urbanist'; font-weight:500;
+  font-size:11.5px; color: var(--fg-mute);
+}
+
+/* ==================== FEATURED CAROUSEL ==================== */
+.feat-strip{
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding: 6px 0 8px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.feat-strip::-webkit-scrollbar{height:6px}
+.feat-strip::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:3px}
+body[data-theme="lux"] .feat-strip::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08)}
+
+/* Inner row con animacion breathing — replica BreathingCarousel.tsx del movil
+   (translateX 0 → -12 → 0 en 4.8s sin-ease infinite alternate, delay 1.2s).
+   Se detiene PERMANENTE al primer scroll/touch via JS (clase .stopped) */
+.feat-track{
+  display:inline-flex; gap: 12px;
+  padding: 0 2px;
+  animation: breathe 4.8s ease-in-out 1.2s infinite alternate;
+  will-change: transform;
+}
+.feat-track.stopped{ animation: none; transform: translateX(0) !important; transition: transform 250ms var(--ease-out) }
+@keyframes breathe{
+  from { transform: translateX(0) }
+  to   { transform: translateX(-12px) }
+}
+@media (prefers-reduced-motion: reduce){
+  .feat-track{ animation: none }
+}
+
+.feat-card{
+  scroll-snap-align: start;
+  width: 200px; flex-shrink: 0;
+  /* Noir: luminous-border glass — replica surface.low rgba(255,255,255,0.03)
+     + borderLight rgba(255,255,255,0.12) a 0.5px (de theme-noir.ts) */
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius:22px;
+  overflow:hidden;
+  cursor:pointer;
+  display:flex; flex-direction:column;
+  padding: 12px;
+  transition: background 250ms var(--ease-out), transform 250ms var(--spring-soft), border-color 250ms var(--ease-out), box-shadow 250ms var(--ease-out);
+}
+.feat-card:hover{ background: rgba(255,255,255,0.05); transform: translateY(-2px) }
+.feat-card:active{ transform: scale(0.985) }
+.feat-card.selected{ border-color: rgba(255,255,255,0.22) }
+
+.feat-photo{
+  aspect-ratio: 4 / 5;
+  background-size: cover;
+  background-position: center 20%;  /* recorta desde arriba como movil contentPosition top:20% */
+  border-radius: 14px;
+  background-color: var(--surface-medium);  /* placeholder mientras carga */
+  position:relative;
+  overflow:hidden;
+}
+.feat-keynote{
+  position:absolute; top:8px; left:8px;
+  padding:3px 8px; border-radius:6px;
+  background: rgba(0,0,0,0.55);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-family:'Urbanist';font-weight:700;font-size:9px;letter-spacing:0.08em;
+  color: #fff; text-transform: uppercase;
+}
+
+.feat-info{ padding: 12px 4px 4px }
+.feat-name{
+  font-family:'Plus Jakarta Sans';font-weight:700;
+  font-size:14px; line-height:1.2;
+  color:var(--fg); margin:0 0 3px;
+  letter-spacing:-0.012em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.feat-role{
+  font-size:11.5px; color:var(--fg-dim);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  margin-bottom:8px;
+}
+.feat-sessions{
+  display:flex; align-items:center; gap:5px;
+  font-size:10.5px; color:var(--fg-mute); font-weight:600;
+}
+.feat-sessions svg{ width:11px; height:11px }
+
+/* ==================== TODOS LIST (replica movil — 1 col larga, fila grande) ==================== */
+.sp-grid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+@container (min-width: 640px){
+  .sp-grid{ grid-template-columns: repeat(2, 1fr); gap: 8px; }
+}
+
+.sp-row{
+  display:flex; align-items:center; gap:14px;
+  padding: 12px;
+  /* Noir: glass translucido + luminous border (replica surface.low + border) */
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 18px;
+  cursor:pointer;
+  text-align: left;
+  transition: background 250ms var(--ease-out), transform 250ms var(--spring-soft), border-color 250ms var(--ease-out);
+}
+.sp-row:hover{ background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.10); transform: translateY(-1px) }
+.sp-row:active{ transform: scale(0.985) }
+.sp-row.selected{ border-color: rgba(255,255,255,0.18) }
+
+.sp-avatar{
+  width:52px; height:52px; border-radius:14px;
+  background-size: cover; background-position: center 20%;
+  flex-shrink:0;
+}
+.sp-row-info{ min-width:0; flex:1 }
+.sp-row-name{
+  font-family:'Plus Jakarta Sans';font-weight:700;
+  font-size:13.5px; color:var(--fg);
+  margin:0 0 2px; letter-spacing:-0.01em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.sp-row-role{
+  font-size:11.5px; color:var(--fg-dim);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  margin-bottom:5px;
+}
+.sp-row-meta{
+  display:inline-flex; align-items:center; gap:4px;
+  padding: 2px 7px; border-radius: 6px;
+  background: var(--surface-medium);
+  font-size: 10px; color: var(--fg-mute); font-weight:600;
+}
+.sp-row-meta svg{ width:10px; height:10px }
+.sp-row .chev{ color: var(--fg-mute); flex-shrink:0 }
+
+/* Section header con link "Ver todos" */
+.sp-section-link{
+  font-family:'Urbanist'; font-weight:500;
+  font-size: 12px; color: var(--fg-dim);
+  cursor:pointer;
+  transition: color 200ms var(--ease-out);
+}
+.sp-section-link:hover{ color: var(--fg) }
+
+/* Empty state for filtered list */
+.sp-empty{
+  text-align:center;
+  padding: 40px 20px;
+  color: var(--fg-mute);
+  font-size: 12.5px;
+}
+.sp-empty svg{ color: var(--fg-mute); margin-bottom: 10px }
+
+/* ==================== DETAIL PANEL (right floating) ==================== */
+.detail{
+  position:absolute;
+  top: clamp(18px, 1.8vw, 28px);
+  bottom: clamp(18px, 1.8vw, 28px);
+  right: clamp(20px, 2vw, 32px);
+  width: clamp(320px, 28vw, 520px);
+  background: var(--surface-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 22px;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+  opacity:0; pointer-events:none;
+  transform: translateX(80px);
+  transition:
+    opacity 380ms var(--ease-out),
+    transform 480ms var(--spring-snap);
+  box-shadow: 0 24px 60px -16px rgba(0,0,0,0.55);
+  z-index:10;
+}
+.detail.open{ opacity:1; pointer-events:auto; transform: translateX(0) }
+.detail.swap-out{
+  opacity:0; transform: translateX(-60px);
+  transition: opacity 220ms var(--ease-out), transform 260ms var(--ease-out);
+}
+
+.dp-header{
+  display:flex;align-items:center;gap:10px;
+  padding: 16px 18px 12px;
+  flex-shrink:0;
+}
+.dp-back{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--surface-medium);color:var(--fg);
+  display:flex;align-items:center;justify-content:center;
+  transition: background 200ms var(--ease-out);
+}
+.dp-back:hover{background:var(--surface-high)}
+.dp-headtitle{
+  flex:1;text-align:center;font-family:'Plus Jakarta Sans';
+  font-size:14px;color:var(--fg);font-weight:700;letter-spacing:-0.01em;
+}
+.dp-headspace{width:32px}
+
+.dp-body{
+  flex:1;overflow-y:auto;
+  padding: 6px 22px 22px;
+}
+.dp-body::-webkit-scrollbar{width:5px}
+.dp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:3px}
+body[data-theme="lux"] .dp-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.06)}
+
+/* Hero vertical (replica movil) — foto arriba + info abajo, pero foto MEDIANA
+   no full-width (en panel narrow se veia exagerada). 60% panel, max 240px, alineada izq */
+.dp-photo{
+  width: 60%;
+  max-width: 240px;
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  background-size: cover; background-position: center 20%;
+  background-color: var(--surface-medium);
+  margin: 0 auto 16px;  /* centrada */
+}
+body[data-theme="lux"] .dp-photo{ box-shadow: var(--shadow-md) }
+
+.dp-name{
+  font-family:'Plus Jakarta Sans';font-weight:800;
+  font-size: clamp(22px, 1.7vw, 26px); line-height:1.15;
+  letter-spacing:-0.022em;
+  margin: 0;
+}
+.dp-role{
+  margin-top: 5px;
+  font-size: 13px;
+  color: var(--fg-dim);
+  line-height: 1.4;
+}
+.dp-role b{ color: var(--fg); font-weight:700 }
+
+.dp-badges{
+  display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+  margin-top:12px;
+}
+.dp-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 10px; border-radius:8px;
+  font-family:'Urbanist';font-weight:700;font-size:11px;letter-spacing:0.04em;
+}
+.dp-badge.tech{background:var(--tech-bg);color:var(--tech)}
+.dp-badge.business{background:var(--business-bg);color:var(--business)}
+.dp-badge.innovation{background:var(--innovation-bg);color:var(--innovation)}
+.dp-badge.leadership{background:var(--leadership-bg);color:var(--leadership)}
+.dp-badge.culture{background:var(--culture-bg);color:var(--culture)}
+
+/* Calificar — minimalista: outline gold sutil, no fill chunky */
+.dp-rate{
+  margin: 16px 0 0 auto;  /* alineado a la derecha */
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  width: fit-content;
+  padding: 7px 14px;
+  border-radius: 99px;
+  background: transparent;
+  border: 1px solid rgba(181,166,139,0.28);
+  color: var(--gold);
+  font-family:'Urbanist'; font-weight:600; font-size:12px;
+  letter-spacing: 0.01em;
+  transition: background 200ms var(--ease-out), border-color 200ms var(--ease-out), transform 200ms var(--spring-soft);
+}
+body[data-theme="lux"] .dp-rate{ border-color: rgba(142,129,112,0.30) }
+.dp-rate:hover{ background: rgba(181,166,139,0.08); border-color: rgba(181,166,139,0.45) }
+body[data-theme="lux"] .dp-rate:hover{ background: rgba(142,129,112,0.08); border-color: rgba(142,129,112,0.45) }
+.dp-rate:active{ transform: scale(0.97) }
+.dp-rate > svg{ width:12px; height:12px; fill: currentColor }
+
+.dp-rate.rated{
+  border-color: var(--border);
+  color: var(--fg-mute);
+  font-weight: 500;
+}
+.dp-rate.rated .stars{ color: var(--gold); display:flex; gap:1.5px }
+.dp-rate.rated .stars svg{ width: 10px; height: 10px }
+
+.dp-section{
+  text-transform:uppercase;letter-spacing:0.18em;
+  font-family:'Plus Jakarta Sans';font-weight:700;
+  font-size:10.5px;color:var(--fg-mute);
+  margin:22px 0 10px;
+}
+
+.dp-about{
+  background:var(--surface-medium);
+  border-radius:13px;padding:14px 16px;
+  color:var(--fg-dim);font-size:13px;line-height:1.55;
+}
+
+.dp-sessions{ display:flex; flex-direction:column; gap:6px }
+.dp-session{
+  display:flex; align-items:stretch; gap:12px;
+  padding:11px 14px;
+  background:var(--surface-medium);
+  border-radius:13px; cursor:pointer;
+  text-align: left;
+  transition: background 200ms var(--ease-out);
+}
+.dp-session:hover{background:var(--surface-high)}
+.dp-session:active{ transform: scale(0.985) }
+.dp-sess-time{
+  display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
+  font-family:'Plus Jakarta Sans';
+  flex-shrink:0; min-width: 56px;
+  border-right: 1px solid var(--border);
+  padding-right: 10px;
+}
+.dp-sess-time .hh{
+  font-size: 13px; font-weight:800; color: var(--fg); letter-spacing:-0.01em;
+}
+.dp-sess-time .ampm{
+  font-size: 9.5px; color: var(--fg-mute); font-weight:600; letter-spacing:0.04em;
+  margin-top: 1px;
+}
+.dp-sess-info{ flex:1; min-width:0 }
+.dp-sess-title{
+  font-family:'Plus Jakarta Sans';font-weight:700;
+  font-size: 12.5px; color: var(--fg);
+  margin:0; line-height:1.3; letter-spacing:-0.005em;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.dp-sess-room{
+  display:flex; align-items:center; gap:5px;
+  margin-top: 4px;
+  font-size: 10.5px; color: var(--fg-mute); font-weight:500;
+}
+.dp-sess-room svg{ width:10px; height:10px }
+.dp-session svg.chev{ color: var(--fg-mute); flex-shrink:0; align-self:center }
+
+/* ==================== EMPTY HINT ==================== */
+.empty-hint{
+  position:absolute;
+  top: clamp(18px, 1.8vw, 28px);
+  bottom: clamp(18px, 1.8vw, 28px);
+  right: clamp(20px, 2vw, 32px);
+  width: clamp(320px, 28vw, 520px);
+  background: var(--surface-card);
+  border: 1px dashed var(--border-strong);
+  border-radius:22px;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:14px;text-align:center;
+  padding:40px;color:var(--fg-mute);
+  opacity:0; pointer-events:none;
+  transition: opacity 280ms var(--ease-out);
+  z-index:5;
+}
+.canvas:not(.has-detail) .empty-hint{ opacity:.55 }
+.empty-hint .glyph{
+  width:60px;height:60px;border-radius:18px;
+  background:var(--surface-medium);
+  display:flex;align-items:center;justify-content:center;
+}
+.empty-hint h3{font-family:'Plus Jakarta Sans';font-weight:700;font-size:14px;margin:0;color:var(--fg-dim);letter-spacing:-0.01em}
+.empty-hint p{font-size:11.5px;margin:4px 0 0;line-height:1.5}
+.kbd{
+  background:var(--surface-low);padding:1px 5px;border-radius:4px;
+  color:var(--fg-dim); font-family:'Urbanist'; font-weight:600;
+}
+
+/* ==================== RATING MODAL ==================== */
+.rate-overlay{
+  position: fixed; inset:0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+  transition: opacity 240ms var(--ease-out);
+  z-index: 200;
+}
+body[data-theme="lux"] .rate-overlay{ background: rgba(0,0,0,0.35) }
+.rate-overlay.open{ opacity:1; pointer-events:auto }
+
+.rate-modal{
+  width: min(420px, 90vw);
+  background: var(--bg-elevated);
+  border:1px solid var(--border-strong);
+  border-radius: 22px;
+  padding: 26px 28px;
+  transform: scale(0.94) translateY(8px);
+  transition: transform 360ms var(--spring-snap);
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.6);
+}
+body[data-theme="lux"] .rate-modal{ box-shadow: var(--shadow-lg) }
+.rate-overlay.open .rate-modal{ transform: scale(1) translateY(0) }
+
+.rate-title{
+  font-family:'Plus Jakarta Sans';font-weight:800;
+  font-size: 19px; margin:0;
+  letter-spacing:-0.018em;
+}
+.rate-sub{
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--fg-dim);
+}
+.rate-diamonds{
+  display:flex; gap:14px; justify-content:center;
+  margin: 22px 0 18px;
+}
+.rate-d{
+  width:38px; height:38px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  color: var(--border-strong);
+  transition: color 180ms var(--ease-out), transform 200ms var(--spring-soft);
+}
+.rate-d:hover{ transform: scale(1.12) }
+.rate-d:active{ transform: scale(0.92) }
+.rate-d.on{ color: var(--gold) }
+.rate-d.on svg{ fill: currentColor }
+.rate-d svg{ width:30px; height:30px }
+
+.rate-comment{
+  width:100%;
+  background: var(--surface-low);
+  border:1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-family: inherit; color: var(--fg);
+  font-size: 12.5px;
+  resize:none; min-height: 70px;
+  outline: none;
+  transition: border 200ms var(--ease-out);
+}
+.rate-comment:focus{ border-color: var(--border-strong) }
+.rate-comment::placeholder{ color: var(--fg-mute) }
+
+.rate-actions{
+  display:flex; flex-direction:column; gap:8px;
+  margin-top: 16px;
+}
+.rate-send{
+  padding: 13px;
+  border-radius: 13px;
+  background: var(--gold); color: #0a0a0a;
+  font-family:'Urbanist'; font-weight:800; font-size:13px;
+  letter-spacing:0.02em;
+  transition: transform 200ms var(--spring-soft), background 200ms var(--ease-out);
+}
+body[data-theme="lux"] .rate-send{ color: #ffffff }
+.rate-send:hover{ transform: translateY(-1px) }
+.rate-send:active{ transform: scale(0.98) }
+.rate-send:disabled{
+  background: var(--surface-medium); color: var(--fg-mute);
+  cursor: not-allowed;
+}
+.rate-cancel{
+  padding: 11px;
+  font-family:'Urbanist'; font-weight:600; font-size:12.5px;
+  color: var(--fg-dim);
+}
+.rate-cancel:hover{ color: var(--fg) }
+
+/* ==================== TWEAKS ==================== */
+.tweaks{
+  position:fixed;top:18px;right:18px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);border-radius:16px;
+  padding:10px 12px;
+  font-size:10px;color:var(--fg-dim);
+  font-family:'Urbanist';display:flex;align-items:center;gap:10px;
+  z-index:60;
+}
+body[data-theme="lux"] .tweaks{ box-shadow: var(--shadow-sm) }
+.tweaks-row{display:flex;align-items:center;gap:5px}
+.swatch{
+  width:18px;height:18px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;
+  transition:transform 180ms var(--spring-soft);
+}
+.swatch:hover{transform:scale(1.12)}
+.swatch.active{border-color:var(--fg)}
+.seg{display:flex;gap:2px;padding:2px;background:var(--surface-low);border-radius:8px}
+.seg button{padding:3px 9px;border-radius:6px;font-size:9.5px;font-weight:600;color:var(--fg-mute)}
+.seg button.active{background:var(--surface-high);color:var(--fg)}
+
+.hint{
+  position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
+  font-family:'Urbanist';font-size:10px;color:var(--fg-mute);
+  letter-spacing:0.04em;pointer-events:none;z-index:1;
+}
+.hint kbd{
+  background:var(--surface-low);padding:1px 5px;border-radius:4px;
+  color:var(--fg-dim); font-family:inherit;
+}
+
+/* ==================== TOAST ==================== */
+.toast{
+  position: fixed; top: 70px; left: 50%;
+  transform: translateX(-50%) translateY(-12px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 16px 10px 12px;
+  font-family: 'Urbanist'; font-weight: 600; font-size: 12.5px;
+  color: var(--fg);
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0; pointer-events: none;
+  transition: all 320ms var(--spring-soft);
+  z-index: 300;
+  box-shadow: 0 12px 32px -8px rgba(0,0,0,0.45);
+}
+body[data-theme="lux"] .toast{ box-shadow: 0 12px 32px -8px rgba(0,0,0,0.18) }
+.toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); pointer-events:auto }
+.toast .toast-icon{
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  background: var(--gold-bg); color: var(--gold);
+}
+</style>
+</head>
+<body data-theme="noir">
+
+<div class="tweaks">
+  <div class="tweaks-row">
+    <span style="opacity:.6">tema</span>
+    <div class="seg" id="seg-mode">
+      <button data-mode="noir" class="active">Noir</button>
+      <button data-mode="lux">Lux</button>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+  <aside class="sidebar">
+    <div class="sb-logo">S</div>
+    <div class="sb-item" title="Inicio"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></div>
+    <div class="sb-item" title="Agenda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></div>
+    <div class="sb-item" title="En vivo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M5 12a7 7 0 0114 0M2 12a10 10 0 0120 0"/></svg><span class="sb-live"></span></div>
+    <div class="sb-item active" title="Speakers"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3z"/><path d="M19 10v1a7 7 0 01-14 0v-1M12 18v3M8 21h8"/></svg></div>
+    <div class="sb-item" title="Networking"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="sb-badge">3</span></div>
+    <div class="sb-item" title="Sponsors"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-8h6v8"/></svg></div>
+    <div class="sb-sep"></div>
+    <div class="sb-item" title="Notif"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg></div>
+    <div class="sb-item" title="Mi perfil" style="margin-top:auto"><div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#7c7cff)"></div></div>
+  </aside>
+
+  <div class="canvas" id="canvas">
+
+    <header class="ag-header">
+      <div class="ag-titleblock">
+        <div class="ag-titles">
+          <h1 class="ag-title">Speakers</h1>
+          <div class="ag-subtitle" id="subtitle">18 speakers · 5 tracks</div>
+        </div>
+      </div>
+      <div class="ag-tools">
+        <button class="ag-tool" id="searchBtn" title="Buscar (⌘K)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+        <div class="ag-search-wrap" id="searchWrap">
+          <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input id="searchInput" placeholder="Nombre, empresa o cargo..." />
+        </div>
+      </div>
+    </header>
+
+    <div class="chip-row" id="chipRow"></div>
+
+    <div class="speakers-wrap">
+      <section class="speakers-card">
+        <div class="sp-body" id="spBody"></div>
+      </section>
+    </div>
+
+    <aside class="detail" id="detailCard">
+      <header class="dp-header">
+        <button class="dp-back" id="dpClose" aria-label="Cerrar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="dp-headtitle">Speaker</div>
+        <div class="dp-headspace"></div>
+      </header>
+      <div class="dp-body" id="dpBody"></div>
+    </aside>
+
+    <div class="empty-hint">
+      <div class="glyph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3z"/><path d="M19 10v1a7 7 0 01-14 0v-1M12 18v3M8 21h8"/></svg></div>
+      <div>
+        <h3>Selecciona un speaker</h3>
+        <p>El detalle aparece aqui · usa <span class="kbd">↑↓</span> · <span class="kbd">Esc</span> cierra</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="hint">click speaker · <kbd>⌘K</kbd> buscar · <kbd>Esc</kbd> cerrar</div>
+
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="toastIcon"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L9 9l-7 .5 5.4 4.6L5.5 22 12 18l6.5 4-1.9-7.9L22 9.5 15 9z"/></svg></div>
+    <span id="toastMsg"></span>
+  </div>
+
+  <!-- Rating Modal -->
+  <div class="rate-overlay" id="rateOverlay">
+    <div class="rate-modal" role="dialog" aria-modal="true" aria-labelledby="rateTitle">
+      <h2 class="rate-title" id="rateTitle">Como estuvo el speaker?</h2>
+      <div class="rate-sub" id="rateSub">Maria Garcia</div>
+      <div class="rate-diamonds" id="rateDiamonds"></div>
+      <textarea class="rate-comment" id="rateComment" placeholder="Comentario opcional..."></textarea>
+      <div class="rate-actions">
+        <button class="rate-send" id="rateSend" disabled>Enviar evaluacion</button>
+        <button class="rate-cancel" id="rateCancel">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ==================== DATASET ==================== */
+const tracks = [
+  { id:'all',         label:'Todos',       color:'#7CFFB2' },
+  { id:'tech',        label:'Tech',        color:'#a8a8ff' },
+  { id:'business',    label:'Business',    color:'#5eead4' },
+  { id:'innovation',  label:'Innovacion',  color:'#f5c66c' },
+  { id:'leadership',  label:'Liderazgo',   color:'#ff8a96' },
+  { id:'culture',     label:'Cultura',     color:'#c084fc' },
+];
+
+const speakers = [
+  { id:1,  name:'Maria Garcia',     role:'CEO & Fundadora',         org:'Kasproduction',  track:'business',   featured:true,  keynote:true,  sessions:7,
+    bio:'Lider empresarial con 15 anos de experiencia en transformacion digital y eventos de alto impacto. Ha producido mas de 200 eventos corporativos en LATAM.',
+    photo:'https://i.pravatar.cc/600?img=47',
+    sessionList:[
+      {time:'09:00 a.m.', title:'Apertura: El futuro del trabajo corporativo', room:'Sala Magna'},
+      {time:'11:30 a.m.', title:'Panel: Innovacion en eventos B2B',           room:'Auditorio'},
+      {time:'02:00 p.m.', title:'Workshop: Como medir el ROI de un evento',   room:'Sala 3'},
+    ]
+  },
+  { id:2,  name:'Andres Gil',       role:'VP Engineering',           org:'Rappi',          track:'tech',       featured:true,  keynote:true,  sessions:6,
+    bio:'Lidera el equipo de plataforma en Rappi escalando a +50M usuarios. Speaker frecuente en QCon, RubyConf y Devoxx.',
+    photo:'https://i.pravatar.cc/600?img=12',
+    sessionList:[
+      {time:'10:00 a.m.', title:'Arquitectura distribuida a escala LATAM',   room:'Auditorio'},
+      {time:'03:30 p.m.', title:'Panel: AI en produccion',                    room:'Sala Magna'},
+    ]
+  },
+  { id:3,  name:'Sofia Mendez',     role:'Head of Design',           org:'Globant',        track:'culture',    featured:true,  sessions:5,
+    bio:'Disenadora con 12 anos liderando equipos de UX en LATAM. Profesora de Maestria en Diseno UX en la Universidad de los Andes.',
+    photo:'https://i.pravatar.cc/600?img=45',
+    sessionList:[
+      {time:'09:30 a.m.', title:'Diseno inclusivo en productos digitales',   room:'Sala 2'},
+      {time:'01:00 p.m.', title:'Workshop: Design ops al servicio del producto', room:'Sala 4'},
+    ]
+  },
+  { id:4,  name:'David Moreno',     role:'CTO',                       org:'MercadoLibre',   track:'leadership', featured:true,  sessions:5,
+    bio:'CTO de MercadoLibre Colombia. Antes lideraba ingenieria en Bold y Nequi. Apasionado por sistemas distribuidos y mentoria tech.',
+    photo:'https://i.pravatar.cc/600?img=14',
+    sessionList:[
+      {time:'10:30 a.m.', title:'Liderar equipos de 200+ engineers',          room:'Auditorio'},
+      {time:'04:00 p.m.', title:'Fireside chat: De junior a CTO',             room:'Sala Magna'},
+    ]
+  },
+
+  { id:5,  name:'Alex Rivera',         role:'Student & Startup Founder', org:'MIT',         track:'innovation', featured:false, sessions:4,
+    bio:'Estudiante de MIT y fundador de una startup en YC W26. Construye herramientas de developer experience para teams remotos.',
+    photo:'https://i.pravatar.cc/600?img=33',
+    sessionList:[
+      {time:'11:00 a.m.', title:'Como construir tu primer MVP en 4 semanas', room:'Sala 3'},
+    ]
+  },
+  { id:6,  name:'Anastasia Petrova',   role:'Developer Advocate',       org:'JetBrains',    track:'tech',       featured:false, sessions:4,
+    bio:'Developer Advocate especializada en Kotlin y herramientas de desarrollo modernas. Conferencista en KotlinConf, Droidcon y JavaZone.',
+    photo:'https://i.pravatar.cc/600?img=49',
+    sessionList:[]
+  },
+  { id:7,  name:'Carlos Beltran',      role:'Head of Growth',           org:'Habi',         track:'business',   featured:false, sessions:3,
+    bio:'Crecio Habi 30x en 18 meses. Antes lideraba growth en Rappi Travel. Especialista en Product-Led Growth para mercados emergentes.',
+    photo:'https://i.pravatar.cc/600?img=15',
+    sessionList:[]
+  },
+  { id:8,  name:'Daniela Ortiz',       role:'Lead Product Designer',    org:'Tul',          track:'culture',    featured:false, sessions:4,
+    bio:'Disenadora de producto con foco en mercados emergentes. Lidero el rediseno completo de Tul B2B en 2025.',
+    photo:'https://i.pravatar.cc/600?img=44',
+    sessionList:[]
+  },
+  { id:9,  name:'Felipe Quintero',     role:'Founder',                   org:'Habi',         track:'innovation', featured:false, sessions:3,
+    bio:'Cofundador de Habi, startup proptech mas grande de LATAM. Antes consultor en McKinsey. Enfocado en transformar la compra-venta de vivienda.',
+    photo:'https://i.pravatar.cc/600?img=11',
+    sessionList:[]
+  },
+  { id:10, name:'Gabriela Ruiz',       role:'Head of People',            org:'Bold',         track:'leadership', featured:false, sessions:3,
+    bio:'Lidera personas en Bold con 800+ empleados. Crea modelos de cultura para empresas en hipercrecimiento. Coach ejecutiva certificada ICF.',
+    photo:'https://i.pravatar.cc/600?img=48',
+    sessionList:[]
+  },
+  { id:11, name:'Javier Castro',       role:'Director of AI',            org:'Nequi',        track:'tech',       featured:false, sessions:5,
+    bio:'Lidera la division de AI en Nequi. PhD en Computer Science. Investigador en aprendizaje automatico aplicado a riesgo crediticio.',
+    photo:'https://i.pravatar.cc/600?img=13',
+    sessionList:[]
+  },
+  { id:12, name:'Lucia Salazar',       role:'Investment Partner',        org:'Kaszek',       track:'business',   featured:false, sessions:4,
+    bio:'Partner en Kaszek liderando inversiones early-stage en LATAM. Mas de 40 inversiones, incluyendo Bold, Habi y Frubana.',
+    photo:'https://i.pravatar.cc/600?img=10',
+    sessionList:[]
+  },
+  { id:13, name:'Mateo Gonzalez',      role:'Tech Lead',                 org:'Frubana',      track:'tech',       featured:false, sessions:3,
+    bio:'Tech Lead de plataforma en Frubana. Especialista en logistica de cadena de frio y optimizacion de rutas con ML.',
+    photo:'https://i.pravatar.cc/600?img=8',
+    sessionList:[]
+  },
+  { id:14, name:'Natalia Vega',        role:'VP Marketing',              org:'Platzi',       track:'business',   featured:false, sessions:4,
+    bio:'VP Marketing de Platzi. Llevo la marca a 5M+ estudiantes en 17 paises. Antes en Rappi y Despegar.',
+    photo:'https://i.pravatar.cc/600?img=43',
+    sessionList:[]
+  },
+  { id:15, name:'Paula Alvarez',       role:'UX Researcher Senior',      org:'Globant',      track:'culture',    featured:false, sessions:3,
+    bio:'Investigadora UX con 10 anos de experiencia. Lidero estudios para clientes Fortune 500. Profesora en Universidad Javeriana.',
+    photo:'https://i.pravatar.cc/600?img=9',
+    sessionList:[]
+  },
+  { id:16, name:'Ricardo Pena',        role:'Senior SRE',                org:'Bold',         track:'tech',       featured:false, sessions:3,
+    bio:'Lidera reliability engineering en Bold. Especialista en sistemas de pagos y observabilidad. Maintainer de proyectos open source CNCF.',
+    photo:'https://i.pravatar.cc/600?img=51',
+    sessionList:[]
+  },
+  { id:17, name:'Sebastian Rojas',     role:'Product Manager Senior',    org:'Rappi',        track:'innovation', featured:false, sessions:4,
+    bio:'PM en el equipo de Rappi Pay. Lanzo 5 productos financieros en 24 meses con +2M usuarios activos. MBA INSEAD.',
+    photo:'https://i.pravatar.cc/600?img=53',
+    sessionList:[]
+  },
+  { id:18, name:'Valentina Restrepo',  role:'Director of Marketing',     org:'Tul',          track:'leadership', featured:false, sessions:3,
+    bio:'Directora de marketing de Tul. Construyo la marca desde 0 hasta presencia en 6 paises de LATAM.',
+    photo:'https://i.pravatar.cc/600?img=20',
+    sessionList:[]
+  },
+];
+
+/* ==================== STATE ==================== */
+const state = {
+  track: 'all',
+  search: '',
+  selectedId: null,
+  ratings: {},        // { speakerId: { stars, comment } }
+  breathStopped: false,
+};
+
+/* ==================== HELPERS ==================== */
+const $ = (s, p=document) => p.querySelector(s);
+const $$ = (s, p=document) => Array.from(p.querySelectorAll(s));
+
+function trackLabel(id){
+  const t = tracks.find(t=>t.id===id);
+  return t ? t.label : id;
+}
+
+function svgChev(){
+  return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chev"><path d="M9 18l6-6-6-6"/></svg>';
+}
+function svgCalendar(){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>';
+}
+function svgPin(){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+}
+function svgStar(filled){
+  return filled
+    ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L9 9l-7 .5 5.4 4.6L5.5 22 12 18l6.5 4-1.9-7.9L22 9.5 15 9z"/></svg>'
+    : '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2L9 9l-7 .5 5.4 4.6L5.5 22 12 18l6.5 4-1.9-7.9L22 9.5 15 9z"/></svg>';
+}
+function svgDiamond(){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M12 3l-4 6 4 12 4-12-4-6"/></svg>';
+}
+
+/* ==================== CHIP RENDER ==================== */
+function renderChips(){
+  const row = $('#chipRow');
+  row.innerHTML = tracks.map(t => `
+    <button class="chip ${state.track===t.id?'active':''}" data-track="${t.id}">
+      <span class="chip-dot" style="background:${t.color}"></span>
+      ${t.label}
+    </button>
+  `).join('');
+  row.querySelectorAll('.chip').forEach(c => {
+    c.addEventListener('click', () => {
+      state.track = c.dataset.track;
+      renderChips(); renderBody();
+    });
+  });
+}
+
+/* ==================== BODY RENDER ==================== */
+function filterSpeakers(){
+  let list = speakers.slice();
+  if (state.track !== 'all') list = list.filter(s => s.track === state.track);
+  if (state.search.trim()){
+    const q = state.search.trim().toLowerCase();
+    list = list.filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      s.org.toLowerCase().includes(q) ||
+      s.role.toLowerCase().includes(q)
+    );
+  }
+  return list;
+}
+
+function renderBody(){
+  const body = $('#spBody');
+  const list = filterSpeakers();
+
+  // subtitle reflects active filters
+  const parts = [`${list.length} ${list.length===1?'speaker':'speakers'}`];
+  if (state.track !== 'all') parts.push(trackLabel(state.track));
+  $('#subtitle').textContent = parts.join(' · ');
+
+  if (list.length === 0){
+    body.innerHTML = `
+      <div class="sp-empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <div>Sin resultados${state.search?` para "${state.search}"`:''}</div>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  const featured = list.filter(s => s.featured);
+  const hasSearch = state.search.trim().length > 0;
+
+  // FEATURED — solo si NO hay search activo (replica movil)
+  if (featured.length && !hasSearch){
+    html += `
+      <div class="sp-section-head">
+        <h2 class="sp-section-title">Destacados</h2>
+        <button class="sp-section-link" data-action="scroll-todos">Ver todos</button>
+      </div>
+      <div class="feat-strip" id="featStrip">
+        <div class="feat-track${state.breathStopped?' stopped':''}" id="featTrack">
+          ${featured.map(s => featCardHtml(s)).join('')}
+        </div>
+      </div>`;
+  }
+
+  // ALL/FILTERED LIST
+  const restList = hasSearch ? list : list.filter(s => !s.featured);
+  if (restList.length){
+    const title = hasSearch ? 'Resultados' : 'Todos';
+    html += `
+      <div class="sp-section-head" id="todosHead" style="${featured.length && !hasSearch ? 'margin-top:24px' : ''}">
+        <h2 class="sp-section-title">${title}</h2>
+        <span class="sp-section-meta">${restList.length} ${restList.length===1?'speaker':'speakers'}</span>
+      </div>
+      <div class="sp-grid">
+        ${restList.map(s => rowHtml(s)).join('')}
+      </div>`;
+  }
+
+  body.innerHTML = html;
+
+  body.querySelectorAll('[data-spid]').forEach(el => {
+    el.addEventListener('click', () => openDetail(parseInt(el.dataset.spid, 10)));
+  });
+  body.querySelectorAll('[data-action="scroll-todos"]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      stopBreathing();
+      const target = body.querySelector('#todosHead');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Stop breathing al primer scroll/touch en featured strip (replica movil onScrollBeginDrag)
+  const strip = body.querySelector('#featStrip');
+  if (strip && !state.breathStopped){
+    const stop = () => stopBreathing();
+    strip.addEventListener('pointerdown', stop, { once:true });
+    strip.addEventListener('wheel', stop, { once:true, passive:true });
+    strip.addEventListener('scroll', stop, { once:true, passive:true });
+  }
+}
+
+function stopBreathing(){
+  if (state.breathStopped) return;
+  state.breathStopped = true;
+  const track = document.getElementById('featTrack');
+  if (track) track.classList.add('stopped');
+}
+
+function featCardHtml(s){
+  const sel = state.selectedId === s.id ? ' selected' : '';
+  return `
+    <article class="feat-card${sel}" data-spid="${s.id}">
+      <div class="feat-photo" style="background-image:url('${s.photo}')">
+        ${s.keynote ? `<span class="feat-keynote">Keynote</span>` : ''}
+      </div>
+      <div class="feat-info">
+        <h3 class="feat-name">${s.name}</h3>
+        <div class="feat-role">${s.role} · ${s.org}</div>
+        <div class="feat-sessions">${svgCalendar()}${s.sessions} ${s.sessions===1?'sesion':'sesiones'}</div>
+      </div>
+    </article>`;
+}
+
+function rowHtml(s){
+  const sel = state.selectedId === s.id ? ' selected' : '';
+  return `
+    <button class="sp-row${sel}" data-spid="${s.id}">
+      <div class="sp-avatar" style="background-image:url('${s.photo}')"></div>
+      <div class="sp-row-info">
+        <h4 class="sp-row-name">${s.name}</h4>
+        <div class="sp-row-role">${s.role} · ${s.org}</div>
+        <span class="sp-row-meta">${svgCalendar()}${s.sessions}</span>
+      </div>
+      ${svgChev()}
+    </button>`;
+}
+
+function svgStarIcon(){
+  return '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5"><path d="M12 2L9 9l-7 .5 5.4 4.6L5.5 22 12 18l6.5 4-1.9-7.9L22 9.5 15 9z"/></svg>';
+}
+
+/* ==================== DETAIL ==================== */
+function openDetail(id){
+  state.selectedId = id;
+  const s = speakers.find(x => x.id === id);
+  if (!s) return;
+
+  const detail = $('#detailCard');
+  const canvas = $('#canvas');
+  const dpBody = $('#dpBody');
+
+  // swap-out → swap-in
+  if (detail.classList.contains('open')){
+    detail.classList.add('swap-out');
+    setTimeout(() => {
+      paintDetail(s, dpBody);
+      detail.classList.remove('swap-out');
+    }, 220);
+  } else {
+    paintDetail(s, dpBody);
+    requestAnimationFrame(() => detail.classList.add('open'));
+  }
+  canvas.classList.add('has-detail');
+  // refresh body to update selected highlight
+  renderBody();
+}
+
+function paintDetail(s, host){
+  const r = state.ratings[s.id];
+  const sessionsHtml = s.sessionList && s.sessionList.length ? s.sessionList.map(ss => `
+    <button class="dp-session">
+      <div class="dp-sess-time">
+        <span class="hh">${ss.time.split(' ')[0]}</span>
+        <span class="ampm">${ss.time.split(' ').slice(1).join(' ')}</span>
+      </div>
+      <div class="dp-sess-info">
+        <h4 class="dp-sess-title">${ss.title}</h4>
+        <div class="dp-sess-room">${svgPin()} ${ss.room}</div>
+      </div>
+      ${svgChev()}
+    </button>`).join('') : `<div class="dp-about" style="text-align:center; color:var(--fg-mute)">Sin sesiones publicas asignadas</div>`;
+
+  host.innerHTML = `
+    <div class="dp-photo" style="background-image:url('${s.photo}')"></div>
+    <h2 class="dp-name">${s.name}</h2>
+    <div class="dp-role">${s.role} en <b>${s.org}</b></div>
+    <div class="dp-badges">
+      <span class="dp-badge ${s.track}">${trackLabel(s.track)}</span>
+      ${s.keynote ? `<span class="dp-badge" style="background:rgba(255,255,255,0.06);color:var(--fg-dim)">Keynote</span>` : ''}
+    </div>
+    ${rateButtonHtml(s, r)}
+    <div class="dp-section">Acerca de</div>
+    <div class="dp-about">${s.bio}</div>
+    <div class="dp-section">Sus sesiones</div>
+    <div class="dp-sessions">${sessionsHtml}</div>
+  `;
+
+  const rateBtn = host.querySelector('.dp-rate');
+  if (rateBtn) rateBtn.addEventListener('click', () => openRateModal(s));
+}
+
+function rateButtonHtml(s, r){
+  if (r){
+    const stars = Array.from({length:5}, (_,i) => svgStar(i < r.stars)).join('');
+    return `<button class="dp-rate rated">
+      <span>Tu evaluacion</span>
+      <span class="stars">${stars}</span>
+    </button>`;
+  }
+  return `<button class="dp-rate">
+    ${svgStarIcon()}
+    Calificar
+  </button>`;
+}
+
+function closeDetail(){
+  $('#detailCard').classList.remove('open');
+  $('#canvas').classList.remove('has-detail');
+  state.selectedId = null;
+  renderBody();
+}
+
+$('#dpClose').addEventListener('click', closeDetail);
+
+/* ==================== RATING MODAL ==================== */
+let rateState = { speakerId:null, stars:0 };
+
+function openRateModal(s){
+  rateState = { speakerId:s.id, stars: state.ratings[s.id]?.stars || 0 };
+  $('#rateSub').textContent = s.name;
+  $('#rateComment').value = state.ratings[s.id]?.comment || '';
+  renderDiamonds();
+  updateRateSendDisabled();
+  $('#rateOverlay').classList.add('open');
+  setTimeout(() => $('#rateComment').focus(), 200);
+}
+
+function renderDiamonds(){
+  const host = $('#rateDiamonds');
+  host.innerHTML = '';
+  for (let i=1; i<=5; i++){
+    const btn = document.createElement('button');
+    btn.className = 'rate-d' + (i<=rateState.stars?' on':'');
+    btn.innerHTML = svgDiamond();
+    btn.addEventListener('click', () => {
+      rateState.stars = i;
+      renderDiamonds();
+      updateRateSendDisabled();
+    });
+    btn.addEventListener('mouseenter', () => {
+      Array.from(host.children).forEach((c, idx) => c.classList.toggle('on', idx < i));
+    });
+    btn.addEventListener('mouseleave', () => {
+      Array.from(host.children).forEach((c, idx) => c.classList.toggle('on', idx < rateState.stars));
+    });
+    host.appendChild(btn);
+  }
+}
+
+function updateRateSendDisabled(){
+  $('#rateSend').disabled = rateState.stars === 0;
+}
+
+$('#rateCancel').addEventListener('click', closeRateModal);
+$('#rateOverlay').addEventListener('click', (e) => {
+  if (e.target === $('#rateOverlay')) closeRateModal();
+});
+
+$('#rateSend').addEventListener('click', () => {
+  if (rateState.stars === 0) return;
+  state.ratings[rateState.speakerId] = {
+    stars: rateState.stars,
+    comment: $('#rateComment').value.trim(),
+  };
+  const s = speakers.find(x => x.id === rateState.speakerId);
+  closeRateModal();
+  // re-render detail to swap button to "rated"
+  if (state.selectedId === s.id){
+    paintDetail(s, $('#dpBody'));
+  }
+  showToast(`Evaluacion enviada · ${rateState.stars}/5`);
+});
+
+function closeRateModal(){
+  $('#rateOverlay').classList.remove('open');
+}
+
+/* ==================== TOAST ==================== */
+let toastTimer;
+function showToast(msg){
+  const t = $('#toast');
+  $('#toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ==================== SEARCH ==================== */
+$('#searchBtn').addEventListener('click', toggleSearch);
+function toggleSearch(){
+  const w = $('#searchWrap');
+  const open = w.classList.toggle('open');
+  if (open){ setTimeout(() => $('#searchInput').focus(), 50) }
+  else { $('#searchInput').value=''; state.search=''; renderBody(); }
+}
+$('#searchInput').addEventListener('input', (e) => {
+  state.search = e.target.value;
+  renderBody();
+});
+
+/* ==================== KEYBOARD ==================== */
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){
+    e.preventDefault();
+    if (!$('#searchWrap').classList.contains('open')) toggleSearch();
+    else $('#searchInput').focus();
+    return;
+  }
+  if (e.key === 'Escape'){
+    if ($('#rateOverlay').classList.contains('open')) closeRateModal();
+    else if ($('#searchWrap').classList.contains('open')) toggleSearch();
+    else if ($('#detailCard').classList.contains('open')) closeDetail();
+  }
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    const list = filterSpeakers();
+    if (!list.length) return;
+    const cur = list.findIndex(s => s.id === state.selectedId);
+    let next = e.key === 'ArrowDown' ? cur+1 : cur-1;
+    if (next < 0) next = list.length-1;
+    if (next >= list.length) next = 0;
+    e.preventDefault();
+    openDetail(list[next].id);
+  }
+});
+
+/* ==================== TWEAKS ==================== */
+$$('#seg-mode button').forEach(b => {
+  b.addEventListener('click', () => {
+    $$('#seg-mode button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    document.body.dataset.theme = b.dataset.mode;
+  });
+});
+
+/* ==================== INIT ==================== */
+renderChips();
+renderBody();
+</script>
+</body>
+</html>
