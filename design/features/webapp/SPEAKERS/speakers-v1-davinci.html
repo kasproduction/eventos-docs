@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>W.5 Speakers — DaVinci v1</title>
+<title>W.5 Speakers — DaVinci v2 (espejo Expo)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -22,20 +22,19 @@
   --fg-mute:#6b6b66;
   --fg-label:#5a5a55;
 
-  --accent:#7CFFB2;
-  --accent-soft:rgba(124,255,178,0.10);
-  --accent-glow:rgba(124,255,178,0.20);
-  --accent-on:#0a0a0a;
-
-  --heart:#FF5D6C;
   --gold:#B5A68B;
-  --gold-bg:rgba(181,166,139,0.14);
+  --gold-soft:rgba(181,166,139,0.45);
+  --gold-bg:rgba(181,166,139,0.10);
+  --gold-bg-strong:rgba(181,166,139,0.16);
+  --gold-border:rgba(181,166,139,0.20);
 
-  --tech:#a8a8ff;       --tech-bg:rgba(168,168,255,0.10);
-  --business:#5eead4;   --business-bg:rgba(94,234,212,0.10);
-  --innovation:#f5c66c; --innovation-bg:rgba(245,198,108,0.10);
-  --leadership:#ff8a96; --leadership-bg:rgba(255,138,150,0.10);
-  --culture:#c084fc;    --culture-bg:rgba(192,132,252,0.10);
+  --linkedin:#0A66C2;
+
+  /* Session types — del mobile speaker/[id].tsx TYPE_COLORS */
+  --st-keynote:#a882ff;
+  --st-panel:#64c8ff;
+  --st-workshop:#ffb464;
+  --st-lightning:#ff7eb3;
 
   --canvas-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
 
@@ -64,10 +63,13 @@ body[data-theme="lux"]{
   --shadow-lg: 0 16px 36px rgba(0,0,0,0.12), 0 6px 12px rgba(0,0,0,0.06);
 
   --gold:#8E8170;
-  --gold-bg:rgba(142,129,112,0.12);
+  --gold-soft:rgba(142,129,112,0.55);
+  --gold-bg:rgba(142,129,112,0.10);
+  --gold-bg-strong:rgba(142,129,112,0.16);
+  --gold-border:rgba(142,129,112,0.22);
 }
 
-body[data-theme="lux"] .speakers-card{ box-shadow: var(--shadow-md) }
+body[data-theme="lux"] .speakers-card{ background: transparent; border:0; box-shadow:none }
 body[data-theme="lux"] .sp-row{
   background: var(--surface-card);
   border-color: transparent;
@@ -89,43 +91,29 @@ body[data-theme="lux"] .feat-card{
 body[data-theme="lux"] .feat-card:hover{
   background: rgba(255,255,255,0.65);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-xl);
 }
 body[data-theme="lux"] .feat-card.selected{
   border-color: var(--border-strong);
   box-shadow: var(--shadow-lg);
 }
-/* En Lux la sub-tabla del speakers-card no necesita box bg solido — deja que las cards floten */
-body[data-theme="lux"] .speakers-card{ background: transparent; border:0; box-shadow:none }
-body[data-theme="lux"] .ag-back,
-body[data-theme="lux"] .ag-tool{
-  background: #ffffff;
+body[data-theme="lux"] .ag-back{ background:#fff; box-shadow: var(--shadow-sm) }
+body[data-theme="lux"] .sp-search{
+  background: #fff;
+  border: 0;
   box-shadow: var(--shadow-sm);
-}
-body[data-theme="lux"] .ag-tabs{
-  background: #f0efea;
-  box-shadow: none;
-}
-body[data-theme="lux"] .ag-tab.active{
-  background: var(--fg); color: #ffffff;
-  box-shadow: 0 2px 8px -1px rgba(0,0,0,0.15);
-}
-body[data-theme="lux"] .chip{
-  background: #ffffff;
-  box-shadow: var(--shadow-sm);
-}
-body[data-theme="lux"] .chip.active{
-  background: var(--fg); color: #ffffff;
-  box-shadow: 0 2px 8px -1px rgba(0,0,0,0.15);
 }
 body[data-theme="lux"] .detail{
   border-color: transparent;
   box-shadow: var(--shadow-lg);
 }
-body[data-theme="lux"] .dp-meta-card,
-body[data-theme="lux"] .dp-about,
+body[data-theme="lux"] .dp-bio,
 body[data-theme="lux"] .dp-session{
   background: #ffffff;
+  border-color: transparent;
+  box-shadow: var(--shadow-sm);
+}
+body[data-theme="lux"] .dp-linkedin{
+  background: var(--linkedin); color: #fff;
   box-shadow: var(--shadow-sm);
 }
 body[data-theme="lux"] .empty-hint{
@@ -133,11 +121,6 @@ body[data-theme="lux"] .empty-hint{
   border: 1px dashed var(--border-strong);
   box-shadow: var(--shadow-sm);
 }
-body[data-theme="lux"] .feat-tag.tech,        body[data-theme="lux"] .dp-badge.tech       { background:#EFF6FF; color:#1D4ED8 }
-body[data-theme="lux"] .feat-tag.business,    body[data-theme="lux"] .dp-badge.business   { background:#F0FDF4; color:#166534 }
-body[data-theme="lux"] .feat-tag.innovation,  body[data-theme="lux"] .dp-badge.innovation { background:#FFF7ED; color:#C2410C }
-body[data-theme="lux"] .feat-tag.leadership,  body[data-theme="lux"] .dp-badge.leadership { background:#FDF2F8; color:#BE185D }
-body[data-theme="lux"] .feat-tag.culture,     body[data-theme="lux"] .dp-badge.culture    { background:#FDF4FF; color:#7E22CE }
 
 *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
 html,body{margin:0;padding:0;background:var(--bg-sunken);color:var(--fg);
@@ -165,7 +148,7 @@ body[data-theme="lux"] .sidebar{ box-shadow: var(--shadow-md) }
 .sb-logo{
   width:32px;height:32px;border-radius:9px;
   display:flex;align-items:center;justify-content:center;margin-bottom:4px;
-  font-family:'Plus Jakarta Sans';font-weight:800;font-size:13px;color:var(--accent);
+  font-family:'Plus Jakarta Sans';font-weight:800;font-size:13px;color:var(--gold);
 }
 .sb-item{
   width:36px;height:36px;border-radius:12px;
@@ -177,17 +160,17 @@ body[data-theme="lux"] .sidebar{ box-shadow: var(--shadow-md) }
 .sb-item.active{color:var(--fg);background:var(--surface-high)}
 .sb-item.active::before{
   content:""; position:absolute; left:-7px; top:8px; bottom:8px;
-  width:2px; border-radius:2px; background:var(--accent);
+  width:2px; border-radius:2px; background:var(--gold);
 }
 .sb-live{
   position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;
-  background:var(--accent);
+  background:#7CFFB2;
   animation:pulse-live 1.6s ease-in-out infinite;
 }
 .sb-badge{
   position:absolute;top:6px;right:6px;
   height:14px;min-width:14px;padding:0 3px;border-radius:99px;
-  background:var(--accent);color:var(--accent-on);
+  background:var(--gold);color:#0a0a0a;
   font-family:'Plus Jakarta Sans';font-size:8px;font-weight:800;
   display:flex;align-items:center;justify-content:center;
   border:1px solid var(--bg-elevated);
@@ -213,33 +196,20 @@ body[data-theme="lux"] .sidebar{ box-shadow: var(--shadow-md) }
   display:flex; flex-direction:column;
 }
 
-/* ==================== HEADER ==================== */
+/* ==================== HEADER (replica W.3 AgendaHeader: title + tools) ==================== */
 .ag-header{
   flex-shrink:0;
   width: 60%;
   min-width: 460px;
   max-width: 920px;
   margin-left: clamp(20px, 2vw, 32px);
-  padding: clamp(20px, 2vw, 32px) clamp(20px, 2vw, 32px) 0;
+  padding: clamp(20px, 2vw, 32px) clamp(20px, 2vw, 32px) clamp(8px, 0.8vw, 12px);
   display:flex; align-items:center; justify-content:space-between; gap:14px;
 }
-.ag-titleblock{display:flex;align-items:center;gap:14px;min-width:0}
-.ag-back{
-  width:32px;height:32px;border-radius:50%;
-  background:var(--surface-low);color:var(--fg);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0; transition: background 200ms var(--ease-out);
-}
-.ag-back:hover{background:var(--surface-medium)}
-.ag-titles{min-width:0}
 .ag-title{
   font-family:'Plus Jakarta Sans';font-weight:800;letter-spacing:-0.022em;
-  font-size:clamp(26px, 2.2vw, 38px);line-height:1;margin:0;
+  font-size:clamp(26px, 2.2vw, 32px);line-height:1;margin:0;
   color:var(--fg); white-space: nowrap;
-}
-.ag-subtitle{
-  margin-top:4px;font-size:clamp(11px, 0.78vw, 13px);
-  color:var(--fg-dim);
 }
 .ag-tools{display:flex;align-items:center;gap:6px;flex-shrink:0;position:relative}
 .ag-tool{
@@ -250,42 +220,18 @@ body[data-theme="lux"] .sidebar{ box-shadow: var(--shadow-md) }
 }
 .ag-tool:hover{color:var(--fg);background:var(--surface-medium)}
 .ag-tool:active{ transform: scale(0.92) }
-
-.ag-tabs{
-  display:inline-flex; gap:3px;
-  padding:3px;
-  background:var(--surface-low);
-  border-radius:11px;
-}
-.ag-tab{
-  padding:6px 12px;
-  border-radius:8px;
-  font-family:'Urbanist';font-weight:600;font-size:11.5px;
-  color:var(--fg-dim);
-  display:inline-flex;align-items:center;gap:6px;
-  transition: all 200ms var(--ease-out);
-}
-.ag-tab:hover{ color:var(--fg) }
-.ag-tab:active{ transform: scale(0.97) }
-.ag-tab.active{
-  background:var(--fg); color:var(--bg-elevated);
-  font-weight:700;
-}
-.ag-tab .count{
-  font-size:10px; font-weight:700; padding:1px 6px; border-radius:99px;
-  background:rgba(255,255,255,0.06); color:var(--fg-dim); min-width:18px; text-align:center;
-}
-.ag-tab.active .count{ background: rgba(0,0,0,0.18); color: var(--bg-elevated) }
+body[data-theme="lux"] .ag-tool{ background:#fff; box-shadow: var(--shadow-sm) }
 
 .ag-search-wrap{
   position:absolute; top:50%; right:0; transform:translateY(-50%);
   display:none; align-items:center;
-  height:38px; padding: 0 12px 0 36px;
+  height:38px; padding: 0 36px 0 36px;
   background: var(--surface-medium);
   border-radius:14px;
   width: 280px;
   z-index:5;
 }
+body[data-theme="lux"] .ag-search-wrap{ background:#fff; box-shadow: var(--shadow-sm) }
 .ag-search-wrap.open{display:flex; animation: pop-in 240ms var(--spring-soft)}
 .ag-search-wrap svg.icon{
   position:absolute; left:13px; color:var(--fg-mute);
@@ -294,34 +240,19 @@ body[data-theme="lux"] .sidebar{ box-shadow: var(--shadow-md) }
   background:transparent;border:none;outline:none;color:var(--fg);
   font-family:inherit;font-size:13px;width:100%;
 }
+.ag-search-wrap input::placeholder{ color:var(--fg-label) }
+.ag-search-close{
+  position:absolute; right:10px;
+  width:20px;height:20px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--fg-mute);
+  transition: color 180ms var(--ease-out), background 180ms var(--ease-out);
+}
+.ag-search-close:hover{ color:var(--fg); background: var(--surface-low) }
 @keyframes pop-in{
-  from{opacity:0;transform:scale(.94) translateY(-4px)}
-  to{opacity:1;transform:scale(1) translateY(0)}
+  from{opacity:0;transform:translateY(-50%) scale(.94)}
+  to{opacity:1;transform:translateY(-50%) scale(1)}
 }
-
-/* ==================== TRACK CHIPS ==================== */
-.chip-row{
-  display:flex; gap:8px; justify-content:flex-start;
-  width: 60%;
-  min-width: 460px;
-  max-width: 920px;
-  padding: clamp(14px, 1.4vw, 20px) clamp(20px, 2vw, 32px) clamp(14px, 1.2vw, 18px);
-  margin-left: clamp(20px, 2vw, 32px);
-  flex-shrink:0; flex-wrap:wrap;
-}
-.chip{
-  padding:5px 11px;font-size:11px;font-weight:600;
-  border-radius:99px;background:var(--surface-low);
-  color:var(--fg-dim);
-  display:flex;align-items:center;gap:6px;
-  font-family:'Urbanist';
-  transition:all 180ms var(--ease-out);
-}
-.chip:hover{color:var(--fg);background:var(--surface-medium)}
-.chip:active{ transform: scale(0.96) }
-.chip.active{background:var(--fg);color:var(--bg-elevated)}
-.chip.active .chip-dot{background:var(--bg-elevated);opacity:.4}
-.chip-dot{width:7px;height:7px;border-radius:50%}
 
 /* ==================== SPEAKERS WRAP ==================== */
 .speakers-wrap{
@@ -334,15 +265,11 @@ body[data-theme="lux"] .sidebar{ box-shadow: var(--shadow-md) }
   width: 60%;
   min-width: 460px;
   max-width: 920px;
-  background: var(--surface-card);
-  border-radius: 24px;
+  background: transparent;
   display: flex; flex-direction: column;
   overflow: hidden;
 }
-.ag-header,
-.chip-row{
-  align-self: flex-start;
-}
+.ag-header{ align-self: flex-start }
 
 .sp-body{
   flex:1; min-height:0;
@@ -357,20 +284,23 @@ body[data-theme="lux"] .sp-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,0
 /* ==================== SECTION HEADER ==================== */
 .sp-section-head{
   display:flex; align-items:baseline; justify-content:space-between;
-  margin: 0 0 14px;
+  margin: 0 0 12px;
 }
-.sp-section-head:not(:first-child){ margin-top: 28px }
+.sp-section-head:not(:first-child){ margin-top: 24px }
 .sp-section-title{
   font-family:'Plus Jakarta Sans';font-weight:800;
-  font-size: clamp(16px, 1.2vw, 20px);
+  font-size: clamp(17px, 1.3vw, 19px);
   letter-spacing:-0.018em;
   color: var(--fg);
   margin:0;
 }
+.sp-section-link,
 .sp-section-meta{
   font-family:'Urbanist'; font-weight:500;
-  font-size:11.5px; color: var(--fg-mute);
+  font-size:12.5px; color: var(--fg-mute);
 }
+.sp-section-link{ cursor:pointer; transition: color 200ms var(--ease-out) }
+.sp-section-link:hover{ color: var(--fg) }
 
 /* ==================== FEATURED CAROUSEL ==================== */
 .feat-strip{
@@ -385,9 +315,7 @@ body[data-theme="lux"] .sp-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,0
 .feat-strip::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:3px}
 body[data-theme="lux"] .feat-strip::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08)}
 
-/* Inner row con animacion breathing — replica BreathingCarousel.tsx del movil
-   (translateX 0 → -12 → 0 en 4.8s sin-ease infinite alternate, delay 1.2s).
-   Se detiene PERMANENTE al primer scroll/touch via JS (clase .stopped) */
+/* Inner row breathing animation — replica BreathingCarousel.tsx del movil */
 .feat-track{
   display:inline-flex; gap: 12px;
   padding: 0 2px;
@@ -406,8 +334,7 @@ body[data-theme="lux"] .feat-strip::-webkit-scrollbar-thumb{background:rgba(0,0,
 .feat-card{
   scroll-snap-align: start;
   width: 200px; flex-shrink: 0;
-  /* Noir: luminous-border glass — replica surface.low rgba(255,255,255,0.03)
-     + borderLight rgba(255,255,255,0.12) a 0.5px (de theme-noir.ts) */
+  /* Noir: luminous-border glass — replica surface.low rgba(255,255,255,0.03) + borderLight 0.5px */
   background: rgba(255,255,255,0.03);
   border: 0.5px solid rgba(255,255,255,0.12);
   border-radius:22px;
@@ -424,9 +351,9 @@ body[data-theme="lux"] .feat-strip::-webkit-scrollbar-thumb{background:rgba(0,0,
 .feat-photo{
   aspect-ratio: 4 / 5;
   background-size: cover;
-  background-position: center 20%;  /* recorta desde arriba como movil contentPosition top:20% */
+  background-position: center 20%;
   border-radius: 14px;
-  background-color: var(--surface-medium);  /* placeholder mientras carga */
+  background-color: var(--surface-medium);
   position:relative;
   overflow:hidden;
 }
@@ -443,23 +370,23 @@ body[data-theme="lux"] .feat-strip::-webkit-scrollbar-thumb{background:rgba(0,0,
 .feat-info{ padding: 12px 4px 4px }
 .feat-name{
   font-family:'Plus Jakarta Sans';font-weight:700;
-  font-size:14px; line-height:1.2;
-  color:var(--fg); margin:0 0 3px;
+  font-size:15px; line-height:1.2;
+  color:var(--fg); margin:0 0 2px;
   letter-spacing:-0.012em;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .feat-role{
-  font-size:11.5px; color:var(--fg-dim);
+  font-size:12px; color:var(--fg-mute);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   margin-bottom:8px;
 }
 .feat-sessions{
   display:flex; align-items:center; gap:5px;
-  font-size:10.5px; color:var(--fg-mute); font-weight:600;
+  font-size:10px; color:var(--fg-mute); font-weight:600;
 }
 .feat-sessions svg{ width:11px; height:11px }
 
-/* ==================== TODOS LIST (replica movil — 1 col larga, fila grande) ==================== */
+/* ==================== TODOS LIST (replica mobile — 1 col larga) ==================== */
 .sp-grid{
   display:grid;
   grid-template-columns: 1fr;
@@ -472,7 +399,6 @@ body[data-theme="lux"] .feat-strip::-webkit-scrollbar-thumb{background:rgba(0,0,
 .sp-row{
   display:flex; align-items:center; gap:14px;
   padding: 12px;
-  /* Noir: glass translucido + luminous border (replica surface.low + border) */
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 18px;
@@ -485,56 +411,48 @@ body[data-theme="lux"] .feat-strip::-webkit-scrollbar-thumb{background:rgba(0,0,
 .sp-row.selected{ border-color: rgba(255,255,255,0.18) }
 
 .sp-avatar{
-  width:52px; height:52px; border-radius:14px;
+  width:56px; height:56px; border-radius:16px;
   background-size: cover; background-position: center 20%;
+  background-color: var(--surface-medium);
   flex-shrink:0;
 }
 .sp-row-info{ min-width:0; flex:1 }
 .sp-row-name{
   font-family:'Plus Jakarta Sans';font-weight:700;
-  font-size:13.5px; color:var(--fg);
-  margin:0 0 2px; letter-spacing:-0.01em;
+  font-size:14px; color:var(--fg);
+  margin:0 0 1px; letter-spacing:-0.01em;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .sp-row-role{
-  font-size:11.5px; color:var(--fg-dim);
+  font-size:12px; color:var(--fg-mute);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   margin-bottom:5px;
 }
 .sp-row-meta{
-  display:inline-flex; align-items:center; gap:4px;
-  padding: 2px 7px; border-radius: 6px;
+  display:inline-flex; align-items:center; gap:3px;
+  padding: 2px 7px; border-radius: 5px;
   background: var(--surface-medium);
   font-size: 10px; color: var(--fg-mute); font-weight:600;
 }
-.sp-row-meta svg{ width:10px; height:10px }
-.sp-row .chev{ color: var(--fg-mute); flex-shrink:0 }
+.sp-row-meta svg{ width:9px; height:9px }
+.sp-row .chev{ color: var(--fg-label); flex-shrink:0 }
 
-/* Section header con link "Ver todos" */
-.sp-section-link{
-  font-family:'Urbanist'; font-weight:500;
-  font-size: 12px; color: var(--fg-dim);
-  cursor:pointer;
-  transition: color 200ms var(--ease-out);
-}
-.sp-section-link:hover{ color: var(--fg) }
-
-/* Empty state for filtered list */
+/* Empty state */
 .sp-empty{
   text-align:center;
   padding: 40px 20px;
   color: var(--fg-mute);
   font-size: 12.5px;
+  font-family:'Urbanist'; font-weight:400;
 }
-.sp-empty svg{ color: var(--fg-mute); margin-bottom: 10px }
 
-/* ==================== DETAIL PANEL (right floating) ==================== */
+/* ==================== DETAIL PANEL ==================== */
 .detail{
   position:absolute;
   top: clamp(18px, 1.8vw, 28px);
   bottom: clamp(18px, 1.8vw, 28px);
   right: clamp(20px, 2vw, 32px);
-  width: clamp(320px, 28vw, 520px);
+  width: clamp(340px, 28vw, 540px);
   background: var(--surface-card);
   border: 1px solid var(--border-strong);
   border-radius: 22px;
@@ -555,153 +473,200 @@ body[data-theme="lux"] .feat-strip::-webkit-scrollbar-thumb{background:rgba(0,0,
 }
 
 .dp-header{
-  display:flex;align-items:center;gap:10px;
-  padding: 16px 18px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding: 16px 20px 8px;
   flex-shrink:0;
 }
 .dp-back{
-  width:32px;height:32px;border-radius:50%;
+  width:36px;height:36px;border-radius:50%;
   background:var(--surface-medium);color:var(--fg);
   display:flex;align-items:center;justify-content:center;
   transition: background 200ms var(--ease-out);
 }
+body[data-theme="lux"] .dp-back{ background:#fff; box-shadow: var(--shadow-sm) }
 .dp-back:hover{background:var(--surface-high)}
+.dp-back:active{ transform: scale(0.94) }
 .dp-headtitle{
-  flex:1;text-align:center;font-family:'Plus Jakarta Sans';
-  font-size:14px;color:var(--fg);font-weight:700;letter-spacing:-0.01em;
+  font-family:'Plus Jakarta Sans';
+  font-size:16px;color:var(--fg);font-weight:700;letter-spacing:-0.01em;
 }
-.dp-headspace{width:32px}
+.dp-headspace{width:36px}
 
 .dp-body{
   flex:1;overflow-y:auto;
-  padding: 6px 22px 22px;
+  padding: 8px 20px 24px;
 }
 .dp-body::-webkit-scrollbar{width:5px}
 .dp-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:3px}
 body[data-theme="lux"] .dp-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.06)}
 
-/* Hero vertical (replica movil) — foto arriba + info abajo, pero foto MEDIANA
-   no full-width (en panel narrow se veia exagerada). 60% panel, max 240px, alineada izq */
+/* Hero photo — square, max 260, centrada en el panel (panel desktop es estrecho,
+   full-width 1:1 dominaba). Mobile usa full-width pero en pantalla 375px da ~330px,
+   aqui limitamos visualmente para mantener proporcion en panel ~340-540px */
 .dp-photo{
-  width: 60%;
-  max-width: 240px;
+  width: 100%;
+  max-width: 260px;
   aspect-ratio: 1 / 1;
-  border-radius: 20px;
+  border-radius: 24px;
   background-size: cover; background-position: center 20%;
   background-color: var(--surface-medium);
-  margin: 0 auto 16px;  /* centrada */
+  margin: 0 auto 20px;
 }
-body[data-theme="lux"] .dp-photo{ box-shadow: var(--shadow-md) }
+body[data-theme="lux"] .dp-photo{ box-shadow: var(--shadow-sm) }
 
 .dp-name{
   font-family:'Plus Jakarta Sans';font-weight:800;
-  font-size: clamp(22px, 1.7vw, 26px); line-height:1.15;
+  font-size: clamp(22px, 1.7vw, 28px); line-height:1.15;
   letter-spacing:-0.022em;
+  color: var(--fg);
   margin: 0;
 }
 .dp-role{
   margin-top: 5px;
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--fg-dim);
   line-height: 1.4;
+  font-family:'Urbanist'; font-weight:400;
 }
-.dp-role b{ color: var(--fg); font-weight:700 }
+.dp-role b{ color: var(--fg); font-weight:600 }
 
-.dp-badges{
-  display:flex; align-items:center; gap:7px; flex-wrap:wrap;
-  margin-top:12px;
+/* Rating display row — Stars + avg + n votos (solo si rating_count > 0) */
+.dp-rating-row{
+  display:flex; align-items:center; gap: 8px;
+  margin-top: 12px;
 }
-.dp-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:5px 10px; border-radius:8px;
-  font-family:'Urbanist';font-weight:700;font-size:11px;letter-spacing:0.04em;
+.dp-rating-stars{ display:flex; gap: 2px; color: var(--gold) }
+.dp-rating-stars svg{ width: 14px; height: 14px }
+.dp-rating-meta{
+  font-family:'Urbanist'; font-weight:500;
+  font-size: 12.5px; color: var(--fg-mute);
 }
-.dp-badge.tech{background:var(--tech-bg);color:var(--tech)}
-.dp-badge.business{background:var(--business-bg);color:var(--business)}
-.dp-badge.innovation{background:var(--innovation-bg);color:var(--innovation)}
-.dp-badge.leadership{background:var(--leadership-bg);color:var(--leadership)}
-.dp-badge.culture{background:var(--culture-bg);color:var(--culture)}
+.dp-rating-meta b{ color: var(--fg); font-weight:700 }
 
-/* Calificar — minimalista: outline gold sutil, no fill chunky */
+/* Action row — LinkedIn + Calificar lado a lado, ambos flex:1 cuando hay 2;
+   cuando solo hay 1 (linkedin_url null) se acota a tamaño contenido y se alinea
+   derecha — en panel desktop ~340-540px, un boton flex:1 solo se veia gigante */
+.dp-actions{
+  display:flex; gap: 8px;
+  margin-top: 20px;
+}
+.dp-actions button{
+  flex: 1 1 0;
+  min-width: 0;
+  display:flex; align-items:center; justify-content:center; gap: 7px;
+  padding: 13px;
+  border-radius: 14px;
+  font-family:'Urbanist'; font-weight:600; font-size: 13px;
+  border: 1px solid transparent;
+  transition: transform 200ms var(--spring-soft), background 200ms var(--ease-out), border-color 200ms var(--ease-out);
+}
+.dp-actions button:active{ transform: scale(0.98) }
+.dp-actions svg{ width:16px; height:16px; flex-shrink:0 }
+/* Solo Calificar (sin LinkedIn) → no llenar todo el ancho */
+.dp-actions:has(> button:only-child){ justify-content: flex-end }
+.dp-actions:has(> button:only-child) button{
+  flex: 0 0 auto;
+  min-width: 180px;
+  max-width: 220px;
+}
+
+.dp-linkedin{
+  background: #ffffff;
+  color: #0a0a0a;
+}
+body[data-theme="lux"] .dp-linkedin{ background: var(--linkedin); color: #fff }
+
 .dp-rate{
-  margin: 16px 0 0 auto;  /* alineado a la derecha */
-  display:flex; align-items:center; justify-content:center; gap:7px;
-  width: fit-content;
-  padding: 7px 14px;
-  border-radius: 99px;
-  background: transparent;
-  border: 1px solid rgba(181,166,139,0.28);
+  background: var(--gold-bg);
   color: var(--gold);
-  font-family:'Urbanist'; font-weight:600; font-size:12px;
-  letter-spacing: 0.01em;
-  transition: background 200ms var(--ease-out), border-color 200ms var(--ease-out), transform 200ms var(--spring-soft);
+  border-color: var(--gold-border) !important;
 }
-body[data-theme="lux"] .dp-rate{ border-color: rgba(142,129,112,0.30) }
-.dp-rate:hover{ background: rgba(181,166,139,0.08); border-color: rgba(181,166,139,0.45) }
-body[data-theme="lux"] .dp-rate:hover{ background: rgba(142,129,112,0.08); border-color: rgba(142,129,112,0.45) }
-.dp-rate:active{ transform: scale(0.97) }
-.dp-rate > svg{ width:12px; height:12px; fill: currentColor }
-
+.dp-rate:hover{ background: var(--gold-bg-strong) }
 .dp-rate.rated{
-  border-color: var(--border);
-  color: var(--fg-mute);
-  font-weight: 500;
+  background: var(--gold-bg);
+  color: var(--gold-soft);
+  border-color: var(--gold-border) !important;
+  cursor: default;
+  opacity: 0.7;
 }
-.dp-rate.rated .stars{ color: var(--gold); display:flex; gap:1.5px }
-.dp-rate.rated .stars svg{ width: 10px; height: 10px }
+.dp-rate.rated:hover{ background: var(--gold-bg) }
 
-.dp-section{
-  text-transform:uppercase;letter-spacing:0.18em;
-  font-family:'Plus Jakarta Sans';font-weight:700;
-  font-size:10.5px;color:var(--fg-mute);
-  margin:22px 0 10px;
+/* Bio card — "ACERCA DE" label uppercase letterspacing 1.2 */
+.dp-bio{
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 18px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+}
+.dp-bio-label{
+  font-family:'Urbanist'; font-weight:700;
+  font-size: 11px; color: var(--fg-label);
+  letter-spacing: 1.2px; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.dp-bio-text{
+  font-family:'Urbanist'; font-weight: 400;
+  font-size: 14px; color: var(--fg-dim);
+  line-height: 1.55;
+  margin: 0;
 }
 
-.dp-about{
-  background:var(--surface-medium);
-  border-radius:13px;padding:14px 16px;
-  color:var(--fg-dim);font-size:13px;line-height:1.55;
+/* Sessions list — replica mobile speaker/[id].tsx */
+.dp-sessions-label{
+  font-family:'Urbanist'; font-weight:700;
+  font-size: 11px; color: var(--fg-label);
+  letter-spacing: 1.2px; text-transform: uppercase;
+  margin: 22px 0 12px 4px;
 }
-
-.dp-sessions{ display:flex; flex-direction:column; gap:6px }
+.dp-sessions{ display:flex; flex-direction:column; gap: 10px }
 .dp-session{
-  display:flex; align-items:stretch; gap:12px;
-  padding:11px 14px;
-  background:var(--surface-medium);
-  border-radius:13px; cursor:pointer;
+  display:flex; align-items:center; gap:14px;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  cursor:pointer;
   text-align: left;
-  transition: background 200ms var(--ease-out);
+  transition: background 200ms var(--ease-out), transform 200ms var(--spring-soft);
 }
-.dp-session:hover{background:var(--surface-high)}
-.dp-session:active{ transform: scale(0.985) }
+.dp-session:hover{ background: var(--surface-medium) }
+.dp-session:active{ transform: scale(0.99) }
 .dp-sess-time{
-  display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
-  font-family:'Plus Jakarta Sans';
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
   flex-shrink:0; min-width: 56px;
-  border-right: 1px solid var(--border);
-  padding-right: 10px;
+  gap: 4px;
 }
-.dp-sess-time .hh{
-  font-size: 13px; font-weight:800; color: var(--fg); letter-spacing:-0.01em;
-}
-.dp-sess-time .ampm{
-  font-size: 9.5px; color: var(--fg-mute); font-weight:600; letter-spacing:0.04em;
-  margin-top: 1px;
-}
-.dp-sess-info{ flex:1; min-width:0 }
-.dp-sess-title{
+.dp-sess-hh{
   font-family:'Plus Jakarta Sans';font-weight:700;
-  font-size: 12.5px; color: var(--fg);
-  margin:0; line-height:1.3; letter-spacing:-0.005em;
+  font-size: 14px; color: var(--fg); letter-spacing:-0.01em;
+}
+.dp-sess-type{
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family:'Urbanist'; font-weight:600;
+  font-size: 9px; letter-spacing: 0.3px; text-transform: uppercase;
+}
+.dp-sess-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap: 4px }
+.dp-sess-title{
+  font-family:'Urbanist'; font-weight:600;
+  font-size: 13px; color: var(--fg); margin:0; line-height:1.35;
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
 }
-.dp-sess-room{
-  display:flex; align-items:center; gap:5px;
-  margin-top: 4px;
-  font-size: 10.5px; color: var(--fg-mute); font-weight:500;
+.dp-sess-loc{
+  display:flex; align-items:center; gap: 4px;
+  font-size: 11px; color: var(--fg-mute);
+  font-family:'Urbanist'; font-weight:400;
 }
-.dp-sess-room svg{ width:10px; height:10px }
-.dp-session svg.chev{ color: var(--fg-mute); flex-shrink:0; align-self:center }
+.dp-sess-loc svg{ width:10px; height:10px }
+.dp-session svg.chev{ color: var(--fg-label); flex-shrink:0 }
+
+.dp-sessions-hint{
+  font-family:'Urbanist'; font-weight:500;
+  font-size: 10.5px; color: var(--fg-label);
+  text-align: center;
+  margin-top: 12px;
+}
 
 /* ==================== EMPTY HINT ==================== */
 .empty-hint{
@@ -709,7 +674,7 @@ body[data-theme="lux"] .dp-rate:hover{ background: rgba(142,129,112,0.08); borde
   top: clamp(18px, 1.8vw, 28px);
   bottom: clamp(18px, 1.8vw, 28px);
   right: clamp(20px, 2vw, 32px);
-  width: clamp(320px, 28vw, 520px);
+  width: clamp(340px, 28vw, 540px);
   background: var(--surface-card);
   border: 1px dashed var(--border-strong);
   border-radius:22px;
@@ -733,7 +698,7 @@ body[data-theme="lux"] .dp-rate:hover{ background: rgba(142,129,112,0.08); borde
   color:var(--fg-dim); font-family:'Urbanist'; font-weight:600;
 }
 
-/* ==================== RATING MODAL ==================== */
+/* ==================== RATING MODAL (estrellas — replica mobile RatingModal) ==================== */
 .rate-overlay{
   position: fixed; inset:0;
   background: rgba(0,0,0,0.55);
@@ -763,28 +728,30 @@ body[data-theme="lux"] .rate-modal{ box-shadow: var(--shadow-lg) }
   font-family:'Plus Jakarta Sans';font-weight:800;
   font-size: 19px; margin:0;
   letter-spacing:-0.018em;
+  color: var(--fg);
 }
 .rate-sub{
   margin-top: 4px;
-  font-size: 12.5px;
-  color: var(--fg-dim);
+  font-size: 13px;
+  color: var(--fg-mute);
+  font-family:'Urbanist'; font-weight:500;
 }
-.rate-diamonds{
+.rate-stars{
   display:flex; gap:14px; justify-content:center;
   margin: 22px 0 18px;
 }
-.rate-d{
+.rate-s{
   width:38px; height:38px;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;
   color: var(--border-strong);
   transition: color 180ms var(--ease-out), transform 200ms var(--spring-soft);
 }
-.rate-d:hover{ transform: scale(1.12) }
-.rate-d:active{ transform: scale(0.92) }
-.rate-d.on{ color: var(--gold) }
-.rate-d.on svg{ fill: currentColor }
-.rate-d svg{ width:30px; height:30px }
+.rate-s:hover{ transform: scale(1.12) }
+.rate-s:active{ transform: scale(0.92) }
+.rate-s.on{ color: var(--gold) }
+.rate-s.on svg{ fill: currentColor }
+.rate-s svg{ width:32px; height:32px }
 
 .rate-comment{
   width:100%;
@@ -793,7 +760,7 @@ body[data-theme="lux"] .rate-modal{ box-shadow: var(--shadow-lg) }
   border-radius: 12px;
   padding: 12px 14px;
   font-family: inherit; color: var(--fg);
-  font-size: 12.5px;
+  font-size: 13px;
   resize:none; min-height: 70px;
   outline: none;
   transition: border 200ms var(--ease-out);
@@ -809,7 +776,7 @@ body[data-theme="lux"] .rate-modal{ box-shadow: var(--shadow-lg) }
   padding: 13px;
   border-radius: 13px;
   background: var(--gold); color: #0a0a0a;
-  font-family:'Urbanist'; font-weight:800; font-size:13px;
+  font-family:'Urbanist'; font-weight:700; font-size:13px;
   letter-spacing:0.02em;
   transition: transform 200ms var(--spring-soft), background 200ms var(--ease-out);
 }
@@ -823,11 +790,11 @@ body[data-theme="lux"] .rate-send{ color: #ffffff }
 .rate-cancel{
   padding: 11px;
   font-family:'Urbanist'; font-weight:600; font-size:12.5px;
-  color: var(--fg-dim);
+  color: var(--fg-mute);
 }
 .rate-cancel:hover{ color: var(--fg) }
 
-/* ==================== TWEAKS ==================== */
+/* ==================== TWEAKS / TOAST ==================== */
 .tweaks{
   position:fixed;top:18px;right:18px;
   background:var(--bg-elevated);
@@ -838,14 +805,6 @@ body[data-theme="lux"] .rate-send{ color: #ffffff }
   z-index:60;
 }
 body[data-theme="lux"] .tweaks{ box-shadow: var(--shadow-sm) }
-.tweaks-row{display:flex;align-items:center;gap:5px}
-.swatch{
-  width:18px;height:18px;border-radius:50%;cursor:pointer;
-  border:2px solid transparent;
-  transition:transform 180ms var(--spring-soft);
-}
-.swatch:hover{transform:scale(1.12)}
-.swatch.active{border-color:var(--fg)}
 .seg{display:flex;gap:2px;padding:2px;background:var(--surface-low);border-radius:8px}
 .seg button{padding:3px 9px;border-radius:6px;font-size:9.5px;font-weight:600;color:var(--fg-mute)}
 .seg button.active{background:var(--surface-high);color:var(--fg)}
@@ -860,7 +819,6 @@ body[data-theme="lux"] .tweaks{ box-shadow: var(--shadow-sm) }
   color:var(--fg-dim); font-family:inherit;
 }
 
-/* ==================== TOAST ==================== */
 .toast{
   position: fixed; top: 70px; left: 50%;
   transform: translateX(-50%) translateY(-12px);
@@ -889,12 +847,10 @@ body[data-theme="lux"] .toast{ box-shadow: 0 12px 32px -8px rgba(0,0,0,0.18) }
 <body data-theme="noir">
 
 <div class="tweaks">
-  <div class="tweaks-row">
-    <span style="opacity:.6">tema</span>
-    <div class="seg" id="seg-mode">
-      <button data-mode="noir" class="active">Noir</button>
-      <button data-mode="lux">Lux</button>
-    </div>
+  <span style="opacity:.6">tema</span>
+  <div class="seg" id="seg-mode">
+    <button data-mode="noir" class="active">Noir</button>
+    <button data-mode="lux">Lux</button>
   </div>
 </div>
 
@@ -915,35 +871,33 @@ body[data-theme="lux"] .toast{ box-shadow: 0 12px 32px -8px rgba(0,0,0,0.18) }
   <div class="canvas" id="canvas">
 
     <header class="ag-header">
-      <div class="ag-titleblock">
-        <div class="ag-titles">
-          <h1 class="ag-title">Speakers</h1>
-          <div class="ag-subtitle" id="subtitle">18 speakers · 5 tracks</div>
-        </div>
-      </div>
+      <h1 class="ag-title">Speakers</h1>
       <div class="ag-tools">
-        <button class="ag-tool" id="searchBtn" title="Buscar (⌘K)">
+        <button class="ag-tool" id="searchBtn" title="Buscar (⌘K)" aria-label="Buscar">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         </button>
         <div class="ag-search-wrap" id="searchWrap">
           <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input id="searchInput" placeholder="Nombre, empresa o cargo..." />
+          <input id="searchInput" placeholder="Nombre, empresa o cargo..." autocomplete="off" />
+          <button class="ag-search-close" id="searchClose" aria-label="Cerrar buscador">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
         </div>
       </div>
     </header>
 
-    <div class="chip-row" id="chipRow"></div>
-
     <div class="speakers-wrap">
       <section class="speakers-card">
-        <div class="sp-body" id="spBody"></div>
+        <div class="sp-body" id="spBody">
+          <div id="spContent"></div>
+        </div>
       </section>
     </div>
 
     <aside class="detail" id="detailCard">
       <header class="dp-header">
-        <button class="dp-back" id="dpClose" aria-label="Cerrar">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <button class="dp-back" id="dpClose" aria-label="Volver">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         </button>
         <div class="dp-headtitle">Speaker</div>
         <div class="dp-headspace"></div>
@@ -961,7 +915,7 @@ body[data-theme="lux"] .toast{ box-shadow: 0 12px 32px -8px rgba(0,0,0,0.18) }
 
   </div>
 
-  <div class="hint">click speaker · <kbd>⌘K</kbd> buscar · <kbd>Esc</kbd> cerrar</div>
+  <div class="hint">click speaker · <kbd>⌘K</kbd> buscar · <kbd>↑↓</kbd> navegar · <kbd>Esc</kbd> cerrar</div>
 
   <div class="toast" id="toast">
     <div class="toast-icon" id="toastIcon"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L9 9l-7 .5 5.4 4.6L5.5 22 12 18l6.5 4-1.9-7.9L22 9.5 15 9z"/></svg></div>
@@ -972,9 +926,9 @@ body[data-theme="lux"] .toast{ box-shadow: 0 12px 32px -8px rgba(0,0,0,0.18) }
   <div class="rate-overlay" id="rateOverlay">
     <div class="rate-modal" role="dialog" aria-modal="true" aria-labelledby="rateTitle">
       <h2 class="rate-title" id="rateTitle">Como estuvo el speaker?</h2>
-      <div class="rate-sub" id="rateSub">Maria Garcia</div>
-      <div class="rate-diamonds" id="rateDiamonds"></div>
-      <textarea class="rate-comment" id="rateComment" placeholder="Comentario opcional..."></textarea>
+      <div class="rate-sub" id="rateSub">Nombre del speaker</div>
+      <div class="rate-stars" id="rateStars"></div>
+      <textarea class="rate-comment" id="rateComment" placeholder="Comentario opcional..." maxlength="280"></textarea>
       <div class="rate-actions">
         <button class="rate-send" id="rateSend" disabled>Enviar evaluacion</button>
         <button class="rate-cancel" id="rateCancel">Cerrar</button>
@@ -985,141 +939,169 @@ body[data-theme="lux"] .toast{ box-shadow: 0 12px 32px -8px rgba(0,0,0,0.18) }
 </div>
 
 <script>
-/* ==================== DATASET ==================== */
-const tracks = [
-  { id:'all',         label:'Todos',       color:'#7CFFB2' },
-  { id:'tech',        label:'Tech',        color:'#a8a8ff' },
-  { id:'business',    label:'Business',    color:'#5eead4' },
-  { id:'innovation',  label:'Innovacion',  color:'#f5c66c' },
-  { id:'leadership',  label:'Liderazgo',   color:'#ff8a96' },
-  { id:'culture',     label:'Cultura',     color:'#c084fc' },
-];
+/* ==================== DATASET (shape backend SpeakerResource) ====================
+   Verificado 2026-05-08: backend solo expone
+   id, name, bio, company, job_title, photo_url, linkedin_url,
+   avg_rating, rating_count, sessions[]
+   NO existen flags featured/keynote/track. Featured y keynote se DERIVAN
+   de speaker.sessions[].session_type.name (replica mobile speakers.tsx). */
+
+const SESSION_TYPES = {
+  keynote:   { name: 'Keynote',   color: '#a882ff' },
+  panel:     { name: 'Panel',     color: '#64c8ff' },
+  workshop:  { name: 'Workshop',  color: '#ffb464' },
+  lightning: { name: 'Lightning', color: '#ff7eb3' },
+  charla:    { name: 'Charla',    color: '#a8a8ff' },
+};
 
 const speakers = [
-  { id:1,  name:'Maria Garcia',     role:'CEO & Fundadora',         org:'Kasproduction',  track:'business',   featured:true,  keynote:true,  sessions:7,
+  { id:1,  name:'Maria Garcia', job_title:'CEO & Fundadora', company:'Kasproduction',
+    photo_url:'https://i.pravatar.cc/600?img=47', linkedin_url:'https://linkedin.com/in/maria',
+    avg_rating: 4.8, rating_count: 24,
     bio:'Lider empresarial con 15 anos de experiencia en transformacion digital y eventos de alto impacto. Ha producido mas de 200 eventos corporativos en LATAM.',
-    photo:'https://i.pravatar.cc/600?img=47',
-    sessionList:[
-      {time:'09:00 a.m.', title:'Apertura: El futuro del trabajo corporativo', room:'Sala Magna'},
-      {time:'11:30 a.m.', title:'Panel: Innovacion en eventos B2B',           room:'Auditorio'},
-      {time:'02:00 p.m.', title:'Workshop: Como medir el ROI de un evento',   room:'Sala 3'},
+    sessions:[
+      {id:101, title:'Apertura: El futuro del trabajo corporativo', start:'2026-05-15T09:00:00', location:'Sala Magna', session_type: SESSION_TYPES.keynote},
+      {id:102, title:'Panel: Innovacion en eventos B2B',           start:'2026-05-15T11:30:00', location:'Auditorio',   session_type: SESSION_TYPES.panel},
+      {id:103, title:'Workshop: Como medir el ROI de un evento',   start:'2026-05-15T14:00:00', location:'Sala 3',      session_type: SESSION_TYPES.workshop},
     ]
   },
-  { id:2,  name:'Andres Gil',       role:'VP Engineering',           org:'Rappi',          track:'tech',       featured:true,  keynote:true,  sessions:6,
+  { id:2, name:'Andres Gil', job_title:'VP Engineering', company:'Rappi',
+    photo_url:'https://i.pravatar.cc/600?img=12', linkedin_url:'https://linkedin.com/in/andres',
+    avg_rating: 4.6, rating_count: 18,
     bio:'Lidera el equipo de plataforma en Rappi escalando a +50M usuarios. Speaker frecuente en QCon, RubyConf y Devoxx.',
-    photo:'https://i.pravatar.cc/600?img=12',
-    sessionList:[
-      {time:'10:00 a.m.', title:'Arquitectura distribuida a escala LATAM',   room:'Auditorio'},
-      {time:'03:30 p.m.', title:'Panel: AI en produccion',                    room:'Sala Magna'},
+    sessions:[
+      {id:201, title:'Arquitectura distribuida a escala LATAM', start:'2026-05-15T10:00:00', location:'Auditorio',  session_type: SESSION_TYPES.keynote},
+      {id:202, title:'Panel: AI en produccion',                 start:'2026-05-15T15:30:00', location:'Sala Magna', session_type: SESSION_TYPES.panel},
     ]
   },
-  { id:3,  name:'Sofia Mendez',     role:'Head of Design',           org:'Globant',        track:'culture',    featured:true,  sessions:5,
+  { id:3, name:'Sofia Mendez', job_title:'Head of Design', company:'Globant',
+    photo_url:'https://i.pravatar.cc/600?img=45', linkedin_url:'https://linkedin.com/in/sofia',
+    avg_rating: 4.9, rating_count: 31,
     bio:'Disenadora con 12 anos liderando equipos de UX en LATAM. Profesora de Maestria en Diseno UX en la Universidad de los Andes.',
-    photo:'https://i.pravatar.cc/600?img=45',
-    sessionList:[
-      {time:'09:30 a.m.', title:'Diseno inclusivo en productos digitales',   room:'Sala 2'},
-      {time:'01:00 p.m.', title:'Workshop: Design ops al servicio del producto', room:'Sala 4'},
+    sessions:[
+      {id:301, title:'Diseno inclusivo en productos digitales',     start:'2026-05-15T09:30:00', location:'Sala 2', session_type: SESSION_TYPES.charla},
+      {id:302, title:'Workshop: Design ops al servicio del producto', start:'2026-05-15T13:00:00', location:'Sala 4', session_type: SESSION_TYPES.workshop},
     ]
   },
-  { id:4,  name:'David Moreno',     role:'CTO',                       org:'MercadoLibre',   track:'leadership', featured:true,  sessions:5,
+  { id:4, name:'David Moreno', job_title:'CTO', company:'MercadoLibre',
+    photo_url:'https://i.pravatar.cc/600?img=14', linkedin_url:'https://linkedin.com/in/david',
+    avg_rating: 4.5, rating_count: 12,
     bio:'CTO de MercadoLibre Colombia. Antes lideraba ingenieria en Bold y Nequi. Apasionado por sistemas distribuidos y mentoria tech.',
-    photo:'https://i.pravatar.cc/600?img=14',
-    sessionList:[
-      {time:'10:30 a.m.', title:'Liderar equipos de 200+ engineers',          room:'Auditorio'},
-      {time:'04:00 p.m.', title:'Fireside chat: De junior a CTO',             room:'Sala Magna'},
+    sessions:[
+      {id:401, title:'Liderar equipos de 200+ engineers', start:'2026-05-15T10:30:00', location:'Auditorio',  session_type: SESSION_TYPES.keynote},
+      {id:402, title:'Fireside chat: De junior a CTO',    start:'2026-05-15T16:00:00', location:'Sala Magna', session_type: SESSION_TYPES.panel},
     ]
   },
-
-  { id:5,  name:'Alex Rivera',         role:'Student & Startup Founder', org:'MIT',         track:'innovation', featured:false, sessions:4,
+  { id:5, name:'Alex Rivera', job_title:'Student & Startup Founder', company:'MIT',
+    photo_url:'https://i.pravatar.cc/600?img=33', linkedin_url:null,
+    avg_rating: null, rating_count: 0,
     bio:'Estudiante de MIT y fundador de una startup en YC W26. Construye herramientas de developer experience para teams remotos.',
-    photo:'https://i.pravatar.cc/600?img=33',
-    sessionList:[
-      {time:'11:00 a.m.', title:'Como construir tu primer MVP en 4 semanas', room:'Sala 3'},
+    sessions:[
+      {id:501, title:'Como construir tu primer MVP en 4 semanas', start:'2026-05-15T11:00:00', location:'Sala 3', session_type: SESSION_TYPES.lightning},
     ]
   },
-  { id:6,  name:'Anastasia Petrova',   role:'Developer Advocate',       org:'JetBrains',    track:'tech',       featured:false, sessions:4,
+  { id:6, name:'Anastasia Petrova', job_title:'Developer Advocate', company:'JetBrains',
+    photo_url:'https://i.pravatar.cc/600?img=49', linkedin_url:'https://linkedin.com/in/ana',
+    avg_rating: null, rating_count: 0,
     bio:'Developer Advocate especializada en Kotlin y herramientas de desarrollo modernas. Conferencista en KotlinConf, Droidcon y JavaZone.',
-    photo:'https://i.pravatar.cc/600?img=49',
-    sessionList:[]
+    sessions:[]
   },
-  { id:7,  name:'Carlos Beltran',      role:'Head of Growth',           org:'Habi',         track:'business',   featured:false, sessions:3,
+  { id:7, name:'Carlos Beltran', job_title:'Head of Growth', company:'Habi',
+    photo_url:'https://i.pravatar.cc/600?img=15', linkedin_url:'https://linkedin.com/in/carlos',
+    avg_rating: 4.2, rating_count: 8,
     bio:'Crecio Habi 30x en 18 meses. Antes lideraba growth en Rappi Travel. Especialista en Product-Led Growth para mercados emergentes.',
-    photo:'https://i.pravatar.cc/600?img=15',
-    sessionList:[]
+    sessions:[
+      {id:701, title:'Growth en mercados emergentes', start:'2026-05-15T12:30:00', location:'Sala 2', session_type: SESSION_TYPES.charla},
+    ]
   },
-  { id:8,  name:'Daniela Ortiz',       role:'Lead Product Designer',    org:'Tul',          track:'culture',    featured:false, sessions:4,
+  { id:8, name:'Daniela Ortiz', job_title:'Lead Product Designer', company:'Tul',
+    photo_url:'https://i.pravatar.cc/600?img=44', linkedin_url:'https://linkedin.com/in/dani',
+    avg_rating: null, rating_count: 0,
     bio:'Disenadora de producto con foco en mercados emergentes. Lidero el rediseno completo de Tul B2B en 2025.',
-    photo:'https://i.pravatar.cc/600?img=44',
-    sessionList:[]
+    sessions:[]
   },
-  { id:9,  name:'Felipe Quintero',     role:'Founder',                   org:'Habi',         track:'innovation', featured:false, sessions:3,
+  { id:9, name:'Felipe Quintero', job_title:'Founder', company:'Habi',
+    photo_url:'https://i.pravatar.cc/600?img=11', linkedin_url:'https://linkedin.com/in/felipe',
+    avg_rating: 4.7, rating_count: 22,
     bio:'Cofundador de Habi, startup proptech mas grande de LATAM. Antes consultor en McKinsey. Enfocado en transformar la compra-venta de vivienda.',
-    photo:'https://i.pravatar.cc/600?img=11',
-    sessionList:[]
+    sessions:[
+      {id:901, title:'Construir una proptech LATAM-first', start:'2026-05-15T14:30:00', location:'Auditorio', session_type: SESSION_TYPES.charla},
+    ]
   },
-  { id:10, name:'Gabriela Ruiz',       role:'Head of People',            org:'Bold',         track:'leadership', featured:false, sessions:3,
+  { id:10, name:'Gabriela Ruiz', job_title:'Head of People', company:'Bold',
+    photo_url:'https://i.pravatar.cc/600?img=48', linkedin_url:'https://linkedin.com/in/gabi',
+    avg_rating: null, rating_count: 0,
     bio:'Lidera personas en Bold con 800+ empleados. Crea modelos de cultura para empresas en hipercrecimiento. Coach ejecutiva certificada ICF.',
-    photo:'https://i.pravatar.cc/600?img=48',
-    sessionList:[]
+    sessions:[]
   },
-  { id:11, name:'Javier Castro',       role:'Director of AI',            org:'Nequi',        track:'tech',       featured:false, sessions:5,
+  { id:11, name:'Javier Castro', job_title:'Director of AI', company:'Nequi',
+    photo_url:'https://i.pravatar.cc/600?img=13', linkedin_url:'https://linkedin.com/in/javier',
+    avg_rating: 4.3, rating_count: 15,
     bio:'Lidera la division de AI en Nequi. PhD en Computer Science. Investigador en aprendizaje automatico aplicado a riesgo crediticio.',
-    photo:'https://i.pravatar.cc/600?img=13',
-    sessionList:[]
+    sessions:[
+      {id:1101, title:'AI en banca digital', start:'2026-05-15T15:00:00', location:'Sala 2', session_type: SESSION_TYPES.charla},
+    ]
   },
-  { id:12, name:'Lucia Salazar',       role:'Investment Partner',        org:'Kaszek',       track:'business',   featured:false, sessions:4,
+  { id:12, name:'Lucia Salazar', job_title:'Investment Partner', company:'Kaszek',
+    photo_url:'https://i.pravatar.cc/600?img=10', linkedin_url:'https://linkedin.com/in/lucia',
+    avg_rating: null, rating_count: 0,
     bio:'Partner en Kaszek liderando inversiones early-stage en LATAM. Mas de 40 inversiones, incluyendo Bold, Habi y Frubana.',
-    photo:'https://i.pravatar.cc/600?img=10',
-    sessionList:[]
+    sessions:[]
   },
-  { id:13, name:'Mateo Gonzalez',      role:'Tech Lead',                 org:'Frubana',      track:'tech',       featured:false, sessions:3,
+  { id:13, name:'Mateo Gonzalez', job_title:'Tech Lead', company:'Frubana',
+    photo_url:'https://i.pravatar.cc/600?img=8', linkedin_url:null,
+    avg_rating: null, rating_count: 0,
     bio:'Tech Lead de plataforma en Frubana. Especialista en logistica de cadena de frio y optimizacion de rutas con ML.',
-    photo:'https://i.pravatar.cc/600?img=8',
-    sessionList:[]
+    sessions:[]
   },
-  { id:14, name:'Natalia Vega',        role:'VP Marketing',              org:'Platzi',       track:'business',   featured:false, sessions:4,
+  { id:14, name:'Natalia Vega', job_title:'VP Marketing', company:'Platzi',
+    photo_url:'https://i.pravatar.cc/600?img=43', linkedin_url:'https://linkedin.com/in/natalia',
+    avg_rating: null, rating_count: 0,
     bio:'VP Marketing de Platzi. Llevo la marca a 5M+ estudiantes en 17 paises. Antes en Rappi y Despegar.',
-    photo:'https://i.pravatar.cc/600?img=43',
-    sessionList:[]
+    sessions:[]
   },
-  { id:15, name:'Paula Alvarez',       role:'UX Researcher Senior',      org:'Globant',      track:'culture',    featured:false, sessions:3,
+  { id:15, name:'Paula Alvarez', job_title:'UX Researcher Senior', company:'Globant',
+    photo_url:'https://i.pravatar.cc/600?img=9', linkedin_url:'https://linkedin.com/in/paula',
+    avg_rating: null, rating_count: 0,
     bio:'Investigadora UX con 10 anos de experiencia. Lidero estudios para clientes Fortune 500. Profesora en Universidad Javeriana.',
-    photo:'https://i.pravatar.cc/600?img=9',
-    sessionList:[]
+    sessions:[]
   },
-  { id:16, name:'Ricardo Pena',        role:'Senior SRE',                org:'Bold',         track:'tech',       featured:false, sessions:3,
+  { id:16, name:'Ricardo Pena', job_title:'Senior SRE', company:'Bold',
+    photo_url:'https://i.pravatar.cc/600?img=51', linkedin_url:'https://linkedin.com/in/ricardo',
+    avg_rating: null, rating_count: 0,
     bio:'Lidera reliability engineering en Bold. Especialista en sistemas de pagos y observabilidad. Maintainer de proyectos open source CNCF.',
-    photo:'https://i.pravatar.cc/600?img=51',
-    sessionList:[]
+    sessions:[]
   },
-  { id:17, name:'Sebastian Rojas',     role:'Product Manager Senior',    org:'Rappi',        track:'innovation', featured:false, sessions:4,
+  { id:17, name:'Sebastian Rojas', job_title:'Product Manager Senior', company:'Rappi',
+    photo_url:'https://i.pravatar.cc/600?img=53', linkedin_url:'https://linkedin.com/in/sebastian',
+    avg_rating: null, rating_count: 0,
     bio:'PM en el equipo de Rappi Pay. Lanzo 5 productos financieros en 24 meses con +2M usuarios activos. MBA INSEAD.',
-    photo:'https://i.pravatar.cc/600?img=53',
-    sessionList:[]
+    sessions:[]
   },
-  { id:18, name:'Valentina Restrepo',  role:'Director of Marketing',     org:'Tul',          track:'leadership', featured:false, sessions:3,
+  { id:18, name:'Valentina Restrepo', job_title:'Director of Marketing', company:'Tul',
+    photo_url:'https://i.pravatar.cc/600?img=20', linkedin_url:null,
+    avg_rating: null, rating_count: 0,
     bio:'Directora de marketing de Tul. Construyo la marca desde 0 hasta presencia en 6 paises de LATAM.',
-    photo:'https://i.pravatar.cc/600?img=20',
-    sessionList:[]
+    sessions:[]
   },
 ];
 
 /* ==================== STATE ==================== */
 const state = {
-  track: 'all',
   search: '',
+  debouncedSearch: '',
   selectedId: null,
-  ratings: {},        // { speakerId: { stars, comment } }
+  ratings: {},        // { speakerId: { stars, comment } } — replica useMySpeakerRatings
   breathStopped: false,
 };
+let searchTimer = null;
 
 /* ==================== HELPERS ==================== */
 const $ = (s, p=document) => p.querySelector(s);
 const $$ = (s, p=document) => Array.from(p.querySelectorAll(s));
 
-function trackLabel(id){
-  const t = tracks.find(t=>t.id===id);
-  return t ? t.label : id;
+function hasKeynoteSession(s){
+  return s.sessions?.some(sess => sess.session_type?.name?.toLowerCase().includes('keynote'));
 }
 
 function svgChev(){
@@ -1133,69 +1115,52 @@ function svgPin(){
 }
 function svgStar(filled){
   return filled
-    ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L9 9l-7 .5 5.4 4.6L5.5 22 12 18l6.5 4-1.9-7.9L22 9.5 15 9z"/></svg>'
-    : '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2L9 9l-7 .5 5.4 4.6L5.5 22 12 18l6.5 4-1.9-7.9L22 9.5 15 9z"/></svg>';
+    ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L9 9l-7 .5 5.4 4.6L5.5 22 12 18l6.5 4-1.9-7.9L22 9.5 15 9z"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2L9 9l-7 .5 5.4 4.6L5.5 22 12 18l6.5 4-1.9-7.9L22 9.5 15 9z"/></svg>';
 }
-function svgDiamond(){
-  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M12 3l-4 6 4 12 4-12-4-6"/></svg>';
+function svgLinkedIn(){
+  return '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14zM8 8a1 1 0 100-2 1 1 0 000 2zm1 10v-7H7v7h2zm9 0v-4c0-1.7-1.3-3-3-3s-3 1.3-3 3v4h2v-4c0-.6.4-1 1-1s1 .4 1 1v4h2z"/></svg>';
 }
-
-/* ==================== CHIP RENDER ==================== */
-function renderChips(){
-  const row = $('#chipRow');
-  row.innerHTML = tracks.map(t => `
-    <button class="chip ${state.track===t.id?'active':''}" data-track="${t.id}">
-      <span class="chip-dot" style="background:${t.color}"></span>
-      ${t.label}
-    </button>
-  `).join('');
-  row.querySelectorAll('.chip').forEach(c => {
-    c.addEventListener('click', () => {
-      state.track = c.dataset.track;
-      renderChips(); renderBody();
-    });
-  });
+function formatTime(iso){
+  const d = new Date(iso);
+  let hh = d.getHours();
+  const mm = String(d.getMinutes()).padStart(2,'0');
+  const ampm = hh >= 12 ? 'p.m.' : 'a.m.';
+  hh = hh % 12; if (hh === 0) hh = 12;
+  return `${hh}:${mm} ${ampm}`;
 }
 
-/* ==================== BODY RENDER ==================== */
+/* ==================== FILTER + FEATURED (replica mobile speakers.tsx) ==================== */
 function filterSpeakers(){
-  let list = speakers.slice();
-  if (state.track !== 'all') list = list.filter(s => s.track === state.track);
-  if (state.search.trim()){
-    const q = state.search.trim().toLowerCase();
-    list = list.filter(s =>
-      s.name.toLowerCase().includes(q) ||
-      s.org.toLowerCase().includes(q) ||
-      s.role.toLowerCase().includes(q)
-    );
-  }
-  return list;
+  if (!state.debouncedSearch.trim()) return speakers.slice();
+  const q = state.debouncedSearch.trim().toLowerCase();
+  return speakers.filter(s =>
+    s.name.toLowerCase().includes(q) ||
+    (s.company && s.company.toLowerCase().includes(q)) ||
+    (s.job_title && s.job_title.toLowerCase().includes(q))
+  );
 }
 
+function getFeatured(){
+  if (!speakers.length) return [];
+  const keynotes = speakers.filter(hasKeynoteSession);
+  if (keynotes.length >= 2) return keynotes.slice(0, 8);
+  return [...speakers]
+    .sort((a, b) => (b.sessions?.length ?? 0) - (a.sessions?.length ?? 0))
+    .slice(0, 5);
+}
+
+/* ==================== RENDER BODY ==================== */
 function renderBody(){
-  const body = $('#spBody');
-  const list = filterSpeakers();
-
-  // subtitle reflects active filters
-  const parts = [`${list.length} ${list.length===1?'speaker':'speakers'}`];
-  if (state.track !== 'all') parts.push(trackLabel(state.track));
-  $('#subtitle').textContent = parts.join(' · ');
-
-  if (list.length === 0){
-    body.innerHTML = `
-      <div class="sp-empty">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <div>Sin resultados${state.search?` para "${state.search}"`:''}</div>
-      </div>`;
-    return;
-  }
+  const host = $('#spContent');
+  const filtered = filterSpeakers();
+  const hasSearch = state.debouncedSearch.trim().length > 0;
+  const featured = hasSearch ? [] : getFeatured();
 
   let html = '';
-  const featured = list.filter(s => s.featured);
-  const hasSearch = state.search.trim().length > 0;
 
-  // FEATURED — solo si NO hay search activo (replica movil)
-  if (featured.length && !hasSearch){
+  // FEATURED — solo si NO hay search activo (replica mobile)
+  if (featured.length){
     html += `
       <div class="sp-section-head">
         <h2 class="sp-section-title">Destacados</h2>
@@ -1203,41 +1168,41 @@ function renderBody(){
       </div>
       <div class="feat-strip" id="featStrip">
         <div class="feat-track${state.breathStopped?' stopped':''}" id="featTrack">
-          ${featured.map(s => featCardHtml(s)).join('')}
+          ${featured.map(featCardHtml).join('')}
         </div>
-      </div>`;
-  }
-
-  // ALL/FILTERED LIST
-  const restList = hasSearch ? list : list.filter(s => !s.featured);
-  if (restList.length){
-    const title = hasSearch ? 'Resultados' : 'Todos';
-    html += `
-      <div class="sp-section-head" id="todosHead" style="${featured.length && !hasSearch ? 'margin-top:24px' : ''}">
-        <h2 class="sp-section-title">${title}</h2>
-        <span class="sp-section-meta">${restList.length} ${restList.length===1?'speaker':'speakers'}</span>
       </div>
-      <div class="sp-grid">
-        ${restList.map(s => rowHtml(s)).join('')}
-      </div>`;
+      <div style="height:24px"></div>`;
   }
 
-  body.innerHTML = html;
+  // TODOS / RESULTADOS
+  html += `
+    <div class="sp-section-head" id="todosHead">
+      <h2 class="sp-section-title">${hasSearch ? 'Resultados' : 'Todos'}</h2>
+      <span class="sp-section-meta">${filtered.length} ${filtered.length===1?'speaker':'speakers'}</span>
+    </div>`;
 
-  body.querySelectorAll('[data-spid]').forEach(el => {
+  if (filtered.length === 0){
+    html += `<div class="sp-empty">No se encontraron speakers.</div>`;
+  } else {
+    html += `<div class="sp-grid">${filtered.map(rowHtml).join('')}</div>`;
+  }
+
+  host.innerHTML = html;
+
+  host.querySelectorAll('[data-spid]').forEach(el => {
     el.addEventListener('click', () => openDetail(parseInt(el.dataset.spid, 10)));
   });
-  body.querySelectorAll('[data-action="scroll-todos"]').forEach(el => {
+  host.querySelectorAll('[data-action="scroll-todos"]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       stopBreathing();
-      const target = body.querySelector('#todosHead');
+      const target = host.querySelector('#todosHead');
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
 
-  // Stop breathing al primer scroll/touch en featured strip (replica movil onScrollBeginDrag)
-  const strip = body.querySelector('#featStrip');
+  // Stop breathing al primer scroll/touch
+  const strip = host.querySelector('#featStrip');
   if (strip && !state.breathStopped){
     const stop = () => stopBreathing();
     strip.addEventListener('pointerdown', stop, { once:true });
@@ -1255,35 +1220,37 @@ function stopBreathing(){
 
 function featCardHtml(s){
   const sel = state.selectedId === s.id ? ' selected' : '';
+  const role = [s.job_title, s.company].filter(Boolean).join(' · ');
+  const sessionCount = s.sessions?.length ?? 0;
   return `
     <article class="feat-card${sel}" data-spid="${s.id}">
-      <div class="feat-photo" style="background-image:url('${s.photo}')">
-        ${s.keynote ? `<span class="feat-keynote">Keynote</span>` : ''}
+      <div class="feat-photo" style="background-image:url('${s.photo_url}')">
+        ${hasKeynoteSession(s) ? `<span class="feat-keynote">Keynote</span>` : ''}
       </div>
       <div class="feat-info">
         <h3 class="feat-name">${s.name}</h3>
-        <div class="feat-role">${s.role} · ${s.org}</div>
-        <div class="feat-sessions">${svgCalendar()}${s.sessions} ${s.sessions===1?'sesion':'sesiones'}</div>
+        <div class="feat-role">${role}</div>
+        ${sessionCount > 0 ? `
+          <div class="feat-sessions">${svgCalendar()}${sessionCount} ${sessionCount===1?'sesion':'sesiones'}</div>
+        ` : ''}
       </div>
     </article>`;
 }
 
 function rowHtml(s){
   const sel = state.selectedId === s.id ? ' selected' : '';
+  const role = [s.job_title, s.company].filter(Boolean).join(' · ');
+  const sessionCount = s.sessions?.length ?? 0;
   return `
     <button class="sp-row${sel}" data-spid="${s.id}">
-      <div class="sp-avatar" style="background-image:url('${s.photo}')"></div>
+      <div class="sp-avatar" style="background-image:url('${s.photo_url}')"></div>
       <div class="sp-row-info">
         <h4 class="sp-row-name">${s.name}</h4>
-        <div class="sp-row-role">${s.role} · ${s.org}</div>
-        <span class="sp-row-meta">${svgCalendar()}${s.sessions}</span>
+        <div class="sp-row-role">${role}</div>
+        ${sessionCount > 0 ? `<span class="sp-row-meta">${svgCalendar()}${sessionCount}</span>` : ''}
       </div>
       ${svgChev()}
     </button>`;
-}
-
-function svgStarIcon(){
-  return '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5"><path d="M12 2L9 9l-7 .5 5.4 4.6L5.5 22 12 18l6.5 4-1.9-7.9L22 9.5 15 9z"/></svg>';
 }
 
 /* ==================== DETAIL ==================== */
@@ -1296,7 +1263,6 @@ function openDetail(id){
   const canvas = $('#canvas');
   const dpBody = $('#dpBody');
 
-  // swap-out → swap-in
   if (detail.classList.contains('open')){
     detail.classList.add('swap-out');
     setTimeout(() => {
@@ -1308,56 +1274,99 @@ function openDetail(id){
     requestAnimationFrame(() => detail.classList.add('open'));
   }
   canvas.classList.add('has-detail');
-  // refresh body to update selected highlight
   renderBody();
 }
 
 function paintDetail(s, host){
   const r = state.ratings[s.id];
-  const sessionsHtml = s.sessionList && s.sessionList.length ? s.sessionList.map(ss => `
-    <button class="dp-session">
-      <div class="dp-sess-time">
-        <span class="hh">${ss.time.split(' ')[0]}</span>
-        <span class="ampm">${ss.time.split(' ').slice(1).join(' ')}</span>
-      </div>
-      <div class="dp-sess-info">
-        <h4 class="dp-sess-title">${ss.title}</h4>
-        <div class="dp-sess-room">${svgPin()} ${ss.room}</div>
-      </div>
-      ${svgChev()}
-    </button>`).join('') : `<div class="dp-about" style="text-align:center; color:var(--fg-mute)">Sin sesiones publicas asignadas</div>`;
+  const alreadyRated = !!r;
+
+  // Role: "Cargo en **Empresa**" (replica mobile speaker/[id].tsx:138-145)
+  let roleHtml = '';
+  if (s.job_title) roleHtml += s.job_title;
+  if (s.job_title && s.company) roleHtml += ' en ';
+  if (s.company) roleHtml += `<b>${s.company}</b>`;
+
+  // Rating display — solo si rating_count > 0 (replica mobile :149)
+  let ratingHtml = '';
+  if (s.avg_rating !== null && s.rating_count > 0){
+    const stars = [1,2,3,4,5].map(i => svgStar(i <= Math.round(s.avg_rating))).join('');
+    ratingHtml = `
+      <div class="dp-rating-row">
+        <div class="dp-rating-stars">${stars}</div>
+        <div class="dp-rating-meta">
+          <b>${s.avg_rating.toFixed(1)}</b> · ${s.rating_count} ${s.rating_count===1?'voto':'votos'}
+        </div>
+      </div>`;
+  }
+
+  // Actions: LinkedIn (si hay url) + Calificar — ambos flex:1
+  const linkedinBtn = s.linkedin_url ? `
+    <button class="dp-linkedin" data-action="linkedin">
+      ${svgLinkedIn()} LinkedIn
+    </button>` : '';
+
+  const rateBtn = `
+    <button class="dp-rate ${alreadyRated?'rated':''}" data-action="rate" ${alreadyRated?'disabled':''}>
+      ${svgStar(true)} ${alreadyRated ? 'Evaluado' : 'Calificar'}
+    </button>`;
+
+  // Sessions (replica mobile speaker/[id].tsx:215-280)
+  const sessionsHtml = (s.sessions && s.sessions.length > 0) ? `
+    <div class="dp-sessions-label">Sus sesiones</div>
+    <div class="dp-sessions">
+      ${s.sessions.map(sess => {
+        const time = formatTime(sess.start);
+        const [hh, ampm] = time.split(' ');
+        const color = sess.session_type?.color ?? 'var(--fg-mute)';
+        const tName = sess.session_type?.name ?? '';
+        return `
+          <button class="dp-session" data-sess-id="${sess.id}">
+            <div class="dp-sess-time">
+              <span class="dp-sess-hh">${hh}</span>
+              ${tName ? `<span class="dp-sess-type" style="background:${color}28;color:${color}">${tName}</span>` : ''}
+            </div>
+            <div class="dp-sess-info">
+              <h4 class="dp-sess-title">${sess.title}</h4>
+              ${sess.location ? `<div class="dp-sess-loc">${svgPin()}${sess.location}</div>` : ''}
+            </div>
+            ${svgChev()}
+          </button>`;
+      }).join('')}
+    </div>
+    <div class="dp-sessions-hint">Toca una sesion para ver el detalle</div>
+  ` : '';
 
   host.innerHTML = `
-    <div class="dp-photo" style="background-image:url('${s.photo}')"></div>
+    <div class="dp-photo" style="background-image:url('${s.photo_url}')"></div>
     <h2 class="dp-name">${s.name}</h2>
-    <div class="dp-role">${s.role} en <b>${s.org}</b></div>
-    <div class="dp-badges">
-      <span class="dp-badge ${s.track}">${trackLabel(s.track)}</span>
-      ${s.keynote ? `<span class="dp-badge" style="background:rgba(255,255,255,0.06);color:var(--fg-dim)">Keynote</span>` : ''}
+    ${roleHtml ? `<div class="dp-role">${roleHtml}</div>` : ''}
+    ${ratingHtml}
+    <div class="dp-actions">
+      ${linkedinBtn}
+      ${rateBtn}
     </div>
-    ${rateButtonHtml(s, r)}
-    <div class="dp-section">Acerca de</div>
-    <div class="dp-about">${s.bio}</div>
-    <div class="dp-section">Sus sesiones</div>
-    <div class="dp-sessions">${sessionsHtml}</div>
+    ${s.bio ? `
+      <div class="dp-bio">
+        <div class="dp-bio-label">Acerca de</div>
+        <p class="dp-bio-text">${s.bio}</p>
+      </div>
+    ` : ''}
+    ${sessionsHtml}
   `;
 
-  const rateBtn = host.querySelector('.dp-rate');
-  if (rateBtn) rateBtn.addEventListener('click', () => openRateModal(s));
-}
+  // Wire actions
+  const rateButton = host.querySelector('[data-action="rate"]');
+  if (rateButton && !alreadyRated) rateButton.addEventListener('click', () => openRateModal(s));
 
-function rateButtonHtml(s, r){
-  if (r){
-    const stars = Array.from({length:5}, (_,i) => svgStar(i < r.stars)).join('');
-    return `<button class="dp-rate rated">
-      <span>Tu evaluacion</span>
-      <span class="stars">${stars}</span>
-    </button>`;
-  }
-  return `<button class="dp-rate">
-    ${svgStarIcon()}
-    Calificar
-  </button>`;
+  const linkedinButton = host.querySelector('[data-action="linkedin"]');
+  if (linkedinButton) linkedinButton.addEventListener('click', () => {
+    showToast('LinkedIn (demo) · ' + s.linkedin_url);
+  });
+
+  host.querySelectorAll('[data-sess-id]').forEach(el => {
+    el.addEventListener('click', () => showToast('Abrir detalle sesion #' + el.dataset.sessId));
+  });
 }
 
 function closeDetail(){
@@ -1369,36 +1378,42 @@ function closeDetail(){
 
 $('#dpClose').addEventListener('click', closeDetail);
 
-/* ==================== RATING MODAL ==================== */
+/* ==================== RATING MODAL (estrellas) ==================== */
 let rateState = { speakerId:null, stars:0 };
 
 function openRateModal(s){
-  rateState = { speakerId:s.id, stars: state.ratings[s.id]?.stars || 0 };
+  rateState = { speakerId:s.id, stars: 0 };
   $('#rateSub').textContent = s.name;
-  $('#rateComment').value = state.ratings[s.id]?.comment || '';
-  renderDiamonds();
+  $('#rateComment').value = '';
+  renderRateStars();
   updateRateSendDisabled();
   $('#rateOverlay').classList.add('open');
   setTimeout(() => $('#rateComment').focus(), 200);
 }
 
-function renderDiamonds(){
-  const host = $('#rateDiamonds');
+function renderRateStars(){
+  const host = $('#rateStars');
   host.innerHTML = '';
   for (let i=1; i<=5; i++){
     const btn = document.createElement('button');
-    btn.className = 'rate-d' + (i<=rateState.stars?' on':'');
-    btn.innerHTML = svgDiamond();
+    btn.className = 'rate-s' + (i<=rateState.stars?' on':'');
+    btn.innerHTML = svgStar(i<=rateState.stars);
     btn.addEventListener('click', () => {
       rateState.stars = i;
-      renderDiamonds();
+      renderRateStars();
       updateRateSendDisabled();
     });
     btn.addEventListener('mouseenter', () => {
-      Array.from(host.children).forEach((c, idx) => c.classList.toggle('on', idx < i));
+      Array.from(host.children).forEach((c, idx) => {
+        c.classList.toggle('on', idx < i);
+        c.innerHTML = svgStar(idx < i);
+      });
     });
     btn.addEventListener('mouseleave', () => {
-      Array.from(host.children).forEach((c, idx) => c.classList.toggle('on', idx < rateState.stars));
+      Array.from(host.children).forEach((c, idx) => {
+        c.classList.toggle('on', idx < rateState.stars);
+        c.innerHTML = svgStar(idx < rateState.stars);
+      });
     });
     host.appendChild(btn);
   }
@@ -1421,7 +1436,6 @@ $('#rateSend').addEventListener('click', () => {
   };
   const s = speakers.find(x => x.id === rateState.speakerId);
   closeRateModal();
-  // re-render detail to swap button to "rated"
   if (state.selectedId === s.id){
     paintDetail(s, $('#dpBody'));
   }
@@ -1442,33 +1456,51 @@ function showToast(msg){
   toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-/* ==================== SEARCH ==================== */
-$('#searchBtn').addEventListener('click', toggleSearch);
-function toggleSearch(){
-  const w = $('#searchWrap');
-  const open = w.classList.toggle('open');
-  if (open){ setTimeout(() => $('#searchInput').focus(), 50) }
-  else { $('#searchInput').value=''; state.search=''; renderBody(); }
+/* ==================== SEARCH colapsable ⌘K — replica W.3 AgendaHeader ==================== */
+const searchInput = $('#searchInput');
+const searchBtn = $('#searchBtn');
+const searchWrap = $('#searchWrap');
+const searchClose = $('#searchClose');
+
+function openSearch(){
+  if (searchWrap.classList.contains('open')) return;
+  searchWrap.classList.add('open');
+  setTimeout(() => searchInput.focus(), 50);
 }
-$('#searchInput').addEventListener('input', (e) => {
-  state.search = e.target.value;
+function closeSearch(){
+  searchWrap.classList.remove('open');
+  searchInput.value = '';
+  state.search = '';
+  state.debouncedSearch = '';
   renderBody();
+}
+searchBtn.addEventListener('click', openSearch);
+searchClose.addEventListener('click', closeSearch);
+
+searchInput.addEventListener('input', (e) => {
+  state.search = e.target.value;
+  if (searchTimer) clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    state.debouncedSearch = state.search.trim();
+    renderBody();
+  }, 400);
 });
 
-/* ==================== KEYBOARD ==================== */
+/* ==================== KEYBOARD (replica W.3 agenda) ==================== */
 document.addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){
     e.preventDefault();
-    if (!$('#searchWrap').classList.contains('open')) toggleSearch();
-    else $('#searchInput').focus();
+    openSearch();
     return;
   }
   if (e.key === 'Escape'){
-    if ($('#rateOverlay').classList.contains('open')) closeRateModal();
-    else if ($('#searchWrap').classList.contains('open')) toggleSearch();
-    else if ($('#detailCard').classList.contains('open')) closeDetail();
+    if ($('#rateOverlay').classList.contains('open')) { closeRateModal(); return }
+    if (searchWrap.classList.contains('open')) { closeSearch(); return }
+    if ($('#detailCard').classList.contains('open')) { closeDetail(); return }
   }
   if (e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    if (document.activeElement === searchInput) return;
+    if (!$('#detailCard').classList.contains('open')) return;
     const list = filterSpeakers();
     if (!list.length) return;
     const cur = list.findIndex(s => s.id === state.selectedId);
@@ -1490,7 +1522,6 @@ $$('#seg-mode button').forEach(b => {
 });
 
 /* ==================== INIT ==================== */
-renderChips();
 renderBody();
 </script>
 </body>
