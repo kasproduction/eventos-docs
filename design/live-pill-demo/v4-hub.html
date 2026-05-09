@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Live Hub v4 — full canvas, miniplayers</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --bg-elevated: #16161a;
+    --bg-raised: #1a1a1f;
+    --surface-low: #1d1d22;
+    --surface-high: #2a2a30;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.16);
+    --text-primary: #ededf0;
+    --text-secondary: #b4b4ba;
+    --text-muted: #767680;
+    --accent: #7c5cff;
+    --accent-light: #a896ff;
+    --live-red: #ff4757;
+    --next-amber: #f5b942;
+    --glass: rgba(20,20,24,0.72);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  body {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 16px;
+    padding: 24px 32px;
+    min-height: 100vh;
+  }
+
+  .toolbar {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    padding: 10px 16px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  .toolbar h1 { margin: 0; font-size: 13px; font-weight: 700; margin-right: 12px; }
+  .toolbar .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-left: 12px; }
+  .toolbar button {
+    padding: 6px 12px;
+    background: transparent; color: var(--text-secondary);
+    border: 1px solid var(--border); border-radius: 999px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .toolbar button:hover { border-color: var(--border-strong); color: var(--text-primary); }
+  .toolbar button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* App shell */
+  .shell {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 100px);
+    background:
+      radial-gradient(circle at 20% 30%, rgba(124,92,255,0.06) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(255,71,87,0.04) 0%, transparent 50%),
+      var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: absolute;
+    left: 18px; top: 50%; transform: translateY(-50%);
+    width: 52px;
+    background: var(--glass);
+    backdrop-filter: blur(22px);
+    border: 1px solid var(--border-strong);
+    border-radius: 28px;
+    padding: 10px 0;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    z-index: 5;
+  }
+  .brand { width: 32px; height: 32px; display: grid; place-items: center; color: var(--accent); font-weight: 800; font-size: 14px; margin-bottom: 6px; }
+  .nav-item {
+    position: relative;
+    width: 36px; height: 36px;
+    display: grid; place-items: center;
+    border-radius: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .nav-item:hover { background: var(--surface-low); color: var(--text-secondary); }
+  .nav-item.active { background: var(--surface-high); color: var(--text-primary); }
+  .nav-item.disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+  .nav-item .badge {
+    position: absolute; top: -2px; right: -2px;
+    min-width: 16px; height: 16px;
+    padding: 0 4px;
+    background: var(--live-red);
+    color: #fff;
+    font-size: 9px; font-weight: 700;
+    display: grid; place-items: center;
+    border-radius: 999px;
+    border: 2px solid var(--bg);
+  }
+  .nav-item .pulse-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 7px; height: 7px;
+    background: var(--live-red);
+    border-radius: 999px;
+    box-shadow: 0 0 8px var(--live-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .divider { width: 26px; height: 1px; background: var(--border); margin: 6px 0; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+
+  /* Stage / Canvas — el modulo Live Hub vive aca */
+  .stage {
+    position: absolute;
+    left: 86px; right: 24px; top: 24px; bottom: 24px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header del Live Hub */
+  .hub-header {
+    padding: 24px 32px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .hub-header .titles h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+  .hub-header .titles .subtitle {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 600;
+  }
+  .hub-header .live-pill-inline {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px;
+    background: color-mix(in srgb, var(--live-red) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--live-red) 30%, transparent);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--live-red);
+  }
+  .hub-header .live-pill-inline::before {
+    content: '';
+    width: 7px; height: 7px;
+    background: var(--live-red);
+    border-radius: 999px;
+    box-shadow: 0 0 6px var(--live-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  /* Body scrolleable */
+  .hub-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 32px 32px;
+  }
+  .hub-body::-webkit-scrollbar { width: 6px; }
+  .hub-body::-webkit-scrollbar-thumb { background: var(--surface-high); border-radius: 999px; }
+
+  /* Section */
+  .section {
+    margin-bottom: 28px;
+  }
+  .section-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-head h2 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-primary);
+  }
+  .section-head h2.live { color: var(--live-red); display: flex; align-items: center; gap: 8px; }
+  .section-head h2.live::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--live-red);
+    border-radius: 999px;
+    box-shadow: 0 0 5px var(--live-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .section-head .qty {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── LIVE GRID (hero + side) ── */
+  .live-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 14px;
+  }
+
+  /* Hero card */
+  .card-hero {
+    position: relative;
+    aspect-ratio: 16/9;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+    border: 1px solid var(--border);
+  }
+  .card-hero:hover { transform: scale(1.005); }
+  .card-hero .poster {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(124,92,255,0.45) 0%, transparent 55%),
+      linear-gradient(135deg, #2a1f4f 0%, #15102a 50%, #0a0810 100%);
+  }
+  .card-hero .gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.85) 100%);
+  }
+  .card-hero .top-row {
+    position: absolute; top: 14px; left: 14px; right: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .card-hero .live-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px;
+    background: var(--live-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 999px;
+  }
+  .card-hero .live-tag::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: #fff;
+    border-radius: 999px;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .card-hero .featured-tag {
+    padding: 5px 10px;
+    background: rgba(255,255,255,0.16);
+    color: #fff;
+    backdrop-filter: blur(10px);
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 999px;
+  }
+  .card-hero .audience-tag {
+    padding: 5px 10px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 999px;
+    font-variant-numeric: tabular-nums;
+  }
+  .card-hero .play-overlay {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .card-hero:hover .play-overlay { opacity: 1; }
+  .card-hero .play-icon {
+    width: 64px; height: 64px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 999px;
+    display: grid; place-items: center;
+    transform: scale(0.8);
+    transition: transform 0.25s ease;
+  }
+  .card-hero:hover .play-icon { transform: scale(1); }
+  .card-hero .play-icon svg { width: 26px; height: 26px; fill: #000; }
+  .card-hero .info {
+    position: absolute; left: 18px; right: 18px; bottom: 16px;
+    color: #fff;
+  }
+  .card-hero .room-tag {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent-light);
+    margin-bottom: 6px;
+  }
+  .card-hero h3 {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.6);
+  }
+  .card-hero .speaker-line {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* Side cards (live secondary) */
+  .live-side {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .card-side {
+    position: relative;
+    aspect-ratio: 16/9;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+    border: 1px solid var(--border);
+    flex: 1;
+  }
+  .card-side:hover { transform: scale(1.01); }
+  .card-side .poster {
+    position: absolute; inset: 0;
+  }
+  .card-side.bg-1 .poster {
+    background: radial-gradient(circle at 30% 20%, rgba(89,170,255,0.5) 0%, transparent 60%), linear-gradient(135deg, #1a2e4d 0%, #0e1828 50%, #08101a 100%);
+  }
+  .card-side.bg-2 .poster {
+    background: radial-gradient(circle at 30% 20%, rgba(245,185,66,0.5) 0%, transparent 60%), linear-gradient(135deg, #4a3315 0%, #2a1d0c 50%, #1a1207 100%);
+  }
+  .card-side.bg-3 .poster {
+    background: radial-gradient(circle at 30% 20%, rgba(255,127,127,0.5) 0%, transparent 60%), linear-gradient(135deg, #4a1e2e 0%, #2a1018 50%, #1a070e 100%);
+  }
+  .card-side .gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.85) 100%);
+  }
+  .card-side .top {
+    position: absolute; top: 10px; left: 10px; right: 10px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .card-side .live-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 7px;
+    background: var(--live-red);
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 999px;
+  }
+  .card-side .live-tag::before {
+    content: '';
+    width: 4px; height: 4px;
+    background: #fff;
+    border-radius: 999px;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .card-side .audience-tag {
+    padding: 3px 8px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 999px;
+  }
+  .card-side .info {
+    position: absolute; left: 12px; right: 12px; bottom: 10px;
+    color: #fff;
+  }
+  .card-side .room-tag {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 3px;
+  }
+  .card-side h4 {
+    margin: 0 0 4px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-side .speaker-line {
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+  }
+
+  /* ── UPCOMING GRID ── */
+  .upcoming-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .card-up {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    display: flex; flex-direction: column;
+  }
+  .card-up:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+  }
+  .card-up .poster {
+    position: relative;
+    aspect-ratio: 16/9;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(245,185,66,0.18) 0%, transparent 60%),
+      linear-gradient(135deg, #2a2317 0%, #15110a 100%);
+  }
+  .card-up.fav .poster {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(124,92,255,0.22) 0%, transparent 60%),
+      linear-gradient(135deg, #2a1f4f 0%, #15102a 100%);
+  }
+  .card-up .countdown-badge {
+    position: absolute; top: 10px; left: 10px;
+    padding: 4px 10px;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(8px);
+    color: var(--next-amber);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 999px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .card-up .countdown-badge.urgent {
+    background: var(--live-red);
+    color: #fff;
+    animation: pulse-bg 1.4s ease-in-out infinite;
+  }
+  .card-up .countdown-badge svg {
+    width: 10px; height: 10px;
+    stroke: currentColor; fill: none; stroke-width: 2;
+  }
+  .card-up .fav-badge {
+    position: absolute; top: 10px; right: 10px;
+    padding: 4px 8px;
+    background: color-mix(in srgb, var(--accent) 26%, transparent);
+    color: var(--accent-light);
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 6px;
+    backdrop-filter: blur(6px);
+  }
+  @keyframes pulse-bg {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .card-up .preview-watermark {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .card-up .info {
+    padding: 12px 14px 14px;
+  }
+  .card-up .room-tag {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .card-up h4 {
+    margin: 0 0 4px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text-primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.6em;
+  }
+  .card-up .speaker-line {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Empty */
+  .empty {
+    padding: 80px 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .empty .glyph {
+    width: 56px; height: 56px;
+    margin: 0 auto 16px;
+    display: grid; place-items: center;
+    border-radius: 999px;
+    background: var(--surface-low);
+    color: var(--text-muted);
+  }
+  .empty .glyph svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Live Hub v4 · full canvas</h1>
+  <span class="label">Live:</span>
+  <button data-state="0">0</button>
+  <button data-state="1">1</button>
+  <button data-state="3" class="active">3</button>
+  <span class="label">Upcoming:</span>
+  <button data-upcoming="0">0</button>
+  <button data-upcoming="2">2</button>
+  <button data-upcoming="6" class="active">6</button>
+</div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">E</div>
+    <div class="divider"></div>
+    <div class="nav-item" title="Inicio">
+      <svg viewBox="0 0 24 24"><path d="M3 12L12 4l9 8M5 10v10h4v-6h6v6h4V10"/></svg>
+    </div>
+    <div class="nav-item" title="Agenda">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+    </div>
+    <div id="liveItem" class="nav-item active" title="En vivo">
+      <svg viewBox="0 0 24 24">
+        <path d="M2 12a10 10 0 0120 0M5 12a7 7 0 0114 0M8 12a4 4 0 018 0"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="nav-item" title="Speakers">
+      <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v3M8 22h8"/></svg>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="hub-header">
+      <div class="titles">
+        <h1 id="hubTitle">En vivo</h1>
+        <div class="subtitle" id="hubSubtitle">3 salas transmitiendo · 6 sesiones proximas</div>
+      </div>
+      <div class="live-pill-inline" id="liveBadge">3 EN VIVO</div>
+    </div>
+
+    <div class="hub-body" id="hubBody"></div>
+  </main>
+</div>
+
+<script>
+  const LIVE = [
+    { id: 203, title: 'Keynote: Banca digital en LatAm', speaker: 'Maria Garcia', org: 'Bancolombia', room: 'Auditorio Principal', featured: true, attendees: 245 },
+    { id: 204, title: 'Workshop: TS avanzado', speaker: 'Sofia Hernandez', org: 'Globant', room: 'Sala 3', featured: false, attendees: 87 },
+    { id: 207, title: 'Panel: Mujeres lideres en tech', speaker: 'Ana Martinez +1', org: 'Rappi', room: 'Sala 2', featured: false, attendees: 132 },
+  ];
+
+  const UPCOMING = [
+    { id: 208, title: 'Demo: Real estate proptech', speaker: 'Jorge Vasquez', room: 'Sala 3', startsInMin: 8, isFavorite: true },
+    { id: 209, title: 'Charla: Cultura de innovacion', speaker: 'Maria Garcia', room: 'Sala 1', startsInMin: 22, isFavorite: false },
+    { id: 210, title: 'Fireside chat: Liderazgo en crisis', speaker: 'CEO panel', room: 'Auditorio Principal', startsInMin: 58, isFavorite: true },
+    { id: 211, title: 'Mesa redonda: Diversidad', speaker: 'Multiple', room: 'Sala 2', startsInMin: 90, isFavorite: false },
+    { id: 212, title: 'Closing keynote', speaker: 'Carlos Rodriguez', room: 'Auditorio Principal', startsInMin: 125, isFavorite: false },
+    { id: 213, title: 'After-event networking', speaker: '—', room: 'Terraza', startsInMin: 180, isFavorite: false },
+  ];
+
+  let liveCount = 3;
+  let upcomingCount = 6;
+
+  const liveItem = document.getElementById('liveItem');
+  const hubTitle = document.getElementById('hubTitle');
+  const hubSubtitle = document.getElementById('hubSubtitle');
+  const hubBody = document.getElementById('hubBody');
+  const liveBadge = document.getElementById('liveBadge');
+
+  function refresh() {
+    // Sidebar pill state
+    liveItem.innerHTML = `
+      <svg viewBox="0 0 24 24">
+        <path d="M2 12a10 10 0 0120 0M5 12a7 7 0 0114 0M8 12a4 4 0 018 0"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      </svg>
+    `;
+    if (liveCount > 0) {
+      liveItem.style.color = 'var(--live-red)';
+      const dot = document.createElement('div');
+      dot.className = 'pulse-dot';
+      liveItem.appendChild(dot);
+      if (liveCount >= 2) {
+        const badge = document.createElement('div');
+        badge.className = 'badge';
+        badge.textContent = String(liveCount);
+        liveItem.appendChild(badge);
+      }
+    } else {
+      liveItem.style.color = '';
+    }
+
+    renderHub();
+  }
+
+  function renderHub() {
+    const live = LIVE.slice(0, liveCount).slice();
+    live.sort((a, b) => Number(b.featured) - Number(a.featured) || b.attendees - a.attendees);
+    const upcoming = UPCOMING.slice(0, upcomingCount).slice();
+    upcoming.sort((a, b) => a.startsInMin - b.startsInMin);
+
+    // Header
+    if (live.length > 0) {
+      hubTitle.textContent = 'En vivo';
+      hubSubtitle.textContent = `${live.length} ${live.length === 1 ? 'sala transmitiendo' : 'salas transmitiendo'}${upcoming.length ? ` · ${upcoming.length} sesiones proximas` : ''}`;
+      liveBadge.textContent = `${live.length} ${live.length === 1 ? 'EN VIVO' : 'EN VIVO'}`;
+      liveBadge.style.display = 'inline-flex';
+    } else if (upcoming.length > 0) {
+      hubTitle.textContent = 'Por arrancar';
+      hubSubtitle.textContent = `Sin transmisiones activas · ${upcoming.length} proximas`;
+      liveBadge.style.display = 'none';
+    } else {
+      hubTitle.textContent = 'En vivo';
+      hubSubtitle.textContent = 'Sin sesiones activas ni proximas';
+      liveBadge.style.display = 'none';
+    }
+
+    let html = '';
+
+    if (live.length === 0 && upcoming.length === 0) {
+      html = `
+        <div class="empty">
+          <div class="glyph">
+            <svg viewBox="0 0 24 24">
+              <path d="M2 12a10 10 0 0120 0M5 12a7 7 0 0114 0M8 12a4 4 0 018 0"/>
+              <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+            </svg>
+          </div>
+          Cuando arranque alguna sesion en vivo aparece aqui.
+        </div>
+      `;
+    } else {
+      // ── LIVE ──
+      if (live.length > 0) {
+        const featured = live[0];
+        const others = live.slice(1);
+        html += `
+          <div class="section">
+            <div class="section-head">
+              <h2 class="live">Pasando ahora</h2>
+              <span class="qty">${live.length} ${live.length === 1 ? 'TRANSMISION' : 'TRANSMISIONES'}</span>
+            </div>
+            ${others.length === 0
+              ? `<div class="hero-only">${heroCard(featured)}</div>`
+              : `<div class="live-grid">
+                  ${heroCard(featured)}
+                  <div class="live-side">
+                    ${others.map((s, i) => sideCard(s, i)).join('')}
+                  </div>
+                </div>`
+            }
+          </div>
+        `;
+      }
+
+      // ── UPCOMING ──
+      if (upcoming.length > 0) {
+        html += `
+          <div class="section">
+            <div class="section-head">
+              <h2>Proximamente</h2>
+              <span class="qty">SIGUIENTES ${upcoming.length}</span>
+            </div>
+            <div class="upcoming-grid">
+              ${upcoming.map(s => upCard(s)).join('')}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    hubBody.innerHTML = html;
+
+    // Bind clicks
+    hubBody.querySelectorAll('[data-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = el.dataset.id;
+        const isLive = el.classList.contains('card-hero') || el.classList.contains('card-side');
+        if (isLive) alert(`Navega a /session-stream/${id}`);
+        else alert(`Navega a /agenda?highlight=${id}`);
+      });
+    });
+  }
+
+  function heroCard(s) {
+    return `
+      <div class="card-hero" data-id="${s.id}">
+        <div class="poster"></div>
+        <div class="gradient"></div>
+        <div class="top-row">
+          <span class="live-tag">En vivo</span>
+          <div style="display:flex; gap:8px;">
+            ${s.featured ? '<span class="featured-tag">Sala principal</span>' : ''}
+            <span class="audience-tag">${s.attendees} viendo</span>
+          </div>
+        </div>
+        <div class="play-overlay">
+          <div class="play-icon">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 21 12 5 21 5 3"/></svg>
+          </div>
+        </div>
+        <div class="info">
+          <div class="room-tag">${s.room}</div>
+          <h3>${s.title}</h3>
+          <div class="speaker-line">${s.speaker}${s.org ? ` · ${s.org}` : ''}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function sideCard(s, idx) {
+    const variant = (idx % 3) + 1;
+    return `
+      <div class="card-side bg-${variant}" data-id="${s.id}">
+        <div class="poster"></div>
+        <div class="gradient"></div>
+        <div class="top">
+          <span class="live-tag">En vivo</span>
+          <span class="audience-tag">${s.attendees}</span>
+        </div>
+        <div class="info">
+          <div class="room-tag">${s.room}</div>
+          <h4>${s.title}</h4>
+          <div class="speaker-line">${s.speaker}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function upCard(s) {
+    const urgent = s.startsInMin < 10;
+    return `
+      <div class="card-up${s.isFavorite ? ' fav' : ''}" data-id="${s.id}">
+        <div class="poster">
+          <div class="countdown-badge${urgent ? ' urgent' : ''}">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            ${urgent ? `EN ${s.startsInMin} MIN` : `EN ${s.startsInMin} MIN`}
+          </div>
+          ${s.isFavorite ? '<span class="fav-badge">Tu agenda</span>' : ''}
+          <div class="preview-watermark">PROXIMAMENTE</div>
+        </div>
+        <div class="info">
+          <div class="room-tag">${s.room}</div>
+          <h4>${s.title}</h4>
+          <div class="speaker-line">${s.speaker}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  document.querySelectorAll('.toolbar button').forEach(b => {
+    b.addEventListener('click', () => {
+      if (b.dataset.state !== undefined) {
+        liveCount = Number(b.dataset.state);
+        document.querySelectorAll('[data-state]').forEach(x => x.classList.toggle('active', x === b));
+      } else if (b.dataset.upcoming !== undefined) {
+        upcomingCount = Number(b.dataset.upcoming);
+        document.querySelectorAll('[data-upcoming]').forEach(x => x.classList.toggle('active', x === b));
+      }
+      refresh();
+    });
+  });
+
+  refresh();
+</script>
+
+</body>
+</html>

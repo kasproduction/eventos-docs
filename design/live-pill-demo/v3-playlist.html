@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Live pill v3 — playlist mode</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --bg-elevated: #16161a;
+    --surface-low: #1d1d22;
+    --surface-high: #2a2a30;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --text-primary: #ededf0;
+    --text-secondary: #b4b4ba;
+    --text-muted: #767680;
+    --accent: #7c5cff;
+    --accent-light: #a896ff;
+    --live-red: #ff4757;
+    --next-amber: #f5b942;
+    --glass: rgba(20,20,24,0.72);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  body {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px;
+    padding: 32px 48px;
+  }
+
+  .toolbar {
+    grid-column: 1 / -1;
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    padding: 12px 18px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 4px;
+  }
+  .toolbar h1 { margin: 0; font-size: 14px; font-weight: 700; margin-right: 12px; }
+  .toolbar .label {
+    font-size: 10px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin-left: 12px;
+  }
+  .toolbar button {
+    padding: 6px 12px;
+    background: transparent; color: var(--text-secondary);
+    border: 1px solid var(--border); border-radius: 999px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .toolbar button:hover { border-color: var(--border-strong); color: var(--text-primary); }
+  .toolbar button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* Stage */
+  .stage {
+    position: relative;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(124,92,255,0.08) 0%, transparent 50%),
+      var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    height: 660px;
+    overflow: hidden;
+  }
+  .stage-hint {
+    position: absolute; bottom: 22px; right: 22px;
+    font-size: 10px; color: var(--text-muted);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: absolute;
+    left: 18px; top: 50%; transform: translateY(-50%);
+    width: 52px;
+    background: var(--glass);
+    backdrop-filter: blur(22px);
+    border: 1px solid var(--border-strong);
+    border-radius: 28px;
+    padding: 10px 0;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    z-index: 5;
+  }
+  .brand { width: 32px; height: 32px; display: grid; place-items: center; color: var(--accent); font-weight: 800; font-size: 14px; margin-bottom: 6px; }
+  .nav-item {
+    position: relative;
+    width: 36px; height: 36px;
+    display: grid; place-items: center;
+    border-radius: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .nav-item:hover { background: var(--surface-low); color: var(--text-secondary); }
+  .nav-item.disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav-item.next-only { color: var(--next-amber); }
+  .nav-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+  .nav-item .badge {
+    position: absolute; top: -2px; right: -2px;
+    min-width: 16px; height: 16px;
+    padding: 0 4px;
+    background: var(--live-red);
+    color: #fff;
+    font-size: 9px; font-weight: 700;
+    display: grid; place-items: center;
+    border-radius: 999px;
+    border: 2px solid var(--bg);
+  }
+  .nav-item.next-only .badge { background: var(--next-amber); color: #1a1500; }
+  .nav-item .pulse-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 7px; height: 7px;
+    background: var(--live-red);
+    border-radius: 999px;
+    box-shadow: 0 0 8px var(--live-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .divider { width: 26px; height: 1px; background: var(--border); margin: 6px 0; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+
+  /* ─── PLAYLIST popover ─── */
+  .playlist {
+    position: absolute;
+    left: 86px; top: 50%; transform: translateY(-50%);
+    width: 340px;
+    max-height: 540px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    overflow: hidden;
+    opacity: 0; pointer-events: none;
+    transition: all 0.22s ease;
+    display: flex; flex-direction: column;
+  }
+  .playlist.open {
+    opacity: 1; pointer-events: auto;
+    transform: translateY(-50%) translateX(4px);
+  }
+
+  .playlist-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .playlist-header .title {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+  }
+  .playlist-header .count {
+    font-size: 10px; color: var(--text-muted);
+    font-weight: 600; letter-spacing: 0.1em;
+  }
+
+  .playlist-body {
+    overflow-y: auto;
+    flex: 1;
+    padding: 4px 0;
+  }
+  .playlist-body::-webkit-scrollbar { width: 4px; }
+  .playlist-body::-webkit-scrollbar-track { background: transparent; }
+  .playlist-body::-webkit-scrollbar-thumb { background: var(--surface-high); border-radius: 999px; }
+
+  /* Section heading mini */
+  .section-mini {
+    padding: 8px 16px 4px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .section-mini.live { color: var(--live-red); }
+  .section-mini.next { color: var(--next-amber); }
+  .section-mini.live::before {
+    content: '';
+    display: block; width: 5px; height: 5px;
+    background: var(--live-red);
+    border-radius: 999px;
+    box-shadow: 0 0 4px var(--live-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .section-mini .qty {
+    margin-left: auto;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  /* PLAYLIST ROW — compact 1 visual block per session */
+  .row {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background 0.12s ease;
+    position: relative;
+  }
+  .row:hover { background: var(--surface-low); }
+  .row.featured {
+    background: linear-gradient(90deg,
+      color-mix(in srgb, var(--accent) 10%, transparent),
+      transparent 70%);
+  }
+  .row.featured::before {
+    content: '';
+    position: absolute; left: 0; top: 8px; bottom: 8px;
+    width: 2px;
+    background: var(--accent-light);
+    border-radius: 2px;
+  }
+
+  /* Left col: status icon */
+  .row .status {
+    width: 36px; height: 36px;
+    display: grid; place-items: center;
+    border-radius: 10px;
+    background: var(--surface-low);
+    color: var(--text-muted);
+    font-size: 9px; font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1.05;
+    text-align: center;
+  }
+  .row.live .status {
+    background: color-mix(in srgb, var(--live-red) 16%, transparent);
+    color: var(--live-red);
+    position: relative;
+  }
+  .row.live .status::after {
+    content: '';
+    position: absolute; top: 6px; right: 6px;
+    width: 6px; height: 6px;
+    background: var(--live-red);
+    border-radius: 999px;
+    box-shadow: 0 0 4px var(--live-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .row.live .status .label { display: none; }
+  .row.next .status {
+    background: color-mix(in srgb, var(--next-amber) 14%, transparent);
+    color: var(--next-amber);
+    flex-direction: column;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .row.next .status .min {
+    font-size: 11px; font-weight: 800; letter-spacing: -0.02em;
+  }
+  .row.next .status .min-unit {
+    font-size: 8px; font-weight: 700; opacity: 0.85;
+  }
+  .row.live .status svg {
+    width: 14px; height: 14px;
+    stroke: currentColor; fill: none; stroke-width: 2;
+  }
+
+  /* Middle col: title + meta */
+  .row .body {
+    min-width: 0;
+    display: flex; flex-direction: column;
+    gap: 2px;
+  }
+  .row .title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .row .meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+  .row .meta .speaker { color: var(--text-secondary); font-weight: 500; }
+  .row .meta .sep { margin: 0 4px; opacity: 0.5; }
+
+  /* Right col: badge / count */
+  .row .right {
+    display: flex; flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .row .right .audience {
+    font-size: 10px; font-weight: 700;
+    color: var(--live-red);
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .row .right .audience-sub {
+    font-size: 8px; font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .row .right .fav-star {
+    color: var(--next-amber);
+    font-size: 11px;
+  }
+  .row .right .pill {
+    font-size: 8px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .row .right .pill.featured-pill {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    color: var(--accent-light);
+  }
+  .row .right .pill.starting-pill {
+    background: var(--live-red);
+    color: #fff;
+    animation: pulseBg 1.4s ease-in-out infinite;
+  }
+  @keyframes pulseBg {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.65; }
+  }
+
+  /* Footer */
+  .playlist-footer {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-elevated);
+  }
+  .playlist-footer a {
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--text-secondary);
+    font-size: 11px; font-weight: 600;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .playlist-footer a:hover { color: var(--text-primary); }
+  .playlist-footer a svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  /* Empty */
+  .empty {
+    padding: 36px 18px; text-align: center;
+    color: var(--text-muted); font-size: 11px;
+  }
+
+  /* Tooltip directo (1 live) */
+  .tooltip {
+    position: absolute;
+    left: 86px; top: 50%;
+    transform: translateY(-50%) translateX(4px);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip strong { color: var(--accent-light); font-weight: 700; }
+  .tooltip .small {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Live pill v3 · playlist</h1>
+  <span class="label">Live:</span>
+  <button data-state="0">0</button>
+  <button data-state="1">1</button>
+  <button data-state="3" class="active">3</button>
+  <span class="label">Upcoming:</span>
+  <button data-upcoming="0">0</button>
+  <button data-upcoming="2">2</button>
+  <button data-upcoming="5" class="active">5</button>
+  <span class="label">Mostrar:</span>
+  <button data-action="open" class="active">popover abierto</button>
+  <button data-action="close">cerrado</button>
+</div>
+
+<div></div>
+
+<div class="stage">
+  <aside class="sidebar">
+    <div class="brand">E</div>
+    <div class="divider"></div>
+    <div class="nav-item" title="Inicio">
+      <svg viewBox="0 0 24 24"><path d="M3 12L12 4l9 8M5 10v10h4v-6h6v6h4V10"/></svg>
+    </div>
+    <div class="nav-item" title="Agenda">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+    </div>
+    <div id="liveItem" class="nav-item disabled" title="En vivo">
+      <svg viewBox="0 0 24 24">
+        <path d="M2 12a10 10 0 0120 0M5 12a7 7 0 0114 0M8 12a4 4 0 018 0"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="nav-item" title="Speakers">
+      <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v3M8 22h8"/></svg>
+    </div>
+  </aside>
+
+  <div id="tooltip" class="tooltip">
+    <strong>EN VIVO ahora</strong>
+    <span class="small" id="tooltipText"></span>
+  </div>
+
+  <div id="playlist" class="playlist">
+    <div class="playlist-header">
+      <div class="title" id="playlistTitle">Pasando ahora</div>
+      <div class="count" id="playlistCount"></div>
+    </div>
+    <div class="playlist-body" id="playlistBody"></div>
+    <div class="playlist-footer">
+      <a href="#" data-action="agenda">
+        Ver agenda completa
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="stage-hint">canvas central / contenido modulo</div>
+</div>
+
+<script>
+  const LIVE = [
+    { id: 203, title: 'Keynote: Banca digital en LatAm', speaker: 'Maria Garcia', room: 'Auditorio Principal', featured: true, attendees: 245 },
+    { id: 204, title: 'Workshop: TS avanzado', speaker: 'Sofia Hernandez', room: 'Sala 3', featured: false, attendees: 87 },
+    { id: 207, title: 'Panel: Mujeres lideres en tech', speaker: 'Ana Martinez +1', room: 'Sala 2', featured: false, attendees: 132 },
+  ];
+
+  const UPCOMING = [
+    { id: 208, title: 'Demo: Real estate proptech', speaker: 'Jorge Vasquez', room: 'Sala 3', startsInMin: 8, isFavorite: true },
+    { id: 209, title: 'Charla: Cultura de innovacion', speaker: 'Maria Garcia', room: 'Sala 1', startsInMin: 22, isFavorite: false },
+    { id: 210, title: 'Fireside chat: Liderazgo en crisis', speaker: 'CEO panel', room: 'Auditorio Principal', startsInMin: 58, isFavorite: true },
+    { id: 211, title: 'Mesa redonda: Diversidad', speaker: 'Multiple', room: 'Sala 2', startsInMin: 90, isFavorite: false },
+    { id: 212, title: 'Closing keynote', speaker: 'Carlos Rodriguez', room: 'Auditorio Principal', startsInMin: 125, isFavorite: false },
+  ];
+
+  const liveItem = document.getElementById('liveItem');
+  const tooltip = document.getElementById('tooltip');
+  const tooltipText = document.getElementById('tooltipText');
+  const playlist = document.getElementById('playlist');
+  const playlistBody = document.getElementById('playlistBody');
+  const playlistTitle = document.getElementById('playlistTitle');
+  const playlistCount = document.getElementById('playlistCount');
+
+  let liveCount = 3;
+  let upcomingCount = 5;
+  let popoverOpen = true;
+
+  function refresh() {
+    liveItem.innerHTML = `
+      <svg viewBox="0 0 24 24">
+        <path d="M2 12a10 10 0 0120 0M5 12a7 7 0 0114 0M8 12a4 4 0 018 0"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      </svg>
+    `;
+    liveItem.classList.remove('disabled', 'next-only');
+    liveItem.style.color = '';
+
+    if (liveCount > 0) {
+      liveItem.style.color = 'var(--live-red)';
+      const dot = document.createElement('div');
+      dot.className = 'pulse-dot';
+      liveItem.appendChild(dot);
+      if (liveCount >= 2) {
+        const badge = document.createElement('div');
+        badge.className = 'badge';
+        badge.textContent = String(liveCount);
+        liveItem.appendChild(badge);
+      }
+    } else if (upcomingCount > 0) {
+      liveItem.classList.add('next-only');
+      const badge = document.createElement('div');
+      badge.className = 'badge';
+      badge.textContent = String(upcomingCount);
+      liveItem.appendChild(badge);
+    } else {
+      liveItem.classList.add('disabled');
+    }
+
+    renderPlaylist();
+    if (popoverOpen) playlist.classList.add('open');
+    else playlist.classList.remove('open');
+  }
+
+  function renderPlaylist() {
+    const live = LIVE.slice(0, liveCount).slice();
+    live.sort((a, b) => Number(b.featured) - Number(a.featured) || b.attendees - a.attendees);
+    const upcoming = UPCOMING.slice(0, upcomingCount).slice();
+    upcoming.sort((a, b) => a.startsInMin - b.startsInMin);
+
+    const totalRooms = live.length;
+    if (totalRooms > 0) {
+      playlistTitle.textContent = 'Pasando ahora';
+      playlistCount.textContent = `${totalRooms} ${totalRooms === 1 ? 'SALA' : 'SALAS'} EN VIVO`;
+    } else if (upcoming.length > 0) {
+      playlistTitle.textContent = 'Empieza pronto';
+      playlistCount.textContent = `SIGUIENTES ${upcoming.length}`;
+    } else {
+      playlistTitle.textContent = 'En vivo';
+      playlistCount.textContent = '';
+    }
+
+    if (live.length === 0 && upcoming.length === 0) {
+      playlistBody.innerHTML = `
+        <div class="empty">No hay sesiones en vivo ni proximas.</div>
+      `;
+      return;
+    }
+
+    let html = '';
+
+    if (live.length > 0) {
+      live.forEach(s => {
+        const fav = s.isFavorite ? '' : '';
+        html += `
+          <div class="row live${s.featured ? ' featured' : ''}" data-id="${s.id}">
+            <div class="status">
+              <svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+            </div>
+            <div class="body">
+              <div class="title">${s.title}</div>
+              <div class="meta">
+                <span class="speaker">${s.speaker}</span>
+                <span class="sep">·</span>${s.room}
+              </div>
+            </div>
+            <div class="right">
+              ${s.featured ? '<span class="pill featured-pill">Principal</span>' : ''}
+              <span class="audience">${s.attendees}</span>
+              <span class="audience-sub">viendo</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    if (upcoming.length > 0) {
+      if (live.length > 0) {
+        html += `
+          <div class="section-mini next">
+            Empieza pronto
+            <span class="qty">SIGUIENTES ${upcoming.length}</span>
+          </div>
+        `;
+      }
+      upcoming.forEach(s => {
+        const startingSoon = s.startsInMin < 10;
+        html += `
+          <div class="row next" data-id="${s.id}">
+            <div class="status">
+              <span class="min">${s.startsInMin}</span>
+              <span class="min-unit">min</span>
+            </div>
+            <div class="body">
+              <div class="title">${s.title}</div>
+              <div class="meta">
+                <span class="speaker">${s.speaker}</span>
+                <span class="sep">·</span>${s.room}
+              </div>
+            </div>
+            <div class="right">
+              ${startingSoon ? '<span class="pill starting-pill">Pronto</span>' : ''}
+              ${s.isFavorite ? '<span class="fav-star">★</span>' : ''}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    playlistBody.innerHTML = html;
+
+    playlistBody.querySelectorAll('.row').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = el.dataset.id;
+        const isLive = el.classList.contains('live');
+        if (isLive) alert(`Navega a /session-stream/${id}`);
+        else alert(`Navega a /agenda?highlight=${id}`);
+      });
+    });
+    const agendaLink = playlist.querySelector('[data-action="agenda"]');
+    if (agendaLink) {
+      agendaLink.onclick = (e) => { e.preventDefault(); alert('Navega a /agenda'); };
+    }
+  }
+
+  liveItem.addEventListener('mouseenter', () => {
+    if (liveCount === 1 && upcomingCount === 0) {
+      const s = LIVE[0];
+      tooltipText.textContent = `${s.title} · ${s.room}`;
+      tooltip.classList.add('show');
+    }
+  });
+  liveItem.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
+
+  liveItem.addEventListener('click', () => {
+    if (liveCount === 0 && upcomingCount === 0) return;
+    if (liveCount === 1 && upcomingCount === 0) {
+      alert(`Navega a /session-stream/${LIVE[0].id}`);
+      return;
+    }
+    popoverOpen = !popoverOpen;
+    refresh();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!popoverOpen) return;
+    if (playlist.contains(e.target) || liveItem.contains(e.target)) return;
+    if (e.target.closest('.toolbar')) return;
+    popoverOpen = false;
+    playlist.classList.remove('open');
+  });
+
+  document.querySelectorAll('.toolbar button').forEach(b => {
+    b.addEventListener('click', () => {
+      if (b.dataset.state !== undefined) {
+        liveCount = Number(b.dataset.state);
+        document.querySelectorAll('[data-state]').forEach(x => x.classList.toggle('active', x === b));
+      } else if (b.dataset.upcoming !== undefined) {
+        upcomingCount = Number(b.dataset.upcoming);
+        document.querySelectorAll('[data-upcoming]').forEach(x => x.classList.toggle('active', x === b));
+      } else if (b.dataset.action === 'open') {
+        popoverOpen = true;
+        document.querySelectorAll('[data-action="open"], [data-action="close"]').forEach(x => x.classList.toggle('active', x === b));
+      } else if (b.dataset.action === 'close') {
+        popoverOpen = false;
+        document.querySelectorAll('[data-action="open"], [data-action="close"]').forEach(x => x.classList.toggle('active', x === b));
+      }
+      refresh();
+    });
+  });
+
+  refresh();
+</script>
+
+</body>
+</html>

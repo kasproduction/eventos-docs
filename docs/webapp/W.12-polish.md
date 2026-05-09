@@ -70,7 +70,7 @@ Cualquier inconsistencia visual / interactiva → fix in-place.
 
 ---
 
-## Fase 3 — Performance (~1.5h) — 0/4
+## Fase 3 — Performance (~3h) — 0/8
 
 ### 3.1 Bundle analysis — 0/2
 - [ ] `pnpm add -D @next/bundle-analyzer`
@@ -79,6 +79,32 @@ Cualquier inconsistencia visual / interactiva → fix in-place.
 ### 3.2 Code splitting — 0/2
 - [ ] Cada modulo lazy-imported via dynamic import
 - [ ] Lighthouse Performance >= 85 desktop, >= 75 mobile
+
+### 3.3 Migracion fetchers SSR → TanStack Query con invalidacion push (DEPENDE DE W.11) — 0/4
+
+> **Arquitectura objetivo (paridad mobile):** la app Expo cachea con
+> `staleTime: Infinity` y SOLO invalida cuando el socket avisa que algo
+> cambio en backend. La webapp deberia hacer lo mismo. Hoy (2026-05-09)
+> usa `staleTimes` del router Next como parche — funciona pero hace
+> refetch cada N min sin razon. Reemplazar por modelo push.
+>
+> **Mejora esperada:** nav promedio 300-500ms → <100ms (5-10x). Skeleton
+> solo en very-first-load del modulo. Cero refetch innecesario cuando el
+> organizador no toco nada.
+>
+> **Bloqueado por:** W.11 sockets RT debe estar wireado y el backend debe
+> emitir eventos por modulo afectado (`agenda:updated`, `speakers:updated`,
+> `event:branding_updated`, etc.) desde Filament observers.
+
+- [ ] Mover fetchers (`fetchAgenda`, `fetchSpeakers`, `fetchHappeningNow`,
+      `fetchPublicEvent`, `getCurrentUser`) a TanStack Query hooks
+      client-side con `staleTime: Infinity`, `gcTime: 30min`
+- [ ] Wrapper `useEventInvalidation()` que escucha eventos socket y hace
+      `qc.invalidateQueries({ queryKey: [...] })` por evento
+- [ ] Quitar `experimental.staleTimes` de `next.config.ts` (ya no aplica)
+- [ ] Quitar `loading.tsx` por modulo donde el render sea client-side
+      (TanStack Query maneja loading state directo) — solo dejar el
+      generico (app)/loading.tsx para el very-first-load del shell
 
 ---
 

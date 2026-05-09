@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Live pill — propuesta UX</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --bg-elevated: #16161a;
+    --surface-low: #1d1d22;
+    --surface-high: #2a2a30;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --text-primary: #ededf0;
+    --text-secondary: #b4b4ba;
+    --text-muted: #767680;
+    --accent: #7c5cff;
+    --accent-light: #a896ff;
+    --live-red: #ff4757;
+    --glass: rgba(20,20,24,0.72);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  body {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 32px;
+    padding: 40px 56px;
+  }
+
+  /* ── Toolbar ────────────────────────────────────── */
+  .toolbar {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 14px 20px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 8px;
+  }
+  .toolbar h1 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-right: 16px;
+  }
+  .toolbar .label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-right: 8px;
+  }
+  .toolbar button {
+    padding: 8px 14px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .toolbar button:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+  .toolbar button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* ── Stage ──────────────────────────────────────── */
+  .stage {
+    position: relative;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(124,92,255,0.08) 0%, transparent 50%),
+      var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    height: 600px;
+    overflow: hidden;
+  }
+
+  /* Hint label dentro del stage */
+  .stage-hint {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── Sidebar pill ───────────────────────────────── */
+  .sidebar {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px;
+    background: var(--glass);
+    backdrop-filter: blur(22px);
+    border: 1px solid var(--border-strong);
+    border-radius: 28px;
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+  .brand {
+    width: 32px; height: 32px;
+    display: grid; place-items: center;
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .nav-item {
+    position: relative;
+    width: 36px; height: 36px;
+    display: grid; place-items: center;
+    border-radius: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .nav-item:hover {
+    background: var(--surface-low);
+    color: var(--text-secondary);
+  }
+  .nav-item.active {
+    background: var(--surface-high);
+    color: var(--text-primary);
+  }
+  .nav-item.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .nav-item svg {
+    width: 18px; height: 18px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.7;
+  }
+  .nav-item .badge {
+    position: absolute;
+    top: -2px; right: -2px;
+    min-width: 16px; height: 16px;
+    padding: 0 4px;
+    background: var(--live-red);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    display: grid; place-items: center;
+    border-radius: 999px;
+    border: 2px solid var(--bg);
+  }
+  .nav-item .pulse-dot {
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 7px; height: 7px;
+    background: var(--live-red);
+    border-radius: 999px;
+    box-shadow: 0 0 8px var(--live-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .divider {
+    width: 26px;
+    height: 1px;
+    background: var(--border);
+    margin: 6px 0;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+
+  /* ── Popover ────────────────────────────────────── */
+  .popover {
+    position: absolute;
+    left: 90px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 320px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.22s ease;
+  }
+  .popover.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%) translateX(4px);
+  }
+  .popover-header {
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .popover-header .label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--live-red);
+  }
+  .popover-header .label::before {
+    content: '';
+    display: block;
+    width: 6px; height: 6px;
+    background: var(--live-red);
+    border-radius: 999px;
+    box-shadow: 0 0 6px var(--live-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .popover-header .count {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .popover-list {
+    max-height: 360px;
+    overflow-y: auto;
+  }
+  .stream-item {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+  }
+  .stream-item:last-child { border-bottom: none; }
+  .stream-item:hover {
+    background: var(--surface-low);
+  }
+  .stream-item.featured {
+    background: linear-gradient(90deg,
+      color-mix(in srgb, var(--accent) 8%, transparent),
+      transparent 60%);
+    border-left: 2px solid var(--accent);
+    padding-left: 16px;
+  }
+  .stream-item .top-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .stream-item .room-tag {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+  }
+  .stream-item.featured .room-tag {
+    color: var(--accent-light);
+  }
+  .stream-item .featured-badge {
+    font-size: 8px;
+    font-weight: 800;
+    padding: 2px 6px;
+    background: color-mix(in srgb, var(--accent) 24%, transparent);
+    color: var(--accent-light);
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .stream-item h4 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text-primary);
+  }
+  .stream-item .meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .stream-item .meta .speaker {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  .stream-item .meta .sep {
+    color: var(--text-muted);
+    margin: 0 6px;
+  }
+
+  .empty-state {
+    padding: 32px 18px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  /* ── Tooltip directo (estado 1 live) ────────────── */
+  .tooltip {
+    position: absolute;
+    left: 90px;
+    top: 50%;
+    transform: translateY(-50%) translateX(4px);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip strong { color: var(--accent-light); font-weight: 700; }
+  .tooltip .small {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  /* ── Disabled tooltip ───────────────────────────── */
+  .tooltip.disabled {
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Live pill — 3 estados</h1>
+  <span class="label">Estado:</span>
+  <button data-state="0" class="active">0 sesiones live</button>
+  <button data-state="1">1 sesion live</button>
+  <button data-state="3">3 sesiones live</button>
+</div>
+
+<!-- Spacer for empty cell -->
+<div></div>
+
+<!-- Stage (simula la webapp) -->
+<div class="stage">
+  <aside class="sidebar">
+    <div class="brand">E</div>
+    <div class="divider"></div>
+
+    <div class="nav-item" title="Inicio">
+      <svg viewBox="0 0 24 24"><path d="M3 12L12 4l9 8M5 10v10h4v-6h6v6h4V10"/></svg>
+    </div>
+
+    <div class="nav-item" title="Agenda">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+    </div>
+
+    <!-- LIVE ITEM (este es el del demo) -->
+    <div id="liveItem" class="nav-item disabled" title="En vivo">
+      <svg viewBox="0 0 24 24">
+        <path d="M2 12a10 10 0 0120 0M5 12a7 7 0 0114 0M8 12a4 4 0 018 0"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      </svg>
+      <!-- pulse dot + badge se muestran condicionalmente via JS -->
+    </div>
+
+    <div class="nav-item" title="Speakers">
+      <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v3M8 22h8"/></svg>
+    </div>
+
+    <div class="nav-item disabled" title="Networking · proximamente">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.87"/></svg>
+    </div>
+  </aside>
+
+  <!-- Tooltip para estado 1 live -->
+  <div id="tooltip" class="tooltip">
+    <strong>EN VIVO ahora</strong>
+    <span class="small" id="tooltipText"></span>
+  </div>
+
+  <!-- Popover para estado 3 live -->
+  <div id="popover" class="popover">
+    <div class="popover-header">
+      <div class="label">En vivo ahora</div>
+      <div class="count" id="popoverCount">3 SALAS</div>
+    </div>
+    <div class="popover-list" id="popoverList"></div>
+  </div>
+
+  <div class="stage-hint">canvas central / contenido modulo</div>
+</div>
+
+<script>
+  const SESSIONS = [
+    { id: 203, title: 'Keynote: Banca digital en LatAm', speaker: 'Maria Garcia', org: 'Bancolombia', room: 'Auditorio Principal', featured: true, attendees: 245 },
+    { id: 204, title: 'Workshop: TypeScript avanzado', speaker: 'Sofia Hernandez', org: 'Globant', room: 'Sala 3', featured: false, attendees: 87 },
+    { id: 207, title: 'Panel: Mujeres lideres en tech', speaker: 'Ana Martinez +1', org: 'Rappi', room: 'Sala 2', featured: false, attendees: 132 },
+  ];
+
+  const liveItem = document.getElementById('liveItem');
+  const tooltip = document.getElementById('tooltip');
+  const tooltipText = document.getElementById('tooltipText');
+  const popover = document.getElementById('popover');
+  const popoverList = document.getElementById('popoverList');
+  const popoverCount = document.getElementById('popoverCount');
+
+  let currentState = 0;
+  let popoverOpen = false;
+
+  function setState(n) {
+    currentState = n;
+    popoverOpen = false;
+    popover.classList.remove('open');
+    tooltip.classList.remove('show');
+
+    // Reset live item
+    liveItem.innerHTML = `
+      <svg viewBox="0 0 24 24">
+        <path d="M2 12a10 10 0 0120 0M5 12a7 7 0 0114 0M8 12a4 4 0 018 0"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      </svg>
+    `;
+
+    if (n === 0) {
+      liveItem.classList.add('disabled');
+      liveItem.classList.remove('active');
+      liveItem.style.color = '';
+    } else {
+      liveItem.classList.remove('disabled');
+      liveItem.style.color = 'var(--live-red)';
+
+      const dot = document.createElement('div');
+      dot.className = 'pulse-dot';
+      liveItem.appendChild(dot);
+
+      if (n >= 2) {
+        const badge = document.createElement('div');
+        badge.className = 'badge';
+        badge.textContent = String(n);
+        liveItem.appendChild(badge);
+      }
+    }
+
+    // Toolbar buttons active state
+    document.querySelectorAll('.toolbar button').forEach(b => {
+      b.classList.toggle('active', Number(b.dataset.state) === n);
+    });
+  }
+
+  liveItem.addEventListener('mouseenter', () => {
+    if (currentState === 0) return;
+    if (currentState === 1) {
+      const s = SESSIONS[0];
+      tooltipText.textContent = `${s.title} · ${s.room}`;
+      tooltip.classList.add('show');
+    }
+  });
+  liveItem.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('show');
+  });
+
+  liveItem.addEventListener('click', (e) => {
+    if (currentState === 0) return;
+    if (currentState === 1) {
+      // Direct nav
+      const s = SESSIONS[0];
+      alert(`Navega a: /session-stream/${s.id}\n(${s.title})`);
+      return;
+    }
+    // Multiple → toggle popover
+    popoverOpen = !popoverOpen;
+    popover.classList.toggle('open', popoverOpen);
+    tooltip.classList.remove('show');
+
+    if (popoverOpen) renderPopover();
+  });
+
+  function renderPopover() {
+    popoverList.innerHTML = '';
+    popoverCount.textContent = `${currentState} SALAS`;
+    const list = SESSIONS.slice(0, currentState);
+    // featured arriba
+    list.sort((a, b) => Number(b.featured) - Number(a.featured) || b.attendees - a.attendees);
+
+    list.forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'stream-item' + (s.featured ? ' featured' : '');
+      item.innerHTML = `
+        <div class="top-row">
+          <span class="room-tag">${s.room}</span>
+          ${s.featured ? '<span class="featured-badge">Sala principal</span>' : ''}
+        </div>
+        <h4>${s.title}</h4>
+        <div class="meta">
+          <span class="speaker">${s.speaker}</span><span class="sep">·</span>${s.attendees} viendo
+        </div>
+      `;
+      item.addEventListener('click', () => {
+        alert(`Navega a: /session-stream/${s.id}\n(${s.title})`);
+        popoverOpen = false;
+        popover.classList.remove('open');
+      });
+      popoverList.appendChild(item);
+    });
+  }
+
+  // Cerrar popover al click fuera
+  document.addEventListener('click', (e) => {
+    if (!popoverOpen) return;
+    if (popover.contains(e.target) || liveItem.contains(e.target)) return;
+    popoverOpen = false;
+    popover.classList.remove('open');
+  });
+
+  // Toolbar
+  document.querySelectorAll('.toolbar button').forEach(b => {
+    b.addEventListener('click', () => setState(Number(b.dataset.state)));
+  });
+
+  setState(0);
+</script>
+
+</body>
+</html>
