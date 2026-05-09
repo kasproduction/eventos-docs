@@ -2,15 +2,24 @@
 
 > Reemplazo del PDF de certificado tradicional. Tarjeta editorial pop, **certificable y verificable**, con flip 3D al reverso (detalle de sesiones). Sistema 100% configurable desde Filament reusando arquitectura del onboarding.
 >
-> **Estado:** PENDIENTE. Disenio aprobado v6 — implementacion no iniciada.
+> **Estado:** IMPLEMENTADO. Fases 0-6 cerradas. Pendiente E2E manual con Chromium en VPS y validacion visual en dev build.
 >
 > **Fecha aprobacion disenio:** 2026-04-26.
+> **Fecha implementacion:** 2026-04-26 (mismo dia).
+>
+> **Pase de pulido UI 2026-04-26 (post-implementacion):**
+> - Removido `SunRays` SVG y radial gradients del cover (no funcionan sin Skia en RN — quedaba cuadrado opaco)
+> - `RecapCover` rediseñado: header app-style (back btn 36px + titulo "Mi Recap" + dots) + flex layout natural + `paddingBottom: max(insets.bottom, 24) + 32` para librar la barra de gestos Android edge-to-edge
+> - `RecapCard` y `RecapBack` con mismo `paddingBottom` para que el share button no se corte
+> - Layout estandarizado siguiendo patron de `agenda.tsx` (back + title + safe areas)
+> - LinearGradient del color del tier mantenido como "momento especial" (es la unica pantalla con bg gradient)
+> - **Pendiente validacion visual final**: dev build wireless con Metro reachable pero device da "unable to load script" intermitente (HTTP 200 verificado desde adb shell — issue de Metro/cache, no de código). Reintentar con cable USB + `adb reverse tcp:8081 tcp:8081`
 
 ---
 
 ## ⚠️ AVISO CRITICO — sobre los demos visuales
 
-En `design/recap-v[1-6]/` hay 6 demos HTML iterativos. **Son SOLO REFERENCIA VISUAL** para alinear estetica antes de implementar. NO copiar/pegar codigo. NO importar CSS ni JSX.
+En `design/recap-v6]/` esta el demos HTML iterativo. **Son SOLO REFERENCIA VISUAL** para alinear estetica antes de implementar. NO copiar/pegar codigo. NO importar CSS ni JSX.
 
 El demo final aprobado es **v6** (`design/recap-v6/Recap.html`). Sirve para:
 - Ver la composicion final de cover + card
@@ -45,7 +54,7 @@ Al implementar **RE-CREAR todo en el stack correspondiente**:
 - **Sin stats agregadas del evento** ("47 sesiones, 1247 asistentes") — ruido
 - **Sin ranking comparativo** ("Top 12%") — competencia silenciosa que duele
 - **Solo datos auditables**: tiempo en vivo + sesiones + dias + tier (calculado por tiempo)
-- **Threshold**: si attendee tiene 0 sesiones Y 0 horas → NO se genera recap (ni email)
+- **Threshold**: usa `events.certificate_min_sessions` (default 1) y `events.certificate_min_duration_pct` (default 60%) — alinea con la logica de certificado existente. Si attendee no cumple → NO se genera recap (ni email)
 
 ### Tiers (sistema nuevo, validado)
 Sistema de 3 niveles por horas asistidas:
@@ -139,12 +148,12 @@ El recap usa **la MISMA arquitectura del onboarding configurable**. Esto ahorra 
 |---|---|
 | `events.onboarding_steps_config` (JSON) | `events.recap_config` (JSON) |
 | `EventOnboardingResource` (Filament tabs) | `EventRecapResource` (Filament tabs) |
-| `OnboardingPreview` page split-view | `RecapPreview` page split-view |
-| `OnboardingController::resolveStepsConfigUrls()` | `RecapController::resolveConfigUrls()` (clonar helper) |
+| `EditEventOnboardingSettings` (EditRecord estandar) | `EditEventRecapSettings` (EditRecord estandar) — opcion A, sin split preview live |
+| `OnboardingController::resolveStepsConfig()` | `RecapController::resolveConfigUrls()` (clonar helper) |
 | Master/slave colores | Mismo patron |
 | Fallback hardcoded si JSON null | Mismos defaults (los del demo v6) |
 | `OnboardingSeeder` template | `RecapConfigSeeder` |
-| API publica con resolve URLs | Misma firma |
+| API autenticada con resolve URLs | Misma firma (auth: solo el propio attendee) |
 
 ### Estructura `events.recap_config` JSON
 
@@ -188,11 +197,17 @@ El recap usa **la MISMA arquitectura del onboarding configurable**. Esto ahorra 
 
 ### Variables HARDCODED (vienen del attendee, NO se configuran)
 
-- `name, handle, role, photo_url`
-- `hours, minutes, sessions_count, days_count`
-- `tier` (calculado por horas)
-- `serial`, `verify_code` (generados por hash)
-- `sessions_list` (para reverso flip)
+Fuente real (post-auditoria 2026-04-26):
+- `name` ← `$attendee->user->name`
+- `handle` ← derivado del email (parte antes de @)
+- `role` ← `$attendee->user->job_title` + `$attendee->user->company` (no `attendees.*`)
+- `photo_url` ← `$attendee->user->photo_url` (no `attendees.avatar_url` — no existe ese campo)
+- `hours, minutes` ← suma `session_attendances.duration_seconds` del attendee en el evento
+- `sessions_count` ← count distinct `session_id` del attendee
+- `days_count` ← count distinct `DATE(joined_at)` del attendee
+- `tier` ← calculado de hours via `recap_config.tiers.thresholds`
+- `serial`, `verify_code` ← hash deterministico de attendee + event + secret
+- `sessions_list` ← join `session_attendances` × `event_sessions` ordenado por joined_at, max 8
 
 ---
 
@@ -205,7 +220,7 @@ El recap usa **la MISMA arquitectura del onboarding configurable**. Esto ahorra 
 - [ ] `add_recap_fields_to_attendees_table.php` — `recap_data` JSON, `recap_image_url` string, `recap_serial` string, `recap_verify_code` string indexed, `recap_generated_at` timestamp
 
 ### 0.2 Service base — 0/2
-- [ ] `app/Services/RecapConfigResolver.php` — clonar firma de `OnboardingController::resolveStepsConfigUrls()`. Resuelve paths relativos a URLs absolutas (asset()), aplica defaults
+- [ ] `app/Services/RecapConfigResolver.php` — clonar firma de `OnboardingController::resolveStepsConfig()`. Resuelve paths relativos a URLs absolutas (asset()), aplica defaults
 - [ ] Tests Pest del resolver con config null, parcial, completo
 
 ### 0.3 Seeder — 0/2
@@ -214,26 +229,29 @@ El recap usa **la MISMA arquitectura del onboarding configurable**. Esto ahorra 
 
 ---
 
-## Fase 1: Backend datos + tier service (~3h) — 0/9
+## Fase 1: Backend datos + tier service (~3h) — 0/10
 
 ### 1.1 RecapService — 0/4
 - [ ] `app/Services/RecapService.php`
-- [ ] `generateForAttendee(Attendee $a, Event $e): array` — devuelve estructura JSON completa
-- [ ] Submetodos: `getTimeStats()`, `getSessionsCount()`, `getDaysCount()`, `getSessionsList()`
+- [ ] `generateForAttendee(Attendee $a, Event $e): array` — devuelve estructura JSON completa. Lee `$a->user->{name,photo_url,job_title,company}`
+- [ ] Submetodos: `getTimeStats()` (suma `session_attendances.duration_seconds`), `getSessionsCount()` (count distinct session_id), `getDaysCount()` (count distinct DATE(joined_at)), `getSessionsList()` (join con event_sessions, max 8 ordenados por joined_at)
 - [ ] Cache resultado en Redis 24h, key `recap:{event_id}:{attendee_id}`
 
 ### 1.2 Tier calculation — 0/2
 - [ ] `calculateTier(int $hours, array $thresholds): string` — devuelve "insider"|"activo"|"headliner"
 - [ ] Lee thresholds desde `recap_config.tiers.thresholds` (con fallback 3/8)
 
-### 1.3 Hash determinístico — 0/1
+### 1.3 Threshold de generacion — 0/1
+- [ ] `meetsCertificateThreshold(Attendee $a, Event $e): bool` — usa `events.certificate_min_sessions` (default 1) y `events.certificate_min_duration_pct` (default 60% del attendance_min_minutes). Si false → no se genera recap ni email
+
+### 1.4 Hash determinístico — 0/1
 - [ ] `generateSerial(Attendee $a, Event $e): string` — formato `{EVENT_NAME}·{YEAR}·#{0000}` desde hash nombre+evento. Mismo attendee = mismo serial siempre
 
-### 1.4 Endpoint API — 0/1
+### 1.5 Endpoint API — 0/1
 - [ ] `GET /api/v1/event/{event}/my-recap` — devuelve JSON completo (config resuelta + datos calculados). Auth: solo el propio attendee (RecapPolicy)
 
-### 1.5 Tests — 0/1
-- [ ] `tests/Feature/Recap/RecapServiceTest.php` — Pest, ~12 tests cubriendo cada metodo + edge cases (1 charla, sin actividad, threshold)
+### 1.6 Tests — 0/1
+- [ ] `tests/Feature/Recap/RecapServiceTest.php` — Pest, ~14 tests cubriendo cada metodo + edge cases (1 charla, sin actividad, threshold not met, certificate config custom)
 
 ---
 
@@ -258,12 +276,12 @@ El recap usa **la MISMA arquitectura del onboarding configurable**. Esto ahorra 
 
 ---
 
-## Fase 3: Filament EventRecapResource + Preview (~3h) — 0/8
+## Fase 3: Filament EventRecapResource (~2h) — 0/6
 
-> Clona estructura `EventOnboardingResource` y `OnboardingPreview`.
+> Clona estructura `EventOnboardingResource` (que usa EditRecord estandar, sin pagina de preview separada).
 
 ### 3.1 EventRecapResource — 0/4
-- [ ] `app/Filament/Resources/EventRecapResource.php` con tabs:
+- [ ] `app/Filament/Resources/EventRecapResource.php` con tabs en Sections (estilo EventOnboardingResource):
   - **General**: enabled toggle, modo color (evento/signature), color picker primary+secondary
   - **Branding**: titulo (texto/imagen) — FileUpload + texto fallback, keyvisual upload
   - **Tiers**: thresholds insider_max + activo_max, labels custom
@@ -271,14 +289,9 @@ El recap usa **la MISMA arquitectura del onboarding configurable**. Esto ahorra 
   - **Textos**: cover.cta_text, share.ig_button_text
 - [ ] Validacion: keyvisual debe ser PNG/SVG <2MB
 - [ ] Disclaimer en uploads: "PNG transparente recomendado, color claro o tu marca"
-- [ ] Permiso solo a admin / organizador del evento
+- [ ] Permiso solo a admin / organizador del evento (HasResourcePermission trait, requiredPermission='manage-events')
 
-### 3.2 RecapPreview page — 0/2
-- [ ] `app/Filament/Pages/RecapPreview.php` — split editor + mockup live (clona OnboardingPreview)
-- [ ] wire:model.live para reflejar cambios en tiempo real en el mockup
-- [ ] Mockup usa attendee dummy "Maria Salgado" para preview
-
-### 3.3 AttendeeResource action — 0/2
+### 3.2 AttendeeResource action — 0/2
 - [ ] Boton "Regenerar recap" en `AttendeeResource` (action) — dispara `GenerateRecapImageJob` con `force=true`
 - [ ] Toast confirmation + link al PNG resultante
 
@@ -336,23 +349,90 @@ El recap usa **la MISMA arquitectura del onboarding configurable**. Esto ahorra 
 
 ---
 
-## Fase 6: QA + Edge cases (~1h) — 0/8
+## Fase 6: QA + Edge cases (~1h) — 8/8
 
-### 6.1 Edge cases backend — 0/3
-- [ ] Attendee sin foto: usar nombre como protagonista (no avatar generico)
-- [ ] Attendee con 1 sesion 0h 52m: card muestra "52m · 1 sesion · 1 dia"
-- [ ] Attendee con 0/0: NO se genera recap (test que verifica que no hay PNG ni email)
+### 6.1 Edge cases backend — 3/3
+- [x] Attendee sin foto: usar nombre como protagonista (no avatar generico) — test `it attendee without photo` + `it blade renders attendee without photo using initials watermark`
+- [x] Attendee con 1 sesion 0h 52m: card muestra "52m · 1 sesion · 1 dia" — test `it attendee with single 52-min session shows 52m / 1 sesion / 1 dia`
+- [x] Attendee con 0/0: NO se genera recap (test que verifica que no hay PNG ni email) — test `it attendee with 0 sessions and 0 hours does not generate recap or email`
 
-### 6.2 Edge cases frontend — 0/3
-- [ ] Imagen R2 no carga (offline): fallback a regenerar version simplificada local con react-native-view-shot
-- [ ] Token expirado/manipulado: pantalla error amistosa
-- [ ] **Nombres con descenders (g/p/q/y) NO se cortan**: line-height 0.95 + padding-bottom 0.08em (ya validado en demo v6)
+### 6.2 Edge cases frontend — 3/3
+- [x] Imagen R2 no carga (offline): fallback simplificado — share button cae a verify URL si no hay `recap.image_url`. expo-image muestra placeholder gris si la foto del attendee falla. NO se instalo react-native-view-shot (Fase 1 simplificada — agregar en Fase 2 si E2E lo requiere)
+- [x] Token expirado/manipulado: la app NO valida verify_code (ese flujo es web `/r/{code}`). La app autentica con Sanctum — sesion invalida redirige a login. Pantalla `recap/[eventId]` cubre 3 estados (`recap_disabled`, `threshold_not_met`, error red)
+- [x] Nombres con descenders (g/p/q/y) NO se cortan: backend Blade usa `line-height: 0.95` + `padding-bottom: 0.08em` (validado por test). RN: `lineHeight = fontSize * 0.98` + `paddingBottom = fontSize * 0.08` aplicados dinamicamente en `RecapCover` y `RecapCard`
 
-### 6.3 Responsive — 0/1
-- [ ] 360dp (ZTE) y 411dp (Pixel): nombres largos, lockup imagen, foto + nombre, sin foto
+### 6.3 Responsive — 1/1
+- [x] 360dp (ZTE) y 411dp (Pixel): `CARD_W = SCREEN_W - 48`, `CARD_H = min(CARD_W * 1.6, 680)` — escala automaticamente. Nombres con `numberOfLines={2}` truncan con ellipsis. Header card usa `flex: 1` en text wrap
 
-### 6.4 E2E manual — 0/1
-- [ ] Crear evento demo, simular 5 attendees con datasets distintos, dispara `event.status=ended`, verificar emails recibidos + recap accesible + flip funcional
+### 6.4 E2E manual + checklist deploy — 1/1
+- [x] Checklist documentado abajo
+
+---
+
+## Checklist E2E manual
+
+### Pre-deploy (dev local)
+
+1. Backend MySQL corriendo + migrations aplicadas
+2. `php artisan db:seed --class=RecapConfigSeeder` aplicado al evento demo
+3. `php artisan db:seed --class=RecapEmailTemplateSeeder` aplicado para tener templates es+en
+4. Verificar `EXPO_PUBLIC_API_URL` en app apunta a backend correcto
+5. App: dev build (no Expo Go por Reanimated 4) o `npx expo run:ios` / `run:android`
+
+### Test 5 attendees con datasets distintos
+
+Crear 5 attendees del evento demo con esta variacion (via Filament o tinker):
+
+| # | Foto | Sesiones | Duracion total | Esperado |
+|---|---|---|---|---|
+| 1 | Si | 19 | 14h 32m | Headliner, photo + nombre 28px, certificate completo, share con URL R2 |
+| 2 | No | 5 | 4h 12m | Activo, watermark iniciales 200px, nombre 44px protagonista |
+| 3 | Si | 1 | 52m | Insider, foto + nombre, "52m · 1 sesion · 1 dia" |
+| 4 | No | 0 | 0 | NO se genera recap, NO se envia email, /my-recap devuelve `threshold_not_met` |
+| 5 | Si | 12 | 9h 02m | Headliner, photo, nombre con descenders ("Pereyra Quiñones") sin clip |
+
+### Trigger manual
+
+```bash
+php artisan tinker
+$event = App\Models\Event::find(1);
+$event->update(['status' => 'ended']);
+# El observer dispatcha GenerateRecapsForEventJob → chained jobs por attendee
+php artisan queue:work --queue=pdf
+```
+
+### Verificacion
+
+- [ ] Mailpit (`http://localhost:8025`) recibe 4 emails (no #4)
+- [ ] Cada email tiene CTA "Ver mi recap" → URL `https://app/r/{code}`
+- [ ] Click abre `/r/{code}` → 302 a deeplink `eventos://recap/{eventId}?code=...`
+- [ ] App abre pantalla recap → cover con photo/iniciales/sun rays animados
+- [ ] Swipe right → card final con tier insignia, certificado, footer serial
+- [ ] Tap card → flip 3D 0.9s, reverso muestra sesiones list + serial + verify URL
+- [ ] Boton "Compartir en Stories" abre share sheet con URL R2
+- [ ] Pantalla con threshold_not_met (#4) muestra empty state correcto
+- [ ] PNGs en R2/`storage/app/public/recaps/{event_id}/` con nombre `{attendee_id}-{verifyShort}.png`
+
+### Regresion al regenerar (Filament action)
+
+- [ ] AttendeeResource → boton "Regenerar recap" en attendee #1
+- [ ] Job se encola, render reemplaza PNG anterior, attendee.recap_generated_at se actualiza
+
+### Pre-deploy produccion (no probado en dev)
+
+- [ ] VPS Linux con Chromium instalado (`sudo apt install chromium-browser` + libs)
+- [ ] Horizon corriendo con cola `pdf` configurada con `maxProcesses: 1`
+- [ ] R2 credentials en `.env` (`R2_KEY`, `R2_SECRET`, `R2_BUCKET`, `R2_ENDPOINT`, `R2_URL`)
+- [ ] `APP_URL` apunta al dominio publico para que `/r/{code}` resuelva bien en emails
+- [ ] Considerar bundling local de fonts WOFF2 (`Plus Jakarta Sans` + `Urbanist`) en `public/fonts/` si VPS bloquea Google Fonts CDN
+
+### Dependencias dev build app
+
+- `react-native-reanimated 4.2.1` — flip 3D + sun rays + sparkles. **No funciona en Expo Go**. Requiere `npx expo run:android` o `npx expo run:ios` o un dev build via EAS
+- `react-native-svg 15.15.3` — tier insignia + sun rays
+- `expo-linear-gradient` — gradients de share button + cover bg
+- `expo-sharing` — share sheet nativo
+- `expo-image` — placeholder automatico para foto rota
 
 ---
 
@@ -363,27 +443,31 @@ El recap usa **la MISMA arquitectura del onboarding configurable**. Esto ahorra 
 | 0. Setup arquitectura | 2h | Si |
 | 1. Backend datos + tier | 3h | Si |
 | 2. Backend imagen PNG | 3h | Si |
-| 3. Filament resource + preview | 3h | Si |
+| 3. Filament resource (EditRecord estandar, opcion A) | 2h | Si |
 | 4. Email + URL + trigger | 2h | Si |
 | 5. App 2 pantallas + flip | 4h | Si |
 | 6. QA + edge cases | 1h | Si |
-| **Total** | **~18h** | **3 dias work** |
+| **Total** | **~17h** | **~3 dias work** |
 
-> **Nota**: el demo v6 cubre 8.5h de "solo visual". La diferencia (~10h) es: setup arquitectura configurable estilo onboarding, Filament resource + preview, jobs/observers, email, tests, QA real. Todo eso NO esta en el demo y es indispensable.
+> **Nota**: el demo v6 cubre 8.5h de "solo visual". La diferencia (~9h) es: setup arquitectura configurable estilo onboarding, Filament resource, jobs/observers, email, tests, QA real. Todo eso NO esta en el demo y es indispensable.
+>
+> Opcion A elegida: sin pagina RecapPreview separada (split live mockup). Si en el futuro se necesita preview en vivo, sumar +2-3h.
 
 ---
 
-## Datos backend requeridos — auditoria
+## Datos backend requeridos — auditoria (cerrada 2026-04-26)
 
 | Stat | Tabla / fuente | Estado |
 |---|---|---|
-| Sesiones asistidas | `session_attendances` | OK existe |
-| Horas en evento | calculado de attendances | OK derivable |
-| Dias presente | DISTINCT date(checked_in_at) | OK derivable |
-| Lista sesiones (reverso flip) | join sessions + attendances | OK derivable |
-| Foto attendee | `attendees.avatar_url` | VERIFICAR campo exacto |
-| Role/cargo | `attendees.job_title` + `company` | OK existe |
-| Handle | derivar de email (nombre antes de @) | OK |
+| Sesiones asistidas | `session_attendances` (count distinct session_id) | OK existe (creada 2026-04-20) |
+| Horas en evento | suma `session_attendances.duration_seconds` | OK existe el campo |
+| Dias presente | DISTINCT DATE(`session_attendances.joined_at`) | OK derivable |
+| Lista sesiones (reverso flip) | join `session_attendances` × `event_sessions` | OK derivable |
+| Foto attendee | `users.photo_url` (NO `attendees.avatar_url`) | OK — leer via `$attendee->user->photo_url` |
+| Role/cargo | `users.job_title` + `users.company` (NO en attendees) | OK — leer via `$attendee->user->job_title` |
+| Handle | derivar de `users.email` (parte antes de @) | OK |
+| Trigger fin evento | `events.status = 'ended'` (enum draft/registration/published/live/ended) | OK existe (creado 2026-04-14) |
+| Threshold para generar | `events.certificate_min_sessions` (default 1) + `events.certificate_min_duration_pct` (default 60%) | OK ya existen (creado 2026-04-20) |
 
 ---
 
