@@ -8,27 +8,38 @@
 
 ## Estado actual
 
-### Vitest unit tests — 7 archivos, **103 tests**
+> **Update 2026-05-09:** Suite completa de retroactivos cerrada en una sesion.
+> 57 E2E + 118 vitest = **175 tests verde**. Mock backend en
+> `e2e/_helpers/mockBackend.mjs` cubre los modulos del shell post-login + el
+> hack de bearer-tag para variar event.status sin levantar mocks alternativos.
+
+### Vitest unit tests — 9 archivos, **118 tests**
 
 | Archivo | Cubre |
 |---|---|
 | `tests/components/agenda/agendaDerive.test.ts` | buildDayStrip, firstDayWithSessions, deriveUiState, trackSlug, formatTime, collectTracks, totalSessions |
-| `tests/components/speakers/speakersDerive.test.ts` | filterSpeakers, getFeatured, hasKeynoteSession, sortAlphabetical (20 tests, 2026-05-08) |
+| `tests/components/speakers/speakersDerive.test.ts` | filterSpeakers, getFeatured, hasKeynoteSession, sortAlphabetical |
 | `tests/lib/api.test.ts` | apiFetch helper (errores, retries, headers) |
 | `tests/lib/authValidators.test.ts` | emailSchema, magicLinkRequestSchema, verifyMagicLinkSchema, passwordLoginSchema |
 | `tests/lib/mailcheck.test.ts` | suggestEmail (typo detection gmail.con → gmail.com) |
 | `tests/lib/streaming/detectSource.test.ts` | detectStreamSource (iframe vs HLS) |
 | `tests/hooks/streaming/useChat.dedup.test.ts` | useChat dedup + useQnA upvote logic |
+| `tests/lib/speakersClient.test.ts` | rateSpeakerRequest 200/409/422/fallback + fetchMySpeakerRatingsClient (7 tests, 2026-05-09) |
+| `tests/lib/agendaClient.test.ts` | toggleFavoriteRequest, rateSessionRequest, fetchMyRatings (8 tests, 2026-05-09) |
 
-### Playwright E2E — 3 archivos, **12 tests**
+### Playwright E2E — 8 archivos, **57 tests**
 
 | Archivo | Tests |
 |---|---|
 | `e2e/auth-gate.spec.ts` | redirects sin cookie + login publica (4 tests) |
 | `e2e/login-form.spec.ts` | step email/sent/password + typo detection (4 tests) |
 | `e2e/verify-page.spec.ts` | token validacion + errores 401/410 (4 tests) |
+| `e2e/home.spec.ts` | 3 estados (pre/live/ended) + 3 variantes de recap (6 tests, 2026-05-09) |
+| `e2e/agenda.spec.ts` | days strip, tabs, chips, search, favoritos optimistic, rating, highlight pulse (16 tests, 2026-05-09) |
+| `e2e/streaming.spec.ts` | live/replay/empty player, about, rating, mobile shell (9 tests, 2026-05-09) |
+| `e2e/speakers.spec.ts` | SSR auth, search, panel, rating 200/409/500, deep link, Esc orden (14 tests, 2026-05-09) |
 
-**Patron clave Playwright:** mockean fetches con `page.route('**/api/...')` — no requieren backend Laravel corriendo. Pure frontend testing con auth simulado.
+**Patron clave Playwright:** SSR pega contra mockBackend Node (`e2e/_helpers/mockBackend.mjs`, puerto 8101) que sirve fixtures de `e2e/_fixtures/data.mjs`. Mutaciones browser-side se mockean con `page.route('**/api/...')` para variar status. Sin Laragon ni socket.io server.
 
 ---
 
@@ -36,13 +47,18 @@
 
 | Modulo | Estado | Unit | E2E |
 |---|---|---|---|
-| **W.1 Auth** | ✅ Implementado y testeado | authValidators, mailcheck | 3 specs (gate, login-form, verify) |
-| **W.2 Home** | ✅ Implementado | ❌ ninguno | ❌ ninguno |
-| **W.3 Agenda** | ✅ Implementado | agendaDerive | ❌ ninguno |
-| **W.4 Streaming** | ✅ Implementado | detectSource, useChat, useQnA | ❌ ninguno |
-| **W.5 Speakers** | ✅ Implementado 2026-05-08 | speakersDerive | ❌ ninguno |
+| **W.1 Auth** | ✅ Implementado y testeado | authValidators, mailcheck | 12 tests (gate, login-form, verify) |
+| **W.2 Home** | ✅ Implementado y testeado | — | 6 tests (pre/live/ended + recap variants) |
+| **W.3 Agenda** | ✅ Implementado y testeado | agendaDerive, agendaClient | 16 tests (days, chips, fav, rate, highlight) |
+| **W.4 Streaming** | ✅ Implementado y testeado | detectSource, useChat, useQnA | 9 tests (player states, about, rate) |
+| **W.5 Speakers** | ✅ Implementado y testeado | speakersDerive, speakersClient | 14 tests (search, panel, rate, deep link) |
 
-**Deuda tecnica:** W.2/W.3/W.4/W.5 tienen cero E2E tests. La regla del proyecto debe ser: **todo modulo nuevo arranca con E2E suite minima cubriendo flujos criticos**, y la deuda actual se cubre retroactivamente.
+**Limitaciones conocidas (no bloqueantes):**
+- W.4 paneles interactivos (chat send, Q&A upvote, poll vote) requieren socket.io
+  server real → cubiertos por vitest unit (useChat dedup) + se tocara con mock
+  socket en sesion futura.
+- W.4 hidden bug: hydration mismatch en `SpeakerDetailPanel.tsx:170` y en
+  `streaming` por `toLocaleTimeString("es-CO")` Node vs browser. Atacar separado.
 
 ---
 
@@ -59,7 +75,11 @@
 
 ---
 
-### 1. W.5 Speakers E2E — `e2e/speakers.spec.ts`
+### 1. W.5 Speakers E2E — `e2e/speakers.spec.ts` ✅ COMPLETADO 2026-05-09
+
+> Las secciones 2-4 abajo (W.3 / W.4 / W.2) tambien quedaron cerradas en la
+> misma sesion del 2026-05-09. El plan original se mantiene como historial
+> del scope que se cubrio.
 
 **Setup:** mock auth cookie + mock fetches `**/api/speakers/...`, `**/events/{id}/speakers`, `**/events/{id}/my-speaker-ratings`.
 
@@ -304,8 +324,57 @@ Un modulo se considera "test-cubierto" cuando tiene:
 
 **Orden propuesto cuando se retome:**
 
-1. Sesion proxima: **W.5 Speakers E2E** (~45 min) — fresco en cabeza
-2. Sesion siguiente: **W.3 Agenda E2E** (~60 min) — incluye highlight pulse
-3. Sesion siguiente: **W.4 Streaming E2E** (~45 min)
-4. Sesion siguiente: **W.2 Home E2E** (~30 min)
-5. Sesion siguiente: **vitest gaps** (speakersClient, agendaClient, view component tests)
+1. ✅ **W.5 Speakers E2E** (14 tests, 2026-05-09) — completado
+2. ✅ **W.3 Agenda E2E** (16 tests, 2026-05-09) — completado
+3. ✅ **W.4 Streaming E2E** (9 tests, 2026-05-09) — completado (sin paneles socket)
+4. ✅ **W.2 Home E2E** (6 tests, 2026-05-09) — completado
+5. ✅ **vitest gaps speakersClient + agendaClient** (15 tests, 2026-05-09) — completado
+
+---
+
+## Infraestructura E2E (instalada 2026-05-09)
+
+**`e2e/_helpers/mockBackend.mjs`** — servidor Node minimal (puerto 8101) que
+simula Laravel para SSR. El dev de E2E (puerto 3100) recibe `API_INTERNAL_URL`
+apuntando ahi en lugar de `eventos-backend.test`. Esto permite tests
+deterministicos sin tocar Laragon ni mutar datos reales.
+
+**`e2e/_fixtures/data.mjs`** — fixtures compartidas (event, user, 6 speakers,
+myRatings). Importadas tanto por mockBackend como por specs.
+
+**`e2e/_helpers/mockAuth.ts`** — helper `setAuthCookie(context, token?)` para
+inyectar la cookie httpOnly `eventos_auth` en tests post-login.
+
+**Patron para tests futuros (W.3, W.4, W.2):**
+
+```ts
+import { setAuthCookie } from "./_helpers/mockAuth";
+
+test.beforeEach(async ({ context }) => {
+  await setAuthCookie(context);
+});
+
+test("...", async ({ page }) => {
+  // SSR usa fixtures del mockBackend (auto)
+  // Mutations browser-side: page.route("**/api/.../...")
+});
+```
+
+**Endpoints del mockBackend ya cubiertos:**
+- `GET /api/v1/auth/me` (401 sin Authorization)
+- `GET /api/v1/events/by-slug/{slug}`
+- `GET /api/v1/events/{id}/speakers`
+- `GET /api/v1/events/{id}/my-speaker-ratings`
+- `POST /api/v1/events/{id}/speakers/{spkid}/rate`
+- `GET /api/v1/events/{id}/agenda` (stub vacio para no error 404 cuando navegas)
+
+**Para W.3 Agenda extender mockBackend:**
+- `GET /api/v1/events/{id}/agenda` con dias + sesiones reales
+- `GET /api/v1/events/{id}/my-ratings`
+- `POST /api/v1/events/{id}/sessions/{sid}/favorite`
+- `POST /api/v1/events/{id}/sessions/{sid}/rate`
+
+**Bug detectado, NO bloqueante:** hydration mismatch en
+`SpeakerDetailPanel.tsx:170` por `formatTime()` con diferencia entre Node y
+browser en `toLocaleTimeString("es-CO")` (probable narrow non-breaking space
+vs space). Documentar y atacar separado.
