@@ -8,8 +8,8 @@
 
 ## Ultima sesion
 
-**Fecha:** 2026-05-09
-**Que se hizo:** Suite de tests retroactivos cerrada de un solo tiron.
+**Fecha:** 2026-05-09 (jornada larga — 3 pases)
+**Que se hizo:** Tests retroactivos + perf tuning navegacion + exploracion UX modulo `/live`.
 
 **Infra E2E nueva:**
 - `mockBackend.mjs` Node http minimal (puerto 8101, separado de Laragon)
@@ -74,27 +74,107 @@ sin warnings de React.**
 
 ---
 
+### Pase C: Perf tuning navegacion + UX live module (2026-05-09 final)
+
+**Perf tuning aplicado (commit `316e099` en eventos-web):**
+- `React.cache()` en `getCurrentUser` + `fetchPublicEvent` para deduplicar
+  llamadas SSR duplicadas (layout + page hacian /auth/me y /events/by-slug
+  cada uno por separado en cada nav). 50% menos roundtrips a Laragon.
+- `experimental.staleTimes`: dynamic 0 → 300s (5min), static → 30min.
+  Volver a un modulo dentro de 5min es instant. **Parche temporal** hasta
+  que W.11 sockets desbloquee invalidacion push (paridad mobile).
+- `loading.tsx` generico (app)/ + por modulo: agenda, home, speakers.
+  Skeletons que mimickean el shape real (day strip, chip filters,
+  feat-cards, sp-grid, split poster + happening col) para evitar
+  layout shift entre skeleton y contenido final.
+
+**Bug UX fixed (mismo commit):**
+- Boton "Ver" / "Unirme" en RoomCard del Home LiveState no tenia
+  `onClick`. Ahora `has_stream=true` → `/session-stream/{id}`, sin stream
+  → `/agenda?highlight={id}`. Toda la card es clickeable + el boton
+  stopPropaga. UX consistente con W.5/W.3.
+
+**Diseno UX exploratorio modulo `/live` (commit `ebf5da4` en APP EVENTOS):**
+5 demos HTML iterativos en `design/live-pill-demo/` hasta llegar a v5
+(aprobada). Concepto cerrado:
+
+- El pill "En vivo" del sidebar **navega a `/es/live`** (modulo nuevo)
+- `/es/live` = **Live Hub estilo Twitch / YouTube Live**: full canvas con
+  hero featured + side cards (live) + grid upcoming, todo con scroll
+  horizontal por seccion para fitear sin scroll vertical
+- Home LiveState se mantiene tal cual (preserva branding del cliente
+  durante el evento). NO hay redundancia conceptual: Home = identidad,
+  /live = consumo focused
+- Card pattern: poster con gradient placeholder + LIVE/countdown badge +
+  audience count + featured tag para `is_featured`. Click → stream module
+- Upcoming cards: countdown amber (rojo si <10min) + watermark
+  "PROXIMAMENTE" + fav badge si esta en agenda del usuario
+- 0 live + 0 upcoming → empty state amigable
+- 0 live + N upcoming → titulo cambia a "Por arrancar", sin badge rojo
+
+**Plan tuning push-based agendado a W.12 polish Fase 3.3:**
+- Migracion de fetchers SSR a TanStack Query con `staleTime: Infinity`
+- Socket emite eventos por modulo (`agenda:updated`, `speakers:updated`,
+  etc.) → cliente invalida queries puntuales
+- Nav esperada: <100ms siempre. Skeleton solo en very-first-load
+- Bloqueado por W.11 sockets RT
+
+**Commits del pase C (no pusheados):**
+- `eventos-web 316e099` — perf+fix: tuning navegacion webapp
+- `APP EVENTOS ebf5da4` — design+docs: live pill propuesta UX + plan tuning
+
+---
+
 ## Proxima sesion
 
-### Opciones para retomar
+### Tarea principal sugerida: implementar `/es/live` (Live Hub)
 
-1. **Commit + push** del trabajo de hoy (el usuario decide cuando)
-2. **Bug fix:** hydration mismatch en `formatTime` (1-2 horas, atacar el
-   issue del narrow non-breaking space — probablemente forzar `Intl.DateTimeFormat`
-   con opcion explicita o normalizar el output)
-3. **Tests E2E avanzados:**
-   - W.4 paneles socket (chat send + Q&A upvote + poll vote) — requiere
-     levantar socket.io server stub
-   - Component happy-DOM tests (SpeakersView preopen, AgendaView highlight
-     initializer) — requieren setup React Testing Library
-4. **Nuevo modulo W.x:** networking, social, sponsors, etc. segun roadmap
+Demo aprobado en `design/live-pill-demo/v5-hub-compact.html`. Implementacion
+estimada ~2-3h:
+
+1. Crear modulo `app/[locale]/(app)/live/page.tsx` con SSR fetch de
+   `fetchHappeningNow(eventId)` + un nuevo `fetchUpNext(eventId)` o
+   derivar de `fetchAgenda` filtrando por `start > serverTime`
+2. Componente `LiveHubView.tsx` con grid `auto / 1fr / 1fr` (header +
+   live row + upcoming row), scroll horizontal por seccion
+3. `LiveCard.tsx` (con variantes `featured` / `bg-1/2/3`) +
+   `UpcomingCard.tsx` (con countdown badge + fav badge)
+4. Wirear pill "En vivo" del sidebar a `/es/live`. State del pill:
+   0 live + 0 upcoming → disabled; 1 live → nav directa al stream
+   con tooltip; N live → nav a /live; 0 live + N upcoming → pill amber
+5. Endpoint `fetchUpNext` o doc en BACKEND-API-MAP que `/happening-now`
+   incluya tambien `next_sessions: [...]` (cross-team con backend)
+6. Skeleton `loading.tsx` matcheando el shape del hub
+
+### Opciones alternativas para retomar
+
+1. **Commit + push** del trabajo de hoy (3 commits sin pushear)
+2. **Bug fix:** hydration mismatch en `formatTime` — probablemente
+   normalizar U+202F via wrapper o forzar formato explicito
+3. **Tests E2E avanzados:** W.4 paneles socket (requiere socket.io
+   stub) + component happy-DOM tests
+4. **Nuevo modulo W.x:** networking / social / sponsors segun roadmap
 5. **Atacar pendientes paralelos:** featured/keynote como flags reales,
-   threshold avg_rating, mobile parity portar highlight a Expo, analytics
-   tracking, errores 82-91 en `design/ERRORES/`
+   mobile parity highlight a Expo, errores 82-91, analytics tracking
 
 **Para arrancar diga:** "siguiente" o el modulo concreto a atacar.
 
-### Decisiones cerradas (no preguntar de nuevo)
+### Decisiones cerradas hoy (pase C, no preguntar de nuevo)
+
+- **`/live` se mantiene como modulo separado** (no se fusiona con Home).
+  Razon: Home preserva branding del cliente durante live; /live es
+  consumo focused. No hay conflicto conceptual.
+- **Live Hub layout:** full canvas con scroll horizontal por seccion
+  (live row + upcoming row), no popover. Demo v5 aprobado.
+- **Pill "En vivo" comportamiento:** 0 live + 0 next → disabled;
+  1 live + 0 next → nav directa al stream con tooltip; N live → nav
+  a /live; 0 live + N next → pill amber con badge contador.
+- **TanStack Query con socket invalidation es el modelo objetivo**
+  pero requiere W.11. Mientras tanto, `staleTimes` 5min/30min como parche.
+- **Featured con `is_featured`** del backend para hero del Live Hub.
+  Backend ya expone el flag en HappeningSession.
+
+### Decisiones cerradas previas (no preguntar de nuevo)
 
 - E2E corre en puerto 3100 (separado del dev del usuario en 3000)
 - mockBackend en 8101 reemplaza Laragon durante tests
