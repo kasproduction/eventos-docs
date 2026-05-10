@@ -66,6 +66,19 @@
 
 ### Opciones para retomar (elegir una)
 
+0. **[BLOCKER founder] Responsive intermedio — desktop angosto / split-screen**
+   El usuario en split-screen 50/50 cae en viewport 683-960px (mitad de
+   monitor 1366 o 1920), que matchea el media query del `TabletRotateOverlay`
+   (`640-1023 + portrait`) → ve "voltea tu tablet" en su laptop. Plan:
+   - **Paso 1 (5 min)**: agregar `(pointer: coarse)` al media query del
+     overlay en `src/components/auth/TabletRotateOverlay.tsx`. Asi solo
+     dispara en touchscreens reales, no en desktop con ventana angosta.
+   - **Paso 2 (1-2h)**: modo "compact desktop" para viewport 640-1023 +
+     pointer fine. Custom variant `compact-desktop` en globals.css.
+     Sidebar pill 52→44px, CanvasCard sin clamp 1600 (toma todo el
+     ancho util), stage padding 24→16px, module headers 22→18px.
+     Auditar W.2/W.3/W.4/W.5/W.10 con container queries (W.10 y agenda
+     ya tienen, falta resto).
 1. **Subir thumbnails reales en Filament para /live** — validar el flujo
    completo end-to-end con imagenes 16:9 reales del cliente. Verifica que
    la API `thumbnail_url` se renderiza bien sobre las cards (sin grain
