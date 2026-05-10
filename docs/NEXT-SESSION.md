@@ -8,171 +8,110 @@
 
 ## Ultima sesion
 
-**Fecha:** 2026-05-09 (jornada larga — 3 pases)
-**Que se hizo:** Tests retroactivos + perf tuning navegacion + exploracion UX modulo `/live`.
+**Fecha:** 2026-05-10
+**Que se hizo:** Modulo W.10 Live Hub end-to-end — backend (Filament + API + seeder) + webapp React + identidad cromatica Slate Mono + flechas carousel speakers + skeleton fix + tests.
 
-**Infra E2E nueva:**
-- `mockBackend.mjs` Node http minimal (puerto 8101, separado de Laragon)
-- `_fixtures/data.mjs` con event/user/speakers/myRatings + agenda 10
-  sesiones (2 dias) + happening-now + 3 estados de recap
-- `mockAuth.ts` setAuthCookie helper (cookie tagueada permite variar
-  scenarios via bearer match en el mock)
-- `playwright.config.ts` con 2 webServers (mock 8101 + dev 3100)
+### Backend (eventos-backend, branch feature/magic-link-auth)
+- Migration `add_thumbnail_path_to_event_sessions` — string(500) nullable
+- Filament FileUpload con `imageEditor()` + crop 16:9 + max 3MB en seccion Streaming
+- Accessor `thumbnail_url` derivado de `Storage::disk('public')` en EventSession model
+- API expone `thumbnail_url` en EventSessionResource (agenda) + HappeningNowController (home + W.10)
+- LiveHubDemoSeeder: 3 lives + 6 upcoming relativas a `now()` para QA del hub
 
-**E2E retroactivos (51 tests nuevos):**
-- W.5 Speakers (14): SSR auth, search ⌘K, panel detail, stars, LinkedIn
-  condicional, rating 200/409/500, click sesion → highlight, deep link, Esc
-- W.3 Agenda (16): days strip, tabs, chips, search por speaker, click
-  card → DetailPanel, favorite optimistic 200/500, rate session past,
-  highlight pulse `?highlight=X` con switch dia + clear class + clear URL
-- W.4 Streaming (9): live/replay/empty player, badge En vivo/Grabacion,
-  about session, rating + auto-prompt en replay, mobile shell
-- W.2 Home (6): 3 estados pre/live/ended + 3 variantes de recap
-  (available/not-eligible/disabled) via bearer-tag
+### Webapp (eventos-web, main)
+- `src/app/[locale]/(app)/live/{page,loading}.tsx` — SSR con Promise.all([happeningNow, upNext])
+- `src/lib/live.ts` — `fetchUpNext` deriva de agenda filtrando `start > server_time`, limit 8
+- 4 componentes: `LiveHubView` + `LiveHero` + `LiveSideCard` + `UpcomingCard`
+- `live.css` — namespace `.live-root`, container queries 1400/1100, lux overrides extensivos
+- SidebarPill: `/live` ahora `available: true`. Quitados los dot pulse del item live (preferencia usuario)
+- `(app)/loading.tsx` minimal — solo CanvasCard semi-transparente, sin shapes que sugieran layout (evita "doble salto" entre skeleton generico y especifico)
 
-**Vitest nuevos (15 tests):**
-- `tests/lib/speakersClient.test.ts` — rateSpeakerRequest 200/409/422/fallback
-  + fetchMySpeakerRatingsClient con map conversion
-- `tests/lib/agendaClient.test.ts` — toggleFavoriteRequest, rateSessionRequest,
-  fetchMyRatings con shape + status checks
+### Identidad cromatica final: Slate Mono (despues de 6 paletas exploradas en v8-paletas.html)
+- Tokens GLOBALES nuevos en `globals.css` (paralelos a `--accent-pair`):
+  - `--slate: #64748b` (base/firma)
+  - `--slate-light: #94a3b8`
+  - `--slate-dark: #475569`
+  - `--slate-deep: #1e293b`
+- Independientes del `--accent` dinamico del cliente — usables en cualquier modulo
+- `/live` cards: gris elevado + ring slate sutil + UN solo radial-gradient elliptical disuelto (no 3 spots concentrados que daban "pixeles muertos")
+- Sin grain SVG (artifacts en grises uniformes), sin dots pulsantes (preferencia usuario)
+- Memoria guardada: `feedback_no_pulsing_dots.md` + `project_slate_secondary.md`
 
-**Bugs reales detectados y corregidos durante los tests:**
-- `AgendaView.tsx`: `usePathname` venia de `next/navigation` (no locale-aware)
-  → al limpiar `?highlight` la URL terminaba en `/es/es/agenda`. Fix: usar
-  `usePathname` desde `@/i18n/navigation`.
-- `lib/publicEvent.ts`: `fetchPublicEvent` no enviaba bearer (endpoint publico).
-  Cambio minimo a forwardear bearer si existe — hace personalizacion posible
-  + nos da el canal de tests para variar event.status sin levantar mocks.
+### Speakers (W.5)
+- BreathingCarousel: 2 flechas flotantes left/right con backdrop-blur cuando hay overflow horizontal. Aparecen sutiles (opacity 0.55) y suben a 100% al hover del wrap. Click → scrollBy 220px smooth + detiene animacion breathing
+- Resuelve "el ultimo destacado no se ve" en desktop sin touch
 
-**Suite total:** 57 E2E + 118 vitest = **175 tests verde**.
+### Tests + QA
+- E2E `live.spec.ts`: 10 tests (auth gate + 4 estados + navegacion click → stream/agenda)
+- Vitest `tests/lib/live.test.ts`: 11 tests (filtros status, orden ASC, limit, starts_in_minutes, error handling, shape preservation)
+- mockBackend bearer-tag scenarios nuevos: `live-empty`, `live-solo`, `no-upcoming` (combinables)
+- Suite final: **129 vitest + 66 E2E = 195 tests verde** (+20 vs ayer)
+- 1 preexistente flaky en streaming.spec.ts (W.4 notFound 404 → recibe 200) — verificado con `git stash`, NO es regresion mia
 
-**Bugs descubiertos por los tests + atacados despues (2026-05-09 sesion B):**
-1. **Hydration mismatch** en `SpeakerDetailPanel`, `StreamShell`, `DetailPanel`
-   por `toLocaleTimeString("es-CO")` con `hour12=true` → V8 (Chromium/Node 22+)
-   inserta U+202F (narrow no-break space) entre la hora y el AM/PM, mientras
-   que Node anterior usa U+0020. React detecta la diferencia y warning.
-   **Fix:** nuevo helper `lib/format/time.ts` con `formatLocalTime` /
-   `formatLocalRange` / `formatLocalDate` que normaliza el output reemplazando
-   U+202F y U+00A0 con espacio regular. Reemplazadas todas las callsites.
-2. **Warning "unique key prop" en `OuterLayoutRouter`** que se disparaba en
-   TODAS las paginas. Causa: `NextIntlClientProvider` como provider mas
-   externo en `[locale]/layout.tsx` interactuaba mal con la reconciliacion
-   de Next 16 + React 19. **Fix:** reorden de providers, `NextIntlClientProvider`
-   ahora es el mas interno (envuelve a `{children}` + `LuminaToastViewport`).
-3. **Sentry "ACTION REQUIRED" warning:** agregado el hook
-   `onRouterTransitionStart` en `instrumentation-client.ts` (export requerido
-   por Sentry SDK desde Next 15 para instrumentar navegaciones).
-4. **AgendaView locale duplicado** (visto en sesion A): `usePathname` venia
-   de `next/navigation`. Cambiado a `@/i18n/navigation`. (ya estaba aplicado)
-5. **publicEvent no enviaba bearer** (visto en sesion A): cambio minimo a
-   forwardear si existe. Da contexto opcional al backend + canal de tests.
+### Iteracion visual (capturas 92-96 + 974, demos v6/v7/v8)
+- v6-hub-balanced.html: base aprobada (hero+side+upcoming, max-width responsive)
+- v7-twitch-style.html: alternativa hero centrado + row uniforme (descartada)
+- v8-paletas.html: 6 paletas exploradas (slate+bronze/sage/terracotta/teal/ochre + slate mono) → mono aprobado
 
-Suite final: **57 E2E + 118 vitest = 175 tests verde, sin hydration warnings,
-sin warnings de React.**
+### Commits (todos pusheados a remote)
+- `eventos-backend c18e3fd` (feature/magic-link-auth) — feat(live): thumbnail_path + seeder W.10
+- `eventos-web 0e185e6` (main) — feat(live): modulo W.10 + slate tokens + speakers arrows + skeleton fix + tests
+- `eventos-docs 67ff36c` (main) — design+chore: demos v6/v7/v8 + capturas iteracion
 
-**Sin commits aun.** Decision pendiente del usuario.
 
----
-
-### Pase C: Perf tuning navegacion + UX live module (2026-05-09 final)
-
-**Perf tuning aplicado (commit `316e099` en eventos-web):**
-- `React.cache()` en `getCurrentUser` + `fetchPublicEvent` para deduplicar
-  llamadas SSR duplicadas (layout + page hacian /auth/me y /events/by-slug
-  cada uno por separado en cada nav). 50% menos roundtrips a Laragon.
-- `experimental.staleTimes`: dynamic 0 → 300s (5min), static → 30min.
-  Volver a un modulo dentro de 5min es instant. **Parche temporal** hasta
-  que W.11 sockets desbloquee invalidacion push (paridad mobile).
-- `loading.tsx` generico (app)/ + por modulo: agenda, home, speakers.
-  Skeletons que mimickean el shape real (day strip, chip filters,
-  feat-cards, sp-grid, split poster + happening col) para evitar
-  layout shift entre skeleton y contenido final.
-
-**Bug UX fixed (mismo commit):**
-- Boton "Ver" / "Unirme" en RoomCard del Home LiveState no tenia
-  `onClick`. Ahora `has_stream=true` → `/session-stream/{id}`, sin stream
-  → `/agenda?highlight={id}`. Toda la card es clickeable + el boton
-  stopPropaga. UX consistente con W.5/W.3.
-
-**Diseno UX exploratorio modulo `/live` (commit `ebf5da4` en APP EVENTOS):**
-5 demos HTML iterativos en `design/live-pill-demo/` hasta llegar a v5
-(aprobada). Concepto cerrado:
-
-- El pill "En vivo" del sidebar **navega a `/es/live`** (modulo nuevo)
-- `/es/live` = **Live Hub estilo Twitch / YouTube Live**: full canvas con
-  hero featured + side cards (live) + grid upcoming, todo con scroll
-  horizontal por seccion para fitear sin scroll vertical
-- Home LiveState se mantiene tal cual (preserva branding del cliente
-  durante el evento). NO hay redundancia conceptual: Home = identidad,
-  /live = consumo focused
-- Card pattern: poster con gradient placeholder + LIVE/countdown badge +
-  audience count + featured tag para `is_featured`. Click → stream module
-- Upcoming cards: countdown amber (rojo si <10min) + watermark
-  "PROXIMAMENTE" + fav badge si esta en agenda del usuario
-- 0 live + 0 upcoming → empty state amigable
-- 0 live + N upcoming → titulo cambia a "Por arrancar", sin badge rojo
-
-**Plan tuning push-based agendado a W.12 polish Fase 3.3:**
-- Migracion de fetchers SSR a TanStack Query con `staleTime: Infinity`
-- Socket emite eventos por modulo (`agenda:updated`, `speakers:updated`,
-  etc.) → cliente invalida queries puntuales
-- Nav esperada: <100ms siempre. Skeleton solo en very-first-load
-- Bloqueado por W.11 sockets RT
-
-**Commits del pase C (no pusheados):**
-- `eventos-web 316e099` — perf+fix: tuning navegacion webapp
-- `APP EVENTOS ebf5da4` — design+docs: live pill propuesta UX + plan tuning
 
 ---
 
 ## Proxima sesion
 
-### Tarea principal sugerida: implementar `/es/live` (Live Hub)
+### Opciones para retomar (elegir una)
 
-Demo aprobado en `design/live-pill-demo/v5-hub-compact.html`. Implementacion
-estimada ~2-3h:
-
-1. Crear modulo `app/[locale]/(app)/live/page.tsx` con SSR fetch de
-   `fetchHappeningNow(eventId)` + un nuevo `fetchUpNext(eventId)` o
-   derivar de `fetchAgenda` filtrando por `start > serverTime`
-2. Componente `LiveHubView.tsx` con grid `auto / 1fr / 1fr` (header +
-   live row + upcoming row), scroll horizontal por seccion
-3. `LiveCard.tsx` (con variantes `featured` / `bg-1/2/3`) +
-   `UpcomingCard.tsx` (con countdown badge + fav badge)
-4. Wirear pill "En vivo" del sidebar a `/es/live`. State del pill:
-   0 live + 0 upcoming → disabled; 1 live → nav directa al stream
-   con tooltip; N live → nav a /live; 0 live + N upcoming → pill amber
-5. Endpoint `fetchUpNext` o doc en BACKEND-API-MAP que `/happening-now`
-   incluya tambien `next_sessions: [...]` (cross-team con backend)
-6. Skeleton `loading.tsx` matcheando el shape del hub
-
-### Opciones alternativas para retomar
-
-1. **Commit + push** del trabajo de hoy (3 commits sin pushear)
-2. **Bug fix:** hydration mismatch en `formatTime` — probablemente
-   normalizar U+202F via wrapper o forzar formato explicito
-3. **Tests E2E avanzados:** W.4 paneles socket (requiere socket.io
-   stub) + component happy-DOM tests
-4. **Nuevo modulo W.x:** networking / social / sponsors segun roadmap
-5. **Atacar pendientes paralelos:** featured/keynote como flags reales,
-   mobile parity highlight a Expo, errores 82-91, analytics tracking
+1. **Subir thumbnails reales en Filament para /live** — validar el flujo
+   completo end-to-end con imagenes 16:9 reales del cliente. Verifica que
+   la API `thumbnail_url` se renderiza bien sobre las cards (sin grain
+   ahora, sin artifacts). 30 min.
+2. **Bug fix W.4 streaming `notFound 404`** — test E2E preexistente flaky
+   (recibe 200 en lugar de 404). Probable: Next.js 16 + Turbopack devuelve
+   200 con la pagina not-found.tsx renderizada. Investigar si es bug
+   nuestro o limitacion del runtime. ~1h.
+3. **Nuevo modulo W.x** — siguientes en backlog del roadmap:
+   - W.6 Networking (matchmaking, lista de asistentes, contactos)
+   - W.7 Social wall (feed unificado)
+   - W.8 Sponsors (brand wall + brand profile)
+4. **Tests avanzados** — W.4 paneles socket (requiere socket.io stub) +
+   component happy-DOM tests para AgendaView highlight init / SpeakersView
+   preopen.
+5. **Mobile parity Expo** — portar las decisiones nuevas al app movil:
+   click sesion → agenda highlight, slate tokens (si aplica al mobile),
+   skeleton matcheado.
+6. **Pendientes design backlog** — errores 82-91 en `design/ERRORES/`
+   (capturas de iteracion sin revisar) + analytics tracking events
+   speakers/agenda.
 
 **Para arrancar diga:** "siguiente" o el modulo concreto a atacar.
 
-### Decisiones cerradas hoy (pase C, no preguntar de nuevo)
+### Decisiones cerradas hoy (2026-05-10, no preguntar de nuevo)
 
-- **`/live` se mantiene como modulo separado** (no se fusiona con Home).
-  Razon: Home preserva branding del cliente durante live; /live es
-  consumo focused. No hay conflicto conceptual.
-- **Live Hub layout:** full canvas con scroll horizontal por seccion
-  (live row + upcoming row), no popover. Demo v5 aprobado.
-- **Pill "En vivo" comportamiento:** 0 live + 0 next → disabled;
-  1 live + 0 next → nav directa al stream con tooltip; N live → nav
-  a /live; 0 live + N next → pill amber con badge contador.
-- **TanStack Query con socket invalidation es el modelo objetivo**
-  pero requiere W.11. Mientras tanto, `staleTimes` 5min/30min como parche.
-- **Featured con `is_featured`** del backend para hero del Live Hub.
-  Backend ya expone el flag en HappeningSession.
+- **Identidad del modulo `/live` = Slate Mono.** Sin acento secundario,
+  solo niveles de slate (#475569/#64748b/#94a3b8) + rojo del badge LIVE.
+  Razon: las paletas con acento secundario (bronze/sage/teal/etc.)
+  competian con el badge rojo o sentian "comerciales". Mono es DaVinci.
+- **Slate como secondary global del sistema** (paralelo a `--accent-pair`).
+  Tokens en `globals.css`: `--slate`, `--slate-light`, `--slate-dark`,
+  `--slate-deep`. Independiente del `--accent` dinamico del cliente.
+  Usable en cualquier modulo cuando branding del cliente no debe dominar.
+- **NO usar dots pulsantes** en ningun modulo. Preferencia general del
+  usuario. Color/iconografia bastan para indicar estado live/activo.
+  Memoria: `feedback_no_pulsing_dots.md`. Aplicado en /live + sidebar pill.
+- **Placeholders de cards = un solo radial-gradient elliptical disuelto,
+  no 3 spots concentrados.** Los 3 spots daban "pixeles muertos" (color
+  banding visible). Tampoco grain SVG (artifacts en grises uniformes).
+- **Loading skeleton (app)/ debe ser MINIMAL** (CanvasCard semi-transp
+  sin shapes). Si tiene shape especifico, genera "doble salto" entre el
+  generico y el del modulo. Cada modulo mantiene su loading.tsx propio.
+- **Carousels en desktop deben tener flechas flotantes** cuando hay
+  overflow horizontal. Touch alone no basta para usuarios sin touch.
+  Aplicado en BreathingCarousel del W.5 Speakers.
 
 ### Decisiones cerradas previas (no preguntar de nuevo)
 
@@ -193,9 +132,16 @@ estimada ~2-3h:
 
 ## Pendientes paralelos
 
-**Tests pendientes (out of scope hoy):**
+**Tests pendientes:**
 - W.4 paneles interactivos (chat/Q&A/polls) — requieren socket.io server stub
 - Component happy-DOM tests para AgendaView highlight initializer + SpeakersView preopen
+- **NUEVO** Bug E2E W.4 streaming `notFound 404` → recibe 200 (pre-existente,
+  posiblemente Next.js 16 + Turbopack devuelve la pagina not-found.tsx con 200)
+
+**W.10 Live Hub validacion visual:**
+- Subir thumbnails reales desde Filament para validar el flujo completo
+  end-to-end (placeholders gradient solos no validan que las imagenes
+  reales se vean bien con el sistema slate)
 
 **Bugs detectados (todos cerrados 2026-05-09):**
 - ~~Hydration mismatch formatTime/formatRange~~ → fixed via `lib/format/time.ts`
