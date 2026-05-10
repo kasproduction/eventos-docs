@@ -71,7 +71,29 @@
 
 ## Proxima sesion
 
-### Opciones para retomar (elegir una)
+### Tarea principal sugerida — **W.6 Networking**
+
+Es el siguiente modulo natural del roadmap webapp. Despues de hoy
+(W.10 cerrado, agenda con bug fix, CI verde), el shell W.0 esta
+estable y listo para alojar otro modulo top-level. Plan:
+
+1. **Investigar primero**: leer endpoints backend `/networking/*` ya
+   expuestos (matchmaking suggestions, interests, conexiones). Ver
+   `project_networking_notes.md` y `project_s118_notes.md` en memoria.
+2. **Espejo Expo**: revisar `eventos-app/components/screens/Networking*`
+   para mantener parity de comportamiento (filtros, tarjetas, intereses).
+3. **UI**: lista de asistentes con filtros (intereses + tracks) +
+   perfil del contacto + accept/reject conexiones. Glass tokens
+   existentes + slate secondary del sistema.
+4. **Tests**: vitest del derive + E2E de navegacion + 4 estados
+   (lista vacia, sin matches, con matches, perfil abierto).
+
+Estimado: ~3-5h.
+
+**Para arrancar diga:** "siguiente" → leeo este doc y arranco con W.6
+directo, o decime un numero de la lista de abajo si preferis otro.
+
+### Otras opciones (alternativas)
 
 1. **Nuevo modulo W.6 Networking** — siguiente natural del roadmap.
    Backend ya expone ~197 endpoints listos (matchmaking, intereses,
