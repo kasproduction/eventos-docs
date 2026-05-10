@@ -540,7 +540,13 @@
       "Bash(pnpm test:e2e --project=chromium --reporter=list \"e2e/home.spec.ts:34\")",
       "Bash(pnpm test:e2e --project=chromium --reporter=list \"e2e/home.spec.ts:111\")",
       "Bash(DEBUG=react* node -e \"console.log\\('Need to actually run the app to catch warning'\\)\")",
-      "Bash(pnpm test:e2e --project=chromium --reporter=list _temp-warning-capture)"
+      "Bash(pnpm test:e2e --project=chromium --reporter=list _temp-warning-capture)",
+      "Bash(pnpm start *)",
+      "Skill(cerrar-sesion)",
+      "Bash(pnpm test:e2e -- live.spec.ts)",
+      "Bash(pnpm test:e2e)",
+      "Bash(pnpm test:e2e -- streaming.spec.ts -g \"session id no existe\")",
+      "Bash(pnpm test:e2e -- speakers.spec.ts)"
     ]
   }
 }

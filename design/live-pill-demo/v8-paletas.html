@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Paletas Live Hub — slate blue + complementos</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --surface: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.18);
+    --text: #ededf0;
+    --text-dim: #a8a8a3;
+    --text-mute: #767680;
+    --live-red: #ef4444;
+    --amber: #f5b942;
+  }
+  body[data-mode="lux"] {
+    --bg: #f5f5f7;
+    --surface: rgba(0,0,0,0.03);
+    --border: rgba(0,0,0,0.10);
+    --border-strong: rgba(0,0,0,0.18);
+    --text: #1a1b1e;
+    --text-dim: #4a4b50;
+    --text-mute: #7c7d82;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 32px 40px 80px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+  .subtitle { margin-top: 4px; font-size: 12px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; }
+
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .toggle {
+    display: inline-flex; gap: 4px; padding: 4px;
+    border: 1px solid var(--border); border-radius: 999px;
+    background: var(--surface);
+  }
+  .toggle button {
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    color: var(--text-mute);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: all 0.15s ease;
+  }
+  .toggle button.active {
+    background: var(--text);
+    color: var(--bg);
+  }
+
+  /* ── Paleta panel ──────────────────────────────────────────────────── */
+
+  .paleta {
+    margin-bottom: 56px;
+    padding-bottom: 36px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .paleta:last-child { border-bottom: none; }
+  .paleta-head {
+    display: flex; align-items: baseline; gap: 18px;
+    margin-bottom: 20px;
+  }
+  .paleta-head h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+  .paleta-head .num {
+    font-size: 11px;
+    color: var(--text-mute);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+  .paleta-head .mood {
+    flex: 1;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  /* Swatches */
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .swatch {
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .swatch .chip {
+    height: 60px;
+    border-bottom: 1px solid var(--border);
+  }
+  .swatch .meta {
+    padding: 8px 10px 10px;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+  .swatch .name {
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .swatch .hex {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--text-mute);
+  }
+
+  /* Cards ejemplo */
+  .examples {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  .examples-up {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  /* Card LIVE (hero size). Tokens locales por paleta:
+     --c-live, --c-live-bg, --c-live-spot1, --c-live-spot2 = card vivo
+     --c-up,   --c-up-bg                                   = card upcoming
+     --c-accent, --c-accent-soft                           = badge fav, countdown */
+  .card-live {
+    position: relative;
+    aspect-ratio: 16/9;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--c-live-bg);
+    border: 1px solid color-mix(in srgb, var(--c-live) 18%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 6px 18px rgba(0,0,0,0.3);
+  }
+  body[data-mode="lux"] .card-live {
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 14px rgba(15,23,42,0.06);
+  }
+  .card-live .poster {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(at 18% 22%, color-mix(in srgb, var(--c-live) 28%, transparent) 0%, transparent 42%),
+      radial-gradient(at 82% 58%, color-mix(in srgb, var(--c-live) 14%, transparent) 0%, transparent 50%),
+      radial-gradient(at 35% 92%, color-mix(in srgb, var(--c-live) 10%, transparent) 0%, transparent 38%),
+      var(--c-live-grad);
+  }
+  body[data-mode="lux"] .card-live .poster {
+    background:
+      radial-gradient(at 18% 22%, color-mix(in srgb, var(--c-live) 18%, transparent) 0%, transparent 42%),
+      radial-gradient(at 82% 58%, color-mix(in srgb, var(--c-live) 9%, transparent) 0%, transparent 50%),
+      radial-gradient(at 35% 92%, color-mix(in srgb, var(--c-live) 6%, transparent) 0%, transparent 38%),
+      var(--c-live-grad-lux);
+  }
+  .card-live .grain {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.7'/></svg>");
+    background-size: 220px 220px;
+    opacity: 0.07;
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+  }
+  body[data-mode="lux"] .card-live .grain { opacity: 0.04; }
+  .card-live .gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.85) 100%);
+  }
+  body[data-mode="lux"] .card-live .gradient {
+    background: linear-gradient(180deg, transparent 50%, rgba(15,23,42,0.78) 100%);
+  }
+  .card-live .top {
+    position: absolute; top: 12px; left: 12px; right: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .badge-live {
+    display: inline-flex; align-items: center;
+    padding: 4px 9px;
+    background: var(--live-red);
+    color: #fff;
+    font-size: 9px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    border-radius: 999px;
+  }
+  .badge-room {
+    padding: 4px 9px;
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    backdrop-filter: blur(8px);
+    font-size: 9px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    border-radius: 999px;
+  }
+  .card-live .info {
+    position: absolute; left: 14px; right: 14px; bottom: 12px;
+    color: #fff;
+  }
+  .card-live .room {
+    font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.16em;
+    color: rgba(255,255,255,0.78);
+    margin-bottom: 4px;
+  }
+  .card-live h3 {
+    margin: 0 0 4px;
+    font-size: 15px; font-weight: 800;
+    line-height: 1.18;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.6);
+  }
+  .card-live .speaker {
+    font-size: 10px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* Card UPCOMING */
+  .card-up {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--c-up-bg);
+    display: flex; flex-direction: column;
+  }
+  .card-up .poster-wrap {
+    position: relative;
+    aspect-ratio: 16/9;
+    background:
+      radial-gradient(at 25% 22%, color-mix(in srgb, var(--c-up) 8%, transparent) 0%, transparent 42%),
+      radial-gradient(at 80% 78%, color-mix(in srgb, var(--c-up) 4%, transparent) 0%, transparent 45%),
+      var(--c-up-grad);
+  }
+  body[data-mode="lux"] .card-up .poster-wrap {
+    background:
+      radial-gradient(at 25% 22%, color-mix(in srgb, var(--c-up) 6%, transparent) 0%, transparent 42%),
+      radial-gradient(at 80% 78%, color-mix(in srgb, var(--c-up) 3%, transparent) 0%, transparent 45%),
+      var(--c-up-grad-lux);
+  }
+  .card-up .poster-wrap::after {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.7'/></svg>");
+    background-size: 180px 180px;
+    opacity: 0.06;
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+  }
+  body[data-mode="lux"] .card-up .poster-wrap::after { opacity: 0.04; }
+  .card-up .countdown {
+    position: absolute; top: 8px; left: 8px;
+    padding: 3px 8px;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(8px);
+    color: var(--c-accent);
+    font-size: 9px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    border-radius: 999px;
+  }
+  .card-up .fav {
+    position: absolute; top: 8px; right: 8px;
+    padding: 3px 7px;
+    background: color-mix(in srgb, var(--c-accent) 28%, transparent);
+    color: color-mix(in srgb, var(--c-accent) 80%, #fff);
+    border: 1px solid color-mix(in srgb, var(--c-accent) 22%, transparent);
+    font-size: 8px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    border-radius: 5px;
+    backdrop-filter: blur(6px);
+  }
+  body[data-mode="lux"] .card-up .fav {
+    background: color-mix(in srgb, var(--c-accent) 14%, transparent);
+    color: color-mix(in srgb, var(--c-accent) 75%, #000);
+    border-color: color-mix(in srgb, var(--c-accent) 18%, transparent);
+  }
+  .card-up .info {
+    padding: 10px 12px 12px;
+  }
+  .card-up .room {
+    font-size: 8px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: color-mix(in srgb, var(--c-accent) 80%, #fff);
+    margin-bottom: 3px;
+  }
+  body[data-mode="lux"] .card-up .room {
+    color: color-mix(in srgb, var(--c-accent) 70%, #000);
+  }
+  .card-up h4 {
+    margin: 0 0 3px;
+    font-size: 12px; font-weight: 700;
+    line-height: 1.25;
+    color: var(--text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-up .speaker {
+    font-size: 10px;
+    color: var(--text-mute);
+  }
+
+  /* ─────────────────── PALETAS ─────────────────── */
+
+  /* 1. SLATE + BRONZE — frio & calido editorial */
+  .p1 {
+    --c-live: #64748b;
+    --c-live-bg: #1a1d20;
+    --c-live-grad: linear-gradient(160deg, #1c1f23 0%, #15171a 60%, #0d0f12 100%);
+    --c-live-grad-lux: linear-gradient(160deg, #f0f2f4 0%, #e6e8ec 60%, #d8dbe1 100%);
+    --c-up: #64748b;
+    --c-up-bg: #141618;
+    --c-up-grad: linear-gradient(140deg, #1a1d20 0%, #131517 60%, #0c0d0f 100%);
+    --c-up-grad-lux: linear-gradient(140deg, #ebedf0 0%, #e0e3e8 60%, #d3d7dd 100%);
+    --c-accent: #b08d57; /* bronze */
+  }
+  body[data-mode="lux"] .p1 {
+    --c-live-bg: #fafafa;
+    --c-up-bg: #f3f4f6;
+    --c-live: #475569;
+    --c-up: #475569;
+    --c-accent: #8e6f3e;
+  }
+
+  /* 2. SLATE + SAGE — frio & verde tierra */
+  .p2 {
+    --c-live: #64748b;
+    --c-live-bg: #1a1d20;
+    --c-live-grad: linear-gradient(160deg, #1c1f23 0%, #15171a 60%, #0d0f12 100%);
+    --c-live-grad-lux: linear-gradient(160deg, #f0f2f4 0%, #e6e8ec 60%, #d8dbe1 100%);
+    --c-up: #64748b;
+    --c-up-bg: #141618;
+    --c-up-grad: linear-gradient(140deg, #1a1d20 0%, #131517 60%, #0c0d0f 100%);
+    --c-up-grad-lux: linear-gradient(140deg, #ebedf0 0%, #e0e3e8 60%, #d3d7dd 100%);
+    --c-accent: #8a9a5b; /* sage */
+  }
+  body[data-mode="lux"] .p2 {
+    --c-live-bg: #fafafa;
+    --c-up-bg: #f3f4f6;
+    --c-live: #475569;
+    --c-up: #475569;
+    --c-accent: #6b7a45;
+  }
+
+  /* 3. SLATE + TERRACOTTA — frio & calido sereno */
+  .p3 {
+    --c-live: #64748b;
+    --c-live-bg: #1a1d20;
+    --c-live-grad: linear-gradient(160deg, #1c1f23 0%, #15171a 60%, #0d0f12 100%);
+    --c-live-grad-lux: linear-gradient(160deg, #f0f2f4 0%, #e6e8ec 60%, #d8dbe1 100%);
+    --c-up: #64748b;
+    --c-up-bg: #141618;
+    --c-up-grad: linear-gradient(140deg, #1a1d20 0%, #131517 60%, #0c0d0f 100%);
+    --c-up-grad-lux: linear-gradient(140deg, #ebedf0 0%, #e0e3e8 60%, #d3d7dd 100%);
+    --c-accent: #c97f5d; /* terracotta */
+  }
+  body[data-mode="lux"] .p3 {
+    --c-live-bg: #fafafa;
+    --c-up-bg: #f3f4f6;
+    --c-live: #475569;
+    --c-up: #475569;
+    --c-accent: #a3624b;
+  }
+
+  /* 4. SLATE + TEAL — analogo, monocromatico sofisticado */
+  .p4 {
+    --c-live: #64748b;
+    --c-live-bg: #1a1d20;
+    --c-live-grad: linear-gradient(160deg, #1c1f23 0%, #15171a 60%, #0d0f12 100%);
+    --c-live-grad-lux: linear-gradient(160deg, #f0f2f4 0%, #e6e8ec 60%, #d8dbe1 100%);
+    --c-up: #64748b;
+    --c-up-bg: #141618;
+    --c-up-grad: linear-gradient(140deg, #1a1d20 0%, #131517 60%, #0c0d0f 100%);
+    --c-up-grad-lux: linear-gradient(140deg, #ebedf0 0%, #e0e3e8 60%, #d3d7dd 100%);
+    --c-accent: #4d8e8a; /* teal sutil */
+  }
+  body[data-mode="lux"] .p4 {
+    --c-live-bg: #fafafa;
+    --c-up-bg: #f3f4f6;
+    --c-live: #475569;
+    --c-up: #475569;
+    --c-accent: #386b68;
+  }
+
+  /* 5. SLATE + OCHRE — frio & dorado discreto */
+  .p5 {
+    --c-live: #64748b;
+    --c-live-bg: #1a1d20;
+    --c-live-grad: linear-gradient(160deg, #1c1f23 0%, #15171a 60%, #0d0f12 100%);
+    --c-live-grad-lux: linear-gradient(160deg, #f0f2f4 0%, #e6e8ec 60%, #d8dbe1 100%);
+    --c-up: #64748b;
+    --c-up-bg: #141618;
+    --c-up-grad: linear-gradient(140deg, #1a1d20 0%, #131517 60%, #0c0d0f 100%);
+    --c-up-grad-lux: linear-gradient(140deg, #ebedf0 0%, #e0e3e8 60%, #d3d7dd 100%);
+    --c-accent: #b08838; /* ochre */
+  }
+  body[data-mode="lux"] .p5 {
+    --c-live-bg: #fafafa;
+    --c-up-bg: #f3f4f6;
+    --c-live: #475569;
+    --c-up: #475569;
+    --c-accent: #876829;
+  }
+
+  /* 6. SLATE MONO — sin acento secundario, solo niveles slate */
+  .p6 {
+    --c-live: #64748b;
+    --c-live-bg: #1a1d20;
+    --c-live-grad: linear-gradient(160deg, #1c1f23 0%, #15171a 60%, #0d0f12 100%);
+    --c-live-grad-lux: linear-gradient(160deg, #f0f2f4 0%, #e6e8ec 60%, #d8dbe1 100%);
+    --c-up: #94a3b8; /* slate-light para upcoming */
+    --c-up-bg: #141618;
+    --c-up-grad: linear-gradient(140deg, #1a1d20 0%, #131517 60%, #0c0d0f 100%);
+    --c-up-grad-lux: linear-gradient(140deg, #ebedf0 0%, #e0e3e8 60%, #d3d7dd 100%);
+    --c-accent: #94a3b8; /* slate-light, mismo que --c-up */
+  }
+  body[data-mode="lux"] .p6 {
+    --c-live-bg: #fafafa;
+    --c-up-bg: #f3f4f6;
+    --c-live: #475569;
+    --c-up: #64748b;
+    --c-accent: #64748b;
+  }
+</style>
+</head>
+<body data-mode="dark">
+
+<div class="toolbar">
+  <div>
+    <h1>Paletas Live Hub W.10</h1>
+    <div class="subtitle">slate blue + acento secundario · 6 opciones</div>
+  </div>
+  <div class="toggle">
+    <button class="active" data-mode="dark">Noir</button>
+    <button data-mode="lux">Lux</button>
+  </div>
+</div>
+
+<!-- ─────────────── PALETA 1: SLATE + BRONZE ─────────────── -->
+<section class="paleta p1">
+  <div class="paleta-head">
+    <h2>Slate + Bronze</h2>
+    <div class="num">01</div>
+    <div class="mood">Editorial cálido. El bronze vibra con el slate como metal sobre piedra. Tonos sobrios, prestigio sin gritar.</div>
+  </div>
+  <div class="swatches">
+    <div class="swatch"><div class="chip" style="background:#64748b"></div><div class="meta"><div class="name">Slate</div><div class="hex">#64748b</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#1a1d20"></div><div class="meta"><div class="name">Card live</div><div class="hex">#1a1d20</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#141618"></div><div class="meta"><div class="name">Card up</div><div class="hex">#141618</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#b08d57"></div><div class="meta"><div class="name">Bronze</div><div class="hex">#b08d57</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#ef4444"></div><div class="meta"><div class="name">Live red</div><div class="hex">#ef4444</div></div></div>
+  </div>
+  <div class="examples">
+    <div class="card-live">
+      <div class="poster"></div>
+      <div class="grain"></div>
+      <div class="gradient"></div>
+      <div class="top">
+        <span class="badge-live">En vivo</span>
+        <span class="badge-room">Sala principal</span>
+      </div>
+      <div class="info">
+        <div class="room">Auditorio Principal</div>
+        <h3>Keynote: Banca digital en LatAm</h3>
+        <div class="speaker">Maria Garcia · Bancolombia</div>
+      </div>
+    </div>
+    <div></div>
+  </div>
+  <div class="examples-up">
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 8 MIN</span>
+        <span class="fav">Tu agenda</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 3</div>
+        <h4>Demo: Real estate proptech</h4>
+        <div class="speaker">Jorge Vasquez</div>
+      </div>
+    </div>
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 22 MIN</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 1</div>
+        <h4>Charla: Cultura de innovacion</h4>
+        <div class="speaker">Maria Garcia</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── PALETA 2: SLATE + SAGE ─────────────── -->
+<section class="paleta p2">
+  <div class="paleta-head">
+    <h2>Slate + Sage</h2>
+    <div class="num">02</div>
+    <div class="mood">Frío + verde tierra. Natural, calmo. Inspira "convencion respetuosa" — slate corporate + sage organico.</div>
+  </div>
+  <div class="swatches">
+    <div class="swatch"><div class="chip" style="background:#64748b"></div><div class="meta"><div class="name">Slate</div><div class="hex">#64748b</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#1a1d20"></div><div class="meta"><div class="name">Card live</div><div class="hex">#1a1d20</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#141618"></div><div class="meta"><div class="name">Card up</div><div class="hex">#141618</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#8a9a5b"></div><div class="meta"><div class="name">Sage</div><div class="hex">#8a9a5b</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#ef4444"></div><div class="meta"><div class="name">Live red</div><div class="hex">#ef4444</div></div></div>
+  </div>
+  <div class="examples">
+    <div class="card-live">
+      <div class="poster"></div>
+      <div class="grain"></div>
+      <div class="gradient"></div>
+      <div class="top">
+        <span class="badge-live">En vivo</span>
+        <span class="badge-room">Sala principal</span>
+      </div>
+      <div class="info">
+        <div class="room">Auditorio Principal</div>
+        <h3>Keynote: Banca digital en LatAm</h3>
+        <div class="speaker">Maria Garcia · Bancolombia</div>
+      </div>
+    </div>
+    <div></div>
+  </div>
+  <div class="examples-up">
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 8 MIN</span>
+        <span class="fav">Tu agenda</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 3</div>
+        <h4>Demo: Real estate proptech</h4>
+        <div class="speaker">Jorge Vasquez</div>
+      </div>
+    </div>
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 22 MIN</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 1</div>
+        <h4>Charla: Cultura de innovacion</h4>
+        <div class="speaker">Maria Garcia</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── PALETA 3: SLATE + TERRACOTTA ─────────────── -->
+<section class="paleta p3">
+  <div class="paleta-head">
+    <h2>Slate + Terracotta</h2>
+    <div class="num">03</div>
+    <div class="mood">Cálido sereno. Terracotta como atardecer mediterráneo, no agresivo como rojo. Editorial gastronomico.</div>
+  </div>
+  <div class="swatches">
+    <div class="swatch"><div class="chip" style="background:#64748b"></div><div class="meta"><div class="name">Slate</div><div class="hex">#64748b</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#1a1d20"></div><div class="meta"><div class="name">Card live</div><div class="hex">#1a1d20</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#141618"></div><div class="meta"><div class="name">Card up</div><div class="hex">#141618</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#c97f5d"></div><div class="meta"><div class="name">Terracotta</div><div class="hex">#c97f5d</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#ef4444"></div><div class="meta"><div class="name">Live red</div><div class="hex">#ef4444</div></div></div>
+  </div>
+  <div class="examples">
+    <div class="card-live">
+      <div class="poster"></div>
+      <div class="grain"></div>
+      <div class="gradient"></div>
+      <div class="top">
+        <span class="badge-live">En vivo</span>
+        <span class="badge-room">Sala principal</span>
+      </div>
+      <div class="info">
+        <div class="room">Auditorio Principal</div>
+        <h3>Keynote: Banca digital en LatAm</h3>
+        <div class="speaker">Maria Garcia · Bancolombia</div>
+      </div>
+    </div>
+    <div></div>
+  </div>
+  <div class="examples-up">
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 8 MIN</span>
+        <span class="fav">Tu agenda</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 3</div>
+        <h4>Demo: Real estate proptech</h4>
+        <div class="speaker">Jorge Vasquez</div>
+      </div>
+    </div>
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 22 MIN</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 1</div>
+        <h4>Charla: Cultura de innovacion</h4>
+        <div class="speaker">Maria Garcia</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── PALETA 4: SLATE + TEAL ─────────────── -->
+<section class="paleta p4">
+  <div class="paleta-head">
+    <h2>Slate + Teal</h2>
+    <div class="num">04</div>
+    <div class="mood">Análogos fríos. Mono-cool, sofisticado. Linear/Vercel-style. Identidad tech minimal.</div>
+  </div>
+  <div class="swatches">
+    <div class="swatch"><div class="chip" style="background:#64748b"></div><div class="meta"><div class="name">Slate</div><div class="hex">#64748b</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#1a1d20"></div><div class="meta"><div class="name">Card live</div><div class="hex">#1a1d20</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#141618"></div><div class="meta"><div class="name">Card up</div><div class="hex">#141618</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#4d8e8a"></div><div class="meta"><div class="name">Teal</div><div class="hex">#4d8e8a</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#ef4444"></div><div class="meta"><div class="name">Live red</div><div class="hex">#ef4444</div></div></div>
+  </div>
+  <div class="examples">
+    <div class="card-live">
+      <div class="poster"></div>
+      <div class="grain"></div>
+      <div class="gradient"></div>
+      <div class="top">
+        <span class="badge-live">En vivo</span>
+        <span class="badge-room">Sala principal</span>
+      </div>
+      <div class="info">
+        <div class="room">Auditorio Principal</div>
+        <h3>Keynote: Banca digital en LatAm</h3>
+        <div class="speaker">Maria Garcia · Bancolombia</div>
+      </div>
+    </div>
+    <div></div>
+  </div>
+  <div class="examples-up">
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 8 MIN</span>
+        <span class="fav">Tu agenda</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 3</div>
+        <h4>Demo: Real estate proptech</h4>
+        <div class="speaker">Jorge Vasquez</div>
+      </div>
+    </div>
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 22 MIN</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 1</div>
+        <h4>Charla: Cultura de innovacion</h4>
+        <div class="speaker">Maria Garcia</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── PALETA 5: SLATE + OCHRE ─────────────── -->
+<section class="paleta p5">
+  <div class="paleta-head">
+    <h2>Slate + Ochre</h2>
+    <div class="num">05</div>
+    <div class="mood">Frío + dorado discreto. Ochre = dorado-amarillo terroso, no shiny. Sensación de manuscrito antiguo + tecnología.</div>
+  </div>
+  <div class="swatches">
+    <div class="swatch"><div class="chip" style="background:#64748b"></div><div class="meta"><div class="name">Slate</div><div class="hex">#64748b</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#1a1d20"></div><div class="meta"><div class="name">Card live</div><div class="hex">#1a1d20</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#141618"></div><div class="meta"><div class="name">Card up</div><div class="hex">#141618</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#b08838"></div><div class="meta"><div class="name">Ochre</div><div class="hex">#b08838</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#ef4444"></div><div class="meta"><div class="name">Live red</div><div class="hex">#ef4444</div></div></div>
+  </div>
+  <div class="examples">
+    <div class="card-live">
+      <div class="poster"></div>
+      <div class="grain"></div>
+      <div class="gradient"></div>
+      <div class="top">
+        <span class="badge-live">En vivo</span>
+        <span class="badge-room">Sala principal</span>
+      </div>
+      <div class="info">
+        <div class="room">Auditorio Principal</div>
+        <h3>Keynote: Banca digital en LatAm</h3>
+        <div class="speaker">Maria Garcia · Bancolombia</div>
+      </div>
+    </div>
+    <div></div>
+  </div>
+  <div class="examples-up">
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 8 MIN</span>
+        <span class="fav">Tu agenda</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 3</div>
+        <h4>Demo: Real estate proptech</h4>
+        <div class="speaker">Jorge Vasquez</div>
+      </div>
+    </div>
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 22 MIN</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 1</div>
+        <h4>Charla: Cultura de innovacion</h4>
+        <div class="speaker">Maria Garcia</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── PALETA 6: SLATE MONO ─────────────── -->
+<section class="paleta p6">
+  <div class="paleta-head">
+    <h2>Slate Mono</h2>
+    <div class="num">06</div>
+    <div class="mood">Sin segundo color — solo slate en niveles. La identidad la da la sobriedad total. Solo el rojo del badge LIVE rompe la calma.</div>
+  </div>
+  <div class="swatches">
+    <div class="swatch"><div class="chip" style="background:#475569"></div><div class="meta"><div class="name">Slate dark</div><div class="hex">#475569</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#64748b"></div><div class="meta"><div class="name">Slate</div><div class="hex">#64748b</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#94a3b8"></div><div class="meta"><div class="name">Slate light</div><div class="hex">#94a3b8</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#1a1d20"></div><div class="meta"><div class="name">Card live</div><div class="hex">#1a1d20</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#ef4444"></div><div class="meta"><div class="name">Live red</div><div class="hex">#ef4444</div></div></div>
+  </div>
+  <div class="examples">
+    <div class="card-live">
+      <div class="poster"></div>
+      <div class="grain"></div>
+      <div class="gradient"></div>
+      <div class="top">
+        <span class="badge-live">En vivo</span>
+        <span class="badge-room">Sala principal</span>
+      </div>
+      <div class="info">
+        <div class="room">Auditorio Principal</div>
+        <h3>Keynote: Banca digital en LatAm</h3>
+        <div class="speaker">Maria Garcia · Bancolombia</div>
+      </div>
+    </div>
+    <div></div>
+  </div>
+  <div class="examples-up">
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 8 MIN</span>
+        <span class="fav">Tu agenda</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 3</div>
+        <h4>Demo: Real estate proptech</h4>
+        <div class="speaker">Jorge Vasquez</div>
+      </div>
+    </div>
+    <div class="card-up">
+      <div class="poster-wrap">
+        <span class="countdown">EN 22 MIN</span>
+      </div>
+      <div class="info">
+        <div class="room">Sala 1</div>
+        <h4>Charla: Cultura de innovacion</h4>
+        <div class="speaker">Maria Garcia</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('.toggle button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.body.dataset.mode = b.dataset.mode;
+      document.querySelectorAll('.toggle button').forEach(x => x.classList.toggle('active', x === b));
+    });
+  });
+</script>
+
+</body>
+</html>

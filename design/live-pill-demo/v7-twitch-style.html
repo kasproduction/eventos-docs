@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Live Hub v7 — Twitch-style (hero + row uniforme)</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --bg-elevated: #16161a;
+    --bg-raised: #1a1a1f;
+    --surface-low: #1d1d22;
+    --surface-high: #2a2a30;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.16);
+    --text-primary: #ededf0;
+    --text-secondary: #b4b4ba;
+    --text-muted: #767680;
+    --accent: #7c5cff;
+    --accent-light: #a896ff;
+    --live-red: #ff4757;
+    --next-amber: #f5b942;
+    --glass: rgba(20,20,24,0.72);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    overflow: hidden;
+  }
+  body {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 14px;
+    padding: 20px 28px;
+    height: 100vh;
+  }
+
+  .toolbar {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    padding: 10px 16px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    flex-shrink: 0;
+  }
+  .toolbar h1 { margin: 0; font-size: 13px; font-weight: 700; margin-right: 12px; }
+  .toolbar .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-left: 12px; }
+  .toolbar button {
+    padding: 6px 12px;
+    background: transparent; color: var(--text-secondary);
+    border: 1px solid var(--border); border-radius: 999px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .toolbar button:hover { border-color: var(--border-strong); color: var(--text-primary); }
+  .toolbar button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* Shell */
+  .shell {
+    position: relative;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(124,92,255,0.06) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(255,71,87,0.04) 0%, transparent 50%),
+      var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: absolute;
+    left: 16px; top: 50%; transform: translateY(-50%);
+    width: 50px;
+    background: var(--glass);
+    backdrop-filter: blur(22px);
+    border: 1px solid var(--border-strong);
+    border-radius: 26px;
+    padding: 9px 0;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    z-index: 5;
+  }
+  .brand { width: 30px; height: 30px; display: grid; place-items: center; color: var(--accent); font-weight: 800; font-size: 13px; margin-bottom: 5px; }
+  .nav-item {
+    position: relative;
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    border-radius: 11px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .nav-item:hover { background: var(--surface-low); color: var(--text-secondary); }
+  .nav-item.active { background: var(--surface-high); color: var(--text-primary); }
+  .nav-item svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+  .nav-item .badge {
+    position: absolute; top: -2px; right: -2px;
+    min-width: 15px; height: 15px;
+    padding: 0 4px;
+    background: var(--live-red);
+    color: #fff;
+    font-size: 9px; font-weight: 700;
+    display: grid; place-items: center;
+    border-radius: 999px;
+    border: 2px solid var(--bg);
+  }
+  .nav-item .pulse-dot {
+    position: absolute; top: 5px; right: 5px;
+    width: 6px; height: 6px;
+    background: var(--live-red);
+    border-radius: 999px;
+    box-shadow: 0 0 7px var(--live-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .divider { width: 24px; height: 1px; background: var(--border); margin: 5px 0; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+
+  /* Stage */
+  .stage {
+    position: absolute;
+    left: 80px; right: 20px; top: 20px; bottom: 20px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .hub-header {
+    padding: 18px 28px 6px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .hub-header .titles h1 { margin: 0; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
+  .hub-header .titles .subtitle {
+    margin-top: 2px;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 600;
+  }
+  .hub-header .live-pill-inline {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 12px;
+    background: color-mix(in srgb, var(--live-red) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--live-red) 30%, transparent);
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--live-red);
+  }
+  .hub-header .live-pill-inline::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--live-red);
+    border-radius: 999px;
+    box-shadow: 0 0 5px var(--live-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  /* Body — hero arriba + row uniforme abajo */
+  .hub-body {
+    flex: 1;
+    padding: 8px 28px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Hero (1 card destacada, centrada) */
+  .hero-wrap {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+  }
+  .hero {
+    position: relative;
+    aspect-ratio: 16/9;
+    width: 100%;
+    max-width: clamp(440px, 44vw, 580px);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+    border: 1px solid var(--border);
+  }
+  .hero:hover { transform: scale(1.005); }
+  .hero .poster {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(124,92,255,0.45) 0%, transparent 55%),
+      linear-gradient(135deg, #2a1f4f 0%, #15102a 50%, #0a0810 100%);
+  }
+  .hero.upcoming-poster .poster {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(245,185,66,0.32) 0%, transparent 55%),
+      linear-gradient(135deg, #2a2317 0%, #15110a 50%, #0a0805 100%);
+  }
+  .hero .gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.85) 100%);
+  }
+  .hero .top-row {
+    position: absolute; top: 14px; left: 14px; right: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .hero .live-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px;
+    background: var(--live-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 999px;
+  }
+  .hero .live-tag::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: #fff;
+    border-radius: 999px;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .hero .countdown-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    color: var(--next-amber);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 999px;
+  }
+  .hero .countdown-tag.urgent { background: var(--live-red); color: #fff; }
+  .hero .countdown-tag svg { width: 10px; height: 10px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .hero .featured-tag {
+    padding: 5px 10px;
+    background: rgba(255,255,255,0.16);
+    color: #fff;
+    backdrop-filter: blur(10px);
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 999px;
+  }
+  .hero .audience-tag {
+    padding: 5px 10px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 999px;
+    font-variant-numeric: tabular-nums;
+  }
+  .hero .play-overlay {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .hero:hover .play-overlay { opacity: 1; }
+  .hero .play-icon {
+    width: 56px; height: 56px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 999px;
+    display: grid; place-items: center;
+    transform: scale(0.85);
+    transition: transform 0.25s ease;
+  }
+  .hero:hover .play-icon { transform: scale(1); }
+  .hero .play-icon svg { width: 22px; height: 22px; fill: #000; }
+  .hero .info {
+    position: absolute; left: 18px; right: 18px; bottom: 16px;
+    color: #fff;
+  }
+  .hero .room-tag {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent-light);
+    margin-bottom: 5px;
+  }
+  .hero h2 {
+    margin: 0 0 5px;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.015em;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.6);
+  }
+  .hero .speaker-line {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* Row uniforme abajo */
+  .row-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .row-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .row-head h3 {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-primary);
+  }
+  .row-head .qty {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+
+  .row-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    align-content: start;
+    min-height: 0;
+  }
+
+  /* Mini cards (live + upcoming uniformes) */
+  .card-mini {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    display: flex;
+    flex-direction: column;
+  }
+  .card-mini:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+  }
+  .card-mini .poster {
+    position: relative;
+    aspect-ratio: 16/9;
+  }
+  .card-mini.live .poster {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(89,170,255,0.5) 0%, transparent 60%),
+      linear-gradient(135deg, #1a2e4d 0%, #0e1828 50%, #08101a 100%);
+  }
+  .card-mini.live.bg-2 .poster {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(124,92,255,0.5) 0%, transparent 60%),
+      linear-gradient(135deg, #2a1f4f 0%, #15102a 50%, #0a0810 100%);
+  }
+  .card-mini.live.bg-3 .poster {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255,127,127,0.5) 0%, transparent 60%),
+      linear-gradient(135deg, #4a1e2e 0%, #2a1018 50%, #1a070e 100%);
+  }
+  .card-mini.upcoming .poster {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(245,185,66,0.18) 0%, transparent 60%),
+      linear-gradient(135deg, #2a2317 0%, #15110a 100%);
+  }
+  .card-mini.upcoming.fav .poster {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(124,92,255,0.22) 0%, transparent 60%),
+      linear-gradient(135deg, #2a1f4f 0%, #15102a 100%);
+  }
+  .card-mini .gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.75) 100%);
+  }
+  .card-mini .top {
+    position: absolute; top: 8px; left: 8px; right: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .card-mini .live-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 7px;
+    background: var(--live-red);
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-radius: 999px;
+  }
+  .card-mini .live-tag::before {
+    content: '';
+    width: 4px; height: 4px;
+    background: #fff;
+    border-radius: 999px;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .card-mini .countdown-tag {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 7px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    color: var(--next-amber);
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 999px;
+  }
+  .card-mini .countdown-tag.urgent {
+    background: var(--live-red);
+    color: #fff;
+    animation: pulse-bg 1.4s ease-in-out infinite;
+  }
+  .card-mini .countdown-tag svg { width: 8px; height: 8px; stroke: currentColor; fill: none; stroke-width: 2; }
+  @keyframes pulse-bg { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+  .card-mini .audience-tag {
+    padding: 2px 7px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 999px;
+  }
+  .card-mini .fav-badge {
+    padding: 2px 7px;
+    background: color-mix(in srgb, var(--accent) 26%, transparent);
+    color: var(--accent-light);
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 5px;
+    backdrop-filter: blur(6px);
+  }
+  .card-mini .play-overlay {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .card-mini:hover .play-overlay { opacity: 1; }
+  .card-mini .play-icon {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 999px;
+    display: grid; place-items: center;
+    transform: scale(0.85);
+    transition: transform 0.25s ease;
+  }
+  .card-mini:hover .play-icon { transform: scale(1); }
+  .card-mini .play-icon svg { width: 16px; height: 16px; fill: #000; }
+  .card-mini .info { padding: 10px 12px 12px; }
+  .card-mini .room-tag {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    margin-bottom: 3px;
+  }
+  .card-mini h4 {
+    margin: 0 0 3px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text-primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.5em;
+  }
+  .card-mini .speaker-line {
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Empty */
+  .empty {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .empty .glyph {
+    width: 56px; height: 56px;
+    margin-bottom: 14px;
+    display: grid; place-items: center;
+    border-radius: 999px;
+    background: var(--surface-low);
+    color: var(--text-muted);
+  }
+  .empty .glyph svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  /* Responsive */
+  @media (max-width: 1400px) {
+    .stage { left: 76px; right: 18px; top: 18px; bottom: 18px; }
+    .hub-header { padding: 16px 26px 6px; }
+    .hub-header .titles h1 { font-size: 18px; }
+    .hub-body { padding: 6px 26px 20px; gap: 14px; }
+    .hero { max-width: clamp(400px, 42vw, 520px); }
+    .hero h2 { font-size: 16px; }
+    .row-grid { grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 10px; }
+  }
+  @media (max-width: 1100px) {
+    .hero { max-width: clamp(360px, 44vw, 460px); }
+    .row-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 9px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Live Hub v7 · Twitch-style</h1>
+  <span class="label">Live:</span>
+  <button data-state="0">0</button>
+  <button data-state="1">1</button>
+  <button data-state="3" class="active">3</button>
+  <span class="label">Upcoming:</span>
+  <button data-upcoming="0">0</button>
+  <button data-upcoming="2">2</button>
+  <button data-upcoming="6" class="active">6</button>
+</div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">E</div>
+    <div class="divider"></div>
+    <div class="nav-item" title="Inicio">
+      <svg viewBox="0 0 24 24"><path d="M3 12L12 4l9 8M5 10v10h4v-6h6v6h4V10"/></svg>
+    </div>
+    <div class="nav-item" title="Agenda">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+    </div>
+    <div id="liveItem" class="nav-item active" title="En vivo">
+      <svg viewBox="0 0 24 24">
+        <path d="M2 12a10 10 0 0120 0M5 12a7 7 0 0114 0M8 12a4 4 0 018 0"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="nav-item" title="Speakers">
+      <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v3M8 22h8"/></svg>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="hub-header">
+      <div class="titles">
+        <h1 id="hubTitle">En vivo</h1>
+        <div class="subtitle" id="hubSubtitle">3 salas transmitiendo · 6 sesiones proximas</div>
+      </div>
+      <div class="live-pill-inline" id="liveBadge">3 EN VIVO</div>
+    </div>
+
+    <div class="hub-body" id="hubBody"></div>
+  </main>
+</div>
+
+<script>
+  const LIVE = [
+    { id: 203, title: 'Keynote: Banca digital en LatAm', speaker: 'Maria Garcia', org: 'Bancolombia', room: 'Auditorio Principal', featured: true, attendees: 245 },
+    { id: 204, title: 'Workshop: TS avanzado', speaker: 'Sofia Hernandez', org: 'Globant', room: 'Sala 3', featured: false, attendees: 87 },
+    { id: 207, title: 'Panel: Mujeres lideres en tech', speaker: 'Ana Martinez +1', org: 'Rappi', room: 'Sala 2', featured: false, attendees: 132 },
+  ];
+
+  const UPCOMING = [
+    { id: 208, title: 'Demo: Real estate proptech', speaker: 'Jorge Vasquez', room: 'Sala 3', startsInMin: 8, isFavorite: true },
+    { id: 209, title: 'Charla: Cultura de innovacion', speaker: 'Maria Garcia', room: 'Sala 1', startsInMin: 22, isFavorite: false },
+    { id: 210, title: 'Fireside chat: Liderazgo en crisis', speaker: 'CEO panel', room: 'Auditorio Principal', startsInMin: 58, isFavorite: true },
+    { id: 211, title: 'Mesa redonda: Diversidad', speaker: 'Multiple', room: 'Sala 2', startsInMin: 90, isFavorite: false },
+    { id: 212, title: 'Closing keynote', speaker: 'Carlos Rodriguez', room: 'Auditorio Principal', startsInMin: 125, isFavorite: false },
+    { id: 213, title: 'After-event networking', speaker: '—', room: 'Terraza', startsInMin: 180, isFavorite: false },
+  ];
+
+  let liveCount = 3;
+  let upcomingCount = 6;
+
+  const liveItem = document.getElementById('liveItem');
+  const hubTitle = document.getElementById('hubTitle');
+  const hubSubtitle = document.getElementById('hubSubtitle');
+  const hubBody = document.getElementById('hubBody');
+  const liveBadge = document.getElementById('liveBadge');
+
+  function refresh() {
+    liveItem.innerHTML = `
+      <svg viewBox="0 0 24 24">
+        <path d="M2 12a10 10 0 0120 0M5 12a7 7 0 0114 0M8 12a4 4 0 018 0"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      </svg>
+    `;
+    if (liveCount > 0) {
+      liveItem.style.color = 'var(--live-red)';
+      const dot = document.createElement('div'); dot.className = 'pulse-dot'; liveItem.appendChild(dot);
+      if (liveCount >= 2) {
+        const badge = document.createElement('div'); badge.className = 'badge'; badge.textContent = String(liveCount); liveItem.appendChild(badge);
+      }
+    } else {
+      liveItem.style.color = '';
+    }
+    renderHub();
+  }
+
+  function renderHub() {
+    const live = LIVE.slice(0, liveCount).slice();
+    live.sort((a, b) => Number(b.featured) - Number(a.featured) || b.attendees - a.attendees);
+    const upcoming = UPCOMING.slice(0, upcomingCount).slice();
+    upcoming.sort((a, b) => a.startsInMin - b.startsInMin);
+
+    // Header
+    if (live.length > 0) {
+      hubTitle.textContent = 'En vivo';
+      hubSubtitle.textContent = `${live.length} ${live.length === 1 ? 'sala transmitiendo' : 'salas transmitiendo'}${upcoming.length ? ` · ${upcoming.length} sesiones proximas` : ''}`;
+      liveBadge.textContent = `${live.length} EN VIVO`;
+      liveBadge.style.display = 'inline-flex';
+    } else if (upcoming.length > 0) {
+      hubTitle.textContent = 'Por arrancar';
+      hubSubtitle.textContent = `Sin transmisiones activas · ${upcoming.length} proximas`;
+      liveBadge.style.display = 'none';
+    } else {
+      hubTitle.textContent = 'En vivo';
+      hubSubtitle.textContent = 'Sin sesiones activas ni proximas';
+      liveBadge.style.display = 'none';
+    }
+
+    // Empty?
+    if (live.length === 0 && upcoming.length === 0) {
+      hubBody.innerHTML = `
+        <div class="empty">
+          <div class="glyph">
+            <svg viewBox="0 0 24 24">
+              <path d="M2 12a10 10 0 0120 0M5 12a7 7 0 0114 0M8 12a4 4 0 018 0"/>
+              <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+            </svg>
+          </div>
+          Cuando arranque alguna sesion en vivo aparece aqui.
+        </div>
+      `;
+      return;
+    }
+
+    // Hero = first live, o first upcoming si no hay lives
+    let heroItem, heroIsLive, restLive, restUpcoming;
+    if (live.length > 0) {
+      heroItem = live[0];
+      heroIsLive = true;
+      restLive = live.slice(1);
+      restUpcoming = upcoming;
+    } else {
+      heroItem = upcoming[0];
+      heroIsLive = false;
+      restLive = [];
+      restUpcoming = upcoming.slice(1);
+    }
+
+    const restAll = [
+      ...restLive.map(s => ({ ...s, kind: 'live' })),
+      ...restUpcoming.map(s => ({ ...s, kind: 'upcoming' })),
+    ];
+
+    let html = `<div class="hero-wrap">${heroIsLive ? heroLive(heroItem) : heroUpcoming(heroItem)}</div>`;
+
+    if (restAll.length > 0) {
+      const liveCount = restLive.length;
+      const upCount = restUpcoming.length;
+      let label;
+      if (liveCount && upCount) label = `${liveCount} en vivo · ${upCount} proximas`;
+      else if (liveCount) label = `${liveCount} mas ${liveCount === 1 ? 'transmision' : 'transmisiones'} en vivo`;
+      else label = `${upCount} ${upCount === 1 ? 'proxima' : 'proximas'}`;
+
+      html += `
+        <div class="row-section">
+          <div class="row-head">
+            <h3>${heroIsLive ? 'Lo demas' : 'Mas proximas'}</h3>
+            <span class="qty">${label.toUpperCase()}</span>
+          </div>
+          <div class="row-grid">
+            ${restAll.map((s, i) => s.kind === 'live' ? miniLive(s, i) : miniUpcoming(s)).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    hubBody.innerHTML = html;
+
+    hubBody.querySelectorAll('[data-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = el.dataset.id;
+        const kind = el.dataset.kind;
+        if (kind === 'live') alert(`Navega a /session-stream/${id}`);
+        else alert(`Navega a /agenda?highlight=${id}`);
+      });
+    });
+  }
+
+  function heroLive(s) {
+    return `
+      <div class="hero" data-id="${s.id}" data-kind="live">
+        <div class="poster"></div>
+        <div class="gradient"></div>
+        <div class="top-row">
+          <span class="live-tag">En vivo</span>
+          <div style="display:flex; gap:8px;">
+            ${s.featured ? '<span class="featured-tag">Sala principal</span>' : ''}
+            <span class="audience-tag">${s.attendees} viendo</span>
+          </div>
+        </div>
+        <div class="play-overlay">
+          <div class="play-icon"><svg viewBox="0 0 24 24"><polygon points="5 3 21 12 5 21 5 3"/></svg></div>
+        </div>
+        <div class="info">
+          <div class="room-tag">${s.room}</div>
+          <h2>${s.title}</h2>
+          <div class="speaker-line">${s.speaker}${s.org ? ` · ${s.org}` : ''}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function heroUpcoming(s) {
+    const urgent = s.startsInMin < 10;
+    return `
+      <div class="hero upcoming-poster" data-id="${s.id}" data-kind="upcoming">
+        <div class="poster"></div>
+        <div class="gradient"></div>
+        <div class="top-row">
+          <span class="countdown-tag${urgent ? ' urgent' : ''}">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            EN ${s.startsInMin} MIN
+          </span>
+          ${s.isFavorite ? '<span class="featured-tag">Tu agenda</span>' : ''}
+        </div>
+        <div class="play-overlay">
+          <div class="play-icon"><svg viewBox="0 0 24 24"><polygon points="5 3 21 12 5 21 5 3"/></svg></div>
+        </div>
+        <div class="info">
+          <div class="room-tag">${s.room}</div>
+          <h2>${s.title}</h2>
+          <div class="speaker-line">${s.speaker}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function miniLive(s, idx) {
+    const variant = (idx % 3) + 1;
+    return `
+      <div class="card-mini live bg-${variant}" data-id="${s.id}" data-kind="live">
+        <div class="poster">
+          <div class="gradient"></div>
+          <div class="top">
+            <span class="live-tag">En vivo</span>
+            <span class="audience-tag">${s.attendees}</span>
+          </div>
+          <div class="play-overlay">
+            <div class="play-icon"><svg viewBox="0 0 24 24"><polygon points="5 3 21 12 5 21 5 3"/></svg></div>
+          </div>
+        </div>
+        <div class="info">
+          <div class="room-tag">${s.room}</div>
+          <h4>${s.title}</h4>
+          <div class="speaker-line">${s.speaker}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function miniUpcoming(s) {
+    const urgent = s.startsInMin < 10;
+    return `
+      <div class="card-mini upcoming${s.isFavorite ? ' fav' : ''}" data-id="${s.id}" data-kind="upcoming">
+        <div class="poster">
+          <div class="gradient"></div>
+          <div class="top">
+            <span class="countdown-tag${urgent ? ' urgent' : ''}">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              ${s.startsInMin}m
+            </span>
+            ${s.isFavorite ? '<span class="fav-badge">Tu agenda</span>' : ''}
+          </div>
+          <div class="play-overlay">
+            <div class="play-icon"><svg viewBox="0 0 24 24"><polygon points="5 3 21 12 5 21 5 3"/></svg></div>
+          </div>
+        </div>
+        <div class="info">
+          <div class="room-tag">${s.room}</div>
+          <h4>${s.title}</h4>
+          <div class="speaker-line">${s.speaker}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  document.querySelectorAll('.toolbar button').forEach(b => {
+    b.addEventListener('click', () => {
+      if (b.dataset.state !== undefined) {
+        liveCount = Number(b.dataset.state);
+        document.querySelectorAll('[data-state]').forEach(x => x.classList.toggle('active', x === b));
+      } else if (b.dataset.upcoming !== undefined) {
+        upcomingCount = Number(b.dataset.upcoming);
+        document.querySelectorAll('[data-upcoming]').forEach(x => x.classList.toggle('active', x === b));
+      }
+      refresh();
+    });
+  });
+
+  refresh();
+</script>
+
+</body>
+</html>
