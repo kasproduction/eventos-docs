@@ -8,119 +8,128 @@
 
 ## Ultima sesion
 
-**Fecha:** 2026-05-10 (segunda sesion del dia)
-**Que se hizo:** Cerrados blocker responsive split-screen (paso 1+2), bug de "UNIRTE" en sesiones terminadas en agenda (con seeder ampliado para reproducirlo), audit superficies sin bug paralelo, fix del W.4 streaming notFound 404 + login-slides handler, CI verde despues de 4 runs rojos seguidos.
+**Fecha:** 2026-05-13 → 2026-05-14
+**Que se hizo:** Modulo W.6 **Social Networking unificado** (combinacion de Networking + Wall en un solo modulo de la webapp — decision 2026-05-13). Demos HTML iterados (v1A/v1B/v2-davinci con foto vertical, comentarios inline, microinteracciones, dark+lux). Implementacion React end-to-end en eventos-web: 4 vistas (Feed/Personas/Solicitudes/Mis posts), composer con foto multipart, comentarios inline Instagram-style, optimistic UI, 14 vitest + 6 E2E pasando. Audit Expo comparado al final → gaps importantes detectados (avatar beam fallback, perfil attendee drawer, sugeridos cards grandes, tab Contactos con vcf, bloqueados, search server-side) — quedan para proxima sesion.
 
-### Webapp (eventos-web, main) — 3 commits hoy
+### Webapp (eventos-web, main) — 1 commit pusheado
 
-**`d9c1700 feat(responsive): compact-desktop variant para split-screen 640-1023 + pointer fine`**
-- Fix BLOCKER: `TabletRotateOverlay` ahora requiere `(pointer: coarse)` — NO dispara overlay "voltea tu tablet" en desktop con ventana angosta (split-screen 50/50 de 1366/1920)
-- Nuevo `@custom-variant compact-desktop` en `globals.css` (640-1023 + pointer:fine)
-- `CanvasCard`: dimensiones movidas a CSS class `.canvas-card-root` para que `@media compact-desktop` pueda overridarlas (sin clamp 1600, sin cap 920)
-- `SidebarPill`: 52→44 width, brand 32→28, slots 36→32, position 18→12 left
-- `Stage`: padding 36→16 + pl 88→68 + py 28→16
-- `agenda.css`: bloque `@media compact` para `.ag-header` (W.3 no tenia container queries; `min-width: 460px` rompia con canvas ~600px) + title 26→18 + subtitle 13→11
-- W.10/W.5 ya tenian `@container` queries; W.4/W.2 usan `clamp()` que escala con viewport — no necesitaron override
-- Verificado visualmente por usuario: split-screen funciona
+**`e2c9b4b feat(W.6): modulo Social Networking — feed + directorio + solicitudes + mis posts`**
 
-**`560c2ed fix(agenda): deriveUiState prioriza tiempo sobre status backend`**
-- Bug QA: `/agenda` mostraba boton "UNIRTE" en sesiones cuyo `end_datetime` ya paso si el backend tenia `status='live'`. Backend NO actualiza automaticamente `live → finished` al expirar la ventana.
-- Fix: replicar patron Expo (`eventos-app/lib/sessionStatus.ts:21`) — solo `cancelled`/`finished`/`ended` hacen short-circuit a "past". El resto se deriva por TIEMPO (`end < serverTime → past`, `start <= now <= end → live`)
-- Bonus: descubierto que enum `event_sessions.status` backend usa `finished` (NO `ended` que es del `Event.status`). Aceptamos ambos por confusion historica
-- Tests: 7 reescritos cubriendo bug repro + nuevos casos (132 vitest verde)
+Implementado fases 1-5:
+- Tipos TS alineados al shape REAL del backend (`author: string` plano, `body`, `liked`, `author_photo`, `is_mine`) — descubierto leyendo `WallController::index`. Antes asumi shape anidado y posts decian "Asistente" en todo
+- Server fetchers (`lib/social.ts`): wall, directory, suggested, my-contacts, received/sent requests, attendee profile. Fallback `[]` si no hay auth
+- Client fetchers (`lib/socialClient.ts`): create post (JSON sin foto, multipart con foto), toggle like, send/respond request, block/unblock, comments
+- API proxies Next.js (`/api/social/*`): 5 rutas con cookie auth httpOnly. Multipart pass-through para foto (gamification del backend dispara `awardPoints('wall_post')` igual)
+- 10 componentes en `components/app/social/`:
+  - `SocialView` (router + state global de posts/attendees/requests para sobrevivir cambios de tab)
+  - `FeedView`, `PostCard`, `Composer` (con foto + preview + Cmd+Enter), `FeedSkeleton`
+  - `InlineComments` (Instagram-style expandible dentro del post — usuario aprobo over drawer)
+  - `PersonasView`, `AttendeeCard`, `SolicitudesView` (tabs Recibidas/Enviadas), `MisPostsView`
+  - `socialDerive.ts` (formatRelativeTime, toggleLikeOptimistic, filterMyPosts)
+- 409 en sendRequest → `lumina.info` "Ya tienes solicitud" (no error rojo)
+- Search universal client-side (feed por body+author, personas por nombre/empresa/cargo)
+- 14 vitest + 6 E2E pasando. mockBackend handlers + socialFixture
+- `SidebarPill`: slot `/social` activo (icono Users), `/networking` removido del nav (fusionado)
 
-**`58ba728 fix(e2e): notFound 404 streaming + login-slides mockBackend handler`**
-- W.4 streaming `notFound 404 → 200`: bug Next.js streaming + `loading.tsx` (vercel/next.js#76501). Cuando hay loading.tsx en el segmento padre, Next.js flushea HTML antes de que la page server component pueda llamar `notFound()` con efecto sobre el status. Trade-off conocido entre skeletons UX y status code.
-  - Test del status → `test.fixme` con explicacion + ref al issue
-  - Nuevo test que valida que el body de la pagina 404 si se renderiza
-- mockBackend: nuevo handler `/login-slides` (devuelve `{data: []}`) — antes generaba 404 noisy + retry-en-SSR causando race conditions en E2E parallel runs
-- CI: verde despues de fail. Se confirmo que los otros 2 fails CI (live click hero, streaming click Calificar) ya pasan en Linux runner gracias al silenciamiento del 404 noisy
+### APP EVENTOS (main) — 1 commit pusheado
 
-### Backend (eventos-backend, branch feature/magic-link-auth) — 1 commit hoy
+**`99136f3 design(W.6): demos social-networking + refs networking`**
+- 3 demos HTML iterados en `design/features/webapp/SOCIAL-NETWORKING/`:
+  - v1-A (3 columnas) + v1-B (2 cols + aside) — referencia comparativa, usuario escogio A
+  - v2-davinci: version final con slate (no gold), elevation, 4 vistas funcionales con JS, lux toggle, foto vertical, comentarios inline, microinteracciones
+- 2 refs visuales en `design/features/webapp/NETWORKING/` (Kilogram + Lens.app dashboards)
 
-**`a871d1a chore(seeder): LiveHubDemoSeeder amplia coverage agenda + bug repro`**
-- Agregadas 4 sesiones past al seeder W.10 (antes solo lives + upcoming):
-  - 2 con `status=live` + `end ya paso` → reproducen el bug en `/agenda`
-  - 1 con `status=finished` (organizador cerro manualmente — enum sesion usa `finished`, NO `ended`)
-  - 1 con `status=cancelled` + `cancelled_at` (cancelada antes del start)
-- Renombrado scope del seeder en docs: ahora sirve W.10 Live Hub + W.3 Agenda
+### Bugs durante la sesion (todos cerrados)
+- ~~"Asistente" en todos los posts~~ → fixed alineando shape backend
+- ~~Publicar fallaba~~ → fix usando `body` no `content`
+- ~~Conectar no persiste al cambiar tab~~ → lift-up de state a SocialView
+- ~~Conectar error rojo 409~~ → manejado como info
+- ~~MoreHorizontal "3 puntitos" sin menu funcional~~ → removido
+- ~~Chips Foto/Hashtag/Sesion fake~~ → quitados (foto reactivada real con multipart)
+- ~~Drawer comentarios lateral~~ → reemplazado por inline expandible (Instagram-style)
 
-### Audit de superficies (sin bug paralelo encontrado)
-- `HappeningNowController` (alimenta `/live` hub + home LiveState): filtra por TIEMPO (`end > now`), ignora `session.status`. ✅ OK
-- `RoomCheckinController` (totem): calcula `status` server-side por tiempo, no confia en columna. ✅ OK
-- `AgendaController` (alimenta `/agenda`): devuelve TODAS las sesiones crudas con `server_time` — la webapp filtra (ya fixeado). ✅ OK
-- `SpatialShell.tsx:26` y `home/page.tsx:40` usan `event.status === "live"` — es `Event.status` no `Session.status` (enum distinto, controlado por organizador). ✅ OK
-
-### Thumbnails reales /live — VALIDADO
-- Usuario subio thumbs 16:9 reales desde Filament para sesiones del seeder
-- Render en `/live` confirmado funcionando (sin grain, sin artifacts, slate tokens compatibles)
-
-### Tests + CI
-- 132 vitest + ~67 E2E verde local (workers=2)
-- CI run `25640672535` ✅ verde despues de 4 runs rojos consecutivos (5-09 → 5-10)
+### Tests
+- 146 vitest verde (14 nuevos de socialDerive)
+- 6 E2E social.spec.ts verde (auth gate, SSR feed, Personas grid, conectar optimistic, accept request quita row + baja badge, mis-posts empty)
 
 ### Commits (todos pusheados a remote)
-- `eventos-web d9c1700` (main) — feat(responsive): compact-desktop variant
-- `eventos-web 560c2ed` (main) — fix(agenda): deriveUiState prioriza tiempo
-- `eventos-web 58ba728` (main) — fix(e2e): notFound + login-slides handler
-- `eventos-backend a871d1a` (feature/magic-link-auth) — chore(seeder): bug repro past sessions
-
-
+- `eventos-web e2c9b4b` (main) — feat(W.6): modulo Social Networking
+- `APP EVENTOS 99136f3` (main, repo eventos-docs) — design(W.6): demos + refs
 
 ---
 
 ## Proxima sesion
 
-### Tarea principal sugerida — **W.6 Networking**
+### Tarea principal — **Cerrar gaps W.6 detectados en audit Expo**
 
-Es el siguiente modulo natural del roadmap webapp. Despues de hoy
-(W.10 cerrado, agenda con bug fix, CI verde), el shell W.0 esta
-estable y listo para alojar otro modulo top-level. Plan:
+El modulo W.6 esta funcional pero la sesion anterior detecto gaps importantes comparado al Expo. Hay que cerrarlos antes de marcar W.6 como done. Prioridad alta→baja segun impacto:
 
-1. **Investigar primero**: leer endpoints backend `/networking/*` ya
-   expuestos (matchmaking suggestions, interests, conexiones). Ver
-   `project_networking_notes.md` y `project_s118_notes.md` en memoria.
-2. **Espejo Expo**: revisar `eventos-app/components/screens/Networking*`
-   para mantener parity de comportamiento (filtros, tarjetas, intereses).
-3. **UI**: lista de asistentes con filtros (intereses + tracks) +
-   perfil del contacto + accept/reject conexiones. Glass tokens
-   existentes + slate secondary del sistema.
-4. **Tests**: vitest del derive + E2E de navegacion + 4 estados
-   (lista vacia, sin matches, con matches, perfil abierto).
+**A. Avatar beam fallback** (~15 min, critico)
+- Expo usa `hostedboringavatars.vercel.app/api/beam?name=X&colors=0EA5E9,6366F1,14B8A6,A855F7,38BDF8` para todos los avatares sin foto. Visual coloreado del nombre, NO iniciales.
+- Codigo de referencia: `eventos-app/lib/avatars.ts:5-18` (`beamAvatarUrl` + `resolveAvatarUrl`)
+- Webapp actual: rendereo `<div>` con iniciales "JP" + palette local. **Bug visible** ("JuanPerez" muestra JP)
+- Fix: crear `eventos-web/src/lib/avatars.ts` espejo. Reemplazar TODOS los avatares del modulo social (PostCard, AttendeeCard, InlineComments, SolicitudesView, SocialView mini-rows) con `<Avatar name photoUrl size />` unico.
 
-Estimado: ~3-5h.
+**B. Perfil del attendee** (~1.5-2h, critico)
+- Sin esto, "Tu red" del panel der no sirve (no hay donde clickear) y los senders de solicitudes tampoco se pueden inspeccionar
+- Referencia Expo: `eventos-app/app/(app)/attendee/[id].tsx` (612 lineas):
+  - Hero horizontal: avatar 80px + nombre + job + company + CTA inline contextual al `relation`
+  - Bio (`profile.bio`)
+  - **Intereses con diferenciado visual** is_common vs no
+  - **Sus sesiones** clickeables → `/session/[id]` con `session_type.color`
+  - Redes sociales (LinkedIn / Twitter / Instagram) - Linking.openURL
+  - **Contactar (SOLO si relation==='contact')**: WhatsApp + Email + Guardar contacto
+  - Bloquear (BottomSheet confirm)
+- En webapp: drawer derecho deslizable dentro del canvas (mejor que pagina dedicada — preserva el contexto del modulo). O modal central. Confirmar UX con usuario al arrancar.
+- Backend: endpoint `/attendees/{id}/profile` ya conectado en `social.ts` (`fetchAttendeeProfile`). Solo falta UI + wire-up del click.
 
-**Para arrancar diga:** "siguiente" → leeo este doc y arranco con W.6
-directo, o decime un numero de la lista de abajo si preferis otro.
+**C. Sugeridos cards grandes** (~45 min, alto UX)
+- Expo `NetworkingScreen.tsx:337-473`: `BreathingCarousel` con cards 160x260px, avatar 56px centrado, pill "N intereses comun", chips de common_tags, CTA full-width
+- Webapp: filas chiquitas en panel der
+- Mover sugeridos del panel der a la columna centro de la vista Personas como header de la lista. Hacer click → perfil
 
-### Otras opciones (alternativas)
+**D. Tab Contactos separado** (~1h)
+- Hoy Mi red esta en panel der como decoracion sin click. Falta vista dedicada
+- Botones: "Guardar en telefono" (vCard download) + "Exportar todos (.vcf)" (blob descarga)
+- Bloqueados accordion como footer
 
-1. **Nuevo modulo W.6 Networking** — siguiente natural del roadmap.
-   Backend ya expone ~197 endpoints listos (matchmaking, intereses,
-   contactos). UI: lista de asistentes con filtros, perfil de cada
-   contacto, accept/reject conexiones. Patron espejo Expo + glass
-   tokens existentes. ~3-5h.
-2. **Nuevo modulo W.7 Social wall** — feed unificado (posts + memorias
-   + momentos). Backend usa `wall_posts` + `wall_comments` ya
-   migrados. Necesita socket subscription para RT. ~4-6h.
-3. **Nuevo modulo W.8 Sponsors** — Brand Wall (grid logos) + Brand
-   Profile (perfil de stand) + contact form. Memoria
-   `project_sponsors_uiux_notes.md` tiene el diseno aprobado. ~3h.
-4. **Mobile parity Expo** — portar al app movil:
-   - Click sesion → agenda highlight (de la webapp W.5)
-   - Verificar derive de session status (Expo ya lo tiene bien — solo
-     verificar que aplica los nuevos status `finished` correctamente)
-   - Slate tokens si aplica al mobile.
-5. **Tests avanzados W.4** — paneles socket (requiere socket.io stub)
-   + component happy-DOM tests para AgendaView highlight init /
-   SpeakersView preopen.
-6. **Pendientes design backlog** — errores 82-91 en `design/ERRORES/`
-   (capturas de iteracion sin revisar) + analytics tracking events
-   speakers/agenda.
+**E. Search server-side + pagination** (~45 min)
+- Expo: debounce 400ms + query `q=text` al backend + `useInfiniteQuery` (max 100 items)
+- Webapp: filter client-side (solo lo cargado SSR). Escala mal con eventos 500+
+- Fix: hook con debounce + refetch + scroll infinite + footer "X de Y asistentes"
 
-**Para arrancar diga:** "siguiente" o el modulo concreto a atacar.
+**F. PostCard pulido** (~30 min)
+- Heart animation spring sequence (scale 1.3 → 1) usando `transform` CSS o framer-motion
+- "Ver N comentarios" link bajo las acciones que tambien expande InlineComments (extra trigger ademas del icono)
 
-### Decisiones cerradas hoy (2026-05-10 #2, no preguntar de nuevo)
+**G. Memorias tab (photos + stories + FAB)** — fase aparte
+- 2do segmento del Social Expo (`app/(app)/social.tsx:218-239`): photo gallery con grid + photo contest banner + PhotoViewer fullscreen + Stories 24h expiry + FAB flotante "+" abajo-derecha
+- Backend ya tiene `/photos`, `/stories`, `/photo-contest` listos
+- Estimar como subfeature de W.6 o modulo separado W.7. Decidir al arrancar.
+
+**Estimado total A-F:** ~5-6h. **A+B+C son los mas criticos** y dan el feature usable en 3h.
+
+**Para arrancar diga:** "siguiente" → arranco con A (avatar) en paralelo con investigacion de UI del perfil (B).
+
+### Otras opciones (si NO quieres cerrar gaps W.6 todavia)
+
+1. **Nuevo modulo W.8 Sponsors** — Brand Wall (grid logos) + Brand Profile + contact form. Memoria `project_sponsors_uiux_notes.md` tiene diseno aprobado. ~3h.
+2. **Mobile parity Expo** — click sesion → agenda highlight, verificar status finished, slate tokens si aplica.
+3. **Tests avanzados W.4** — paneles socket (requiere socket.io stub) + component happy-DOM tests.
+4. **Pendientes design backlog** — errores 82-91 en `design/ERRORES/` (capturas sin revisar) + analytics tracking events speakers/agenda.
+
+### Decisiones cerradas en esta sesion (2026-05-13/14, no preguntar)
+
+- **Social Networking = modulo unificado.** Combina Networking + Wall en uno solo en la webapp (mobile sigue separado por limitacion de espacio). Decision basada en refs LinkedIn 2026 + Whova Social Wall.
+- **Slot `/networking` removido del sidebar W.0.** Fusionado dentro de `/social`. Icono `Users` (no MessageSquare).
+- **Comentarios INLINE expandibles dentro del post**, no drawer lateral. Aprobado explicitamente over drawer (Instagram-style).
+- **Composer SIN chips Foto/Hashtag/Sesion fake.** Solo boton Foto real (multipart upload) + boton Publicar. Foto va en mismo endpoint backend → gamification dispara `awardPoints('wall_post')` igual.
+- **409 en sendRequest NO es error.** Backend devuelve 409 si ya existe solicitud pendiente — manejar como `lumina.info` "Ya tienes solicitud" y mantener optimistic.
+- **State global de posts/attendees/requests en SocialView** (no en sub-views). Permite que comentarios/likes/relacion persistan al cambiar de tab.
+- **Shape backend wall posts es PLANO** (verificado leyendo `WallController::index`): `author: string` (NO objeto anidado), `body` (NO content), `liked` (NO is_liked), `author_photo` separado, `is_mine` true/false, cursor pagination `next_cursor` (NO meta).
+- **Avatar fallback NO es iniciales.** Expo usa beam visual coloreado (`hostedboringavatars.vercel.app/api/beam`). Esto queda PENDIENTE de implementar en la webapp (gap A del audit).
+
+### Decisiones cerradas previas (2026-05-10 #2, no preguntar de nuevo)
 
 - **`TabletRotateOverlay` requiere `pointer: coarse`** (no solo viewport
   640-1023 + portrait). Sin ese check, desktop con ventana angosta
