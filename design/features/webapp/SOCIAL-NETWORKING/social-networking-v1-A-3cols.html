@@ -1,0 +1,979 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>W.6 Social Networking — DaVinci v1 (opcion A: 3 columnas)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-sunken:#0a0a0a;
+  --bg-elevated:#141414;
+  --surface-low:#1a1a1a;
+  --surface-medium:#1f1f1f;
+  --surface-high:#262626;
+  --surface-card:#181818;
+  --border:rgba(255,255,255,0.06);
+  --border-strong:rgba(255,255,255,0.12);
+  --fg:#f5f5f4;
+  --fg-dim:#a8a8a3;
+  --fg-mute:#6b6b66;
+  --fg-label:#5a5a55;
+
+  --gold:#B5A68B;
+  --gold-soft:rgba(181,166,139,0.45);
+  --gold-bg:rgba(181,166,139,0.10);
+  --gold-bg-strong:rgba(181,166,139,0.16);
+  --gold-border:rgba(181,166,139,0.22);
+
+  --slate:#64748b;
+  --slate-light:#94a3b8;
+  --slate-dark:#475569;
+  --slate-deep:#334155;
+
+  --canvas-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+
+  --spring-soft: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+html,body{margin:0;padding:0;background:var(--bg-sunken);color:var(--fg);
+  font-family:'Urbanist',system-ui,sans-serif;height:100%;overflow:hidden}
+button{font-family:inherit;color:inherit;background:transparent;border:none;cursor:pointer;padding:0}
+
+.stage{
+  min-height:100vh; width:100%;
+  display:flex;align-items:center;justify-content:center;
+  padding:28px 36px 28px 96px;
+}
+
+/* ==================== SIDEBAR W.0 ==================== */
+.sidebar{
+  position:fixed; left:18px; top:50%; transform:translateY(-50%);
+  width:52px; padding:10px 6px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:28px;
+  box-shadow:0 12px 32px rgba(0,0,0,0.4);
+  z-index:50;
+}
+.sb-logo{
+  width:32px;height:32px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:4px;
+  font-family:'Plus Jakarta Sans';font-weight:800;font-size:13px;color:var(--gold);
+}
+.sb-item{
+  width:36px;height:36px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--fg-mute); cursor:pointer; position:relative;
+  transition:color 200ms var(--ease-out), background 200ms var(--ease-out);
+}
+.sb-item:hover{color:var(--fg)}
+.sb-item.active{color:var(--fg);background:var(--surface-high)}
+.sb-item.active::before{
+  content:""; position:absolute; left:-7px; top:8px; bottom:8px;
+  width:2px; border-radius:2px; background:var(--gold);
+}
+.sb-badge{
+  position:absolute;top:6px;right:6px;
+  height:14px;min-width:14px;padding:0 3px;border-radius:99px;
+  background:var(--gold);color:#0a0a0a;
+  font-family:'Plus Jakarta Sans';font-size:8px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--bg-elevated);
+}
+.sb-sep{width:24px;height:1px;background:var(--border);margin:4px 0}
+
+/* ==================== CANVAS RAIZ ==================== */
+.canvas{
+  width: min(1600px, calc(100vw - 150px));
+  height: min(calc(100vh - 56px), 920px);
+  border-radius:26px;
+  container-type: inline-size;
+  background:var(--bg-elevated);
+  border:1px solid var(--border-strong);
+  box-shadow:var(--canvas-shadow);
+  overflow:hidden;
+  position:relative;
+  display:grid;
+  grid-template-columns: 260px 1fr 300px;
+}
+
+/* ==================== COL IZQ — IDENTIDAD + NAV MODULO + CONTACTOS RECIENTES ==================== */
+.sn-left{
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  padding:24px 18px;
+  overflow-y:auto;
+}
+.sn-left::-webkit-scrollbar{width:4px}
+.sn-left::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:3px}
+
+.identity{ display:flex; flex-direction:column; align-items:center; text-align:center; padding:4px 4px 18px }
+.identity .avatar{
+  width:74px; height:74px; border-radius:50%;
+  background: linear-gradient(135deg,#a78bfa,#7c7cff);
+  border:2px solid var(--gold-border);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:26px; color:#0a0a0a;
+  margin-bottom:12px;
+}
+.identity h2{
+  font-family:'Plus Jakarta Sans'; font-weight:800; letter-spacing:-0.018em;
+  font-size:16px; line-height:1.15;
+  color:var(--fg); margin:0 0 3px;
+}
+.identity p{
+  font-family:'Urbanist'; font-weight:500;
+  font-size:12px; color: var(--fg-mute);
+  margin:0 0 12px;
+}
+.identity .stats{
+  display:flex; gap:14px;
+  margin-top:6px;
+}
+.stat{ text-align:center }
+.stat .num{
+  display:block;
+  font-family:'Plus Jakarta Sans'; font-weight:800;
+  font-size:15px; color:var(--fg);
+  letter-spacing:-0.01em;
+}
+.stat .lab{
+  display:block;
+  font-family:'Urbanist'; font-weight:500;
+  font-size:10px; color:var(--fg-label);
+  text-transform:uppercase; letter-spacing:0.06em;
+  margin-top:1px;
+}
+
+.sn-nav{
+  display:flex; flex-direction:column; gap:3px;
+  margin:14px -6px 0;
+  border-top:1px solid var(--border);
+  padding-top:14px;
+}
+.nav-item{
+  display:flex; align-items:center; gap:10px;
+  padding:9px 12px; border-radius:11px;
+  font-family:'Urbanist'; font-weight:500; font-size:13px;
+  color:var(--fg-dim); cursor:pointer;
+  transition: color 180ms var(--ease-out), background 180ms var(--ease-out);
+  position:relative;
+}
+.nav-item:hover{ color:var(--fg); background:var(--surface-low) }
+.nav-item.active{ color:var(--fg); background:var(--surface-medium); font-weight:600 }
+.nav-item.active::before{
+  content:""; position:absolute; left:-6px; top:10px; bottom:10px;
+  width:2px; border-radius:2px; background:var(--gold);
+}
+.nav-item .ic{ flex-shrink:0; display:flex; color:var(--fg-mute) }
+.nav-item.active .ic{ color:var(--gold) }
+.nav-item .nb{
+  margin-left:auto;
+  background:var(--surface-high); color:var(--fg);
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:10px;
+  height:18px; min-width:20px; padding:0 6px; border-radius:99px;
+  display:flex; align-items:center; justify-content:center;
+}
+.nav-item.alert .nb{ background:var(--gold); color:#0a0a0a }
+
+.sub-head{
+  font-family:'Plus Jakarta Sans'; font-weight:700;
+  font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--fg-label);
+  margin:22px 6px 10px;
+}
+
+.act-list{ display:flex; flex-direction:column; gap:2px }
+.act-row{
+  display:flex; align-items:center; gap:10px;
+  padding:8px 6px; border-radius:10px; cursor:pointer;
+  transition: background 180ms var(--ease-out);
+}
+.act-row:hover{ background:var(--surface-low) }
+.act-av{
+  width:32px; height:32px; border-radius:50%;
+  flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:12px; color:#0a0a0a;
+}
+.act-tx{ flex:1; min-width:0; line-height:1.25 }
+.act-tx .nm{
+  display:block;
+  font-family:'Urbanist'; font-weight:600; font-size:12.5px; color:var(--fg);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.act-tx .ms{
+  display:block;
+  font-family:'Urbanist'; font-weight:400; font-size:11px; color:var(--fg-mute);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.act-tx .ms b{ color:var(--fg-dim); font-weight:600 }
+.act-time{
+  font-family:'Urbanist'; font-weight:500; font-size:10px; color:var(--fg-label);
+  flex-shrink:0;
+}
+
+/* ==================== COL CENTRO — STORIES + COMPOSER + FEED ==================== */
+.sn-center{
+  display:flex; flex-direction:column;
+  min-width:0;
+  padding:22px 26px 0;
+  overflow:hidden;
+}
+
+.sn-header{
+  display:flex; align-items:baseline; justify-content:space-between;
+  padding-bottom:14px;
+}
+.sn-title{
+  font-family:'Plus Jakarta Sans'; font-weight:800; letter-spacing:-0.022em;
+  font-size:26px; line-height:1; margin:0;
+  color:var(--fg);
+}
+.sn-sub{
+  font-family:'Urbanist'; font-weight:500;
+  font-size:12px; color:var(--fg-mute);
+  margin-top:5px;
+}
+
+.sn-feed{ flex:1; min-height:0; overflow-y:auto; padding-bottom:24px }
+.sn-feed::-webkit-scrollbar{ width:5px }
+.sn-feed::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.06); border-radius:3px }
+
+/* Stories carousel */
+.stories{
+  display:flex; gap:14px; padding:8px 2px 14px;
+  overflow-x:auto;
+  scrollbar-width: none;
+}
+.stories::-webkit-scrollbar{ display:none }
+.story{
+  flex-shrink:0;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  cursor:pointer; width:62px;
+}
+.story-ring{
+  width:60px; height:60px; border-radius:50%;
+  padding:2px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--slate-light) 50%, var(--slate-dark) 100%);
+  display:flex; align-items:center; justify-content:center;
+  transition: transform 240ms var(--spring-soft);
+}
+.story:hover .story-ring{ transform: scale(1.05) }
+.story-inner{
+  width:100%; height:100%; border-radius:50%;
+  border:2px solid var(--bg-elevated);
+  background-size:cover; background-position:center;
+}
+.story.add .story-ring{ background: var(--surface-medium); padding:0 }
+.story.add .story-inner{
+  border:1.5px dashed var(--border-strong);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--fg-mute);
+  background:var(--surface-low);
+}
+.story-lab{
+  font-family:'Urbanist'; font-weight:500;
+  font-size:10.5px; color:var(--fg-dim);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width:62px;
+}
+
+/* Composer */
+.composer{
+  border:1px solid var(--border);
+  background: var(--surface-low);
+  border-radius:18px;
+  padding:14px 16px;
+  margin:0 0 22px;
+}
+.cp-row1{ display:flex; gap:12px; align-items:flex-start }
+.cp-av{
+  width:38px; height:38px; border-radius:50%;
+  background: linear-gradient(135deg,#a78bfa,#7c7cff);
+  flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; color:#0a0a0a;
+}
+.cp-input{
+  flex:1;
+  font-family:'Urbanist'; font-weight:500; font-size:14px;
+  color:var(--fg-mute);
+  padding:10px 0; min-height:38px;
+  outline:none; cursor:text;
+}
+.cp-row2{
+  display:flex; align-items:center; gap:8px;
+  margin-top:6px;
+}
+.cp-chip{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 11px; border-radius:99px;
+  background:transparent;
+  border:1px solid var(--border);
+  font-family:'Urbanist'; font-weight:500; font-size:11.5px;
+  color:var(--fg-dim);
+  cursor:pointer;
+  transition: background 180ms var(--ease-out), border-color 180ms var(--ease-out), color 180ms var(--ease-out);
+}
+.cp-chip:hover{ background:var(--surface-medium); color:var(--fg); border-color:var(--border-strong) }
+.cp-chip svg{ width:13px; height:13px }
+.cp-post{
+  margin-left:auto;
+  padding:9px 18px; border-radius:99px;
+  background: var(--gold); color:#0a0a0a;
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:12.5px;
+  cursor:pointer;
+  transition: transform 180ms var(--ease-out), opacity 180ms var(--ease-out);
+}
+.cp-post:hover{ opacity:.9 }
+.cp-post:active{ transform: scale(0.97) }
+
+/* Post card */
+.post{
+  border:1px solid var(--border);
+  background: var(--surface-card);
+  border-radius:20px;
+  padding:18px;
+  margin-bottom:18px;
+  transition: border-color 200ms var(--ease-out);
+}
+.post:hover{ border-color: var(--border-strong) }
+.post-head{ display:flex; align-items:center; gap:11px; margin-bottom:12px }
+.post-av{
+  width:42px; height:42px; border-radius:50%;
+  flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:15px; color:#0a0a0a;
+}
+.post-id{ flex:1; line-height:1.2 }
+.post-id .nm{
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px;
+  color:var(--fg); display:block; letter-spacing:-0.008em;
+}
+.post-id .meta{
+  font-family:'Urbanist'; font-weight:500; font-size:11.5px;
+  color:var(--fg-mute); display:block; margin-top:1px;
+}
+.post-id .meta b{ color:var(--fg-dim); font-weight:600 }
+.post-more{
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--fg-mute); cursor:pointer;
+}
+.post-more:hover{ background:var(--surface-medium); color:var(--fg) }
+
+.post-body{
+  font-family:'Urbanist'; font-weight:400; font-size:14px;
+  color:var(--fg); line-height:1.5;
+  margin:0 0 12px;
+}
+.post-body .ht{ color:var(--gold); cursor:pointer }
+.post-img{
+  border-radius:14px; overflow:hidden;
+  aspect-ratio: 16 / 10;
+  background-size: cover; background-position: center;
+  margin-bottom:12px;
+}
+
+.post-actions{
+  display:flex; align-items:center; gap:18px;
+  padding-top:10px;
+  border-top:1px solid var(--border);
+}
+.pa{
+  display:inline-flex; align-items:center; gap:7px;
+  font-family:'Urbanist'; font-weight:600; font-size:12.5px;
+  color:var(--fg-dim); cursor:pointer;
+  transition: color 180ms var(--ease-out);
+}
+.pa:hover{ color:var(--fg) }
+.pa.liked{ color:var(--gold) }
+.pa svg{ width:16px; height:16px }
+.pa-bk{ margin-left:auto; color:var(--fg-mute); cursor:pointer }
+.pa-bk:hover{ color:var(--fg) }
+
+/* ==================== COL DER — PERSONAS (SUGERIDOS + SOLICITUDES + TU RED) ==================== */
+.sn-right{
+  border-left:1px solid var(--border);
+  display:flex; flex-direction:column;
+  padding:24px 18px;
+  overflow-y:auto;
+}
+.sn-right::-webkit-scrollbar{ width:4px }
+.sn-right::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.06); border-radius:3px }
+
+.r-section{ display:flex; flex-direction:column }
+.r-section + .r-section{ margin-top:22px }
+.r-head{
+  display:flex; align-items:baseline; justify-content:space-between;
+  margin:0 6px 12px;
+}
+.r-head h3{
+  font-family:'Plus Jakarta Sans'; font-weight:800;
+  font-size:13.5px; letter-spacing:-0.01em;
+  color:var(--fg); margin:0;
+}
+.r-head .link{
+  font-family:'Urbanist'; font-weight:500;
+  font-size:11px; color:var(--fg-mute); cursor:pointer;
+}
+.r-head .link:hover{ color:var(--fg) }
+.r-head .badge{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:18px; min-width:20px; padding:0 6px; border-radius:99px;
+  background:var(--gold); color:#0a0a0a;
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:10px;
+  margin-left:8px;
+}
+
+/* Sugeridos: avatar grande arriba + nombre + N comunes + boton + */
+.sg-list{ display:flex; flex-direction:column; gap:6px }
+.sg-row{
+  display:flex; align-items:center; gap:11px;
+  padding:9px 8px; border-radius:13px;
+  cursor:pointer;
+  transition: background 180ms var(--ease-out);
+}
+.sg-row:hover{ background:var(--surface-low) }
+.sg-av{
+  width:42px; height:42px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; color:#0a0a0a;
+}
+.sg-body{ flex:1; min-width:0; line-height:1.25 }
+.sg-body .nm{
+  font-family:'Urbanist'; font-weight:700; font-size:13px; color:var(--fg);
+  display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.sg-body .ro{
+  font-family:'Urbanist'; font-weight:500; font-size:11px; color:var(--fg-mute);
+  display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.sg-body .ci{
+  display:inline-flex; align-items:center; gap:4px;
+  font-family:'Urbanist'; font-weight:600; font-size:10.5px;
+  color:var(--gold); margin-top:2px;
+}
+.sg-body .ci svg{ width:10px; height:10px }
+.sg-btn{
+  width:32px; height:32px; border-radius:50%;
+  border:1px solid var(--gold-border);
+  background: var(--gold-bg);
+  color:var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; cursor:pointer;
+  transition: all 200ms var(--ease-out);
+}
+.sg-btn:hover{ background:var(--gold); color:#0a0a0a }
+.sg-btn.sent{ background: var(--surface-medium); border-color: var(--border); color: var(--fg-mute); cursor: default }
+
+/* Solicitudes */
+.rq-list{ display:flex; flex-direction:column; gap:8px }
+.rq-row{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:11px 12px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.rq-top{ display:flex; align-items:center; gap:10px }
+.rq-av{
+  width:36px; height:36px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13px; color:#0a0a0a;
+}
+.rq-body{ flex:1; min-width:0; line-height:1.25 }
+.rq-body .nm{
+  font-family:'Urbanist'; font-weight:700; font-size:12.5px; color:var(--fg);
+  display:block;
+}
+.rq-body .ro{
+  font-family:'Urbanist'; font-weight:500; font-size:10.5px; color:var(--fg-mute);
+  display:block;
+}
+.rq-msg{
+  font-family:'Urbanist'; font-weight:400; font-size:11.5px;
+  color:var(--fg-dim); margin:0;
+  padding:8px 10px; border-radius:9px;
+  background: var(--surface-low);
+  line-height:1.4;
+}
+.rq-acts{ display:flex; gap:6px }
+.rq-btn{
+  flex:1;
+  padding:7px 0; border-radius:9px;
+  font-family:'Urbanist'; font-weight:700; font-size:11.5px;
+  cursor:pointer; text-align:center;
+  transition: all 180ms var(--ease-out);
+}
+.rq-btn.acc{ background:var(--gold); color:#0a0a0a }
+.rq-btn.acc:hover{ opacity:.9 }
+.rq-btn.rej{ background:transparent; border:1px solid var(--border-strong); color:var(--fg-dim) }
+.rq-btn.rej:hover{ color:var(--fg); border-color: var(--fg-mute) }
+
+/* Tu red (mini contactos) */
+.cn-list{ display:flex; flex-direction:column; gap:2px }
+.cn-row{
+  display:flex; align-items:center; gap:10px;
+  padding:7px 6px; border-radius:10px;
+  cursor:pointer;
+  transition: background 180ms var(--ease-out);
+}
+.cn-row:hover{ background:var(--surface-low) }
+.cn-av{
+  width:30px; height:30px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:11px; color:#0a0a0a;
+}
+.cn-body{ flex:1; min-width:0 }
+.cn-body .nm{
+  font-family:'Urbanist'; font-weight:600; font-size:12px; color:var(--fg);
+  display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.cn-body .ro{
+  font-family:'Urbanist'; font-weight:500; font-size:10.5px; color:var(--fg-mute);
+  display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.cn-on{
+  width:8px; height:8px; border-radius:50%;
+  background: var(--gold); flex-shrink:0;
+}
+
+/* Variant chooser fixed bottom right */
+.variant-tag{
+  position:fixed; bottom:20px; right:24px;
+  z-index:60;
+  background: var(--bg-elevated);
+  border:1px solid var(--border-strong);
+  border-radius:99px;
+  padding:8px 14px;
+  font-family:'Plus Jakarta Sans'; font-weight:700; font-size:11.5px;
+  color:var(--fg-dim);
+  display:inline-flex; gap:8px; align-items:center;
+  letter-spacing:0.04em;
+}
+.variant-tag b{ color:var(--gold) }
+
+@container (max-width: 1280px){
+  .canvas{ grid-template-columns: 220px 1fr 270px }
+}
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- Sidebar W.0 — slot Social activo -->
+  <aside class="sidebar">
+    <div class="sb-logo">EV</div>
+    <div class="sb-item" title="Inicio"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></div>
+    <div class="sb-item" title="Agenda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></div>
+    <div class="sb-item" title="En vivo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M5 12a7 7 0 0114 0M2 12a10 10 0 0120 0"/></svg></div>
+    <div class="sb-item" title="Speakers"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3z"/><path d="M19 10v1a7 7 0 01-14 0v-1M12 18v3M8 21h8"/></svg></div>
+    <div class="sb-item active" title="Social"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="7" r="2.2"/><path d="M3 19c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M14.5 14.2c2 .8 3.5 2.7 3.5 4.8"/></svg><span class="sb-badge">3</span></div>
+    <div class="sb-item" title="Sponsors"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-8h6v8"/></svg></div>
+    <div class="sb-sep"></div>
+    <div class="sb-item" title="Mi perfil" style="margin-top:auto"><div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#7c7cff)"></div></div>
+  </aside>
+
+  <main class="canvas">
+
+    <!-- ========== COL IZQ ========== -->
+    <section class="sn-left">
+      <div class="identity">
+        <div class="avatar">CR</div>
+        <h2>Camila Restrepo</h2>
+        <p>Founder · Lumira Studio</p>
+        <div class="stats">
+          <div class="stat"><span class="num">12</span><span class="lab">Posts</span></div>
+          <div class="stat"><span class="num">38</span><span class="lab">Red</span></div>
+          <div class="stat"><span class="num">5</span><span class="lab">Sesiones</span></div>
+        </div>
+      </div>
+
+      <nav class="sn-nav">
+        <div class="nav-item active">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+          Feed
+        </div>
+        <div class="nav-item">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span>
+          Personas
+        </div>
+        <div class="nav-item alert">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span>
+          Solicitudes
+          <span class="nb">3</span>
+        </div>
+        <div class="nav-item">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 8h18"/></svg></span>
+          Mis posts
+        </div>
+        <div class="nav-item">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 11a7 7 0 11-14 0 7 7 0 0114 0z"/><path d="M5 11v8a2 2 0 002 2h10a2 2 0 002-2v-8"/></svg></span>
+          Guardados
+        </div>
+      </nav>
+
+      <div class="sub-head">Actividad reciente</div>
+      <div class="act-list">
+        <div class="act-row">
+          <div class="act-av" style="background:#f59e0b">DR</div>
+          <div class="act-tx">
+            <span class="nm">Daniel Ruiz</span>
+            <span class="ms">Le dio like a <b>tu post</b></span>
+          </div>
+          <span class="act-time">2m</span>
+        </div>
+        <div class="act-row">
+          <div class="act-av" style="background:#10b981">SM</div>
+          <div class="act-tx">
+            <span class="nm">Sofia Mejia</span>
+            <span class="ms">Comento en <b>tu foto</b></span>
+          </div>
+          <span class="act-time">8m</span>
+        </div>
+        <div class="act-row">
+          <div class="act-av" style="background:#ec4899">VC</div>
+          <div class="act-tx">
+            <span class="nm">Valentina Cortes</span>
+            <span class="ms">Acepto tu conexion</span>
+          </div>
+          <span class="act-time">1h</span>
+        </div>
+        <div class="act-row">
+          <div class="act-av" style="background:#6366f1">AS</div>
+          <div class="act-tx">
+            <span class="nm">Andres Solorzano</span>
+            <span class="ms">Te menciono</span>
+          </div>
+          <span class="act-time">2h</span>
+        </div>
+        <div class="act-row">
+          <div class="act-av" style="background:#f97316">MR</div>
+          <div class="act-tx">
+            <span class="nm">Miguel Restrepo</span>
+            <span class="ms">Empezo a seguirte</span>
+          </div>
+          <span class="act-time">3h</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== COL CENTRO ========== -->
+    <section class="sn-center">
+      <div class="sn-header">
+        <div>
+          <h1 class="sn-title">Social</h1>
+          <div class="sn-sub">63 momentos hoy del evento</div>
+        </div>
+      </div>
+
+      <div class="sn-feed">
+
+        <!-- Stories -->
+        <div class="stories">
+          <div class="story add">
+            <div class="story-ring">
+              <div class="story-inner">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              </div>
+            </div>
+            <span class="story-lab">Subir</span>
+          </div>
+          <div class="story">
+            <div class="story-ring"><div class="story-inner" style="background:linear-gradient(135deg,#a78bfa,#7c7cff)"></div></div>
+            <span class="story-lab">Camila</span>
+          </div>
+          <div class="story">
+            <div class="story-ring"><div class="story-inner" style="background:linear-gradient(135deg,#f59e0b,#dc2626)"></div></div>
+            <span class="story-lab">Keynote</span>
+          </div>
+          <div class="story">
+            <div class="story-ring"><div class="story-inner" style="background:linear-gradient(135deg,#10b981,#0ea5e9)"></div></div>
+            <span class="story-lab">Daniel</span>
+          </div>
+          <div class="story">
+            <div class="story-ring"><div class="story-inner" style="background:linear-gradient(135deg,#ec4899,#a78bfa)"></div></div>
+            <span class="story-lab">After</span>
+          </div>
+          <div class="story">
+            <div class="story-ring"><div class="story-inner" style="background:linear-gradient(135deg,#6366f1,#0ea5e9)"></div></div>
+            <span class="story-lab">Andres</span>
+          </div>
+          <div class="story">
+            <div class="story-ring"><div class="story-inner" style="background:linear-gradient(135deg,#f97316,#fbbf24)"></div></div>
+            <span class="story-lab">Stand</span>
+          </div>
+        </div>
+
+        <!-- Composer -->
+        <div class="composer">
+          <div class="cp-row1">
+            <div class="cp-av">CR</div>
+            <div class="cp-input">Comparte algo del evento...</div>
+          </div>
+          <div class="cp-row2">
+            <button class="cp-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+              Foto
+            </button>
+            <button class="cp-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h.01M7 12h.01M7 17h.01M12 7h.01M12 12h.01M12 17h.01M17 7h.01M17 12h.01M17 17h.01"/></svg>
+              Hashtag
+            </button>
+            <button class="cp-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              Sesion
+            </button>
+            <button class="cp-post">Publicar</button>
+          </div>
+        </div>
+
+        <!-- Post 1 -->
+        <article class="post">
+          <div class="post-head">
+            <div class="post-av" style="background:#10b981">SM</div>
+            <div class="post-id">
+              <span class="nm">Sofia Mejia</span>
+              <span class="meta"><b>Product Lead · Nimbus</b> · hace 6 min</span>
+            </div>
+            <button class="post-more" aria-label="mas">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="18" r="1.2"/></svg>
+            </button>
+          </div>
+          <p class="post-body">La sesion de Maria Fernanda sobre IA en producto fue oro puro. Tres takeaways que ya estoy aplicando este lunes <span class="ht">#producto</span> <span class="ht">#ai</span></p>
+          <div class="post-img" style="background-image:linear-gradient(120deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.35) 100%),url('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=900&q=80')"></div>
+          <div class="post-actions">
+            <span class="pa liked">
+              <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 21s-7-4.5-9.5-9.5C1 8 3.5 4.5 7 4.5c2 0 3.5 1 5 3 1.5-2 3-3 5-3 3.5 0 6 3.5 4.5 7C19 16.5 12 21 12 21z"/></svg>
+              247
+            </span>
+            <span class="pa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3.3-7L21 4v6h-6"/></svg>
+              32
+            </span>
+            <span class="pa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 18-3-7-7-3z"/></svg>
+              Compartir
+            </span>
+            <span class="pa pa-bk">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/></svg>
+            </span>
+          </div>
+        </article>
+
+        <!-- Post 2 -->
+        <article class="post">
+          <div class="post-head">
+            <div class="post-av" style="background:#6366f1">AS</div>
+            <div class="post-id">
+              <span class="nm">Andres Solorzano</span>
+              <span class="meta"><b>CTO · Vortex</b> · hace 22 min</span>
+            </div>
+            <button class="post-more" aria-label="mas">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="18" r="1.2"/></svg>
+            </button>
+          </div>
+          <p class="post-body">Pregunta para la audiencia: cuantos de ustedes ya estan corriendo agentes LLM en produccion? Y mas importante, donde se les ha caido la pinta? <span class="ht">#agents</span></p>
+          <div class="post-actions">
+            <span class="pa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.5-9.5C1 8 3.5 4.5 7 4.5c2 0 3.5 1 5 3 1.5-2 3-3 5-3 3.5 0 6 3.5 4.5 7C19 16.5 12 21 12 21z"/></svg>
+              89
+            </span>
+            <span class="pa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3.3-7L21 4v6h-6"/></svg>
+              28
+            </span>
+            <span class="pa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 18-3-7-7-3z"/></svg>
+              Compartir
+            </span>
+            <span class="pa pa-bk">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/></svg>
+            </span>
+          </div>
+        </article>
+
+        <!-- Post 3 -->
+        <article class="post">
+          <div class="post-head">
+            <div class="post-av" style="background:#f59e0b">DR</div>
+            <div class="post-id">
+              <span class="nm">Daniel Ruiz</span>
+              <span class="meta"><b>Designer · Estudio 9</b> · hace 1 h</span>
+            </div>
+            <button class="post-more" aria-label="mas">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="18" r="1.2"/></svg>
+            </button>
+          </div>
+          <p class="post-body">Stand de Lumira en el primer piso, pasen a saludar. Tenemos demo del nuevo SDK y cafe bueno <span class="ht">#stand</span> <span class="ht">#sdk</span></p>
+          <div class="post-img" style="background-image:linear-gradient(120deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0.35) 100%),url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=900&q=80')"></div>
+          <div class="post-actions">
+            <span class="pa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.5-9.5C1 8 3.5 4.5 7 4.5c2 0 3.5 1 5 3 1.5-2 3-3 5-3 3.5 0 6 3.5 4.5 7C19 16.5 12 21 12 21z"/></svg>
+              124
+            </span>
+            <span class="pa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3.3-7L21 4v6h-6"/></svg>
+              19
+            </span>
+            <span class="pa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 18-3-7-7-3z"/></svg>
+              Compartir
+            </span>
+            <span class="pa pa-bk">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/></svg>
+            </span>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ========== COL DER ========== -->
+    <aside class="sn-right">
+
+      <!-- Sugeridos por intereses -->
+      <section class="r-section">
+        <div class="r-head">
+          <h3>Sugeridos para ti</h3>
+          <span class="link">Ver todos</span>
+        </div>
+        <div class="sg-list">
+          <div class="sg-row">
+            <div class="sg-av" style="background:#ec4899">VC</div>
+            <div class="sg-body">
+              <span class="nm">Valentina Cortes</span>
+              <span class="ro">Head of Product · Lumen</span>
+              <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 010 18"/></svg>4 intereses en comun</span>
+            </div>
+            <button class="sg-btn" aria-label="Conectar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </div>
+          <div class="sg-row">
+            <div class="sg-av" style="background:#06b6d4">MF</div>
+            <div class="sg-body">
+              <span class="nm">Maria Fernanda Solis</span>
+              <span class="ro">Speaker · Investigadora IA</span>
+              <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 010 18"/></svg>3 intereses en comun</span>
+            </div>
+            <button class="sg-btn sent" aria-label="Enviada">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+          </div>
+          <div class="sg-row">
+            <div class="sg-av" style="background:#f97316">MR</div>
+            <div class="sg-body">
+              <span class="nm">Miguel Restrepo</span>
+              <span class="ro">Founder · Nodal</span>
+              <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 010 18"/></svg>3 intereses en comun</span>
+            </div>
+            <button class="sg-btn" aria-label="Conectar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </div>
+          <div class="sg-row">
+            <div class="sg-av" style="background:#a78bfa">LP</div>
+            <div class="sg-body">
+              <span class="nm">Laura Pineda</span>
+              <span class="ro">Marketing Lead · Ferro</span>
+              <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 010 18"/></svg>2 intereses en comun</span>
+            </div>
+            <button class="sg-btn" aria-label="Conectar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Solicitudes -->
+      <section class="r-section">
+        <div class="r-head">
+          <h3>Solicitudes <span class="badge">3</span></h3>
+          <span class="link">Todas</span>
+        </div>
+        <div class="rq-list">
+          <div class="rq-row">
+            <div class="rq-top">
+              <div class="rq-av" style="background:#dc2626">JT</div>
+              <div class="rq-body">
+                <span class="nm">Julian Torres</span>
+                <span class="ro">CEO · Briza</span>
+              </div>
+            </div>
+            <p class="rq-msg">"Vi tu post sobre el SDK, me encantaria conectar para charlar de integraciones"</p>
+            <div class="rq-acts">
+              <button class="rq-btn acc">Aceptar</button>
+              <button class="rq-btn rej">Mas tarde</button>
+            </div>
+          </div>
+          <div class="rq-row">
+            <div class="rq-top">
+              <div class="rq-av" style="background:#10b981">NB</div>
+              <div class="rq-body">
+                <span class="nm">Natalia Bedoya</span>
+                <span class="ro">Investor · K-Ventures</span>
+              </div>
+            </div>
+            <div class="rq-acts">
+              <button class="rq-btn acc">Aceptar</button>
+              <button class="rq-btn rej">Mas tarde</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tu red -->
+      <section class="r-section">
+        <div class="r-head">
+          <h3>Tu red</h3>
+          <span class="link">Ver todos (38)</span>
+        </div>
+        <div class="cn-list">
+          <div class="cn-row">
+            <div class="cn-av" style="background:#10b981">SM</div>
+            <div class="cn-body">
+              <span class="nm">Sofia Mejia</span>
+              <span class="ro">Product Lead · Nimbus</span>
+            </div>
+            <span class="cn-on"></span>
+          </div>
+          <div class="cn-row">
+            <div class="cn-av" style="background:#6366f1">AS</div>
+            <div class="cn-body">
+              <span class="nm">Andres Solorzano</span>
+              <span class="ro">CTO · Vortex</span>
+            </div>
+            <span class="cn-on"></span>
+          </div>
+          <div class="cn-row">
+            <div class="cn-av" style="background:#f59e0b">DR</div>
+            <div class="cn-body">
+              <span class="nm">Daniel Ruiz</span>
+              <span class="ro">Designer · Estudio 9</span>
+            </div>
+          </div>
+          <div class="cn-row">
+            <div class="cn-av" style="background:#ec4899">PA</div>
+            <div class="cn-body">
+              <span class="nm">Paula Arenas</span>
+              <span class="ro">UX Researcher · Vector</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+
+  </main>
+
+  <div class="variant-tag">OPCION <b>A</b> · 3 columnas</div>
+</div>
+</body>
+</html>
