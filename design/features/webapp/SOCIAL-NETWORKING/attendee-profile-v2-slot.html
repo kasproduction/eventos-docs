@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>W.6 — Perfil attendee · DaVinci v2.1 (slot der + posts inline + estados Expo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-sunken:#0a0a0a;
+  --bg-elevated:#141414;
+  --surface-low:#1a1a1a;
+  --surface-medium:#1f1f1f;
+  --surface-high:#262626;
+  --surface-card:#181818;
+  --border:rgba(255,255,255,0.06);
+  --border-strong:rgba(255,255,255,0.12);
+  --fg:#f5f5f4;
+  --fg-dim:#a8a8a3;
+  --fg-mute:#6b6b66;
+  --fg-label:#5a5a55;
+
+  --gold:#B5A68B;
+  --slate:#64748b;
+  --slate-light:#94a3b8;
+  --slate-dark:#475569;
+  --slate-soft: rgba(148,163,184,0.16);
+  --slate-soft-strong: rgba(148,163,184,0.24);
+  --slate-border: rgba(148,163,184,0.28);
+
+  --canvas-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+
+  --spring-soft: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-sans:    'Urbanist', system-ui, sans-serif;
+
+  --col-left: 260px;
+  --col-right: 300px;
+  --col-right-profile: 360px;
+}
+
+*{ box-sizing: border-box }
+html,body{ margin: 0; padding: 0; background: var(--bg-sunken); color: var(--fg);
+  font-family: var(--font-sans); -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   Shell mockup (replica el CanvasCard del W.0)
+   ============================================================ */
+
+.shell{
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 28px 48px;
+}
+.canvas{
+  width: 100%;
+  max-width: 1600px;
+  min-height: calc(100vh - 72px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: var(--canvas-shadow);
+  overflow: hidden;
+}
+
+/* Grid del modulo Social — anima el ancho del slot der cuando hay perfil abierto */
+.sn-canvas{
+  display: grid;
+  grid-template-columns: var(--col-left) minmax(0, 1fr) var(--col-right);
+  height: 100%;
+  min-height: calc(100vh - 72px);
+  transition: grid-template-columns 280ms var(--ease-in-out);
+}
+.sn-canvas.profile-open{
+  grid-template-columns: var(--col-left) minmax(0, 1fr) var(--col-right-profile);
+}
+
+/* ============================================================
+   COLUMNA IZQUIERDA — sidebar identidad
+   ============================================================ */
+.col-left{
+  border-right: 1px solid var(--border);
+  padding: 28px 22px;
+}
+.identity{ text-align: center; margin-bottom: 28px }
+.identity-avatar{
+  width: 72px; height: 72px; border-radius: 50%;
+  background-size: cover; background-position: center;
+  margin: 0 auto 14px; border: 1px solid var(--border);
+  background-image: url('https://hostedboringavatars.vercel.app/api/beam/72/Juan%20Perez?colors=475569,64748b,94a3b8,B5A68B,e7e5e4');
+}
+.identity h2{ font-family: var(--font-display); font-weight: 700; font-size: 16px; margin: 0 0 4px 0; color: var(--fg) }
+.identity p{ font-family: var(--font-sans); font-size: 11.5px; color: var(--fg-mute); margin: 0 0 18px 0 }
+.identity-stats{ display: flex; justify-content: center; gap: 28px }
+.stat .n{ display: block; font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--fg); text-align: center }
+.stat .l{ display: block; font-family: var(--font-sans); font-weight: 500; font-size: 9.5px; color: var(--fg-label); text-transform: uppercase; letter-spacing: 0.10em; text-align: center }
+
+.nav{ display: flex; flex-direction: column; gap: 2px }
+.nav-item{
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer;
+  font-family: var(--font-sans); font-weight: 500; font-size: 13.5px;
+  color: var(--fg-dim); transition: all 160ms var(--ease-out);
+}
+.nav-item:hover{ background: var(--surface-low); color: var(--fg) }
+.nav-item.active{ background: var(--surface-medium); color: var(--fg); font-weight: 600 }
+
+/* ============================================================
+   COLUMNA CENTRAL — feed inline editorial (sin cards)
+   ============================================================ */
+.col-center{
+  padding: 28px 36px 36px;
+  overflow-y: auto;
+  max-height: calc(100vh - 72px);
+}
+.center-head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px;
+}
+.center-head h1{ font-family: var(--font-display); font-weight: 700; font-size: 24px; color: var(--fg); margin: 0 }
+.center-search{
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; background: var(--surface-low); border: 1px solid var(--border);
+  border-radius: 999px; width: 280px;
+}
+.center-search svg{ color: var(--fg-mute); flex-shrink: 0 }
+.center-search input{
+  background: transparent; border: 0; outline: 0; color: var(--fg);
+  font-family: var(--font-sans); font-size: 12.5px; width: 100%;
+}
+.center-search input::placeholder{ color: var(--fg-mute) }
+
+/* ---- Composer inline (sin card) ---- */
+.composer{
+  display: flex; gap: 14px;
+  padding: 6px 0 18px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+.composer .av{
+  width: 38px; height: 38px; border-radius: 50%;
+  background-size: cover; flex-shrink: 0;
+  background-image: url('https://hostedboringavatars.vercel.app/api/beam/38/Juan%20Perez?colors=475569,64748b,94a3b8,B5A68B,e7e5e4');
+}
+.composer .body{ flex: 1 }
+.composer .ph{
+  color: var(--fg-mute); font-family: var(--font-sans);
+  font-size: 14.5px; margin-bottom: 10px; cursor: text;
+}
+.composer-actions{
+  display: flex; justify-content: space-between; align-items: center;
+}
+.composer-actions .pill{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 999px;
+  background: transparent; color: var(--fg-mute);
+  font-family: var(--font-sans); font-size: 12px; cursor: pointer;
+  border: 0;
+}
+.composer-actions .pill:hover{ color: var(--fg) }
+.composer-actions .publish{
+  padding: 7px 16px; border-radius: 999px;
+  background: var(--surface-medium); border: 1px solid var(--border-strong);
+  color: var(--fg-mute); font-family: var(--font-sans);
+  font-weight: 600; font-size: 12.5px; cursor: not-allowed;
+}
+
+/* ---- Posts inline editorial (sin card, separados por divider) ---- */
+.post{
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+}
+.post:last-child{ border-bottom: 0 }
+.post-head{
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 10px;
+}
+.post-av{
+  width: 38px; height: 38px; border-radius: 50%;
+  background-size: cover; background-position: center;
+  flex-shrink: 0; border: 1px solid var(--border);
+}
+.post-meta .post-name{
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 14px; color: var(--fg); display: block;
+}
+.post-meta .post-date{
+  font-family: var(--font-sans); font-size: 11.5px;
+  color: var(--fg-mute); display: block; margin-top: 2px;
+}
+.post-body{
+  font-family: var(--font-sans); font-weight: 400;
+  font-size: 15px; color: var(--fg-dim);
+  line-height: 1.55; margin: 0 0 12px 0;
+  padding-left: 50px;
+}
+.post-actions{
+  display: flex; gap: 22px; padding-left: 50px;
+  color: var(--fg-mute); font-family: var(--font-sans);
+  font-size: 12.5px;
+}
+.post-actions span{
+  display: inline-flex; align-items: center; gap: 6px;
+  cursor: pointer; transition: color 160ms var(--ease-out);
+}
+.post-actions span:hover{ color: var(--fg) }
+
+/* ============================================================
+   COLUMNA DERECHA — slot que muta entre panel-default y panel-profile
+   ============================================================ */
+.col-right{
+  border-left: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.panel{
+  position: absolute; inset: 0;
+  padding: 24px 22px;
+  overflow-y: auto;
+  transition:
+    opacity 220ms var(--ease-out),
+    transform 280ms var(--spring-soft);
+}
+.panel-default{ opacity: 1; transform: translateX(0) }
+.panel-profile{ opacity: 0; transform: translateX(16px); pointer-events: none }
+.profile-open .panel-default{ opacity: 0; transform: translateX(-12px); pointer-events: none }
+.profile-open .panel-profile{ opacity: 1; transform: translateX(0); pointer-events: auto }
+
+/* ---- Panel default ---- */
+.sn-section{ margin-bottom: 22px }
+.sn-section h3{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--fg-label); margin: 0 0 12px 0;
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.sn-section h3 .lk{
+  font-size: 10px; color: var(--slate-light);
+  text-transform: none; letter-spacing: 0;
+  cursor: pointer; font-weight: 500;
+}
+.empty-hint{
+  font-family: var(--font-sans); font-size: 12px;
+  color: var(--fg-mute); margin: 0; line-height: 1.5;
+}
+
+.mini-row{
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 4px; border-radius: 10px; cursor: pointer;
+  transition: all 160ms var(--ease-out);
+}
+.mini-row:hover{
+  background: var(--surface-low);
+  padding-left: 8px; padding-right: 8px;
+  margin-left: -4px; margin-right: -4px;
+}
+.mini-av{
+  width: 32px; height: 32px; border-radius: 50%;
+  background-size: cover; background-position: center;
+  flex-shrink: 0; border: 1px solid var(--border);
+}
+.mini-info{ flex: 1; min-width: 0 }
+.mini-name{
+  display: block; font-family: var(--font-sans); font-weight: 600;
+  font-size: 12.5px; color: var(--fg);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mini-role{
+  display: block; font-family: var(--font-sans); font-weight: 500;
+  font-size: 11px; color: var(--fg-mute);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ============================================================
+   PANEL PROFILE — perfil del attendee dentro del slot
+   ============================================================ */
+.pp-head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.pp-back{
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; border: 0; color: var(--fg-mute);
+  font-family: var(--font-sans); font-weight: 500; font-size: 11.5px;
+  cursor: pointer; padding: 4px 0; border-radius: 8px;
+  text-transform: uppercase; letter-spacing: 0.10em;
+}
+.pp-close{
+  width: 30px; height: 30px;
+  border: 1px solid var(--border); border-radius: 50%;
+  background: var(--surface-low); color: var(--fg-dim);
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  transition: all 160ms var(--ease-out);
+}
+.pp-close:hover{ background: var(--surface-medium); color: var(--fg); border-color: var(--border-strong) }
+
+/* Dev toggle de estados — solo para el demo, no va al codigo */
+.pp-dev-toggle{
+  display: flex; align-items: center; gap: 4px;
+  background: var(--surface-low); border: 1px solid var(--border);
+  border-radius: 999px; padding: 3px;
+  margin-bottom: 18px; font-family: var(--font-sans);
+}
+.pp-dev-toggle button{
+  flex: 1; background: transparent; border: 0;
+  color: var(--fg-mute); font-family: var(--font-sans);
+  font-weight: 600; font-size: 10px;
+  padding: 5px 6px; border-radius: 999px; cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: all 160ms var(--ease-out);
+}
+.pp-dev-toggle button.active{
+  background: var(--slate-light); color: #0a0a0a;
+}
+.pp-dev-label{
+  font-family: var(--font-sans); font-weight: 600;
+  font-size: 9px; color: var(--fg-label);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  text-align: center; margin: 0 0 6px 0;
+}
+
+.pp-hero{
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  margin-bottom: 20px;
+}
+.pp-avatar{
+  width: 88px; height: 88px; border-radius: 50%;
+  background-size: cover; background-position: center;
+  border: 1px solid var(--border); margin-bottom: 12px;
+}
+.pp-name{
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 19px; line-height: 1.2; letter-spacing: -0.015em;
+  color: var(--fg); margin: 0 0 3px 0;
+}
+.pp-role{
+  font-family: var(--font-sans); font-weight: 500;
+  font-size: 12.5px; color: var(--fg-dim);
+  margin: 0 0 10px 0;
+}
+.pp-socials{ display: inline-flex; gap: 8px }
+.pp-socials a{
+  width: 28px; height: 28px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface-low);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--fg-mute); transition: all 160ms var(--ease-out);
+}
+.pp-socials a:hover{ color: var(--fg); border-color: var(--border-strong); transform: translateY(-1px) }
+
+.pp-in-common{
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 8px 12px;
+  background: var(--slate-soft); border: 1px solid var(--slate-border);
+  border-radius: 10px;
+  font-family: var(--font-sans); font-weight: 600;
+  font-size: 11.5px; color: var(--slate-light);
+  margin-bottom: 16px; text-align: center; line-height: 1.35;
+}
+.pp-in-common b{ color: var(--fg) }
+
+/* ============= Zona de acciones (cambia segun estado) ============= */
+.pp-actions-zone{
+  margin-bottom: 22px;
+  position: relative;
+  min-height: 44px;
+}
+
+/* Cada vista de acciones — se intercambian segun [data-relation] */
+.action-view{ display: none; flex-direction: column; gap: 8px }
+.panel-profile[data-relation="none"]     .action-none{ display: flex }
+.panel-profile[data-relation="sent"]     .action-sent{ display: flex }
+.panel-profile[data-relation="received"] .action-received{ display: flex }
+.panel-profile[data-relation="contact"]  .action-contact{ display: flex }
+.panel-profile.composing-message .action-view{ display: none }
+.panel-profile.composing-message .compose-view{ display: flex }
+
+.pp-btn{
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 14px; border-radius: 10px;
+  font-family: var(--font-sans); font-weight: 700;
+  font-size: 12.5px; cursor: pointer;
+  transition: all 180ms var(--ease-out);
+  border: 1px solid transparent; letter-spacing: 0.01em;
+}
+.pp-btn-primary{ background: var(--slate-light); color: #0a0a0a; border-color: var(--slate-light) }
+.pp-btn-primary:hover{ background: #b5c2cf; transform: translateY(-1px) }
+.pp-btn-ghost{ background: transparent; border-color: var(--border-strong); color: var(--fg-dim) }
+.pp-btn-ghost:hover{ background: var(--surface-low); color: var(--fg); border-color: var(--slate-border) }
+.pp-btn-disabled{
+  background: var(--surface-low); border-color: var(--border); color: var(--fg-mute);
+  cursor: not-allowed;
+}
+.pp-btn-row{ display: flex; gap: 8px }
+.pp-btn-row .pp-btn{ flex: 1 }
+.pp-btn-cancel{
+  background: transparent; border: 0; color: var(--fg-mute);
+  font-family: var(--font-sans); font-weight: 500; font-size: 11.5px;
+  cursor: pointer; padding: 6px; text-align: center;
+}
+.pp-btn-cancel:hover{ color: var(--fg) }
+
+/* Acciones de contacto (cuando relation === contact) */
+.contact-row{
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 12px; border-radius: 11px;
+  background: var(--surface-low); border: 1px solid var(--border);
+  cursor: pointer; transition: all 180ms var(--ease-out);
+  font-family: var(--font-sans);
+}
+.contact-row:hover{
+  background: var(--surface-medium); border-color: var(--slate-border);
+  transform: translateY(-1px);
+}
+.contact-row .ic{
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--slate-soft); display: inline-flex;
+  align-items: center; justify-content: center;
+  color: var(--slate-light); flex-shrink: 0;
+}
+.contact-row .body{ flex: 1; min-width: 0 }
+.contact-row .body .lb{
+  display: block; font-weight: 700; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--fg-label); margin-bottom: 2px;
+}
+.contact-row .body .va{
+  display: block; font-weight: 500; font-size: 12.5px;
+  color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Compose view (textarea para mensaje opcional de conexion) */
+.compose-view{
+  display: none; flex-direction: column; gap: 10px;
+}
+.compose-view textarea{
+  width: 100%; min-height: 86px; resize: vertical;
+  padding: 11px 12px; border-radius: 10px;
+  background: var(--surface-low); border: 1px solid var(--border);
+  color: var(--fg); font-family: var(--font-sans); font-size: 12.5px;
+  line-height: 1.5; outline: 0;
+}
+.compose-view textarea:focus{ border-color: var(--slate-border); background: var(--surface-medium) }
+.compose-view textarea::placeholder{ color: var(--fg-mute) }
+.compose-counter{
+  font-family: var(--font-sans); font-size: 10.5px;
+  color: var(--fg-label); text-align: right;
+  margin-top: -4px;
+}
+
+/* ============= Secciones del cuerpo ============= */
+.pp-section{ margin-bottom: 20px }
+.pp-section-title{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--fg-label); margin: 0 0 10px 0;
+}
+.pp-bio{
+  font-family: var(--font-sans); font-weight: 400;
+  font-size: 13px; line-height: 1.55;
+  color: var(--fg-dim); margin: 0;
+}
+
+.pp-interests{ display: flex; flex-wrap: wrap; gap: 6px }
+.pp-int{
+  padding: 5px 10px; border-radius: 999px;
+  font-family: var(--font-sans); font-weight: 500;
+  font-size: 11px; border: 1px solid var(--border);
+  background: var(--surface-low); color: var(--fg-mute);
+}
+.pp-int.shared{
+  background: var(--slate-soft); border-color: var(--slate-border);
+  color: var(--slate-light); font-weight: 600;
+}
+
+.pp-session{
+  display: grid; grid-template-columns: 1fr auto;
+  align-items: center; gap: 8px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: all 160ms var(--ease-out);
+}
+.pp-session:last-child{ border-bottom: 0 }
+.pp-session:hover{
+  padding-left: 6px; padding-right: 6px;
+  margin-left: -6px; margin-right: -6px;
+  background: var(--surface-low); border-radius: 8px;
+}
+.pp-session-time{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 10.5px; color: var(--fg-label);
+  text-transform: uppercase; letter-spacing: 0.10em;
+  margin-bottom: 2px;
+}
+.pp-session-title{
+  font-family: var(--font-sans); font-weight: 600;
+  font-size: 12.5px; color: var(--fg);
+  margin: 0; line-height: 1.35;
+}
+.pp-session-arrow{ color: var(--fg-label); transition: all 160ms var(--ease-out) }
+.pp-session:hover .pp-session-arrow{ color: var(--slate-light); transform: translateX(2px) }
+
+.pp-foot{
+  display: flex; justify-content: center;
+  padding-top: 16px; border-top: 1px solid var(--border);
+}
+.pp-block{
+  background: transparent; border: 0;
+  color: rgba(220,38,38,0.72); font-family: var(--font-sans);
+  font-weight: 500; font-size: 11.5px;
+  cursor: pointer; padding: 6px 12px; border-radius: 8px;
+  letter-spacing: 0.02em;
+}
+.pp-block:hover{ background: rgba(220,38,38,0.08); color: #f87171 }
+
+.mini-row.active-profile{
+  background: var(--slate-soft);
+  padding-left: 8px; padding-right: 8px;
+  margin-left: -4px; margin-right: -4px;
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="canvas">
+    <div class="sn-canvas" id="sn">
+
+      <!-- ============= COLUMNA IZQ ============= -->
+      <aside class="col-left">
+        <div class="identity">
+          <div class="identity-avatar"></div>
+          <h2>Juan Perez</h2>
+          <p>presencial@eventos.test</p>
+          <div class="identity-stats">
+            <div class="stat"><span class="n">2</span><span class="l">Posts</span></div>
+            <div class="stat"><span class="n">6</span><span class="l">Red</span></div>
+          </div>
+        </div>
+        <nav class="nav">
+          <div class="nav-item active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Feed
+          </div>
+          <div class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Personas
+          </div>
+          <div class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            Solicitudes
+          </div>
+          <div class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            Mis posts
+          </div>
+        </nav>
+      </aside>
+
+      <!-- ============= COLUMNA CENTRAL (feed inline, sin cards) ============= -->
+      <section class="col-center">
+        <div class="center-head">
+          <h1>Social</h1>
+          <label class="center-search">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Buscar en posts" />
+          </label>
+        </div>
+
+        <!-- Composer inline -->
+        <div class="composer">
+          <div class="av"></div>
+          <div class="body">
+            <p class="ph">Comparte algo del evento...</p>
+            <div class="composer-actions">
+              <button class="pill">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                Foto
+              </button>
+              <button class="publish">Publicar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Posts inline editorial -->
+        <article class="post">
+          <div class="post-head">
+            <div class="post-av" style="background-image:url('https://hostedboringavatars.vercel.app/api/beam/38/Ethan%20Brooks?colors=475569,64748b,94a3b8,B5A68B,e7e5e4')"></div>
+            <div class="post-meta">
+              <span class="post-name">Ethan Brooks</span>
+              <span class="post-date">24 abr</span>
+            </div>
+          </div>
+          <p class="post-body">Networking de primer nivel en este evento</p>
+          <div class="post-actions">
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> 1</span>
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 2</span>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-head">
+            <div class="post-av" style="background-image:url('https://hostedboringavatars.vercel.app/api/beam/38/Juan%20Perez?colors=475569,64748b,94a3b8,B5A68B,e7e5e4')"></div>
+            <div class="post-meta">
+              <span class="post-name">Juan Perez</span>
+              <span class="post-date">24 abr</span>
+            </div>
+          </div>
+          <p class="post-body">Bis on is</p>
+          <div class="post-actions">
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> 1</span>
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 0</span>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-head">
+            <div class="post-av" style="background-image:url('https://hostedboringavatars.vercel.app/api/beam/38/Lina%20Castillo?colors=475569,64748b,94a3b8,B5A68B,e7e5e4')"></div>
+            <div class="post-meta">
+              <span class="post-name">Lina Castillo</span>
+              <span class="post-date">24 abr</span>
+            </div>
+          </div>
+          <p class="post-body">El mejor summit empresarial del año</p>
+          <div class="post-actions">
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> 0</span>
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 0</span>
+          </div>
+        </article>
+
+        <article class="post">
+          <div class="post-head">
+            <div class="post-av" style="background-image:url('https://hostedboringavatars.vercel.app/api/beam/38/Sofia%20Romero?colors=475569,64748b,94a3b8,B5A68B,e7e5e4')"></div>
+            <div class="post-meta">
+              <span class="post-name">Sofia Romero</span>
+              <span class="post-date">24 abr</span>
+            </div>
+          </div>
+          <p class="post-body">Networking de primer nivel en este evento</p>
+          <div class="post-actions">
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> 0</span>
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 0</span>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- ============= COLUMNA DERECHA — slot ============= -->
+      <div class="col-right">
+
+        <!-- Panel default -->
+        <div class="panel panel-default" id="panel-default">
+          <div class="sn-section">
+            <h3>Sugeridos para ti</h3>
+            <p class="empty-hint">Agrega intereses en tu perfil para que el matchmaking encuentre afinidades.</p>
+          </div>
+
+          <div class="sn-section">
+            <h3>Solicitudes</h3>
+            <p class="empty-hint">Sin solicitudes pendientes.</p>
+          </div>
+
+          <div class="sn-section">
+            <h3>Tu red <span class="lk">Ver todos (6)</span></h3>
+
+            <div class="mini-row" data-id="sofia" data-name="Sofia Torres" data-role="CEO · Fintech Latam" data-relation="contact">
+              <div class="mini-av" style="background-image:url('https://hostedboringavatars.vercel.app/api/beam/32/Sofia%20Torres?colors=475569,64748b,94a3b8,B5A68B,e7e5e4')"></div>
+              <div class="mini-info">
+                <span class="mini-name">Sofia Torres</span>
+                <span class="mini-role">CEO · Fintech Latam</span>
+              </div>
+            </div>
+
+            <div class="mini-row" data-id="diego" data-name="Diego Ramirez" data-role="Director Creativo · Studio Digital" data-relation="contact">
+              <div class="mini-av" style="background-image:url('https://hostedboringavatars.vercel.app/api/beam/32/Diego%20Ramirez?colors=475569,64748b,94a3b8,B5A68B,e7e5e4')"></div>
+              <div class="mini-info">
+                <span class="mini-name">Diego Ramirez</span>
+                <span class="mini-role">Director Creativo · Studio Digital</span>
+              </div>
+            </div>
+
+            <div class="mini-row" data-id="valentina" data-name="Valentina Cruz" data-role="Product Manager · Startup Hub" data-relation="contact">
+              <div class="mini-av" style="background-image:url('https://hostedboringavatars.vercel.app/api/beam/32/Valentina%20Cruz?colors=475569,64748b,94a3b8,B5A68B,e7e5e4')"></div>
+              <div class="mini-info">
+                <span class="mini-name">Valentina Cruz</span>
+                <span class="mini-role">Product Manager · Startup Hub</span>
+              </div>
+            </div>
+
+            <div class="mini-row" data-id="ryan" data-name="Ryan Cooper" data-role="Associate · Accel Partners" data-relation="contact">
+              <div class="mini-av" style="background-image:url('https://hostedboringavatars.vercel.app/api/beam/32/Ryan%20Cooper?colors=475569,64748b,94a3b8,B5A68B,e7e5e4')"></div>
+              <div class="mini-info">
+                <span class="mini-name">Ryan Cooper</span>
+                <span class="mini-role">Associate · Accel Partners</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel profile — estado por defecto none -->
+        <div class="panel panel-profile" id="panel-profile" data-relation="none">
+
+          <div class="pp-head">
+            <span class="pp-back">PERFIL</span>
+            <button class="pp-close" id="pp-close" aria-label="Cerrar perfil">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- Dev toggle (solo en demo, no va al React) -->
+          <p class="pp-dev-label">Demo — estado de relacion</p>
+          <div class="pp-dev-toggle">
+            <button type="button" class="active" data-rel="none">No contacto</button>
+            <button type="button" data-rel="sent">Enviada</button>
+            <button type="button" data-rel="received">Recibida</button>
+            <button type="button" data-rel="contact">Contacto</button>
+          </div>
+
+          <div class="pp-hero">
+            <div class="pp-avatar" id="pp-avatar"></div>
+            <h2 class="pp-name" id="pp-name">Diego Ramirez</h2>
+            <p class="pp-role" id="pp-role">Director Creativo · Studio Digital</p>
+            <span class="pp-socials">
+              <a href="#" aria-label="LinkedIn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.95v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43c-1.14 0-2.06-.93-2.06-2.06s.92-2.06 2.06-2.06 2.06.92 2.06 2.06-.92 2.06-2.06 2.06zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+              </a>
+              <a href="#" aria-label="Instagram">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              </a>
+            </span>
+          </div>
+
+          <p class="pp-in-common">
+            <b>2</b> intereses en comun: Branding · Eventos
+          </p>
+
+          <!-- Zona de acciones — cambia segun data-relation -->
+          <div class="pp-actions-zone">
+
+            <!-- none: solo Conectar -->
+            <div class="action-view action-none">
+              <button class="pp-btn pp-btn-primary" id="btn-connect-open">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="22" y1="11" x2="22" y2="17"/><line x1="19" y1="14" x2="25" y2="14"/></svg>
+                Conectar con Diego
+              </button>
+            </div>
+
+            <!-- sent: disabled -->
+            <div class="action-view action-sent">
+              <button class="pp-btn pp-btn-disabled" disabled>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+                Solicitud enviada
+              </button>
+              <button class="pp-btn pp-btn-cancel" id="btn-cancel-sent">Cancelar solicitud</button>
+            </div>
+
+            <!-- received: Aceptar + Ignorar -->
+            <div class="action-view action-received">
+              <div class="pp-btn-row">
+                <button class="pp-btn pp-btn-primary">Aceptar</button>
+                <button class="pp-btn pp-btn-ghost">Ignorar</button>
+              </div>
+            </div>
+
+            <!-- contact: WhatsApp + Email + vCard (espejo Expo Contactar section) -->
+            <div class="action-view action-contact">
+              <div class="contact-row">
+                <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
+                <div class="body">
+                  <span class="lb">WhatsApp</span>
+                  <span class="va">+57 312 555 0184</span>
+                </div>
+              </div>
+              <div class="contact-row">
+                <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+                <div class="body">
+                  <span class="lb">Email</span>
+                  <span class="va">diego@studiodigital.co</span>
+                </div>
+              </div>
+              <div class="contact-row">
+                <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                <div class="body">
+                  <span class="lb">vCard</span>
+                  <span class="va">Descargar a tu agenda</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Compose view (textarea para mensaje opcional) -->
+            <div class="action-view compose-view">
+              <textarea id="compose-text" placeholder="Decile algo a Diego (opcional, max 500)" maxlength="500"></textarea>
+              <p class="compose-counter"><span id="compose-count">0</span> / 500</p>
+              <div class="pp-btn-row">
+                <button class="pp-btn pp-btn-primary" id="btn-send">Enviar solicitud</button>
+                <button class="pp-btn pp-btn-ghost" id="btn-compose-cancel">Cancelar</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bio -->
+          <div class="pp-section">
+            <h3 class="pp-section-title">Sobre</h3>
+            <p class="pp-bio">Lidero el equipo creativo de Studio Digital. Trabajamos con marcas de moda y bebidas en campañas inmersivas.</p>
+          </div>
+
+          <!-- Intereses -->
+          <div class="pp-section">
+            <h3 class="pp-section-title">Intereses</h3>
+            <div class="pp-interests">
+              <span class="pp-int shared">Branding</span>
+              <span class="pp-int shared">Eventos</span>
+              <span class="pp-int">Moda</span>
+              <span class="pp-int">Bebidas</span>
+              <span class="pp-int">3D</span>
+            </div>
+          </div>
+
+          <!-- Sesiones -->
+          <div class="pp-section">
+            <h3 class="pp-section-title">Asistira a</h3>
+            <div class="pp-session" role="link" tabindex="0">
+              <div>
+                <div class="pp-session-time">Mar 12 · 10:30</div>
+                <p class="pp-session-title">Creatividad aplicada en marcas</p>
+              </div>
+              <svg class="pp-session-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="pp-session" role="link" tabindex="0">
+              <div>
+                <div class="pp-session-time">Mar 12 · 16:00</div>
+                <p class="pp-session-title">Panel: Branding latinoamericano</p>
+              </div>
+              <svg class="pp-session-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="pp-session" role="link" tabindex="0">
+              <div>
+                <div class="pp-session-time">Mar 13 · 09:00</div>
+                <p class="pp-session-title">Activaciones inmersivas</p>
+              </div>
+              <svg class="pp-session-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          </div>
+
+          <div class="pp-foot">
+            <button class="pp-block">Bloquear</button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const sn = document.getElementById('sn');
+const close = document.getElementById('pp-close');
+const ppAvatar = document.getElementById('pp-avatar');
+const ppName = document.getElementById('pp-name');
+const ppRole = document.getElementById('pp-role');
+const panelProfile = document.getElementById('panel-profile');
+const devToggle = document.querySelector('.pp-dev-toggle');
+
+// Click sobre mini-row de Tu red → abre perfil con su relation
+document.querySelectorAll('.mini-row').forEach(row => {
+  row.addEventListener('click', () => {
+    const name = row.dataset.name;
+    const role = row.dataset.role;
+    const relation = row.dataset.relation || 'none';
+    ppAvatar.style.backgroundImage = `url('https://hostedboringavatars.vercel.app/api/beam/88/${encodeURIComponent(name)}?colors=475569,64748b,94a3b8,B5A68B,e7e5e4')`;
+    ppName.textContent = name;
+    ppRole.textContent = role;
+    setRelation(relation);
+    panelProfile.classList.remove('composing-message');
+    document.querySelectorAll('.mini-row').forEach(r => r.classList.remove('active-profile'));
+    row.classList.add('active-profile');
+    sn.classList.add('profile-open');
+  });
+});
+
+function setRelation(rel){
+  panelProfile.setAttribute('data-relation', rel);
+  devToggle.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.rel === rel));
+}
+
+close.addEventListener('click', () => {
+  sn.classList.remove('profile-open');
+  panelProfile.classList.remove('composing-message');
+  document.querySelectorAll('.mini-row').forEach(r => r.classList.remove('active-profile'));
+});
+
+devToggle.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-rel]');
+  if (!btn) return;
+  panelProfile.classList.remove('composing-message');
+  setRelation(btn.dataset.rel);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && sn.classList.contains('profile-open')) {
+    sn.classList.remove('profile-open');
+    panelProfile.classList.remove('composing-message');
+    document.querySelectorAll('.mini-row').forEach(r => r.classList.remove('active-profile'));
+  }
+});
+
+// Flujo Conectar: muestra el compose view (textarea)
+document.getElementById('btn-connect-open').addEventListener('click', () => {
+  panelProfile.classList.add('composing-message');
+  setTimeout(() => document.getElementById('compose-text').focus(), 80);
+});
+document.getElementById('btn-compose-cancel').addEventListener('click', () => {
+  panelProfile.classList.remove('composing-message');
+});
+document.getElementById('btn-send').addEventListener('click', () => {
+  // Demo: pasa a estado sent
+  panelProfile.classList.remove('composing-message');
+  setRelation('sent');
+});
+document.getElementById('btn-cancel-sent').addEventListener('click', () => {
+  setRelation('none');
+});
+
+// Counter del textarea
+const composeText = document.getElementById('compose-text');
+const composeCount = document.getElementById('compose-count');
+composeText.addEventListener('input', () => {
+  composeCount.textContent = composeText.value.length;
+});
+</script>
+
+</body>
+</html>
