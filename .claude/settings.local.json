@@ -546,7 +546,27 @@
       "Bash(pnpm test:e2e -- live.spec.ts)",
       "Bash(pnpm test:e2e)",
       "Bash(pnpm test:e2e -- streaming.spec.ts -g \"session id no existe\")",
-      "Bash(pnpm test:e2e -- speakers.spec.ts)"
+      "Bash(pnpm test:e2e -- speakers.spec.ts)",
+      "Bash(pushd \"C:/laragon/www/eventos-web\")",
+      "Bash(echo \"---EXIT $?---\")",
+      "Bash(pnpm vitest *)",
+      "Bash(pushd \"C:/laragon/www/eventos-backend\")",
+      "Bash(echo \"started $!\")",
+      "PowerShell(try { $r = Invoke-WebRequest -UseBasicParsing -Uri \"http://localhost:3000\" -TimeoutSec 5; \"Status: $\\($r.StatusCode\\)\" } catch { \"Err: $\\($_.Exception.Message\\)\" })",
+      "PowerShell(try { $r = Invoke-WebRequest -UseBasicParsing -Uri \"http://eventos-backend.test\" -TimeoutSec 3; \"Backend Laragon: $\\($r.StatusCode\\)\" } catch { \"Backend Laragon: $\\($_.Exception.Message\\)\" })",
+      "Bash(pnpm test:e2e --grep \"session id no existe\")",
+      "PowerShell(try { $r = Invoke-WebRequest -UseBasicParsing -Uri \"http://localhost:3000/es/session-stream/0\" -MaximumRedirection 0 -TimeoutSec 10; \"STATUS: $\\($r.StatusCode\\)`nLOC: $\\($r.Headers.Location\\)\" } catch { $resp = $_.Exception.Response; if \\($resp\\) { $loc = $resp.Headers[\"Location\"]; \"STATUS: $\\($resp.StatusCode.value__\\) LOC: $loc\" } else { \"ERR: $\\($_.Exception.Message\\)\" } })",
+      "Bash(gh pr *)",
+      "Bash(pnpm test:e2e --grep \"click hero|click Calificar|notFound|renderiza pagina 404\")",
+      "Bash(pnpm test:e2e --grep \"/ root sin auth|highlight pulse\")",
+      "Bash(pnpm test:e2e --workers=2)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(echo \"EXITCODE: $?\")",
+      "Bash(npx eslint *)",
+      "Bash(awk '{print $NF}')",
+      "Bash(cat vitest.config.ts)",
+      "Bash(cat vitest.config.mts)",
+      "Bash(cat vite.config.ts)"
     ]
   }
 }
