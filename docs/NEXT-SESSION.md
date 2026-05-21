@@ -25,12 +25,9 @@
 
 ### Estado git al cierre
 
-- `APP EVENTOS main` — 3 archivos nuevos sin commit:
-  - `docs/webapp/PARITY-MATRIX.md`
-  - `docs/living/PENDIENTES-WEBAPP.md`
-  - `docs/NEXT-SESSION.md` (modificado)
-  - Memorias `project_parity_matrix.md` + `project_pendientes_webapp.md` + actualizacion `MEMORY.md`
-- `eventos-web main` — sin cambios esta sesion (sigue 3 commits ahead origin con W.8 perfil + tests)
+- `APP EVENTOS main` — commit `b19786d` pusheado a origin/main (PARITY-MATRIX.md + PENDIENTES-WEBAPP.md + NEXT-SESSION.md actualizado)
+- `eventos-web main` — 3 commits sesion W.8 pusheados (`e2c9b4b..492c28c`): avatar beam + perfil in-slot visionOS + 49 tests vitest
+- Memorias actualizadas: `project_parity_matrix.md`, `project_pendientes_webapp.md`, `feedback_mirror_feature_completo.md`, `feedback_una_sola_ventana_operativa.md`, indice `MEMORY.md`
 
 ---
 
