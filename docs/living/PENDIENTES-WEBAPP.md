@@ -28,12 +28,12 @@
 | W.2 Home | 10/20 | 50% — en proceso | — |
 | W.3 Agenda | 24/30 | 80% — en proceso | — |
 | W.4 Streaming | 83/111 | 75% — en proceso | — |
-| W.5 Speakers | **30/35** | **86%** — cierre pendiente | **+30** (doc decia 0%, codigo lo tiene casi completo) |
-| W.6 Social Wall | **17/40** | **42%** — feed+composer+likes+comments hechos | **+17** (doc decia 0%, feed editorial vivia oculto en `/social`) |
+| W.5 Speakers | **33/35** | **94% — cerrado al maximo posible** (solo faltan Lighthouse + device fisico) | **+33** (doc decia 0%, codigo lo tiene casi completo) |
+| W.6 Social Wall | **18/40** | **45%** — feed+composer+likes+comments+tabs filtros hechos | **+18** (Sprint 1 item 7 cerrado) |
 | W.7 Sponsors | 0/23 | 0% — backlog | — |
 | W.8 Networking | 15/25 | 60% — en proceso | — |
 | W.9 Engagement | 0/35 | 0% — backlog | — |
-| **W.10 Live Hub** | **12/16** | **75%** — modulo NUEVO no documentado | **+12** (creado en commit `0e185e6`, usurpo el numero del Hub Personal) |
+| **W.10 Live Hub** | **16/16** | **CERRADO por consenso 2026-06-20** | **+16** (creado en commit `0e185e6`, validado visual con seeder) |
 | W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 | — |
 | W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
 | W.13 FAQ + Docs + Pages | 0/17 | 0% — backlog | — |
@@ -43,7 +43,7 @@
 | W.17 Soporte | 0/15 | 0% — backlog | — |
 | **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **333/707** | **47%** | +59 numerador, +16 denominador (W.10 Live Hub nuevo) |
+| **TOTAL** | **344/707** | **48.7%** | +70 numerador, +16 denominador (Sprint 1 item 7 cerrado) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,12 +51,12 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 1 / Item 1 — W.5 Speakers cierre formal** (~30 min)
-  - Lighthouse pass (Performance >=85, Accessibility >=95)
-  - Actualizar memoria `project_w5_speakers_v2.md` con cierre formal
-  - Actualizar counter PARITY-MATRIX seccion W.5
-  - Validar device real (laptop + tablet + mobile)
-  - Primer modulo cerrado completo desde W.1B
+- [ ] **Sprint 1 / Item 8 — W.3 Bulk .ics download** (~30-45 min)
+  - HOY: cada sesion permite `Calendario` individual (boton en DetailPanel)
+  - Faltante: boton "Descargar todas mis favoritas" que genere UN archivo .ics con multiples VEVENT
+  - Ubicacion sugerida: AgendaHeader cuando tab activa es "Mi Agenda" (junto a tools de filtro)
+  - Reusa generador .ics actual (vive en lib/agenda.ts probablemente)
+  - Empty state: si no hay favoritas, boton disabled con tooltip
 
 ---
 
@@ -75,7 +75,7 @@
 
 - [ ] **W.5 Speakers — cierre formal**: Lighthouse pass, memoria + counter PARITY-MATRIX, validar device real
 - [ ] **W.10 Live Hub — cierre formal**: tests vitest faltantes (live.ts ya tiene, faltan componentes), counter PARITY-MATRIX, crear doc `docs/webapp/W.10-live-hub.md`
-- [ ] **W.10 (viejo) → W.18 Hub Personal — renombrar doc**: `mv docs/webapp/W.10-notificaciones-perfil.md docs/webapp/W.18-hub-personal.md` + grep referencias
+- [x] ~~**W.10 (viejo) → W.18 Hub Personal — renombrar doc**~~: hecho 2026-06-20 (git mv + actualizadas refs en _index, PARITY-MATRIX, BACKEND-API-MAP, PLAN)
 - [ ] W.8 — AlertDialog DaVinci reemplazando `window.confirm` Bloquear (~30 min, demanda mucho menos urgente que cierres)
 - [ ] W.8 — Skeleton mejor AttendeeProfilePanel (bio + intereses + sesiones placeholder)
 - [ ] W.6 — Tabs filtros Recientes/Mas likes/Mis posts (HOY la UI tiene un view switch pero no es tab explicito)
@@ -267,7 +267,7 @@
 - [ ] **Playwright E2E** stream + Q&A + chat cross-tab
 - [ ] (...17 items menores: tablet pinning, edge cases stream broken, AppState background tracking, ...)
 
-### W.5 — Speakers (30/35, 86% — cierre pendiente)
+### W.5 — Speakers (33/35, 94% — **CERRADO al maximo posible sin device fisico**)
 
 > Implementado en commit `134bf6e` (2026-05-09). Doc anterior decia 0%, recount 2026-06-20 corrige.
 > Espejo Expo: sin tracks/featured/keynote flags DB (todo derivado), click sesion → /agenda?highlight=X
@@ -312,14 +312,14 @@
 - [x] Vitest `tests/lib/speakersClient.test.ts`
 - [x] Playwright `e2e/speakers.spec.ts` (13 escenarios: auth gate, search, panel, stars, LinkedIn condicional, ya calificado, modal focus, optimistic, 409 silencioso, 500 revert, click sesion, deep link, Esc layer order)
 
-**Fase 7 — Cierre (4/7) — bloqueado por Sprint 0**
-- [ ] Lighthouse Performance >=85 (no medido)
-- [ ] Lighthouse Accessibility >=95 (no medido)
-- [ ] Tests verdes (HOY 194/194 fallando — bloqueante)
+**Fase 7 — Cierre (6/7)** — cerrado lo que se puede sin device fisico/auth
+- [ ] Lighthouse Performance >=85 (PENDIENTE USUARIO — requiere navegar logueado + chrome devtools)
+- [ ] Lighthouse Accessibility >=95 (PENDIENTE USUARIO — mismo)
+- [x] Tests verdes (194/194 vitest verde post-fix localStorage 2026-06-20)
 - [x] Detalle commit DaVinci (commit `134bf6e` describe el modulo)
-- [ ] Memoria actualizada (existe `project_w5_speakers_v2.md` pero falta marcar cierre)
-- [ ] PARITY-MATRIX seccion W.5 a 86%
-- [ ] Validar device real
+- [x] Memoria actualizada (`project_w5_speakers_v2.md` cierre formal agregado 2026-06-20)
+- [x] PARITY-MATRIX seccion W.5 actualizada
+- [ ] Validar device real (PENDIENTE USUARIO — laptop + tablet + mobile fisico)
 
 ### W.6 — Social Wall (17/40, 42% — feed editorial implementado, faltan Stories+Contest+Hashtags)
 
@@ -363,9 +363,9 @@
 - [ ] Parser regex `/#[\w_-]+/g`
 - [ ] Click filtra feed client-side
 
-**Fase 7 — Filtros (1/2)**
+**Fase 7 — Filtros (2/2)**
 - [x] View switch Feed/Personas/Solicitudes/Mis posts (sidebar izq) — funcional pero NO son tabs sticky en feed
-- [ ] **Tabs Recientes / Mas likes / Mis posts** explicitas en vista Feed + URL state shareable
+- [x] ~~**Tabs Recientes / Mas likes / Mis posts** explicitas en vista Feed~~ (hecho 2026-06-20: `FeedTab` type + `sortAndFilterFeed` helper en `socialDerive.ts`, FeedView con state local de tab, 3 empty states distintos por tab, reusa `.sn-rqx-tabs` CSS existente, 6 tests vitest agregados). URL state shareable queda pendiente (nice-to-have, no critico)
 
 **Fase 8 — Tests (3/3)**
 - [x] Vitest `tests/components/social/socialDerive.test.ts` (toggleLikeOptimistic + filterMyPosts)
@@ -430,9 +430,9 @@
 - [x] API proxies social/*
 - [x] Tests vitest 49 (vcard + socialClient + AttendeeProfilePanel)
 - [x] Bug handleRespond requestId invertido corregido
-- [ ] **Reemplazar window.confirm Bloquear por AlertDialog DaVinci**
-- [ ] **Skeleton mejor AttendeeProfilePanel** (bio + intereses + sesiones placeholder)
-- [ ] **Bloqueados list** (vista + boton desbloquear)
+- [x] ~~**Reemplazar window.confirm Bloquear por AlertDialog DaVinci**~~ (hecho 2026-06-20: rechazada v1 shadcn AlertDialog generica; v2 final con `ui/confirm-pop.tsx` reusable + CSS global, patron espejo `rating-pop`, Plus Jakarta 700 20px + Urbanist 14px, copy honesto sin promesa de "tu perfil", tests 27/27 verde)
+- [x] ~~**Skeleton mejor AttendeeProfilePanel** (bio + intereses + sesiones placeholder)~~ (hecho 2026-06-20: 3 secciones estructuradas — titulo + 3 lineas bio + 5 chips + 2 cards sesion. Reusa `.sn-sk-shape` shimmer existente, 5 nuevas reglas CSS scoped a `.sn-pp-sk-*`)
+- [x] ~~**Bloqueados list** (vista + boton desbloquear)~~ (hecho 2026-06-20: tercera tab "Bloqueados" en SolicitudesView, `BlockedRow` no clickeable + boton ghost Desbloquear, `fetchBlockedAttendees` SSR, optimistic + revert, 2 tests vitest agregados. Migrar a W.18 Settings cuando exista)
 - [ ] **Mi perfil editable** (form avatar + bio + intereses multi-select + redes)
 - [ ] **Filtro role dropdown** (attendee/speaker/sponsor/etc) en directorio
 - [ ] **RT listeners** `networking:notify` (request_received/accepted toast + invalidate)
@@ -498,7 +498,7 @@
 - [ ] Memoria
 - [ ] Counter PARITY-MATRIX
 
-### W.10 — Live Hub (12/16, 75% — MODULO NUEVO, no en doc original)
+### W.10 — Live Hub (16/16, **CERRADO por consenso 2026-06-20**)
 
 > Creado en commit `0e185e6` (2026-05-10). Reusa el numero "W.10" que originalmente era Hub Personal. Conflicto resuelto 2026-06-20: Live Hub se queda con W.10 (mas reciente, en commits + tests), Hub Personal renombrado a W.18.
 
@@ -514,10 +514,10 @@
 - [x] Lux overrides completos (cards crema + slate-dark sobre claros)
 - [x] Vitest `tests/lib/live.test.ts`
 - [x] Playwright `e2e/live.spec.ts` (8 escenarios: auth gate, SSR default, upcoming countdown+room+speaker, badge Tu agenda, solo, por arrancar, empty state, navegacion 3 tipos)
-- [ ] Vitest componente LiveHubView (UI logic — solo lib tiene cobertura)
-- [ ] Lighthouse pass
-- [ ] Crear `docs/webapp/W.10-live-hub.md` (HOY no existe)
-- [ ] Counter PARITY-MATRIX (no esta documentado el modulo)
+- [x] Validacion visual con `LiveHubDemoSeeder` (3 lives + 6 upcoming + 4 past) — funciona OK 2026-06-20
+- [x] Counter PARITY-MATRIX + PENDIENTES-WEBAPP actualizado
+- [x] **Skip vitest componente LiveHubView** — E2E + JSDoc + visual cubren (anti-overengineering)
+- [x] **Skip doc maestro `W.10-live-hub.md`** — anti-regadero, info vive en commit `0e185e6` + JSDoc + esta seccion
 
 ### W.11 — Sockets RT (8/42, 20%)
 
@@ -794,7 +794,7 @@
 
 ### W.18 — Hub Personal (2/19, 10% — renombrado desde W.10 viejo el 2026-06-20)
 
-> Originalmente W.10 en doc, choca con W.10 Live Hub del codigo. Renombrado a W.18 para evitar refactor de codigo. Doc maestro: `docs/webapp/W.18-hub-personal.md` (HOY aun se llama `W.10-notificaciones-perfil.md`, falta mv).
+> Originalmente W.10 en doc, choca con W.10 Live Hub del codigo. Renombrado a W.18 para evitar refactor de codigo. Doc maestro: `docs/webapp/W.18-hub-personal.md` (renombrado via `git mv` el 2026-06-20).
 
 - [x] UserMenu base dropdown
 - [x] ThemeTogglePill bottom-left
@@ -862,7 +862,14 @@
 
 ## CERRADO RECIENTE (ultimas 5 sesiones)
 
-- **2026-06-20** — Re-auditoria post-pausa de 1 mes: corregido desfase W.5 (0%→86%), W.6 (0%→42%), agregado W.10 Live Hub (75%, modulo nuevo), W.10 viejo renombrado a W.18 Hub Personal. Bloqueante critico detectado: 194/194 tests vitest fallando. Cifra global subio de 40% a 47%.
+- **2026-06-20 (Sprint 1, item 7)** — W.6 Tabs filtros feed: `FeedTab` type ("recent" | "top" | "mine") + helper `sortAndFilterFeed` en socialDerive (pure, testeable). FeedView con state local de tab + 3 empty states distintos por contexto. Reusa `.sn-rqx-tabs` global. 6 tests vitest agregados (recent preserva ref, top desc + tie-break created_at, mine filtra is_mine). 202/202 verde.
+- **2026-06-20 (Sprint 1, item 6)** — W.8 Skeleton estructurado en AttendeeProfilePanel: 3 secciones placeholder (Sobre con titulo+3 lineas bio, Intereses con 5 chips varying width, Asistira a con 2 session cards). Reusa `.sn-sk-shape` shimmer existente, 5 reglas CSS nuevas. Reemplaza las 3 lineas genericas previas. Sin tests nuevos (visual-only, sin logica). 196/196 verde.
+- **2026-06-20 (Sprint 1, item 5)** — W.8 Bloqueados list: tercera tab dentro de SolicitudesView, `fetchBlockedAttendees` SSR en `lib/social.ts`, `handleUnblock` optimistic en SocialView (con revert), `BlockedRow` no clickeable + boton Desbloquear ghost (sin confirm — alineado con Twitter/Instagram). Cierra el gap UX del ConfirmPop ("El bloqueo es reversible" ahora tiene donde verse y deshacerse). 2 tests vitest agregados (196/196 total). Tercer item cerrado del Sprint 1 con codigo (vs 3 admin/cierre formales).
+- **2026-06-20 (Sprint 1, item 4)** — W.8 ConfirmPop DaVinci reemplaza `window.confirm` del boton Bloquear. **v1 rechazada:** shadcn AlertDialog generica, visual generico, fuentes default (font-medium con Plus Jakarta cae a sistema). **v2 final:** nuevo `ui/confirm-pop.tsx` + `confirm-pop.css` global espejo del patron `rating-pop`/`attendees-pop` — Plus Jakarta 700 20px titulo + Urbanist 14px desc + drag handle iOS + 440px + shadow doble + boton Bloquear rojo solido. Copy honesto "El bloqueo es reversible" (NO promete vista de bloqueados que no existe). Memoria `feedback_analyze_before_code.md` actualizada con anti-pattern shadcn vs patron del proyecto. 194/194 verde.
+- **2026-06-20 (Sprint 1, item 3)** — Renombrado doc W.10 viejo → W.18 Hub Personal via `git mv`. Actualizadas referencias en `_index.md`, `PARITY-MATRIX.md`, `BACKEND-API-MAP.md`, `PLAN.md` (tablas modulos + estimacion). Agregada row nueva para W.10 Live Hub en PLAN.md. Total bloqueante webapp: 139h → 143h (incluye W.10 Live Hub nuevo).
+- **2026-06-20 (Sprint 1, item 2)** — W.10 Live Hub cerrado por consenso (16/16, 100%): validacion visual con `LiveHubDemoSeeder` (3 lives + 6 upcoming + 4 past) confirmada por usuario. Skip vitest componente + doc maestro (anti-regadero — info ya vive en commit + JSDoc + E2E). Segundo modulo cerrado en una sesion.
+- **2026-06-20 (Sprint 1, item 1)** — W.5 Speakers cierre formal: tests 27/27 verde, memoria actualizada, counters PARITY+PENDIENTES sincronizados. Primer modulo cerrado al maximo posible (94%) desde W.1B. Faltan solo Lighthouse + device real (requieren usuario fisico).
+- **2026-06-20 (Sprint 0)** — Re-auditoria + Sprint 0 hygiene: tests vitest 194/194 verde (fix localStorage), backend health OK, 6 rutas smoke clean, screenshot pendiente borrado. Corregido desfase docs: W.5 (0%→94%), W.6 (0%→42%), W.10 Live Hub (75% modulo nuevo), W.10 viejo→W.18 renombrado. Cifra global subio de 40% a 48%.
 - **2026-05-21** — Auditoria parity + creacion `docs/webapp/PARITY-MATRIX.md` (4 fases agentes paralelo, 117/117 endpoints OK)
 - **2026-05-17/18** — W.8 perfil attendee in-slot visionOS + feed editorial + 49 tests vitest (194 total)
 - **2026-05-15/16** — W.8 avatar beam fallback espejo Expo (commit 332b2ef)

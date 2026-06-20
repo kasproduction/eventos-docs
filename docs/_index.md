@@ -56,7 +56,7 @@
 | [W.7-sponsors.md](webapp/W.7-sponsors.md) | Brand Wall, lead capture, trivia |
 | [W.8-networking.md](webapp/W.8-networking.md) | Matchmaking, perfiles, chat 1:1, bookmarks |
 | [W.9-encuestas-gamification.md](webapp/W.9-encuestas-gamification.md) | Engagement: leaderboard, passport, rewards |
-| [W.10-notificaciones-perfil.md](webapp/W.10-notificaciones-perfil.md) | Hub personal: Mi QR, Mis... |
+| [W.18-hub-personal.md](webapp/W.18-hub-personal.md) | Hub personal: Mi QR, Mis... (renombrado desde W.10 el 2026-06-20 — W.10 paso a Live Hub) |
 | [W.11-sockets-rt.md](webapp/W.11-sockets-rt.md) | Socket.IO + dedup + 4 capas RT |
 | [W.12-polish.md](webapp/W.12-polish.md) | Polish + E2E + PWA |
 | [W.13-faq-documentos-pages.md](webapp/W.13-faq-documentos-pages.md) | FAQ + Documentos + Pages dinamicas |

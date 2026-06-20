@@ -98,7 +98,7 @@ Lumina Noir solido (no glass de entorno real). Paneles con bordes sutiles + opac
 | W.7 | `W.7-sponsors.md` | Brand Wall, Brand Profile, lead capture, trivia | ~7h |
 | W.8 | `W.8-networking.md` | Directorio, matchmaking, suggested, perfiles, requests sent/received, chat 1:1, bookmarks, blocked list | ~7h |
 | W.9 | `W.9-encuestas-gamification.md` | Encuestas, leaderboard, badges, passport stamps, rewards, prizes, streak | ~10h |
-| W.10 | `W.10-notificaciones-perfil.md` | Notif, perfil, settings, Mi QR, Mis Stands, Mis Redenciones, Mis Prizes, Mi Recap, Soporte access, Cambiar evento | ~8h |
+| W.10 | _(sin doc — info en commit `0e185e6` + JSDoc + PARITY-MATRIX)_ | **Live Hub** — browsing transmisiones activas + proximas (hero + side cards + grid upcoming). CERRADO 2026-06-20. | ~4h |
 | W.11 | `W.11-sockets-rt.md` | Socket.IO RT en toda la web | ~6h |
 | W.12 | `W.12-polish.md` | Responsive final, transiciones, loading states, PWA, E2E | ~8h |
 | W.13 | `W.13-faq-documentos-pages.md` | FAQ, Documentos descargables, Pages dinamicas | ~3h |
@@ -106,6 +106,7 @@ Lumina Noir solido (no glass de entorno real). Paneles con bordes sutiles + opac
 | W.15 | `W.15-vendor-dashboard.md` | Mi Stand, Leads capturados, Stats, Team (OPCIONAL Fase 1) | ~6h |
 | W.16 | `W.16-live-moments.md` | Trivia Kahoot engine, Sorteo Ceremony display, Concurso Fotos display, Golden Ticket reveal, Spin Wheel readonly | ~6h |
 | W.17 | `W.17-soporte.md` | Tickets de soporte, chat staff, RT updates | ~3h |
+| W.18 | `W.18-hub-personal.md` | Notif, perfil, settings, Mi QR, Mis Stands, Mis Redenciones, Mis Prizes, Mi Recap, Soporte access, Cambiar evento (renombrado desde W.10 el 2026-06-20) | ~8h |
 | **W.X** | `W.X-welcome-showcase.md` | **WelcomeShowcase cinematic post-login** — trailer de 6 beats con componentes reales en miniatura (Speakers/Agenda/Streaming/Connect/Gamification/Sponsors). Bloqueado por W.3+W.4+W.5+W.7+W.8+W.9 (ADR-025) | ~3.5h |
 
 ---
@@ -259,7 +260,7 @@ Detalle en `W.1-setup-auth.md`. Nota: el demo `design/showcase-onboarding-v6.htm
 | W.7 Sponsors | ~7h | Si | Vendor side delegado a W.15 |
 | W.8 Networking | ~7h | Si | Expandido por bookmarks + blocked + sent requests |
 | W.9 Engagement | ~10h | Si | Expandido por Passport + Rewards + Prizes + Streak |
-| W.10 Hub Personal | ~8h | Si | Expandido por Mi QR + Mis... + Cambiar evento |
+| W.10 Live Hub | ~4h | Si | Modulo NUEVO browsing transmisiones, CERRADO 2026-06-20 |
 | W.11 Sockets RT | ~6h | Si | RT en toda la web |
 | W.12 Polish + E2E + PWA | ~8h | Si | Cierre webapp |
 | W.13 FAQ + Documentos + Pages | ~3h | Si | Modulo nuevo |
@@ -267,9 +268,10 @@ Detalle en `W.1-setup-auth.md`. Nota: el demo `design/showcase-onboarding-v6.htm
 | W.15 Vendor Dashboard | ~6h | **Opcional** | Solo si cliente solicita |
 | W.16 Live Moments (subset) | ~6h | Si | Trivia + Sorteo + Concurso fotos display |
 | W.17 Soporte | ~3h | Si | Modulo nuevo |
+| W.18 Hub Personal | ~8h | Si | Expandido por Mi QR + Mis... + Cambiar evento (renombrado desde W.10 el 2026-06-20) |
 | W.X WelcomeShowcase | ~3.5h | Si | Cinematic onboarding — bloqueado por W.3+W.4+W.5+W.7+W.8+W.9 (ADR-025). Reusa componentes reales en miniatura |
-| **Total bloqueante** | **~139h** | | **~31-35 dias work** |
-| **Total con W.15 opcional** | **~145h** | | **~33-37 dias work** |
+| **Total bloqueante** | **~143h** | | **~32-36 dias work** (incluye W.10 Live Hub nuevo) |
+| **Total con W.15 opcional** | **~149h** | | **~34-38 dias work** |
 
 > **Nota**: estimacion asume backend 100% listo. Cero trabajo backend nuevo previsto excepto endpoints magic link (~3-4h backend, sesion separada). Si algun modulo requiere ajuste backend, **es bloqueante del modulo** y se planea aparte.
 

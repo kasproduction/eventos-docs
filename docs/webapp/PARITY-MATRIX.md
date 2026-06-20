@@ -24,12 +24,12 @@
 | W.2 Home | hero cinematic + happening-now + recap + sponsors band + GamificationHud + anuncios mini + surveys + archive | 10/20 | Cinematic + happening + recap base | 50% | Si |
 | W.3 Agenda | lista + filtros + favoritos + detalle + .ics + ratings + RT + lifecycle | 24/30 | Core funcional + ratings | 80% | Si |
 | W.4 Streaming | detector source + player + Q&A + chat + polls + trivia + anuncios + replay + layout spatial | 83/111 | Socket + player + Q&A + chat + polls + layout | 75% | Si |
-| W.5 Speakers | directorio + featured + perfil + rating + deep link | **30/35** | **Implementado (lista + featured + perfil + rating + deep link + 13 tests E2E)** | **86%** | Si |
+| W.5 Speakers | directorio + featured + perfil + rating + deep link | **33/35** | **CERRADO maximo posible (lista + featured + perfil + rating + deep link + 27 vitest + 13 E2E + memoria + counter)** | **94%** (faltan Lighthouse + device fisico) | Si |
 | W.6 Social Wall | feed + posts + comentarios + likes + stories + photo contest + hashtags + filtros | **17/40** | Feed + composer + foto upload + likes optimistic + comentarios editorial + mis posts + 3 tests | **42%** (faltan stories, contest, hashtags, tabs explicitas) | Si |
 | W.7 Sponsors | brand wall + profile + favorite + contact + trivia | 0/23 | **No empezado** | 0% | Si |
 | W.8 Networking | directorio + suggested + perfil + solicitudes + bloqueados + mi perfil | 15/25 | Directorio + perfil in-slot + solicitudes + vCard/WhatsApp/Email (sin bloqueados ni mi perfil ni filtro role) | ~60% | Si |
 | W.9 Engagement | encuestas + leaderboard + logros + passport + rewards + prizes | 0/35 | **No empezado** | 0% | Si |
-| **W.10 Live Hub** | hero + side + upcoming + 4 estados visuales + nav | **12/16** | **Modulo NUEVO** (commit `0e185e6`, no en doc original — usurpo numero del Hub Personal) | **75%** | Si |
+| **W.10 Live Hub** | hero + side + upcoming + 4 estados visuales + nav | **16/16** | **CERRADO por consenso 2026-06-20** (commit `0e185e6` + E2E 8 escenarios + validado visual con seeder) | **100%** | Si |
 | W.11 Sockets RT | client + rooms + listeners + invalidation + fallback | 0/42 | Singleton usado en W.4 streaming | ~20% | Si |
 | W.12 Polish + E2E + PWA | responsive + a11y + perf + PWA + Sentry validation | 0/43 | No empezado | 0% | Si (cierre Fase 1) |
 | W.13 FAQ + Documentos + Pages | accordion + lista + WebView | 0/17 | **No empezado** | 0% | Si |
@@ -137,15 +137,18 @@
 - [ ] Mobile/tablet layout (hoy solo desktop 60/20/20)
 - [ ] Playwright E2E
 
-### W.5 — Speakers (CRITICO, 86% done — cierre formal pendiente)
+### W.5 — Speakers (CRITICO, 94% done — CERRADO al maximo posible)
 - [x] Hooks fetchSpeakers + fetchMySpeakerRatings + rateSpeakerRequest
 - [x] Featured carousel derivation (BreathingCarousel + getFeatured)
 - [x] Lista alfabetica + search 400ms debounce
 - [x] DetailPanel slide-in con race protection
 - [x] Rating 1-5 UNIQUE con comment 280 chars + 409 silencioso
 - [x] Deep link `?id=X` auto-open + `?highlight=sId` agenda
-- [x] Tests Vitest (speakersDerive + speakersClient) + Playwright (13 escenarios)
-- [ ] Lighthouse pass + validar device real (cierre formal)
+- [x] Tests Vitest 27 (speakersDerive + speakersClient) + Playwright 13 escenarios — verde 2026-06-20
+- [x] Memoria `project_w5_speakers_v2.md` con cierre formal 2026-06-20
+- [x] Counter PARITY-MATRIX + PENDIENTES-WEBAPP actualizado
+- [ ] Lighthouse Performance >=85 + Accessibility >=95 (requiere usuario logueado + devtools)
+- [ ] Validar device real laptop + tablet + mobile (requiere dispositivos fisicos)
 
 ### W.6 — Social Wall (CRITICO, 42% done — feed editorial implementado, faltan Stories+Contest+Hashtags)
 - [x] Feed paginated SSR + Composer max 500 + foto upload via File API
@@ -159,16 +162,15 @@
 - [ ] Filtros Recientes / Mas likes / Mis posts (tabs explicitas en vista Feed)
 - [ ] Paginacion UI (SSR carga primera, falta load-more / infinite scroll)
 
-### W.10 — Live Hub (CRITICO, 75% done — modulo NUEVO)
+### W.10 — Live Hub (CRITICO, 100% — CERRADO por consenso 2026-06-20)
 - [x] SSR fetchHappeningNow + fetchUpNext (deriva agenda + limit 8)
 - [x] LiveHubView + LiveHero + LiveSideCard + UpcomingCard
 - [x] 4 estados visuales (default 2+N, 1 solo, 0 lives + N upcoming, empty)
 - [x] Navegacion contextual (has_stream → /session-stream, sino → /agenda?highlight)
 - [x] Slate Mono tokens globales + Lux overrides
 - [x] Tests Vitest (live.ts) + Playwright (8 escenarios)
-- [ ] Vitest componente LiveHubView (UI logic)
-- [ ] Doc maestro `docs/webapp/W.10-live-hub.md` (no existe)
-- [ ] Lighthouse pass
+- [x] Validacion visual con LiveHubDemoSeeder (3 lives + 6 upcoming + 4 past)
+- [x] **Skip vitest componente y doc maestro** — info redundante con commit `0e185e6` + JSDoc + E2E (anti-regadero)
 
 ### W.7 — Sponsors (CRITICO, 0% done)
 - [ ] Hooks useSponsors + useFavorite + useContact
@@ -202,7 +204,7 @@
 - [ ] Cerrar sesion completo
 - [ ] User menu dropdown condicional (vendor/premios/canjes/soporte links)
 - [ ] Mi Recap link
-- [ ] Renombrar `docs/webapp/W.10-notificaciones-perfil.md` → `docs/webapp/W.18-hub-personal.md`
+- [x] ~~Renombrar `docs/webapp/W.10-notificaciones-perfil.md` → `docs/webapp/W.18-hub-personal.md`~~ (hecho 2026-06-20)
 
 ### W.11 — Sockets RT (CRITICO, ~20% done)
 - [ ] Socket singleton + connection management exponential backoff

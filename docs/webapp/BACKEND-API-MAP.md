@@ -784,7 +784,7 @@ features hipoteticas).
 | W.7 Sponsors | 5 | 5/5 ✅ | Directorio + favorito + contact + view |
 | W.8 Networking | 11 | 11/11 ✅ | Directory + suggested + contacts + blocked (sin DM) |
 | W.9 Gamification | 6 | 6/6 ✅ | Points + leaderboard + passport + trivia + visit-stand + rewards |
-| W.10 Hub Personal | 8 | 8/8 ✅ | Profile + photo + qr + prizes + redemptions + recap + support + ratings |
+| W.18 Hub Personal | 8 | 8/8 ✅ | Profile + photo + qr + prizes + redemptions + recap + support + ratings (renombrado desde W.10 el 2026-06-20) |
 | W.11 Sockets RT | 7 events | 7/7 ✅ | Eventos session lifecycle + chat + points ya emitidos |
 | W.13 FAQ/Docs/Pages | 3 | 3/3 ✅ | FAQs + documents + pages |
 | W.14 Anuncios | 2 | 2/2 ✅ | announcements + highlights |
