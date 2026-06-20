@@ -3,6 +3,43 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-06-20 — Sesion DaVinci pulido social + responsive (6 bugs)
+
+### BUG-334: React key warning en BlockedRow (RESUELTO)
+- **Severidad:** MEDIA — `SolicitudesView.tsx` linea 136: `<BlockedRow key={item.id} ...>` con `item.id` undefined porque `fetchBlockedAttendees` se tipo como `AttendeeListItem[]` (que tiene `id`), pero el backend `/me/blocked` devuelve shape `BlockedItem` (con `attendee_id` + `blocked_at`, NO `id`). Todos los rows tenian key=undefined → warning React "Each child should have a unique key prop"
+- **Fix:** `lib/social.ts` cambio tipo `AttendeeListItem[]` → `BlockedItem[]`. Propagado a `SocialView.tsx` (state `blocked` tipado correcto, handler `handleUnblock` usa `attendee_id`, `handleBlocked` construye BlockedItem con shape correcto + timestamp local optimistic). `SolicitudesView.tsx` props + `BlockedRow` con `key={item.attendee_id}`
+- **Archivos:** `eventos-web/src/lib/social.ts`, `src/components/app/social/SocialView.tsx`, `src/components/app/social/SolicitudesView.tsx`
+
+### BUG-333: Skeleton AttendeeProfilePanel v1 sobreprometia (RESUELTO)
+- **Severidad:** BAJA — v1 del skeleton renderizaba 3 secciones estructuradas (titulo "Sobre" + 3 lineas + titulo "Intereses" + 5 chips + titulo "Asistira a" + 2 cards). Las secciones reales son CONDICIONALES (`profile.bio?`, `profile.interests.length>0?`, `profile.sessions.length>0?`). Para attendees sin bio/intereses/sesiones, el usuario veia el skeleton elaborado → cargaba → todo desaparecia. Mismatch visual confuso
+- **Fix:** v2 neutro — 1 titulo chico + 3 lineas tipo bio sin titulos especificos. Honesto: "viene mas info" sin promesa de estructura. Borrado CSS auxiliar `.sn-pp-sk-*` (chips, sessions, section)
+- **Archivos:** `eventos-web/src/components/app/social/AttendeeProfilePanel.tsx`, `src/components/app/social/social.css`
+
+### BUG-332: Boton outline en Lux se veia lavado (RESUELTO)
+- **Severidad:** MEDIA — Despues del fix de prominencia (BUG-330 bajamos a outline ghost), el `.sn-pp-btn.primary` usaba `color: var(--slate-light)` y borde con color-mix de slate. `--slate-light` es el MISMO hex en Noir y Lux (token independiente del tema). En Lux (fondo claro #f6f8fa) el slate-light quedaba poco contrastado, casi invisible. Usuario reporto "en lux se ve pesimo"
+- **Fix:** Cambio tokens hardcoded a tokens theme-aware — `color: var(--text-primary)` + `border-color: var(--border-strong)` + hover `background: var(--surface-low)`. Mismo patron que `sn-rqx-btn.rej` (Ignorar) que ya estaba bien resuelto. Tokens se invierten automatico Noir↔Lux
+- **Archivos:** `eventos-web/src/components/app/social/social.css` linea ~1078
+
+### BUG-331: Boton "Conectar" sobredimensionado / dominante visualmente (RESUELTO)
+- **Severidad:** MEDIA — Despues del fix responsive inicial (BUG-329), el boton seguia viendose "gigante como si tuviera ceguera" (palabras del usuario). El boton `.sn-pp-btn.primary` era solido `var(--slate-light)` + texto negro contrastante + bold 700 → pop visual dominante. En una card de directorio el HERO debe ser avatar+nombre, el CTA es terciario
+- **Fix:** Pattern espejo de LinkedIn/Twitter "Connect" en directorios. Outline ghost (bg transparent + border + text color), font weight 700→600 (semibold), padding compacto 5/11, max-width 220→150, font-size 11px. Bajada de jerarquia visual completa
+- **Archivos:** `eventos-web/src/components/app/social/social.css` linea ~1043
+
+### BUG-330: Grid Personas con tiers fijos truncaba boton "Conectar" en 1366x768 (RESUELTO)
+- **Severidad:** ALTA — `.sn-pp-grid` con `grid-template-columns: repeat(2, 1fr)` rigido. En 1366x768 con perfil abierto: 1366 - sidebar W.0 (80) - sn-col-left (260) - sn-col-right (360 perfil abierto) = ~666 px centro / 2 cols = 323 cada card → boton "+ Conectar" se cortaba mostrando "+ Conec". Container query existia (@1280) pero el canvas raiz quedaba >1280 en 1366, asi que NO disparaba
+- **Fix (3 iteraciones):**
+  1. v1: tiers progresivos 3 niveles container query (1440/1100) + sidebars mas chicos. Parche, no responsive real.
+  2. v2: responsive PROPORCIONAL real — `clamp(200px, 17%, 260px)` para sidebars, `repeat(auto-fill, minmax(min(260px, 100%), 1fr))` para grid (espejo de live.css), `min-width: max-content` + `flex-wrap: wrap` en boton para nunca truncar.
+  3. v3: compactacion + outline ghost (ver BUG-330).
+- **Archivos:** `eventos-web/src/components/app/social/social.css` linea ~7-30 (canvas) y ~951-1085 (grid+btn)
+
+### BUG-329: Suite vitest 194/194 fallando (Node 25 experimental localStorage) (RESUELTO)
+- **Severidad:** CRITICA — Bloqueante de cierre formal de cualquier modulo (no se puede declarar W.5 "cerrado" con tests rojos). Re-auditoria 2026-06-20 detecto que TODOS los 194 tests vitest fallaban con `TypeError: localStorage.clear is not a function` en `tests/setup.ts:17`. Causa raiz: Node 25.8.1 expone un `globalThis.localStorage` experimental (warning `--localstorage-file was provided without a valid path`) que shadowea el de jsdom 29 con un stub sin metodos
+- **Fix:** `tests/setup.ts` con `beforeAll` que stubea `globalThis.localStorage` Y `window.localStorage` con un Storage propio Map-based via `Object.defineProperty`. Una sesion, un archivo, un fix
+- **Archivos:** `eventos-web/tests/setup.ts`
+
+---
+
 ## 2026-05-06 — W.0 Shell audit (3 bugs)
 
 ### BUG-328: Bell button del sidebar sin onClick (UX confusa) (RESUELTO)

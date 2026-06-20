@@ -70,7 +70,7 @@
 - [x] ~~Smoke test 6 rutas~~ → todas 307 (auth gate funcionando), login 200, cero 500, cero warnings runtime
 - [x] ~~Decidir screenshot~~ → borrado (era captura Valorant random, sin relacion con la webapp, 2026-06-20)
 
-### Sprint 1 — Cierres formales modulos casi-hechos (~2-3h, 1 sesion) — 0/8
+### Sprint 1 — Cierres formales modulos casi-hechos (~2-3h, 1 sesion) — 7/8
 > Cosechar lo que ya esta al 80-90%. Cierra modulos completos = sube % global y baja stress mental.
 
 - [ ] **W.5 Speakers — cierre formal**: Lighthouse pass, memoria + counter PARITY-MATRIX, validar device real
