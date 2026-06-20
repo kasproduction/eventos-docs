@@ -1,8 +1,9 @@
-# Pendientes — Webapp (Bancolombia)
+# Pendientes — Webapp (post-Bancolombia, producto propio)
 
 > Vista operativa unica. Todo lo faltante para vender webapp standalone — desde tu cama, transporte o cualquier device sin abrir otros docs.
 >
-> **Generado:** 2026-05-21 (auditoria de parity)
+> **Re-auditado:** 2026-06-20 (recount realidad codigo vs doc despues de 1 mes de pausa)
+> **Pivote comercial:** Bancolombia se perdio — el producto sigue, ahora generico para el proximo cliente
 > **Fuente de detalle:** `docs/webapp/PARITY-MATRIX.md` (cruce Expo↔Webapp↔Backend, 117/117 endpoints backend OK)
 > **Detalle por modulo:** `docs/webapp/W.X-*.md`
 >
@@ -11,74 +12,94 @@
 
 ---
 
-## RESUMEN GLOBAL
+## ~~ALERTA — bloqueante critico detectado 2026-06-20~~ — RESUELTO 2026-06-20
 
-| Modulo | Counter | Estado |
-|---|---|---|
-| W.0 Spatial UI base | 20/24 | 83% — en proceso |
-| W.1 Setup + Auth + UI Foundation | 102/107 | 95% — en proceso |
-| W.1B Backend magic link | 10/10 | **CERRADO** |
-| W.2 Home | 10/20 | 50% — en proceso |
-| W.3 Agenda | 24/30 | 80% — en proceso |
-| W.4 Streaming | 83/111 | 75% — en proceso |
-| W.5 Speakers | 0/35 | 0% — backlog |
-| W.6 Social Wall | 0/40 | 0% — backlog (Networking confundido aqui — ver W.8) |
-| W.7 Sponsors | 0/23 | 0% — backlog |
-| W.8 Networking | ~15/25 | 60% — en proceso (lo "social" implementado realmente es W.8) |
-| W.9 Engagement | 0/35 | 0% — backlog |
-| W.10 Hub Personal | 2/19 | 10% — backlog |
-| W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 |
-| W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 |
-| W.13 FAQ + Docs + Pages | 0/17 | 0% — backlog |
-| W.14 Anuncios + Bell | 0/20 | 0% — backlog |
-| W.15 Vendor Dashboard | 0/35 | **OPCIONAL** Fase 1 |
-| W.16 Live Moments | 0/23 | 0% — backlog |
-| W.17 Soporte | 0/15 | 0% — backlog |
-| W.X Welcome Showcase | 0/7 | **BLOQUEADO** |
-| **TOTAL** | **274/691** | **40%** |
+~~194/194 tests vitest fallando.~~ → **194/194 verdes.** Root cause: Node 25.8.1 expone `globalThis.localStorage` experimental (warning `--localstorage-file was provided without a valid path`) que shadowea el de jsdom 29 con un stub sin metodos. Fix en `eventos-web/tests/setup.ts`: stub propio Map-based + `Object.defineProperty` sobre globalThis + window. Una sesion, un archivo, un fix.
+
+---
+
+## RESUMEN GLOBAL (post-recount)
+
+| Modulo | Counter | Estado | Cambio vs auditoria 2026-05-21 |
+|---|---|---|---|
+| W.0 Spatial UI base | 20/24 | 83% — en proceso | — |
+| W.1 Setup + Auth + UI Foundation | 102/107 | 95% — en proceso | — |
+| W.1B Backend magic link | 10/10 | **CERRADO** | — |
+| W.2 Home | 10/20 | 50% — en proceso | — |
+| W.3 Agenda | 24/30 | 80% — en proceso | — |
+| W.4 Streaming | 83/111 | 75% — en proceso | — |
+| W.5 Speakers | **30/35** | **86%** — cierre pendiente | **+30** (doc decia 0%, codigo lo tiene casi completo) |
+| W.6 Social Wall | **17/40** | **42%** — feed+composer+likes+comments hechos | **+17** (doc decia 0%, feed editorial vivia oculto en `/social`) |
+| W.7 Sponsors | 0/23 | 0% — backlog | — |
+| W.8 Networking | 15/25 | 60% — en proceso | — |
+| W.9 Engagement | 0/35 | 0% — backlog | — |
+| **W.10 Live Hub** | **12/16** | **75%** — modulo NUEVO no documentado | **+12** (creado en commit `0e185e6`, usurpo el numero del Hub Personal) |
+| W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 | — |
+| W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
+| W.13 FAQ + Docs + Pages | 0/17 | 0% — backlog | — |
+| W.14 Anuncios + Bell | 0/20 | 0% — backlog | — |
+| W.15 Vendor Dashboard | 0/35 | **OPCIONAL** Fase 1 | — |
+| W.16 Live Moments | 0/23 | 0% — backlog | — |
+| W.17 Soporte | 0/15 | 0% — backlog | — |
+| **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
+| W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
+| **TOTAL** | **333/707** | **47%** | +59 numerador, +16 denominador (W.10 Live Hub nuevo) |
+
+> Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
 ---
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 1 / Item 1 — W.8 AlertDialog DaVinci en boton Bloquear** (~30 min)
-  - Archivo: `eventos-web/src/components/app/social/AttendeeProfilePanel.tsx`
-  - Reemplazar `window.confirm` por componente `<AlertDialog>` de shadcn
-  - Estilo DaVinci (tokens del proyecto, sin emojis)
+- [ ] **Sprint 1 / Item 1 — W.5 Speakers cierre formal** (~30 min)
+  - Lighthouse pass (Performance >=85, Accessibility >=95)
+  - Actualizar memoria `project_w5_speakers_v2.md` con cierre formal
+  - Actualizar counter PARITY-MATRIX seccion W.5
+  - Validar device real (laptop + tablet + mobile)
+  - Primer modulo cerrado completo desde W.1B
 
 ---
 
-## SPRINTS PROPUESTOS (orden recomendado)
+## SPRINTS PROPUESTOS (orden recomendado, recalculado 2026-06-20)
 
-### Sprint 1 — Correcciones Tier 1 (~5-6h, 1 sesion) — 0/6
-> Items que NO requieren diseño nuevo. Programar sobre lo existente.
+### Sprint 0 — Hygiene (~2-3h, urgente) — 4/4 **CERRADO**
+> Bloqueante. Sin esto cualquier cierre formal es mentira.
 
-- [ ] W.8 — Reemplazar `window.confirm` Bloquear por AlertDialog DaVinci
-- [ ] W.8 — Skeleton mas amigable en AttendeeProfilePanel (bio + intereses + sesiones placeholder, no 3 lineas grises)
-- [ ] W.8 — Playwright E2E happy path (abrir perfil → conectar → solicitud enviada)
-- [ ] W.6 — Filtros tabs Recientes / Mas likes / Mis posts (UI ya existe, falta logica orden client-side)
-- [ ] W.3 — Bulk .ics download (todas las favoritas en un solo archivo)
-- [ ] W.0 — Wire modulos top-level a sidebar (hoy solo W.2/W.3 navegan, faltan W.5-W.17)
+- [x] ~~Reparar suite vitest (194/194 fallando)~~ → 194/194 verdes (fix `tests/setup.ts` localStorage stub, 2026-06-20)
+- [x] ~~Verificar Laragon backend~~ → health 200 OK (2026-06-20)
+- [x] ~~Smoke test 6 rutas~~ → todas 307 (auth gate funcionando), login 200, cero 500, cero warnings runtime
+- [x] ~~Decidir screenshot~~ → borrado (era captura Valorant random, sin relacion con la webapp, 2026-06-20)
 
-### Sprint 2 — Correcciones Tier 2 (~8-10h, 1-2 sesiones) — 0/7
-> Refs internas (patrones ya establecidos en el proyecto), poco diseño nuevo.
+### Sprint 1 — Cierres formales modulos casi-hechos (~2-3h, 1 sesion) — 0/8
+> Cosechar lo que ya esta al 80-90%. Cierra modulos completos = sube % global y baja stress mental.
 
-- [ ] W.8 — Bloqueados list (reusa AttendeeCard + boton Desbloquear)
-- [ ] W.8 — Mi perfil editable (form avatar + bio + intereses + redes)
-- [ ] W.8 — Filtro role dropdown (attendee/speaker/sponsor)
-- [ ] W.3 — Lifecycle badges ORIGINAL / AJUSTADA / CANCELADA
-- [ ] W.4 — Replay detection + auto-rating modal post-stream
-- [ ] W.2 — Sponsors logo band en home (strip discreto, mientras W.7 no este)
-- [ ] W.2 — Anuncios mini badge en home (punto rojo + count)
+- [ ] **W.5 Speakers — cierre formal**: Lighthouse pass, memoria + counter PARITY-MATRIX, validar device real
+- [ ] **W.10 Live Hub — cierre formal**: tests vitest faltantes (live.ts ya tiene, faltan componentes), counter PARITY-MATRIX, crear doc `docs/webapp/W.10-live-hub.md`
+- [ ] **W.10 (viejo) → W.18 Hub Personal — renombrar doc**: `mv docs/webapp/W.10-notificaciones-perfil.md docs/webapp/W.18-hub-personal.md` + grep referencias
+- [ ] W.8 — AlertDialog DaVinci reemplazando `window.confirm` Bloquear (~30 min, demanda mucho menos urgente que cierres)
+- [ ] W.8 — Skeleton mejor AttendeeProfilePanel (bio + intereses + sesiones placeholder)
+- [ ] W.6 — Tabs filtros Recientes/Mas likes/Mis posts (HOY la UI tiene un view switch pero no es tab explicito)
+- [ ] W.3 — Bulk .ics download (todas mis favoritas un archivo)
+- [ ] W.0 — Wire modulos top-level a sidebar (hoy `/live` `/social` `/speakers` ya navegan — verificar que sidebar refleja, completar `/sponsors` `/profile` cuando existan)
 
-### Sprint 3 — W.5 Speakers (~5h, 1 sesion DaVinci) — 0/35
-### Sprint 4 — W.7 Sponsors (~7h, 1-2 sesiones DaVinci) — 0/23
-### Sprint 5 — W.9 Engagement (~10h, 2 sesiones) — 0/35
-### Sprint 6 — W.10 Hub + W.14 Anuncios+Bell + W.17 Soporte (~12h, 2-3 sesiones) — 0/54
-### Sprint 7 — W.16 Live Moments (~6h, 1-2 sesiones) — 0/23
-### Sprint 8 — W.11 Sockets RT consolidacion + W.12 Polish/PWA/E2E (~14h, 2-3 sesiones) — 0/85
+### Sprint 2 — Modulos criticos no empezados, orden CRITICO PARITY (~25h, 4-5 sesiones DaVinci) — 0/N
+> "Lo que falta para vender webapp standalone" segun PARITY-MATRIX seccion 5.
 
-**Total estimado para webapp standalone vendible:** ~60-70h sin W.15 vendor (8-10 sesiones DaVinci)
+- [ ] Sprint 2.A — W.7 Sponsors (~7h, 1-2 sesiones DaVinci) — 0/23
+- [ ] Sprint 2.B — W.9 Engagement (encuestas + leaderboard + passport VIEW + rewards + Golden Ticket) (~10h, 2 sesiones) — 0/35
+- [ ] Sprint 2.C — W.14 Anuncios + Banners + Bell (~3-4h, 1 sesion) — 0/20
+- [ ] Sprint 2.D — W.17 Soporte (~3h, 1 sesion) — 0/15
+- [ ] Sprint 2.E — W.18 Hub Personal (perfil editable + settings) (~5-6h, 1-2 sesiones) — 0/19
+
+### Sprint 3 — W.6 completar (Stories + Photo Contest + Hashtags) (~3-4h, 1 sesion) — 0/19
+### Sprint 4 — W.16 Live Moments (Trivia + Sorteo + Golden Ticket reveal) (~6h, 1-2 sesiones) — 0/23
+### Sprint 5 — W.13 FAQ + Documentos + Pages (~3h, 1 sesion) — 0/17
+### Sprint 6 — W.8 Networking completar (bloqueados + mi perfil + filtros role) (~3h, 1 sesion) — 0/10
+### Sprint 7 — W.2/W.3/W.4 completar (sponsors band + lifecycle + replay + anuncios in-stream) (~10h, 2 sesiones) — 0/30
+### Sprint 8 — W.11 Sockets RT consolidacion (~6h, 1-2 sesiones) — 0/34
+### Sprint 9 — W.12 Polish + E2E + PWA (cierre Fase 1) (~8-10h, 2 sesiones) — 0/43
+
+**Total estimado para webapp standalone vendible:** ~70-80h sin W.15 vendor (10-12 sesiones DaVinci)
 
 ---
 
@@ -246,89 +267,87 @@
 - [ ] **Playwright E2E** stream + Q&A + chat cross-tab
 - [ ] (...17 items menores: tablet pinning, edge cases stream broken, AppState background tracking, ...)
 
-### W.5 — Speakers (0/35, BACKLOG)
+### W.5 — Speakers (30/35, 86% — cierre pendiente)
 
-> **Demo HTML aprobado 2026-05-08.** Implementacion lista para arrancar.
+> Implementado en commit `134bf6e` (2026-05-09). Doc anterior decia 0%, recount 2026-06-20 corrige.
 > Espejo Expo: sin tracks/featured/keynote flags DB (todo derivado), click sesion → /agenda?highlight=X
 
-**Fase 0 — Hooks (0/3)**
-- [ ] `useSpeakers(eventId)` lista
-- [ ] `useSpeaker(speakerId)` detalle
-- [ ] `useSpeakerRating(speakerId)` rate + my-ratings
+**Fase 0 — Hooks (3/3)**
+- [x] `fetchSpeakers(eventId)` lista (lib/speakers.ts)
+- [x] `fetchMySpeakerRatings(eventId)` (lib/speakers.ts)
+- [x] `rateSpeakerRequest` + `fetchMySpeakerRatingsClient` (lib/speakersClient.ts)
 
-**Fase 1 — Featured derivation (0/3)**
-- [ ] Algoritmo featured (keynotes o top sessions, no flag DB)
-- [ ] Fallback top 5 by session_count si no hay keynote
-- [ ] Carousel breathing auto-rotate
+**Fase 1 — Featured derivation (3/3)**
+- [x] Algoritmo `getFeatured()` (speakersDerive.ts) — keynotes o top sessions, no flag DB
+- [x] Fallback top by session_count si no hay keynote
+- [x] BreathingCarousel auto-rotate + flechas al hover
 
-**Fase 2 — Lista (0/4)**
-- [ ] Lista alfabetica 1-col mobile / 2-col desktop
-- [ ] SpeakerListItem (photo 56x56 + nombre + rol + session count badge)
-- [ ] Search debounce 400ms
-- [ ] Empty state
+**Fase 2 — Lista (4/4)**
+- [x] Lista alfabetica via `sortAlphabetical()`
+- [x] SpeakerListItem (photo + nombre + rol + session count badge)
+- [x] Search debounce 400ms
+- [x] Empty state (2 variantes: no-speakers + no-results)
 
-**Fase 3 — DetailPanel (0/7)**
-- [ ] DetailPanel slide-in 320-520px 480ms
-- [ ] Hero foto 4:5 XL
-- [ ] Nombre + job + company
-- [ ] Bio card
-- [ ] Sesiones grid (time + type badge + title + location)
-- [ ] Click sesion → /agenda?highlight={id}
-- [ ] LinkedIn button condicional
+**Fase 3 — DetailPanel (7/7)**
+- [x] SpeakerDetailPanel slide-in con race protection
+- [x] Hero foto + nombre + job + company + bio
+- [x] Sesiones grid clickable
+- [x] Click sesion → `/agenda?highlight={id}` con router.push (sin race vs URL sync)
+- [x] LinkedIn button condicional (test E2E lo verifica)
 
-**Fase 4 — Rating (0/4)**
-- [ ] Rating UI stars interactivo (1-5)
-- [ ] Comment 280 chars textarea
-- [ ] UNIQUE constraint check pre-submit
-- [ ] Estado "Calificar" vs "Evaluado" post-submit
+**Fase 4 — Rating (4/4)**
+- [x] SpeakersRatingModal con stars + comment 280 chars
+- [x] UNIQUE 409 → silencioso + re-hidrata my-ratings (sin error toast)
+- [x] Estado "Calificar" vs "Evaluado" + boton disabled si ya calificado
+- [x] Optimistic update + revert en fallo real
 
-**Fase 5 — Deep link + viewport (0/4)**
-- [ ] Deep link `?id=X` auto-open detail
-- [ ] Agenda `?highlight=sId` scroll + pulse gold
-- [ ] SSR fetcher
-- [ ] 3 viewports (desktop / tablet / mobile)
+**Fase 5 — Deep link + viewport (3/4)**
+- [x] Deep link `?id=X` auto-open via useState initializer (R19 set-state-in-render)
+- [x] URL sync sin recargar (router.replace scroll:false)
+- [x] SSR fetcher (page.tsx hace `Promise.all([speakers, myRatings])`)
+- [ ] Validar 3 viewports en device real (desktop/tablet/mobile)
 
-**Fase 6 — Tests (0/3)**
-- [ ] Skeleton
-- [ ] Vitest hooks + featured derivation
-- [ ] Playwright happy path
+**Fase 6 — Tests (3/3)**
+- [x] Vitest `tests/components/speakers/speakersDerive.test.ts`
+- [x] Vitest `tests/lib/speakersClient.test.ts`
+- [x] Playwright `e2e/speakers.spec.ts` (13 escenarios: auth gate, search, panel, stars, LinkedIn condicional, ya calificado, modal focus, optimistic, 409 silencioso, 500 revert, click sesion, deep link, Esc layer order)
 
-**Fase 7 — Cierre (0/7)**
-- [ ] Lighthouse Performance >=85
-- [ ] Lighthouse Accessibility >=95
-- [ ] Tests verdes
-- [ ] Memoria actualizada
-- [ ] PARITY-MATRIX seccion W.5 a 100%
-- [ ] Detalle commit DaVinci
+**Fase 7 — Cierre (4/7) — bloqueado por Sprint 0**
+- [ ] Lighthouse Performance >=85 (no medido)
+- [ ] Lighthouse Accessibility >=95 (no medido)
+- [ ] Tests verdes (HOY 194/194 fallando — bloqueante)
+- [x] Detalle commit DaVinci (commit `134bf6e` describe el modulo)
+- [ ] Memoria actualizada (existe `project_w5_speakers_v2.md` pero falta marcar cierre)
+- [ ] PARITY-MATRIX seccion W.5 a 86%
 - [ ] Validar device real
 
-### W.6 — Social Wall (0/40, BACKLOG — feed editorial parcial vive en W.8)
+### W.6 — Social Wall (17/40, 42% — feed editorial implementado, faltan Stories+Contest+Hashtags)
 
-> NOTA: Lo "social" implementado (feed + composer + posts + comentarios) tecnicamente es W.6 Wall, pero esta integrado en lo que llamamos "Social Networking" junto con W.8. Listar como pendientes los items Wall NO implementados.
+> Recount 2026-06-20: el feed editorial implementado en `/social` (compartido con W.8 Networking) es W.6 Wall. Doc anterior listaba 0% por error de auditoria. Lo IMPLEMENTADO marcado [x] aqui.
 
-**Fase 0 — Hooks (0/3)**
-- [ ] useSocialFeed paginated
-- [ ] usePostComments lazy
-- [ ] useCreatePost mutation optimistic
+**Fase 0 — Hooks (2/3)**
+- [x] `fetchWallFeed` SSR (lib/social.ts) — backend usa `?page=` (paginacion pendiente UI)
+- [ ] `usePostComments` lazy (hoy carga al expandir InlineComments — verificar si es lazy real)
+- [x] `createWallPost` mutation con foto opcional + manejo `pending` (post en moderacion)
 
-**Fase 1 — Feed (0/4)**
+**Fase 1 — Feed (3/4)**
 - [x] PostCard render
 - [x] InlineComments expandible
-- [ ] Paginacion page-based (backend usa `?page=`)
-- [ ] Empty "Aun no hay publicaciones"
+- [ ] Paginacion page-based UI (SSR carga primera, falta load-more / infinite scroll)
+- [x] Empty hint en SidebarRight ("Conecta con asistentes desde Personas")
 
-**Fase 2 — Like + Comments (0/5)**
-- [x] Heart optimistic setQueryData
-- [x] POST revert on fail
-- [x] Animacion heart Framer Motion
-- [x] Click "X comentarios" expande sub-thread
-- [x] Input crear comentario inline
+**Fase 2 — Like + Comments (5/5)**
+- [x] Heart optimistic (`toggleLikeOptimistic` + `toggleWallLike`)
+- [x] POST revert on fail (SocialClientError catch)
+- [x] Sync likes_count con server (race condition manejada)
+- [x] Click "X comentarios" expande sub-thread (estado `expandedComments`)
+- [x] Input crear comentario inline (Composer + handleCommentAdded)
 
-**Fase 3 — Crear post (0/4)**
-- [x] PostComposer textarea max 500
-- [ ] **Imagen upload** preview antes enviar
-- [x] Optimistic post aparece estado "enviando"
-- [ ] Listener `wall:post` deduplica propio via socket
+**Fase 3 — Crear post (3/4)**
+- [x] Composer textarea max 500
+- [x] **Imagen upload** preview antes enviar (File API en createWallPost)
+- [x] Post optimistic aparece + lumina toast
+- [ ] Listener `wall:post` deduplica propio via socket (depende W.11)
 
 **Fase 4 — Stories (0/4)**
 - [ ] **StoriesBar arriba feed con avatares ring + upload "+"**
@@ -344,14 +363,14 @@
 - [ ] Parser regex `/#[\w_-]+/g`
 - [ ] Click filtra feed client-side
 
-**Fase 7 — Filtros (0/2)**
-- [ ] **Tabs Recientes / Mas likes / Mis posts**
-- [ ] URL state shareable
+**Fase 7 — Filtros (1/2)**
+- [x] View switch Feed/Personas/Solicitudes/Mis posts (sidebar izq) — funcional pero NO son tabs sticky en feed
+- [ ] **Tabs Recientes / Mas likes / Mis posts** explicitas en vista Feed + URL state shareable
 
-**Fase 8 — Tests (0/3)**
-- [ ] Vitest optimistic like + dedup
-- [ ] Playwright crear + like + comentar cross-tab
-- [ ] Playwright post fallido + retry
+**Fase 8 — Tests (3/3)**
+- [x] Vitest `tests/components/social/socialDerive.test.ts` (toggleLikeOptimistic + filterMyPosts)
+- [x] Vitest `tests/components/social/AttendeeProfilePanel.test.tsx`
+- [x] Playwright `e2e/social.spec.ts` (5 escenarios: SSR shell+feed, switch Personas, conectar optimistic, aceptar solicitud, Mis posts vacio)
 
 ### W.7 — Sponsors (0/23, BACKLOG)
 
@@ -479,27 +498,26 @@
 - [ ] Memoria
 - [ ] Counter PARITY-MATRIX
 
-### W.10 — Hub Personal (2/19, 10%)
+### W.10 — Live Hub (12/16, 75% — MODULO NUEVO, no en doc original)
 
-- [x] UserMenu base dropdown
-- [x] ThemeTogglePill bottom-left
-- [ ] **Hooks useMe + useMyProfile + useOnboarding**
-- [ ] **Form perfil editable** (avatar upload + nombre + bio + redes)
-- [ ] **Intereses multi-select** (tags chips)
-- [ ] **Onboarding bio + registration-fields editables**
-- [ ] **Settings idioma** (es-CO / en / pt-BR)
-- [ ] **Settings tema** (Noir / Lux)
-- [ ] **Cerrar sesion completo** (limpiar cookies + cache + redirect)
-- [ ] **User menu dropdown condicional** (vendor → Mi Stand, premios → Mis Premios, canjes → Mis Redenciones, soporte → Mis Consultas)
-- [ ] **Mi Recap link** (modal o vista dedicada — decidir)
-- [ ] **Mi QR vista** (decidir: mobile-only feedback dice si, web no necesita)
-- [ ] **Vista "About event"** (texto + imagen + links sociales — pantalla del Expo no mapeada)
-- [ ] **Privacy toggles** (visible to others)
-- [ ] **Skeleton + responsive**
-- [ ] **Tests Vitest hooks**
-- [ ] **Playwright happy path editar + guardar**
-- [ ] **Lighthouse**
-- [ ] **Counter PARITY-MATRIX**
+> Creado en commit `0e185e6` (2026-05-10). Reusa el numero "W.10" que originalmente era Hub Personal. Conflicto resuelto 2026-06-20: Live Hub se queda con W.10 (mas reciente, en commits + tests), Hub Personal renombrado a W.18.
+
+- [x] SSR `fetchHappeningNow` + `fetchUpNext` (lib/live.ts + lib/happeningNow.ts)
+- [x] Sidebar pill `/live` activo (ya no disabled)
+- [x] LiveHubView root + LiveHero + LiveSideCard + UpcomingCard
+- [x] 4 estados visuales: default 2+N, 1 live solo, 0 lives + N upcoming, 0+0 empty
+- [x] Click hero/side con has_stream → /session-stream/{id}; sin stream → /agenda?highlight
+- [x] Click upcoming → /agenda?highlight={id}
+- [x] Header pill "X EN VIVO" indicador
+- [x] Tokens Slate Mono globales (--slate, --slate-light, --slate-dark, --slate-deep) en globals.css
+- [x] Single radial-gradient elliptical disuelto (sin spots concentrados)
+- [x] Lux overrides completos (cards crema + slate-dark sobre claros)
+- [x] Vitest `tests/lib/live.test.ts`
+- [x] Playwright `e2e/live.spec.ts` (8 escenarios: auth gate, SSR default, upcoming countdown+room+speaker, badge Tu agenda, solo, por arrancar, empty state, navegacion 3 tipos)
+- [ ] Vitest componente LiveHubView (UI logic — solo lib tiene cobertura)
+- [ ] Lighthouse pass
+- [ ] Crear `docs/webapp/W.10-live-hub.md` (HOY no existe)
+- [ ] Counter PARITY-MATRIX (no esta documentado el modulo)
 
 ### W.11 — Sockets RT (8/42, 20%)
 
@@ -774,6 +792,30 @@
 - [ ] Memoria
 - [ ] Counter PARITY-MATRIX
 
+### W.18 — Hub Personal (2/19, 10% — renombrado desde W.10 viejo el 2026-06-20)
+
+> Originalmente W.10 en doc, choca con W.10 Live Hub del codigo. Renombrado a W.18 para evitar refactor de codigo. Doc maestro: `docs/webapp/W.18-hub-personal.md` (HOY aun se llama `W.10-notificaciones-perfil.md`, falta mv).
+
+- [x] UserMenu base dropdown
+- [x] ThemeTogglePill bottom-left
+- [ ] **Hooks useMe + useMyProfile + useOnboarding**
+- [ ] **Form perfil editable** (avatar upload + nombre + bio + redes)
+- [ ] **Intereses multi-select** (tags chips)
+- [ ] **Onboarding bio + registration-fields editables**
+- [ ] **Settings idioma** (es-CO / en / pt-BR)
+- [ ] **Settings tema** (Noir / Lux)
+- [ ] **Cerrar sesion completo** (limpiar cookies + cache + redirect)
+- [ ] **User menu dropdown condicional** (vendor → Mi Stand, premios → Mis Premios, canjes → Mis Redenciones, soporte → Mis Consultas)
+- [ ] **Mi Recap link** (modal o vista dedicada — decidir)
+- [ ] **Mi QR vista** (decidir: mobile-only feedback dice si, web no necesita)
+- [ ] **Vista "About event"** (texto + imagen + links sociales — pantalla del Expo no mapeada)
+- [ ] **Privacy toggles** (visible to others)
+- [ ] **Skeleton + responsive**
+- [ ] **Tests Vitest hooks**
+- [ ] **Playwright happy path editar + guardar**
+- [ ] **Lighthouse**
+- [ ] **Counter PARITY-MATRIX**
+
 ### W.X — Welcome Showcase (0/7, BLOQUEADO)
 
 > Espera W.3 + W.4 + W.5 + W.7 + W.8 + W.9 cerrados para reusar componentes reales en miniatura.
@@ -820,6 +862,7 @@
 
 ## CERRADO RECIENTE (ultimas 5 sesiones)
 
+- **2026-06-20** — Re-auditoria post-pausa de 1 mes: corregido desfase W.5 (0%→86%), W.6 (0%→42%), agregado W.10 Live Hub (75%, modulo nuevo), W.10 viejo renombrado a W.18 Hub Personal. Bloqueante critico detectado: 194/194 tests vitest fallando. Cifra global subio de 40% a 47%.
 - **2026-05-21** — Auditoria parity + creacion `docs/webapp/PARITY-MATRIX.md` (4 fases agentes paralelo, 117/117 endpoints OK)
 - **2026-05-17/18** — W.8 perfil attendee in-slot visionOS + feed editorial + 49 tests vitest (194 total)
 - **2026-05-15/16** — W.8 avatar beam fallback espejo Expo (commit 332b2ef)

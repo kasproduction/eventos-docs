@@ -5,6 +5,7 @@
 > Cruza cada feature/pantalla del Expo con su modulo webapp planeado (W.X), su estado real implementado en `eventos-web`, los endpoints backend que usa, y los gaps concretos.
 >
 > **Generado:** 2026-05-21 (auditoria de 4 fases — Expo screens, docs W.X, eventos-web codigo, backend Laravel)
+> **Re-auditado:** 2026-06-20 — corregido desfase doc vs codigo (W.5/W.6/W.10 estaban mal contados)
 > **Backend:** 117/117 endpoints criticos verificados, 0 gaps bloqueantes
 > **Solo mobile** (no aplica web): `mi-qr`, `scanner-invite`, `scanner-stand`, `staff-checkin` — interacciones presenciales (camara, escaneo fisico)
 > **Vista parcial en web:** `passport` — ver stamps si aplica, ganarlos requiere QR fisico (mobile)
@@ -23,12 +24,12 @@
 | W.2 Home | hero cinematic + happening-now + recap + sponsors band + GamificationHud + anuncios mini + surveys + archive | 10/20 | Cinematic + happening + recap base | 50% | Si |
 | W.3 Agenda | lista + filtros + favoritos + detalle + .ics + ratings + RT + lifecycle | 24/30 | Core funcional + ratings | 80% | Si |
 | W.4 Streaming | detector source + player + Q&A + chat + polls + trivia + anuncios + replay + layout spatial | 83/111 | Socket + player + Q&A + chat + polls + layout | 75% | Si |
-| W.5 Speakers | directorio + featured + perfil + rating + deep link | 0/35 | **No empezado** | 0% | Si |
-| W.6 Social Wall | feed + posts + comentarios + likes + stories + photo contest + hashtags + filtros | 0/40 | Feed + composer + likes + comentarios editorial (mirror Networking, no Wall) | ~25% (sin stories ni contest) | Si |
+| W.5 Speakers | directorio + featured + perfil + rating + deep link | **30/35** | **Implementado (lista + featured + perfil + rating + deep link + 13 tests E2E)** | **86%** | Si |
+| W.6 Social Wall | feed + posts + comentarios + likes + stories + photo contest + hashtags + filtros | **17/40** | Feed + composer + foto upload + likes optimistic + comentarios editorial + mis posts + 3 tests | **42%** (faltan stories, contest, hashtags, tabs explicitas) | Si |
 | W.7 Sponsors | brand wall + profile + favorite + contact + trivia | 0/23 | **No empezado** | 0% | Si |
-| W.8 Networking | directorio + suggested + perfil + solicitudes + bloqueados + mi perfil | 0/25 | Directorio + perfil in-slot + solicitudes (sin bloqueados ni mi perfil) | ~60% | Si |
+| W.8 Networking | directorio + suggested + perfil + solicitudes + bloqueados + mi perfil | 15/25 | Directorio + perfil in-slot + solicitudes + vCard/WhatsApp/Email (sin bloqueados ni mi perfil ni filtro role) | ~60% | Si |
 | W.9 Engagement | encuestas + leaderboard + logros + passport + rewards + prizes | 0/35 | **No empezado** | 0% | Si |
-| W.10 Hub Personal | perfil editable + Mi QR (solo mobile) + settings + menu user | 0/19 | UserMenu + ThemeToggle parciales | ~10% | Si |
+| **W.10 Live Hub** | hero + side + upcoming + 4 estados visuales + nav | **12/16** | **Modulo NUEVO** (commit `0e185e6`, no en doc original — usurpo numero del Hub Personal) | **75%** | Si |
 | W.11 Sockets RT | client + rooms + listeners + invalidation + fallback | 0/42 | Singleton usado en W.4 streaming | ~20% | Si |
 | W.12 Polish + E2E + PWA | responsive + a11y + perf + PWA + Sentry validation | 0/43 | No empezado | 0% | Si (cierre Fase 1) |
 | W.13 FAQ + Documentos + Pages | accordion + lista + WebView | 0/17 | **No empezado** | 0% | Si |
@@ -36,19 +37,23 @@
 | W.15 Vendor Dashboard | Mi Stand + Leads + Stats + Team | 0/35 | **No empezado** | 0% | **Opcional Fase 1** |
 | W.16 Live Moments | trivia + sorteo + photo contest display + golden ticket reveal | 0/23 | **No empezado** | 0% | Si |
 | W.17 Soporte | tickets simples + mis consultas | 0/15 | **No empezado** | 0% | Si |
+| **W.18 Hub Personal** | perfil editable + Mi QR (solo mobile) + settings + menu user | 2/19 | UserMenu + ThemeToggle parciales | ~10% | Si |
 | W.X Welcome Showcase | cinematic 6 beats | 0/7 | **Bloqueado** | 0% | No (tour opcional) |
 
-### 1.2 Totales
+### 1.2 Totales (post-recount 2026-06-20)
 
 | Indicador | Valor |
 |---|---|
 | Pantallas Expo (sin solo-mobile) | 33 |
-| Modulos webapp planeados | 21 (W.0-W.X) |
+| Modulos webapp planeados | 22 (W.0-W.X + W.18 renombrado) |
 | Modulos 100% cerrados | 2 (W.1, W.1B) |
-| Modulos parcialmente implementados | 7 (W.0, W.2, W.3, W.4, W.6, W.8, W.10, W.11) |
-| Modulos 0% empezados | 12 (W.5, W.7, W.9, W.12-W.17, W.X) |
+| Modulos casi cerrados (>=75%) | 4 (W.0, W.1, W.5, W.10) |
+| Modulos parcialmente implementados | 9 (W.0, W.2, W.3, W.4, W.5, W.6, W.8, W.10, W.11, W.18) |
+| Modulos 0% empezados | 10 (W.7, W.9, W.12-W.17, W.X) |
 | Endpoints backend cubren features | 117/117 (100%) |
 | Endpoints backend bonus disponibles | 34 (Pulse organizer, webhooks, presets, etc) |
+| Tests vitest (estado actual) | **194/194 fallando** (drift por pausa de mes — bloqueante cierres formales) |
+| Tests Playwright E2E | 9 specs (agenda, auth-gate, home, live, login-form, social, speakers, streaming, verify-page) |
 
 ---
 
@@ -132,25 +137,38 @@
 - [ ] Mobile/tablet layout (hoy solo desktop 60/20/20)
 - [ ] Playwright E2E
 
-### W.5 — Speakers (CRITICO, 0% done)
-- [ ] Hooks useSpeakers + useSpeaker + useSpeakerRating
-- [ ] Featured carousel derivation (keynotes o top sessions)
-- [ ] Lista alfabetica 1-col mobile / 2-col desktop + search 400ms debounce
-- [ ] DetailPanel 320-520px slide-in 480ms
-- [ ] Rating 1-5 UNIQUE con comment 280 chars
-- [ ] Deep link `?id=X` auto-open + `?highlight=sId` agenda
-- [ ] Skeleton + 3 viewports
-- [ ] Tests Vitest + Playwright
+### W.5 — Speakers (CRITICO, 86% done — cierre formal pendiente)
+- [x] Hooks fetchSpeakers + fetchMySpeakerRatings + rateSpeakerRequest
+- [x] Featured carousel derivation (BreathingCarousel + getFeatured)
+- [x] Lista alfabetica + search 400ms debounce
+- [x] DetailPanel slide-in con race protection
+- [x] Rating 1-5 UNIQUE con comment 280 chars + 409 silencioso
+- [x] Deep link `?id=X` auto-open + `?highlight=sId` agenda
+- [x] Tests Vitest (speakersDerive + speakersClient) + Playwright (13 escenarios)
+- [ ] Lighthouse pass + validar device real (cierre formal)
 
-### W.6 — Social Wall (CRITICO, ~25% done — solo feed editorial)
+### W.6 — Social Wall (CRITICO, 42% done — feed editorial implementado, faltan Stories+Contest+Hashtags)
+- [x] Feed paginated SSR + Composer max 500 + foto upload via File API
+- [x] Heart optimistic + comments inline + mis posts filter
+- [x] Tests Vitest (socialDerive + AttendeeProfilePanel) + Playwright (5 escenarios)
 - [ ] **Stories bar 24h** (avatares + ring + click → modal viewer progress bars)
 - [ ] **Photo Contest banner** (status active/ended, countdown timer en vivo, podio top 3 con medallas + corona, "X fotos participando")
 - [ ] **Galeria fotos** grid con reorder por likes durante contest active
 - [ ] Photo viewer swipe + like + caption
-- [ ] Subir foto desde webapp (input file en vez de ImagePicker)
 - [ ] Hashtags client-side parser
-- [ ] Filtros Recientes / Mas likes / Mis posts
-- [ ] Tests Vitest + Playwright
+- [ ] Filtros Recientes / Mas likes / Mis posts (tabs explicitas en vista Feed)
+- [ ] Paginacion UI (SSR carga primera, falta load-more / infinite scroll)
+
+### W.10 — Live Hub (CRITICO, 75% done — modulo NUEVO)
+- [x] SSR fetchHappeningNow + fetchUpNext (deriva agenda + limit 8)
+- [x] LiveHubView + LiveHero + LiveSideCard + UpcomingCard
+- [x] 4 estados visuales (default 2+N, 1 solo, 0 lives + N upcoming, empty)
+- [x] Navegacion contextual (has_stream → /session-stream, sino → /agenda?highlight)
+- [x] Slate Mono tokens globales + Lux overrides
+- [x] Tests Vitest (live.ts) + Playwright (8 escenarios)
+- [ ] Vitest componente LiveHubView (UI logic)
+- [ ] Doc maestro `docs/webapp/W.10-live-hub.md` (no existe)
+- [ ] Lighthouse pass
 
 ### W.7 — Sponsors (CRITICO, 0% done)
 - [ ] Hooks useSponsors + useFavorite + useContact
@@ -177,13 +195,14 @@
 - [ ] **Rewards** catalogo + redeem flow + my-prizes + Golden Ticket modal con QR
 - [ ] Toast +X puntos via diff tracking (no hay socket dedicado)
 
-### W.10 — Hub Personal (CRITICO, ~10% done)
+### W.18 — Hub Personal (CRITICO, ~10% done — renombrado desde W.10 viejo el 2026-06-20)
 - [ ] Form perfil editable (nombre + redes + foto + bio)
 - [ ] Onboarding bio + intereses + registration-fields editables
 - [ ] Settings idioma es-CO/en/pt-BR + tema Noir/Lux
 - [ ] Cerrar sesion completo
 - [ ] User menu dropdown condicional (vendor/premios/canjes/soporte links)
 - [ ] Mi Recap link
+- [ ] Renombrar `docs/webapp/W.10-notificaciones-perfil.md` → `docs/webapp/W.18-hub-personal.md`
 
 ### W.11 — Sockets RT (CRITICO, ~20% done)
 - [ ] Socket singleton + connection management exponential backoff
@@ -286,18 +305,19 @@
 
 > Lista ordenada por criticidad. Si vendemos webapp standalone a un cliente que NO usa Expo mobile, esto es lo MINIMO que tenemos que cerrar antes de demo:
 
-### CRITICO — sin esto el evento no es funcional en webapp
+### CRITICO — sin esto el evento no es funcional en webapp (post-recount 2026-06-20)
 
-1. **W.5 Speakers (5h)** — directorio + perfil + rating. Sin speakers el contenido del evento no se ve.
-2. **W.7 Sponsors (7h)** — Brand Wall + Brand Profile + contact + favoritos. Sin esto los patrocinadores no aparecen.
-3. **W.9 Engagement (10h)** — encuestas + leaderboard + passport (VIEW) + rewards + Golden Ticket. Sin esto no hay gamificacion.
-4. **W.6 Social completar (3-4h)** — agregar Stories + Photo Contest + Galeria fotos al mirror actual.
-5. **W.14 Anuncios + Banners + Bell (3h)** — comunicacion en vivo del evento. Sin esto el organizador no puede notificar.
-6. **W.10 Hub Personal (5-6h)** — perfil editable + settings + user menu. Sin esto el usuario no puede modificar sus datos.
-7. **W.16 Live Moments (6h)** — Trivia + Sorteo + Golden Ticket reveal. Vivacidad del evento.
-8. **W.17 Soporte (3h)** — sin esto no hay canal para escalar problemas.
+> W.5 ya no esta aqui — esta implementado 86%, solo necesita cierre formal (Sprint 1).
 
-**Total CRITICO: ~42h** (5-6 sesiones DaVinci)
+1. **W.7 Sponsors (7h)** — Brand Wall + Brand Profile + contact + favoritos. Sin esto los patrocinadores no aparecen.
+2. **W.9 Engagement (10h)** — encuestas + leaderboard + passport (VIEW) + rewards + Golden Ticket. Sin esto no hay gamificacion.
+3. **W.6 Social completar (3-4h)** — agregar Stories + Photo Contest + Galeria fotos + Hashtags + tabs filtros al feed editorial existente.
+4. **W.14 Anuncios + Banners + Bell (3-4h)** — comunicacion en vivo del evento. Sin esto el organizador no puede notificar.
+5. **W.18 Hub Personal (5-6h)** — perfil editable + settings + user menu. Sin esto el usuario no puede modificar sus datos.
+6. **W.16 Live Moments (6h)** — Trivia + Sorteo + Golden Ticket reveal. Vivacidad del evento.
+7. **W.17 Soporte (3h)** — sin esto no hay canal para escalar problemas.
+
+**Total CRITICO post-recount: ~37h** (5 sesiones DaVinci, baja desde 42h por W.5 cosechado)
 
 ### IMPORTANTE — sin esto degradado pero funciona
 
@@ -323,33 +343,47 @@
 
 ## 6. Recomendaciones de orden de ataque
 
-Si el objetivo es vender webapp standalone lo antes posible:
+Si el objetivo es vender webapp standalone lo antes posible (post-recount 2026-06-20):
 
-**Sprint 1 — Identidad del evento (8h)**
-- W.5 Speakers (5h)
-- W.14 Anuncios + Bell parcial (3h)
+**Sprint 0 — Hygiene urgente (2-3h)**
+- Reparar suite vitest 194/194 fallando
+- Verificar Laragon backend arriba
+- Smoke test 6 rutas implementadas
+- Decidir screenshot pendiente `design/ERRORES/`
 
-**Sprint 2 — Comercial + Gamificacion base (10h)**
+**Sprint 1 — Cierres formales (2-3h)**
+- W.5 Speakers cierre (Lighthouse + memoria + counter)
+- W.10 Live Hub cierre (vitest componente + doc + counter)
+- W.10→W.18 renombrar doc
+- W.8 AlertDialog + Skeleton (Tier 1 correcciones)
+- W.6 tabs filtros + W.3 bulk .ics + W.0 wire sidebar
+
+**Sprint 2 — Comercial + Gamificacion base (17h)**
 - W.7 Sponsors (7h)
-- W.6 completar Stories + Contest (3h)
-
-**Sprint 3 — Engagement core (10h)**
 - W.9 Engagement (10h)
 
-**Sprint 4 — Personalizacion + Soporte (9h)**
-- W.10 Hub Personal (5-6h)
+**Sprint 3 — Comunicacion + Soporte (10h)**
+- W.14 Anuncios + Banners + Bell (3-4h)
 - W.17 Soporte (3h)
+- W.18 Hub Personal (3-4h primera fase)
 
-**Sprint 5 — Live experience (10h)**
-- W.16 Live Moments (6h)
-- W.14 Banners + Highlights (2h)
-- W.13 FAQ + Docs + Pages (3h ya parcial)
+**Sprint 4 — W.6 completar (3-4h)**
+- Stories + Photo Contest + Hashtags + tabs explicitas
 
-**Sprint 6 — Cierre (12h)**
+**Sprint 5 — Live experience (6h)**
+- W.16 Live Moments (Trivia + Sorteo + Golden Ticket reveal)
+
+**Sprint 6 — Contenido informativo (3h)**
+- W.13 FAQ + Documentos + Pages
+
+**Sprint 7 — Networking completar (3h)**
+- W.8 Bloqueados + Mi perfil editable + Filtro role
+
+**Sprint 8 — Cierre Fase 1 (16-18h)**
 - W.11 Sockets RT consolidacion (6h)
-- W.12 Polish + PWA + E2E (8h)
+- W.12 Polish + PWA + E2E (10-12h)
 
-**Total para vender webapp standalone:** ~60h (8-10 sesiones DaVinci).
+**Total para vender webapp standalone (post-recount):** ~60-65h (10-12 sesiones DaVinci).
 **Con W.15 vendor:** +6h.
 
 ---
