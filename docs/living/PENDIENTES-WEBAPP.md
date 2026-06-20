@@ -431,7 +431,7 @@
 - [x] Tests vitest 49 (vcard + socialClient + AttendeeProfilePanel)
 - [x] Bug handleRespond requestId invertido corregido
 - [x] ~~**Reemplazar window.confirm Bloquear por AlertDialog DaVinci**~~ (hecho 2026-06-20: rechazada v1 shadcn AlertDialog generica; v2 final con `ui/confirm-pop.tsx` reusable + CSS global, patron espejo `rating-pop`, Plus Jakarta 700 20px + Urbanist 14px, copy honesto sin promesa de "tu perfil", tests 27/27 verde)
-- [x] ~~**Skeleton mejor AttendeeProfilePanel** (bio + intereses + sesiones placeholder)~~ (hecho 2026-06-20: 3 secciones estructuradas — titulo + 3 lineas bio + 5 chips + 2 cards sesion. Reusa `.sn-sk-shape` shimmer existente, 5 nuevas reglas CSS scoped a `.sn-pp-sk-*`)
+- [x] ~~**Skeleton mejor AttendeeProfilePanel**~~ (hecho 2026-06-20 v1: 3 secciones estructuradas. v2 simplificado mismo dia por feedback usuario "no coincide con lo que hay" — secciones reales Sobre/Intereses/Asistira a son condicionales y pueden no aparecer para muchos attendees → over-promesa visual. Skeleton final es honesto: 1 titulo chico + 3 lineas tipo bio, sin chips ni cards.)
 - [x] ~~**Bloqueados list** (vista + boton desbloquear)~~ (hecho 2026-06-20: tercera tab "Bloqueados" en SolicitudesView, `BlockedRow` no clickeable + boton ghost Desbloquear, `fetchBlockedAttendees` SSR, optimistic + revert, 2 tests vitest agregados. Migrar a W.18 Settings cuando exista)
 - [ ] **Mi perfil editable** (form avatar + bio + intereses multi-select + redes)
 - [ ] **Filtro role dropdown** (attendee/speaker/sponsor/etc) en directorio
@@ -840,6 +840,7 @@
 ### Mobile parity (cuando webapp este al dia)
 - [ ] Portar "click sesion → agenda highlight" del webapp W.5 al Expo
 - [ ] Otros gaps mobile que aparezcan en sesiones futuras
+- [ ] **Mobile webapp split Social vs Networking (2026-06-20):** webapp desktop unifica `/social` con sidebar (Feed + Personas + Solicitudes + Mis posts). Mobile webapp debe SEPARAR como en Expo: `/social` (Wall + Memorias + Momentos) + `/networking` (directorio + solicitudes + contactos + bloqueados). Ver `project_social_unified_notes.md` en memoria para arquitectura completa. Trabajo futuro, NO en scope actual
 
 ### Backend nice-to-have (NO bloqueante)
 - [ ] Search server-side params standardizados
