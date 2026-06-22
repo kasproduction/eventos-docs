@@ -80,6 +80,29 @@ Cualquier inconsistencia visual / interactiva → fix in-place.
 - [ ] Cada modulo lazy-imported via dynamic import
 - [ ] Lighthouse Performance >= 85 desktop, >= 75 mobile
 
+### 3.2b Ambient prefetch — 0/2 (idea Kamilo 2026-06-21)
+> Patron Linear/Notion: pre-cachear las rutas top-level del sidebar EN
+> BACKGROUND mientras el usuario interactua con cualquier ruta
+> autenticada (o con el onboarding). Cuando navega, todo esta warm y
+> NO ve skeletons en cada click.
+>
+> Implementacion: `<RouteWarmer />` en `(app)/layout.tsx`. Al mount,
+> `requestIdleCallback` → `router.prefetch()` paralelo de las 5 rutas
+> restantes del sidebar (skip la activa). Auto-skip rutas disabled.
+> Skipear si `navigator.connection.saveData === true`.
+>
+> Bonus: pagina del onboarding tambien dispara prefetch al boton
+> "Comenzar" — para cuando el usuario aterriza en /home, las 5 rutas
+> del sidebar ya estan en cache.
+>
+> Limites: solo prod (dev igual compila on-demand). Funciona con el
+> RSC payload Next 16, complementa la migracion 3.3 (TanStack + push
+> invalidation) pero es ortogonal — esto cubre el RSC del shell, esa
+> cubre los datos del modulo.
+
+- [ ] `<RouteWarmer />` en `(app)/layout.tsx` con `requestIdleCallback`
+- [ ] Bonus: prefetch tambien en ultima pantalla del onboarding
+
 ### 3.3 Migracion fetchers SSR → TanStack Query con invalidacion push (DEPENDE DE W.11) — 0/4
 
 > **Arquitectura objetivo (paridad mobile):** la app Expo cachea con
