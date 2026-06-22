@@ -22,7 +22,7 @@
 
 | Modulo | Counter | Estado | Cambio vs auditoria 2026-05-21 |
 |---|---|---|---|
-| W.0 Spatial UI base | 20/24 | 83% — en proceso | — |
+| W.0 Spatial UI base | **21/24** | **87%** — en proceso | **+1** (Sprint 1 item 9 — wire sidebar + quitar brand letter) |
 | W.1 Setup + Auth + UI Foundation | 102/107 | 95% — en proceso | — |
 | W.1B Backend magic link | 10/10 | **CERRADO** | — |
 | W.2 Home | 10/20 | 50% — en proceso | — |
@@ -43,7 +43,7 @@
 | W.17 Soporte | 0/15 | 0% — backlog | — |
 | **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **345/707** | **48.8%** | +71 numerador, +16 denominador (Sprint 1 item 8 cerrado) |
+| **TOTAL** | **346/707** | **48.9%** | +72 numerador, +16 denominador (Sprint 1 CERRADO 9/9) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,10 +51,11 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 1 / Item 9 — W.0 Wire modulos top-level a sidebar** (~30 min, cierra Sprint 1)
-  - Auditar handlers click en items del sidebar W.0
-  - Items con ruta existente (`/live`, `/social`, `/speakers`, `/agenda`) → verificar navegacion
-  - Items pendientes (`/sponsors`, `/profile`, `/engagement`) → tooltip "proximamente" + cursor disabled (no rotos)
+- [ ] **Sprint 2.A — W.7 Sponsors** (~7h, 1-2 sesiones DaVinci) — 0/23
+  - Modulo nuevo completo (no espejo directo Expo — tiene divergencia segun PARITY-MATRIX)
+  - Decisiones de diseno previas: ver `project_sponsors_uiux_notes.md` (Brand Wall + Brand Profile + contact form)
+  - Backend endpoints listos: 117/117 OK
+  - **Antes de codear:** sesion DaVinci de diseno — refs externas (Cisco/Hopin sponsor halls), wireframe propuesto, validacion. NO codear sin aprobacion
 
 ---
 
@@ -68,7 +69,7 @@
 - [x] ~~Smoke test 6 rutas~~ → todas 307 (auth gate funcionando), login 200, cero 500, cero warnings runtime
 - [x] ~~Decidir screenshot~~ → borrado (era captura Valorant random, sin relacion con la webapp, 2026-06-20)
 
-### Sprint 1 — Cierres formales modulos casi-hechos (~2-3h, 1 sesion) — 8/9
+### Sprint 1 — Cierres formales modulos casi-hechos (~2-3h, 1 sesion) — 9/9 **CERRADO 2026-06-21**
 > Cosechar lo que ya esta al 80-90%. Cierra modulos completos = sube % global y baja stress mental.
 
 - [ ] **W.5 Speakers — cierre formal**: Lighthouse pass, memoria + counter PARITY-MATRIX, validar device real
@@ -78,7 +79,7 @@
 - [ ] W.8 — Skeleton mejor AttendeeProfilePanel (bio + intereses + sesiones placeholder)
 - [ ] W.6 — Tabs filtros Recientes/Mas likes/Mis posts (HOY la UI tiene un view switch pero no es tab explicito)
 - [x] ~~**W.3 — Bulk .ics download**~~: hecho 2026-06-21. Reemplazado handler fake `handleTodas` con `downloadAgendaIcs()` real. Generador puro `lib/ics.ts` (RFC 5545: VCALENDAR + N VEVENT con UID determinista, DTSTAMP UTC, escape comas/semicolons/backslash). Boton "Todas" del AgendaHeader ahora visible cuando hay favoritas en CUALQUIER dia (`countMine > 0`, antes era `visibleSessions.length > 0` del dia). Filename `mi-agenda-{event.slug}.ics`. +16 tests vitest (218 verde, typecheck OK)
-- [ ] W.0 — Wire modulos top-level a sidebar (hoy `/live` `/social` `/speakers` ya navegan — verificar que sidebar refleja, completar `/sponsors` `/profile` cuando existan)
+- [x] ~~**W.0 — Wire modulos top-level a sidebar**~~: hecho 2026-06-21. Verificado smoke 5/5 items (home, agenda, live, speakers, social) navegan sin error. Patron `available: boolean` ya implementado: `/sponsors` correctamente disabled con tooltip "proximamente" + opacidad 55%. Logica decidida: **conforme aparece cada modulo, se cambia `available: false` → `true` en `SidebarPill.tsx`** (no agregamos items fantasma futuros). Bonus: quitado el brand letter inicial (`event.name?.charAt(0)`) — generaba ruido visual tipo debug en eventos sin logo elaborado
 
 ### Sprint 2 — Modulos criticos no empezados, orden CRITICO PARITY (~25h, 4-5 sesiones DaVinci) — 0/N
 > "Lo que falta para vender webapp standalone" segun PARITY-MATRIX seccion 5.
@@ -125,7 +126,7 @@
 - [x] Theme toggle pill bottom-left
 - [x] Live pulse indicator
 - [x] Connection status pill
-- [ ] **Modulos navegables top-level desde sidebar** (W.5-W.17 sin handlers; hoy solo W.2/W.3)
+- [x] ~~**Modulos navegables top-level desde sidebar**~~ 2026-06-21 — 5/5 items navegan (home, agenda, live, speakers, social). Sponsors disabled con tooltip "proximamente"
 - [ ] **Command palette ⌘K funcional** (busqueda navegar a cualquier seccion)
 - [ ] **Pre-load vecinos** (lazy mount de paneles adyacentes)
 - [ ] **Validar device real** iPad portrait/landscape, Pixel, iPhone
