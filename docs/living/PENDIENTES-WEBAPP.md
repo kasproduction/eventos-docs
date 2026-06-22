@@ -30,7 +30,7 @@
 | W.4 Streaming | 83/111 | 75% — en proceso | — |
 | W.5 Speakers | **33/35** | **94% — cerrado al maximo posible** (solo faltan Lighthouse + device fisico) | **+33** (doc decia 0%, codigo lo tiene casi completo) |
 | W.6 Social Wall | **18/40** | **45%** — feed+composer+likes+comments+tabs filtros hechos | **+18** (Sprint 1 item 7 cerrado) |
-| W.7 Sponsors | 0/23 | 0% — backlog | — |
+| **W.7 Sponsors** | **20/23** | **87% — implementado, pendiente Lighthouse + device fisico** | **+20** (Sprint 2.A entero, 2026-06-21) |
 | W.8 Networking | 15/25 | 60% — en proceso | — |
 | W.9 Engagement | 0/35 | 0% — backlog | — |
 | **W.10 Live Hub** | **16/16** | **CERRADO por consenso 2026-06-20** | **+16** (creado en commit `0e185e6`, validado visual con seeder) |
@@ -43,7 +43,7 @@
 | W.17 Soporte | 0/15 | 0% — backlog | — |
 | **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **346/707** | **48.9%** | +72 numerador, +16 denominador (Sprint 1 CERRADO 9/9) |
+| **TOTAL** | **366/707** | **51.8%** | +92 numerador, +16 denominador (Sprint 2.A — W.7 Sponsors) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,11 +51,11 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 2.A — W.7 Sponsors** (~7h, 1-2 sesiones DaVinci) — 0/23
-  - Modulo nuevo completo (no espejo directo Expo — tiene divergencia segun PARITY-MATRIX)
-  - Decisiones de diseno previas: ver `project_sponsors_uiux_notes.md` (Brand Wall + Brand Profile + contact form)
-  - Backend endpoints listos: 117/117 OK
-  - **Antes de codear:** sesion DaVinci de diseno — refs externas (Cisco/Hopin sponsor halls), wireframe propuesto, validacion. NO codear sin aprobacion
+- [ ] **Sprint 2.B — W.9 Engagement** (~10h, 2 sesiones DaVinci) — 0/35
+  - Encuestas + leaderboard + passport VIEW + rewards + Golden Ticket
+  - Backend endpoints listos: GamificationController + PointsService completos
+  - Sponsors W.7 ya wireo `visit-stand` + trivia → reusar patrones para encuestas/passport
+  - Antes de codear: sesion DaVinci de diseno (wireframe propuesto + refs)
 
 ---
 

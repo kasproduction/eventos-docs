@@ -1,0 +1,1415 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>W.7 Sponsors — DaVinci v2 (patron Speakers)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-sunken:#0a0a0a;
+  --bg-elevated:#141414;
+  --surface-low:#1a1a1a;
+  --surface-medium:#1f1f1f;
+  --surface-high:#262626;
+  --surface-card:#181818;
+  --border:rgba(255,255,255,0.06);
+  --border-strong:rgba(255,255,255,0.12);
+  --fg:#f5f5f4;
+  --fg-dim:#a8a8a3;
+  --fg-mute:#6b6b66;
+  --fg-label:#5a5a55;
+
+  --accent:#7CFFB2;
+  --accent-soft:rgba(124,255,178,0.10);
+  --accent-glow:rgba(124,255,178,0.20);
+  --accent-on:#0a0a0a;
+
+  --heart:#FF5D6C;
+  --gold:#B5A68B;
+  --gold-bg:rgba(181,166,139,0.14);
+
+  --tier-platinum-fg: rgba(255,255,255,0.85);
+  --tier-gold-fg: rgba(255,210,80,0.85);
+  --tier-silver-fg: rgba(180,185,200,0.85);
+  --tier-bronze-fg: rgba(210,155,90,0.85);
+  --tier-media-fg: rgba(110,165,255,0.85);
+
+  --trivia:#a78bfa;
+  --trivia-bg:rgba(167,139,250,0.10);
+  --trivia-border:rgba(167,139,250,0.22);
+
+  --passport:#5eead4;
+  --passport-bg:rgba(94,234,212,0.10);
+
+  --canvas-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+  --spring-soft: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --spring-snap: cubic-bezier(0.16, 1.2, 0.3, 1);
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body[data-theme="lux"]{
+  --bg-sunken:#F6F8FA;
+  --bg-elevated:#FFFFFF;
+  --surface-low:#FFFFFF;
+  --surface-medium:rgba(0,0,0,0.03);
+  --surface-high:rgba(0,0,0,0.06);
+  --surface-card:#FFFFFF;
+  --border:rgba(0,0,0,0.08);
+  --border-strong:rgba(0,0,0,0.14);
+  --fg:#1A1B1E;
+  --fg-dim:#4A4B50;
+  --fg-mute:#7C7D82;
+  --fg-label:#A8A9AE;
+  --canvas-shadow: 0 16px 48px rgba(0,0,0,0.12);
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 8px 20px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.05);
+  --gold:#8E8170;
+  --gold-bg:rgba(142,129,112,0.12);
+  --tier-platinum-fg: #2a2a2e;
+  --tier-gold-fg: #b8881a;
+  --tier-silver-fg: #6a7080;
+  --tier-bronze-fg: #b06820;
+  --tier-media-fg: #2a6cb8;
+}
+
+*{box-sizing:border-box; margin:0; padding:0}
+html,body{height:100%}
+body{
+  font-family: 'Urbanist', system-ui, sans-serif;
+  background: var(--bg-sunken);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ============== Shell ============== */
+.shell{
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  padding: 24px 28px 24px 84px;
+  background:
+    radial-gradient(ellipse at 20% 30%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 60%),
+    radial-gradient(ellipse at 80% 70%, color-mix(in srgb, var(--accent) 5%, transparent), transparent 55%),
+    var(--bg-sunken);
+}
+.sidebar{
+  position: fixed; left: 18px; top: 50%;
+  transform: translateY(-50%);
+  width: 52px; display: flex; flex-direction: column; gap: 4px;
+  padding: 10px 0;
+  border-radius: 28px;
+  border: 1px solid var(--border-strong);
+  background: color-mix(in srgb, var(--bg-elevated) 90%, transparent);
+  backdrop-filter: blur(22px) saturate(1.2);
+  z-index: 50;
+}
+.sidebar .slot{
+  width: 36px; height: 36px; margin: 0 auto;
+  display: grid; place-items: center;
+  border-radius: 12px; color: var(--fg-mute); cursor: pointer;
+  transition: background 180ms;
+}
+.sidebar .slot.active{ background: var(--surface-high); color: var(--fg); }
+.sidebar .slot:hover:not(.active){ background: var(--surface-medium); color: var(--fg-dim) }
+.sidebar .slot.disabled{ opacity: 0.5; cursor: not-allowed; }
+.sidebar .divider{ height: 1px; width: 22px; margin: 6px auto; background: var(--border); }
+.theme-toggle{
+  position: fixed; left: 18px; bottom: 18px;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  color: var(--fg-dim);
+  display: grid; place-items: center;
+  cursor: pointer; z-index: 50;
+}
+
+/* ============== Canvas ============== */
+.canvas{
+  width: 100%;
+  max-width: 1600px;
+  height: min(calc(100vh - 56px), 920px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: var(--canvas-shadow);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto 1fr;
+  transition: grid-template-columns 360ms var(--ease-out);
+}
+.canvas.has-detail{
+  grid-template-columns: minmax(560px, 1.6fr) minmax(480px, 1fr);
+  grid-template-areas:
+    "head head"
+    "tabs tabs"
+    "feat feat"
+    "list detail";
+}
+.canvas:not(.has-detail) .sp-head{ grid-column: 1 / -1; }
+.canvas.has-detail .sp-head{ grid-area: head; }
+.canvas.has-detail .sp-tabs{ grid-area: tabs; }
+.canvas.has-detail .sp-featured{ grid-area: feat; }
+.canvas.has-detail .sp-list{ grid-area: list; }
+.canvas.has-detail .sp-detail{ grid-area: detail; }
+
+/* ============== Header ============== */
+.sp-head{
+  padding: 28px 32px 12px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.sp-titles h1{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: -0.5px;
+}
+.sp-titles .sub{
+  font-size: 13px;
+  color: var(--fg-mute);
+  margin-top: 4px;
+}
+.sp-tools{ display: flex; align-items: center; gap: 8px; }
+.sp-search{
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  border-radius: 99px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  min-width: 260px;
+}
+.sp-search input{
+  flex: 1; background: transparent; border: 0; outline: 0;
+  color: var(--fg); font-family: 'Urbanist', sans-serif; font-size: 13px;
+}
+.sp-search input::placeholder{ color: var(--fg-label); }
+
+/* ============== Tabs (filtros tier) ============== */
+.sp-tabs{
+  padding: 0 32px 16px;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sp-tabs::-webkit-scrollbar{ display: none; }
+.tab{
+  padding: 7px 14px;
+  border-radius: 99px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--fg-mute);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 180ms;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab:hover{ background: var(--surface-medium); color: var(--fg-dim); }
+.tab.active{
+  background: var(--surface-high);
+  color: var(--fg);
+  border-color: var(--border-strong);
+}
+.tab .dot{
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+.tab .count{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  color: var(--fg-label);
+  margin-left: 2px;
+}
+.tab.active .count{ color: var(--fg-mute); }
+
+/* ============== Featured Carousel ============== */
+.sp-featured{
+  padding: 0 32px 18px;
+  position: relative;
+}
+.featured-wrap{
+  display: flex;
+  gap: 16px;
+  overflow: hidden;
+  position: relative;
+}
+.featured-card{
+  flex: 1 1 0;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)),
+    var(--surface-card);
+  border: 1px solid var(--border-strong);
+  cursor: pointer;
+  transition: transform 320ms var(--spring-snap), border-color 220ms;
+  position: relative;
+  overflow: hidden;
+}
+.featured-card::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 320ms;
+}
+.featured-card:hover{ transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent) 30%, var(--border-strong)); }
+.featured-card:hover::before{ opacity: 1; }
+.featured-card .logo{
+  width: 80px; height: 80px;
+  border-radius: 18px;
+  background: var(--surface-medium);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--fg-dim);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.featured-card .logo img{ width: 100%; height: 100%; object-fit: cover; }
+.featured-card .info{
+  display: flex; flex-direction: column; justify-content: center;
+  min-width: 0;
+}
+.featured-card .top-line{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.featured-card .tier-tag{
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--tier-platinum-fg);
+}
+.featured-card .meta-dot{
+  width: 3px; height: 3px;
+  background: var(--fg-label);
+  border-radius: 50%;
+}
+.featured-card .badges{
+  display: flex; gap: 4px;
+}
+.featured-card .name{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.2px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.featured-card .desc{
+  font-size: 12px;
+  color: var(--fg-mute);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.featured-card.shuffle-out{
+  animation: card-out 600ms var(--ease-out) forwards;
+}
+.featured-card.shuffle-in{
+  animation: card-in 600ms var(--spring-soft) backwards;
+}
+@keyframes card-out{
+  to{ opacity: 0; transform: translateY(-4px) scale(0.96); filter: blur(2px); }
+}
+@keyframes card-in{
+  from{ opacity: 0; transform: translateY(8px) scale(0.96); filter: blur(2px); }
+}
+
+.feat-pills{
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 12px;
+}
+.feat-pills .pill{
+  width: 14px; height: 3px;
+  border-radius: 2px;
+  background: var(--surface-high);
+  transition: width 280ms, background 280ms;
+}
+.feat-pills .pill.active{
+  width: 22px;
+  background: var(--fg-mute);
+}
+
+/* ============== Lista vertical de sponsors ============== */
+.sp-list{
+  overflow-y: auto;
+  padding: 2px 32px 28px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-high) transparent;
+}
+.sp-list::-webkit-scrollbar{ width: 6px; }
+.sp-list::-webkit-scrollbar-track{ background: transparent; }
+.sp-list::-webkit-scrollbar-thumb{ background: var(--surface-high); border-radius: 3px; }
+
+.section-divider{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 12px;
+}
+.section-divider .label{
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--fg-label);
+}
+.section-divider .line{
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-divider .count-pill{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 9px;
+  color: var(--fg-label);
+  background: var(--surface-low);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.sp-row{
+  display: grid;
+  grid-template-columns: 56px 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: background 220ms, border-color 220ms, transform 220ms var(--spring-snap);
+}
+.sp-row:hover{
+  background: var(--surface-low);
+  border-color: var(--border);
+  transform: translateY(-1px);
+}
+.sp-row.selected{
+  background: var(--surface-medium);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border-strong));
+}
+.sp-row .logo{
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  background: var(--surface-medium);
+  border: 1px solid var(--border);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--fg-dim);
+  overflow: hidden;
+}
+.sp-row .logo img{ width: 100%; height: 100%; object-fit: cover; }
+.sp-row .info{ min-width: 0; }
+.sp-row .top-line{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.sp-row .name{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.2px;
+  color: var(--fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sp-row .tier-pill{
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.sp-row .tier-pill.gold{ color: var(--tier-gold-fg); background: rgba(255,210,80,0.10); }
+.sp-row .tier-pill.silver{ color: var(--tier-silver-fg); background: rgba(180,185,200,0.10); }
+.sp-row .tier-pill.bronze{ color: var(--tier-bronze-fg); background: rgba(210,155,90,0.10); }
+.sp-row .tier-pill.media{ color: var(--tier-media-fg); background: rgba(110,165,255,0.10); }
+.sp-row .desc{
+  font-size: 12px;
+  color: var(--fg-mute);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sp-row .badges{
+  display: flex; gap: 4px;
+  align-items: center;
+}
+.sp-row .mini-badge{
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+}
+.sp-row .mini-badge.passport{
+  background: var(--passport-bg);
+  border: 1px solid color-mix(in srgb, var(--passport) 50%, transparent);
+  color: var(--passport);
+}
+.sp-row .mini-badge.trivia{
+  background: var(--trivia-bg);
+  border: 1px solid color-mix(in srgb, var(--trivia) 50%, transparent);
+  color: var(--trivia);
+}
+.sp-row .chev{ color: var(--fg-label); }
+
+/* Living shuffle (FLIP transitions) */
+.sp-row.swap-out{ animation: row-out 360ms var(--ease-out) forwards; }
+.sp-row.swap-in{ animation: row-in 360ms var(--spring-soft) backwards; }
+@keyframes row-out{ to{ opacity: 0.4; } }
+@keyframes row-in{ from{ opacity: 0.4; } }
+
+/* ============== Detail Panel (igual a v1) ============== */
+.sp-detail{
+  border-left: 1px solid var(--border);
+  background: var(--bg-elevated);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-high) transparent;
+  animation: panel-in 320ms var(--spring-soft) backwards;
+}
+.sp-detail::-webkit-scrollbar{ width: 6px; }
+.sp-detail::-webkit-scrollbar-track{ background: transparent; }
+.sp-detail::-webkit-scrollbar-thumb{ background: var(--surface-high); border-radius: 3px; }
+@keyframes panel-in{
+  from{ opacity: 0; transform: translateX(20px); }
+  to{ opacity: 1; transform: translateX(0); }
+}
+
+.detail-head{
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 24px 0;
+}
+.detail-close, .icon-btn{
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--surface-low); border: 0;
+  color: var(--fg-dim); cursor: pointer;
+  display: grid; place-items: center;
+  transition: background 180ms;
+}
+.detail-close:hover, .icon-btn:hover{ background: var(--surface-medium); color: var(--fg); }
+.icon-btn.fav{ color: var(--heart); }
+.icon-btn.fav.on{ background: color-mix(in srgb, var(--heart) 15%, transparent); }
+
+.detail-hero{ padding: 28px 28px 18px; text-align: center; position: relative; }
+.detail-hero .logo{
+  width: 88px; height: 88px;
+  border-radius: 22px;
+  margin: 0 auto 16px;
+  display: grid; place-items: center;
+  background: var(--surface-medium);
+  border: 1px solid var(--border-strong);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 32px;
+  color: var(--fg-dim);
+  overflow: hidden;
+}
+.detail-hero .logo img{ width: 100%; height: 100%; object-fit: cover; }
+.detail-hero .name{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 22px;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.detail-hero .tier-pill-hero{
+  display: inline-flex; align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--fg-mute);
+}
+.detail-hero .desc{
+  margin-top: 14px;
+  font-size: 13px; line-height: 1.6;
+  color: var(--fg-dim);
+}
+.passport-pill{
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 99px;
+  background: var(--passport-bg);
+  border: 1px solid var(--passport);
+  font-size: 9px; font-weight: 700;
+  color: var(--passport);
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+}
+
+.points-toast{
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  border-radius: 99px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-glow);
+  color: var(--accent);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+  pointer-events: none; opacity: 0;
+  animation: points-pop 2200ms var(--spring-soft) forwards;
+}
+@keyframes points-pop{
+  0%{ opacity: 0; transform: translate(-50%, -8px) scale(0.85); }
+  15%{ opacity: 1; transform: translate(-50%, 0) scale(1.04); }
+  25%{ transform: translate(-50%, 0) scale(1); }
+  80%{ opacity: 1; }
+  100%{ opacity: 0; transform: translate(-50%, -12px) scale(0.95); }
+}
+
+.detail-section{
+  padding: 22px 28px;
+  border-top: 1px solid var(--border);
+}
+.section-title{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 10px;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--fg-label);
+  margin-bottom: 12px;
+}
+
+.session-item{
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 12px; align-items: center;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  margin-bottom: 8px; cursor: pointer;
+}
+.session-item:hover{ background: var(--surface-medium); }
+.session-item .time{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 14px;
+}
+.session-item .time .type{
+  display: block; margin-top: 3px;
+  font-size: 8px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--fg-mute);
+}
+.session-item .title{
+  font-size: 13px; font-weight: 500;
+  line-height: 1.3; margin-bottom: 3px;
+}
+.session-item .where{
+  font-size: 11px; color: var(--fg-mute);
+  display: flex; align-items: center; gap: 4px;
+}
+
+.chip-row{ display: flex; flex-wrap: wrap; gap: 8px; }
+.chip{
+  padding: 7px 14px; border-radius: 99px;
+  background: var(--surface-low); border: 1px solid var(--border);
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 500; font-size: 12px;
+  color: var(--fg-dim);
+  cursor: pointer;
+  transition: all 180ms;
+  user-select: none;
+}
+.chip:hover{ background: var(--surface-medium); color: var(--fg); border-color: var(--border-strong); }
+.chip.active{
+  background: var(--surface-high);
+  color: var(--fg);
+  border-color: var(--accent);
+}
+
+.contact-msg{
+  margin-top: 12px; width: 100%;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-family: 'Urbanist', sans-serif;
+  font-size: 13px; color: var(--fg);
+  resize: none; outline: 0;
+  min-height: 80px;
+}
+.contact-msg:focus{ border-color: var(--border-strong); }
+.contact-cta{
+  margin-top: 12px; width: 100%;
+  padding: 13px; border-radius: 12px;
+  border: 0; background: var(--accent);
+  color: var(--accent-on);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 13px;
+  cursor: pointer;
+  transition: opacity 180ms, transform 120ms;
+}
+.contact-cta:hover{ opacity: 0.92; }
+.contact-cta:active{ transform: scale(0.98); }
+.contact-cta:disabled{
+  background: var(--surface-medium);
+  color: var(--fg-mute);
+  cursor: not-allowed; opacity: 0.6;
+}
+.contact-sent{
+  margin-top: 14px; padding: 14px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-glow);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.contact-sent .head{
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+  color: var(--accent);
+}
+.contact-sent .sub{
+  font-size: 11px; color: var(--fg-mute);
+  padding-left: 22px;
+}
+
+/* Trivia (igual a v1) */
+.trivia-card{
+  background: var(--trivia-bg);
+  border: 1px solid var(--trivia-border);
+  border-radius: 16px;
+  padding: 18px;
+}
+.trivia-head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.trivia-head .left{
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 13px;
+  color: var(--trivia);
+}
+.trivia-bonus{
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700;
+  color: var(--trivia);
+  background: color-mix(in srgb, var(--trivia) 15%, transparent);
+  padding: 4px 10px;
+  border-radius: 99px;
+}
+.trivia-question{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600; font-size: 14px;
+  line-height: 1.4; margin-bottom: 14px;
+}
+.trivia-option{
+  width: 100%; text-align: left;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px; margin-bottom: 8px;
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif; font-size: 13px;
+  color: var(--fg-dim);
+  transition: all 180ms;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.trivia-option:hover:not(.locked){
+  background: var(--surface-medium);
+  border-color: var(--border-strong);
+  color: var(--fg);
+}
+.trivia-option.locked{ cursor: default; }
+.trivia-option.correct{
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border-color: var(--accent);
+  color: var(--accent); font-weight: 600;
+}
+.trivia-option.wrong{
+  background: color-mix(in srgb, var(--heart) 15%, transparent);
+  border-color: var(--heart);
+  color: var(--heart); font-weight: 600;
+}
+.trivia-option.dimmed{ opacity: 0.5; }
+.trivia-option .icon{ display: none; }
+.trivia-option.correct .icon, .trivia-option.wrong .icon{ display: inline-flex; }
+.trivia-feedback{
+  margin-top: 12px; text-align: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+  color: var(--accent);
+}
+.trivia-feedback.wrong{ color: var(--heart); }
+.trivia-progress{ display: flex; gap: 4px; margin-bottom: 12px; }
+.trivia-progress .dot{
+  flex: 1; height: 3px; border-radius: 2px;
+  background: var(--surface-low);
+}
+.trivia-progress .dot.done{ background: var(--trivia); }
+.trivia-progress .dot.current{ background: color-mix(in srgb, var(--trivia) 60%, transparent); }
+
+.action-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.action-btn{
+  padding: 12px; border-radius: 12px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  color: var(--fg-dim);
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 600; font-size: 12px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  text-decoration: none;
+  transition: all 180ms;
+}
+.action-btn:hover{ background: var(--surface-medium); color: var(--fg); border-color: var(--border-strong); }
+
+.empty-state{
+  padding: 80px 20px; text-align: center;
+  color: var(--fg-mute);
+}
+.empty-state svg{ margin-bottom: 14px; color: var(--fg-label); }
+.empty-state .title{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600; font-size: 14px;
+  color: var(--fg-dim);
+  margin-bottom: 6px;
+}
+
+.heart-pop{ animation: heart-pop 360ms var(--spring-soft); }
+@keyframes heart-pop{
+  0%{ transform: scale(1); }
+  40%{ transform: scale(1.3); }
+  100%{ transform: scale(1); }
+}
+
+@media (max-width: 900px){
+  .shell{ padding: 12px 14px 12px 70px; }
+  .canvas.has-detail{ grid-template-columns: 1fr; }
+  .featured-card{ grid-template-columns: 56px 1fr; padding: 14px; }
+  .featured-card .logo{ width: 56px; height: 56px; font-size: 20px; }
+}
+</style>
+</head>
+<body data-theme="noir">
+
+<aside class="sidebar">
+  <div class="slot" title="Home"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M5 10v10h14V10"/></svg></div>
+  <div class="slot" title="Agenda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg></div>
+  <div class="slot" title="Live"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><path d="M16.2 7.8a6 6 0 010 8.4M7.8 7.8a6 6 0 000 8.4M19.1 4.9a10 10 0 010 14.2M4.9 4.9a10 10 0 000 14.2"/></svg></div>
+  <div class="slot" title="Speakers"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg></div>
+  <div class="slot" title="Social"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+  <div class="slot active" title="Sponsors"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l9-5 9 5v14M9 21V12h6v9"/></svg></div>
+  <div class="divider"></div>
+  <div class="slot disabled"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg></div>
+  <div class="slot"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+</aside>
+
+<button class="theme-toggle" id="themeToggle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></button>
+
+<div class="shell">
+  <div class="canvas" id="canvas">
+
+    <header class="sp-head">
+      <div class="sp-titles">
+        <h1>Sponsors</h1>
+        <div class="sub" id="sub">Conoce a los aliados que hacen posible este evento</div>
+      </div>
+      <div class="sp-tools">
+        <div class="sp-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--fg-label)"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="search" placeholder="Buscar sponsor..." />
+        </div>
+      </div>
+    </header>
+
+    <nav class="sp-tabs" id="tabs"></nav>
+
+    <section class="sp-featured" id="featured"></section>
+
+    <main class="sp-list" id="list"></main>
+
+    <aside class="sp-detail" id="detail" style="display:none"></aside>
+
+  </div>
+</div>
+
+<script>
+// ============== Mock data — espejo SponsorSeeder backend ==============
+const SPONSORS = [
+  // Platinum (4) — van al carousel featured
+  { id:1,  tier:'platinum', name:'Bancolombia', desc:'Banca digital y soluciones financieras para empresas de Latinoamerica.', logo_url:null, website_url:'https://bancolombia.com', contact_email:'aliados@bancolombia.com', show_contact_button:true, trivia_enabled:true, passport_enabled:true, visit_points:50,
+    services:[{id:1,name:'Banca corporativa'},{id:2,name:'Inversion'},{id:3,name:'Wealth management'}],
+    sessions:[{id:101,title:'Banca abierta: el futuro del API banking', time:'09:30', type:'Keynote', typeColor:'#a882ff', location:'Sala Principal'}],
+    trivias:[
+      {id:1, question:'En que ano fue fundado Bancolombia?', options:['1875','1945','1998','2003'], correct_index:1, bonus_points:30},
+      {id:2, question:'En cuantos paises tiene presencia Bancolombia?', options:['3','5','7','10'], correct_index:2, bonus_points:30}
+    ]
+  },
+  { id:2,  tier:'platinum', name:'Microsoft', desc:'Plataforma de IA y nube empresarial. Azure + Copilot para empresas.', logo_url:null, website_url:'https://microsoft.com', contact_email:'partners@microsoft.com', show_contact_button:true, trivia_enabled:true, passport_enabled:true, visit_points:50,
+    services:[{id:4,name:'Azure Cloud'},{id:5,name:'Copilot Enterprise'},{id:6,name:'Power Platform'}],
+    sessions:[{id:102,title:'Azure AI Foundry — del prototipo a produccion', time:'14:00', type:'Workshop', typeColor:'#ffb464', location:'Sala B'}],
+    trivias:[{id:3, question:'Cual es el nombre del CEO actual de Microsoft?', options:['Bill Gates','Steve Ballmer','Satya Nadella','Tim Cook'], correct_index:2, bonus_points:30}]
+  },
+  { id:3,  tier:'platinum', name:'Latam Airlines', desc:'Conectamos Latinoamerica con el mundo. Vuelos premium y carga corporativa.', logo_url:null, website_url:'https://latamairlines.com', contact_email:'corporate@latam.com', show_contact_button:true, trivia_enabled:false, passport_enabled:true, visit_points:50,
+    services:[{id:7,name:'Corporate travel'},{id:8,name:'Cargo'}],
+    sessions:[]
+  },
+  { id:4,  tier:'platinum', name:'Rappi', desc:'Super app lider en Latam. Delivery, fintech y servicios on-demand.', logo_url:null, website_url:'https://rappi.com', contact_email:null, show_contact_button:false, trivia_enabled:true, passport_enabled:false, visit_points:50,
+    services:[{id:9,name:'Rappi Business'},{id:10,name:'RappiPay'}],
+    sessions:[{id:103,title:'Como construir una super app — caso Rappi', time:'11:30', type:'Panel', typeColor:'#64c8ff', location:'Sala C'}],
+    trivias:[{id:4, question:'Cuantos paises cubre Rappi actualmente?', options:['4','7','9','11'], correct_index:2, bonus_points:25}]
+  },
+
+  // Gold (6)
+  { id:5,  tier:'gold', name:'Globant', desc:'Software studio digital. Inteligencia artificial y experiencias inmersivas.', logo_url:null, website_url:'https://globant.com', contact_email:'talent@globant.com', show_contact_button:true, trivia_enabled:true, passport_enabled:true, visit_points:30,
+    services:[{id:11,name:'AI Studio'},{id:12,name:'Game Studio'},{id:13,name:'Healthcare Studio'}],
+    sessions:[{id:104,title:'Building human-AI symbiosis', time:'10:30', type:'Lightning', typeColor:'#ff7eb3', location:'Sala A'}],
+    trivias:[{id:5, question:'En que ano fue fundado Globant?', options:['2003','2007','2010','2014'], correct_index:0, bonus_points:20}]
+  },
+  { id:6,  tier:'gold', name:'Mercado Libre', desc:'Marketplace + Mercado Pago. El gigante del e-commerce de Latam.', logo_url:null, website_url:'https://mercadolibre.com', contact_email:'partners@mercadolibre.com', show_contact_button:true, trivia_enabled:false, passport_enabled:true, visit_points:30,
+    services:[{id:14,name:'Mercado Pago'},{id:15,name:'Mercado Envios'},{id:16,name:'Mercado Ads'}],
+    sessions:[]
+  },
+  { id:7,  tier:'gold', name:'Despegar', desc:'OTA #1 de Latinoamerica. Vuelos, hoteles y experiencias.', logo_url:null, website_url:'https://despegar.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:25,
+    services:[{id:17,name:'Corporate Travel'},{id:18,name:'Experiences'}], sessions:[]
+  },
+  { id:8,  tier:'gold', name:'Stripe', desc:'Infraestructura de pagos para internet.', logo_url:null, website_url:'https://stripe.com', contact_email:'latam@stripe.com', show_contact_button:true, trivia_enabled:true, passport_enabled:true, visit_points:30,
+    services:[{id:19,name:'Payments'},{id:20,name:'Connect'},{id:21,name:'Capital'}],
+    sessions:[{id:105,title:'Pagos sin friccion para SaaS B2B', time:'15:30', type:'Workshop', typeColor:'#ffb464', location:'Sala D'}],
+    trivias:[{id:6, question:'Quien fundo Stripe?', options:['Patrick & John Collison','Stewart Butterfield','Brian Chesky','Drew Houston'], correct_index:0, bonus_points:25}]
+  },
+  { id:9,  tier:'gold', name:'Nubank', desc:'El banco digital lider de Latinoamerica.', logo_url:null, website_url:'https://nubank.com.br', contact_email:'partnerships@nubank.com.br', show_contact_button:true, trivia_enabled:false, passport_enabled:false, visit_points:25,
+    services:[{id:22,name:'Nu Business'}], sessions:[]
+  },
+  { id:10, tier:'gold', name:'Tigo', desc:'Telecomunicaciones para Latinoamerica. 5G, fibra y soluciones IoT.', logo_url:null, website_url:'https://tigo.com', contact_email:'empresas@tigo.com', show_contact_button:true, trivia_enabled:false, passport_enabled:false, visit_points:25,
+    services:[{id:23,name:'Tigo Business'},{id:24,name:'IoT Solutions'}], sessions:[]
+  },
+
+  // Silver (10)
+  { id:11, tier:'silver', name:'Notion', desc:'Workspace para equipos.', logo_url:null, website_url:'https://notion.so', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:true, visit_points:15, services:[], sessions:[] },
+  { id:12, tier:'silver', name:'Figma', desc:'Plataforma de diseno colaborativo.', logo_url:null, website_url:'https://figma.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:true, visit_points:15, services:[], sessions:[] },
+  { id:13, tier:'silver', name:'Slack', desc:'Comunicacion empresarial.', logo_url:null, website_url:'https://slack.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:15, services:[], sessions:[] },
+  { id:14, tier:'silver', name:'Linear', desc:'Issue tracking para equipos de producto.', logo_url:null, website_url:'https://linear.app', contact_email:'business@linear.app', show_contact_button:true, trivia_enabled:false, passport_enabled:false, visit_points:15, services:[{id:25,name:'Linear Enterprise'}], sessions:[] },
+  { id:15, tier:'silver', name:'Vercel', desc:'Frontend cloud.', logo_url:null, website_url:'https://vercel.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:15, services:[], sessions:[] },
+  { id:16, tier:'silver', name:'Auth0', desc:'Identidad como servicio.', logo_url:null, website_url:'https://auth0.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:15, services:[], sessions:[] },
+  { id:17, tier:'silver', name:'Datadog', desc:'Observabilidad para cloud nativo.', logo_url:null, website_url:'https://datadoghq.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:15, services:[], sessions:[] },
+  { id:18, tier:'silver', name:'Sentry', desc:'Application monitoring.', logo_url:null, website_url:'https://sentry.io', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:15, services:[], sessions:[] },
+  { id:19, tier:'silver', name:'PostHog', desc:'Product analytics open source.', logo_url:null, website_url:'https://posthog.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:15, services:[], sessions:[] },
+  { id:20, tier:'silver', name:'Resend', desc:'API para email transaccional.', logo_url:null, website_url:'https://resend.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:15, services:[], sessions:[] },
+
+  // Bronze (6)
+  { id:21, tier:'bronze', name:'Loom', desc:'Video async messaging.', logo_url:null, website_url:'https://loom.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:10, services:[], sessions:[] },
+  { id:22, tier:'bronze', name:'Cal.com', desc:'Programacion de reuniones.', logo_url:null, website_url:'https://cal.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:10, services:[], sessions:[] },
+  { id:23, tier:'bronze', name:'Plausible', desc:'Web analytics simple.', logo_url:null, website_url:'https://plausible.io', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:10, services:[], sessions:[] },
+  { id:24, tier:'bronze', name:'Tinybird', desc:'API analytics realtime.', logo_url:null, website_url:'https://tinybird.co', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:10, services:[], sessions:[] },
+  { id:25, tier:'bronze', name:'Mux', desc:'Video API para developers.', logo_url:null, website_url:'https://mux.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:10, services:[], sessions:[] },
+  { id:26, tier:'bronze', name:'Liveblocks', desc:'Realtime APIs para apps colaborativas.', logo_url:null, website_url:'https://liveblocks.io', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:10, services:[], sessions:[] },
+
+  // Media (4)
+  { id:27, tier:'media', name:'El Tiempo', desc:'Diario de Colombia.', logo_url:null, website_url:'https://eltiempo.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:5, services:[], sessions:[] },
+  { id:28, tier:'media', name:'Semana', desc:'Revista de actualidad.', logo_url:null, website_url:'https://semana.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:5, services:[], sessions:[] },
+  { id:29, tier:'media', name:'Forbes Latam', desc:'Negocios y liderazgo.', logo_url:null, website_url:'https://forbes.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:5, services:[], sessions:[] },
+  { id:30, tier:'media', name:'Bloomberg', desc:'Mercados financieros globales.', logo_url:null, website_url:'https://bloomberg.com', contact_email:null, show_contact_button:false, trivia_enabled:false, passport_enabled:false, visit_points:5, services:[], sessions:[] },
+];
+
+const state = {
+  search: '',
+  activeTab: 'all',  // all | platinum | gold | silver | bronze | media
+  selectedId: null,
+  featuredIdx: 0,  // indice del Platinum visible en carousel
+  shuffleSeed: 0,  // semilla para shuffle de la lista (NO afecta tiers entre si)
+  favorites: new Set([2, 11]),
+  contactsSent: new Set([]),
+  triviaAnswered: new Map(),
+  triviaIndex: new Map(),
+};
+
+const TIER_LABELS = { platinum:'Platinum', gold:'Gold', silver:'Silver', bronze:'Bronze', media:'Media' };
+const TIER_ORDER = ['platinum','gold','silver','bronze','media'];
+
+// ============== Utils ==============
+function shuffleWithSeed(arr, seed){
+  const copy = [...arr];
+  let s = seed;
+  for (let i = copy.length - 1; i > 0; i--){
+    s = (s * 9301 + 49297) % 233280;
+    const j = Math.floor((s / 233280) * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+function logoFallback(name){ return name.charAt(0).toUpperCase(); }
+function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t = setTimeout(()=>fn(...a), ms); }; }
+
+// ============== Tabs ==============
+function renderTabs(){
+  const tabs = document.getElementById('tabs');
+  const counts = { all: SPONSORS.length };
+  for (const t of TIER_ORDER) counts[t] = SPONSORS.filter(s => s.tier === t).length;
+
+  const tierDotColor = { platinum:'rgba(255,255,255,0.7)', gold:'#ffd250', silver:'#b4b9c8', bronze:'#d29b5a', media:'#6ea5ff' };
+
+  let html = `<button class="tab ${state.activeTab === 'all' ? 'active' : ''}" data-tab="all">
+    Todos <span class="count">${counts.all}</span>
+  </button>`;
+  for (const t of TIER_ORDER){
+    if (counts[t] === 0) continue;
+    html += `<button class="tab ${state.activeTab === t ? 'active' : ''}" data-tab="${t}">
+      <span class="dot" style="background:${tierDotColor[t]}"></span>
+      ${TIER_LABELS[t]} <span class="count">${counts[t]}</span>
+    </button>`;
+  }
+  tabs.innerHTML = html;
+  tabs.querySelectorAll('.tab').forEach(btn => {
+    btn.onclick = () => {
+      state.activeTab = btn.dataset.tab;
+      renderTabs();
+      renderFeatured();
+      renderList();
+    };
+  });
+}
+
+// ============== Featured Carousel (Platinum rotativo) ==============
+function getFeaturedPool(){
+  // Si tab = all → todos los platinum
+  // Si tab = otro tier → mostrar los top de ese tier? mejor: solo en 'all'
+  // Si tab = platinum → todos los platinum
+  if (state.activeTab === 'all' || state.activeTab === 'platinum'){
+    return SPONSORS.filter(s => s.tier === 'platinum');
+  }
+  return [];
+}
+function renderFeatured(){
+  const feat = document.getElementById('featured');
+  const pool = getFeaturedPool();
+  if (!pool.length){ feat.innerHTML = ''; return; }
+  if (state.search){ feat.innerHTML = ''; return; }  // ocultar durante busqueda
+  if (state.featuredIdx >= pool.length) state.featuredIdx = 0;
+
+  // Mostramos 2 cards lado a lado (uno destacado + uno secundario). Cada
+  // 8s el indice avanza y todos los Platinum tienen su minuto al frente
+  // → equidad dentro del tier.
+  const i0 = state.featuredIdx % pool.length;
+  const i1 = (state.featuredIdx + 1) % pool.length;
+  const cards = pool.length >= 2 ? [pool[i0], pool[i1]] : [pool[i0]];
+
+  let html = `<div class="featured-wrap">`;
+  for (const sp of cards){
+    html += renderFeaturedCard(sp);
+  }
+  html += `</div>`;
+
+  // Indicadores (pills) — uno por cada Platinum
+  html += `<div class="feat-pills">`;
+  for (let i = 0; i < pool.length; i++){
+    html += `<div class="pill ${i === i0 || i === i1 ? 'active' : ''}"></div>`;
+  }
+  html += `</div>`;
+
+  feat.innerHTML = html;
+  feat.querySelectorAll('.featured-card').forEach(card => {
+    card.onclick = () => selectSponsor(Number(card.dataset.id));
+  });
+}
+function renderFeaturedCard(sp){
+  const passportBadge = sp.passport_enabled ? `<span title="Pasaporte" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--passport-bg);border:1px solid var(--passport);color:var(--passport)">
+    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  </span>` : '';
+  const triviaBadge = sp.trivia_enabled ? `<span title="Tiene trivia" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--trivia-bg);border:1px solid var(--trivia);color:var(--trivia)">
+    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/></svg>
+  </span>` : '';
+  const logoEl = sp.logo_url
+    ? `<div class="logo"><img src="${sp.logo_url}" alt=""/></div>`
+    : `<div class="logo">${logoFallback(sp.name)}</div>`;
+  return `<div class="featured-card shuffle-in" data-id="${sp.id}">
+    ${logoEl}
+    <div class="info">
+      <div class="top-line">
+        <span class="tier-tag">${TIER_LABELS[sp.tier]}</span>
+        <span class="meta-dot"></span>
+        <div class="badges">${passportBadge}${triviaBadge}</div>
+      </div>
+      <div class="name">${sp.name}</div>
+      <div class="desc">${sp.desc || ''}</div>
+    </div>
+  </div>`;
+}
+
+// Auto-rotate featured cada 8s
+let featuredTimer = null;
+function startFeaturedRotation(){
+  if (featuredTimer) clearInterval(featuredTimer);
+  featuredTimer = setInterval(() => {
+    if (state.search) return;
+    const pool = getFeaturedPool();
+    if (pool.length <= 2) return;  // no rotar si solo hay 2 cards (ya estan los 2)
+    state.featuredIdx = (state.featuredIdx + 2) % pool.length;
+    renderFeatured();
+  }, 8000);
+}
+
+// ============== Lista vertical ==============
+function getListPool(){
+  // Tab filtra. Pero si tab=all NO incluye Platinum (esos viven en el carousel arriba)
+  const q = state.search.trim().toLowerCase();
+  let pool = SPONSORS;
+  if (state.activeTab === 'all'){
+    pool = SPONSORS.filter(s => s.tier !== 'platinum');
+  } else if (state.activeTab !== 'platinum'){
+    pool = SPONSORS.filter(s => s.tier === state.activeTab);
+  } else {
+    pool = []; // platinum solo en carousel
+  }
+  if (q){
+    // Cuando hay busqueda, mostramos TODOS los matches incluso Platinum (no hay carousel)
+    if (state.activeTab === 'all'){
+      pool = SPONSORS;
+    }
+    pool = pool.filter(s => s.name.toLowerCase().includes(q) || (s.desc||'').toLowerCase().includes(q));
+  }
+  return pool;
+}
+function renderList(){
+  const list = document.getElementById('list');
+  const pool = getListPool();
+
+  if (pool.length === 0){
+    if (state.activeTab === 'platinum' && !state.search){
+      list.innerHTML = `<div class="empty-state">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div class="title">Los Platinum estan arriba</div>
+        <div>Mira el carousel destacado al inicio.</div>
+      </div>`;
+      return;
+    }
+    list.innerHTML = `<div class="empty-state">
+      <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <div class="title">Sin resultados</div>
+      <div>No encontramos sponsors con esos criterios.</div>
+    </div>`;
+    return;
+  }
+
+  // Agrupar por tier y shuffle DENTRO de cada tier (equidad)
+  const byTier = {};
+  for (const s of pool){
+    if (!byTier[s.tier]) byTier[s.tier] = [];
+    byTier[s.tier].push(s);
+  }
+  let html = '';
+  for (const tier of TIER_ORDER){
+    const items = byTier[tier];
+    if (!items?.length) continue;
+    // Solo mostrar divider de seccion cuando tab=all (en filtro especifico no aporta)
+    if (state.activeTab === 'all'){
+      html += `<div class="section-divider">
+        <div class="label">${TIER_LABELS[tier]}</div>
+        <div class="count-pill">${items.length}</div>
+        <div class="line"></div>
+      </div>`;
+    }
+    const shuffled = state.search ? items : shuffleWithSeed(items, state.shuffleSeed + tier.charCodeAt(0));
+    for (const sp of shuffled){
+      html += renderRow(sp);
+    }
+  }
+  list.innerHTML = html;
+
+  list.querySelectorAll('.sp-row').forEach(row => {
+    row.onclick = () => selectSponsor(Number(row.dataset.id));
+  });
+}
+function renderRow(sp){
+  const selected = state.selectedId === sp.id ? ' selected' : '';
+  const logoEl = sp.logo_url
+    ? `<div class="logo"><img src="${sp.logo_url}" alt=""/></div>`
+    : `<div class="logo">${logoFallback(sp.name)}</div>`;
+  let badges = '';
+  if (sp.passport_enabled){
+    badges += `<div class="mini-badge passport" title="Pasaporte">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>`;
+  }
+  if (sp.trivia_enabled){
+    badges += `<div class="mini-badge trivia" title="Tiene trivia">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/></svg>
+    </div>`;
+  }
+  return `<div class="sp-row${selected}" data-id="${sp.id}">
+    ${logoEl}
+    <div class="info">
+      <div class="top-line">
+        <span class="name">${sp.name}</span>
+        <span class="tier-pill ${sp.tier}">${TIER_LABELS[sp.tier]}</span>
+      </div>
+      <div class="desc">${sp.desc || ''}</div>
+    </div>
+    <div class="badges">${badges}</div>
+    <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>`;
+}
+
+// ============== Detail Panel ==============
+function selectSponsor(id){
+  if (state.selectedId === id){
+    state.selectedId = null;
+    document.getElementById('canvas').classList.remove('has-detail');
+    document.getElementById('detail').style.display = 'none';
+    renderList();
+    renderFeatured();
+    return;
+  }
+  state.selectedId = id;
+  document.getElementById('canvas').classList.add('has-detail');
+  document.getElementById('detail').style.display = 'block';
+  renderDetail();
+  renderList();
+  renderFeatured();
+}
+function renderDetail(){
+  const detail = document.getElementById('detail');
+  const sp = SPONSORS.find(s => s.id === state.selectedId);
+  if (!sp){ detail.innerHTML = ''; return; }
+  const isFav = state.favorites.has(sp.id);
+  const isContactSent = state.contactsSent.has(sp.id);
+  const logoEl = sp.logo_url
+    ? `<div class="logo"><img src="${sp.logo_url}" alt=""/></div>`
+    : `<div class="logo">${logoFallback(sp.name)}</div>`;
+
+  let sessionsHtml = '';
+  if (sp.sessions?.length){
+    sessionsHtml = `<div class="detail-section">
+      <div class="section-title">Sus sesiones</div>
+      ${sp.sessions.map(s => `<div class="session-item">
+        <div class="time">${s.time}<span class="type" style="color:${s.typeColor}">${s.type}</span></div>
+        <div>
+          <div class="title">${s.title}</div>
+          <div class="where"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${s.location}</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  let triviaHtml = '';
+  if (sp.trivia_enabled && sp.trivias?.length){
+    const cur = state.triviaIndex.get(sp.id) ?? 0;
+    const total = sp.trivias.length;
+    const allAnswered = sp.trivias.every(t => state.triviaAnswered.has(t.id));
+    const progressDots = sp.trivias.map((t, i) => {
+      const done = state.triviaAnswered.has(t.id);
+      const current = i === cur && !done;
+      return `<div class="dot ${done ? 'done' : current ? 'current' : ''}"></div>`;
+    }).join('');
+    if (allAnswered){
+      const correctCount = sp.trivias.filter(t => state.triviaAnswered.get(t.id)?.is_correct).length;
+      triviaHtml = `<div class="detail-section"><div class="trivia-card">
+        <div class="trivia-head">
+          <div class="left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/></svg>Trivia completada</div>
+          <div class="trivia-bonus"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8.5 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 9 8.5 12 2"/></svg>${correctCount}/${total} correctas</div>
+        </div>
+        <div style="color:var(--fg-dim); font-size:12px; line-height:1.5">Gracias por participar! Ya respondiste todas las preguntas de ${sp.name}.</div>
+      </div></div>`;
+    } else {
+      const t = sp.trivias[cur];
+      const answered = state.triviaAnswered.get(t.id);
+      triviaHtml = `<div class="detail-section"><div class="trivia-card">
+        <div class="trivia-progress">${progressDots}</div>
+        <div class="trivia-head">
+          <div class="left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/></svg>Pregunta ${cur+1} de ${total}</div>
+          <div class="trivia-bonus"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15 8.5 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 9 8.5 12 2"/></svg>+${t.bonus_points} pts</div>
+        </div>
+        <div class="trivia-question">${t.question}</div>
+        ${t.options.map((opt, i) => {
+          let cls = 'trivia-option';
+          if (answered){
+            cls += ' locked';
+            if (i === t.correct_index) cls += ' correct';
+            else if (i === answered.selected) cls += ' wrong';
+            else cls += ' dimmed';
+          }
+          const iconOk = i === t.correct_index ? `<span class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>` : '';
+          const iconBad = (answered && i === answered.selected && i !== t.correct_index) ? `<span class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>` : '';
+          return `<button class="${cls}" data-trivia="${t.id}" data-option="${i}" ${answered ? 'disabled' : ''}><span>${opt}</span>${iconOk}${iconBad}</button>`;
+        }).join('')}
+        ${answered ? `<div class="trivia-feedback ${answered.is_correct ? '' : 'wrong'}">${answered.is_correct ? `+${t.bonus_points} puntos · siguiente pregunta...` : 'Respuesta incorrecta · siguiente pregunta...'}</div>` : ''}
+      </div></div>`;
+    }
+  }
+
+  let contactHtml = '';
+  if (sp.services?.length){
+    if (isContactSent){
+      contactHtml = `<div class="detail-section"><div class="contact-sent">
+        <div class="head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Solicitud enviada</div>
+        <div class="sub">${sp.name} recibira tu perfil y los servicios seleccionados.</div>
+      </div></div>`;
+    } else {
+      contactHtml = `<div class="detail-section">
+        <div class="section-title">Que te interesa?</div>
+        <div class="chip-row" id="services-${sp.id}">${sp.services.map(svc => `<div class="chip" data-service="${svc.id}">${svc.name}</div>`).join('')}</div>
+        <textarea class="contact-msg" placeholder="Cuentales tu interes (opcional)..." maxlength="1000"></textarea>
+        <button class="contact-cta" id="contact-cta-${sp.id}" disabled>Solicitar contacto</button>
+      </div>`;
+    }
+  }
+
+  let actionsHtml = '';
+  const hasWebsite = !!sp.website_url;
+  const hasEmail = sp.show_contact_button && !!sp.contact_email;
+  if (hasWebsite || hasEmail){
+    actionsHtml = `<div class="detail-section"><div class="action-row">
+      ${hasWebsite ? `<a class="action-btn" href="${sp.website_url}" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 010 20 15 15 0 010-20z"/></svg>Sitio web</a>` : ''}
+      ${hasEmail ? `<a class="action-btn" href="mailto:${sp.contact_email}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email</a>` : ''}
+    </div></div>`;
+  }
+
+  const passportPill = sp.passport_enabled
+    ? `<span class="passport-pill"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Pasaporte</span>` : '';
+
+  detail.innerHTML = `
+    <div class="detail-head">
+      <button class="detail-close" id="close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="icon-btn fav ${isFav ? 'on' : ''}" id="fav-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      </button>
+    </div>
+    <div class="detail-hero">
+      <div class="points-toast" id="points-toast"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8.5 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 9 8.5 12 2"/></svg>+${sp.visit_points} puntos por visitar</div>
+      ${logoEl}
+      <div class="name">${sp.name}${passportPill}</div>
+      <div class="tier-pill-hero">${TIER_LABELS[sp.tier]}</div>
+      ${sp.desc ? `<div class="desc">${sp.desc}</div>` : ''}
+    </div>
+    ${sessionsHtml}
+    ${triviaHtml}
+    ${contactHtml}
+    ${actionsHtml}
+  `;
+
+  document.getElementById('close').onclick = () => selectSponsor(sp.id);
+  const favBtn = document.getElementById('fav-btn');
+  favBtn.onclick = () => {
+    if (state.favorites.has(sp.id)) state.favorites.delete(sp.id);
+    else state.favorites.add(sp.id);
+    favBtn.querySelector('svg').classList.add('heart-pop');
+    setTimeout(() => favBtn.querySelector('svg').classList.remove('heart-pop'), 360);
+    renderDetail();
+  };
+
+  if (sp.services?.length && !isContactSent){
+    const chips = detail.querySelectorAll(`#services-${sp.id} .chip`);
+    const cta = document.getElementById(`contact-cta-${sp.id}`);
+    let selected = new Set();
+    const refresh = () => {
+      const n = selected.size;
+      cta.disabled = n === 0;
+      cta.textContent = n === 0 ? 'Solicitar contacto' : `Enviar solicitud (${n})`;
+    };
+    chips.forEach(chip => {
+      chip.onclick = () => {
+        const sid = chip.dataset.service;
+        if (selected.has(sid)){ selected.delete(sid); chip.classList.remove('active'); }
+        else { selected.add(sid); chip.classList.add('active'); }
+        refresh();
+      };
+    });
+    cta.onclick = () => {
+      state.contactsSent.add(sp.id);
+      renderDetail();
+    };
+  }
+
+  detail.querySelectorAll('.trivia-option:not(.locked)').forEach(opt => {
+    opt.onclick = () => {
+      const tId = Number(opt.dataset.trivia);
+      const optIdx = Number(opt.dataset.option);
+      const t = sp.trivias.find(x => x.id === tId);
+      const isCorrect = optIdx === t.correct_index;
+      state.triviaAnswered.set(tId, { selected: optIdx, is_correct: isCorrect });
+      renderDetail();
+      setTimeout(() => {
+        const c = state.triviaIndex.get(sp.id) ?? 0;
+        if (c < sp.trivias.length - 1){ state.triviaIndex.set(sp.id, c + 1); }
+        renderDetail();
+      }, 1800);
+    };
+  });
+
+  const toast = document.getElementById('points-toast');
+  if (toast){
+    toast.style.animation = 'none';
+    void toast.offsetHeight;
+    toast.style.animation = '';
+  }
+}
+
+// ============== Search ==============
+document.getElementById('search').addEventListener('input', debounce((e) => {
+  state.search = e.target.value;
+  renderFeatured();
+  renderList();
+}, 250));
+
+// ============== Living shuffle list (cada 7s — DENTRO de cada tier) ==============
+setInterval(() => {
+  if (state.search) return;
+  state.shuffleSeed = Math.floor(Math.random() * 100000);
+  renderList();
+}, 7000);
+
+// ============== Theme toggle ==============
+document.getElementById('themeToggle').addEventListener('click', () => {
+  document.body.dataset.theme = document.body.dataset.theme === 'noir' ? 'lux' : 'noir';
+});
+
+// ============== Init ==============
+renderTabs();
+renderFeatured();
+renderList();
+startFeaturedRotation();
+</script>
+</body>
+</html>
