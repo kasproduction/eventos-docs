@@ -23,6 +23,7 @@
 | Docs | **W.10 viejo Hub Personal → W.18 (rename)** | 2026-06-20 | `git mv docs/webapp/W.10-notificaciones-perfil.md → W.18-hub-personal.md`. Refs actualizadas en `_index.md`, `PARITY-MATRIX.md`, `BACKEND-API-MAP.md`, `PLAN.md` (agregado row W.10 Live Hub nuevo + W.18 Hub Personal en tabla modulos y estimacion). Conflicto numeracion resuelto. |
 | Hygiene | **Fix vitest suite 194→202/202 verde** | 2026-06-20 | Node 25.8.1 expone `globalThis.localStorage` experimental sin metodos. Fix `tests/setup.ts`: stub propio Map-based + `Object.defineProperty` sobre globalThis + window. Una sesion, un archivo, un fix. Desbloquea cierre formal de modulos. |
 | Re-auditoria | **Counters reales doc vs codigo** | 2026-06-20 | Sesion completa de re-recount despues de 1 mes pausa. W.5: 0%→94%, W.6: 0%→45%, W.10 Live Hub nuevo 100%, W.18 renombrado. Total global 40%→48.7% (344/707). PARITY-MATRIX + PENDIENTES-WEBAPP sincronizados con realidad. |
+| W.3 | **Bulk .ics download (Mi Agenda completa)** | 2026-06-21 | Generador puro `lib/ics.ts` RFC 5545 client-side (VCALENDAR + N VEVENT, UID determinista, DTSTAMP UTC, escape comas/semicolons/backslash). Reemplaza handler fake `handleTodas` de AgendaView. Boton "Todas" del header ahora visible cuando `countMine > 0` (favoritas en CUALQUIER dia, no solo el visible). Filename `mi-agenda-{event.slug}.ics`. Sin endpoint backend nuevo: el snapshot AgendaData ya tiene todo. +16 tests vitest (218/218 verde). |
 
 ---
 

@@ -26,7 +26,7 @@
 | W.1 Setup + Auth + UI Foundation | 102/107 | 95% — en proceso | — |
 | W.1B Backend magic link | 10/10 | **CERRADO** | — |
 | W.2 Home | 10/20 | 50% — en proceso | — |
-| W.3 Agenda | 24/30 | 80% — en proceso | — |
+| W.3 Agenda | **25/30** | **83%** — en proceso | **+1** (Sprint 1 item 8 — bulk .ics) |
 | W.4 Streaming | 83/111 | 75% — en proceso | — |
 | W.5 Speakers | **33/35** | **94% — cerrado al maximo posible** (solo faltan Lighthouse + device fisico) | **+33** (doc decia 0%, codigo lo tiene casi completo) |
 | W.6 Social Wall | **18/40** | **45%** — feed+composer+likes+comments+tabs filtros hechos | **+18** (Sprint 1 item 7 cerrado) |
@@ -43,7 +43,7 @@
 | W.17 Soporte | 0/15 | 0% — backlog | — |
 | **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **344/707** | **48.7%** | +70 numerador, +16 denominador (Sprint 1 item 7 cerrado) |
+| **TOTAL** | **345/707** | **48.8%** | +71 numerador, +16 denominador (Sprint 1 item 8 cerrado) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,12 +51,10 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 1 / Item 8 — W.3 Bulk .ics download** (~30-45 min)
-  - HOY: cada sesion permite `Calendario` individual (boton en DetailPanel)
-  - Faltante: boton "Descargar todas mis favoritas" que genere UN archivo .ics con multiples VEVENT
-  - Ubicacion sugerida: AgendaHeader cuando tab activa es "Mi Agenda" (junto a tools de filtro)
-  - Reusa generador .ics actual (vive en lib/agenda.ts probablemente)
-  - Empty state: si no hay favoritas, boton disabled con tooltip
+- [ ] **Sprint 1 / Item 9 — W.0 Wire modulos top-level a sidebar** (~30 min, cierra Sprint 1)
+  - Auditar handlers click en items del sidebar W.0
+  - Items con ruta existente (`/live`, `/social`, `/speakers`, `/agenda`) → verificar navegacion
+  - Items pendientes (`/sponsors`, `/profile`, `/engagement`) → tooltip "proximamente" + cursor disabled (no rotos)
 
 ---
 
@@ -70,7 +68,7 @@
 - [x] ~~Smoke test 6 rutas~~ → todas 307 (auth gate funcionando), login 200, cero 500, cero warnings runtime
 - [x] ~~Decidir screenshot~~ → borrado (era captura Valorant random, sin relacion con la webapp, 2026-06-20)
 
-### Sprint 1 — Cierres formales modulos casi-hechos (~2-3h, 1 sesion) — 7/8
+### Sprint 1 — Cierres formales modulos casi-hechos (~2-3h, 1 sesion) — 8/9
 > Cosechar lo que ya esta al 80-90%. Cierra modulos completos = sube % global y baja stress mental.
 
 - [ ] **W.5 Speakers — cierre formal**: Lighthouse pass, memoria + counter PARITY-MATRIX, validar device real
@@ -79,7 +77,7 @@
 - [ ] W.8 — AlertDialog DaVinci reemplazando `window.confirm` Bloquear (~30 min, demanda mucho menos urgente que cierres)
 - [ ] W.8 — Skeleton mejor AttendeeProfilePanel (bio + intereses + sesiones placeholder)
 - [ ] W.6 — Tabs filtros Recientes/Mas likes/Mis posts (HOY la UI tiene un view switch pero no es tab explicito)
-- [ ] W.3 — Bulk .ics download (todas mis favoritas un archivo)
+- [x] ~~**W.3 — Bulk .ics download**~~: hecho 2026-06-21. Reemplazado handler fake `handleTodas` con `downloadAgendaIcs()` real. Generador puro `lib/ics.ts` (RFC 5545: VCALENDAR + N VEVENT con UID determinista, DTSTAMP UTC, escape comas/semicolons/backslash). Boton "Todas" del AgendaHeader ahora visible cuando hay favoritas en CUALQUIER dia (`countMine > 0`, antes era `visibleSessions.length > 0` del dia). Filename `mi-agenda-{event.slug}.ics`. +16 tests vitest (218 verde, typecheck OK)
 - [ ] W.0 — Wire modulos top-level a sidebar (hoy `/live` `/social` `/speakers` ya navegan — verificar que sidebar refleja, completar `/sponsors` `/profile` cuando existan)
 
 ### Sprint 2 — Modulos criticos no empezados, orden CRITICO PARITY (~25h, 4-5 sesiones DaVinci) — 0/N

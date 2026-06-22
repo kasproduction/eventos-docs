@@ -236,9 +236,9 @@ Doc maestro de TODOS los endpoints: `BACKEND-API-MAP.md`.
 - [ ] Mutation room-checkin/checkout → diferido a sesion dedicada
 - [ ] Queue si capacity llena → diferido
 
-### 4.6.2 .ics download — 1/2
+### 4.6.2 .ics download — 2/2 ✅
 - [x] Boton "Calendario" en card upcoming + DetailPanel → `downloadSessionIcs()` via anchor, respeta Content-Disposition del backend
-- [ ] "Descargar Mi Agenda" completa (.ics bulk) → endpoint `/my-agenda/ics` NO existe en backend; diferido o agregar al backend
+- [x] "Descargar Mi Agenda" completa (.ics bulk) → boton "Todas" en AgendaHeader (visible en tab Mi Agenda cuando hay favoritas en cualquier dia). Generador puro client-side `lib/ics.ts` (RFC 5545: VCALENDAR + N VEVENT, UID determinista `eventos-{eventId}-session-{sessionId}@eventos.app`, DTSTAMP UTC, escape comas/semicolons/backslash). Filename `mi-agenda-{event.slug}.ics`. NO requirio endpoint backend — el snapshot AgendaData del cliente ya tiene todos los campos necesarios. +16 tests vitest (2026-06-21)
 
 ### 4.6.3 Rating post-sesion — 2/2 ✅
 - [x] Cards `past` sin rating → boton "Evaluar" gold abre `<RatingModal />`
