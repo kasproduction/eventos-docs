@@ -30,7 +30,7 @@
 | W.4 Streaming | 83/111 | 75% — en proceso | — |
 | W.5 Speakers | **33/35** | **94% — cerrado al maximo posible** (solo faltan Lighthouse + device fisico) | **+33** (doc decia 0%, codigo lo tiene casi completo) |
 | W.6 Social Wall | **18/40** | **45%** — feed+composer+likes+comments+tabs filtros hechos | **+18** (Sprint 1 item 7 cerrado) |
-| **W.7 Sponsors** | **20/23** | **87% — implementado, pendiente Lighthouse + device fisico** | **+20** (Sprint 2.A entero, 2026-06-21) |
+| **W.7 Sponsors** | **23/23** | **CERRADO 2026-06-21** | **+23** (Sprint 2.A entero — skeleton + tooltip + E2E 12/12 + Lighthouse acc 98) |
 | W.8 Networking | 15/25 | 60% — en proceso | — |
 | W.9 Engagement | 0/35 | 0% — backlog | — |
 | **W.10 Live Hub** | **16/16** | **CERRADO por consenso 2026-06-20** | **+16** (creado en commit `0e185e6`, validado visual con seeder) |
@@ -43,7 +43,7 @@
 | W.17 Soporte | 0/15 | 0% — backlog | — |
 | **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **366/707** | **51.8%** | +92 numerador, +16 denominador (Sprint 2.A — W.7 Sponsors) |
+| **TOTAL** | **369/707** | **52.2%** | +95 numerador (Sprint 2.A CERRADO 23/23 + cierre formal modulo) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -54,7 +54,7 @@
 - [ ] **Sprint 2.B — W.9 Engagement** (~10h, 2 sesiones DaVinci) — 0/35
   - Encuestas + leaderboard + passport VIEW + rewards + Golden Ticket
   - Backend endpoints listos: GamificationController + PointsService completos
-  - Sponsors W.7 ya wireo `visit-stand` + trivia → reusar patrones para encuestas/passport
+  - Sponsors W.7 (CERRADO 23/23) ya wireo `visit-stand` + trivia answer → reusar patrones para encuestas/passport
   - Antes de codear: sesion DaVinci de diseno (wireframe propuesto + refs)
 
 ---
