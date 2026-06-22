@@ -8,50 +8,70 @@
 
 ## Ultima sesion
 
-**Fecha:** 2026-06-20 (sesion larga, retomamos despues de 1 mes de pausa)
-**Pivote comercial:** Bancolombia se perdio. El producto sigue, ahora generico para el proximo cliente.
+**Fecha:** 2026-06-21 (sesion larga DaVinci — Sprint 1 cierre + Sprint 2.A entero)
+**Total acumulado webapp:** **369/707 = 52.2%** (cruzamos el 50% por primera vez)
 
-**Que se hizo:**
+**Que se hizo (orden cronologico):**
 
-1. **Re-auditoria realidad codigo vs doc** — el PENDIENTES-WEBAPP estaba desactualizado de mes y medio. Counters corregidos: W.5 0%→94%, W.6 0%→45%, W.10 Live Hub nuevo 100%, W.18 Hub Personal renombrado. **Total global 40% → 48.7%** (344/707 items).
-2. **Sprint 0 hygiene completo (4/4):** fix tests vitest 194→202 verde (Node 25 localStorage stub), Laragon backend OK, smoke 6 rutas sin 500, screenshot Valorant random borrado.
-3. **Sprint 1 cierres y pulido (7/8):** W.5 Speakers cierre formal (94%), W.10 Live Hub cerrado por consenso (100%, validado visual con `LiveHubDemoSeeder`), rename W.10→W.18 con refs actualizadas, **W.8 ConfirmPop DaVinci** (componente reusable patron `rating-pop`, NO shadcn — rechazada v1 generica), **W.8 Bloqueados list** (tercera tab Solicitudes con BlockedRow + handler optimistic), skeleton v2 honesto (despues de iteracion donde v1 sobreprometia), W.6 tabs filtros feed (Recientes/Mas likes/Mis posts con helper pure + 6 tests).
-4. **6 bugs nuevos registrados** (BUG-329 a BUG-334): vitest Node 25, grid Personas truncado 1366x768, boton sobredimensionado, boton outline lavado en Lux, skeleton v1 sobreprometia, React key warning BlockedRow tipo wrong.
-5. **Memorias actualizadas:** `feedback_una_sola_ventana_operativa.md` ahora incluye **regla de disciplina** (marcar `[x]` antes de commitear, no despues — el doc se vuelve cementerio mentiroso sin esto). `feedback_analyze_before_code.md` con anti-pattern shadcn Dialog generico vs patron custom del proyecto (`rating-pop`/`confirm-pop`). `project_social_unified_notes.md` con **divergencia desktop vs mobile** (desktop unifica `/social`, mobile debe SEPARAR como Expo: `/social` + `/networking`).
+1. **Sprint 1 — Item 8 cerrado**: **W.3 Bulk .ics download** (boton "Todas" del AgendaHeader Mi Agenda — reemplazado handler fake con `downloadAgendaIcs()` real. Generador puro `lib/ics.ts` RFC 5545 + 16 tests vitest).
+2. **Sprint 1 — Item 9 cerrado**: **W.0 sidebar wire** verificado smoke 5/5 items navegando + quitado brand letter (`event.name?.charAt(0)`) del sidebar (generaba ruido visual tipo debug en eventos sin logo). **Sprint 1 CERRADO 9/9**.
+3. **Fix theme provider (BUG-335)**: next-themes 0.4.6 incompatible Next 16 + React 19 (issues #385/#387 sin fix upstream). Reemplazado con provider propio 60 lineas + script anti-FOUC inline en `<head>` del LocaleLayout server component.
+4. **Sprint 2.A — W.7 Sponsors CERRADO 23/23** (todo el modulo en una sesion):
+   - Wall espejo Expo con framer-motion `layout` spring damping 28 stiffness 120 (equivalente Reanimated)
+   - DetailPanel: Hero + Sessions + Trivia (espejo TriviaModal Expo con letras A/B/C/D + boton "Responder/Siguiente/Ver resultado" + pantalla resumen "+N puntos ganados" autoclose) + ContactForm (chips + textarea + 409 ALREADY_CONTACTED) + Actions
+   - Skeleton SSR con shimmer + Tooltip radix custom compact + Esc/click fuera cierran + stagger reveal del detail
+   - Lumina toasts top-center (no inline) + colores neutrales rgba(80,200,120)/rgba(255,100,100) (no var(--accent))
+   - Elevaciones Lux multi-layer shadows + Noir shadow base oscura (sin halo accent)
+   - 14 vitest + **12 E2E Playwright verde** + Lighthouse acc 98 + CLS 0
+5. **Backend gaps cerrados (BUG-336, BUG-337)**: SponsorResource expone trivia/passport/visit_points + GamificationController visitStand devuelve `points_awarded` (distingue idempotente).
+6. **Demos HTML standalone v1/v2/v3**: 3 iteraciones de diseño antes de validar el patron split layout literal Expo. v3 es el que se implemento en React.
+7. **Idea ambient prefetch (RouteWarmer)** archivada en `W.12-polish.md` Fase 3.2b — patron Linear/Notion para precachear rutas del sidebar durante onboarding. Queda para Sprint W.12 Polish.
+
+### Bugs registrados (BUG-335 a BUG-338)
+
+- **BUG-335 (ALTA)** next-themes 0.4.6 incompatible Next 16 + React 19 — RESUELTO (provider propio)
+- **BUG-336 (MEDIA)** SponsorResource backend no exponia 3 campos del Sponsor model — RESUELTO
+- **BUG-337 (ALTA)** visitStand devolvia visit_points sin distinguir si tryAward otorgo — RESUELTO
+- **BUG-338 (MEDIA)** Polish W.7: halo accent rojo + elevacion desaparecia en shuffle + heart pop CSS forzado + toast inline violaba lumina — RESUELTO (4 fixes agrupados)
 
 ### Decisiones cerradas en esta sesion (no preguntar)
 
-- **Producto generico post-Bancolombia** — webapp se sigue construyendo para el proximo cliente, no se reescribe ni se pausa.
-- **Webapp modal/dialog pattern**: NUNCA defaultear a shadcn AlertDialog/Dialog generico. Usar custom pattern del proyecto (`rating-pop` / `confirm-pop`) con tokens Lumina Noir/Lux + Plus Jakarta 600+. **shadcn AlertDialog rechazada explicitamente** por generica y por usar fuentes default. Ver `feedback_analyze_before_code.md`.
-- **Disciplina doc operativo**: al cerrar implementacion, marcar `[x]` en PENDIENTES-WEBAPP **antes** de commitear, incluido en el mismo commit. Sin esto el doc se vuelve cementerio mentiroso (como nos paso entre mayo 8 y mayo 21).
-- **W.10 conflicto resuelto**: codigo usa W.10 Live Hub (mas reciente, commit `0e185e6`). Doc viejo "W.10 Hub Personal" renombrado a W.18. Sin refactor codigo, solo doc.
-- **Mobile webapp futuro**: split `/social` vs `/networking` espejo Expo. En desktop se mantiene unificado (canvas + sidebar). Trabajo de migracion futura, no scope actual.
-- **Skip docs maestros para modulos cerrados por consenso**: W.10 Live Hub NO tiene `docs/webapp/W.10-live-hub.md` (commit + JSDoc + E2E + visual ya bastan — anti-regadero). Misma regla para futuros modulos donde el codigo + tests cubren bien.
-- **Responsive REAL no parche**: usar `clamp()` + `min-width: max-content` + `auto-fill, minmax(min(X, 100%), 1fr)` + flex-wrap. Nada de tiers fijos con N media queries.
-- **Tokens theme-aware obligatorio en outline buttons**: `--text-primary` + `--border-strong` + `--surface-low` (se invierten Noir/Lux). NO usar `--slate-light` u otros tokens hardcoded.
+- **Webapp = espejo LITERAL del Expo a la izquierda + DetailPanel der vacio hasta click**. NO inventar carousel/tabs/lista alternativa. Ver `feedback_split_layout_pattern.md`. Aplicado a W.7, valido tambien para futuros W.X.
+- **Animaciones interactivas via framer-motion** (heart, badge pop, tap, layout). CSS keyframes solo para skeleton + stagger reveal. Ver `feedback_animations_framer_motion.md`. **CSS `transition: transform` choca con framer-motion `layout`** — elegir uno.
+- **Endpoints gamificados deben devolver `points_awarded` explicito** (0 si tryAward fue idempotente). Auditar W.3/W.4/W.6/W.9. Ver `feedback_gamification_points_awarded.md`.
+- **Colores success/error neutrales** `rgba(80,200,120)` verde + `rgba(255,100,100)` rojo en confirmaciones — NO `var(--accent)` del cliente (puede ser rojo/coral). Espejo Expo.
+- **Badge trivia (?) en cards REMOVIDO**. Solo mantenemos badge pasaporte ✓ (compromiso real del asistente).
+- **Tier label NO se muestra en el detail panel** (solo en el Wall por jerarquia de tamaño). Decision espejo Expo.
+- **Sin outline accent en cards selected**. La seleccion se comunica via DetailPanel abierto, el outline en wall era redundante + se veia mal con primary_color rojo del cliente.
+- **Lighthouse Performance autenticado se mide en batch QA final cross-modulos** (afecta W.3/W.5/W.7/W.10/W.6/W.8 igual — Lighthouse standalone redirige a login). NO es bloqueante para cierre formal de modulos individuales.
+- **Validacion device fisico** (tablet + mobile) tambien va al batch QA final.
+- **Ambient prefetch / RouteWarmer** → W.12 Polish Fase 3.2b (NO hacer ahora).
 
-### Estado git al cierre
+### Estado git al cierre — todo pusheado
 
-- `APP EVENTOS main` — 4 commits pusheables: `96fed63` (re-auditoria), `905a85c` (docs sync), `96d333f` (skeleton v2 + screenshots), `5792029` (COMPLETADO + BUG-LOG)
-- `eventos-web main` — 4 commits pusheables: `d5108ac` (fix tests Node 25), `667a1bd` (ConfirmPop + Bloqueados + skeleton + tabs filtros), `dc9d5c4` (skeleton v2 + responsive social)
-- Memorias actualizadas: `feedback_una_sola_ventana_operativa.md`, `feedback_analyze_before_code.md`, `project_social_unified_notes.md`, `project_w5_speakers_v2.md`
-- Suite eventos-web: **202/202 verde**, typecheck OK
-- Sin push (queda a discrecion del usuario)
+- `eventos-web` main: `b4770ed` (W.7 cierre formal 23/23 — skeleton + tooltip + E2E + heart polish) ← HEAD
+- `APP EVENTOS` main: `f4dbb01` (W.12 ambient prefetch idea archivada) ← HEAD
+- `eventos-backend` feature/magic-link-auth: `967b8bb` (SponsorResource + visit-stand points_awarded)
+- Suite eventos-web: **232 vitest + 12 E2E = 244 tests verde**, typecheck OK
+- 4 memorias nuevas: `project_w7_sponsors_webapp.md`, `feedback_split_layout_pattern.md`, `feedback_animations_framer_motion.md`, `feedback_gamification_points_awarded.md`
 
 ---
 
 ## Para arrancar la proxima sesion
 
 1. Abrir `docs/living/PENDIENTES-WEBAPP.md` desde donde estes
-2. Mirar **"QUE SIGUE"** arriba — tarea concreta lista: **Sprint 1 / Item 8 — W.3 Bulk .ics download** (~30-45 min, boton "Descargar todas" en AgendaHeader tab Mi Agenda)
-3. Despues Item 9 — **W.0 Wire modulos top-level a sidebar** (auditar handlers + tooltip "proximamente" en items sin ruta) → cierra Sprint 1
-4. Sprint 2 son modulos nuevos completos (Sponsors, Engagement, Anuncios, Soporte, Hub Personal) — 30-37h, 5-6 sesiones DaVinci
+2. Mirar **"QUE SIGUE"** arriba — tarea concreta: **Sprint 2.B — W.9 Engagement** (~10h, 2 sesiones DaVinci)
+   - Encuestas + leaderboard + passport VIEW + rewards + Golden Ticket
+   - Backend endpoints listos (GamificationController + PointsService completos)
+   - **Reusar patrones de W.7**: visit-stand + trivia answer ya wireados, reutilizar shape para vote_poll + passport view
+   - **Antes de codear**: sesion DaVinci de diseno (wireframe propuesto + refs externas)
+3. Despues de W.9: Sprint 2.C (W.14 Anuncios + Bell, ~3-4h) → Sprint 2.D (W.17 Soporte, ~3h) → Sprint 2.E (W.18 Hub Personal, ~5-6h)
 
-**QA pendiente (visual, requiere navegar logueado):**
-- Lighthouse Performance ≥85 + Accessibility ≥95 en `/es/speakers`, `/es/social`, `/es/home`
-- Validar device real (laptop + tablet + mobile fisicos) en W.5 + W.8 + W.10
-- Smoke en tema Lux cross-modulos (checklist en chat de sesion pasada, items 1-34)
-- Smoke `/es/live` en Lux y comportamiento navegacion hero/side/upcoming
+**QA pendiente (cross-modulos, batch final pre-demo):**
+- Lighthouse Performance autenticado en `/es/agenda`, `/es/speakers`, `/es/sponsors`, `/es/live`, `/es/social` (cookie inyectada via puppeteer)
+- Validar device fisico: laptop + tablet horizontal + mobile real
+- Smoke Lux cross-modulos (transiciones Noir↔Lux con DetailPanel abierto en cada modulo)
+- Validar device fisico W.5 + W.7 + W.10 (todos al ~95% pendientes de hardware test)
 
 ---
 
@@ -60,14 +80,14 @@
 - **Working dir principal:** `C:\laragon\www\APP EVENTOS` (este repo, docs+design)
 - **Webapp Next.js:** `C:\laragon\www\eventos-web`
 - **Mobile Expo:** `C:\Users\Kasproduction\Projects\eventos-app`
-- **Backend Laravel:** `C:\laragon\www\eventos-backend` (Laragon)
+- **Backend Laravel:** `C:\laragon\www\eventos-backend` (Laragon) en branch `feature/magic-link-auth`
 - **Modo de trabajo:** DaVinci — calidad sobre cantidad, cero emojis. PASO 0 anclado en `/siguiente`
 - **E2E:** `pnpm test:e2e` levanta auto mockBackend (8101) + dev (3100). Reusa servers entre runs.
-- **Workflow git:** commits cuando usuario diga "commit" / "guardar". Push solo con palabra explicita "push". Nunca skip hooks
+- **Workflow git:** commits cuando usuario diga "commit" / "guardar". Push solo con palabra explicita "push". Nunca skip hooks.
 - **Usuario:** Kamilo Arias (solo founder), espanol coloquial
 - **Fuente operativa unica:** `docs/living/PENDIENTES-WEBAPP.md`
 - **Fuente parity:** `docs/webapp/PARITY-MATRIX.md`
-- **Bug log:** `docs/living/BUG-LOG.md` (BUG-001 a BUG-334)
+- **Bug log:** `docs/living/BUG-LOG.md` (BUG-001 a BUG-338, 241 resueltos / 2 pendientes)
 - **Completado:** `docs/living/COMPLETADO.md`
 
 ---

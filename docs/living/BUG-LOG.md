@@ -3,6 +3,46 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-06-21 — Sesion DaVinci W.7 Sponsors completo (4 bugs)
+
+### BUG-338: Polish visuales W.7 — 4 issues agrupados (RESUELTO)
+- **Severidad:** MEDIA — Detectados en testing live del Wall + DetailPanel:
+  1. **Halo accent en hover Platinum** rompia con eventos cuya `primary_color` es rojo/coral (cliente real lo verifico — "outline rojo del accent sobra"). Bug visual coherencia tema.
+  2. **Elevacion Noir desaparecia durante living shuffle** porque solo estaba definida en `:hover`. Cuando las cards se reordenan cada 7s, el mouse deja de hovear y volvian a estado plano momentaneamente.
+  3. **Heart pop animation CSS vanilla** se veia cortada/forzada (keyframes `sp-heart-pop` 360ms con 3 keyframes scale 1→1.3→1). Usuario reporto "se ve toda forzada y cortada no se ve natural".
+  4. **Toast `+puntos por visitar` inline en el hero del detail** violaba el patron lumina del proyecto (todos los toasts viven top-center, 1 a la vez). Tambien aparecia siempre aunque el usuario ya hubiera visitado (ver BUG-337).
+- **Fix:**
+  1. Removido halo accent. Reemplazado por `box-shadow: 0 8px 20px -8px rgba(0,0,0,0.55)` neutral en Noir (sin tinte de color del cliente).
+  2. Shadow base aplicada en estado reposo (no solo hover) — ahora la elevacion sobrevive al shuffle aunque el mouse se pierda del target.
+  3. CSS keyframes removidas. Reemplazadas por framer-motion `AnimatePresence` con `key={isFavorite-tick}` que fuerza remount + spring damping 10 stiffness 380 mass 0.6 fresh en cada toggle. Tambien `whileTap` scale 0.88 spring.
+  4. Toast movido a `lumina.success({message: "+N puntos por visitar"})` top-center. Hero quedo limpio sin floating toast inline.
+- **Archivos:** `sponsors.css` (shadows + remove `.sp-heart-pop` keyframes), `SponsorHero.tsx` (motion.button + AnimatePresence), `SponsorDetailPanel.tsx` (lumina call), removidos halo accent + transition transform CSS para no chocar con framer-motion `layout`
+- **Aprendizaje:** **Cuando un elemento usa framer-motion `layout` (shuffle smooth), NO aplicar tambien CSS `transition: transform` — chocan**. Ademas, **animaciones de UX micro (heart pop, badge pulse) deben ir en framer-motion, no en CSS keyframes vanilla** — el spring physics da naturalidad que los keyframes con 3 puntos no logran. CSS keyframes solo para animaciones de carga decorativas (skeleton shimmer).
+
+### BUG-337: visitStand devolvia visit_points sin distinguir si tryAward otorgo (UI mostraba toast falso) (RESUELTO)
+- **Severidad:** ALTA — `GamificationController::visitStand` siempre devolvia `visit_points: $sponsor->visit_points`, sin importar si `PointsService::tryAward` efectivamente otorgo puntos. tryAward es idempotente: retorna `null` si el usuario ya visito ese sponsor antes, si gamification esta deshabilitada para la accion `visit_stand`, o si el role del attendee no permite recibir esa accion. **El cliente webapp W.7 mostraba toast `+50 puntos por visitar` cada vez que el usuario abria el detail del mismo sponsor**, aunque ya hubiera recibido los puntos en una visita anterior. UX enganosa — el cliente crei que ganaba puntos cuando no.
+- **Fix:** `visitStand` ahora captura el return de `tryAward` (PointsLog o null) y devuelve `points_awarded: int` (0 si null). Cliente solo muestra toast si `points_awarded > 0`. `VisitStandResponse` type frontend tambien agrega el campo.
+- **Archivos:** `GamificationController.php` (capture log + return points_awarded), `lib/types/sponsor.ts` (type), `SponsorDetailPanel.tsx` (condicional toast)
+- **Aprendizaje:** **Endpoints gamificados que llaman a `tryAward` deben SIEMPRE exponer si efectivamente otorgaron puntos**, no solo el valor configurado. Aplicable a futuros endpoints: rate_session, ask_question, wall_post, vote_poll, etc. tryAward es idempotente por diseno — la respuesta del controller tiene que reflejarlo.
+
+### BUG-336: SponsorResource no exponia trivia_enabled / passport_enabled / visit_points (RESUELTO)
+- **Severidad:** MEDIA — Gap del SponsorResource backend: los 3 campos del Sponsor model (`trivia_enabled`, `passport_enabled`, `visit_points`) NO estaban en el toArray. El cliente webapp W.7 los necesita para:
+  1. Mostrar badges pasaporte/trivia en las cards del wall ANTES de pegar visit-stand
+  2. Decidir si renderizar el panel trivia condicional
+  3. Mostrar el valor de visit_points en el toast/UI
+  Si el cliente solo se entera de la trivia AL pegar visit-stand, hay un delay UX evidente.
+- **Fix:** Agregados los 3 campos al `SponsorResource::toArray` (boolean casts + int cast para visit_points).
+- **Archivos:** `app/Http/Resources/V1/SponsorResource.php` (+3 lineas)
+- **Aprendizaje:** Antes de implementar el cliente de cualquier feature gamificado, verificar que el Resource expone TODOS los flags de la entidad. Pequeño gap = trabajo de re-fetch innecesario en cliente.
+
+### BUG-335: next-themes 0.4.6 incompatible Next 16 + React 19 ("Encountered a script tag") (RESUELTO)
+- **Severidad:** ALTA — `next-themes 0.4.6` inyecta su script anti-FOUC adentro del cliente component (ThemeProvider) con `<script dangerouslySetInnerHTML>`. React 19 + Next 16 Turbopack lo flagea como error de runtime: *"Encountered a script tag while rendering React component. Scripts inside React components are never executed when rendering on the client."* Bug abierto upstream sin fix: issues #385 (Mar 19, 2026) y #387 (Mar 24, 2026), ambos `open + bug + triage`. Sin ETA del mantainer.
+- **Fix:** Reemplazo total de next-themes con provider propio en `src/components/providers/ThemeProvider.tsx` (~60 lineas). API minima compatible: `useTheme()` retorna `{theme, resolvedTheme, setTheme}`. Script anti-FOUC inline en `<head>` del LocaleLayout server component (donde si es safe). Actualizado 4 consumers (ThemeToggle, ThemeTogglePill, EventThemeProvider, sonner) cambiando solo el import.
+- **Archivos:** `src/app/[locale]/layout.tsx` (script inline en head), `src/components/providers/ThemeProvider.tsx` (rewrite), 4 consumers (cambio import)
+- **Aprendizaje:** **Para dependencias que injectan scripts blocking (anti-FOUC, theme detection, analytics critico), preferir provider propio cuando el package tiene bugs upstream sin fix activo**. 60 lineas con context propio es trivial; debugging un bug de tercero puede costar dias. next-themes queda en package.json sin desinstalar por si hay uso indirecto en otra parte de la build.
+
+---
+
 ## 2026-06-20 — Sesion DaVinci pulido social + responsive (6 bugs)
 
 ### BUG-334: React key warning en BlockedRow (RESUELTO)
@@ -1934,10 +1974,10 @@
 | Severidad | Count | Resueltos | Pendientes |
 |-----------|-------|-----------|------------|
 | CRITICA | 32 | 32 | 0 |
-| ALTA | 81 | 81 | 0 |
-| MEDIA | 102 | 100 | 2 (BUG-111, BUG-127) |
+| ALTA | 83 | 83 | 0 |
+| MEDIA | 104 | 102 | 2 (BUG-111, BUG-127) |
 | BAJA | 24 | 24 | 0 |
-| **Total** | **239+** | **237+** | **2** |
+| **Total** | **243+** | **241+** | **2** |
 
 > Nota: BUG-005 a BUG-015 cuentan como 11 bugs individuales en una sola entrada.
 
