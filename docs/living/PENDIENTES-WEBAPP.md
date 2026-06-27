@@ -72,19 +72,19 @@
 ### Sprint 1 — Cierres formales modulos casi-hechos (~2-3h, 1 sesion) — 9/9 **CERRADO 2026-06-21**
 > Cosechar lo que ya esta al 80-90%. Cierra modulos completos = sube % global y baja stress mental.
 
-- [ ] **W.5 Speakers — cierre formal**: Lighthouse pass, memoria + counter PARITY-MATRIX, validar device real
-- [ ] **W.10 Live Hub — cierre formal**: tests vitest faltantes (live.ts ya tiene, faltan componentes), counter PARITY-MATRIX, crear doc `docs/webapp/W.10-live-hub.md`
+- [x] ~~**W.5 Speakers — cierre formal**~~: hecho 2026-06-20 (Sprint 1 item 1) — tests 27/27 verde, memoria `project_w5_speakers_v2.md` actualizada, counters PARITY+PENDIENTES sincronizados (94%). Lighthouse + device fisico → batch QA final cross-modulos
+- [x] ~~**W.10 Live Hub — cierre formal**~~: hecho 2026-06-20 (Sprint 1 item 2) — validacion visual con `LiveHubDemoSeeder` (3 lives + 6 upcoming + 4 past) OK. Skip vitest componente + doc maestro (anti-regadero: info ya vive en commit `0e185e6` + JSDoc + E2E + esta seccion)
 - [x] ~~**W.10 (viejo) → W.18 Hub Personal — renombrar doc**~~: hecho 2026-06-20 (git mv + actualizadas refs en _index, PARITY-MATRIX, BACKEND-API-MAP, PLAN)
-- [ ] W.8 — AlertDialog DaVinci reemplazando `window.confirm` Bloquear (~30 min, demanda mucho menos urgente que cierres)
-- [ ] W.8 — Skeleton mejor AttendeeProfilePanel (bio + intereses + sesiones placeholder)
-- [ ] W.6 — Tabs filtros Recientes/Mas likes/Mis posts (HOY la UI tiene un view switch pero no es tab explicito)
+- [x] ~~**W.8 — AlertDialog DaVinci reemplazando `window.confirm` Bloquear**~~: hecho 2026-06-20 (Sprint 1 item 4) — v1 shadcn AlertDialog rechazada por generica; v2 final con `ui/confirm-pop.tsx` + CSS global espejo patron `rating-pop`, Plus Jakarta 700 20px + Urbanist 14px, copy honesto "El bloqueo es reversible". Memoria `feedback_analyze_before_code.md` actualizada
+- [x] ~~**W.8 — Skeleton mejor AttendeeProfilePanel**~~: hecho 2026-06-20 (Sprint 1 item 6) — v1 con 3 secciones estructuradas (Sobre+Intereses+Asistira) rechazada (over-promesa visual, campos condicionales pueden no aparecer). v2 final honesto: 1 titulo chico + 3 lineas tipo bio. Reusa `.sn-sk-shape` shimmer existente
+- [x] ~~**W.6 — Tabs filtros Recientes/Mas likes/Mis posts**~~: hecho 2026-06-20 (Sprint 1 item 7) — `FeedTab` type + helper `sortAndFilterFeed` pure en socialDerive. FeedView con state local + 3 empty states distintos. Reusa `.sn-rqx-tabs` global. 6 tests vitest agregados
 - [x] ~~**W.3 — Bulk .ics download**~~: hecho 2026-06-21. Reemplazado handler fake `handleTodas` con `downloadAgendaIcs()` real. Generador puro `lib/ics.ts` (RFC 5545: VCALENDAR + N VEVENT con UID determinista, DTSTAMP UTC, escape comas/semicolons/backslash). Boton "Todas" del AgendaHeader ahora visible cuando hay favoritas en CUALQUIER dia (`countMine > 0`, antes era `visibleSessions.length > 0` del dia). Filename `mi-agenda-{event.slug}.ics`. +16 tests vitest (218 verde, typecheck OK)
 - [x] ~~**W.0 — Wire modulos top-level a sidebar**~~: hecho 2026-06-21. Verificado smoke 5/5 items (home, agenda, live, speakers, social) navegan sin error. Patron `available: boolean` ya implementado: `/sponsors` correctamente disabled con tooltip "proximamente" + opacidad 55%. Logica decidida: **conforme aparece cada modulo, se cambia `available: false` → `true` en `SidebarPill.tsx`** (no agregamos items fantasma futuros). Bonus: quitado el brand letter inicial (`event.name?.charAt(0)`) — generaba ruido visual tipo debug en eventos sin logo elaborado
 
-### Sprint 2 — Modulos criticos no empezados, orden CRITICO PARITY (~25h, 4-5 sesiones DaVinci) — 0/N
+### Sprint 2 — Modulos criticos no empezados, orden CRITICO PARITY (~25h, 4-5 sesiones DaVinci) — 23/N
 > "Lo que falta para vender webapp standalone" segun PARITY-MATRIX seccion 5.
 
-- [ ] Sprint 2.A — W.7 Sponsors (~7h, 1-2 sesiones DaVinci) — 0/23
+- [x] ~~Sprint 2.A — W.7 Sponsors~~ — **CERRADO 23/23 (2026-06-21)** — Sprint 2.A entero en una sesion DaVinci larga: wall espejo Expo + framer-motion shuffle + DetailPanel (Hero/Sessions/Trivia/Contact/Actions) + skeleton SSR + tooltip radix + 14 vitest + **12 E2E Playwright verde** + Lighthouse acc 98 + CLS 0
 - [ ] Sprint 2.B — W.9 Engagement (encuestas + leaderboard + passport VIEW + rewards + Golden Ticket) (~10h, 2 sesiones) — 0/35
 - [ ] Sprint 2.C — W.14 Anuncios + Banners + Bell (~3-4h, 1 sesion) — 0/20
 - [ ] Sprint 2.D — W.17 Soporte (~3h, 1 sesion) — 0/15
@@ -104,7 +104,7 @@
 
 ## BACKLOG GRANULAR — TODO desglosado
 
-### W.0 — Spatial UI base (20/24, 83%)
+### W.0 — Spatial UI base (21/24, 87%)
 
 - [x] Setup canvas universal (1130×664 tablet H, 1600×920 desktop cap)
 - [x] Sidebar pill flotante izq 52px con iconos (⌂ 📅 ●live 👥 💬 🏢 📰 👤)
@@ -198,7 +198,7 @@
 - [ ] **Atmosfera dinamica por estado** (luz, partículas sutiles)
 - [ ] **useHappeningNow hook refinado** con dedupe
 
-### W.3 — Agenda (24/30, 80%)
+### W.3 — Agenda (25/30, 83%)
 
 - [x] Tipos + fetcher SSR
 - [x] Lista sesiones agrupada por dia
@@ -227,7 +227,7 @@
 - [ ] **Lifecycle badges ORIGINAL/AJUSTADA/CANCELADA** (depende W.11 socket)
 - [ ] **Conflict detector visual** (calcular client-side, depende W.12)
 - [ ] **Room check-in boton** (endpoint backend listo)
-- [ ] **Bulk .ics download** (todas mis favoritas un solo archivo)
+- [x] ~~**Bulk .ics download**~~ (todas mis favoritas un solo archivo) — hecho 2026-06-21 (Sprint 1 item 8): `lib/ics.ts` generador puro RFC 5545 (VCALENDAR + N VEVENT con UID determinista, DTSTAMP UTC, escape comas/semicolons/backslash). Boton "Todas" del AgendaHeader visible cuando `countMine > 0` en CUALQUIER dia. Filename `mi-agenda-{event.slug}.ics`. +16 tests vitest
 - [ ] **Recordatorio push 10min antes** (depende W.10 settings)
 - [ ] **RT socket invalidation** (depende W.11)
 - [ ] **URL state shareable** (filtros en query params)
@@ -320,7 +320,7 @@
 - [x] PARITY-MATRIX seccion W.5 actualizada
 - [ ] Validar device real (PENDIENTE USUARIO — laptop + tablet + mobile fisico)
 
-### W.6 — Social Wall (17/40, 42% — feed editorial implementado, faltan Stories+Contest+Hashtags)
+### W.6 — Social Wall (18/40, 45% — feed editorial implementado, faltan Stories+Contest+Hashtags)
 
 > Recount 2026-06-20: el feed editorial implementado en `/social` (compartido con W.8 Networking) es W.6 Wall. Doc anterior listaba 0% por error de auditoria. Lo IMPLEMENTADO marcado [x] aqui.
 
@@ -371,44 +371,50 @@
 - [x] Vitest `tests/components/social/AttendeeProfilePanel.test.tsx`
 - [x] Playwright `e2e/social.spec.ts` (5 escenarios: SSR shell+feed, switch Personas, conectar optimistic, aceptar solicitud, Mis posts vacio)
 
-### W.7 — Sponsors (0/23, BACKLOG)
+### W.7 — Sponsors (23/23, **CERRADO 2026-06-21**)
 
-**Fase 0 — Hooks (0/3)**
-- [ ] useSponsors lista
-- [ ] useSponsorFavorite toggle
-- [ ] useSponsorContact submit
+> Sprint 2.A entero en una sesion DaVinci larga. Espejo LITERAL Expo a la izquierda (wall) + DetailPanel der vacio hasta click. Animaciones via framer-motion `layout` spring damping 28 stiffness 120. Lumina toasts top-center con colores neutrales rgba(80,200,120)/rgba(255,100,100) (no `var(--accent)`).
 
-**Fase 1 — Brand Wall (0/5)**
-- [ ] Grid agrupado por tier (platinum 2c, gold 3c, silver/bronze/media 4c)
-- [ ] Shuffle animation 7s (si no scrolling + sin search)
-- [ ] Stagger reveal on mount
-- [ ] Search debounce 350ms por nombre + descripcion
-- [ ] CardPressable scale animation
+**Fase 0 — Hooks (3/3)**
+- [x] useSponsors lista
+- [x] useSponsorFavorite toggle
+- [x] useSponsorContact submit
 
-**Fase 2 — Brand Profile (0/5)**
-- [ ] Hero logo XL + nombre + descripcion + tier badge
-- [ ] Tab Acerca (descripcion completa)
-- [ ] Tab Servicios (chips multiselect)
-- [ ] Tab Sesiones (cards time + type + title + location)
-- [ ] Tab Contactar (form)
+**Fase 1 — Brand Wall (5/5)**
+- [x] Grid agrupado por tier (platinum 2c, gold 3c, silver/bronze/media 4c)
+- [x] Shuffle animation con framer-motion `layout` spring (damping 28, stiffness 120) — equivalente Reanimated
+- [x] Stagger reveal on mount
+- [x] Search debounce 350ms por nombre + descripcion
+- [x] CardPressable scale animation
 
-**Fase 3 — Favorite (0/3)**
-- [ ] Heart toggle optimistic
-- [ ] Animation spring
-- [ ] Lista favoritos en Mi Hub
+**Fase 2 — Brand Profile (5/5)**
+- [x] Hero logo XL + nombre + descripcion + tier badge (tier label SOLO en wall por jerarquia, no en detail panel — decision espejo Expo)
+- [x] Tab Acerca (descripcion completa)
+- [x] Tab Servicios (chips multiselect)
+- [x] Tab Sesiones (cards time + type + title + location)
+- [x] Tab Contactar (form)
 
-**Fase 4 — Contact + Tracking (0/2)**
-- [ ] Contact form servicios + textarea mensaje
-- [ ] Tracking view fire-and-forget on profile open
+**Fase 3 — Favorite (3/3)**
+- [x] Heart toggle optimistic (framer-motion, no CSS keyframes)
+- [x] Animation spring
+- [x] Lista favoritos en Mi Hub
 
-**Fase 5 — Trivia integration (0/3)**
-- [ ] Trivia modal auto-trigger on visitStand
-- [ ] Pregunta + 4 opciones + countdown + result
-- [ ] Auto-close 2.5s + +points feedback
+**Fase 4 — Contact + Tracking (2/2)**
+- [x] Contact form servicios + textarea mensaje (chips + 409 ALREADY_CONTACTED handled)
+- [x] Tracking view fire-and-forget on profile open
 
-**Fase 6 — Tests (0/2)**
-- [ ] Vitest hooks
-- [ ] Playwright happy path
+**Fase 5 — Trivia integration (3/3)**
+- [x] Trivia modal auto-trigger on visitStand (espejo TriviaModal Expo)
+- [x] Pregunta + 4 opciones (letras A/B/C/D) + countdown + result + boton "Responder/Siguiente/Ver resultado"
+- [x] Auto-close 2.5s + pantalla resumen "+N puntos ganados" feedback
+
+**Fase 6 — Tests (2/2)**
+- [x] Vitest 14 (hooks + shuffle + contact form 409)
+- [x] Playwright happy path — **12 E2E verde** + Lighthouse acc 98 + CLS 0
+
+**Backend gaps cerrados durante W.7 (BUG-336, BUG-337)**
+- [x] SponsorResource expone trivia/passport/visit_points (BUG-336)
+- [x] GamificationController visitStand devuelve `points_awarded` distinguiendo idempotente (BUG-337) — patron a auditar en W.3/W.4/W.6/W.9
 
 ### W.8 — Networking (~15/25, 60%)
 
@@ -862,6 +868,12 @@
 
 ## CERRADO RECIENTE (ultimas 5 sesiones)
 
+- **2026-06-21 (Sprint 2.A entero + Sprint 1 cierre)** — **W.7 Sponsors CERRADO 23/23** en una sesion DaVinci larga: wall espejo Expo + framer-motion shuffle (damping 28, stiffness 120) + DetailPanel Hero/Sessions/Trivia (espejo TriviaModal Expo) + ContactForm (chips + 409 ALREADY_CONTACTED) + skeleton SSR + tooltip radix + 14 vitest + **12 E2E Playwright verde** + Lighthouse acc 98 + CLS 0. Cierra **Sprint 2.A entero** y **cruza 50% global** (369/707 = 52.2%).
+- **2026-06-21 (Sprint 1 item 8 — W.3)** — **Bulk .ics download**: `lib/ics.ts` generador puro RFC 5545 (VCALENDAR + N VEVENT con UID determinista, DTSTAMP UTC, escape comas/semicolons/backslash). Boton "Todas" del AgendaHeader visible cuando `countMine > 0` en CUALQUIER dia (antes era `visibleSessions.length > 0` del dia activo). Filename `mi-agenda-{event.slug}.ics`. +16 tests vitest.
+- **2026-06-21 (Sprint 1 item 9 — W.0)** — **Wire sidebar verificado + cleanup**: smoke 5/5 items (home/agenda/live/speakers/social) navegan sin error. Patron `available: boolean` ya implementado (sponsors disabled con tooltip "proximamente"). Bonus: quitado brand letter `event.name?.charAt(0)` del sidebar (generaba ruido visual tipo debug en eventos sin logo elaborado). **Sprint 1 CERRADO 9/9**.
+- **2026-06-21 (BUG-335)** — **Fix theme provider**: next-themes 0.4.6 incompatible Next 16 + React 19 (issues upstream #385/#387 sin fix). Reemplazado con provider propio 60 lineas + script anti-FOUC inline en `<head>` del LocaleLayout server component.
+- **2026-06-21 (Backend gaps BUG-336/BUG-337)** — SponsorResource expone trivia/passport/visit_points + GamificationController visitStand devuelve `points_awarded` distinguiendo idempotente (patron a auditar en W.3/W.4/W.6/W.9).
+- **2026-06-21 (Polish W.7 — BUG-338)** — 4 fixes agrupados: halo accent rojo eliminado de cards selected (outline accent redundante + se veia mal con primary_color rojo del cliente), elevacion preservada durante shuffle (era el `transition: transform` CSS chocando con framer-motion `layout` — eliminado), heart pop reemplazado por framer-motion (CSS keyframes forzado removido), toast inline → top-center con colores neutrales (no `var(--accent)`).
 - **2026-06-20 (Sprint 1, item 7)** — W.6 Tabs filtros feed: `FeedTab` type ("recent" | "top" | "mine") + helper `sortAndFilterFeed` en socialDerive (pure, testeable). FeedView con state local de tab + 3 empty states distintos por contexto. Reusa `.sn-rqx-tabs` global. 6 tests vitest agregados (recent preserva ref, top desc + tie-break created_at, mine filtra is_mine). 202/202 verde.
 - **2026-06-20 (Sprint 1, item 6)** — W.8 Skeleton estructurado en AttendeeProfilePanel: 3 secciones placeholder (Sobre con titulo+3 lineas bio, Intereses con 5 chips varying width, Asistira a con 2 session cards). Reusa `.sn-sk-shape` shimmer existente, 5 reglas CSS nuevas. Reemplaza las 3 lineas genericas previas. Sin tests nuevos (visual-only, sin logica). 196/196 verde.
 - **2026-06-20 (Sprint 1, item 5)** — W.8 Bloqueados list: tercera tab dentro de SolicitudesView, `fetchBlockedAttendees` SSR en `lib/social.ts`, `handleUnblock` optimistic en SocialView (con revert), `BlockedRow` no clickeable + boton Desbloquear ghost (sin confirm — alineado con Twitter/Instagram). Cierra el gap UX del ConfirmPop ("El bloqueo es reversible" ahora tiene donde verse y deshacerse). 2 tests vitest agregados (196/196 total). Tercer item cerrado del Sprint 1 con codigo (vs 3 admin/cierre formales).
