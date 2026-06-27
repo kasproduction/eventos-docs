@@ -32,7 +32,7 @@
 | W.6 Social Wall | **18/40** | **45%** — feed+composer+likes+comments+tabs filtros hechos | **+18** (Sprint 1 item 7 cerrado) |
 | **W.7 Sponsors** | **23/23** | **CERRADO 2026-06-21** | **+23** (Sprint 2.A entero — skeleton + tooltip + E2E 12/12 + Lighthouse acc 98) |
 | W.8 Networking | 15/25 | 60% — en proceso | — |
-| W.9 Engagement | 0/35 | 0% — backlog | — |
+| W.9 Engagement | **18/35** | **51% — en proceso (Sprint 2.B sesion 1)** | **+18** (2026-06-27: hub split layout completo + 6 cards + 6 panels + RGB ring + QR real + Avatar) |
 | **W.10 Live Hub** | **16/16** | **CERRADO por consenso 2026-06-20** | **+16** (creado en commit `0e185e6`, validado visual con seeder) |
 | W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 | — |
 | W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
@@ -43,7 +43,7 @@
 | W.17 Soporte | 0/15 | 0% — backlog | — |
 | **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **369/707** | **52.2%** | +95 numerador (Sprint 2.A CERRADO 23/23 + cierre formal modulo) |
+| **TOTAL** | **387/707** | **54.7%** | +18 W.9 inicial (Sprint 2.B sesion 1 — hub split + 6 cards + 6 panels + RGB ring + QR + Avatar) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,11 +51,16 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 2.B — W.9 Engagement** (~10h, 2 sesiones DaVinci) — 0/35
-  - Encuestas + leaderboard + passport VIEW + rewards + Golden Ticket
-  - Backend endpoints listos: GamificationController + PointsService completos
-  - Sponsors W.7 (CERRADO 23/23) ya wireo `visit-stand` + trivia answer → reusar patrones para encuestas/passport
-  - Antes de codear: sesion DaVinci de diseno (wireframe propuesto + refs)
+- [ ] **Sprint 2.B — W.9 Engagement sesion 2** (~5h, finalizar) — 18/35 (51%)
+  - **Sesion 1 (2026-06-27 — COMPLETADA):** hub split layout + 6 cards + 6 panels + RGB ring WAVE_COLORS + QR real qrcode.react + Avatar real con boring-avatars beam fallback + colores TEAL fijos (no accent cliente) + degradacion suave 5 endpoints + sidebar + i18n. Commit `32018f1` eventos-web pusheado
+  - **Sesion 2 (proxima) — pendiente:**
+    - Lazy fetch `rankingEntries` + `fullRewards` + `fullPassportStamps` al abrir cada panel (hoy se usan los del overview)
+    - Mutations: `redeemReward`, `claimTicket`, `useTrackPointsDiff` (toast "+X pts via diff")
+    - Tests vitest `desafioDerive.test.ts` (helpers puros: pointsRatio, segmentsFilled, retosProgress, pickFeaturedTicket)
+    - Tests E2E `desafio.spec.ts` (5 escenarios: auth gate, SSR hub, open Golden Ticket panel, open Ranking panel, Esc cierra)
+    - Validar shape exacto endpoints contra backend real (passport puede devolver shape distinto al esperado)
+    - Eliminar `mockOverview()` fallback en produccion (solo dev)
+    - Cierre formal commit + memoria + counter
 
 ---
 
@@ -85,7 +90,7 @@
 > "Lo que falta para vender webapp standalone" segun PARITY-MATRIX seccion 5.
 
 - [x] ~~Sprint 2.A — W.7 Sponsors~~ — **CERRADO 23/23 (2026-06-21)** — Sprint 2.A entero en una sesion DaVinci larga: wall espejo Expo + framer-motion shuffle + DetailPanel (Hero/Sessions/Trivia/Contact/Actions) + skeleton SSR + tooltip radix + 14 vitest + **12 E2E Playwright verde** + Lighthouse acc 98 + CLS 0
-- [ ] Sprint 2.B — W.9 Engagement (encuestas + leaderboard + passport VIEW + rewards + Golden Ticket) (~10h, 2 sesiones) — 0/35
+- [ ] Sprint 2.B — W.9 Engagement (encuestas + leaderboard + passport VIEW + rewards + Golden Ticket) (~10h, 2 sesiones) — **18/35 sesion 1 hecha**
 - [ ] Sprint 2.C — W.14 Anuncios + Banners + Bell (~3-4h, 1 sesion) — 0/20
 - [ ] Sprint 2.D — W.17 Soporte (~3h, 1 sesion) — 0/15
 - [ ] Sprint 2.E — W.18 Hub Personal (perfil editable + settings) (~5-6h, 1-2 sesiones) — 0/19
@@ -868,6 +873,7 @@
 
 ## CERRADO RECIENTE (ultimas 5 sesiones)
 
+- **2026-06-27 (Sprint 2.B sesion 1)** — **W.9 Desafio hub inicial 18/35 (51%)**: split layout literal espejo W.7 + 6 cards apiladas espejo DESAFIO Expo (Hero + Golden Tickets + Premios preview + Tip + Retos + Pasaporte) + 6 detail panels (GoldenTicket reveal con QR real qrcode.react + Ranking podio escalado + Premios catalogo + Todos los retos + Pasaporte + Como funciona con 5 reglas educativas + tabla puntos). Avatar component reusable con photo_url + boring-avatars beam fallback (espejo Expo `lib/avatars.ts`). RgbRing + RgbRect con WAVE_COLORS pasteles 6s linear (espejo Expo). Colores **TEAL fijos** (`#39d2c0` + `#B5A68B` GOLD + `#C0C0C0` silver + `#CD7F32` bronze) — **NO `var(--accent)` del cliente** porque Expo no customiza gamification. SSR agrega 5 endpoints con degradacion suave. i18n + sidebar wired. Commit `32018f1` eventos-web pusheado. Pendiente sesion 2: lazy fetch + mutations + tests vitest/E2E + validacion contra backend real.
 - **2026-06-21 (Sprint 2.A entero + Sprint 1 cierre)** — **W.7 Sponsors CERRADO 23/23** en una sesion DaVinci larga: wall espejo Expo + framer-motion shuffle (damping 28, stiffness 120) + DetailPanel Hero/Sessions/Trivia (espejo TriviaModal Expo) + ContactForm (chips + 409 ALREADY_CONTACTED) + skeleton SSR + tooltip radix + 14 vitest + **12 E2E Playwright verde** + Lighthouse acc 98 + CLS 0. Cierra **Sprint 2.A entero** y **cruza 50% global** (369/707 = 52.2%).
 - **2026-06-21 (Sprint 1 item 8 — W.3)** — **Bulk .ics download**: `lib/ics.ts` generador puro RFC 5545 (VCALENDAR + N VEVENT con UID determinista, DTSTAMP UTC, escape comas/semicolons/backslash). Boton "Todas" del AgendaHeader visible cuando `countMine > 0` en CUALQUIER dia (antes era `visibleSessions.length > 0` del dia activo). Filename `mi-agenda-{event.slug}.ics`. +16 tests vitest.
 - **2026-06-21 (Sprint 1 item 9 — W.0)** — **Wire sidebar verificado + cleanup**: smoke 5/5 items (home/agenda/live/speakers/social) navegan sin error. Patron `available: boolean` ya implementado (sponsors disabled con tooltip "proximamente"). Bonus: quitado brand letter `event.name?.charAt(0)` del sidebar (generaba ruido visual tipo debug en eventos sin logo elaborado). **Sprint 1 CERRADO 9/9**.

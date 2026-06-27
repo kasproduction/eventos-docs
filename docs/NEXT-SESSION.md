@@ -8,8 +8,47 @@
 
 ## Ultima sesion
 
-**Fecha:** 2026-06-21 (sesion larga DaVinci — Sprint 1 cierre + Sprint 2.A entero)
-**Total acumulado webapp:** **369/707 = 52.2%** (cruzamos el 50% por primera vez)
+**Fecha:** 2026-06-27 (Sprint 2.B sesion 1 — W.9 Desafio hub inicial)
+**Total acumulado webapp:** **387/707 = 54.7%** (+18 desde 52.2%)
+
+### Que se hizo (2026-06-27):
+
+1. **Demos exploracion v1/v2/v3** en `design/features/webapp/W9-engagement/` — 3 iteraciones hasta validar patron correcto (split layout literal + RGB ring WAVE_COLORS pasteles + podio escalado #2 #1 #3). Commit `14d6067` en APP EVENTOS.
+2. **W.9 React implementacion inicial 18/35 (51%)** en `eventos-web` commit `32018f1`:
+   - Split layout literal espejo W.7: wall izq con 6 cards apiladas espejo DESAFIO Expo + DetailPanel der
+   - 6 cards: Hero (avatar + puntos + posicion + barra segmentada + podio escalado top 3 con RGB ring en #1) / Golden Tickets / Premios preview / Tip motivacional / Retos card / Pasaporte card
+   - 6 panels detail: GoldenTicket reveal (con QR real qrcode.react usando qr_token) / Ranking (podio + lista top 50) / Premios (catalogo) / Todos los retos (lista con estado) / Pasaporte (grid completo) / Como funciona (5 reglas educativas + tabla puntos)
+   - Avatar component reusable con `photo_url` + boring-avatars beam fallback (espejo Expo `lib/avatars.ts`)
+   - RgbRing + RgbRect con WAVE_COLORS pasteles `#a8edea #fed6e3 #d4a5ff #a8c0ff #b8f0c0 #ffd6aa` 6s linear (espejo Expo)
+   - Colores TEAL fijos: `#39d2c0` accent + `#B5A68B` gold + `#C0C0C0` silver + `#CD7F32` bronze. **NO `var(--accent)` del cliente** porque Expo no customiza gamification (decision arquitectural)
+   - SSR `fetchDesafioOverview` agrega 5 endpoints con degradacion suave (`leaderboard` + `me/points` + `me/prizes` + `rewards` + `my-passport`)
+   - Sidebar W.0: nuevo item Desafio con icono Trophy
+   - i18n: agregado `nav.desafio` en es/en/pt
+   - Typecheck OK + lint clean en codigo W.9
+
+### Bugs registrados (sesion 2026-06-27)
+
+- **W.9 codigo defensivo** en lib/desafio.ts: `passport.data.stamps` puede ser null/objeto/array. Normalizado con type narrowing antes de leer keys nested. Mismo trato para prizes/rewards/leaderboard.
+- **Colores accent rojo full pantalla** — root cause: `var(--accent)` del cliente (rojo Bancolombia / coral generico) en lugar de TEAL fijo Expo. Fix: tokens `--dx-accent: #39d2c0` independientes del cliente.
+
+### Decisiones cerradas en esta sesion (no preguntar)
+
+- **Gamification NO usa primary_color del cliente** (TEAL/GOLD/CYAN fijos). Ver `feedback_no_accent_in_gamification.md`. Patron a aplicar tambien a W.2 GamificationHud + W.16 Trivia/Spin si se portan.
+- **Avatar reusable** con boring-avatars beam fallback (mismo patron Expo `lib/avatars.ts`). NO seguir poniendo iniciales en text si hay `photo_url` disponible.
+- **QR real con qrcode.react** (instalado), no placeholders dots. Token viene del backend (`qr_token` field).
+- **Como funciona ≠ Retos** — son 2 panels visualmente distintos. Retos = estado personal con check, Rules = reglas educativas + tabla puntos.
+- **WAVE_COLORS pasteles** (NO neon cyan/magenta/yellow) para RGB ring. Solo en avatar #1 podio + QR Golden Ticket.
+
+### Estado git al cierre
+
+- `eventos-web` main: `32018f1` (feat W.9 Desafio hub split layout + 6 cards + 6 panels + RGB ring + QR) ← HEAD pusheado
+- `APP EVENTOS` main: `14d6067` (docs W.9 demos v1/v2/v3) ← HEAD pusheado (faltan pendientes actualizados en este commit)
+- Suite eventos-web typecheck OK + lint W.9 clean
+
+### Original
+
+**Fecha previa:** 2026-06-21 (sesion larga DaVinci — Sprint 1 cierre + Sprint 2.A entero)
+**Total acumulado webapp previo:** **369/707 = 52.2%** (cruzamos el 50% por primera vez)
 
 **Que se hizo (orden cronologico):**
 
