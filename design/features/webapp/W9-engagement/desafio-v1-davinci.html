@@ -1,0 +1,1556 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>W.9 DESAFIO — DaVinci v1 (Hub Engagement espejo Expo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-sunken:#0a0a0a;
+  --bg-elevated:#141414;
+  --surface-low:#1a1a1a;
+  --surface-medium:#1f1f1f;
+  --surface-high:#262626;
+  --surface-card:#181818;
+  --border:rgba(255,255,255,0.06);
+  --border-strong:rgba(255,255,255,0.12);
+  --fg:#f5f5f4;
+  --fg-dim:#a8a8a3;
+  --fg-mute:#6b6b66;
+  --fg-label:#5a5a55;
+  --accent:#7CFFB2;
+  --accent-soft:rgba(124,255,178,0.10);
+  --accent-glow:rgba(124,255,178,0.20);
+  --accent-on:#0a0a0a;
+
+  --gold:#E8C764;
+  --gold-soft:rgba(232,199,100,0.10);
+  --gold-glow:rgba(232,199,100,0.22);
+  --teal:#5eead4;
+  --teal-soft:rgba(94,234,212,0.10);
+  --teal-glow:rgba(94,234,212,0.20);
+
+  --tier-platinum:#E5E7EB;
+  --tier-gold:#E8C764;
+  --tier-silver:#B4B9C8;
+  --tier-bronze:#D29B5A;
+  --tier-media:#6EA5FF;
+
+  --canvas-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+  --spring-soft: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --spring-snap: cubic-bezier(0.16, 1.2, 0.3, 1);
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body[data-theme="lux"]{
+  --bg-sunken:#F6F8FA;
+  --bg-elevated:#FFFFFF;
+  --surface-low:#FFFFFF;
+  --surface-medium:rgba(0,0,0,0.03);
+  --surface-high:rgba(0,0,0,0.06);
+  --surface-card:#FFFFFF;
+  --border:rgba(0,0,0,0.08);
+  --border-strong:rgba(0,0,0,0.14);
+  --fg:#1A1B1E;
+  --fg-dim:#4A4B50;
+  --fg-mute:#7C7D82;
+  --fg-label:#A8A9AE;
+  --canvas-shadow: 0 16px 48px rgba(0,0,0,0.12);
+  --accent-on:#FFFFFF;
+}
+
+*{box-sizing:border-box; margin:0; padding:0}
+html,body{height:100%}
+body{
+  font-family: 'Urbanist', system-ui, sans-serif;
+  background: var(--bg-sunken);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ============== Shell + Sidebar (reused W.0) ============== */
+.shell{
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  padding: 24px 28px 24px 84px;
+  background:
+    radial-gradient(ellipse at 20% 30%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 60%),
+    radial-gradient(ellipse at 80% 70%, color-mix(in srgb, var(--gold) 5%, transparent), transparent 55%),
+    var(--bg-sunken);
+}
+.sidebar{
+  position: fixed; left: 18px; top: 50%;
+  transform: translateY(-50%);
+  width: 52px; display: flex; flex-direction: column; gap: 4px;
+  padding: 10px 0;
+  border-radius: 28px;
+  border: 1px solid var(--border-strong);
+  background: color-mix(in srgb, var(--bg-elevated) 90%, transparent);
+  backdrop-filter: blur(22px) saturate(1.2);
+  z-index: 50;
+}
+.sidebar .slot{ width:36px;height:36px;margin:0 auto;display:grid;place-items:center;border-radius:12px;color:var(--fg-mute);cursor:pointer; }
+.sidebar .slot.active{ background: var(--surface-high); color: var(--fg); }
+.sidebar .divider{ height:1px;width:22px;margin:6px auto;background:var(--border); }
+.theme-toggle{ position:fixed;left:18px;bottom:18px;width:38px;height:38px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--fg-dim);display:grid;place-items:center;cursor:pointer;z-index:50; }
+
+/* ============== Canvas ============== */
+.canvas{
+  width: 100%;
+  max-width: 1600px;
+  height: min(calc(100vh - 56px), 920px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: var(--canvas-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============== Header ============== */
+.head{
+  padding: 26px 36px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.head h1{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 24px;
+  letter-spacing: -0.5px;
+}
+.head .sub{
+  font-size: 12px;
+  color: var(--fg-mute);
+  margin-top: 4px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.head .rules-link{
+  font-size: 13px;
+  color: var(--fg-dim);
+  padding: 8px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-low);
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif;
+}
+.head .rules-link:hover{ color: var(--fg); border-color: var(--accent); }
+
+/* ============== Hub body ============== */
+.hub{
+  overflow-y: auto;
+  padding: 24px 36px 36px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-high) transparent;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 16px;
+  align-content: start;
+}
+.hub::-webkit-scrollbar{ width:6px }
+.hub::-webkit-scrollbar-thumb{ background: var(--surface-high); border-radius:3px }
+.col{ display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* ============== Card base ============== */
+.card{
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px;
+}
+.card-head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.card-head .title{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+.card-head .more{
+  font-size: 12px;
+  color: var(--fg-mute);
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.card-head .more:hover{ color: var(--accent); }
+
+/* ============== Card 1 — Hero ============== */
+.card-hero{
+  background:
+    radial-gradient(ellipse at 0% 0%, var(--accent-glow), transparent 55%),
+    var(--surface-card);
+  border: 1px solid var(--border-strong);
+  position: relative;
+  overflow: hidden;
+}
+.card-hero::after{
+  content: '';
+  position: absolute; right: -120px; top: -120px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-soft), transparent 70%);
+  pointer-events: none;
+}
+.hero-row{ display: flex; align-items: flex-end; gap: 24px; }
+.hero-points{ flex: 1; }
+.hero-points .label{
+  font-size: 11px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+.hero-points .value{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 56px;
+  letter-spacing: -2px;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--fg), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-points .unit{
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 500; font-size: 14px;
+  color: var(--fg-dim);
+  margin-left: 8px;
+}
+.hero-rank{
+  text-align: right;
+}
+.hero-rank .label{
+  font-size: 11px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+.hero-rank .pos{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 26px;
+  letter-spacing: -0.5px;
+}
+.hero-rank .pos .of{ color: var(--fg-mute); font-weight: 500; font-size: 16px; }
+
+.hero-progress{
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+.hero-progress .seg{
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-high);
+}
+.hero-progress .seg.filled{ background: var(--accent); }
+
+.hero-top3{
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.hero-top3 .label{
+  font-size: 11px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.hero-top3 .ranks{ display: flex; gap: 18px; align-items: center; }
+.rank-mini{ display: flex; align-items: center; gap: 8px; }
+.rank-mini .num{
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+}
+.rank-mini.gold .num{ background: var(--gold); color: #0a0a0a; }
+.rank-mini.silver .num{ background: var(--tier-silver); color: #0a0a0a; }
+.rank-mini.bronze .num{ background: var(--tier-bronze); color: #0a0a0a; }
+.rank-mini .avatar{ width: 24px; height: 24px; border-radius: 50%; background: var(--surface-high); border: 1px solid var(--border); display: grid; place-items: center; font-size: 10px; color: var(--fg-dim); }
+.rank-mini .name{ font-size: 12px; color: var(--fg-dim); }
+.rank-mini .pts{ font-size: 11px; color: var(--fg-mute); margin-left: 2px; }
+
+.hero-cta{
+  margin-top: 18px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface-high);
+  border: 1px solid var(--border-strong);
+  color: var(--fg);
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 600; font-size: 13px;
+  cursor: pointer;
+  text-align: center;
+}
+.hero-cta:hover{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+/* ============== Card 2 — Golden Tickets ============== */
+.card-tickets{
+  background:
+    radial-gradient(ellipse at 100% 0%, var(--gold-soft), transparent 60%),
+    var(--surface-card);
+  border: 1px solid var(--border);
+}
+.tickets-list{ display: flex; flex-direction: column; gap: 10px; }
+.ticket{
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface-low);
+  cursor: pointer;
+  transition: border-color 200ms;
+}
+.ticket:hover{ border-color: var(--gold); }
+.ticket .icon{
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: grid; place-items: center;
+}
+.ticket.pending .icon{ background: var(--gold-soft); color: var(--gold); border: 1px solid rgba(232,199,100,0.30); }
+.ticket.claimed .icon{ background: var(--teal-soft); color: var(--teal); border: 1px solid rgba(94,234,212,0.30); }
+.ticket .meta .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 14px; }
+.ticket .meta .sponsor{ font-size: 11px; color: var(--fg-mute); margin-top: 2px; }
+.ticket .badge{
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.ticket.pending .badge{ background: var(--gold-soft); color: var(--gold); }
+.ticket.claimed .badge{ background: var(--teal-soft); color: var(--teal); }
+
+/* ============== Card 3 — Premios preview ============== */
+.rewards-preview{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.reward-mini{
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  background: var(--surface-low);
+  cursor: pointer;
+  transition: border-color 200ms;
+}
+.reward-mini:hover{ border-color: var(--accent); }
+.reward-mini .thumb{
+  height: 84px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--surface-medium), var(--surface-high));
+  margin-bottom: 10px;
+  display: grid; place-items: center;
+  color: var(--fg-mute);
+  font-size: 28px;
+}
+.reward-mini .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 13px; }
+.reward-mini .cost{
+  margin-top: 6px;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.reward-mini.disabled{ opacity: 0.55; }
+.reward-mini.disabled .cost{ background: var(--surface-high); color: var(--fg-mute); }
+
+/* ============== Card 4 — Motivational tip ============== */
+.card-tip{
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px;
+}
+.tip-icon{
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.tip-text{ font-size: 13px; color: var(--fg-dim); }
+.tip-text strong{ color: var(--fg); font-weight: 600; }
+
+/* ============== Card 5 — Retos preview ============== */
+.retos-progress{
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.retos-progress .bar{
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-high);
+  overflow: hidden;
+}
+.retos-progress .bar .fill{
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+}
+.retos-progress .count{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 14px;
+}
+.retos-progress .count .total{ color: var(--fg-mute); font-weight: 500; }
+
+.reto-next{
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.reto-next .icon{
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--surface-high);
+  color: var(--fg-dim);
+  display: grid; place-items: center;
+}
+.reto-next .meta{ flex: 1; }
+.reto-next .label-tag{ font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.6px; }
+.reto-next .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 14px; margin-top: 2px; }
+.reto-next .pts{ font-size: 12px; color: var(--accent); font-weight: 600; }
+
+/* ============== Card 6 — Pasaporte preview ============== */
+.passport-progress{
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.passport-progress .bar{
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-high);
+  overflow: hidden;
+}
+.passport-progress .bar .fill{
+  height: 100%;
+  background: var(--teal);
+  border-radius: 4px;
+}
+.passport-progress .count{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 14px;
+}
+.passport-progress .count .total{ color: var(--fg-mute); font-weight: 500; }
+
+.passport-grid{
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.stamp{
+  aspect-ratio: 1;
+  border-radius: 12px;
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 14px;
+  position: relative;
+}
+.stamp.stamped{
+  background: var(--teal-soft);
+  border: 1px solid rgba(94,234,212,0.30);
+  color: var(--teal);
+}
+.stamp.stamped::after{
+  content: '✓';
+  position: absolute;
+  top: 4px; right: 6px;
+  font-size: 10px;
+  color: var(--teal);
+}
+.stamp.empty{
+  background: var(--surface-low);
+  border: 1px dashed var(--border-strong);
+  color: var(--fg-label);
+}
+.stamp.more{
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  color: var(--fg-mute);
+  font-size: 12px;
+  cursor: pointer;
+}
+.stamp.more:hover{ color: var(--accent); border-color: var(--accent); }
+
+/* ============== Modal overlay ============== */
+.overlay{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 40px 60px 40px 100px;
+}
+.overlay.open{ display: flex; }
+.modal{
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+}
+.modal-head{
+  padding: 18px 22px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.modal-head h3{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 16px;
+  letter-spacing: -0.2px;
+}
+.modal-close{
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--surface-medium);
+  border: 0;
+  color: var(--fg-dim);
+  cursor: pointer;
+  display: grid; place-items: center;
+}
+.modal-body{ padding: 22px; overflow-y: auto; }
+
+/* Modal — Golden Ticket reveal */
+.modal-gt{ max-width: 440px; }
+.gt-content{
+  text-align: center;
+  padding: 14px 20px 24px;
+}
+.gt-accent-line{
+  height: 3px;
+  width: 64px;
+  background: var(--gold);
+  margin: 0 auto 20px;
+  border-radius: 2px;
+  box-shadow: 0 0 16px var(--gold-glow);
+}
+.gt-icon{
+  width: 72px; height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  border: 1px solid rgba(232,199,100,0.30);
+  display: grid; place-items: center;
+  color: var(--gold);
+}
+.gt-overline{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.gt-name{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 22px;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.gt-sponsor{
+  font-size: 13px;
+  color: var(--fg-mute);
+  margin-bottom: 20px;
+}
+.gt-claim-box{
+  background: var(--surface-low);
+  border: 1px dashed var(--gold);
+  border-radius: 14px;
+  padding: 20px 18px;
+  margin-bottom: 16px;
+}
+.gt-claim-label{
+  font-size: 11px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+.gt-claim-code{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 28px;
+  letter-spacing: 2px;
+  color: var(--gold);
+}
+.gt-qr{
+  width: 140px; height: 140px;
+  margin: 16px auto 0;
+  border-radius: 12px;
+  background: white;
+  display: grid; place-items: center;
+  background-image: radial-gradient(circle, #111 1px, transparent 1.5px), radial-gradient(circle, #111 1px, transparent 1.5px);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+  border: 4px solid white;
+}
+.gt-hint{
+  font-size: 12px;
+  color: var(--fg-mute);
+  margin-top: 14px;
+}
+
+/* Modal — Rewards catalogo */
+.modal-rewards{ max-width: 720px; }
+.rewards-tabs{
+  display: flex; gap: 8px;
+  padding: 0 22px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.rewards-tab{
+  padding: 8px 14px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Urbanist', sans-serif;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--fg-mute);
+  cursor: pointer;
+}
+.rewards-tab.active{ background: var(--surface-high); color: var(--fg); border-color: var(--border-strong); }
+.rewards-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.reward-card{
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--surface-low);
+  display: flex; flex-direction: column;
+}
+.reward-card .thumb{
+  height: 110px;
+  background: linear-gradient(135deg, var(--surface-medium), var(--surface-high));
+  display: grid; place-items: center;
+  color: var(--fg-mute);
+  font-size: 36px;
+}
+.reward-card .body{ padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.reward-card .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 14px; }
+.reward-card .sponsor{ font-size: 11px; color: var(--fg-mute); }
+.reward-card .row{ display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 8px; }
+.reward-card .cost{
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.reward-card .btn{
+  padding: 6px 12px;
+  border-radius: 99px;
+  background: var(--accent);
+  color: var(--accent-on);
+  border: 0;
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 600; font-size: 12px;
+  cursor: pointer;
+}
+.reward-card.disabled{ opacity: 0.55; }
+.reward-card.disabled .cost{ background: var(--surface-high); color: var(--fg-mute); }
+.reward-card.disabled .btn{ background: var(--surface-high); color: var(--fg-mute); cursor: not-allowed; }
+
+/* Modal — Trivia panel (espejo Expo TriviaPanel) */
+.modal-trivia{ max-width: 460px; }
+.trivia-body{ padding: 22px; }
+.trivia-sponsor{
+  display: flex; align-items: center; gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+.trivia-sponsor .logo{ width: 32px; height: 32px; border-radius: 8px; background: var(--surface-high); display: grid; place-items: center; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 12px; color: var(--fg-dim); }
+.trivia-sponsor .meta .label{ font-size: 10px; color: var(--fg-mute); text-transform: uppercase; letter-spacing: 0.6px; }
+.trivia-sponsor .meta .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 13px; }
+.trivia-countdown{
+  display: flex; align-items: center; gap: 8px;
+  margin-left: auto;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 14px;
+  color: var(--accent);
+}
+.trivia-q-num{ font-size: 11px; color: var(--fg-mute); margin-bottom: 8px; }
+.trivia-question{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 17px;
+  letter-spacing: -0.2px;
+  line-height: 1.4;
+  margin-bottom: 18px;
+}
+.trivia-options{ display: flex; flex-direction: column; gap: 8px; }
+.trivia-opt{
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-low);
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif;
+  font-size: 14px;
+  color: var(--fg-dim);
+  transition: border-color 200ms;
+}
+.trivia-opt:hover{ border-color: var(--accent); color: var(--fg); }
+.trivia-opt .letter{
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--surface-high);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+  color: var(--fg);
+  flex-shrink: 0;
+}
+.trivia-action{
+  margin-top: 18px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-on);
+  border: 0;
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 700; font-size: 14px;
+  cursor: pointer;
+}
+
+/* Modal — Leaderboard full */
+.modal-leaderboard{ max-width: 520px; }
+.lb-podium{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.podium-slot{
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 14px 10px;
+  border-radius: 14px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+}
+.podium-slot.first{ border-color: var(--gold); background: linear-gradient(180deg, var(--gold-soft), transparent); }
+.podium-slot.second{ border-color: var(--tier-silver); }
+.podium-slot.third{ border-color: var(--tier-bronze); }
+.podium-slot .num{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 13px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+}
+.podium-slot.first .num{ background: var(--gold); color: #0a0a0a; }
+.podium-slot.second .num{ background: var(--tier-silver); color: #0a0a0a; }
+.podium-slot.third .num{ background: var(--tier-bronze); color: #0a0a0a; }
+.podium-slot .avatar{ width: 44px; height: 44px; border-radius: 50%; background: var(--surface-high); border: 1px solid var(--border-strong); display: grid; place-items: center; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--fg-dim); }
+.podium-slot .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 12px; text-align: center; }
+.podium-slot .pts{ font-size: 11px; color: var(--fg-mute); }
+
+.lb-list{ padding: 8px 22px 0; }
+.lb-row{
+  display: grid;
+  grid-template-columns: 24px 32px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.lb-row:last-child{ border-bottom: 0; }
+.lb-row .pos{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+  color: var(--fg-mute);
+  text-align: right;
+}
+.lb-row .avatar{ width: 32px; height: 32px; border-radius: 50%; background: var(--surface-high); border: 1px solid var(--border); display: grid; place-items: center; font-size: 11px; color: var(--fg-dim); }
+.lb-row .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 13px; }
+.lb-row .pts{ font-size: 12px; color: var(--fg-dim); font-weight: 600; }
+.lb-row.me{ background: var(--accent-soft); border-radius: 8px; margin: 4px -8px; padding: 10px 8px; border-bottom-color: transparent; }
+.lb-row.me .pos{ color: var(--accent); }
+.lb-row.me .name{ color: var(--accent); }
+
+.lb-sticky{
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elevated);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.lb-sticky .label{ font-size: 11px; color: var(--fg-mute); text-transform: uppercase; letter-spacing: 0.6px; }
+.lb-sticky .pos{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px; color: var(--accent); }
+
+/* Modal — Retos sheet */
+.modal-retos{ max-width: 480px; }
+.retos-list{ display: flex; flex-direction: column; gap: 4px; }
+.reto-row{
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 8px;
+  border-radius: 10px;
+}
+.reto-row .icon{
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.reto-row.done .icon{ background: var(--accent-soft); color: var(--accent); }
+.reto-row.pending .icon{ background: var(--surface-high); color: var(--fg-mute); }
+.reto-row .meta{ flex: 1; min-width: 0; }
+.reto-row .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 14px; }
+.reto-row .desc{ font-size: 12px; color: var(--fg-mute); margin-top: 2px; }
+.reto-row .pts-tag{
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.reto-row.done .pts-tag{ background: var(--accent-soft); color: var(--accent); }
+.reto-row.pending .pts-tag{ background: var(--surface-high); color: var(--fg-mute); }
+.reto-row.done .name{ color: var(--fg-dim); }
+
+/* Modal — Passport full */
+.modal-passport{ max-width: 600px; }
+.passport-full{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.stamp-full{
+  border-radius: 14px;
+  padding: 16px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  text-align: center;
+  position: relative;
+}
+.stamp-full.stamped{
+  background: var(--teal-soft);
+  border: 1px solid rgba(94,234,212,0.30);
+}
+.stamp-full.empty{
+  background: var(--surface-low);
+  border: 1px dashed var(--border-strong);
+  opacity: 0.6;
+}
+.stamp-full .logo{
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: var(--surface-high);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 16px;
+  color: var(--fg-dim);
+}
+.stamp-full.stamped .logo{ color: var(--teal); }
+.stamp-full .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 13px; }
+.stamp-full .tier{
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+.stamp-full[data-tier="platinum"] .tier{ background: rgba(229,231,235,0.10); color: var(--tier-platinum); }
+.stamp-full[data-tier="gold"] .tier{ background: var(--gold-soft); color: var(--gold); }
+.stamp-full[data-tier="silver"] .tier{ background: rgba(180,185,200,0.10); color: var(--tier-silver); }
+.stamp-full[data-tier="bronze"] .tier{ background: rgba(210,155,90,0.10); color: var(--tier-bronze); }
+.stamp-full .date{ font-size: 10px; color: var(--fg-mute); }
+.stamp-full .check{
+  position: absolute;
+  top: 8px; right: 10px;
+  color: var(--teal);
+  font-size: 11px;
+}
+.passport-foot{
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+.passport-foot .icon{ color: var(--teal); flex-shrink: 0; }
+
+/* Modal — Rules / Como funciona */
+.modal-rules{ max-width: 480px; }
+.rules-list{ display: flex; flex-direction: column; gap: 2px; }
+.rule-row{
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 6px;
+  border-bottom: 1px solid var(--border);
+}
+.rule-row:last-child{ border-bottom: 0; }
+.rule-row .icon{ width: 32px; height: 32px; border-radius: 8px; background: var(--surface-high); color: var(--fg-dim); display: grid; place-items: center; flex-shrink: 0; }
+.rule-row .label{ flex: 1; font-size: 13px; color: var(--fg); }
+.rule-row .pts{
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+/* Notes */
+.notes{
+  position: fixed; right: 18px; bottom: 18px;
+  display: flex; flex-direction: column; gap: 6px;
+  z-index: 60;
+}
+.notes button{
+  padding: 8px 14px;
+  border-radius: 99px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  color: var(--fg-dim);
+  font-family: 'Urbanist', sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+}
+.notes button:hover{ color: var(--accent); border-color: var(--accent); }
+
+</style>
+</head>
+<body data-theme="noir">
+
+<div class="shell">
+
+  <!-- Sidebar W.0 reused — 9 items con engagement+encuestas agregados -->
+  <aside class="sidebar">
+    <div class="slot" title="Home">⌂</div>
+    <div class="slot" title="Agenda">▤</div>
+    <div class="slot" title="Live">●</div>
+    <div class="slot" title="Speakers">☆</div>
+    <div class="slot" title="Social">◇</div>
+    <div class="slot" title="Sponsors">▦</div>
+    <div class="divider"></div>
+    <div class="slot active" title="Desafio">♛</div>
+    <div class="slot" title="Encuestas">✓</div>
+    <div class="divider"></div>
+    <div class="slot" title="Perfil">◐</div>
+  </aside>
+  <button class="theme-toggle" id="themeBtn" title="Toggle theme">◐</button>
+
+  <main class="canvas">
+    <header class="head">
+      <div>
+        <h1>Desafio</h1>
+        <div class="sub">Tu progreso en el evento</div>
+      </div>
+      <button class="rules-link" data-open="rules">Como funciona</button>
+    </header>
+
+    <section class="hub">
+
+      <!-- COLUMNA IZQUIERDA -->
+      <div class="col">
+
+        <!-- 1 — Hero -->
+        <article class="card card-hero">
+          <div class="hero-row">
+            <div class="hero-points">
+              <div class="label">Tus puntos</div>
+              <div class="value">1.420<span class="unit">pts</span></div>
+            </div>
+            <div class="hero-rank">
+              <div class="label">Posicion</div>
+              <div class="pos">#23<span class="of"> / 187</span></div>
+            </div>
+          </div>
+
+          <div class="hero-progress" title="Progreso vs #1 (3.250 pts)">
+            <div class="seg filled"></div>
+            <div class="seg filled"></div>
+            <div class="seg filled"></div>
+            <div class="seg filled"></div>
+            <div class="seg"></div>
+            <div class="seg"></div>
+            <div class="seg"></div>
+            <div class="seg"></div>
+            <div class="seg"></div>
+            <div class="seg"></div>
+          </div>
+
+          <div class="hero-top3">
+            <div class="label">Top 3</div>
+            <div class="ranks">
+              <div class="rank-mini gold">
+                <div class="num">1</div>
+                <div class="avatar">M</div>
+                <div class="name">Maria R.<span class="pts"> · 3.250</span></div>
+              </div>
+              <div class="rank-mini silver">
+                <div class="num">2</div>
+                <div class="avatar">A</div>
+                <div class="name">Andres T.<span class="pts"> · 2.800</span></div>
+              </div>
+              <div class="rank-mini bronze">
+                <div class="num">3</div>
+                <div class="avatar">L</div>
+                <div class="name">Laura M.<span class="pts"> · 2.140</span></div>
+              </div>
+            </div>
+          </div>
+
+          <button class="hero-cta" data-open="leaderboard">Ver ranking completo</button>
+        </article>
+
+        <!-- 2 — Golden Tickets -->
+        <article class="card card-tickets">
+          <div class="card-head">
+            <div class="title">Mis premios ganados</div>
+            <div class="more">2 premios →</div>
+          </div>
+          <div class="tickets-list">
+            <div class="ticket pending" data-open="gt">
+              <div class="icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9a6 6 0 0 0 12 0V3H6z"/><path d="M8 21h8M12 17v4"/></svg>
+              </div>
+              <div class="meta">
+                <div class="name">Cena VIP en Andres Carne de Res</div>
+                <div class="sponsor">Sorteo Cena Premium · Bancolombia</div>
+              </div>
+              <div class="badge">Reclamar</div>
+            </div>
+            <div class="ticket claimed">
+              <div class="icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="meta">
+                <div class="name">Mochila Eventos premium</div>
+                <div class="sponsor">Sorteo Daily · Coca-Cola</div>
+              </div>
+              <div class="badge">Reclamado</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 3 — Premios preview -->
+        <article class="card">
+          <div class="card-head">
+            <div class="title">Canjea tus puntos</div>
+            <div class="more" data-open="rewards">Ver todos →</div>
+          </div>
+          <div class="rewards-preview">
+            <div class="reward-mini">
+              <div class="thumb">★</div>
+              <div class="name">Camiseta evento</div>
+              <div class="cost">500 pts</div>
+            </div>
+            <div class="reward-mini disabled">
+              <div class="thumb">♪</div>
+              <div class="name">Bono Spotify 3 meses</div>
+              <div class="cost">1.800 pts</div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- COLUMNA DERECHA -->
+      <div class="col">
+
+        <!-- 4 — Motivational tip -->
+        <article class="card-tip">
+          <div class="tip-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6M12 22a10 10 0 1 0 0-20"/><path d="M8 12l3 3 5-6"/></svg>
+          </div>
+          <div class="tip-text">Te faltan <strong>720 puntos</strong> para entrar al <strong>Top 10</strong>. Visita stands o responde encuestas activas.</div>
+        </article>
+
+        <!-- 5 — Retos preview -->
+        <article class="card">
+          <div class="card-head">
+            <div class="title">Retos del evento</div>
+            <div class="more" data-open="retos">8 de 13 completados →</div>
+          </div>
+          <div class="retos-progress">
+            <div class="bar"><div class="fill" style="width:62%"></div></div>
+            <div class="count">8<span class="total"> / 13</span></div>
+          </div>
+          <div class="reto-next">
+            <div class="icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            </div>
+            <div class="meta">
+              <div class="label-tag">Proximo reto</div>
+              <div class="name">Pregunta en una sesion live</div>
+            </div>
+            <div class="pts">+15 pts</div>
+          </div>
+        </article>
+
+        <!-- 6 — Pasaporte preview -->
+        <article class="card">
+          <div class="card-head">
+            <div class="title">Pasaporte sponsors</div>
+            <div class="more" data-open="passport">4 de 9 stands →</div>
+          </div>
+          <div class="passport-progress">
+            <div class="bar"><div class="fill" style="width:44%"></div></div>
+            <div class="count">4<span class="total"> / 9</span></div>
+          </div>
+          <div class="passport-grid">
+            <div class="stamp stamped">B</div>
+            <div class="stamp stamped">C</div>
+            <div class="stamp stamped">M</div>
+            <div class="stamp stamped">G</div>
+            <div class="stamp empty">A</div>
+            <div class="stamp more" data-open="passport">+5</div>
+          </div>
+        </article>
+
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ============== Modales overlay ============== -->
+
+  <!-- Golden Ticket reveal -->
+  <div class="overlay" id="overlay-gt">
+    <article class="modal modal-gt">
+      <div class="modal-head">
+        <h3>Premio ganado</h3>
+        <button class="modal-close" data-close>✕</button>
+      </div>
+      <div class="modal-body gt-content">
+        <div class="gt-accent-line"></div>
+        <div class="gt-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 0 0 12 0V3H6z"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div class="gt-overline">Ganador · Pendiente reclamo</div>
+        <div class="gt-name">Cena VIP en Andres Carne de Res</div>
+        <div class="gt-sponsor">Sorteo Cena Premium Sponsors · por Bancolombia</div>
+
+        <div class="gt-claim-box">
+          <div class="gt-claim-label">Codigo de reclamo</div>
+          <div class="gt-claim-code">GT-7842</div>
+        </div>
+        <div class="gt-qr"></div>
+        <div class="gt-hint">Presenta este codigo en el stand de Bancolombia, salon principal.</div>
+      </div>
+    </article>
+  </div>
+
+  <!-- Rewards catalogo -->
+  <div class="overlay" id="overlay-rewards">
+    <article class="modal modal-rewards">
+      <div class="modal-head">
+        <h3>Premios</h3>
+        <button class="modal-close" data-close>✕</button>
+      </div>
+      <div class="rewards-tabs">
+        <button class="rewards-tab active">Catalogo</button>
+        <button class="rewards-tab">Mis canjes (1)</button>
+      </div>
+      <div class="modal-body">
+        <div class="rewards-grid">
+          <div class="reward-card">
+            <div class="thumb">★</div>
+            <div class="body">
+              <div>
+                <div class="name">Camiseta evento</div>
+                <div class="sponsor">Stock: 8 disponibles</div>
+              </div>
+              <div class="row">
+                <div class="cost">500 pts</div>
+                <button class="btn">Canjear</button>
+              </div>
+            </div>
+          </div>
+          <div class="reward-card disabled">
+            <div class="thumb">♪</div>
+            <div class="body">
+              <div>
+                <div class="name">Bono Spotify 3 meses</div>
+                <div class="sponsor">Stock: 12 disponibles</div>
+              </div>
+              <div class="row">
+                <div class="cost">1.800 pts</div>
+                <button class="btn">Te faltan 380</button>
+              </div>
+            </div>
+          </div>
+          <div class="reward-card">
+            <div class="thumb">♔</div>
+            <div class="body">
+              <div>
+                <div class="name">Llavero metalico</div>
+                <div class="sponsor">Stock: 24 disponibles</div>
+              </div>
+              <div class="row">
+                <div class="cost">200 pts</div>
+                <button class="btn">Canjear</button>
+              </div>
+            </div>
+          </div>
+          <div class="reward-card disabled">
+            <div class="thumb">☕</div>
+            <div class="body">
+              <div>
+                <div class="name">Tarjeta Juan Valdez $50K</div>
+                <div class="sponsor">Stock: 5 disponibles</div>
+              </div>
+              <div class="row">
+                <div class="cost">2.500 pts</div>
+                <button class="btn">Te faltan 1.080</button>
+              </div>
+            </div>
+          </div>
+          <div class="reward-card">
+            <div class="thumb">✎</div>
+            <div class="body">
+              <div>
+                <div class="name">Kit cuaderno + boli</div>
+                <div class="sponsor">Stock: 18 disponibles</div>
+              </div>
+              <div class="row">
+                <div class="cost">350 pts</div>
+                <button class="btn">Canjear</button>
+              </div>
+            </div>
+          </div>
+          <div class="reward-card disabled">
+            <div class="thumb">▶</div>
+            <div class="body">
+              <div>
+                <div class="name">Curso online Platzi</div>
+                <div class="sponsor">Stock: agotado</div>
+              </div>
+              <div class="row">
+                <div class="cost">3.000 pts</div>
+                <button class="btn">Agotado</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <!-- Trivia panel (espejo Expo) -->
+  <div class="overlay" id="overlay-trivia">
+    <article class="modal modal-trivia">
+      <div class="modal-head">
+        <h3>Trivia stand</h3>
+        <button class="modal-close" data-close>✕</button>
+      </div>
+      <div class="trivia-body">
+        <div class="trivia-sponsor">
+          <div class="logo">B</div>
+          <div class="meta">
+            <div class="label">Patrocinado por</div>
+            <div class="name">Bancolombia</div>
+          </div>
+          <div class="trivia-countdown">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            00:18
+          </div>
+        </div>
+        <div class="trivia-q-num">Pregunta 2 de 5</div>
+        <div class="trivia-question">¿En que ano fue fundado Bancolombia como empresa unificada actual?</div>
+        <div class="trivia-options">
+          <div class="trivia-opt"><div class="letter">A</div>1995</div>
+          <div class="trivia-opt"><div class="letter">B</div>1998</div>
+          <div class="trivia-opt"><div class="letter">C</div>2005</div>
+          <div class="trivia-opt"><div class="letter">D</div>2010</div>
+        </div>
+        <button class="trivia-action">Responder</button>
+      </div>
+    </article>
+  </div>
+
+  <!-- Leaderboard top 50 -->
+  <div class="overlay" id="overlay-leaderboard">
+    <article class="modal modal-leaderboard">
+      <div class="modal-head">
+        <h3>Ranking del evento</h3>
+        <button class="modal-close" data-close>✕</button>
+      </div>
+      <div class="modal-body" style="padding:0;">
+        <div class="lb-podium">
+          <div class="podium-slot first">
+            <div class="num">1</div>
+            <div class="avatar">M</div>
+            <div class="name">Maria R.</div>
+            <div class="pts">3.250 pts</div>
+          </div>
+          <div class="podium-slot second">
+            <div class="num">2</div>
+            <div class="avatar">A</div>
+            <div class="name">Andres T.</div>
+            <div class="pts">2.800 pts</div>
+          </div>
+          <div class="podium-slot third">
+            <div class="num">3</div>
+            <div class="avatar">L</div>
+            <div class="name">Laura M.</div>
+            <div class="pts">2.140 pts</div>
+          </div>
+        </div>
+        <div class="lb-list">
+          <div class="lb-row"><div class="pos">4</div><div class="avatar">J</div><div class="name">Juan Camilo P.</div><div class="pts">1.980</div></div>
+          <div class="lb-row"><div class="pos">5</div><div class="avatar">D</div><div class="name">Diana Restrepo</div><div class="pts">1.870</div></div>
+          <div class="lb-row"><div class="pos">6</div><div class="avatar">F</div><div class="name">Felipe Gomez</div><div class="pts">1.750</div></div>
+          <div class="lb-row"><div class="pos">7</div><div class="avatar">S</div><div class="name">Sofia Vargas</div><div class="pts">1.690</div></div>
+          <div class="lb-row"><div class="pos">8</div><div class="avatar">R</div><div class="name">Ricardo Mejia</div><div class="pts">1.580</div></div>
+          <div class="lb-row"><div class="pos">9</div><div class="avatar">V</div><div class="name">Valentina Ruiz</div><div class="pts">1.510</div></div>
+          <div class="lb-row"><div class="pos">10</div><div class="avatar">N</div><div class="name">Nicolas Quintero</div><div class="pts">1.500</div></div>
+          <div class="lb-row"><div class="pos">11</div><div class="avatar">C</div><div class="name">Camila Hoyos</div><div class="pts">1.488</div></div>
+          <div class="lb-row"><div class="pos">22</div><div class="avatar">E</div><div class="name">Esteban Rivera</div><div class="pts">1.430</div></div>
+          <div class="lb-row me"><div class="pos">23</div><div class="avatar">K</div><div class="name">Tu (Kamilo A.)</div><div class="pts">1.420</div></div>
+          <div class="lb-row"><div class="pos">24</div><div class="avatar">T</div><div class="name">Tatiana Lopez</div><div class="pts">1.398</div></div>
+        </div>
+      </div>
+      <div class="lb-sticky">
+        <div>
+          <div class="label">Tu posicion</div>
+          <div class="pos">#23 / 187</div>
+        </div>
+        <button class="hero-cta" style="width:auto;padding:8px 18px;">Compartir</button>
+      </div>
+    </article>
+  </div>
+
+  <!-- Retos sheet -->
+  <div class="overlay" id="overlay-retos">
+    <article class="modal modal-retos">
+      <div class="modal-head">
+        <h3>Retos del evento</h3>
+        <button class="modal-close" data-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="retos-list">
+          <div class="reto-row done">
+            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="meta"><div class="name">Hacer check-in al evento</div><div class="desc">Completado el 27 jun</div></div>
+            <div class="pts-tag">+50</div>
+          </div>
+          <div class="reto-row done">
+            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="meta"><div class="name">Completar tu perfil</div><div class="desc">Foto + intereses</div></div>
+            <div class="pts-tag">+30</div>
+          </div>
+          <div class="reto-row done">
+            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="meta"><div class="name">Calificar 3 sesiones</div><div class="desc">3 de 3 ratings enviados</div></div>
+            <div class="pts-tag">+45</div>
+          </div>
+          <div class="reto-row done">
+            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="meta"><div class="name">Visitar 3 stands</div><div class="desc">4 de 3 stands visitados</div></div>
+            <div class="pts-tag">+60</div>
+          </div>
+          <div class="reto-row pending">
+            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+            <div class="meta"><div class="name">Pregunta en una sesion live</div><div class="desc">0 de 1 preguntas enviadas</div></div>
+            <div class="pts-tag">+15</div>
+          </div>
+          <div class="reto-row pending">
+            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+            <div class="meta"><div class="name">Conectar con 5 asistentes</div><div class="desc">3 de 5 conexiones aceptadas</div></div>
+            <div class="pts-tag">+40</div>
+          </div>
+          <div class="reto-row pending">
+            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+            <div class="meta"><div class="name">Publicar en el muro social</div><div class="desc">0 de 1 publicaciones</div></div>
+            <div class="pts-tag">+25</div>
+          </div>
+          <div class="reto-row pending">
+            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+            <div class="meta"><div class="name">Votar en 2 encuestas</div><div class="desc">1 de 2 votos enviados</div></div>
+            <div class="pts-tag">+20</div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <!-- Passport full -->
+  <div class="overlay" id="overlay-passport">
+    <article class="modal modal-passport">
+      <div class="modal-head">
+        <h3>Pasaporte sponsors · 4 de 9</h3>
+        <button class="modal-close" data-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="passport-full">
+          <div class="stamp-full stamped" data-tier="platinum">
+            <div class="check">✓</div>
+            <div class="logo">B</div>
+            <div class="name">Bancolombia</div>
+            <div class="tier">Platinum</div>
+            <div class="date">27 jun</div>
+          </div>
+          <div class="stamp-full stamped" data-tier="gold">
+            <div class="check">✓</div>
+            <div class="logo">C</div>
+            <div class="name">Coca-Cola</div>
+            <div class="tier">Gold</div>
+            <div class="date">27 jun</div>
+          </div>
+          <div class="stamp-full stamped" data-tier="gold">
+            <div class="check">✓</div>
+            <div class="logo">M</div>
+            <div class="name">Microsoft</div>
+            <div class="tier">Gold</div>
+            <div class="date">27 jun</div>
+          </div>
+          <div class="stamp-full stamped" data-tier="silver">
+            <div class="check">✓</div>
+            <div class="logo">G</div>
+            <div class="name">Google</div>
+            <div class="tier">Silver</div>
+            <div class="date">27 jun</div>
+          </div>
+          <div class="stamp-full empty" data-tier="silver">
+            <div class="logo">A</div>
+            <div class="name">Apple</div>
+            <div class="tier">Silver</div>
+            <div class="date">Sin visitar</div>
+          </div>
+          <div class="stamp-full empty" data-tier="bronze">
+            <div class="logo">A</div>
+            <div class="name">Amazon</div>
+            <div class="tier">Bronze</div>
+            <div class="date">Sin visitar</div>
+          </div>
+          <div class="stamp-full empty" data-tier="bronze">
+            <div class="logo">S</div>
+            <div class="name">Stripe</div>
+            <div class="tier">Bronze</div>
+            <div class="date">Sin visitar</div>
+          </div>
+          <div class="stamp-full empty" data-tier="bronze">
+            <div class="logo">L</div>
+            <div class="name">LinkedIn</div>
+            <div class="tier">Bronze</div>
+            <div class="date">Sin visitar</div>
+          </div>
+          <div class="stamp-full empty" data-tier="bronze">
+            <div class="logo">N</div>
+            <div class="name">Notion</div>
+            <div class="tier">Bronze</div>
+            <div class="date">Sin visitar</div>
+          </div>
+        </div>
+        <div class="passport-foot">
+          <div class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+          </div>
+          <div>Pide al vendedor del stand que escanee tu QR para sellar el pasaporte. Completa los 9 para entrar al sorteo final.</div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <!-- Rules / Como funciona -->
+  <div class="overlay" id="overlay-rules">
+    <article class="modal modal-rules">
+      <div class="modal-head">
+        <h3>Como ganas puntos</h3>
+        <button class="modal-close" data-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="rules-list">
+          <div class="rule-row"><div class="icon">⌂</div><div class="label">Check-in al evento</div><div class="pts">+50</div></div>
+          <div class="rule-row"><div class="icon">▦</div><div class="label">Visitar un stand sponsor</div><div class="pts">+20</div></div>
+          <div class="rule-row"><div class="icon">?</div><div class="label">Responder trivia stand correctamente</div><div class="pts">+15 bonus</div></div>
+          <div class="rule-row"><div class="icon">★</div><div class="label">Calificar una sesion</div><div class="pts">+15</div></div>
+          <div class="rule-row"><div class="icon">!</div><div class="label">Preguntar en sesion live (Q&A)</div><div class="pts">+15</div></div>
+          <div class="rule-row"><div class="icon">✎</div><div class="label">Publicar en el muro</div><div class="pts">+25</div></div>
+          <div class="rule-row"><div class="icon">◇</div><div class="label">Subir una foto al muro</div><div class="pts">+30</div></div>
+          <div class="rule-row"><div class="icon">⚐</div><div class="label">Likes acumulados (5/10/20/50/100)</div><div class="pts">+10–100</div></div>
+          <div class="rule-row"><div class="icon">○</div><div class="label">Comentar en el muro (max 10/dia)</div><div class="pts">+5</div></div>
+          <div class="rule-row"><div class="icon">◆</div><div class="label">Aceptar conexion con asistente</div><div class="pts">+10</div></div>
+          <div class="rule-row"><div class="icon">✓</div><div class="label">Votar encuesta</div><div class="pts">+10</div></div>
+          <div class="rule-row"><div class="icon">◐</div><div class="label">Completar tu perfil + intereses</div><div class="pts">+30</div></div>
+          <div class="rule-row"><div class="icon">●</div><div class="label">Chatear en sesion live (una vez)</div><div class="pts">+5</div></div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+</div>
+
+<!-- Notes — quick toggles para demo -->
+<div class="notes">
+  <button data-open="trivia">Demo: Trivia modal</button>
+  <button id="themeQuick">Demo: toggle Lux</button>
+</div>
+
+<script>
+// Theme toggle
+const body = document.body;
+function toggleTheme(){
+  body.dataset.theme = body.dataset.theme === 'noir' ? 'lux' : 'noir';
+}
+document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+document.getElementById('themeQuick').addEventListener('click', toggleTheme);
+
+// Modal open/close
+document.querySelectorAll('[data-open]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = 'overlay-' + btn.dataset.open;
+    document.getElementById(id)?.classList.add('open');
+  });
+});
+document.querySelectorAll('[data-close]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.closest('.overlay')?.classList.remove('open');
+  });
+});
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', (e) => {
+    if (e.target === o) o.classList.remove('open');
+  });
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') document.querySelectorAll('.overlay.open').forEach(o => o.classList.remove('open'));
+});
+</script>
+
+</body>
+</html>

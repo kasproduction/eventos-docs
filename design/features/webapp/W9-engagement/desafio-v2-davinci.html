@@ -1,0 +1,1343 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>W.9 DESAFIO — DaVinci v2 (split layout + RGB ring)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-sunken:#0a0a0a;
+  --bg-elevated:#141414;
+  --surface-low:#1a1a1a;
+  --surface-medium:#1f1f1f;
+  --surface-high:#262626;
+  --surface-card:#181818;
+  --border:rgba(255,255,255,0.06);
+  --border-strong:rgba(255,255,255,0.12);
+  --fg:#f5f5f4;
+  --fg-dim:#a8a8a3;
+  --fg-mute:#6b6b66;
+  --fg-label:#5a5a55;
+  --accent:#7CFFB2;
+  --accent-soft:rgba(124,255,178,0.10);
+  --accent-glow:rgba(124,255,178,0.20);
+  --accent-on:#0a0a0a;
+
+  --gold:#E8C764;
+  --gold-soft:rgba(232,199,100,0.10);
+  --gold-glow:rgba(232,199,100,0.22);
+  --teal:#5eead4;
+  --teal-soft:rgba(94,234,212,0.10);
+  --teal-glow:rgba(94,234,212,0.20);
+  --rose:#FF6B8B;
+
+  --tier-platinum:#E5E7EB;
+  --tier-gold:#E8C764;
+  --tier-silver:#B4B9C8;
+  --tier-bronze:#D29B5A;
+  --tier-media:#6EA5FF;
+
+  --canvas-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+  --spring-soft: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --spring-snap: cubic-bezier(0.16, 1.2, 0.3, 1);
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body[data-theme="lux"]{
+  --bg-sunken:#F6F8FA;
+  --bg-elevated:#FFFFFF;
+  --surface-low:#FFFFFF;
+  --surface-medium:rgba(0,0,0,0.03);
+  --surface-high:rgba(0,0,0,0.06);
+  --surface-card:#FFFFFF;
+  --border:rgba(0,0,0,0.08);
+  --border-strong:rgba(0,0,0,0.14);
+  --fg:#1A1B1E;
+  --fg-dim:#4A4B50;
+  --fg-mute:#7C7D82;
+  --fg-label:#A8A9AE;
+  --canvas-shadow: 0 16px 48px rgba(0,0,0,0.12);
+  --accent-on:#FFFFFF;
+}
+
+*{box-sizing:border-box; margin:0; padding:0}
+html,body{height:100%}
+body{
+  font-family: 'Urbanist', system-ui, sans-serif;
+  background: var(--bg-sunken);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ============== Shell + Sidebar (reused W.0) ============== */
+.shell{
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  padding: 24px 28px 24px 84px;
+  background:
+    radial-gradient(ellipse at 20% 30%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%),
+    radial-gradient(ellipse at 80% 70%, color-mix(in srgb, var(--gold) 4%, transparent), transparent 55%),
+    var(--bg-sunken);
+}
+.sidebar{
+  position: fixed; left: 18px; top: 50%;
+  transform: translateY(-50%);
+  width: 52px; display: flex; flex-direction: column; gap: 4px;
+  padding: 10px 0;
+  border-radius: 28px;
+  border: 1px solid var(--border-strong);
+  background: color-mix(in srgb, var(--bg-elevated) 90%, transparent);
+  backdrop-filter: blur(22px) saturate(1.2);
+  z-index: 50;
+}
+.sidebar .slot{ width:36px;height:36px;margin:0 auto;display:grid;place-items:center;border-radius:12px;color:var(--fg-mute);cursor:pointer; font-size: 14px; }
+.sidebar .slot.active{ background: var(--surface-high); color: var(--fg); }
+.sidebar .divider{ height:1px;width:22px;margin:6px auto;background:var(--border); }
+.theme-toggle{ position:fixed;left:18px;bottom:18px;width:38px;height:38px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--fg-dim);display:grid;place-items:center;cursor:pointer;z-index:50; }
+
+/* ============== Canvas — split layout literal ============== */
+.canvas{
+  width: 100%;
+  max-width: 1600px;
+  height: min(calc(100vh - 56px), 920px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: var(--canvas-shadow);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+}
+
+/* ============== Hub menu izquierda ============== */
+.hub-menu{
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.hub-head{
+  padding: 22px 22px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.hub-head .title{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 18px;
+  letter-spacing: -0.3px;
+}
+.hub-head .me-row{
+  margin-top: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hub-head .me-avatar{
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--surface-high);
+  border: 1px solid var(--border-strong);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 13px;
+  color: var(--fg-dim);
+}
+.hub-head .me-stats{ flex: 1; }
+.hub-head .me-pts{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 17px;
+  letter-spacing: -0.3px;
+}
+.hub-head .me-pts .u{ color: var(--fg-mute); font-weight: 500; font-size: 12px; margin-left: 2px; }
+.hub-head .me-rank{ font-size: 11px; color: var(--accent); font-weight: 600; margin-top: 1px; }
+
+.hub-nav{
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-high) transparent;
+}
+.hub-nav::-webkit-scrollbar{ width:6px }
+.hub-nav::-webkit-scrollbar-thumb{ background: var(--surface-high); border-radius:3px }
+
+.nav-item{
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif;
+  font-size: 13px;
+  color: var(--fg-dim);
+  border: 1px solid transparent;
+  transition: background 180ms, color 180ms;
+}
+.nav-item:hover{ background: var(--surface-low); color: var(--fg); }
+.nav-item.active{ background: var(--surface-medium); color: var(--fg); border-color: var(--border); }
+.nav-item .icon{
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--surface-high);
+  display: grid; place-items: center;
+  color: var(--fg-dim);
+  flex-shrink: 0;
+}
+.nav-item.active .icon{ background: var(--accent-soft); color: var(--accent); }
+.nav-item .label{ flex: 1; font-weight: 500; }
+.nav-item.active .label{ font-weight: 600; }
+.nav-item .badge{
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--fg-mute);
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--surface-low);
+}
+.nav-item .badge.dot{ background: var(--accent); color: var(--accent-on); padding: 2px 7px; }
+.nav-item .badge.gold-badge{ background: var(--gold-soft); color: var(--gold); }
+
+.nav-divider{ height: 1px; background: var(--border); margin: 8px 4px; }
+.nav-label{
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--fg-label);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 6px 12px 4px;
+}
+
+/* ============== Detail panel derecha ============== */
+.detail{
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.detail-head{
+  padding: 22px 28px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.detail-head h2{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 16px;
+  letter-spacing: -0.2px;
+}
+.detail-head .sub{
+  font-size: 11px;
+  color: var(--fg-mute);
+  margin-top: 2px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.detail-body{
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 28px 28px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-high) transparent;
+}
+.detail-body::-webkit-scrollbar{ width:6px }
+.detail-body::-webkit-scrollbar-thumb{ background: var(--surface-high); border-radius:3px }
+
+.panel{ display: none; }
+.panel.active{ display: block; }
+
+/* ============== Panel: RESUMEN ============== */
+.resumen-hero{
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 22px;
+  align-items: center;
+}
+.me-block{ text-align: center; }
+.me-block .pts{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 34px;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.me-block .pts-u{
+  font-size: 11px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-top: 4px;
+}
+.me-block .rank{
+  margin-top: 14px;
+  padding: 6px 12px;
+  border-radius: 99px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.progress-block{ display: flex; flex-direction: column; gap: 10px; }
+.progress-block .info{
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 11px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.progress-block .info strong{ color: var(--fg); font-weight: 700; }
+.bar-segmented{
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+}
+.bar-segmented .seg{
+  height: 5px;
+  border-radius: 3px;
+  background: var(--surface-high);
+}
+.bar-segmented .seg.filled{ background: var(--accent); }
+.progress-block .hint{
+  font-size: 12px;
+  color: var(--fg-dim);
+  margin-top: 4px;
+}
+.progress-block .hint strong{ color: var(--fg); }
+
+/* Podio inline con RGB ring */
+.podio-row{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.podio-slot{
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 8px 12px;
+  border-radius: 12px;
+  position: relative;
+}
+.podio-slot.first{ background: linear-gradient(180deg, var(--gold-soft), transparent 70%); }
+.podio-slot.second{ background: linear-gradient(180deg, rgba(180,185,200,0.08), transparent 70%); }
+.podio-slot.third{ background: linear-gradient(180deg, rgba(210,155,90,0.08), transparent 70%); }
+.podio-slot .num{
+  position: absolute;
+  top: 6px; left: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 10px;
+  color: var(--fg-mute);
+}
+.podio-slot.first .num{ color: var(--gold); }
+.podio-slot.second .num{ color: var(--tier-silver); }
+.podio-slot.third .num{ color: var(--tier-bronze); }
+
+/* RGB ring signature */
+.rgb-ring{
+  position: relative;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+}
+.rgb-ring::before{
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg,
+    #00ffff 0deg,
+    #ff00ff 90deg,
+    #ffff00 180deg,
+    #00ff88 270deg,
+    #00ffff 360deg);
+  animation: rgb-spin 4s linear infinite;
+  z-index: 0;
+}
+.rgb-ring::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  z-index: 1;
+}
+.rgb-ring .avatar{
+  position: relative;
+  z-index: 2;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--surface-high);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 16px;
+  color: var(--fg);
+}
+@keyframes rgb-spin{ to { transform: rotate(360deg); } }
+
+.podio-slot .avatar-flat{
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--surface-high);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 16px;
+  color: var(--fg);
+  border: 2px solid;
+}
+.podio-slot.second .avatar-flat{ border-color: var(--tier-silver); }
+.podio-slot.third .avatar-flat{ border-color: var(--tier-bronze); }
+
+.podio-slot .name{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600; font-size: 11px;
+  text-align: center;
+}
+.podio-slot .pts{ font-size: 10px; color: var(--fg-mute); }
+
+/* Mini cards en resumen */
+.resumen-quick{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.quick-card{
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color 180ms;
+}
+.quick-card:hover{ border-color: var(--accent); }
+.quick-card .label{
+  font-size: 10px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.quick-card .value{
+  margin-top: 6px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 18px;
+}
+.quick-card .value .of{ color: var(--fg-mute); font-weight: 500; font-size: 12px; }
+.quick-card .arrow{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--fg-mute);
+}
+
+/* ============== Panel: PREMIOS (golden tickets + redenciones) ============== */
+.tickets-list{ display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.ticket-row{
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-card);
+  cursor: pointer;
+}
+.ticket-row.pending{ border-color: rgba(232,199,100,0.30); }
+.ticket-row:hover{ border-color: var(--gold); }
+.ticket-row .icon{
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+}
+.ticket-row.pending .icon{ background: var(--gold-soft); color: var(--gold); }
+.ticket-row.claimed .icon{ background: var(--teal-soft); color: var(--teal); }
+.ticket-row .meta .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 13px; }
+.ticket-row .meta .sponsor{ font-size: 11px; color: var(--fg-mute); margin-top: 2px; }
+.ticket-row .badge{
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.ticket-row.pending .badge{ background: var(--gold-soft); color: var(--gold); }
+.ticket-row.claimed .badge{ background: var(--teal-soft); color: var(--teal); }
+
+/* Golden Ticket reveal inline (cuando es el primero pending) */
+.gt-reveal{
+  padding: 22px;
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse at 50% 0%, var(--gold-soft), transparent 60%),
+    var(--surface-card);
+  border: 1px solid rgba(232,199,100,0.20);
+  text-align: center;
+}
+.gt-accent-line{
+  height: 2px;
+  width: 48px;
+  background: var(--gold);
+  margin: 0 auto 14px;
+  border-radius: 1px;
+  box-shadow: 0 0 12px var(--gold-glow);
+}
+.gt-icon-circle{
+  width: 56px; height: 56px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  border: 1px solid rgba(232,199,100,0.30);
+  display: grid; place-items: center;
+  color: var(--gold);
+}
+.gt-overline{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 10px;
+  color: var(--gold);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.gt-name{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 17px;
+  letter-spacing: -0.3px;
+  margin-bottom: 4px;
+}
+.gt-sponsor{ font-size: 12px; color: var(--fg-mute); margin-bottom: 16px; }
+
+.gt-code-box{
+  background: var(--surface-low);
+  border: 1px dashed rgba(232,199,100,0.45);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+}
+.gt-code-label{
+  font-size: 10px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 4px;
+}
+.gt-code-value{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--gold);
+}
+
+/* QR with RGB ring signature */
+.gt-qr-wrap{
+  position: relative;
+  width: 124px; height: 124px;
+  margin: 0 auto 12px;
+  border-radius: 14px;
+  padding: 4px;
+  background: conic-gradient(from 0deg,
+    #00ffff 0deg,
+    #ff00ff 90deg,
+    #ffff00 180deg,
+    #00ff88 270deg,
+    #00ffff 360deg);
+  animation: rgb-spin 5s linear infinite;
+}
+.gt-qr{
+  width: 100%; height: 100%;
+  border-radius: 10px;
+  background: white;
+  background-image:
+    radial-gradient(circle, #111 1.4px, transparent 1.6px),
+    radial-gradient(circle, #111 1.4px, transparent 1.6px);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+.gt-hint{
+  font-size: 11px;
+  color: var(--fg-mute);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* ============== Panel: REWARDS catalogo ============== */
+.rewards-tabs{
+  display: flex; gap: 6px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.rewards-tab{
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Urbanist', sans-serif;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--fg-mute);
+  cursor: pointer;
+}
+.rewards-tab.active{ background: var(--surface-high); color: var(--fg); border-color: var(--border-strong); }
+.rewards-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.reward-card{
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-card);
+  display: flex; flex-direction: column;
+}
+.reward-card .thumb{
+  height: 86px;
+  background: linear-gradient(135deg, var(--surface-medium), var(--surface-high));
+  display: grid; place-items: center;
+  color: var(--fg-mute);
+  font-size: 26px;
+}
+.reward-card .body{ padding: 10px 12px 12px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.reward-card .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 12px; line-height: 1.3; }
+.reward-card .sponsor{ font-size: 10px; color: var(--fg-mute); }
+.reward-card .row{ display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: auto; }
+.reward-card .cost{
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.reward-card .btn{
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: var(--accent);
+  color: var(--accent-on);
+  border: 0;
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 600; font-size: 10px;
+  cursor: pointer;
+}
+.reward-card.disabled{ opacity: 0.55; }
+.reward-card.disabled .cost{ background: var(--surface-high); color: var(--fg-mute); }
+.reward-card.disabled .btn{ background: var(--surface-high); color: var(--fg-mute); cursor: not-allowed; }
+
+/* ============== Panel: RETOS lista ============== */
+.retos-list{ display: flex; flex-direction: column; gap: 2px; }
+.reto-row{
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.reto-row:hover{ background: var(--surface-low); }
+.reto-row .icon{
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.reto-row.done .icon{ background: var(--accent-soft); color: var(--accent); }
+.reto-row.pending .icon{ background: var(--surface-high); color: var(--fg-mute); }
+.reto-row .meta{ flex: 1; min-width: 0; }
+.reto-row .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 13px; }
+.reto-row .desc{ font-size: 11px; color: var(--fg-mute); margin-top: 1px; }
+.reto-row .pts-tag{
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.reto-row.done .pts-tag{ background: var(--accent-soft); color: var(--accent); }
+.reto-row.pending .pts-tag{ background: var(--surface-high); color: var(--fg-mute); }
+.reto-row.done .name{ color: var(--fg-dim); }
+
+/* ============== Panel: PASSPORT ============== */
+.passport-progress-row{
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 14px;
+}
+.passport-progress-row .bar{
+  flex: 1;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--surface-high);
+  overflow: hidden;
+}
+.passport-progress-row .bar .fill{ height: 100%; background: var(--teal); border-radius: 4px; }
+.passport-progress-row .count{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 13px;
+}
+.passport-progress-row .count .total{ color: var(--fg-mute); font-weight: 500; font-size: 11px; }
+
+.passport-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.stamp-card{
+  border-radius: 12px;
+  padding: 14px 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  text-align: center;
+  position: relative;
+}
+.stamp-card.stamped{
+  background: var(--teal-soft);
+  border: 1px solid rgba(94,234,212,0.30);
+}
+.stamp-card.empty{
+  background: var(--surface-low);
+  border: 1px dashed var(--border-strong);
+  opacity: 0.6;
+}
+.stamp-card .logo{
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: var(--surface-high);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 14px;
+  color: var(--fg-dim);
+}
+.stamp-card.stamped .logo{ color: var(--teal); }
+.stamp-card .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 11px; }
+.stamp-card .tier{
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 6px;
+  border-radius: 99px;
+}
+.stamp-card[data-tier="platinum"] .tier{ background: rgba(229,231,235,0.10); color: var(--tier-platinum); }
+.stamp-card[data-tier="gold"] .tier{ background: var(--gold-soft); color: var(--gold); }
+.stamp-card[data-tier="silver"] .tier{ background: rgba(180,185,200,0.10); color: var(--tier-silver); }
+.stamp-card[data-tier="bronze"] .tier{ background: rgba(210,155,90,0.10); color: var(--tier-bronze); }
+.stamp-card .date{ font-size: 9px; color: var(--fg-mute); }
+.stamp-card .check{
+  position: absolute;
+  top: 6px; right: 8px;
+  color: var(--teal);
+  font-size: 10px;
+}
+.passport-hint{
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  font-size: 11px;
+  color: var(--fg-dim);
+  line-height: 1.4;
+}
+.passport-hint .icon{ color: var(--teal); flex-shrink: 0; }
+
+/* ============== Panel: RANKING ============== */
+.lb-podium-full{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.lb-podium-full .podio-slot{ padding: 16px 10px 12px; }
+
+.lb-list{ display: flex; flex-direction: column; }
+.lb-row{
+  display: grid;
+  grid-template-columns: 22px 32px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.lb-row:last-child{ border-bottom: 0; }
+.lb-row .pos{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 11px;
+  color: var(--fg-mute);
+  text-align: right;
+}
+.lb-row .avatar{ width: 32px; height: 32px; border-radius: 50%; background: var(--surface-high); border: 1px solid var(--border); display: grid; place-items: center; font-size: 10px; color: var(--fg-dim); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; }
+.lb-row .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 12px; }
+.lb-row .pts{ font-size: 11px; color: var(--fg-dim); font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif; }
+.lb-row.me{ background: var(--accent-soft); border-radius: 8px; margin: 4px -4px; padding: 9px 12px; border-bottom-color: transparent; }
+.lb-row.me .pos, .lb-row.me .name{ color: var(--accent); }
+.lb-row.skip{
+  font-size: 10px; color: var(--fg-label);
+  text-align: center;
+  padding: 6px 0;
+  border-bottom: 0;
+  font-style: italic;
+}
+
+/* ============== Panel: ENCUESTAS ============== */
+.poll-row{
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-card);
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.poll-row.active{ border-color: rgba(124,255,178,0.30); }
+.poll-row .head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.poll-row .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 13px; }
+.poll-row .live-dot{
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.poll-row .live-dot::before{
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.poll-row.closed .live-dot{ color: var(--fg-mute); }
+.poll-row.closed .live-dot::before{ background: var(--fg-mute); }
+.poll-row .desc{ font-size: 11px; color: var(--fg-mute); }
+
+/* ============== Panel: RULES ============== */
+.rules-list{ display: flex; flex-direction: column; }
+.rule-row{
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--border);
+}
+.rule-row:last-child{ border-bottom: 0; }
+.rule-row .icon{ width: 28px; height: 28px; border-radius: 7px; background: var(--surface-high); color: var(--fg-dim); display: grid; place-items: center; flex-shrink: 0; font-size: 12px; }
+.rule-row .label{ flex: 1; font-size: 12px; color: var(--fg); }
+.rule-row .pts{
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+}
+
+/* Section titles inside panels */
+.section-title{
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--fg-label);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 18px 0 10px;
+}
+.section-title:first-child{ margin-top: 0; }
+
+</style>
+</head>
+<body data-theme="noir">
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="slot" title="Home">⌂</div>
+    <div class="slot" title="Agenda">▤</div>
+    <div class="slot" title="Live">●</div>
+    <div class="slot" title="Speakers">☆</div>
+    <div class="slot" title="Social">◇</div>
+    <div class="slot" title="Sponsors">▦</div>
+    <div class="divider"></div>
+    <div class="slot active" title="Desafio">♛</div>
+    <div class="divider"></div>
+    <div class="slot" title="Perfil">◐</div>
+  </aside>
+  <button class="theme-toggle" id="themeBtn" title="Toggle theme">◐</button>
+
+  <main class="canvas">
+
+    <!-- ============ HUB MENU IZQUIERDA ============ -->
+    <aside class="hub-menu">
+      <div class="hub-head">
+        <div class="title">Desafio</div>
+        <div class="me-row">
+          <div class="me-avatar">K</div>
+          <div class="me-stats">
+            <div class="me-pts">1.420<span class="u"> pts</span></div>
+            <div class="me-rank">Posicion #23 / 187</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="hub-nav">
+        <div class="nav-item active" data-go="resumen">
+          <div class="icon">★</div>
+          <div class="label">Mi resumen</div>
+        </div>
+        <div class="nav-item" data-go="premios">
+          <div class="icon">♛</div>
+          <div class="label">Mis premios</div>
+          <div class="badge gold-badge">2</div>
+        </div>
+        <div class="nav-item" data-go="rewards">
+          <div class="icon">◆</div>
+          <div class="label">Canjear puntos</div>
+        </div>
+        <div class="nav-item" data-go="retos">
+          <div class="icon">✓</div>
+          <div class="label">Retos</div>
+          <div class="badge">8/13</div>
+        </div>
+        <div class="nav-item" data-go="passport">
+          <div class="icon">▦</div>
+          <div class="label">Pasaporte</div>
+          <div class="badge">4/9</div>
+        </div>
+        <div class="nav-item" data-go="ranking">
+          <div class="icon">♔</div>
+          <div class="label">Ranking</div>
+        </div>
+
+        <div class="nav-divider"></div>
+
+        <div class="nav-item" data-go="encuestas">
+          <div class="icon">!</div>
+          <div class="label">Encuestas</div>
+          <div class="badge dot">2</div>
+        </div>
+
+        <div class="nav-divider"></div>
+
+        <div class="nav-item" data-go="rules">
+          <div class="icon">?</div>
+          <div class="label">Como funciona</div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- ============ DETAIL PANEL DERECHA ============ -->
+    <section class="detail">
+
+      <!-- Panel: RESUMEN -->
+      <article class="panel active" data-panel="resumen">
+        <div class="detail-head">
+          <div>
+            <h2>Mi resumen</h2>
+            <div class="sub">Progreso en el evento</div>
+          </div>
+        </div>
+        <div class="detail-body">
+
+          <div class="resumen-hero">
+            <div class="me-block">
+              <div class="pts">1.420</div>
+              <div class="pts-u">puntos</div>
+              <div class="rank">#23 / 187</div>
+            </div>
+            <div class="progress-block">
+              <div class="info"><span>Vs lider</span><strong>43% del top</strong></div>
+              <div class="bar-segmented">
+                <div class="seg filled"></div><div class="seg filled"></div><div class="seg filled"></div><div class="seg filled"></div>
+                <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+              </div>
+              <div class="hint">Te faltan <strong>720 pts</strong> para entrar al <strong>Top 10</strong>. Visita stands o vota encuestas activas.</div>
+            </div>
+          </div>
+
+          <div class="section-title">Top 3 del evento</div>
+          <div class="podio-row">
+            <div class="podio-slot first">
+              <div class="num">#1</div>
+              <div class="rgb-ring">
+                <div class="avatar">M</div>
+              </div>
+              <div class="name">Maria R.</div>
+              <div class="pts">3.250 pts</div>
+            </div>
+            <div class="podio-slot second">
+              <div class="num">#2</div>
+              <div class="avatar-flat">A</div>
+              <div class="name">Andres T.</div>
+              <div class="pts">2.800 pts</div>
+            </div>
+            <div class="podio-slot third">
+              <div class="num">#3</div>
+              <div class="avatar-flat">L</div>
+              <div class="name">Laura M.</div>
+              <div class="pts">2.140 pts</div>
+            </div>
+          </div>
+
+          <div class="section-title">Accesos rapidos</div>
+          <div class="resumen-quick">
+            <div class="quick-card" data-go="retos">
+              <div class="label">Retos</div>
+              <div class="value">8<span class="of"> / 13 completados</span></div>
+              <div class="arrow"><span>Proximo: pregunta en sesion live</span><span>→</span></div>
+            </div>
+            <div class="quick-card" data-go="passport">
+              <div class="label">Pasaporte</div>
+              <div class="value">4<span class="of"> / 9 stands</span></div>
+              <div class="arrow"><span>Visita 5 mas para sorteo final</span><span>→</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: PREMIOS (golden tickets) -->
+      <article class="panel" data-panel="premios">
+        <div class="detail-head">
+          <div>
+            <h2>Mis premios ganados</h2>
+            <div class="sub">2 premios · 1 pendiente reclamo</div>
+          </div>
+        </div>
+        <div class="detail-body">
+
+          <div class="gt-reveal">
+            <div class="gt-accent-line"></div>
+            <div class="gt-icon-circle">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 0 0 12 0V3H6z"/><path d="M8 21h8M12 17v4"/></svg>
+            </div>
+            <div class="gt-overline">Ganador · Pendiente reclamo</div>
+            <div class="gt-name">Cena VIP en Andres Carne de Res</div>
+            <div class="gt-sponsor">Sorteo Cena Premium Sponsors · por Bancolombia</div>
+
+            <div class="gt-code-box">
+              <div class="gt-code-label">Codigo de reclamo</div>
+              <div class="gt-code-value">GT-7842</div>
+            </div>
+            <div class="gt-qr-wrap"><div class="gt-qr"></div></div>
+            <div class="gt-hint">Presenta este codigo en el stand de Bancolombia,<br/>salon principal. Vencimiento: 30 jun 23:59.</div>
+          </div>
+
+          <div class="section-title" style="margin-top:22px;">Historial</div>
+          <div class="tickets-list">
+            <div class="ticket-row claimed">
+              <div class="icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="meta">
+                <div class="name">Mochila Eventos premium</div>
+                <div class="sponsor">Sorteo Daily · Coca-Cola · 25 jun</div>
+              </div>
+              <div class="badge">Reclamado</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: REWARDS catalogo -->
+      <article class="panel" data-panel="rewards">
+        <div class="detail-head">
+          <div>
+            <h2>Canjear puntos</h2>
+            <div class="sub">Tienes 1.420 puntos disponibles</div>
+          </div>
+        </div>
+        <div class="detail-body">
+          <div class="rewards-tabs">
+            <button class="rewards-tab active">Catalogo</button>
+            <button class="rewards-tab">Mis canjes (1)</button>
+          </div>
+          <div class="rewards-grid">
+            <div class="reward-card">
+              <div class="thumb">★</div>
+              <div class="body">
+                <div><div class="name">Camiseta evento</div><div class="sponsor">Stock: 8</div></div>
+                <div class="row"><div class="cost">500 pts</div><button class="btn">Canjear</button></div>
+              </div>
+            </div>
+            <div class="reward-card disabled">
+              <div class="thumb">♪</div>
+              <div class="body">
+                <div><div class="name">Bono Spotify 3 meses</div><div class="sponsor">Stock: 12</div></div>
+                <div class="row"><div class="cost">1.800 pts</div><button class="btn">Faltan 380</button></div>
+              </div>
+            </div>
+            <div class="reward-card">
+              <div class="thumb">♔</div>
+              <div class="body">
+                <div><div class="name">Llavero metalico</div><div class="sponsor">Stock: 24</div></div>
+                <div class="row"><div class="cost">200 pts</div><button class="btn">Canjear</button></div>
+              </div>
+            </div>
+            <div class="reward-card disabled">
+              <div class="thumb">☕</div>
+              <div class="body">
+                <div><div class="name">Tarjeta Juan Valdez $50K</div><div class="sponsor">Stock: 5</div></div>
+                <div class="row"><div class="cost">2.500 pts</div><button class="btn">Faltan 1.080</button></div>
+              </div>
+            </div>
+            <div class="reward-card">
+              <div class="thumb">✎</div>
+              <div class="body">
+                <div><div class="name">Kit cuaderno + boli</div><div class="sponsor">Stock: 18</div></div>
+                <div class="row"><div class="cost">350 pts</div><button class="btn">Canjear</button></div>
+              </div>
+            </div>
+            <div class="reward-card disabled">
+              <div class="thumb">▶</div>
+              <div class="body">
+                <div><div class="name">Curso online Platzi</div><div class="sponsor">Agotado</div></div>
+                <div class="row"><div class="cost">3.000 pts</div><button class="btn">Agotado</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: RETOS -->
+      <article class="panel" data-panel="retos">
+        <div class="detail-head">
+          <div>
+            <h2>Retos del evento</h2>
+            <div class="sub">8 de 13 completados</div>
+          </div>
+        </div>
+        <div class="detail-body">
+          <div class="retos-list">
+            <div class="reto-row done">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="meta"><div class="name">Hacer check-in al evento</div><div class="desc">Completado · 27 jun</div></div>
+              <div class="pts-tag">+50</div>
+            </div>
+            <div class="reto-row done">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="meta"><div class="name">Completar tu perfil</div><div class="desc">Foto + intereses</div></div>
+              <div class="pts-tag">+30</div>
+            </div>
+            <div class="reto-row done">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="meta"><div class="name">Calificar 3 sesiones</div><div class="desc">3 de 3 ratings enviados</div></div>
+              <div class="pts-tag">+45</div>
+            </div>
+            <div class="reto-row done">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="meta"><div class="name">Visitar 3 stands</div><div class="desc">4 de 3 stands visitados</div></div>
+              <div class="pts-tag">+60</div>
+            </div>
+            <div class="reto-row done">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="meta"><div class="name">Responder 2 trivias correctas</div><div class="desc">2 de 2</div></div>
+              <div class="pts-tag">+30</div>
+            </div>
+            <div class="reto-row pending">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="meta"><div class="name">Pregunta en una sesion live</div><div class="desc">0 de 1 preguntas Q&A</div></div>
+              <div class="pts-tag">+15</div>
+            </div>
+            <div class="reto-row pending">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="meta"><div class="name">Conectar con 5 asistentes</div><div class="desc">3 de 5 conexiones aceptadas</div></div>
+              <div class="pts-tag">+40</div>
+            </div>
+            <div class="reto-row pending">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="meta"><div class="name">Publicar en el muro social</div><div class="desc">0 de 1 publicaciones</div></div>
+              <div class="pts-tag">+25</div>
+            </div>
+            <div class="reto-row pending">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="meta"><div class="name">Votar en 2 encuestas</div><div class="desc">1 de 2 votos enviados</div></div>
+              <div class="pts-tag">+20</div>
+            </div>
+            <div class="reto-row pending">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="meta"><div class="name">Completar el pasaporte</div><div class="desc">4 de 9 stands</div></div>
+              <div class="pts-tag">+100</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: PASSPORT -->
+      <article class="panel" data-panel="passport">
+        <div class="detail-head">
+          <div>
+            <h2>Pasaporte sponsors</h2>
+            <div class="sub">4 de 9 stands visitados</div>
+          </div>
+        </div>
+        <div class="detail-body">
+          <div class="passport-progress-row">
+            <div class="bar"><div class="fill" style="width:44%"></div></div>
+            <div class="count">4<span class="total"> / 9</span></div>
+          </div>
+          <div class="passport-grid">
+            <div class="stamp-card stamped" data-tier="platinum"><div class="check">✓</div><div class="logo">B</div><div class="name">Bancolombia</div><div class="tier">Platinum</div><div class="date">27 jun</div></div>
+            <div class="stamp-card stamped" data-tier="gold"><div class="check">✓</div><div class="logo">C</div><div class="name">Coca-Cola</div><div class="tier">Gold</div><div class="date">27 jun</div></div>
+            <div class="stamp-card stamped" data-tier="gold"><div class="check">✓</div><div class="logo">M</div><div class="name">Microsoft</div><div class="tier">Gold</div><div class="date">27 jun</div></div>
+            <div class="stamp-card stamped" data-tier="silver"><div class="check">✓</div><div class="logo">G</div><div class="name">Google</div><div class="tier">Silver</div><div class="date">27 jun</div></div>
+            <div class="stamp-card empty" data-tier="silver"><div class="logo">A</div><div class="name">Apple</div><div class="tier">Silver</div><div class="date">Sin visitar</div></div>
+            <div class="stamp-card empty" data-tier="bronze"><div class="logo">A</div><div class="name">Amazon</div><div class="tier">Bronze</div><div class="date">Sin visitar</div></div>
+            <div class="stamp-card empty" data-tier="bronze"><div class="logo">S</div><div class="name">Stripe</div><div class="tier">Bronze</div><div class="date">Sin visitar</div></div>
+            <div class="stamp-card empty" data-tier="bronze"><div class="logo">L</div><div class="name">LinkedIn</div><div class="tier">Bronze</div><div class="date">Sin visitar</div></div>
+            <div class="stamp-card empty" data-tier="bronze"><div class="logo">N</div><div class="name">Notion</div><div class="tier">Bronze</div><div class="date">Sin visitar</div></div>
+          </div>
+          <div class="passport-hint">
+            <div class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg></div>
+            <div>Pide al vendedor del stand que escanee tu QR para sellar el pasaporte. Completa los 9 para entrar al sorteo final (+100 pts).</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: RANKING -->
+      <article class="panel" data-panel="ranking">
+        <div class="detail-head">
+          <div>
+            <h2>Ranking del evento</h2>
+            <div class="sub">187 participantes · actualizado en vivo</div>
+          </div>
+        </div>
+        <div class="detail-body">
+          <div class="lb-podium-full">
+            <div class="podio-slot first">
+              <div class="num">#1</div>
+              <div class="rgb-ring"><div class="avatar">M</div></div>
+              <div class="name">Maria R.</div>
+              <div class="pts">3.250 pts</div>
+            </div>
+            <div class="podio-slot second">
+              <div class="num">#2</div>
+              <div class="avatar-flat">A</div>
+              <div class="name">Andres T.</div>
+              <div class="pts">2.800 pts</div>
+            </div>
+            <div class="podio-slot third">
+              <div class="num">#3</div>
+              <div class="avatar-flat">L</div>
+              <div class="name">Laura M.</div>
+              <div class="pts">2.140 pts</div>
+            </div>
+          </div>
+          <div class="lb-list">
+            <div class="lb-row"><div class="pos">4</div><div class="avatar">J</div><div class="name">Juan Camilo P.</div><div class="pts">1.980</div></div>
+            <div class="lb-row"><div class="pos">5</div><div class="avatar">D</div><div class="name">Diana Restrepo</div><div class="pts">1.870</div></div>
+            <div class="lb-row"><div class="pos">6</div><div class="avatar">F</div><div class="name">Felipe Gomez</div><div class="pts">1.750</div></div>
+            <div class="lb-row"><div class="pos">7</div><div class="avatar">S</div><div class="name">Sofia Vargas</div><div class="pts">1.690</div></div>
+            <div class="lb-row"><div class="pos">8</div><div class="avatar">R</div><div class="name">Ricardo Mejia</div><div class="pts">1.580</div></div>
+            <div class="lb-row"><div class="pos">9</div><div class="avatar">V</div><div class="name">Valentina Ruiz</div><div class="pts">1.510</div></div>
+            <div class="lb-row"><div class="pos">10</div><div class="avatar">N</div><div class="name">Nicolas Quintero</div><div class="pts">1.500</div></div>
+            <div class="lb-row skip">···</div>
+            <div class="lb-row"><div class="pos">22</div><div class="avatar">E</div><div class="name">Esteban Rivera</div><div class="pts">1.430</div></div>
+            <div class="lb-row me"><div class="pos">23</div><div class="avatar">K</div><div class="name">Tu (Kamilo A.)</div><div class="pts">1.420</div></div>
+            <div class="lb-row"><div class="pos">24</div><div class="avatar">T</div><div class="name">Tatiana Lopez</div><div class="pts">1.398</div></div>
+            <div class="lb-row"><div class="pos">25</div><div class="avatar">P</div><div class="name">Pablo Cano</div><div class="pts">1.380</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: ENCUESTAS -->
+      <article class="panel" data-panel="encuestas">
+        <div class="detail-head">
+          <div>
+            <h2>Encuestas</h2>
+            <div class="sub">2 activas · 5 cerradas</div>
+          </div>
+        </div>
+        <div class="detail-body">
+          <div class="section-title">Activas</div>
+          <div class="poll-row active">
+            <div class="head">
+              <div class="name">¿Cual fue tu charla favorita de la manana?</div>
+              <div class="live-dot">En curso</div>
+            </div>
+            <div class="desc">3 preguntas · +10 pts al votar</div>
+          </div>
+          <div class="poll-row active">
+            <div class="head">
+              <div class="name">Como calificas el catering del evento</div>
+              <div class="live-dot">En curso</div>
+            </div>
+            <div class="desc">1 pregunta · +10 pts al votar</div>
+          </div>
+
+          <div class="section-title">Cerradas</div>
+          <div class="poll-row closed">
+            <div class="head">
+              <div class="name">Tema preferido para el panel de la tarde</div>
+              <div class="live-dot">Cerrada</div>
+            </div>
+            <div class="desc">Votaste · +10 pts ganados</div>
+          </div>
+          <div class="poll-row closed">
+            <div class="head">
+              <div class="name">Encuesta de bienvenida</div>
+              <div class="live-dot">Cerrada</div>
+            </div>
+            <div class="desc">Votaste · +10 pts ganados</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: RULES -->
+      <article class="panel" data-panel="rules">
+        <div class="detail-head">
+          <div>
+            <h2>Como ganas puntos</h2>
+            <div class="sub">13 acciones disponibles</div>
+          </div>
+        </div>
+        <div class="detail-body">
+          <div class="rules-list">
+            <div class="rule-row"><div class="icon">⌂</div><div class="label">Check-in al evento</div><div class="pts">+50</div></div>
+            <div class="rule-row"><div class="icon">▦</div><div class="label">Visitar un stand sponsor</div><div class="pts">+20</div></div>
+            <div class="rule-row"><div class="icon">?</div><div class="label">Responder trivia stand correctamente</div><div class="pts">+15 bonus</div></div>
+            <div class="rule-row"><div class="icon">★</div><div class="label">Calificar una sesion</div><div class="pts">+15</div></div>
+            <div class="rule-row"><div class="icon">!</div><div class="label">Preguntar en sesion live (Q&A)</div><div class="pts">+15</div></div>
+            <div class="rule-row"><div class="icon">✎</div><div class="label">Publicar en el muro</div><div class="pts">+25</div></div>
+            <div class="rule-row"><div class="icon">◇</div><div class="label">Subir una foto al muro</div><div class="pts">+30</div></div>
+            <div class="rule-row"><div class="icon">⚐</div><div class="label">Likes acumulados (5/10/20/50/100)</div><div class="pts">+10–100</div></div>
+            <div class="rule-row"><div class="icon">○</div><div class="label">Comentar en el muro (max 10/dia)</div><div class="pts">+5</div></div>
+            <div class="rule-row"><div class="icon">◆</div><div class="label">Aceptar conexion con asistente</div><div class="pts">+10</div></div>
+            <div class="rule-row"><div class="icon">✓</div><div class="label">Votar encuesta</div><div class="pts">+10</div></div>
+            <div class="rule-row"><div class="icon">◐</div><div class="label">Completar tu perfil + intereses</div><div class="pts">+30</div></div>
+            <div class="rule-row"><div class="icon">●</div><div class="label">Chatear en sesion live (una vez)</div><div class="pts">+5</div></div>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script>
+const body = document.body;
+document.getElementById('themeBtn').addEventListener('click', () => {
+  body.dataset.theme = body.dataset.theme === 'noir' ? 'lux' : 'noir';
+});
+
+document.querySelectorAll('[data-go]').forEach(el => {
+  el.addEventListener('click', () => {
+    const target = el.dataset.go;
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelector(`.nav-item[data-go="${target}"]`)?.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.panel[data-panel="${target}"]`)?.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>

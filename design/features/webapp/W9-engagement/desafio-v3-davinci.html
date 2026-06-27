@@ -1,0 +1,1432 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>W.9 DESAFIO — DaVinci v3 (hub espejo Expo + DetailPanel)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-sunken:#0a0a0a;
+  --bg-elevated:#141414;
+  --surface-low:#1a1a1a;
+  --surface-medium:#1f1f1f;
+  --surface-high:#262626;
+  --surface-card:#181818;
+  --border:rgba(255,255,255,0.06);
+  --border-strong:rgba(255,255,255,0.12);
+  --fg:#f5f5f4;
+  --fg-dim:#a8a8a3;
+  --fg-mute:#6b6b66;
+  --fg-label:#5a5a55;
+  --accent:#7CFFB2;
+  --accent-soft:rgba(124,255,178,0.10);
+  --accent-glow:rgba(124,255,178,0.20);
+  --accent-on:#0a0a0a;
+
+  --gold:#E8C764;
+  --gold-soft:rgba(232,199,100,0.10);
+  --gold-glow:rgba(232,199,100,0.22);
+  --teal:#5eead4;
+  --teal-soft:rgba(94,234,212,0.10);
+
+  --tier-platinum:#E5E7EB;
+  --tier-gold:#E8C764;
+  --tier-silver:#B4B9C8;
+  --tier-bronze:#D29B5A;
+
+  --canvas-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+  --spring-snap: cubic-bezier(0.16, 1.2, 0.3, 1);
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body[data-theme="lux"]{
+  --bg-sunken:#F6F8FA;
+  --bg-elevated:#FFFFFF;
+  --surface-low:#FFFFFF;
+  --surface-medium:rgba(0,0,0,0.03);
+  --surface-high:rgba(0,0,0,0.06);
+  --surface-card:#FFFFFF;
+  --border:rgba(0,0,0,0.08);
+  --border-strong:rgba(0,0,0,0.14);
+  --fg:#1A1B1E;
+  --fg-dim:#4A4B50;
+  --fg-mute:#7C7D82;
+  --fg-label:#A8A9AE;
+  --canvas-shadow: 0 16px 48px rgba(0,0,0,0.12);
+  --accent-on:#FFFFFF;
+}
+
+*{box-sizing:border-box; margin:0; padding:0}
+html,body{height:100%}
+body{
+  font-family: 'Urbanist', system-ui, sans-serif;
+  background: var(--bg-sunken);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ============== Shell + Sidebar (reused W.0) ============== */
+.shell{
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  padding: 24px 28px 24px 84px;
+  background:
+    radial-gradient(ellipse at 20% 30%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%),
+    radial-gradient(ellipse at 80% 70%, color-mix(in srgb, var(--gold) 4%, transparent), transparent 55%),
+    var(--bg-sunken);
+}
+.sidebar{
+  position: fixed; left: 18px; top: 50%;
+  transform: translateY(-50%);
+  width: 52px; display: flex; flex-direction: column; gap: 4px;
+  padding: 10px 0;
+  border-radius: 28px;
+  border: 1px solid var(--border-strong);
+  background: color-mix(in srgb, var(--bg-elevated) 90%, transparent);
+  backdrop-filter: blur(22px) saturate(1.2);
+  z-index: 50;
+}
+.sidebar .slot{ width:36px;height:36px;margin:0 auto;display:grid;place-items:center;border-radius:12px;color:var(--fg-mute);cursor:pointer; font-size: 14px; }
+.sidebar .slot.active{ background: var(--surface-high); color: var(--fg); }
+.sidebar .divider{ height:1px;width:22px;margin:6px auto;background:var(--border); }
+.theme-toggle{ position:fixed;left:18px;bottom:18px;width:38px;height:38px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--fg-dim);display:grid;place-items:center;cursor:pointer;z-index:50; }
+
+/* ============== Canvas — split layout (igual W.7) ============== */
+.canvas{
+  width: 100%;
+  max-width: 1600px;
+  height: min(calc(100vh - 56px), 920px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: var(--canvas-shadow);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+}
+
+/* ============== Wall (izquierda — HUB completo espejo Expo) ============== */
+.wall{
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+}
+.wall-head{
+  padding: 22px 26px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.wall-head h1{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 20px;
+  letter-spacing: -0.3px;
+}
+.wall-head .sub{
+  font-size: 11px;
+  color: var(--fg-mute);
+  margin-top: 2px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.wall-head .rules-btn{
+  font-size: 12px;
+  color: var(--fg-dim);
+  padding: 7px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-low);
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif;
+}
+.wall-head .rules-btn:hover{ color: var(--accent); border-color: var(--accent); }
+
+.wall-body{
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 26px 26px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-high) transparent;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.wall-body::-webkit-scrollbar{ width:6px }
+.wall-body::-webkit-scrollbar-thumb{ background: var(--surface-high); border-radius:3px }
+
+/* ============== RGB Ring (WAVE_COLORS espejo Expo) ============== */
+.rgb-ring{
+  position: relative;
+  display: grid; place-items: center;
+}
+.rgb-ring::before{
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg,
+    #a8edea, #fed6e3, #d4a5ff, #a8c0ff, #b8f0c0, #ffd6aa, #a8edea);
+  animation: rgb-spin 6s linear infinite;
+  z-index: 0;
+}
+.rgb-ring::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  z-index: 1;
+}
+.rgb-ring > *{ position: relative; z-index: 2; }
+
+.rgb-rect{
+  position: relative;
+  padding: 3px;
+  border-radius: 12px;
+}
+.rgb-rect::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: conic-gradient(from 0deg,
+    #a8edea, #fed6e3, #d4a5ff, #a8c0ff, #b8f0c0, #ffd6aa, #a8edea);
+  animation: rgb-spin 6s linear infinite;
+  z-index: 0;
+}
+.rgb-rect > *{ position: relative; z-index: 1; }
+
+@keyframes rgb-spin{ to { transform: rotate(360deg); } }
+
+/* ============== Card base ============== */
+.card{
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 200ms;
+}
+.card:hover{ border-color: var(--border-strong); }
+.card.selected{ border-color: var(--accent); }
+.card-head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.card-head .title{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+.card-head .more{
+  font-size: 11px;
+  color: var(--fg-mute);
+  font-family: 'Urbanist', sans-serif;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.card:hover .card-head .more{ color: var(--accent); }
+
+/* ============== Card 1 — HERO ============== */
+.card-hero{
+  padding: 18px;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+}
+.hero-top{
+  display: grid; grid-template-columns: auto 1fr auto; gap: 16px;
+  align-items: center;
+}
+.me-avatar{
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--surface-high);
+  border: 1px solid var(--border-strong);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 14px;
+  color: var(--fg-dim);
+}
+.hero-me .pts{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 24px;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+.hero-me .pts .u{ font-weight: 500; font-size: 12px; color: var(--fg-mute); margin-left: 4px; }
+.hero-me .pos{
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.hero-bar{
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+}
+.hero-bar .seg{
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface-high);
+}
+.hero-bar .seg.filled{ background: var(--accent); }
+.hero-info{
+  margin-top: 8px;
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 10px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.hero-info strong{ color: var(--fg); font-weight: 700; }
+
+.hero-top3{
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 8px;
+  align-items: end;
+}
+.podio{
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 10px 4px 8px;
+  border-radius: 10px;
+  background: var(--surface-low);
+  position: relative;
+}
+/* Reorden visual #2 #1 #3 (semantica #1 #2 #3 se mantiene en HTML) */
+.podio.first{ order: 2; padding: 14px 6px 10px; background: linear-gradient(180deg, var(--gold-soft), transparent 80%); }
+.podio.second{ order: 1; padding-top: 18px; background: linear-gradient(180deg, rgba(180,185,200,0.08), transparent 70%); }
+.podio.third{ order: 3; padding-top: 22px; background: linear-gradient(180deg, rgba(210,155,90,0.08), transparent 70%); }
+.podio .num{
+  position: absolute;
+  top: 4px; left: 6px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 9px;
+}
+.podio.first .num{ color: var(--gold); font-size: 10px; }
+.podio.second .num{ color: var(--tier-silver); }
+.podio.third .num{ color: var(--tier-bronze); }
+
+/* Tamanos escalados: #1 grande, #2 mediano, #3 chico */
+.podio.first .rgb-ring{ width: 52px; height: 52px; }
+.podio.first .rgb-ring .av{
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--surface-high);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 16px;
+  color: var(--fg);
+}
+.podio.second .av-flat{
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--surface-high);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 13px;
+  color: var(--fg);
+  border: 1.5px solid var(--tier-silver);
+}
+.podio.third .av-flat{
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--surface-high);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+  color: var(--fg);
+  border: 1.5px solid var(--tier-bronze);
+}
+.podio .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 10px; text-align: center; }
+.podio.first .name{ font-size: 11px; }
+.podio .pts-mini{ font-size: 9px; color: var(--fg-mute); }
+.podio.first .pts-mini{ font-size: 10px; color: var(--gold); font-weight: 700; }
+
+.hero-cta{
+  margin-top: 12px;
+  width: 100%;
+  padding: 9px;
+  border-radius: 10px;
+  background: var(--surface-high);
+  border: 1px solid var(--border-strong);
+  color: var(--fg);
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 600; font-size: 11px;
+  cursor: pointer;
+}
+.hero-cta:hover{ background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+/* ============== Card 2 — GOLDEN TICKETS ============== */
+.card-gt{ background: var(--surface-card); }
+.tickets{ display: flex; flex-direction: column; gap: 8px; }
+.ticket{
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-low);
+}
+.ticket.pending{ border-color: rgba(232,199,100,0.30); }
+.ticket .icon{
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  display: grid; place-items: center;
+}
+.ticket.pending .icon{ background: var(--gold-soft); color: var(--gold); }
+.ticket.claimed .icon{ background: var(--teal-soft); color: var(--teal); }
+.ticket .meta .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 12px; line-height: 1.3; }
+.ticket .meta .sponsor{ font-size: 10px; color: var(--fg-mute); margin-top: 1px; }
+.ticket .badge{
+  padding: 3px 7px;
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.ticket.pending .badge{ background: var(--gold-soft); color: var(--gold); }
+.ticket.claimed .badge{ background: var(--teal-soft); color: var(--teal); }
+
+/* ============== Card 3 — PREMIOS preview ============== */
+.rewards-preview{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.reward-mini{
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--surface-low);
+}
+.reward-mini .thumb{
+  height: 60px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--surface-medium), var(--surface-high));
+  margin-bottom: 8px;
+  display: grid; place-items: center;
+  color: var(--fg-mute);
+  font-size: 20px;
+}
+.reward-mini .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 11px; line-height: 1.3; }
+.reward-mini .cost{
+  margin-top: 5px;
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 7px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.reward-mini.disabled{ opacity: 0.55; }
+.reward-mini.disabled .cost{ background: var(--surface-high); color: var(--fg-mute); }
+
+/* ============== Card 4 — TIP ============== */
+.card-tip{
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  cursor: default;
+}
+.card-tip:hover{ border-color: var(--border); }
+.tip-icon{
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.tip-text{ font-size: 12px; color: var(--fg-dim); line-height: 1.4; }
+.tip-text strong{ color: var(--fg); font-weight: 600; }
+
+/* ============== Card 5 — RETOS preview ============== */
+.retos-bar-row{
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.retos-bar-row .bar{
+  flex: 1;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--surface-high);
+  overflow: hidden;
+}
+.retos-bar-row .bar .fill{
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+}
+.retos-bar-row .count{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+}
+.retos-bar-row .count .total{ color: var(--fg-mute); font-weight: 500; font-size: 10px; }
+
+.reto-next{
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.reto-next .icon{
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--surface-high);
+  color: var(--fg-dim);
+  display: grid; place-items: center;
+}
+.reto-next .meta{ flex: 1; }
+.reto-next .tag{ font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; }
+.reto-next .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 12px; margin-top: 1px; }
+.reto-next .pts{ font-size: 11px; color: var(--accent); font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+/* ============== Card 6 — PASAPORTE preview ============== */
+.passport-bar-row{
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.passport-bar-row .bar{
+  flex: 1;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--surface-high);
+  overflow: hidden;
+}
+.passport-bar-row .bar .fill{
+  height: 100%;
+  background: var(--teal);
+  border-radius: 4px;
+}
+.passport-bar-row .count{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+}
+.passport-bar-row .count .total{ color: var(--fg-mute); font-weight: 500; font-size: 10px; }
+
+.passport-mini{
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+.stamp-mini{
+  aspect-ratio: 1;
+  border-radius: 9px;
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+  position: relative;
+}
+.stamp-mini.stamped{
+  background: var(--teal-soft);
+  border: 1px solid rgba(94,234,212,0.30);
+  color: var(--teal);
+}
+.stamp-mini.empty{
+  background: var(--surface-low);
+  border: 1px dashed var(--border-strong);
+  color: var(--fg-label);
+}
+.stamp-mini.more{
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  color: var(--fg-mute);
+  font-size: 10px;
+}
+
+/* ============== Detail (derecha) ============== */
+.detail{
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.detail-head{
+  padding: 22px 26px 14px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  min-height: 64px;
+}
+.detail-head h2{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 16px;
+  letter-spacing: -0.2px;
+}
+.detail-head .sub{
+  font-size: 11px;
+  color: var(--fg-mute);
+  margin-top: 2px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.detail-close{
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--surface-medium);
+  border: 0;
+  color: var(--fg-dim);
+  cursor: pointer;
+  display: grid; place-items: center;
+  font-size: 13px;
+}
+.detail-close:hover{ background: var(--surface-high); color: var(--fg); }
+.detail-body{
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 26px 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-high) transparent;
+}
+.detail-body::-webkit-scrollbar{ width:6px }
+.detail-body::-webkit-scrollbar-thumb{ background: var(--surface-high); border-radius:3px }
+
+.panel{ display: none; }
+.panel.active{ display: block; }
+
+/* Empty state */
+.empty-state{
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 40px 26px;
+  color: var(--fg-mute);
+}
+.empty-state .icon{
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  display: grid; place-items: center;
+  color: var(--fg-label);
+  margin-bottom: 14px;
+}
+.empty-state .label{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 13px;
+  color: var(--fg-dim);
+  margin-bottom: 4px;
+}
+.empty-state .desc{ font-size: 12px; color: var(--fg-mute); max-width: 280px; line-height: 1.5; }
+
+/* ============== Panel: Golden Ticket reveal ============== */
+.gt-reveal{
+  text-align: center;
+}
+.gt-line{
+  height: 2px;
+  width: 44px;
+  background: var(--gold);
+  margin: 0 auto 14px;
+  border-radius: 1px;
+  box-shadow: 0 0 12px var(--gold-glow);
+}
+.gt-icon-circle{
+  width: 52px; height: 52px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  border: 1px solid rgba(232,199,100,0.30);
+  display: grid; place-items: center;
+  color: var(--gold);
+}
+.gt-overline{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 10px;
+  color: var(--gold);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.gt-name{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 17px;
+  letter-spacing: -0.3px;
+  margin-bottom: 4px;
+}
+.gt-sponsor{ font-size: 11px; color: var(--fg-mute); margin-bottom: 16px; }
+
+.gt-code-box{
+  background: var(--surface-low);
+  border: 1px dashed rgba(232,199,100,0.40);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+.gt-code-label{ font-size: 10px; color: var(--fg-mute); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+.gt-code-value{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--gold);
+}
+
+/* QR con RGB rect (espejo Expo RgbRect) */
+.gt-qr-wrap{
+  width: 124px; height: 124px;
+  margin: 0 auto;
+}
+.gt-qr-wrap .rgb-rect{ width: 100%; height: 100%; }
+.gt-qr{
+  width: 100%; height: 100%;
+  border-radius: 10px;
+  background: white;
+  background-image:
+    radial-gradient(circle, #111 1.4px, transparent 1.6px),
+    radial-gradient(circle, #111 1.4px, transparent 1.6px);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+.gt-hint{
+  font-size: 11px;
+  color: var(--fg-mute);
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.gt-section{
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.section-title{
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--fg-label);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+}
+
+.history-item{
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.history-item:last-child{ border-bottom: 0; }
+.history-item .icon{ width: 30px; height: 30px; border-radius: 8px; background: var(--teal-soft); color: var(--teal); display: grid; place-items: center; }
+.history-item .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 12px; }
+.history-item .meta{ font-size: 10px; color: var(--fg-mute); margin-top: 1px; }
+.history-item .badge{
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: var(--teal-soft); color: var(--teal);
+}
+
+/* ============== Panel: Rewards catalogo ============== */
+.rewards-tabs{
+  display: flex; gap: 6px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.rewards-tab{
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Urbanist', sans-serif;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--fg-mute);
+  cursor: pointer;
+}
+.rewards-tab.active{ background: var(--surface-high); color: var(--fg); border-color: var(--border-strong); }
+.rewards-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.reward-card{
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-card);
+  display: flex; flex-direction: column;
+}
+.reward-card .thumb{
+  height: 80px;
+  background: linear-gradient(135deg, var(--surface-medium), var(--surface-high));
+  display: grid; place-items: center;
+  color: var(--fg-mute);
+  font-size: 26px;
+}
+.reward-card .body{ padding: 10px 12px 12px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.reward-card .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 12px; line-height: 1.3; }
+.reward-card .sponsor{ font-size: 10px; color: var(--fg-mute); }
+.reward-card .row{ display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: auto; }
+.reward-card .cost{
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.reward-card .btn{
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: var(--accent);
+  color: var(--accent-on);
+  border: 0;
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 600; font-size: 10px;
+  cursor: pointer;
+}
+.reward-card.disabled{ opacity: 0.55; }
+.reward-card.disabled .cost{ background: var(--surface-high); color: var(--fg-mute); }
+.reward-card.disabled .btn{ background: var(--surface-high); color: var(--fg-mute); cursor: not-allowed; }
+
+/* ============== Panel: Retos lista ============== */
+.retos-list{ display: flex; flex-direction: column; gap: 2px; }
+.reto-row{
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 8px;
+  border-radius: 10px;
+}
+.reto-row .icon{ width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0; }
+.reto-row.done .icon{ background: var(--accent-soft); color: var(--accent); }
+.reto-row.pending .icon{ background: var(--surface-high); color: var(--fg-mute); }
+.reto-row .meta{ flex: 1; min-width: 0; }
+.reto-row .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 12px; }
+.reto-row .desc{ font-size: 10px; color: var(--fg-mute); margin-top: 1px; }
+.reto-row .pts-tag{
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.reto-row.done .pts-tag{ background: var(--accent-soft); color: var(--accent); }
+.reto-row.pending .pts-tag{ background: var(--surface-high); color: var(--fg-mute); }
+.reto-row.done .name{ color: var(--fg-dim); }
+
+/* ============== Panel: Passport full ============== */
+.passport-grid-full{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.stamp-card{
+  border-radius: 12px;
+  padding: 12px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  text-align: center;
+  position: relative;
+}
+.stamp-card.stamped{ background: var(--teal-soft); border: 1px solid rgba(94,234,212,0.30); }
+.stamp-card.empty{ background: var(--surface-low); border: 1px dashed var(--border-strong); opacity: 0.6; }
+.stamp-card .logo{
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: var(--surface-high);
+  display: grid; place-items: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 13px;
+  color: var(--fg-dim);
+}
+.stamp-card.stamped .logo{ color: var(--teal); }
+.stamp-card .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 10px; }
+.stamp-card .tier{
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 6px;
+  border-radius: 99px;
+}
+.stamp-card[data-tier="platinum"] .tier{ background: rgba(229,231,235,0.10); color: var(--tier-platinum); }
+.stamp-card[data-tier="gold"] .tier{ background: var(--gold-soft); color: var(--gold); }
+.stamp-card[data-tier="silver"] .tier{ background: rgba(180,185,200,0.10); color: var(--tier-silver); }
+.stamp-card[data-tier="bronze"] .tier{ background: rgba(210,155,90,0.10); color: var(--tier-bronze); }
+.stamp-card .date{ font-size: 9px; color: var(--fg-mute); }
+.stamp-card .check{ position: absolute; top: 5px; right: 7px; color: var(--teal); font-size: 9px; }
+.passport-hint{
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface-low);
+  border: 1px solid var(--border);
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 11px;
+  color: var(--fg-dim);
+  line-height: 1.45;
+}
+.passport-hint .icon{ color: var(--teal); flex-shrink: 0; margin-top: 1px; }
+
+/* ============== Panel: Ranking ============== */
+.lb-podium{
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+  align-items: end;
+}
+.lb-podium .podio.first{ padding: 18px 8px 12px; }
+.lb-podium .podio.second{ padding: 22px 6px 10px; }
+.lb-podium .podio.third{ padding: 28px 6px 10px; }
+.lb-podium .podio.first .rgb-ring{ width: 64px; height: 64px; }
+.lb-podium .podio.first .rgb-ring .av{ width: 60px; height: 60px; font-size: 18px; }
+.lb-podium .podio.second .av-flat{ width: 48px; height: 48px; font-size: 15px; }
+.lb-podium .podio.third .av-flat{ width: 42px; height: 42px; font-size: 14px; }
+.lb-podium .podio.first .name{ font-size: 12px; }
+.lb-podium .podio .pts-mini{ font-size: 10px; }
+.lb-podium .podio.first .pts-mini{ font-size: 11px; }
+.lb-list{ display: flex; flex-direction: column; }
+.lb-row{
+  display: grid;
+  grid-template-columns: 22px 32px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+}
+.lb-row:last-child{ border-bottom: 0; }
+.lb-row .pos{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 10px; color: var(--fg-mute); text-align: right; }
+.lb-row .av{ width: 32px; height: 32px; border-radius: 50%; background: var(--surface-high); border: 1px solid var(--border); display: grid; place-items: center; font-size: 10px; color: var(--fg-dim); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; }
+.lb-row .name{ font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 11px; }
+.lb-row .pts{ font-size: 10px; color: var(--fg-dim); font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif; }
+.lb-row.me{ background: var(--accent-soft); border-radius: 8px; margin: 3px -4px; padding: 8px 10px; border-bottom-color: transparent; }
+.lb-row.me .pos, .lb-row.me .name{ color: var(--accent); }
+.lb-row.skip{ font-size: 9px; color: var(--fg-label); text-align: center; padding: 4px 0; border-bottom: 0; font-style: italic; }
+
+/* ============== Panel: Rules ============== */
+.rules-list{ display: flex; flex-direction: column; }
+.rule-row{
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 4px;
+  border-bottom: 1px solid var(--border);
+}
+.rule-row:last-child{ border-bottom: 0; }
+.rule-row .icon{ width: 26px; height: 26px; border-radius: 7px; background: var(--surface-high); color: var(--fg-dim); display: grid; place-items: center; flex-shrink: 0; font-size: 11px; }
+.rule-row .label{ flex: 1; font-size: 11px; color: var(--fg); }
+.rule-row .pts{
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 9px;
+}
+
+</style>
+</head>
+<body data-theme="noir">
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="slot" title="Home">⌂</div>
+    <div class="slot" title="Agenda">▤</div>
+    <div class="slot" title="Live">●</div>
+    <div class="slot" title="Speakers">☆</div>
+    <div class="slot" title="Social">◇</div>
+    <div class="slot" title="Sponsors">▦</div>
+    <div class="divider"></div>
+    <div class="slot active" title="Desafio">♛</div>
+    <div class="divider"></div>
+    <div class="slot" title="Perfil">◐</div>
+  </aside>
+  <button class="theme-toggle" id="themeBtn" title="Toggle theme">◐</button>
+
+  <main class="canvas">
+
+    <!-- ============ WALL IZQUIERDA — HUB COMPLETO ESPEJO EXPO ============ -->
+    <section class="wall">
+      <div class="wall-head">
+        <div>
+          <h1>Desafio</h1>
+          <div class="sub">Tu progreso en el evento</div>
+        </div>
+        <button class="rules-btn" data-go="rules">Como funciona</button>
+      </div>
+      <div class="wall-body">
+
+        <!-- 1. HERO -->
+        <article class="card card-hero" data-go="ranking">
+          <div class="hero-top">
+            <div class="me-avatar">K</div>
+            <div class="hero-me">
+              <div class="pts">1.420<span class="u"> pts</span></div>
+              <div class="pos">Posicion #23 / 187</div>
+            </div>
+            <button class="hero-cta" style="width:auto;padding:7px 12px;font-size:11px;">Ranking →</button>
+          </div>
+          <div class="hero-bar">
+            <div class="seg filled"></div><div class="seg filled"></div><div class="seg filled"></div><div class="seg filled"></div>
+            <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+          </div>
+          <div class="hero-info"><span>Vs lider</span><strong>43% del top</strong></div>
+
+          <div class="hero-top3">
+            <div class="podio first">
+              <div class="num">#1</div>
+              <div class="rgb-ring"><div class="av">M</div></div>
+              <div class="name">Maria R.</div>
+              <div class="pts-mini">3.250</div>
+            </div>
+            <div class="podio second">
+              <div class="num">#2</div>
+              <div class="av-flat">A</div>
+              <div class="name">Andres T.</div>
+              <div class="pts-mini">2.800</div>
+            </div>
+            <div class="podio third">
+              <div class="num">#3</div>
+              <div class="av-flat">L</div>
+              <div class="name">Laura M.</div>
+              <div class="pts-mini">2.140</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 2. GOLDEN TICKETS -->
+        <article class="card card-gt" data-go="gt">
+          <div class="card-head">
+            <div class="title">Mis premios ganados</div>
+            <div class="more">2 premios →</div>
+          </div>
+          <div class="tickets">
+            <div class="ticket pending">
+              <div class="icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9a6 6 0 0 0 12 0V3H6z"/><path d="M8 21h8M12 17v4"/></svg>
+              </div>
+              <div class="meta">
+                <div class="name">Cena VIP en Andres Carne de Res</div>
+                <div class="sponsor">Sorteo Cena Premium · Bancolombia</div>
+              </div>
+              <div class="badge">Reclamar</div>
+            </div>
+            <div class="ticket claimed">
+              <div class="icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="meta">
+                <div class="name">Mochila Eventos premium</div>
+                <div class="sponsor">Sorteo Daily · Coca-Cola</div>
+              </div>
+              <div class="badge">Reclamado</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 3. PREMIOS preview -->
+        <article class="card" data-go="rewards">
+          <div class="card-head">
+            <div class="title">Canjea tus puntos</div>
+            <div class="more">Ver todos →</div>
+          </div>
+          <div class="rewards-preview">
+            <div class="reward-mini">
+              <div class="thumb">★</div>
+              <div class="name">Camiseta evento</div>
+              <div class="cost">500 pts</div>
+            </div>
+            <div class="reward-mini disabled">
+              <div class="thumb">♪</div>
+              <div class="name">Bono Spotify 3m</div>
+              <div class="cost">1.800 pts</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 4. TIP -->
+        <article class="card-tip">
+          <div class="tip-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6M12 22a10 10 0 1 0 0-20"/><path d="M8 12l3 3 5-6"/></svg>
+          </div>
+          <div class="tip-text">Te faltan <strong>720 pts</strong> para el <strong>Top 10</strong>. Visita stands o vota encuestas activas.</div>
+        </article>
+
+        <!-- 5. RETOS -->
+        <article class="card" data-go="retos">
+          <div class="card-head">
+            <div class="title">Retos del evento</div>
+            <div class="more">8 / 13 →</div>
+          </div>
+          <div class="retos-bar-row">
+            <div class="bar"><div class="fill" style="width:62%"></div></div>
+            <div class="count">8<span class="total"> / 13</span></div>
+          </div>
+          <div class="reto-next">
+            <div class="icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            </div>
+            <div class="meta">
+              <div class="tag">Proximo reto</div>
+              <div class="name">Pregunta en una sesion live</div>
+            </div>
+            <div class="pts">+15</div>
+          </div>
+        </article>
+
+        <!-- 6. PASAPORTE -->
+        <article class="card" data-go="passport">
+          <div class="card-head">
+            <div class="title">Pasaporte sponsors</div>
+            <div class="more">4 / 9 →</div>
+          </div>
+          <div class="passport-bar-row">
+            <div class="bar"><div class="fill" style="width:44%"></div></div>
+            <div class="count">4<span class="total"> / 9</span></div>
+          </div>
+          <div class="passport-mini">
+            <div class="stamp-mini stamped">B</div>
+            <div class="stamp-mini stamped">C</div>
+            <div class="stamp-mini stamped">M</div>
+            <div class="stamp-mini stamped">G</div>
+            <div class="stamp-mini empty">A</div>
+            <div class="stamp-mini more">+4</div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ DETAIL DERECHA ============ -->
+    <section class="detail" id="detail">
+
+      <!-- Estado por defecto: empty -->
+      <div class="empty-state" id="emptyState">
+        <div class="icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        </div>
+        <div class="label">Selecciona una tarjeta</div>
+        <div class="desc">Toca una de las tarjetas de la izquierda para ver el detalle aqui mismo.</div>
+      </div>
+
+      <!-- Panel: Golden Ticket -->
+      <article class="panel" data-panel="gt">
+        <div class="detail-head">
+          <div>
+            <h2>Premio ganado</h2>
+            <div class="sub">Pendiente reclamo</div>
+          </div>
+          <button class="detail-close" data-close>✕</button>
+        </div>
+        <div class="detail-body">
+          <div class="gt-reveal">
+            <div class="gt-line"></div>
+            <div class="gt-icon-circle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 0 0 12 0V3H6z"/><path d="M8 21h8M12 17v4"/></svg>
+            </div>
+            <div class="gt-overline">Ganador · Pendiente reclamo</div>
+            <div class="gt-name">Cena VIP en Andres Carne de Res</div>
+            <div class="gt-sponsor">Sorteo Cena Premium · por Bancolombia</div>
+
+            <div class="gt-code-box">
+              <div class="gt-code-label">Codigo de reclamo</div>
+              <div class="gt-code-value">GT-7842</div>
+            </div>
+            <div class="gt-qr-wrap"><div class="rgb-rect"><div class="gt-qr"></div></div></div>
+            <div class="gt-hint">Presenta este codigo en el stand de Bancolombia, salon principal.<br/>Vencimiento: 30 jun 23:59.</div>
+          </div>
+
+          <div class="gt-section">
+            <div class="section-title">Historial</div>
+            <div class="history-item">
+              <div class="icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div>
+                <div class="name">Mochila Eventos premium</div>
+                <div class="meta">Coca-Cola · 25 jun</div>
+              </div>
+              <div class="badge">Reclamado</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: Rewards -->
+      <article class="panel" data-panel="rewards">
+        <div class="detail-head">
+          <div>
+            <h2>Canjear puntos</h2>
+            <div class="sub">Tienes 1.420 pts disponibles</div>
+          </div>
+          <button class="detail-close" data-close>✕</button>
+        </div>
+        <div class="detail-body">
+          <div class="rewards-tabs">
+            <button class="rewards-tab active">Catalogo</button>
+            <button class="rewards-tab">Mis canjes (1)</button>
+          </div>
+          <div class="rewards-grid">
+            <div class="reward-card">
+              <div class="thumb">★</div>
+              <div class="body">
+                <div><div class="name">Camiseta evento</div><div class="sponsor">Stock: 8</div></div>
+                <div class="row"><div class="cost">500 pts</div><button class="btn">Canjear</button></div>
+              </div>
+            </div>
+            <div class="reward-card disabled">
+              <div class="thumb">♪</div>
+              <div class="body">
+                <div><div class="name">Bono Spotify 3m</div><div class="sponsor">Stock: 12</div></div>
+                <div class="row"><div class="cost">1.800 pts</div><button class="btn">Faltan 380</button></div>
+              </div>
+            </div>
+            <div class="reward-card">
+              <div class="thumb">♔</div>
+              <div class="body">
+                <div><div class="name">Llavero metalico</div><div class="sponsor">Stock: 24</div></div>
+                <div class="row"><div class="cost">200 pts</div><button class="btn">Canjear</button></div>
+              </div>
+            </div>
+            <div class="reward-card disabled">
+              <div class="thumb">☕</div>
+              <div class="body">
+                <div><div class="name">Tarjeta Juan Valdez $50K</div><div class="sponsor">Stock: 5</div></div>
+                <div class="row"><div class="cost">2.500 pts</div><button class="btn">Faltan 1.080</button></div>
+              </div>
+            </div>
+            <div class="reward-card">
+              <div class="thumb">✎</div>
+              <div class="body">
+                <div><div class="name">Kit cuaderno + boli</div><div class="sponsor">Stock: 18</div></div>
+                <div class="row"><div class="cost">350 pts</div><button class="btn">Canjear</button></div>
+              </div>
+            </div>
+            <div class="reward-card disabled">
+              <div class="thumb">▶</div>
+              <div class="body">
+                <div><div class="name">Curso online Platzi</div><div class="sponsor">Agotado</div></div>
+                <div class="row"><div class="cost">3.000 pts</div><button class="btn">Agotado</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: Retos -->
+      <article class="panel" data-panel="retos">
+        <div class="detail-head">
+          <div>
+            <h2>Retos del evento</h2>
+            <div class="sub">8 de 13 completados</div>
+          </div>
+          <button class="detail-close" data-close>✕</button>
+        </div>
+        <div class="detail-body">
+          <div class="retos-list">
+            <div class="reto-row done">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="meta"><div class="name">Check-in al evento</div><div class="desc">Completado · 27 jun</div></div>
+              <div class="pts-tag">+50</div>
+            </div>
+            <div class="reto-row done">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="meta"><div class="name">Completar tu perfil</div><div class="desc">Foto + intereses</div></div>
+              <div class="pts-tag">+30</div>
+            </div>
+            <div class="reto-row done">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="meta"><div class="name">Calificar 3 sesiones</div><div class="desc">3 de 3 ratings</div></div>
+              <div class="pts-tag">+45</div>
+            </div>
+            <div class="reto-row done">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="meta"><div class="name">Visitar 3 stands</div><div class="desc">4 de 3 stands</div></div>
+              <div class="pts-tag">+60</div>
+            </div>
+            <div class="reto-row done">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="meta"><div class="name">Responder 2 trivias correctas</div><div class="desc">2 de 2</div></div>
+              <div class="pts-tag">+30</div>
+            </div>
+            <div class="reto-row pending">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="meta"><div class="name">Pregunta en sesion live</div><div class="desc">0 de 1 Q&A</div></div>
+              <div class="pts-tag">+15</div>
+            </div>
+            <div class="reto-row pending">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="meta"><div class="name">Conectar con 5 asistentes</div><div class="desc">3 de 5 conexiones</div></div>
+              <div class="pts-tag">+40</div>
+            </div>
+            <div class="reto-row pending">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="meta"><div class="name">Publicar en el muro</div><div class="desc">0 de 1 publicaciones</div></div>
+              <div class="pts-tag">+25</div>
+            </div>
+            <div class="reto-row pending">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="meta"><div class="name">Votar 2 encuestas</div><div class="desc">1 de 2 votos</div></div>
+              <div class="pts-tag">+20</div>
+            </div>
+            <div class="reto-row pending">
+              <div class="icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="meta"><div class="name">Completar pasaporte</div><div class="desc">4 de 9 stands</div></div>
+              <div class="pts-tag">+100</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: Passport -->
+      <article class="panel" data-panel="passport">
+        <div class="detail-head">
+          <div>
+            <h2>Pasaporte sponsors</h2>
+            <div class="sub">4 de 9 stands visitados</div>
+          </div>
+          <button class="detail-close" data-close>✕</button>
+        </div>
+        <div class="detail-body">
+          <div class="passport-grid-full">
+            <div class="stamp-card stamped" data-tier="platinum"><div class="check">✓</div><div class="logo">B</div><div class="name">Bancolombia</div><div class="tier">Platinum</div><div class="date">27 jun</div></div>
+            <div class="stamp-card stamped" data-tier="gold"><div class="check">✓</div><div class="logo">C</div><div class="name">Coca-Cola</div><div class="tier">Gold</div><div class="date">27 jun</div></div>
+            <div class="stamp-card stamped" data-tier="gold"><div class="check">✓</div><div class="logo">M</div><div class="name">Microsoft</div><div class="tier">Gold</div><div class="date">27 jun</div></div>
+            <div class="stamp-card stamped" data-tier="silver"><div class="check">✓</div><div class="logo">G</div><div class="name">Google</div><div class="tier">Silver</div><div class="date">27 jun</div></div>
+            <div class="stamp-card empty" data-tier="silver"><div class="logo">A</div><div class="name">Apple</div><div class="tier">Silver</div><div class="date">Sin visitar</div></div>
+            <div class="stamp-card empty" data-tier="bronze"><div class="logo">A</div><div class="name">Amazon</div><div class="tier">Bronze</div><div class="date">Sin visitar</div></div>
+            <div class="stamp-card empty" data-tier="bronze"><div class="logo">S</div><div class="name">Stripe</div><div class="tier">Bronze</div><div class="date">Sin visitar</div></div>
+            <div class="stamp-card empty" data-tier="bronze"><div class="logo">L</div><div class="name">LinkedIn</div><div class="tier">Bronze</div><div class="date">Sin visitar</div></div>
+            <div class="stamp-card empty" data-tier="bronze"><div class="logo">N</div><div class="name">Notion</div><div class="tier">Bronze</div><div class="date">Sin visitar</div></div>
+          </div>
+          <div class="passport-hint">
+            <div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg></div>
+            <div>Pide al vendedor del stand que escanee tu QR para sellar el pasaporte. Completa los 9 para entrar al sorteo final (+100 pts).</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: Ranking -->
+      <article class="panel" data-panel="ranking">
+        <div class="detail-head">
+          <div>
+            <h2>Ranking del evento</h2>
+            <div class="sub">187 participantes · en vivo</div>
+          </div>
+          <button class="detail-close" data-close>✕</button>
+        </div>
+        <div class="detail-body">
+          <div class="lb-podium">
+            <div class="podio first">
+              <div class="num">#1</div>
+              <div class="rgb-ring"><div class="av">M</div></div>
+              <div class="name">Maria R.</div>
+              <div class="pts-mini">3.250 pts</div>
+            </div>
+            <div class="podio second">
+              <div class="num">#2</div>
+              <div class="av-flat">A</div>
+              <div class="name">Andres T.</div>
+              <div class="pts-mini">2.800 pts</div>
+            </div>
+            <div class="podio third">
+              <div class="num">#3</div>
+              <div class="av-flat">L</div>
+              <div class="name">Laura M.</div>
+              <div class="pts-mini">2.140 pts</div>
+            </div>
+          </div>
+          <div class="lb-list">
+            <div class="lb-row"><div class="pos">4</div><div class="av">J</div><div class="name">Juan Camilo P.</div><div class="pts">1.980</div></div>
+            <div class="lb-row"><div class="pos">5</div><div class="av">D</div><div class="name">Diana Restrepo</div><div class="pts">1.870</div></div>
+            <div class="lb-row"><div class="pos">6</div><div class="av">F</div><div class="name">Felipe Gomez</div><div class="pts">1.750</div></div>
+            <div class="lb-row"><div class="pos">7</div><div class="av">S</div><div class="name">Sofia Vargas</div><div class="pts">1.690</div></div>
+            <div class="lb-row"><div class="pos">8</div><div class="av">R</div><div class="name">Ricardo Mejia</div><div class="pts">1.580</div></div>
+            <div class="lb-row"><div class="pos">9</div><div class="av">V</div><div class="name">Valentina Ruiz</div><div class="pts">1.510</div></div>
+            <div class="lb-row"><div class="pos">10</div><div class="av">N</div><div class="name">Nicolas Quintero</div><div class="pts">1.500</div></div>
+            <div class="lb-row skip">···</div>
+            <div class="lb-row"><div class="pos">22</div><div class="av">E</div><div class="name">Esteban Rivera</div><div class="pts">1.430</div></div>
+            <div class="lb-row me"><div class="pos">23</div><div class="av">K</div><div class="name">Tu (Kamilo A.)</div><div class="pts">1.420</div></div>
+            <div class="lb-row"><div class="pos">24</div><div class="av">T</div><div class="name">Tatiana Lopez</div><div class="pts">1.398</div></div>
+            <div class="lb-row"><div class="pos">25</div><div class="av">P</div><div class="name">Pablo Cano</div><div class="pts">1.380</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Panel: Rules -->
+      <article class="panel" data-panel="rules">
+        <div class="detail-head">
+          <div>
+            <h2>Como ganas puntos</h2>
+            <div class="sub">13 acciones disponibles</div>
+          </div>
+          <button class="detail-close" data-close>✕</button>
+        </div>
+        <div class="detail-body">
+          <div class="rules-list">
+            <div class="rule-row"><div class="icon">⌂</div><div class="label">Check-in al evento</div><div class="pts">+50</div></div>
+            <div class="rule-row"><div class="icon">▦</div><div class="label">Visitar stand sponsor</div><div class="pts">+20</div></div>
+            <div class="rule-row"><div class="icon">?</div><div class="label">Trivia stand correcta</div><div class="pts">+15 bonus</div></div>
+            <div class="rule-row"><div class="icon">★</div><div class="label">Calificar una sesion</div><div class="pts">+15</div></div>
+            <div class="rule-row"><div class="icon">!</div><div class="label">Preguntar en Q&A</div><div class="pts">+15</div></div>
+            <div class="rule-row"><div class="icon">✎</div><div class="label">Publicar en el muro</div><div class="pts">+25</div></div>
+            <div class="rule-row"><div class="icon">◇</div><div class="label">Subir foto al muro</div><div class="pts">+30</div></div>
+            <div class="rule-row"><div class="icon">⚐</div><div class="label">Likes acumulados (5/10/20/50/100)</div><div class="pts">+10–100</div></div>
+            <div class="rule-row"><div class="icon">○</div><div class="label">Comentar (max 10/dia)</div><div class="pts">+5</div></div>
+            <div class="rule-row"><div class="icon">◆</div><div class="label">Aceptar conexion</div><div class="pts">+10</div></div>
+            <div class="rule-row"><div class="icon">✓</div><div class="label">Votar encuesta</div><div class="pts">+10</div></div>
+            <div class="rule-row"><div class="icon">◐</div><div class="label">Completar perfil + intereses</div><div class="pts">+30</div></div>
+            <div class="rule-row"><div class="icon">●</div><div class="label">Chatear en sesion live</div><div class="pts">+5</div></div>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script>
+const body = document.body;
+document.getElementById('themeBtn').addEventListener('click', () => {
+  body.dataset.theme = body.dataset.theme === 'noir' ? 'lux' : 'noir';
+});
+
+const emptyState = document.getElementById('emptyState');
+const panels = document.querySelectorAll('.panel');
+const cards = document.querySelectorAll('[data-go]');
+
+function openPanel(name){
+  emptyState.style.display = 'none';
+  panels.forEach(p => p.classList.remove('active'));
+  document.querySelector(`.panel[data-panel="${name}"]`)?.classList.add('active');
+  // Marcar card selected
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+  document.querySelector(`.card[data-go="${name}"]`)?.classList.add('selected');
+}
+function closePanel(){
+  panels.forEach(p => p.classList.remove('active'));
+  emptyState.style.display = '';
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+}
+
+cards.forEach(el => {
+  el.addEventListener('click', () => openPanel(el.dataset.go));
+});
+document.querySelectorAll('[data-close]').forEach(b => {
+  b.addEventListener('click', (e) => { e.stopPropagation(); closePanel(); });
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closePanel();
+});
+</script>
+
+</body>
+</html>
