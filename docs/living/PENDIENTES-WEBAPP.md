@@ -37,13 +37,13 @@
 | W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 | — |
 | W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
 | W.13 FAQ + Docs + Pages | 0/17 | 0% — backlog | — |
-| W.14 Anuncios + Bell | 0/20 | 0% — backlog | — |
+| W.14 Anuncios + Bell | **10/20** | **50% — Sprint 2.C Fase A 2026-06-29** (lista + BellPopover + deeplink + localStorage unread + E2E 10/10). Faltan banners + highlights + RT socket + Web Push (W.12) | **+10** |
 | W.15 Vendor Dashboard | 0/35 | **OPCIONAL** Fase 1 | — |
 | W.16 Live Moments | 0/23 | 0% — backlog | — |
 | W.17 Soporte | 0/15 | 0% — backlog | — |
 | **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **404/707** | **57.1%** | +5 W.9 cierre formal (redemptions inline + E2E 11/11 verde con 3 viewports + counter PARITY sync, 270/270 vitest + 95 E2E verde) |
+| **TOTAL** | **414/707** | **58.6%** | +10 W.14 Fase A (lista anuncios + BellPopover sidebar + deep link helper + localStorage unread + E2E 10/10 verde + 309/309 vitest + 105 E2E verde) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,15 +51,15 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 2.C — W.14 Anuncios + Boletines + Bell** (~3-4h, 1 sesion) — 0/19+bonus
-  - Lista anuncios + detalle + socket RT + deep link handler
-  - BannersCarousel auto 5s + imagen/video
-  - Highlights mini carousel
-  - BellPopover con counter unread
+- [ ] **Sprint 2.C continuacion — W.14 Fase B (Banners + Highlights + RT socket)** (~2h, 1 sesion)
+  - BannersCarousel auto 5s + imagen/video en home hero (modifica W.2 tambien)
+  - Highlights mini carousel en home
+  - Socket `announcement:new` → invalidate lista + badge unread aumenta (depende W.11)
+  - Tracking: 8 tipos de push backend documentados en memoria para Web Push W.12
 
-> **W.9 Desafio CERRADO 35/35 (2026-06-29).** Sprint 2.B completo. Detalle en seccion "W.9" abajo. Resumen: hub split layout + 6 cards + 6 paneles + redeem optimistic + redemptions inline (sin tab "Mis canjes" por espejo Expo) + bloque orphans + 270/270 vitest + 11/11 E2E (incluye 3 viewports automatizados). Batch QA final cross-modulos (Lighthouse + device fisico) queda al cierre Fase 1 junto con W.3/W.5/W.7/W.10.
+> **W.14 Fase A entregada 2026-06-29 (10/20):** lista `/anuncios` + BellPopover sidebar + helper deep-link puro (13 mappings) + localStorage unread tracking + E2E 10/10. Golden ticket end-to-end verificado (backend `GameController:680` crea announcement privado `eventos://gamification/rewards`, webapp lo lista + click → `/desafio`).
 
-> **Despues de W.14:** Sprint 2.D W.17 Soporte (~3h) → Sprint 2.E W.18 Hub Personal (~5-6h) → Sprint 3 W.6 completar.
+> **Despues de W.14 Fase B:** Sprint 2.D W.17 Soporte (~3h) → Sprint 2.E W.18 Hub Personal (~5-6h) → Sprint 3 W.6 completar.
 
 ---
 
@@ -91,7 +91,7 @@
 - [x] ~~Sprint 2.A — W.7 Sponsors~~ — **CERRADO 23/23 (2026-06-21)** — Sprint 2.A entero en una sesion DaVinci larga: wall espejo Expo + framer-motion shuffle + DetailPanel (Hero/Sessions/Trivia/Contact/Actions) + skeleton SSR + tooltip radix + 14 vitest + **12 E2E Playwright verde** + Lighthouse acc 98 + CLS 0
 - [x] ~~Sprint 2.B — W.9 Engagement~~ — **CERRADO 35/35 (2026-06-29)** — hub split + 6 cards + 6 panels + RGB ring + QR + lazy fetch + redeem optimistic + redemptions inline + bloque orphans. 270/270 vitest + 11/11 E2E (incluye desktop 1600 / tablet H 1130 / mobile 390 sin overflow horizontal)
 
-- [ ] Sprint 2.C — W.14 Anuncios + Banners + Bell (~3-4h, 1 sesion) — 0/20
+- [~] Sprint 2.C — W.14 Anuncios + Banners + Bell — **Fase A entregada 10/20 (50%) 2026-06-29.** Fase B residual (Banners + Highlights + RT) ~2h
 - [ ] Sprint 2.D — W.17 Soporte (~3h, 1 sesion) — 0/15
 - [ ] Sprint 2.E — W.18 Hub Personal (perfil editable + settings) (~5-6h, 1-2 sesiones) — 0/19
 

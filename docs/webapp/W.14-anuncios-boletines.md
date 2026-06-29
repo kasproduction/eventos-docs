@@ -48,23 +48,22 @@ Socket events:
 
 ---
 
-## Fase 0 — Hooks (~30min) — 0/3
-
-- [ ] `useAnnouncements(eventId)` con read mutation
-- [ ] `useBanners(eventId)` con auto-rotate logic
-- [ ] `useHighlights(eventId)` (compartido con W.2 Home)
+## Fase 0 — Hooks (~30min) — 1/3
+- [x] **SSR fetcher** `lib/announcements.ts` con `fetchAnnouncements(eventId)` (apiFetch + bearer cookie). Pattern: server-side en layout + page, sin client hook duplicado.
+- [~N/A] `useBanners(eventId)` con auto-rotate logic — Fase B
+- [~N/A] `useHighlights(eventId)` — Fase B (compartido con W.2 Home)
 
 ---
 
-## Fase 1 — Anuncios (~1h) — 0/4
+## Fase 1 — Anuncios (~1h) — 3/4 ✓
 
-### 1.1 Lista — 0/2
-- [ ] `<AnnouncementsList />` con cards (icono tipo + titulo + extracto + tiempo + dot unread)
-- [ ] Tabs: "Todos" / "No leidos"
+### 1.1 Lista — 2/2 ✓
+- [x] `<AnnouncementsView />` lista vertical de cards (image opcional + dot color + timeAgo + title + body + chevron). Espejo Expo `anuncios.tsx`. Empty state cuando 0 items.
+- [~rechazado] Tabs "Todos / No leidos" — eliminado: backend NO persiste read_at, todos los items son "vistos" cuando abris la pagina. Tabs serian solo cosmeticas y confusas. Decision DaVinci.
 
-### 1.2 Detalle + RT — 0/2
-- [ ] Click anuncio → `<AnnouncementDetail />` modal o panel secundario
-- [ ] Socket `announcement:new` → toast + invalidate lista + badge unread aumenta
+### 1.2 Detalle + RT — 1/2
+- [x] Click anuncio → handler segun `parseActionUrl()`: internal (router.push) / external (window.open '_blank') / internal-future (toast amable) / unknown (console.warn). Sin modal/panel — los anuncios entran completos en card, no merecen detail page.
+- [ ] Socket `announcement:new` → invalidate + badge unread aumenta — depende W.11 sockets RT (~20%). Fase B.
 
 ---
 
@@ -91,14 +90,14 @@ Socket events:
 
 ---
 
-## Fase 4 — Tests (~30min) — 0/3
+## Fase 4 — Tests (~30min) — 2/3 ✓
 
-### 4.1 Vitest — 0/1
-- [ ] Mark as read optimistic
+### 4.1 Vitest — 1/1 ✓
+- [x] **Helpers puros 39 tests verde:** `announcementDeeplink.test.ts` (23 — 13 mappings + none/external/edge + backlog future) + `announcementsUnread.test.ts` (16 — countUnread + lastSeenKey + timeAgo). 309/309 suite total.
 
-### 4.2 Playwright — 0/2
-- [ ] Happy path: ver lista + leer anuncio + ver banner rotando
-- [ ] Edge case: socket `announcement:new` → toast aparece + badge actualiza
+### 4.2 Playwright — 1/2
+- [x] **E2E `anuncios.spec.ts` 10/10 verde (15s estable, serial mode):** auth gate / SSR lista sorted / click action interna (golden ticket → /desafio, espejo Expo) / click sin action_url (no nav, info estatica) / click internal-future (toast amable, no nav) / empty state / BellPopover badge unread baja a 0 al abrir / Ver todos navega / click card popover golden ticket → /desafio / sidebar item Anuncios navega.
+- [ ] Edge case socket `announcement:new` — Fase B (depende W.11).
 
 ---
 
@@ -197,9 +196,16 @@ logic. Cuando se ejecute esta seccion W.14, tocar:
 
 ---
 
-## Cierre
+## Cierre Fase A (2026-06-29) — 10/20
 
-- [ ] Tests verde
-- [ ] Validado 3 viewports
-- [ ] Lighthouse OK
-- [ ] Commit DaVinci + memoria + PENDIENTES.md
+- [x] Tests verde — 309/309 vitest + 10/10 E2E anuncios.spec.ts
+- [x] Commit DaVinci + memoria + PENDIENTES + PARITY actualizados
+- [ ] Validado 3 viewports — Fase B con banners (los anuncios solos son lista vertical estandar)
+- [ ] Lighthouse OK — batch QA final cross-modulos
+
+## Pendiente Fase B (~2h)
+
+- [ ] BannersCarousel auto 5s + indicators + video/image (tocar W.2 home tambien)
+- [ ] HighlightsList + cross-link con W.2 home
+- [ ] Socket `announcement:new` (depende W.11)
+- [ ] **Web Push real (manifest + SW + VAPID + endpoint backend `/me/push-subscriptions`)** → W.12 Polish, no aqui. Backend ya tiene 8 tipos de push (`announcement`, `agenda_reminder`, `agenda_update`, `session_changed`, `staff_invitation`, `staff_accepted`, `support_resolved`, `refresh_all`) que el cliente Expo procesa via `useNotifications.ts:67-77`. Cuando se haga Web Push, respetar este enum 1:1.

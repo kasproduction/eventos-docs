@@ -29,6 +29,7 @@
 | W.7 Sponsors | brand wall + profile + favorite + contact + trivia | **23/23** | **CERRADO 2026-06-21** (wall espejo Expo + DetailPanel + Trivia + ContactForm + 14 vitest + 12 E2E + Lighthouse 98) | **100%** | Si |
 | W.8 Networking | directorio + suggested + perfil + solicitudes + bloqueados + mi perfil | 15/25 | Directorio + perfil in-slot + solicitudes + vCard/WhatsApp/Email (sin bloqueados ni mi perfil ni filtro role) | ~60% | Si |
 | W.9 Engagement | encuestas + leaderboard + logros + passport + rewards + prizes | **35/35** | **CERRADO 2026-06-29** (hub split + 6 cards + 6 panels + RGB ring + QR real + lazy fetch + redeem optimistic + redemptions inline + bloque orphans + 11 E2E + 33 vitest. Encuestas viven en W.4) | **100%** | Si |
+| W.14 Anuncios + Bell | lista anuncios + popover bell + deep links + banners + highlights + push | **10/20** | **Fase A 2026-06-29** (lista `/anuncios` + BellPopover sidebar + helper deep-link 13 mappings + localStorage unread + 10 E2E + 39 vitest helpers). Faltan banners + highlights + RT socket (W.11) + Web Push (W.12) | **50%** | Si |
 | **W.10 Live Hub** | hero + side + upcoming + 4 estados visuales + nav | **16/16** | **CERRADO por consenso 2026-06-20** (commit `0e185e6` + E2E 8 escenarios + validado visual con seeder) | **100%** | Si |
 | W.11 Sockets RT | client + rooms + listeners + invalidation + fallback | 0/42 | Singleton usado en W.4 streaming | ~20% | Si |
 | W.12 Polish + E2E + PWA | responsive + a11y + perf + PWA + Sentry validation | 0/43 | No empezado | 0% | Si (cierre Fase 1) |
@@ -52,8 +53,8 @@
 | Modulos 0% empezados | 8 (W.12-W.17, W.X) |
 | Endpoints backend cubren features | 117/117 (100%) |
 | Endpoints backend bonus disponibles | 34 (Pulse organizer, webhooks, presets, etc) |
-| Tests vitest (estado actual) | **270/270 verde** (2026-06-29: +11 redemptions inline + helpers W.9) |
-| Tests Playwright E2E | 10 specs (agenda, auth-gate, desafio, home, live, login-form, social, speakers, sponsors, streaming, verify-page) — 11/11 desafio verde con serial mode |
+| Tests vitest (estado actual) | **309/309 verde** (2026-06-29: +39 W.14 deeplink + unread helpers) |
+| Tests Playwright E2E | 11 specs (agenda, anuncios, auth-gate, desafio, home, live, login-form, social, speakers, sponsors, streaming, verify-page) — 10/10 anuncios + 11/11 desafio verde con serial mode |
 
 ---
 
@@ -71,7 +72,7 @@
 | `(tabs)/profile.tsx` | Perfil usuario | W.10 | Parcial (~10%) | me, me/profile, me/photo, me/onboarding-data, me/registration-fields | Form editable nombre/foto/bio/intereses, settings idioma/tema, cerrar sesion, user menu dropdown completo | CRITICO |
 | `about.tsx` | Acerca evento | W.10 o W.13 | 0% | events/{id}/branding (about_text, about_image_url, about_links) | No existe vista en webapp. Considerar agregar a docs W.10 o W.13 | IMPORTANTE |
 | `agenda.tsx` | Lista agenda + filtros + favoritos + .ics + rating | W.3 | Done (80%) | agenda, sessions/{id}/favorite, sessions/{id}/rate, my-ratings, calendar.ics | Lifecycle badges (ORIGINAL/AJUSTADA/CANCELADA), conflictos, room check-in boton, recordatorio 10min, RT socket invalidation | IMPORTANTE (resto diferido a W.11, W.12) |
-| `anuncios.tsx` | Lista anuncios + deep links | W.14 | 0% | events/{id}/announcements | Lista + detalle + socket RT + deep link handler `eventos://` | CRITICO |
+| `anuncios.tsx` | Lista anuncios + deep links | W.14 | **Done Fase A 2026-06-29** | events/{id}/announcements | Lista vertical espejo Expo + BellPopover sidebar + helper deep-link (13 mappings: gamification/agenda/session/speakers/sponsors/social/anuncios + my-support/faq/recap/join-team graceful future) + localStorage unread + 10 E2E. Socket RT pendiente (W.11). Web Push pendiente (W.12). | — |
 | `assign-staff.tsx` | QR scan asignar staff | N/A | N/A | rooms/admin, rooms/assign | Solo mobile (requiere camara). No portar | N/A |
 | `attendee/[id].tsx` | Perfil otro asistente | W.8 | Done (in-slot panel) | attendees/{id}/profile, contacts/request, contacts/block | Implementado como panel der MUTA — verificar tests E2E | — |
 | `banners.tsx` | Carousel banners patrocinadores | W.14 | 0% | events/{id}/banners | BannersCarousel auto 5s + imagen/video | IMPORTANTE |

@@ -8,8 +8,33 @@
 
 ## Ultima sesion
 
-**Fecha:** 2026-06-29 (Sprint 2.B **W.9 CERRADO 35/35** — redemptions inline + E2E 11/11 verde + 3 viewports + PARITY sync)
-**Total acumulado webapp:** **404/707 = 57.1%** (+5 desde 56.4% en una sola sesion)
+**Fecha:** 2026-06-29 (Sprint 2.C **W.14 Fase A entregada 10/20** — lista anuncios + BellPopover + deep-link helper + golden ticket E2E verificado)
+**Total acumulado webapp:** **414/707 = 58.6%** (+10 desde 57.1%, +15 en el dia)
+
+### W.14 Fase A (2026-06-29 — 10/20, 50%):
+
+1. **`lib/announcement-deeplink.ts`** — helper puro `parseActionUrl()` con 13 mappings `eventos://*` → rutas webapp. Verificado contra grep backend: `GameController:685` + `GoldenTicketResource:144,232` + `EventPhotoResource:237,364` ya generan `action_url: eventos://gamification/rewards` cuando alguien gana — webapp lo mapea a `/desafio` directo. Backlog W.13/W.15/W.17 caen a `internal-future` con toast amable. Externos a `window.open('_blank', noopener,noreferrer)`. Desconocidos a `console.warn` sin romper UI. 23 vitest.
+2. **`lib/announcements.ts`** — SSR fetcher con apiFetch + bearer cookie. Backend mezcla publicos por rol + privados `target_attendee_id`.
+3. **`lib/announcements-unread.ts`** — helpers puros `countUnread` / `lastSeenKey` / `timeAgo` con `now` inyectable. 16 vitest.
+4. **Ruta `/[locale]/(app)/anuncios/page.tsx`** SSR + `AnnouncementsView` cliente con lista vertical espejo Expo `anuncios.tsx`. Cards expandibles inline si tienen action_url (sin modal/panel — los anuncios entran completos en card). Marca `lastSeenAt` al montar para bajar badge bell.
+5. **`BellPopover`** reemplaza `<span>` placeholder en `SidebarPill` (W.0). Preview 5 mas recientes + footer "Ver todos" → `/anuncios`. Badge unread via `localStorage:eventos:announcements:lastSeenAt:{eventId}` con sync cross-tab via `storage` event. Lazy init useState (no setState-in-effect). Divergencia intencional vs Expo (mobile bottom tabs vs sidebar desktop, popover ahorra navegacion).
+6. **Sidebar nav item Anuncios** (icono Megaphone, available:true).
+7. **i18n** namespace `anuncios.*` en es/en/pt (title/subtitle/empty/popover/futureToast/openCta).
+8. **Layout integration** `app/[locale]/(app)/layout.tsx` fetch announcements server-side, pasa a SpatialShell → SidebarPill.
+9. **E2E `anuncios.spec.ts` 10/10 verde** (15s estable, serial mode): auth gate / SSR sorted by fecha / click eventos://gamification/rewards → /desafio / click sin action_url no nav / click internal-future toast / empty state via bearer "no-announcements" / Bell badge unread cae a 0 al abrir / popover footer Ver todos / popover card golden ticket cierra+nav / sidebar item Anuncios nav.
+10. **309/309 vitest verde** (+39 nuevos: 23 deeplink + 16 unread), typecheck OK, lint W.14 clean, build OK (proxy NO necesario — fetcher SSR directo).
+
+### Decisiones cerradas en esta sesion (no preguntar)
+
+- **Sin tabs "Todos/No leidos"** — backend no persiste read_at, tabs serian cosmeticas confusas.
+- **Sin modal/panel detail** — anuncios entran completos en card.
+- **localStorage:lastSeenAt scopeado por eventId** — multi-evento aislado, sobrevive recarga.
+- **BellPopover divergencia intencional** vs contador in-memory de Expo — sidebar lateral webapp ahorra navegacion. Documentado en memoria.
+- **Web Push real → W.12 Polish** (no W.14). Backend tiene 8 tipos de push enum documentados en `project_webpush_w12_pending.md` para respetar 1:1 cuando se implemente. iOS Safari requiere PWA instalada home screen.
+- **RT socket `announcement:new` → Fase B** (depende W.11 sockets 20%).
+- **Banners + Highlights → Fase B** (tocan W.2 home, no contaminar en esta sesion).
+
+### Cierre formal W.9 (2026-06-29 — 35/35, 100%):
 
 ### Cierre formal W.9 (2026-06-29 — 35/35, 100%):
 
@@ -171,12 +196,11 @@ Sesion 1 entrego: hub split layout + 6 cards + 6 panels + RGB ring + QR real + A
 ## Para arrancar la proxima sesion
 
 1. Abrir `docs/living/PENDIENTES-WEBAPP.md` desde donde estes
-2. Mirar **"QUE SIGUE"** arriba — tarea concreta: **Sprint 2.C — W.14 Anuncios + Boletines + Bell** (~3-4h, 1 sesion)
-   - Lista anuncios + detalle + socket RT + deep link handler
-   - BannersCarousel auto 5s + imagen/video
-   - Highlights mini carousel
-   - BellPopover con counter unread
-3. Despues de W.14: Sprint 2.D W.17 Soporte (~3h) → Sprint 2.E W.18 Hub Personal (~5-6h) → Sprint 3 W.6 completar.
+2. Mirar **"QUE SIGUE"** arriba — opciones:
+   - **W.14 Fase B residual** (~2h) — banners + highlights + RT socket (depende W.11)
+   - **Sprint 2.D W.17 Soporte** (~3h) — tickets simples + mis consultas
+   - **Sprint 2.E W.18 Hub Personal** (~5-6h) — perfil editable + settings + Mi QR mobile
+3. **Web Push real** queda formalmente registrado en `project_webpush_w12_pending.md` para Sprint W.12 Polish (~6-8h cross-stack con manifest+SW+VAPID+endpoint backend).
 
 **QA pendiente (cross-modulos, batch final pre-demo):**
 - Lighthouse Performance autenticado en `/es/agenda`, `/es/speakers`, `/es/sponsors`, `/es/live`, `/es/social` (cookie inyectada via puppeteer)
