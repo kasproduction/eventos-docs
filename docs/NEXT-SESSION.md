@@ -8,10 +8,65 @@
 
 ## Ultima sesion
 
-**Fecha:** 2026-06-29 (Sprint 2.B sesion 2 — W.9 Desafio shapes + lazy fetch + redeem optimistic + haptic + tickets individuales)
-**Total acumulado webapp:** **399/707 = 56.4%** (+12 desde 54.7%)
+**Fecha:** 2026-06-29 (Sprint 2.B sesion 3 — W.9 Desafio redemptions inline + E2E 8/8 verde)
+**Total acumulado webapp:** **402/707 = 56.9%** (+3 desde 56.4%)
 
-### Que se hizo (2026-06-29):
+### Que se hizo (2026-06-29 — sesion 3 E2E):
+
+**E2E `desafio.spec.ts` — 8/8 verde, 13s estable:**
+
+1. Auth gate (sin cookie → /es/login)
+2. SSR hub renderiza (hero + 6 cards + panel vacio)
+3. Click ticket pending → panel reveal sin lista repetida
+4. Rewards panel: 5 estados CTA inline visibles (Canjear / Mostrar QR / Ya canjeado / Agotado / Faltan X)
+5. Mostrar QR: spy verifica NO se hace POST al proxy `/api/desafio/.../redeem/...`
+6. Canjear: spy verifica POST exactamente 1 vez + modal loading→ready
+7. Esc cierra RedeemModal (panel sigue abierto)
+8. Bloque orphans: reward 999 retirado aparece arriba + click reabre modal sin POST
+
+**Infraestructura E2E nueva:**
+- Fixture `desafioFixture` en `e2e/_fixtures/data.mjs` (leaderboard + myPoints + myPrizes + rewards con 5 ids variados + myRedemptions con 3 estados + passport)
+- 7 handlers en `e2e/_helpers/mockBackend.mjs` (`/leaderboard`, `/me/points`, `/me/prizes`, `/rewards`, `/my-passport`, `/me/redemptions`, POST `/rewards/:id/redeem`)
+- `test.describe.configure({ mode: "serial" })` interno al describe "con auth" — con 8 workers paralelos el dev server saturaba (SSR combina 5 fetches + lazy fetch agrega 2). Serial corre ~2s/test estable vs 30s timeout flaky.
+
+### Decisiones cerradas en esta sesion (no preguntar)
+
+- **Tab "Mis canjes" descartado.** Expo NO tiene tab separada — las redemptions viven INLINE en el catalogo. La webapp espejo: cada card del catalogo chequea su redemption activa y muta el CTA. Si el reward fue retirado, bloque "Canjes activos sin catalogo" arriba garantiza acceso al QR.
+- **"Mostrar QR" reusa token existente** — `handleShowExistingQR` reabre `RedeemModal` en `ready` con `myRedemptions[]` ya cacheado, sin pegar POST otra vez. Cero riesgo de cobrar puntos doble.
+- **Helpers puros con `now` inyectable** (`findActiveRedemption(rewardId, redemptions, now?)`) — facilita tests sin mocks de Date.
+- **`test.describe.configure({ mode: "serial" })` para specs con SSR pesado.** Specs cuyo SSR combina 5+ fetches saturan el dev server con 8 workers paralelos y se vuelven flaky por timeout. Serial mode interno al describe los hace estables sin sacrificar cobertura. Patron a aplicar en otros specs si aparece flakiness.
+
+### Estado git al cierre
+
+- `eventos-web` main: cambios LOCALES sin commit todavia. Archivos modificados: `DesafioView.tsx`, `DesafioDetail.tsx`, `RewardsPanel.tsx`, `desafio.css`, `desafio-client.ts`, `desafio-normalize.ts`, `types/desafio.ts`, `desafioNormalize.test.ts`, `e2e/_fixtures/data.mjs`, `e2e/_helpers/mockBackend.mjs`. Archivos nuevos: `src/app/api/desafio/[eventId]/redemptions/route.ts`, `e2e/desafio.spec.ts`. HEAD remoto: `4238c69`. Suite **270/270 vitest verde** + **8/8 E2E desafio verde** (serial mode 13s), typecheck OK, lint W.9 clean.
+- `APP EVENTOS` main: cambios LOCALES sin commit todavia en `PENDIENTES-WEBAPP.md` + `NEXT-SESSION.md`. HEAD remoto: `b266448`.
+- Cuando hagas el commit, sumar los 2 archivos: en eventos-web `feat(W.9): redemptions inline + E2E desafio.spec.ts 8/8 verde — sin tab Mis canjes, espejo Expo`; en APP EVENTOS `docs(W.9): sesion 3 — 33/35 + redemptions inline + E2E + memoria`.
+
+### Que se hizo previamente (2026-06-29 — sesion 3 parcial):
+
+1. **Hallazgo de auditoria espejo Expo:** Expo NO tiene tab "Mis canjes" — las redemptions estan EMBEBIDAS INLINE en cada card del catalogo de rewards (`leaderboard.tsx:316-345`). El tab placeholder que arrastrabamos del Sprint 2.B sesion 2 era invento webapp y chocaba con `feedback_mirror_feature_completo.md` + `feedback_no_repetir_info_en_panel.md`. Decision tomada via filtro DaVinci: **eliminar tab + integrar 3 estados inline**.
+
+2. **Tipo + helpers puros + tests:**
+   - Nuevo `DesafioMyRedemption` en `lib/types/desafio.ts` (id + reward nullable + status + token opcional + expires_at + created_at).
+   - `lib/desafio-normalize.ts`: `normalizeMyRedemption`, `findActiveRedemption(rewardId, redemptions, now?)`, `hasConfirmedRedemption(rewardId, redemptions)`, `orphanActiveRedemptions(catalogIds, redemptions, now?)`.
+   - +8 tests vitest en `desafioNormalize.test.ts` (22 totales en el archivo, 270/270 verde total).
+
+3. **Proxy Next + fetcher:** `src/app/api/desafio/[eventId]/redemptions/route.ts` → `GET /me/redemptions?event_id=X` con auth cookie. Fetcher `fetchMyRedemptionsClient` en `desafio-client.ts`.
+
+4. **DesafioView wireado:**
+   - Nuevo state `myRedemptions[]`. Lazy fetch en paralelo cuando se abre el panel `rewards` (`Promise.all([rewards, redemptions])`).
+   - Refetch silencioso tras un redeem exitoso (para que al cerrar y reabrir el modal el catalogo muestre "Mostrar QR" inmediato).
+   - Nuevo handler `handleShowExistingQR(rewardId)`: reabre `RedeemModal` directo en estado `ready` con el token EXISTENTE — sin pegarle otra vez al POST `/redeem` (no se descuentan puntos dobles).
+
+5. **RewardsPanel refactor:**
+   - Eliminado tab "Catalogo / Mis canjes".
+   - Cada `dx-reward-card` ahora elige CTA segun 5 estados (en prioridad): pending+token vigente → "Mostrar QR" (TEAL borderless) / confirmed → "Ya canjeado" disabled + badge check / agotado / canjeando / can_redeem / faltan X.
+   - Bloque `.dx-rewards-orphans` arriba del grid si hay redemptions pending vigentes de rewards retirados del catalogo (garantiza que el usuario nunca pierda acceso al QR).
+   - CSS nuevo: `.dx-btn.dx-btn-show-qr` (TEAL borderless), `.dx-reward-badge-confirmed` (badge check esquina del thumb), bloque orphans con borde+fondo TEAL soft.
+
+6. **270/270 vitest verde** (+11 desde 259), typecheck OK, lint clean del modulo desafio.
+
+### Que se hizo previamente (2026-06-29 sesion 2):
 
 1. **Shape gaps cliente↔backend resueltos** (cero modificacion backend, contrato Expo intacto) — 3 bugs criticos detectados via auditoria del flow real:
    - `/me/prizes`: `normalizeTicket` lee `reward.name`/`sponsor.name` nested (bug visible "adasdas · por" / "de ." en 104.png — el reveal del Golden Ticket mostraba string vacio).
@@ -43,22 +98,6 @@
 8. **27 tests vitest nuevos** — `desafioDerive.test.ts` (11 helpers puros) + `desafioNormalize.test.ts` (14 cubriendo los 3 shape gaps). Suite total 259/259 verde (era 232).
 
 9. **Roadmap actualizado** — `PENDIENTES-WEBAPP.md` counter W.9 18→30/35, total 387→399 (56.4%) + `W.9-encuestas-gamification.md` reescrito con arquitectura final.
-
-### Decisiones cerradas en esta sesion (no preguntar)
-
-- **Encuestas NO viven en W.9** — viven en W.4 Streaming (in-stream context con sockets). NO duplicar en hub.
-- **Toast "+X pts via diff" descartado** por espejo Expo. Expo NO muestra toast al ganar puntos. Ver `feedback_no_points_diff_toast.md`.
-- **`claimTicket` attendee-side NO existe** — el vendedor confirma con `POST /rewards/confirm`. El attendee solo muestra QR.
-- **Backend es la verdad firme** — Expo lo consume hoy en produccion. Webapp SIEMPRE se adapta al shape backend, nunca al reves.
-- **Panel der NUNCA repite info que ya esta en wall card** — cada wall card lista sus items, click en item → detalle in-panel. Ver `feedback_no_repetir_info_en_panel.md`.
-- **Desktop usa panel der, NO modal** — modal solo cuando el flujo es fundamentalmente externo al panel (caso unico: `RedeemModal`). Ver `feedback_no_modal_desktop.md`.
-
-### Estado git al cierre — todo pusheado
-
-- `eventos-web` main: `4238c69` (feat W.9 sesion 2 — shapes backend reales + lazy fetch + redeem optimistic + haptic + tickets individuales) ← HEAD pusheado
-- `APP EVENTOS` main: `8daec39` (docs W.9 sesion 2 entregada — 30/35 + roadmap actualizado) ← HEAD pusheado
-- Suite eventos-web: **259/259 vitest verde** (+27 nuevos), typecheck OK, lint W.9 clean
-- 3 memorias nuevas: `feedback_no_repetir_info_en_panel.md`, `feedback_no_modal_desktop.md`, `feedback_no_points_diff_toast.md`. Actualizada `project_w9_engagement_webapp.md`.
 
 ### Original (sesion previa)
 
@@ -120,12 +159,11 @@ Sesion 1 entrego: hub split layout + 6 cards + 6 panels + RGB ring + QR real + A
 ## Para arrancar la proxima sesion
 
 1. Abrir `docs/living/PENDIENTES-WEBAPP.md` desde donde estes
-2. Mirar **"QUE SIGUE"** arriba — tarea concreta: **Sprint 2.B residual W.9** (~2-3h, sesion corta)
-   - Tab "Mis canjes" del RewardsPanel wireado con `GET /me/redemptions` (placeholder hoy)
-   - Tests E2E `desafio.spec.ts` (5 escenarios: auth gate, SSR hub, click ticket pending abre panel reveal, redeem optimistic, Esc cierra)
-   - Validar manual 3 viewports (desktop 1600 / tablet H 1130 / mobile webapp)
+2. Mirar **"QUE SIGUE"** arriba — tarea concreta: **Sprint 2.B residual W.9** (~30min, sesion muy corta)
+   - **Commit + push** de los 2 repos (eventos-web + APP EVENTOS) — cambios sesion 3 estan LOCALES
+   - Validar manual 3 viewports (desktop 1600 / tablet H 1130 / mobile webapp) — sobre todo el flujo nuevo "Mostrar QR" reabriendo modal con token existente
    - Counter PARITY-MATRIX sincronizar W.9
-   - Cierre formal 30/35 → 35/35
+   - Cierre formal 33/35 → 35/35
 3. Despues de cerrar W.9: Sprint 2.C (W.14 Anuncios + Bell, ~3-4h) → Sprint 2.D (W.17 Soporte, ~3h) → Sprint 2.E (W.18 Hub Personal, ~5-6h)
 
 **QA pendiente (cross-modulos, batch final pre-demo):**
