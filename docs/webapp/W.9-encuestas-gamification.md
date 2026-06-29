@@ -1,17 +1,35 @@
-# W.9 — Encuestas + Gamification + Passport + Rewards
+# W.9 — Desafio (Engagement Hub)
 
-> Encuestas (live polls + surveys post-evento) + Leaderboard + Logros (acciones completadas — no badges separados) + Passport stamps + Rewards/Redemption. Engagement core.
+> Leaderboard + Logros (acciones completadas) + Passport stamps + Rewards/Redemption + Golden Tickets. Engagement core.
 >
-> **Estimacion:** ~8h (reducida de 10h tras audit — sin badges/streak inventados).
+> **Counter:** **30/35 (86%)** — Sprint 2.B sesion 2 entregada (2026-06-29, commit `4238c69` local)
+> **Estimacion total:** ~12h (gastadas ~9h, faltan ~2-3h)
 > **Dependencias:** W.0, W.1.
-> **Estado:** Pendiente — backend audit completado 2026-05-07.
 
-**Sub-areas (tabs internos en pantalla "Engagement"):**
-- **Tab 1: Encuestas** (polls fuera de sesion + surveys post-evento)
-- **Tab 2: Leaderboard** + mi posicion + breakdown
-- **Tab 3: Mis Logros** (`attendeeStatus.actions` — NO badges como entidad)
-- **Tab 4: Passport** (stamps por visitar stands)
-- **Tab 5: Rewards** (canjear puntos por premios)
+**Arquitectura final (2026-06-29):**
+- Hub split layout literal espejo W.7. Wall izq apila 6 cards (Hero/Tickets/Premios/Tip/Retos/Pasaporte) — click en card abre panel der con detalle.
+- **Encuestas viven en W.4 Streaming** (in-stream context con `poll:new`/`poll:vote`/`poll:closed` sockets). NO se replican en W.9 hub.
+- **Golden Tickets**: wall card lista TODOS los tickets, cada pending es boton individual, click → panel der con SU reveal (sin lista repetida ni modal).
+- **Redeem optimistic**: modal abre inmediato con QR skeleton, backend genera token + descuenta puntos en paralelo, modal rellena cuando llega.
+- **Sin toast "+X pts via diff"**: descartado por espejo Expo (Expo NO muestra toast al ganar puntos, sube silencioso al refrescar).
+- **Colores TEAL/GOLD/CYAN fijos** del sistema gamification, NO `var(--accent)` del cliente.
+- **Haptic** wireado en todo el modulo (5 intensidades en `lib/haptic.ts`).
+
+**Cards del wall (todas implementadas):**
+- HeroCard — avatar + puntos + posicion + barra segmentada vs lider + podio escalado top 3
+- GoldenTicketsCard — TODOS los tickets, pending son botones, claimed son info
+- RewardsPreviewCard — preview primeros 2 (oculta si `rewards_enabled=false`)
+- TipCard — proximo objetivo motivacional
+- RetosCard — barra completed/total + proximo reto
+- PasaporteCard — barra + grid 6 stamps + boton "+N" (oculta si `passport_enabled=false`)
+
+**Panels del detail (todos implementados):**
+- GoldenTicketPanel — reveal de UN ticket especifico
+- RankingPanel — podio + lista top 50
+- RewardsPanel — catalogo + redeem optimistic con RedeemModal
+- RetosPanel — lista de logros con estado
+- PasaportePanel — grid completo + metadata
+- RulesPanel — reglas educativas + tabla puntos
 
 ---
 
@@ -123,101 +141,85 @@ NO existen como eventos dedicados: `points.awarded`, `leaderboard.updated`, `bad
 
 ---
 
-## Fase 0 — Hooks (~30min) — 0/4
+## Fase 0 — Hooks / fetchers — 3/4
 
-- [ ] `useSurveys(eventId)` — surveys del evento
-- [ ] `useLeaderboard(eventId)` — top 50 + my_position + my_points
-- [ ] `useMyPoints(eventId)` — total + actions[]
-- [ ] `useGamificationConfig(eventId)` — para mostrar reglas
-
----
-
-## Fase 1 — Encuestas / Surveys (~1.5h) — 0/4
-
-### 1.1 Lista — 0/2
-- [ ] `<SurveysList />` con filtros activas/cerradas
-- [ ] Cada survey: titulo + tiempo restante o "Cerrada"
-
-### 1.2 Votar — 0/2
-- [ ] Click opcion → `POST /polls/{id}/vote {option_id}` → mostrar resultados
-- [ ] Si ya voto: muestra resultado directo (`my_answers` no vacio)
+- [x] **`fetchDesafioOverview(eventId)`** SSR — agrega 5 endpoints (`/leaderboard` + `/me/points` + `/me/prizes` + `/rewards` + `/my-passport`) con degradacion suave. Reemplaza `useMyPoints` + `useLeaderboard` separados con una llamada SSR. `lib/desafio.ts`.
+- [x] **Lazy fetchers client** (`lib/desafio-client.ts`): `fetchRankingClient`, `fetchRewardsClient`, `fetchPassportClient`, `redeemRewardClient`. Llamados al abrir cada panel via proxies Next `/api/desafio/[eventId]/{leaderboard|rewards|passport|redeem/[rewardId]}`.
+- [x] **`fetchDesafioRanking` server** (`lib/desafio.ts`) — equivalente server-side de `useLeaderboard`.
+- [~N/A] `useGamificationConfig` — `actions[]` ya viene embebido en `/me/points` response, no requiere hook separado.
 
 ---
 
-## Fase 2 — Leaderboard (~1.5h) — 0/4
+## Fase 1 — Encuestas / Surveys — N/A descartado
 
-### 2.1 Tabla — 0/2
-- [ ] `<LeaderboardTable />` top 50 (backend default), opcion "ver todo" si pedimos endpoint paginado
-- [ ] Cada fila: posicion + avatar + nombre + total_points
-
-### 2.2 Mi posicion — 0/2
-- [ ] Sticky bar con `my_position + my_points`
-- [ ] Si `my_position > 50` → mostrar "Estas en posicion #234" debajo del top 50
+- [~N/A] **Encuestas viven en W.4 Streaming** (in-stream context con `poll:new`/`poll:vote`/`poll:closed` sockets). NO duplicar en W.9 hub. Decision arquitectural 2026-06-28.
 
 ---
 
-## Fase 3 — Mis Logros (NO Badges) (~1h) — 0/3
+## Fase 2 — Leaderboard — 3/4
 
-### 3.1 Grid — 0/2
-- [ ] `<MisLogros />` itera sobre `attendeeStatus.actions[]`
-- [ ] Cada item: icon + label + earned/possible + completed badge si `completed=true`
-- [ ] Items con `completed=false` en grayscale
-
-### 3.2 Detalle (modal) — 0/1
-- [ ] Click → modal con descripcion del action + cuantos puntos da + `daily_max` si aplica + cuantas veces lo completaste
+- [x] `RankingPanel` muestra top 50 (`leaderboard()` PointsService backend ya limita a 50).
+- [x] Cada fila: posicion + avatar (boring-avatars beam fallback) + nombre + total_points.
+- [x] Sticky bar `my_position + my_points` — HeroCard del wall siempre visible con la posicion del usuario + barra segmentada vs lider.
+- [x] `my_position > 50` cubierto — backend devuelve `my_position` separado del top 50, panel muestra siempre "Tu posicion #N".
+- [ ] Share rank social — fuera scope sesion 2, va a backlog futuro.
 
 ---
 
-## Fase 4 — Passport stamps (~1.5h) — 0/4
+## Fase 3 — Mis Logros / Retos — 3/3
 
-### 4.1 Passport visual — 0/2
-- [ ] `<Passport />` libreta visual con grid de stamps obtenidos via `GET /events/{id}/my-passport`
-- [ ] Cada stamp: icono sponsor/stand + nombre + fecha desbloqueo
-
-### 4.2 Trigger desbloqueo — 0/2
-- [ ] `POST /events/{id}/visit-stand/{sponsorId}` se dispara desde:
-  - mobile: scanner QR del stand (no aplica web)
-  - web: visitar `<SponsorProfile>` (W.7) por X tiempo o click en CTA
-- [ ] Socket `data:invalidate {entity:'passport'}` → invalidate `my-passport` → animacion stamp aparece + toast
+- [x] `RetosCard` (wall preview) + `RetosPanel` (lista completa) itera sobre `actions[]` del overview.
+- [x] Cada item: icon + label + earned/points + estado completed/pending (visual diferenciado `.dx-reto-row.done` vs `.pending`).
+- [x] Detalle inline en la lista (no modal separado — info ya esta visible).
 
 ---
 
-## Fase 5 — Rewards/Redemption (~2h) — 0/5
+## Fase 4 — Passport stamps — 3/4
 
-### 5.1 Catalogo — 0/2
-- [ ] `<RewardsCatalog />` grid usando `GET /events/{id}/rewards`
-- [ ] Cada reward: imagen + nombre + costo en puntos + boton "Canjear"
-- [ ] Si user no tiene puntos suficientes → boton deshabilitado con tooltip
-
-### 5.2 Redeem — 0/2
-- [ ] Click "Canjear" → modal confirm
-- [ ] `POST /events/{id}/rewards/{rewardId}/redeem` → muestra `redeemed_at` + codigo + instrucciones
-
-### 5.3 Mis redenciones + premios — 0/1
-- [ ] Tab "Mis Premios" mezcla `GET /me/prizes` + `GET /me/redemptions`
-- [ ] Cada item: tipo (golden_ticket / sorteo / canje) + estado + codigo
+- [x] `PasaporteCard` wall (preview 6 stamps + boton "+N") + `PasaportePanel` grid completo.
+- [x] Cada stamp: logo sponsor + nombre + tier + stamped_at.
+- [x] Solo VIEW (earning via QR fisico mobile — correcto, no aplica a webapp).
+- [ ] Socket `data:invalidate{entity:passport}` → animacion + toast — depende W.11 sockets RT, no es bloqueante para cierre W.9.
 
 ---
 
-## Fase 6 — Toast +X puntos via diff (~30min) — 0/2
+## Fase 5 — Rewards/Redemption — 4/5
 
-Como NO hay socket dedicado `points.awarded`:
-
-- [ ] Hook `useTrackPointsDiff()` guarda `previousTotal` antes de cada `data:invalidate` con entity `'points'`
-- [ ] Tras refetch, computa `delta = newTotal - previousTotal`
-- [ ] Si `delta > 0` → toast Sonner "+{delta} puntos"
-- [ ] Si delta>=10 (umbral) → animacion confetti sutil
+- [x] `RewardsPreviewCard` (wall preview 2 items) + `RewardsPanel` (catalogo grid completo via lazy fetch).
+- [x] Cada reward: icon + nombre + costo + `remaining_stock` + sponsor. `can_redeem` calculado cliente-side (`myPoints >= points_cost && remaining_stock > 0`).
+- [x] **Redeem optimistic** — boton "Canjear" abre `RedeemModal` INMEDIATO con estado loading (QR skeleton shimmer + "Estamos preparando tu codigo…"). En paralelo `POST /events/{id}/rewards/{rewardId}/redeem`. Al exito: modal transiciona a estado ready (QR real + countdown 5min). Al error: modal cierra + `lumina.error` con codigo especifico (`INSUFFICIENT_POINTS` / `OUT_OF_STOCK` / `ALREADY_PENDING`).
+- [x] Display token + hint "Muestra al vendedor" + countdown.
+- [ ] **Tab "Mis canjes"** wireado con `GET /me/redemptions` — placeholder hoy (tab existe en panel pero vacio). Scope sesion 3.
 
 ---
 
-## Fase 7 — Tests (~30min) — 0/3
+## Fase 6 — Golden Ticket reveal — 2/2
 
-### 7.1 Vitest — 0/1
-- [ ] Diff calc en `useTrackPointsDiff` con multiples invalidates seguidos
+- [x] `GoldenTicketPanel` panel der: trophy XL + line gold + overline "Ganador" + nombre + sponsor + claim_code XXL gold + QR grande con RGB rect animado (`@property --dx-rgb-angle`) + hint "Presenta este codigo en el stand de…" + countdown si `expires_at`.
+- [x] **Flow individual** (decision 2026-06-29): wall card lista TODOS los tickets, pending son `<button>` individuales con haptic, claimed son `<div>` info estatica. Click pending → selecciona ese ticket + abre panel der mostrando SU reveal solo (sin lista repetida ni modal). Click otra vez → toggle, cierra panel. Click otro pending → cambia ticket revelado.
 
-### 7.2 Playwright — 0/2
-- [ ] Happy path: votar survey + ver leaderboard + ver mis logros
-- [ ] Edge case: poll cerrada solo muestra resultados
+---
+
+## Fase 7 — Toast +X puntos via diff — N/A descartado
+
+- [~N/A] **Descartado 2026-06-29** por espejo Expo. El Expo NO muestra toast al ganar puntos: `visit-stand` + `trivia answer` + acciones del muro/agenda suben puntos silenciosamente, el usuario descubre el incremento al volver al HUD del home o al leaderboard. Memoria `feedback_no_points_diff_toast.md`.
+
+---
+
+## Fase 8 — Tests — 1/3
+
+- [x] **Vitest helpers puros** — `tests/components/desafio/desafioDerive.test.ts` (11 tests: `initials`, `pointsRatio`, `segmentsFilled`, `pointsToTop`, `sortActions`, `pickFeaturedTicket`, `retosProgress`) + `tests/lib/desafioNormalize.test.ts` (14 tests cubriendo los 3 shape gaps backend: ticket nested reward/sponsor, reward `can_redeem` calculado, passport `stands`→`stamps`).
+- [~N/A] Vitest diff calc — N/A (no implementamos points diff).
+- [ ] **Playwright `desafio.spec.ts`** (5 escenarios: auth gate, SSR hub renderiza, click ticket pending abre panel der con SU reveal, redeem optimistic abre modal con loading→ready, Esc cierra) — sesion 3.
+
+---
+
+## Fase 9 — Cierre formal — 0/4
+
+- [ ] Validar manual 3 viewports (desktop 1600 / tablet H 1130 / mobile webapp).
+- [ ] Lighthouse autenticado — batch QA final cross-modulos (no bloqueante).
+- [ ] Memoria — actualizar `project_w9_engagement_webapp.md` con arquitectura final + crear `feedback_no_repetir_info_en_panel.md` + `feedback_no_modal_desktop.md` + `feedback_no_points_diff_toast.md`.
+- [ ] Counter PARITY-MATRIX sincronizar W.9.
 
 ---
 
