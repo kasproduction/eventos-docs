@@ -37,13 +37,13 @@
 | W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 | — |
 | W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
 | W.13 FAQ + Docs + Pages | 0/17 | 0% — backlog | — |
-| W.14 Anuncios + Bell | **10/20** | **50% — Sprint 2.C Fase A 2026-06-29** (lista + BellPopover + deeplink + localStorage unread + E2E 10/10). Faltan banners + highlights + RT socket + Web Push (W.12) | **+10** |
+| W.14 Anuncios + Bell | **10/20** | **50% — Sprint 2.C Fase A v2 refactor 2026-06-29** (split layout wall + DetailPanel + BellPopover unico entry + deeplink + localStorage + E2E 13/13). Faltan banners + highlights + RT + Web Push (W.12) | **+10** |
 | W.15 Vendor Dashboard | 0/35 | **OPCIONAL** Fase 1 | — |
 | W.16 Live Moments | 0/23 | 0% — backlog | — |
 | W.17 Soporte | 0/15 | 0% — backlog | — |
 | **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **414/707** | **58.6%** | +10 W.14 Fase A (lista anuncios + BellPopover sidebar + deep link helper + localStorage unread + E2E 10/10 verde + 309/309 vitest + 105 E2E verde) |
+| **TOTAL** | **414/707** | **58.6%** | +10 W.14 Fase A (split layout anuncios + BellPopover unico entry + deep link helper + localStorage unread + E2E 13/13 verde + 309/309 vitest + 108 E2E verde) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
