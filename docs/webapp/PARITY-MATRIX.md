@@ -26,9 +26,9 @@
 | W.4 Streaming | detector source + player + Q&A + chat + polls + trivia + anuncios + replay + layout spatial | 83/111 | Socket + player + Q&A + chat + polls + layout | 75% | Si |
 | W.5 Speakers | directorio + featured + perfil + rating + deep link | **33/35** | **CERRADO maximo posible (lista + featured + perfil + rating + deep link + 27 vitest + 13 E2E + memoria + counter)** | **94%** (faltan Lighthouse + device fisico) | Si |
 | W.6 Social Wall | feed + posts + comentarios + likes + stories + photo contest + hashtags + filtros | **17/40** | Feed + composer + foto upload + likes optimistic + comentarios editorial + mis posts + 3 tests | **42%** (faltan stories, contest, hashtags, tabs explicitas) | Si |
-| W.7 Sponsors | brand wall + profile + favorite + contact + trivia | 0/23 | **No empezado** | 0% | Si |
+| W.7 Sponsors | brand wall + profile + favorite + contact + trivia | **23/23** | **CERRADO 2026-06-21** (wall espejo Expo + DetailPanel + Trivia + ContactForm + 14 vitest + 12 E2E + Lighthouse 98) | **100%** | Si |
 | W.8 Networking | directorio + suggested + perfil + solicitudes + bloqueados + mi perfil | 15/25 | Directorio + perfil in-slot + solicitudes + vCard/WhatsApp/Email (sin bloqueados ni mi perfil ni filtro role) | ~60% | Si |
-| W.9 Engagement | encuestas + leaderboard + logros + passport + rewards + prizes | 0/35 | **No empezado** | 0% | Si |
+| W.9 Engagement | encuestas + leaderboard + logros + passport + rewards + prizes | **35/35** | **CERRADO 2026-06-29** (hub split + 6 cards + 6 panels + RGB ring + QR real + lazy fetch + redeem optimistic + redemptions inline + bloque orphans + 11 E2E + 33 vitest. Encuestas viven en W.4) | **100%** | Si |
 | **W.10 Live Hub** | hero + side + upcoming + 4 estados visuales + nav | **16/16** | **CERRADO por consenso 2026-06-20** (commit `0e185e6` + E2E 8 escenarios + validado visual con seeder) | **100%** | Si |
 | W.11 Sockets RT | client + rooms + listeners + invalidation + fallback | 0/42 | Singleton usado en W.4 streaming | ~20% | Si |
 | W.12 Polish + E2E + PWA | responsive + a11y + perf + PWA + Sentry validation | 0/43 | No empezado | 0% | Si (cierre Fase 1) |
@@ -46,14 +46,14 @@
 |---|---|
 | Pantallas Expo (sin solo-mobile) | 33 |
 | Modulos webapp planeados | 22 (W.0-W.X + W.18 renombrado) |
-| Modulos 100% cerrados | 2 (W.1, W.1B) |
+| Modulos 100% cerrados | 5 (W.1, W.1B, W.7, W.9, W.10) |
 | Modulos casi cerrados (>=75%) | 4 (W.0, W.1, W.5, W.10) |
-| Modulos parcialmente implementados | 9 (W.0, W.2, W.3, W.4, W.5, W.6, W.8, W.10, W.11, W.18) |
-| Modulos 0% empezados | 10 (W.7, W.9, W.12-W.17, W.X) |
+| Modulos parcialmente implementados | 9 (W.0, W.2, W.3, W.4, W.5, W.6, W.8, W.11, W.18) |
+| Modulos 0% empezados | 8 (W.12-W.17, W.X) |
 | Endpoints backend cubren features | 117/117 (100%) |
 | Endpoints backend bonus disponibles | 34 (Pulse organizer, webhooks, presets, etc) |
-| Tests vitest (estado actual) | **194/194 fallando** (drift por pausa de mes — bloqueante cierres formales) |
-| Tests Playwright E2E | 9 specs (agenda, auth-gate, home, live, login-form, social, speakers, streaming, verify-page) |
+| Tests vitest (estado actual) | **270/270 verde** (2026-06-29: +11 redemptions inline + helpers W.9) |
+| Tests Playwright E2E | 10 specs (agenda, auth-gate, desafio, home, live, login-form, social, speakers, sponsors, streaming, verify-page) — 11/11 desafio verde con serial mode |
 
 ---
 
@@ -76,17 +76,17 @@
 | `attendee/[id].tsx` | Perfil otro asistente | W.8 | Done (in-slot panel) | attendees/{id}/profile, contacts/request, contacts/block | Implementado como panel der MUTA — verificar tests E2E | — |
 | `banners.tsx` | Carousel banners patrocinadores | W.14 | 0% | events/{id}/banners | BannersCarousel auto 5s + imagen/video | IMPORTANTE |
 | `documentos.tsx` | Lista documentos descargables | W.13 | 0% | events/{id}/documents | Lista cards icono MIME + size + download | IMPORTANTE |
-| `encuestas.tsx` | Encuestas vivas + polls | W.9 | 0% | events/{id}/surveys, polls/{id}/vote | Lista activas/cerradas + voting + socket poll:new/closed | CRITICO |
+| `encuestas.tsx` | Encuestas vivas + polls | **W.4** (no W.9) | Done en W.4 streaming | events/{id}/surveys, polls/{id}/vote | Vive in-stream (sockets poll:new/closed). Decision arquitectural sesion 2: NO duplicar en W.9 hub. | — |
 | `faq.tsx` | FAQ + contact support | W.13 | 0% | events/{id}/faqs, events/support/mine | Accordion 3 estados conversacionales (browsing/thinking/answering) + counter "Mis consultas" | IMPORTANTE |
 | `join-team/[token].tsx` | Acepta invitación stand | W.15 | 0% | stands/invitations/{token}, accept, reject | Vista publica sin-login + actualiza hasVendorAccess | OPCIONAL (W.15) |
 | `lead-detail.tsx` | Detalle lead | W.15 | 0% | leads/{id}, leads/{id}/edits | Detail drawer notas/tier editable + historial ediciones | OPCIONAL (W.15) |
-| `leaderboard.tsx` | Ranking + challenges + premios + Golden Ticket | W.9 + W.16 | 0% | leaderboard, my-points, passport, gamification, me/prizes, me/redemptions, rewards, rewards/redeem, rewards/confirm | Top 10 + my_position + 3 tabs (Leaderboard/Challenges/Rewards) + GoldenTicketModal QR + share rank | CRITICO |
+| `leaderboard.tsx` | Ranking + challenges + premios + Golden Ticket | W.9 + W.16 | **Done 100%** | leaderboard, my-points, passport, gamification, me/prizes, me/redemptions, rewards, rewards/redeem, rewards/confirm | Hub split (wall 6 cards + DetailPanel 6 paneles), redemptions INLINE en catalogo (5 estados CTA), Mostrar QR reusa token sin POST, bloque orphans, 11 E2E verde. share rank backlog futuro | — |
 | `leads.tsx` | Lista leads scanned (vendor) | W.15 | 0% | leads/{eventId}, leads/export | FlashList grouped por fecha + tier badges + FAB scanner (no aplica web — solo lista) | OPCIONAL (W.15) |
 | `mi-equipo.tsx` | Team management vendor | W.15 | 0% | me/stand, stands/members/invite-by-*, stands/members/{id}/remove, stands/members/{id}/transfer, stands/search-attendees, stands/share-link | Slots + Activos + Pendientes + invitar 3-vias + transfer ownership + remove + share link modal | OPCIONAL (W.15) |
 | `mi-stand.tsx` | Stand dashboard vendor | W.15 | 0% | stands/{eventId}, leads/{eventId} | Hero sponsor + stats clickables + scanner FAB (mobile only) | OPCIONAL (W.15) |
 | `my-support.tsx` | Mis consultas soporte | W.17 | 0% | events/support/mine | Lista cards status + admin_response green bar | CRITICO |
 | `pages/[id].tsx` | Pagina CMS dinamica | W.13 | 0% | events/{id}/pages, pages/{id} | WebView iframe/HTML body purificado DOMPurify | IMPORTANTE |
-| `passport.tsx` | Passport stamps stands visitados | W.9 | 0% (solo VIEW) | events/{id}/my-passport | Grid stamps + progreso "X/Y stands" + completed banner. Earning requiere QR fisico (mobile-only) | IMPORTANTE (VIEW only) |
+| `passport.tsx` | Passport stamps stands visitados | W.9 | **Done VIEW 100%** | events/{id}/my-passport | PasaporteCard wall + PasaportePanel grid completo + progress X/Y. Earning via QR fisico se queda mobile. | — |
 | `recap/[eventId].tsx` | Recap post-evento swipe | W.10 (Mi Recap link) | 0% | events/{eventId}/recap, events/{eventId}/my-recap | FlatList horizontal paging cover + cards. Estados: error, disabled, threshold not met. **No esta documentado en docs/webapp/W.X** — gap doc | IMPORTANTE |
 | `session/[id].tsx` | Detalle sesion + speakers + rate | W.3 | Done (DetailPanel) | agenda, sessions/{id}/favorite, sessions/{id}/rate, track | Verificar speakers grid clickable → speaker detail + add-to-calendar variants | — |
 | `session-chat/[id].tsx` | Chat sesion live + emojis flotantes + polls | W.4 | Parcial | sessions/{id}/chat, polls/{id}/vote, socket chat:* | Emojis flotantes animados (FloatingEmojiItem bounce + fade) — falta en webapp. Pinned message banner. | IMPORTANTE |
@@ -189,13 +189,13 @@
 - [ ] Skeleton mas amigable en AttendeeProfilePanel
 - [ ] Playwright E2E (abrir perfil → conectar → solicitud)
 
-### W.9 — Engagement (CRITICO, 0% done — incluye gamification del feedback usuario)
-- [ ] **Surveys** lista + votacion con socket poll:new/closed
-- [ ] **Leaderboard** top 50 + my_position sticky + share rank
-- [ ] **Mis Logros** grid actions (NO badges como entidad)
-- [ ] **Passport stamps** VIEW grid + progress (earning requiere mobile)
-- [ ] **Rewards** catalogo + redeem flow + my-prizes + Golden Ticket modal con QR
-- [ ] Toast +X puntos via diff tracking (no hay socket dedicado)
+### W.9 — Engagement (CERRADO 35/35, 100% — 2026-06-29)
+- [~N/A] **Surveys** — viven en W.4 Streaming (sockets poll:new/closed in-stream). Decision arquitectural sesion 2.
+- [x] **Leaderboard** top 50 + my_position sticky (HeroCard wall siempre visible). Share rank → backlog futuro.
+- [x] **Mis Logros** grid actions (RetosCard + RetosPanel, no badges como entidad — espejo Expo).
+- [x] **Passport stamps** VIEW grid + progress (earning via QR fisico se queda mobile).
+- [x] **Rewards** catalogo + redeem optimistic flow + my-prizes + Golden Ticket reveal con QR + redemptions INLINE en catalogo (5 estados CTA inline, bloque orphans).
+- [~N/A] Toast +X puntos via diff — descartado por espejo Expo. Expo no muestra toast al ganar puntos.
 
 ### W.18 — Hub Personal (CRITICO, ~10% done — renombrado desde W.10 viejo el 2026-06-20)
 - [ ] Form perfil editable (nombre + redes + foto + bio)

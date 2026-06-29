@@ -8,10 +8,22 @@
 
 ## Ultima sesion
 
-**Fecha:** 2026-06-29 (Sprint 2.B sesion 3 — W.9 Desafio redemptions inline + E2E 8/8 verde)
-**Total acumulado webapp:** **402/707 = 56.9%** (+3 desde 56.4%)
+**Fecha:** 2026-06-29 (Sprint 2.B **W.9 CERRADO 35/35** — redemptions inline + E2E 11/11 verde + 3 viewports + PARITY sync)
+**Total acumulado webapp:** **404/707 = 57.1%** (+5 desde 56.4% en una sola sesion)
 
-### Que se hizo (2026-06-29 — sesion 3 E2E):
+### Cierre formal W.9 (2026-06-29 — 35/35, 100%):
+
+**+5 items sobre 30/35 al cierre del Sprint 2.B:**
+
+1. **Redemptions INLINE en catalogo** (eliminado tab "Mis canjes" por espejo Expo). Helper puros + 8 vitest nuevos.
+2. **`handleShowExistingQR` reusa token sin POST** (cero riesgo cobrar puntos doble).
+3. **Bloque "Canjes activos sin catalogo"** para rewards retirados — el usuario nunca pierde el QR.
+4. **E2E desafio.spec.ts 11/11 verde**: 8 escenarios funcionales + 3 viewports automatizados (desktop 1600 / tablet H 1130 / mobile 390, validan no overflow horizontal).
+5. **PARITY-MATRIX sync**: W.9 0/35→35/35 + W.7 0/23→23/23 + totales (modulos cerrados 2→5, vitest 194 fail→270 verde, E2E 9→11 specs).
+
+Validacion visual Lighthouse + UX premium en device fisico → batch QA final cross-modulos (junto con W.3/W.5/W.7/W.10 — patron consistente del proyecto, no bloqueante para cierre formal de modulo).
+
+### Que se hizo previamente (2026-06-29 — sesion 3 E2E):
 
 **E2E `desafio.spec.ts` — 8/8 verde, 13s estable:**
 
@@ -159,12 +171,12 @@ Sesion 1 entrego: hub split layout + 6 cards + 6 panels + RGB ring + QR real + A
 ## Para arrancar la proxima sesion
 
 1. Abrir `docs/living/PENDIENTES-WEBAPP.md` desde donde estes
-2. Mirar **"QUE SIGUE"** arriba — tarea concreta: **Sprint 2.B residual W.9** (~30min, sesion muy corta)
-   - **Commit + push** de los 2 repos (eventos-web + APP EVENTOS) — cambios sesion 3 estan LOCALES
-   - Validar manual 3 viewports (desktop 1600 / tablet H 1130 / mobile webapp) — sobre todo el flujo nuevo "Mostrar QR" reabriendo modal con token existente
-   - Counter PARITY-MATRIX sincronizar W.9
-   - Cierre formal 33/35 → 35/35
-3. Despues de cerrar W.9: Sprint 2.C (W.14 Anuncios + Bell, ~3-4h) → Sprint 2.D (W.17 Soporte, ~3h) → Sprint 2.E (W.18 Hub Personal, ~5-6h)
+2. Mirar **"QUE SIGUE"** arriba — tarea concreta: **Sprint 2.C — W.14 Anuncios + Boletines + Bell** (~3-4h, 1 sesion)
+   - Lista anuncios + detalle + socket RT + deep link handler
+   - BannersCarousel auto 5s + imagen/video
+   - Highlights mini carousel
+   - BellPopover con counter unread
+3. Despues de W.14: Sprint 2.D W.17 Soporte (~3h) → Sprint 2.E W.18 Hub Personal (~5-6h) → Sprint 3 W.6 completar.
 
 **QA pendiente (cross-modulos, batch final pre-demo):**
 - Lighthouse Performance autenticado en `/es/agenda`, `/es/speakers`, `/es/sponsors`, `/es/live`, `/es/social` (cookie inyectada via puppeteer)

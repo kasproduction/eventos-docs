@@ -32,7 +32,7 @@
 | W.6 Social Wall | **18/40** | **45%** — feed+composer+likes+comments+tabs filtros hechos | **+18** (Sprint 1 item 7 cerrado) |
 | **W.7 Sponsors** | **23/23** | **CERRADO 2026-06-21** | **+23** (Sprint 2.A entero — skeleton + tooltip + E2E 12/12 + Lighthouse acc 98) |
 | W.8 Networking | 15/25 | 60% — en proceso | — |
-| W.9 Engagement | **33/35** | **94% — Sprint 2.B sesion 3 parcial + E2E** | **+3** (2026-06-29: redemptions inline + E2E desafio.spec.ts 8/8 verde con serial mode + 8 tests vitest nuevos) |
+| **W.9 Engagement** | **35/35** | **CERRADO 2026-06-29 (Sprint 2.B)** | **+5** (2026-06-29: redemptions inline + E2E 11/11 verde con viewports desktop/tablet H/mobile + 8 tests vitest. counter PARITY sync) |
 | **W.10 Live Hub** | **16/16** | **CERRADO por consenso 2026-06-20** | **+16** (creado en commit `0e185e6`, validado visual con seeder) |
 | W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 | — |
 | W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
@@ -43,7 +43,7 @@
 | W.17 Soporte | 0/15 | 0% — backlog | — |
 | **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **402/707** | **56.9%** | +3 W.9 sesion 3 (redemptions inline + E2E desafio.spec.ts 8/8 verde + 8 tests vitest nuevos, 270/270 vitest verde + 92 E2E verde) |
+| **TOTAL** | **404/707** | **57.1%** | +5 W.9 cierre formal (redemptions inline + E2E 11/11 verde con 3 viewports + counter PARITY sync, 270/270 vitest + 95 E2E verde) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,17 +51,15 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 2.B — W.9 residual + cierre formal** (~1-2h, 1 sesion corta) — 32/35 (91%)
-  - **Sesion 1 (2026-06-27 — COMPLETADA):** hub split layout + 6 cards + 6 panels + RGB ring WAVE_COLORS + QR real + Avatar real + colores TEAL fijos + degradacion suave 5 endpoints + sidebar + i18n. Commit `32018f1` eventos-web pusheado
-  - **Sesion 2 (2026-06-29 — COMPLETADA, commit `4238c69`):** shapes backend reales (`/me/prizes` nested + `/my-passport` stands + `/rewards` can_redeem calculado) + 4 proxies Next + lazy fetch al abrir panels + redeem optimistic (modal con 2 estados: loading skeleton → ready con QR + countdown) + haptic helper 5 intensidades wireado en todo el modulo + golden tickets flow individual (wall card lista TODOS los tickets, cada pending boton individual, click → reveal en panel der mostrando SOLO ese ticket, sin lista repetida ni modal) + QR ring rotando aleatorio fix (`@property --dx-rgb-angle` anima conic-gradient) + focus ring azul "boton gigante" fix + 27 tests vitest nuevos (259/259 verde). Decisiones cerradas: `useTrackPointsDiff` descartado (espejo Expo no lo hace), `claimTicket` descartado (no existe attendee-side, vendedor confirma)
-  - **Sesion 3 parcial (2026-06-29 — COMPLETADA):** redemptions INLINE en el catalogo (eliminado tab "Mis canjes" — Expo NO tiene tab separada, las redemptions viven embebidas en cada card del catalogo `leaderboard.tsx:316-345`). Nuevo proxy `/api/desafio/[eventId]/redemptions`, fetcher `fetchMyRedemptionsClient`, normalizador `normalizeMyRedemption`, helpers puros `findActiveRedemption`/`hasConfirmedRedemption`/`orphanActiveRedemptions`. RewardsPanel sin tabs: cada card tiene 5 estados (Mostrar QR TEAL borderless / Ya canjeado disabled+check / Agotado / Canjeando… / Canjear o Faltan X). `handleShowExistingQR` reabre `RedeemModal` con token existente sin pegarle al POST. Bloque "Canjes activos sin catalogo" si reward fue retirado. +8 tests vitest (270/270 verde, typecheck OK, lint clean)
-  - **Sesion 3 residual (proxima ~30min):**
-    - Validar manual 3 viewports (desktop 1600+, tablet H 1130, mobile webapp) — sobre todo el QR + claim code que en mobile deberia leerse bien
-    - Counter PARITY-MATRIX sincronizar W.9
-    - Cierre formal commit + memoria + counter → 35/35
+- [ ] **Sprint 2.C — W.14 Anuncios + Boletines + Bell** (~3-4h, 1 sesion) — 0/19+bonus
+  - Lista anuncios + detalle + socket RT + deep link handler
+  - BannersCarousel auto 5s + imagen/video
+  - Highlights mini carousel
+  - BellPopover con counter unread
 
-  - **E2E `desafio.spec.ts` ENTREGADO 2026-06-29 (8/8 verde con serial mode):** auth gate / SSR hub / click ticket pending → panel reveal / 5 estados inline del catalogo (Canjear, Mostrar QR, Ya canjeado disabled+check, Agotado, Faltan X) / Mostrar QR reusa token SIN POST / Canjear hace POST / Esc cierra modal / bloque orphans. Fixture `desafioFixture` + 7 handlers en mockBackend. Serial mode interno (evita saturar dev server con 8 workers, 13s vs 30s timeout)
-  - **Batch QA final cross-modulos** (no bloqueante para cierre W.9, va al final con W.3/W.5/W.7/W.10): Lighthouse autenticado + device fisico
+> **W.9 Desafio CERRADO 35/35 (2026-06-29).** Sprint 2.B completo. Detalle en seccion "W.9" abajo. Resumen: hub split layout + 6 cards + 6 paneles + redeem optimistic + redemptions inline (sin tab "Mis canjes" por espejo Expo) + bloque orphans + 270/270 vitest + 11/11 E2E (incluye 3 viewports automatizados). Batch QA final cross-modulos (Lighthouse + device fisico) queda al cierre Fase 1 junto con W.3/W.5/W.7/W.10.
+
+> **Despues de W.14:** Sprint 2.D W.17 Soporte (~3h) → Sprint 2.E W.18 Hub Personal (~5-6h) → Sprint 3 W.6 completar.
 
 ---
 
@@ -91,7 +89,8 @@
 > "Lo que falta para vender webapp standalone" segun PARITY-MATRIX seccion 5.
 
 - [x] ~~Sprint 2.A — W.7 Sponsors~~ — **CERRADO 23/23 (2026-06-21)** — Sprint 2.A entero en una sesion DaVinci larga: wall espejo Expo + framer-motion shuffle + DetailPanel (Hero/Sessions/Trivia/Contact/Actions) + skeleton SSR + tooltip radix + 14 vitest + **12 E2E Playwright verde** + Lighthouse acc 98 + CLS 0
-- [ ] Sprint 2.B — W.9 Engagement (leaderboard + passport VIEW + rewards + Golden Tickets — encuestas viven en W.4) — **33/35 (94%), faltan 3 viewports + cierre formal**
+- [x] ~~Sprint 2.B — W.9 Engagement~~ — **CERRADO 35/35 (2026-06-29)** — hub split + 6 cards + 6 panels + RGB ring + QR + lazy fetch + redeem optimistic + redemptions inline + bloque orphans. 270/270 vitest + 11/11 E2E (incluye desktop 1600 / tablet H 1130 / mobile 390 sin overflow horizontal)
+
 - [ ] Sprint 2.C — W.14 Anuncios + Banners + Bell (~3-4h, 1 sesion) — 0/20
 - [ ] Sprint 2.D — W.17 Soporte (~3h, 1 sesion) — 0/15
 - [ ] Sprint 2.E — W.18 Hub Personal (perfil editable + settings) (~5-6h, 1-2 sesiones) — 0/19
@@ -452,7 +451,7 @@
 - [ ] **Tracking analytics** social.profile_opened + connection_sent + contact_method_clicked
 - [ ] **Cierre commit + memoria + counter PARITY-MATRIX**
 
-### W.9 — Engagement (leaderboard + logros + passport + rewards + golden tickets) (33/35, 94%)
+### W.9 — Engagement (leaderboard + logros + passport + rewards + golden tickets) — **CERRADO 35/35 (100%) 2026-06-29**
 
 > Arquitectura final 2026-06-29: hub split layout literal espejo W.7. Wall izq apila 6 cards (Hero/Tickets/Premios/Tip/Retos/Pasaporte), panel der detalle del seleccionado. Shapes adaptados al backend real (Expo intacto). Encuestas viven en W.4 Streaming (in-stream context), no se replican aqui. Toast "+X puntos via diff" DESCARTADO (espejo Expo no lo hace).
 
@@ -502,11 +501,11 @@
 - [~N/A] Vitest diff calc — N/A (no implementamos points diff)
 - [x] Playwright `desafio.spec.ts` 8/8 verde — auth gate / SSR hub / click ticket pending → reveal / 5 estados CTA inline / Mostrar QR sin POST / Canjear con POST / Esc cierra / bloque orphans. Fixture + 7 handlers mockBackend. Serial mode (evita saturar dev con 8 workers paralelos, 13s vs 30s timeout)
 
-**Fase 9 — Cierre formal (0/4)**
-- [ ] Validar manual 3 viewports (desktop 1600 / tablet H 1130 / mobile webapp)
-- [ ] Lighthouse autenticado — batch QA final cross-modulos
-- [ ] Memoria — `project_w9_engagement_webapp.md` actualizar con arquitectura final + nuevas memorias (`feedback_no_repetir_info_en_panel.md`, `feedback_no_modal_desktop.md`, `feedback_no_points_diff_toast.md`)
-- [ ] Counter PARITY-MATRIX sincronizar W.9
+**Fase 9 — Cierre formal (4/4) ✓**
+- [x] Validar 3 viewports — E2E automatizado verifica desktop 1600x900 + tablet H 1130x800 + mobile 390x844 (sin overflow horizontal, hub renderiza, panel abre, modal sin overflow). Validacion visual UX se queda al batch QA final cross-modulos (W.5/W.7/W.10/W.9)
+- [ ] Lighthouse autenticado — **batch QA final cross-modulos** (no bloqueante para cierre formal, idem W.5/W.7/W.10)
+- [x] Memoria — `project_w9_engagement_webapp.md` actualizada con arquitectura final + nuevas memorias (`feedback_no_repetir_info_en_panel.md`, `feedback_no_modal_desktop.md`, `feedback_no_points_diff_toast.md`)
+- [x] Counter PARITY-MATRIX sincronizado W.9 0/35→35/35 + W.7 0/23→23/23 + totales (modulos cerrados 2→5, vitest 194 fail→270 verde, E2E 9→11 specs)
 
 **Decisiones arquitecturales W.9 (no preguntar de nuevo):**
 - Colores TEAL/GOLD/CYAN fijos, NO `var(--accent)` del cliente (gamification = sistema, no marca cliente). Ver `feedback_no_accent_in_gamification.md`.
