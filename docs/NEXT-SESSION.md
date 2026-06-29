@@ -8,42 +8,63 @@
 
 ## Ultima sesion
 
-**Fecha:** 2026-06-27 (Sprint 2.B sesion 1 — W.9 Desafio hub inicial)
-**Total acumulado webapp:** **387/707 = 54.7%** (+18 desde 52.2%)
+**Fecha:** 2026-06-29 (Sprint 2.B sesion 2 — W.9 Desafio shapes + lazy fetch + redeem optimistic + haptic + tickets individuales)
+**Total acumulado webapp:** **399/707 = 56.4%** (+12 desde 54.7%)
 
-### Que se hizo (2026-06-27):
+### Que se hizo (2026-06-29):
 
-1. **Demos exploracion v1/v2/v3** en `design/features/webapp/W9-engagement/` — 3 iteraciones hasta validar patron correcto (split layout literal + RGB ring WAVE_COLORS pasteles + podio escalado #2 #1 #3). Commit `14d6067` en APP EVENTOS.
-2. **W.9 React implementacion inicial 18/35 (51%)** en `eventos-web` commit `32018f1`:
-   - Split layout literal espejo W.7: wall izq con 6 cards apiladas espejo DESAFIO Expo + DetailPanel der
-   - 6 cards: Hero (avatar + puntos + posicion + barra segmentada + podio escalado top 3 con RGB ring en #1) / Golden Tickets / Premios preview / Tip motivacional / Retos card / Pasaporte card
-   - 6 panels detail: GoldenTicket reveal (con QR real qrcode.react usando qr_token) / Ranking (podio + lista top 50) / Premios (catalogo) / Todos los retos (lista con estado) / Pasaporte (grid completo) / Como funciona (5 reglas educativas + tabla puntos)
-   - Avatar component reusable con `photo_url` + boring-avatars beam fallback (espejo Expo `lib/avatars.ts`)
-   - RgbRing + RgbRect con WAVE_COLORS pasteles `#a8edea #fed6e3 #d4a5ff #a8c0ff #b8f0c0 #ffd6aa` 6s linear (espejo Expo)
-   - Colores TEAL fijos: `#39d2c0` accent + `#B5A68B` gold + `#C0C0C0` silver + `#CD7F32` bronze. **NO `var(--accent)` del cliente** porque Expo no customiza gamification (decision arquitectural)
-   - SSR `fetchDesafioOverview` agrega 5 endpoints con degradacion suave (`leaderboard` + `me/points` + `me/prizes` + `rewards` + `my-passport`)
-   - Sidebar W.0: nuevo item Desafio con icono Trophy
-   - i18n: agregado `nav.desafio` en es/en/pt
-   - Typecheck OK + lint clean en codigo W.9
+1. **Shape gaps cliente↔backend resueltos** (cero modificacion backend, contrato Expo intacto) — 3 bugs criticos detectados via auditoria del flow real:
+   - `/me/prizes`: `normalizeTicket` lee `reward.name`/`sponsor.name` nested (bug visible "adasdas · por" / "de ." en 104.png — el reveal del Golden Ticket mostraba string vacio).
+   - `/my-passport`: rename `stands[]`/`name`/`required`/`completed:bool` (backend) vs lo que esperaba el cliente.
+   - `/rewards`: `can_redeem` calculado cliente-side (`myPoints >= points_cost && remaining_stock > 0`). Antes siempre false → nada se podia canjear.
+   - Tipos adaptados (`DesafioReward.remaining_stock` + `sponsor_logo`, `DesafioPassportStamp.logo_url`, nuevos `DesafioPassport`/`DesafioRedemption`).
+   - Normalizadores compartidos server+client en `lib/desafio-normalize.ts`.
 
-### Bugs registrados (sesion 2026-06-27)
+2. **Lazy fetch al abrir panels** — 4 proxies Next handlers (`/api/desafio/[eventId]/{leaderboard|rewards|passport|redeem/[rewardId]}`) + `lib/desafio-client.ts` con `fetchRankingClient`/`fetchRewardsClient`/`fetchPassportClient`/`redeemRewardClient` + `DesafioClientError` con codigo tipado.
 
-- **W.9 codigo defensivo** en lib/desafio.ts: `passport.data.stamps` puede ser null/objeto/array. Normalizado con type narrowing antes de leer keys nested. Mismo trato para prizes/rewards/leaderboard.
-- **Colores accent rojo full pantalla** — root cause: `var(--accent)` del cliente (rojo Bancolombia / coral generico) en lugar de TEAL fijo Expo. Fix: tokens `--dx-accent: #39d2c0` independientes del cliente.
+3. **Redeem optimistic** — `RedeemModal` con 2 estados:
+   - **loading**: abre INMEDIATO al click "Canjear" con QR skeleton shimmer + nombre + cost + spinner.
+   - **ready**: cuando llega el token del backend, transiciona a QR real `qrcode.react` + countdown 5min + hint.
+   - Si falla: cierra modal + `lumina.error` con mensaje especifico (`INSUFFICIENT_POINTS` / `OUT_OF_STOCK` / `ALREADY_PENDING`).
+
+4. **Haptic helper** (`lib/haptic.ts`) — wrapper `vibrate(soft|medium|strong|success|error)` con safety check. Wireado en cards del wall (medium), boton "Como funciona" (medium), boton "Ranking →" del HeroCard (medium), boton "Canjear" (strong), tabs Catalogo/Mis canjes (soft), cerrar modales (soft), click ticket pending (medium).
+
+5. **Golden tickets flow individual** (corregido tras 2 iteraciones rechazadas):
+   - Wall card NO es boton gigante. Cada ticket pending es `<button>` individual con haptic. Claimed son `<div>` info estatica.
+   - Click pending → set `selectedTicketId` + abre panel der mostrando SOLO ese ticket (sin lista repetida ni modal).
+   - Iteracion 1 (rechazada): mostre lista repetida en panel der → usuario: "para que repetir la info?".
+   - Iteracion 2 (rechazada): abri `TicketRevealModal` full-screen → usuario: "es vista de computador, para que quiero modal".
+   - Iteracion final aceptada: reveal directo en panel der.
+
+6. **QR ring fix** (bug 104.png) — `.dx-rgb-rect::before` rotaba fisicamente un cuadrado del mismo tamaño del frame, las esquinas salian → cuadrado pastel aleatorio detras del QR. Fix: `@property --dx-rgb-angle` anima el angulo del `conic-gradient` en lugar de rotar el cuadrado.
+
+7. **Focus ring azul "boton gigante" fix** — `.dx-card:focus { outline: none }` + `:focus-visible` custom accent. Click con mouse no muestra ring, keyboard nav si.
+
+8. **27 tests vitest nuevos** — `desafioDerive.test.ts` (11 helpers puros) + `desafioNormalize.test.ts` (14 cubriendo los 3 shape gaps). Suite total 259/259 verde (era 232).
+
+9. **Roadmap actualizado** — `PENDIENTES-WEBAPP.md` counter W.9 18→30/35, total 387→399 (56.4%) + `W.9-encuestas-gamification.md` reescrito con arquitectura final.
 
 ### Decisiones cerradas en esta sesion (no preguntar)
 
-- **Gamification NO usa primary_color del cliente** (TEAL/GOLD/CYAN fijos). Ver `feedback_no_accent_in_gamification.md`. Patron a aplicar tambien a W.2 GamificationHud + W.16 Trivia/Spin si se portan.
-- **Avatar reusable** con boring-avatars beam fallback (mismo patron Expo `lib/avatars.ts`). NO seguir poniendo iniciales en text si hay `photo_url` disponible.
-- **QR real con qrcode.react** (instalado), no placeholders dots. Token viene del backend (`qr_token` field).
-- **Como funciona ≠ Retos** — son 2 panels visualmente distintos. Retos = estado personal con check, Rules = reglas educativas + tabla puntos.
-- **WAVE_COLORS pasteles** (NO neon cyan/magenta/yellow) para RGB ring. Solo en avatar #1 podio + QR Golden Ticket.
+- **Encuestas NO viven en W.9** — viven en W.4 Streaming (in-stream context con sockets). NO duplicar en hub.
+- **Toast "+X pts via diff" descartado** por espejo Expo. Expo NO muestra toast al ganar puntos. Ver `feedback_no_points_diff_toast.md`.
+- **`claimTicket` attendee-side NO existe** — el vendedor confirma con `POST /rewards/confirm`. El attendee solo muestra QR.
+- **Backend es la verdad firme** — Expo lo consume hoy en produccion. Webapp SIEMPRE se adapta al shape backend, nunca al reves.
+- **Panel der NUNCA repite info que ya esta en wall card** — cada wall card lista sus items, click en item → detalle in-panel. Ver `feedback_no_repetir_info_en_panel.md`.
+- **Desktop usa panel der, NO modal** — modal solo cuando el flujo es fundamentalmente externo al panel (caso unico: `RedeemModal`). Ver `feedback_no_modal_desktop.md`.
 
-### Estado git al cierre
+### Estado git al cierre — todo pusheado
 
-- `eventos-web` main: `32018f1` (feat W.9 Desafio hub split layout + 6 cards + 6 panels + RGB ring + QR) ← HEAD pusheado
-- `APP EVENTOS` main: `14d6067` (docs W.9 demos v1/v2/v3) ← HEAD pusheado (faltan pendientes actualizados en este commit)
-- Suite eventos-web typecheck OK + lint W.9 clean
+- `eventos-web` main: `4238c69` (feat W.9 sesion 2 — shapes backend reales + lazy fetch + redeem optimistic + haptic + tickets individuales) ← HEAD pusheado
+- `APP EVENTOS` main: `8daec39` (docs W.9 sesion 2 entregada — 30/35 + roadmap actualizado) ← HEAD pusheado
+- Suite eventos-web: **259/259 vitest verde** (+27 nuevos), typecheck OK, lint W.9 clean
+- 3 memorias nuevas: `feedback_no_repetir_info_en_panel.md`, `feedback_no_modal_desktop.md`, `feedback_no_points_diff_toast.md`. Actualizada `project_w9_engagement_webapp.md`.
+
+### Original (sesion previa)
+
+**Fecha previa:** 2026-06-27 (Sprint 2.B sesion 1 — W.9 Desafio hub inicial 18/35)
+
+Sesion 1 entrego: hub split layout + 6 cards + 6 panels + RGB ring + QR real + Avatar + colores TEAL fijos + SSR 5 endpoints + sidebar + i18n. Commit `32018f1` eventos-web. Detalle completo en `project_w9_engagement_webapp.md`.
 
 ### Original
 
@@ -99,12 +120,13 @@
 ## Para arrancar la proxima sesion
 
 1. Abrir `docs/living/PENDIENTES-WEBAPP.md` desde donde estes
-2. Mirar **"QUE SIGUE"** arriba — tarea concreta: **Sprint 2.B — W.9 Engagement** (~10h, 2 sesiones DaVinci)
-   - Encuestas + leaderboard + passport VIEW + rewards + Golden Ticket
-   - Backend endpoints listos (GamificationController + PointsService completos)
-   - **Reusar patrones de W.7**: visit-stand + trivia answer ya wireados, reutilizar shape para vote_poll + passport view
-   - **Antes de codear**: sesion DaVinci de diseno (wireframe propuesto + refs externas)
-3. Despues de W.9: Sprint 2.C (W.14 Anuncios + Bell, ~3-4h) → Sprint 2.D (W.17 Soporte, ~3h) → Sprint 2.E (W.18 Hub Personal, ~5-6h)
+2. Mirar **"QUE SIGUE"** arriba — tarea concreta: **Sprint 2.B residual W.9** (~2-3h, sesion corta)
+   - Tab "Mis canjes" del RewardsPanel wireado con `GET /me/redemptions` (placeholder hoy)
+   - Tests E2E `desafio.spec.ts` (5 escenarios: auth gate, SSR hub, click ticket pending abre panel reveal, redeem optimistic, Esc cierra)
+   - Validar manual 3 viewports (desktop 1600 / tablet H 1130 / mobile webapp)
+   - Counter PARITY-MATRIX sincronizar W.9
+   - Cierre formal 30/35 → 35/35
+3. Despues de cerrar W.9: Sprint 2.C (W.14 Anuncios + Bell, ~3-4h) → Sprint 2.D (W.17 Soporte, ~3h) → Sprint 2.E (W.18 Hub Personal, ~5-6h)
 
 **QA pendiente (cross-modulos, batch final pre-demo):**
 - Lighthouse Performance autenticado en `/es/agenda`, `/es/speakers`, `/es/sponsors`, `/es/live`, `/es/social` (cookie inyectada via puppeteer)
