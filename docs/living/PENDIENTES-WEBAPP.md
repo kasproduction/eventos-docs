@@ -36,14 +36,14 @@
 | **W.10 Live Hub** | **16/16** | **CERRADO por consenso 2026-06-20** | **+16** (creado en commit `0e185e6`, validado visual con seeder) |
 | W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 | — |
 | W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
-| W.13 FAQ + Docs + Pages | 0/17 | 0% — backlog | — |
-| W.14 Anuncios + Bell | **10/20** | **50% — Sprint 2.C Fase A v2 refactor 2026-06-29** (split layout wall + DetailPanel + BellPopover unico entry + deeplink + localStorage + E2E 13/13). Faltan banners + highlights + RT + Web Push (W.12) | **+10** |
+| **W.13 FAQ + Docs + Pages** | **10/17** | **59% — Fase A entregada 2026-06-29 nocturna** (FAQ Asistente con Orb Siri-style + split layout + thinking timer 800ms + on-the-fly change + Mis consultas/Contactar soporte CTAs siempre visibles + E2E 13/13). Falta Fase B: Documents (~1h) + Pages dinamicas (skip Fase 2 segun feedback) | **+10** |
+| W.14 Anuncios + Bell | **11/20** | **55% — Fase A + backend integration 2026-06-29** (split layout wall + DetailPanel + BellPopover unico entry + deeplink + localStorage + E2E 13/13 + backend `EditSupportRequest.php` crea announcement privado `eventos://my-support` cuando admin responde ticket). Faltan banners + highlights + RT + Web Push (W.12) | **+11** |
 | W.15 Vendor Dashboard | 0/35 | **OPCIONAL** Fase 1 | — |
-| W.16 Live Moments | 0/23 | 0% — backlog | — |
-| W.17 Soporte | 0/15 | 0% — backlog | — |
+| W.16 Live Moments | 0/23 | 0% — **SKIP webapp** (mobile-first, sorteos/trivia/golden ticket reveal son experiencia celu, no laptop). Webapp solo muestra resultados historicos | — |
+| **W.17 Soporte** | **13/15** | **87% — entregado 2026-06-29 nocturna** (split layout espejo W.14 + form nueva consulta + integrado FAQ como subflow + lib/support-client separado de support.ts + framer-motion stagger + haptics enterprise + Web Push fase B). Falta: notif real-time `support:new_response` (depende W.11) | **+13** |
 | **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **414/707** | **58.6%** | +10 W.14 Fase A (split layout anuncios + BellPopover unico entry + deep link helper + localStorage unread + E2E 13/13 verde + 309/309 vitest + 108 E2E verde) |
+| **TOTAL** | **438/707** | **61.9%** | +24 sesion nocturna 2026-06-29 (W.13 Fase A +10 + W.17 +13 + W.14 +1 backend integration). Bug critico hydration mismatch SSR resuelto (sponsors:123 + 5 componentes mas con `useState(() => Date.now())` → nuevo hook `useNow` + memoria `feedback_no_date_now_in_usestate`) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -57,9 +57,12 @@
   - Socket `announcement:new` → invalidate lista + badge unread aumenta (depende W.11)
   - Tracking: 8 tipos de push backend documentados en memoria para Web Push W.12
 
-> **W.14 Fase A entregada 2026-06-29 (10/20):** lista `/anuncios` + BellPopover sidebar + helper deep-link puro (13 mappings) + localStorage unread tracking + E2E 10/10. Golden ticket end-to-end verificado (backend `GameController:680` crea announcement privado `eventos://gamification/rewards`, webapp lo lista + click → `/desafio`).
-
-> **Despues de W.14 Fase B:** Sprint 2.D W.17 Soporte (~3h) → Sprint 2.E W.18 Hub Personal (~5-6h) → Sprint 3 W.6 completar.
+> **Orden recomendado tras conversacion de cierre 2026-06-29 nocturna (DaVinci recortes scope):**
+> 1. W.14 Fase B (~2h) → 2. W.13 Fase B solo Documents (~1h, Pages a Fase 2) → 3. **W.18 Hub Personal CRITICO (~5-6h)** → 4. W.8 Networking completar (~3h) → 5. W.4 Replay + anuncios in-stream (~5h) → 6. W.11 sockets criticos solo 6 items (~2h) → 7. W.12 Web Push + Sentry (~4h).
+>
+> **Skips confirmados:** W.16 entero (mobile-first), W.6 Stories+Photo Contest (mobile-first, nicho), W.2 sponsors band + lifecycle states (ya hay /sponsors, cinematic ya esta), W.11 reducido de 42 a ~6 items, W.12 reducido a Web Push+Sentry (PWA installable + offline + Lighthouse100 + E2E full → Fase 1.5 o skip).
+>
+> **Recount sin bloat:** ~22h totales (3-4 sesiones DaVinci) vs 70-80h del roadmap original.
 
 ---
 
