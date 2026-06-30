@@ -6,10 +6,78 @@
 
 ---
 
-## Ultima sesion (cierre 2026-06-29 nocturno — continuacion del dia)
+## Ultima sesion (cierre 2026-06-30 — W.14 Fase B Cartel Digital)
 
-**Total acumulado webapp:** ~436/707 = **62%** (+22 hoy entre las 2 sesiones)
-**Estado al cierre:** todo en `main` de `eventos-web` (HEAD `c33e794`). CI corriendo `gh run 28420089131` al momento de guardar — **VERIFICAR PRIMERO al abrir** si quedo verde.
+**Total acumulado webapp:** **~446/707 = 63.1%** (+8 hoy: W.14 +6 + W.2 +2)
+**Estado al cierre:** todo pusheado. `eventos-web` HEAD remoto + `APP EVENTOS` docs + `eventos-backend` commit `1d8d1e4` (announcement on ticket-resolve) finalmente con push.
+
+### W.14 Fase B — Cartel Digital entregado 17/20 (85%)
+
+**Que es:** carrusel ambient signage en col der LIVE state. NO slideshow.
+- Banner 16:9 arriba col der (~230px, ~25% del alto)
+- Cross-fade 700ms cada 6s. Sin dots, sin flechas. Cartelera, no slideshow.
+- Hover/focus pausa el ciclo
+- Sponsor pill top-left si `sponsor_name`, titulo overlay bottom-left si `title`
+- Click → deeplink via `parseActionUrl` (reusado de W.14 Fase A Anuncios)
+- Empty → zona colapsa, feed salas ocupa 100%
+- Single item → estatico, no cicla
+- `prefers-reduced-motion` → cross-fade instantaneo
+- SSR-safe (sin `useState(() => Date.now())`)
+
+**Archivos nuevos:**
+- `src/lib/banners.ts` + `src/lib/highlights.ts` — SSR fetchers
+- `src/lib/cartel-items.ts` — merger round-robin + tipo `CartelItem`
+- `src/components/app/home/CartelDigital.tsx` — componente client
+- `tests/lib/cartelItems.test.ts` (11 vitest merger)
+- `tests/components/home/CartelDigital.test.tsx` (12 vitest componente)
+- `e2e/cartel.spec.ts` (6 specs)
+
+**Archivos modificados:**
+- `LiveState.tsx` — split adaptive col der (cartel arriba si hay items, feed 100% si no)
+- `HomeView.tsx` + `home/page.tsx` — propagar y fetchear `cartelItems`
+- `e2e/_fixtures/data.mjs` + `e2e/_helpers/mockBackend.mjs` — handlers + bearer `no-cartel`
+
+**Verificacion:** 356/356 vitest verde + 6/6 E2E cartel + 6/6 E2E home (sin regresion) + typecheck + lint clean.
+
+**Backend cero cambios** — `BannerController` + `HighlightController` + `HighlightObserver` ya existian.
+
+### Decisiones cerradas (no preguntar)
+
+- **Cartelera ≠ slideshow.** Sin dots, sin flechas, sin counter. Ambient, no interactivo.
+- **Cross-fade puro 700ms** (estandar signage real: Daktronics/Mercedes-Benz Stadium/ScreenCloud). Ni slide horizontal ni split-flap.
+- **6s por slot** para banner y highlight (sin jerarquia visual rara).
+- **Banners + Highlights mergeados en UN solo cartel** round-robin. Backend separado, webapp unifica cliente.
+- **Sponsor pill discreta** muestra `sponsor_name` directo (no label "Sponsor"). Highlights sin pill.
+- **Cartel solo en LIVE state.** PRE y ENDED no muestran cartel (sponsor premium quiere visibilidad cuando hay eyeballs reales).
+- **Backend reusado cero cambios.** Si organizador no configura banners/highlights, cartel ausente — feed salas ocupa 100%.
+
+### Re-estimacion sprints (analisis honesto post-entrega)
+
+Velocidad real ~50% mas rapida por reuso de patrones (parseActionUrl, lumina, useNow, framer split layout, mockBackend bearer scenarios). Roadmap original 22h → realista **11-14h en 3 sesiones DaVinci**.
+
+| Sprint | Cierre 2026-06-29 | Realista 2026-06-30 |
+|---|---|---|
+| W.13 Fase B Documents | ~1h | **30-40 min** |
+| W.18 Hub Personal | ~5-6h CRITICO | **3-4h** riesgo MEDIO (sin espejo Expo) |
+| W.8 Networking | ~3h | **1.5-2h** |
+| W.4 Replay + in-stream | ~5h | **3h** riesgo MEDIO (depende backend) |
+| W.11 sockets criticos | ~2h | **1-1.5h** riesgo ALTO (E2E flaky) |
+| W.12 Web Push + Sentry | ~4h | **2-3h** |
+
+Detalle en `memory/project_velocity_analysis_2026_06_30.md`.
+
+### Estado git al cierre
+
+- **`eventos-web` main:** pusheado (cartel digital + 23 tests + E2E + fixtures + mockBackend)
+- **`APP EVENTOS` main:** pusheado (PENDIENTES + NEXT-SESSION + memorias)
+- **`eventos-backend` feature/magic-link-auth:** `1d8d1e4` finalmente pusheado (announcement on ticket-resolve)
+
+---
+
+## Sesion 2026-06-29 nocturna — W.13 + W.17 + bug SSR hydration
+
+**Total acumulado webapp:** ~436/707 = **62%** (+22 entre 2 sesiones)
+**Estado al cierre:** todo en `main` de `eventos-web` (HEAD `c33e794`).
 
 ### Modulos avanzados/cerrados HOY (sesion nocturna)
 

@@ -25,7 +25,7 @@
 | W.0 Spatial UI base | **21/24** | **87%** — en proceso | **+1** (Sprint 1 item 9 — wire sidebar + quitar brand letter) |
 | W.1 Setup + Auth + UI Foundation | 102/107 | 95% — en proceso | — |
 | W.1B Backend magic link | 10/10 | **CERRADO** | — |
-| W.2 Home | 10/20 | 50% — en proceso | — |
+| W.2 Home | **12/20** | **60% — en proceso** (split adaptive col der LIVE: cartel arriba si hay items, feed salas ocupa 100% si no — 2026-06-30) | **+2** |
 | W.3 Agenda | **25/30** | **83%** — en proceso | **+1** (Sprint 1 item 8 — bulk .ics) |
 | W.4 Streaming | 83/111 | 75% — en proceso | — |
 | W.5 Speakers | **33/35** | **94% — cerrado al maximo posible** (solo faltan Lighthouse + device fisico) | **+33** (doc decia 0%, codigo lo tiene casi completo) |
@@ -37,13 +37,13 @@
 | W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 | — |
 | W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
 | **W.13 FAQ + Docs + Pages** | **10/17** | **59% — Fase A entregada 2026-06-29 nocturna** (FAQ Asistente con Orb Siri-style + split layout + thinking timer 800ms + on-the-fly change + Mis consultas/Contactar soporte CTAs siempre visibles + E2E 13/13). Falta Fase B: Documents (~1h) + Pages dinamicas (skip Fase 2 segun feedback) | **+10** |
-| W.14 Anuncios + Bell | **11/20** | **55% — Fase A + backend integration 2026-06-29** (split layout wall + DetailPanel + BellPopover unico entry + deeplink + localStorage + E2E 13/13 + backend `EditSupportRequest.php` crea announcement privado `eventos://my-support` cuando admin responde ticket). Faltan banners + highlights + RT + Web Push (W.12) | **+11** |
+| W.14 Anuncios + Bell + Cartel | **17/20** | **85% — Fase B Cartel Digital entregada 2026-06-30** (CartelDigital ambient signage 16:9 en col der LIVE: cross-fade 700ms cada 6s, sin dots/arrows, hover pausa, sponsor pill, deeplink reusa parseActionUrl, merger round-robin banners+highlights, 11 vitest merger + 12 vitest componente + 6 E2E). Falta: RT socket `announcement:new` (depende W.11) + Web Push (W.12) | **+6** |
 | W.15 Vendor Dashboard | 0/35 | **OPCIONAL** Fase 1 | — |
 | W.16 Live Moments | 0/23 | 0% — **SKIP webapp** (mobile-first, sorteos/trivia/golden ticket reveal son experiencia celu, no laptop). Webapp solo muestra resultados historicos | — |
 | **W.17 Soporte** | **13/15** | **87% — entregado 2026-06-29 nocturna** (split layout espejo W.14 + form nueva consulta + integrado FAQ como subflow + lib/support-client separado de support.ts + framer-motion stagger + haptics enterprise + Web Push fase B). Falta: notif real-time `support:new_response` (depende W.11) | **+13** |
 | **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **438/707** | **61.9%** | +24 sesion nocturna 2026-06-29 (W.13 Fase A +10 + W.17 +13 + W.14 +1 backend integration). Bug critico hydration mismatch SSR resuelto (sponsors:123 + 5 componentes mas con `useState(() => Date.now())` → nuevo hook `useNow` + memoria `feedback_no_date_now_in_usestate`) |
+| **TOTAL** | **446/707** | **63.1%** | +8 sesion 2026-06-30 (W.14 Fase B +6 + W.2 Home +2). Cartel Digital CartelDigital ambient signage entregado: backend reusado cero cambios, 23 vitest + 6 E2E verde, 356/356 vitest full suite |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,18 +51,22 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 2.C continuacion — W.14 Fase B (Banners + Highlights + RT socket)** (~2h, 1 sesion)
-  - BannersCarousel auto 5s + imagen/video en home hero (modifica W.2 tambien)
-  - Highlights mini carousel en home
-  - Socket `announcement:new` → invalidate lista + badge unread aumenta (depende W.11)
-  - Tracking: 8 tipos de push backend documentados en memoria para Web Push W.12
+- [ ] **Sprint 2.D — W.13 Fase B Documents** (~30-40 min, fraccion de sesion)
+  - Lista plana de documentos del evento + descarga directa (PDF/imagen/link externo)
+  - Skip Pages dinamicas → Fase 2 (no critico para vender webapp standalone)
 
-> **Orden recomendado tras conversacion de cierre 2026-06-29 nocturna (DaVinci recortes scope):**
-> 1. W.14 Fase B (~2h) → 2. W.13 Fase B solo Documents (~1h, Pages a Fase 2) → 3. **W.18 Hub Personal CRITICO (~5-6h)** → 4. W.8 Networking completar (~3h) → 5. W.4 Replay + anuncios in-stream (~5h) → 6. W.11 sockets criticos solo 6 items (~2h) → 7. W.12 Web Push + Sentry (~4h).
+> **Orden recomendado (re-estimado 2026-06-30 tras entrega W.14 Fase B):**
+> 1. ~~W.14 Fase B~~ → CERRADO 2026-06-30 (17/20, falta solo RT socket)
+> 2. W.13 Fase B Documents (~30-40 min, antes ~1h)
+> 3. **W.18 Hub Personal CRITICO (~3-4h, antes ~5-6h)** — riesgo MEDIO, primer feature sin espejo Expo claro
+> 4. W.8 Networking (~1.5-2h, antes ~3h)
+> 5. W.4 Replay + anuncios in-stream (~3h, antes ~5h) — riesgo MEDIO si backend replay no listo
+> 6. W.11 sockets criticos 6 items (~1-1.5h, antes ~2h) — riesgo ALTO E2E flaky
+> 7. W.12 Web Push + Sentry (~2-3h, antes ~4h)
+>
+> **Re-estimacion 2026-06-30:** `project_velocity_analysis_2026_06_30.md`. Roadmap original 22h → realista **11-14h en 3 sesiones DaVinci**. Velocidad subio por reuso de patrones (parseActionUrl, lumina, useNow, framer split layout) — no por atajos. Riesgos vigilados: W.18 sin espejo, W.11 sockets, W.4 backend replay.
 >
 > **Skips confirmados:** W.16 entero (mobile-first), W.6 Stories+Photo Contest (mobile-first, nicho), W.2 sponsors band + lifecycle states (ya hay /sponsors, cinematic ya esta), W.11 reducido de 42 a ~6 items, W.12 reducido a Web Push+Sentry (PWA installable + offline + Lighthouse100 + E2E full → Fase 1.5 o skip).
->
-> **Recount sin bloat:** ~22h totales (3-4 sesiones DaVinci) vs 70-80h del roadmap original.
 
 ---
 
@@ -94,9 +98,10 @@
 - [x] ~~Sprint 2.A — W.7 Sponsors~~ — **CERRADO 23/23 (2026-06-21)** — Sprint 2.A entero en una sesion DaVinci larga: wall espejo Expo + framer-motion shuffle + DetailPanel (Hero/Sessions/Trivia/Contact/Actions) + skeleton SSR + tooltip radix + 14 vitest + **12 E2E Playwright verde** + Lighthouse acc 98 + CLS 0
 - [x] ~~Sprint 2.B — W.9 Engagement~~ — **CERRADO 35/35 (2026-06-29)** — hub split + 6 cards + 6 panels + RGB ring + QR + lazy fetch + redeem optimistic + redemptions inline + bloque orphans. 270/270 vitest + 11/11 E2E (incluye desktop 1600 / tablet H 1130 / mobile 390 sin overflow horizontal)
 
-- [~] Sprint 2.C — W.14 Anuncios + Banners + Bell — **Fase A entregada 10/20 (50%) 2026-06-29.** Fase B residual (Banners + Highlights + RT) ~2h
-- [ ] Sprint 2.D — W.17 Soporte (~3h, 1 sesion) — 0/15
-- [ ] Sprint 2.E — W.18 Hub Personal (perfil editable + settings) (~5-6h, 1-2 sesiones) — 0/19
+- [x] ~~Sprint 2.C — W.14 Anuncios + Banners + Bell~~ — **CERRADO 17/20 (2026-06-30)**. Fase A 2026-06-29 (Anuncios + BellPopover + deeplink + E2E 13). Fase B 2026-06-30 (CartelDigital ambient signage 16:9 col der LIVE: cross-fade 700ms cada 6s, sin dots/arrows, hover pausa, sponsor pill, merger round-robin banners+highlights, backend reusado cero cambios, 23 vitest + 6 E2E). Falta: socket `announcement:new` (depende W.11) + Web Push (W.12)
+- [x] ~~Sprint 2.D — W.17 Soporte~~ — **CERRADO 13/15 (2026-06-29)** (split layout espejo W.14 + subflow Asistente + EditSupportRequest crea announcement privado). Falta RT response (W.11)
+- [ ] Sprint 2.E — W.13 Fase B Documents (~30-40 min) — 10/17 → ~13-15/17
+- [ ] Sprint 2.F — W.18 Hub Personal (perfil editable + settings) (~3-4h, 1 sesion) — 0/19
 
 ### Sprint 3 — W.6 completar (Stories + Photo Contest + Hashtags) (~3-4h, 1 sesion) — 0/19
 ### Sprint 4 — W.16 Live Moments (Trivia + Sorteo + Golden Ticket reveal) (~6h, 1-2 sesiones) — 0/23
