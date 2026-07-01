@@ -51,12 +51,23 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 2.F — W.18 Hub Personal** (~3-4h, 1 sesion) — perfil editable + settings + tema. **CRITICO** para vender webapp standalone. Riesgo MEDIO: primer feature sin espejo Expo claro (perfil mobile ≠ desktop).
+- [ ] **Sprint 2.F — W.18 Hub Personal** (~2-3h, 1 sesion) — perfil editable + intereses + logout. **CRITICO** para vender webapp standalone. **Riesgo BAJO** (blueprint claro tras investigacion Expo).
 
-> **Orden recomendado (re-estimado 2026-06-30 tras entregar W.14 Fase B + W.13 Fase B):**
+  **Blueprint listo** en `memory/project_w18_hub_personal_blueprint.md`:
+  - Expo `ProfileScreen.tsx` (927 lineas, ~85% completo) sirve como espejo directo
+  - 11 endpoints backend listos: `/me/profile` GET/PUT, `/me/photo` POST/DELETE, `/me/points`, `/events/{id}/my-interests` GET/PUT, etc.
+  - Componentes Expo replicables: `StatCard`, `DataRow`, `EditField`, `BottomSheet`
+  - **Decision DaVinci pendiente al arrancar:** layout single-column centrado max-w-640 vs split layout wall + panel. Mi voto tentativo single-column (es tu perfil personal, no navegador de listas). Definir al inicio, NO codear antes.
+  - Divergencias Expo → Webapp confirmadas: FAQ ya en sidebar (no duplicar entry), Toggle tema global existe (no duplicar aca), idioma toggle nuevo webapp (i18n ya en 3 idiomas)
+
+> **Orden recomendado (re-estimado 2026-06-30 tarde tras investigar W.18):**
 > 1. ~~W.14 Fase B~~ → CERRADO 2026-06-30 (17/20, falta solo RT socket)
 > 2. ~~W.13 Fase B Documents~~ → CERRADO 2026-06-30 tarde (15/17, backend ZIP escalable)
-> 3. **W.18 Hub Personal CRITICO (~3-4h, antes ~5-6h)** — riesgo MEDIO, primer feature sin espejo Expo claro
+> 3. **W.18 Hub Personal (~2-3h, riesgo BAJO)** — espejo Expo directo confirmado
+> 4. W.8 Networking completar (~1.5-2h)
+> 5. W.4 Replay + in-stream (~3h) — riesgo MEDIO backend replay
+> 6. W.11 sockets criticos 6 items (~1-1.5h) — riesgo ALTO E2E flaky
+> 7. W.12 Web Push + Sentry (~2-3h)
 > 4. W.8 Networking (~1.5-2h, antes ~3h)
 > 5. W.4 Replay + anuncios in-stream (~3h, antes ~5h) — riesgo MEDIO si backend replay no listo
 > 6. W.11 sockets criticos 6 items (~1-1.5h, antes ~2h) — riesgo ALTO E2E flaky
@@ -99,7 +110,7 @@
 - [x] ~~Sprint 2.C — W.14 Anuncios + Banners + Bell~~ — **CERRADO 17/20 (2026-06-30)**. Fase A 2026-06-29 (Anuncios + BellPopover + deeplink + E2E 13). Fase B 2026-06-30 (CartelDigital ambient signage 16:9 col der LIVE: cross-fade 700ms cada 6s, sin dots/arrows, hover pausa, sponsor pill, merger round-robin banners+highlights, backend reusado cero cambios, 23 vitest + 6 E2E). Falta: socket `announcement:new` (depende W.11) + Web Push (W.12)
 - [x] ~~Sprint 2.D — W.17 Soporte~~ — **CERRADO 13/15 (2026-06-29)** (split layout espejo W.14 + subflow Asistente + EditSupportRequest crea announcement privado). Falta RT response (W.11)
 - [x] ~~Sprint 2.E — W.13 Fase B Documents~~ — **CERRADO 15/17 (2026-06-30 tarde)** (split layout wall + preview embed + skeleton shimmer + descarga individual + bulk ZIP pre-generado backend con job + observer + endpoint escalable a 10K users, backend migration + Model fillable + composer maennchen/zipstream-php pure PHP). Falta: Pages dinamicas (skip Fase 2)
-- [ ] Sprint 2.F — W.18 Hub Personal (perfil editable + settings) (~3-4h, 1 sesion) — 0/19
+- [ ] Sprint 2.F — W.18 Hub Personal (perfil editable + intereses + logout) (~2-3h, 1 sesion, riesgo BAJO) — 0/19. **Blueprint en `memory/project_w18_hub_personal_blueprint.md`** — espejo Expo `ProfileScreen.tsx` + 11 endpoints backend listos + componentes reusables identificados. Decision DaVinci pendiente: layout single-column vs split
 
 ### Sprint 3 — W.6 completar (Stories + Photo Contest + Hashtags) (~3-4h, 1 sesion) — 0/19
 ### Sprint 4 — W.16 Live Moments (Trivia + Sorteo + Golden Ticket reveal) (~6h, 1-2 sesiones) — 0/23

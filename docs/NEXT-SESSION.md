@@ -74,7 +74,21 @@ Bug introducido ayer al arreglar hydration mismatch: `useSyncExternalStore` con 
 
 - **`eventos-web` main:** pusheado con feature W.13 Fase B + hotfix useNow + fix CSP frame-src + memorias updated
 - **`eventos-backend` feature/magic-link-auth:** pusheado con migration + Observer + Job + Controller + Model fillable + composer maennchen/zipstream-php + Route + seed limpio
-- **`APP EVENTOS` main:** pusheado con NEXT-SESSION + PENDIENTES actualizado + 2 memorias nuevas + 2 memorias updated
+- **`APP EVENTOS` main:** pusheado con NEXT-SESSION + PENDIENTES actualizado + memorias
+
+### Correccion post-cierre — investigacion W.18 Hub Personal (para arrancar bien la proxima)
+
+En el cierre inicial marque W.18 como "riesgo MEDIO / 3-4h — primer feature sin espejo Expo claro". **Fue error.** Post-cierre investigue el perfil en Expo (`Explore` agent, 2026-06-30 tarde) y encontre:
+
+- **Expo tiene ProfileScreen.tsx** de 927 lineas ~85% completo (`eventos-app/components/screens/ProfileScreen.tsx`). Espejo directo.
+- **Backend YA tiene 11 endpoints** listos (`/me/profile` GET/PUT, `/me/photo` POST/DELETE, `/me/points`, `/events/{id}/my-interests` GET/PUT, etc.).
+- **Componentes reusables identificados:** `StatCard`, `DataRow`, `EditField`, `MyInterests`, `BottomSheet` — todos replicables en webapp con shadcn/Radix.
+- **FAQ NO esta dentro del perfil** en Expo — es un icono "Ayuda" en el header top-right que navega a `/faq`. En webapp `/faq` ya vive en sidebar, no duplicamos el entry.
+- **Features Expo NO tiene que webapp puede sumar:** idioma toggle (i18n ya en es/en/pt), notificaciones opt-in cuando W.12 Web Push llegue.
+
+**Correccion:** W.18 pasa a **riesgo BAJO** + **2-3h**. Blueprint completo en `memory/project_w18_hub_personal_blueprint.md`.
+
+**Decision DaVinci pendiente al arrancar la proxima sesion (NO codear antes):** layout single-column centrado max-w-640 vs split layout wall + panel der. Mi voto tentativo single-column (perfil personal no es navegador de listas). Definir con el usuario primero.
 
 ---
 
