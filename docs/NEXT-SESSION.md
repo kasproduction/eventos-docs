@@ -6,9 +6,81 @@
 
 ---
 
-## Ultima sesion (cierre 2026-06-30 — W.14 Fase B Cartel Digital)
+## Ultima sesion (cierre 2026-06-30 tarde — W.13 Fase B Documents + arquitectura ZIP escalable)
 
-**Total acumulado webapp:** **~446/707 = 63.1%** (+8 hoy: W.14 +6 + W.2 +2)
+**Total acumulado webapp:** **~451/707 = 63.8%** (+13 hoy entre 2 sesiones: cartel manana + documents tarde)
+**Estado al cierre:** todo pusheado. `eventos-web`, `eventos-backend` (main + feature/magic-link-auth), `APP EVENTOS` (docs + memoria) sincronizados.
+
+### W.13 Fase B — Documents entregado 15/17 (88%)
+
+**Que es:** ruta `/documentos` con split layout wall + preview panel der, sidebar item dinamico (`available` segun count).
+
+**Comportamiento:**
+- Wall izq scroleable con cards (icono lucide FileText/FileImage/FileVideo/FileAudio/File — NO emojis, memoria `feedback_no_emoji_icons_ui`)
+- Panel der 2 estados: empty / detail con preview embed segun kind (PDF iframe, imagen `<img>`, video/audio `<video>/<audio>` controls, otros fallback metadata)
+- Skeleton shimmer mientras carga el iframe/img/video (reusa `sn-sk-shape` pattern) + fade-in 220ms + timeout fallback 6s
+- Descarga individual con `<a download>` + suggestedFilename (sanitizado)
+- **Bulk "Descargar todos" ARQUITECTURA ESCALABLE** — pre-generada backend, cero ZIP client-side
+- URL state `?id=X` para deep link + Esc cierra
+- CSP `frame-src` extendido a `https:` para permitir embed cross-origin
+
+### Arquitectura ZIP pre-generado (decision escalable a 10K users)
+
+**Trigger inicial:** JSZip client-side fallo por CORS con archivos externos (africau.edu, etc.). Y ZIP on-the-fly server-side no escala a 10K simultaneos (satura PHP-FPM). Diseno final espejo de plataformas grandes (Notion/Dropbox/GDrive):
+
+**Backend:**
+- Migration `events` + `documents_zip_url`, `documents_zip_generated_at`
+- `DocumentObserver` (Filament create/edit/delete) dispatch `RegenerateDocumentsZipJob`
+- Job `ShouldBeUnique` TTL 30s (coalesce ediciones rapidas del organizador)
+- Job usa `maennchen/zipstream-php` (puro PHP, no requiere `ext-zip`, streaming = baja RAM)
+- Sube al disk `filesystems.documents_zip_disk` (default `public` dev, `r2` prod)
+- Endpoint `GET /events/{id}/documents/zip` devuelve JSON `{ url, generated_at }` (200) o `{ status: not_ready }` (202)
+
+**Frontend:**
+- Proxy `/api/documents/{eventId}/zip` con bearer server-side
+- Boton bulk hace fetch → recibe URL → `<a download>` con URL del CDN
+- Sacado `jszip` de package.json (~50KB dep menos)
+
+**Costo con Cloudflare R2 en prod:**
+- 10K descargas × 10MB = 100 GB de tráfico = **$0.00** (R2 egress gratis, no como AWS S3)
+- Storage: ~10 MB por evento = <$0.001/mes
+- CPU backend: cero (Laravel solo redirect)
+- Regeneracion: 1 job por cambio del organizador (segundos, no bloquea)
+
+**Detalles completos:** `memory/project_w13_documents.md`.
+
+### Fix critico dentro de la sesion — `useNow` snapshot inestable
+
+Bug introducido ayer al arreglar hydration mismatch: `useSyncExternalStore` con `getSnapshot: () => Date.now()` viola contrato del hook (snapshot debe ser estable). React llama snapshot cada render, detecta cambio, re-render, otro snapshot, otro valor, loop → "Maximum update depth exceeded" en AgendaView (30+ consumers amplifican). Fix en `993c9ea`: snapshot lee de un objeto interno estable via `useMemo` + notify explicito en subscribe. E2E agenda paso de 2/15 → 13/15 tests. Memoria `feedback_no_date_now_in_usestate` actualizada con el gotcha.
+
+### Bugs adicionales resueltos (con memorias)
+
+- **TaskStop deja node.exe huerfano en Windows** → `feedback_taskstop_zombie_node`. Verificar con `tasklist` + `taskkill /PID X /F` si aparece "Jest worker exception" post-cierre
+- **NO emojis como iconos UI** → `feedback_no_emoji_icons_ui`. Iconografia es lucide siempre. Primera version de Documents uso 📕🖼️🎬🎵📄 y hubo que revertir
+- **CSP `frame-src` restrictivo bloqueaba PDF embed** → agregado `https: data:` en next.config.ts. El bloqueo NO era de w3.org/culinaria sino nuestro propio webapp
+- **Seed backend tenia 6 documents duplicados x2** → limpiado con tinker (`Document::where(event_id)->delete()` + re-seed manual solo docs)
+
+### Decisiones cerradas (no preguntar)
+
+- **NUNCA JSZip client-side para bulk descarga a escala** — CORS + saturacion. Pre-generar backend + servir del CDN. Memoria `feedback_no_client_zip_scale`
+- **Iconos siempre lucide, cero emojis en UI** — memoria `feedback_no_emoji_icons_ui`
+- **`useSyncExternalStore` requiere snapshot estable** — no `() => Date.now()`, usar ref/state con notify explicito
+- **CSP `frame-src https: data:`** para permitir embed PDF/media HTTPS externos del organizador
+- **Documents en Expo es siempre disponible** (no condicional por estado del evento). Webapp espeja ese comportamiento aunque en Expo la pantalla sea "huerfana" (no navegable desde UI). En webapp le pusimos entry propio en sidebar
+- **Deep link `eventos://documents/{id}`** mapeado a `/documentos?id=X` (patron espejo `/anuncios`)
+- **Cloudflare R2 arquitectura documentada** (`docs/infra/DISPONIBILIDAD-HA.md`) — en dev es local, en prod es R2 con egress gratis. Job del ZIP es disk-agnostico
+
+### Estado git al cierre
+
+- **`eventos-web` main:** pusheado con feature W.13 Fase B + hotfix useNow + fix CSP frame-src + memorias updated
+- **`eventos-backend` feature/magic-link-auth:** pusheado con migration + Observer + Job + Controller + Model fillable + composer maennchen/zipstream-php + Route + seed limpio
+- **`APP EVENTOS` main:** pusheado con NEXT-SESSION + PENDIENTES actualizado + 2 memorias nuevas + 2 memorias updated
+
+---
+
+## Sesion 2026-06-30 manana — W.14 Fase B Cartel Digital
+
+**Total acumulado tras esta seccion:** **~446/707 = 63.1%** (+8: W.14 +6 + W.2 +2). Luego +5 en la tarde con W.13 Fase B (arriba).
 **Estado al cierre:** todo pusheado. `eventos-web` HEAD remoto + `APP EVENTOS` docs + `eventos-backend` commit `1d8d1e4` (announcement on ticket-resolve) finalmente con push.
 
 ### W.14 Fase B — Cartel Digital entregado 17/20 (85%)
