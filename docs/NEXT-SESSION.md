@@ -6,15 +6,20 @@
 
 ---
 
-## 🎯 SI ARRANCAS CON FABLE 5 — LEER PRIMERO
+## SI ARRANCAS CON FABLE 5 — LEER PRIMERO
 
-`docs/FABLE-5-BRIEF.md` — brief especifico de investigacion cross-repo aprovechando el 1M context. Fable NO codea webapp — solo produce `docs/W.11-SOCKETS-PLAN.md` con codigo listo-para-pegar + tests + decisiones. Opus 4.8 ejecuta despues.
+**Archivo:** `docs/FABLE-5-BRIEF.md`
 
-**Objetivo unico Fable:** investigar exhaustivo con 1M context (Expo + webapp + socket server + backend Laravel) y producir plan tan completo que Opus solo tenga que copiar-pegar-testear.
+Brief exhaustivo de investigacion cross-repo aprovechando el 1M context. Incluye:
 
-**Tiempo estimado Fable:** 30-60 min de investigacion. Cero codigo webapp durante esta ventana.
+- **Mapa completo de contexto** — 6 repos con paths absolutos, todos los docs del hub (`PARITY-MATRIX.md`, `BACKEND-API-MAP.md`, `PLAN.md`, `COMPLETADO.md`, `BUG-LOG.md`, 7 ROADMAP-*.md, 20+ W.X-*.md), memoria completa Claude Code (~90 archivos en `.claude/projects/.../memory/`), designs aprobados, patterns de los 12 modulos ya cerrados
+- **Mision unica** — investigar exhaustivo Expo + webapp + socket server + backend Laravel y producir `docs/W.11-SOCKETS-PLAN.md` con codigo listo-para-pegar + tests + decisiones
+- **Reglas duras** — NO codear webapp durante esta ventana, solo el documento plan. Opus 4.8 ejecuta despues copiando el plan
+- **Perfil del usuario** — modo DaVinci, cero fabricacion, espejo Expo literal
 
-Si arrancas con Opus 4.8 normal: ignora el brief Fable y sigue el flujo estandar de `/siguiente` (leer esta pagina + PENDIENTES-WEBAPP).
+**Tiempo estimado Fable:** 30-60 min de investigacion. Cero codigo webapp.
+
+Si arrancas con Opus 4.8 normal: ignora el brief Fable y sigue flujo estandar `/siguiente` (leer esta pagina + `docs/living/PENDIENTES-WEBAPP.md`).
 
 ---
 

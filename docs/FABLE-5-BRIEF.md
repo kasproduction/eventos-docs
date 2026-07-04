@@ -4,6 +4,110 @@
 
 ---
 
+## MAPA COMPLETO DE CONTEXTO — lee esto primero
+
+### Repos (todos los paths absolutos)
+
+| Repo | Path | Stack | Rol |
+|---|---|---|---|
+| **Webapp (target)** | `C:\laragon\www\eventos-web\` | Next 16 + React 19 + Tailwind 4, pnpm | LO QUE VAS A MODIFICAR |
+| **Expo mobile (source of truth)** | `C:\Users\Kasproduction\Projects\eventos-app\` | Expo SDK 55, React Native, NativeWind | ESPEJO A COPIAR |
+| **Backend Laravel** | `C:\laragon\www\eventos-backend\` | Laravel 12 + Filament 3, PostgreSQL | Emite eventos via HTTP → socket server |
+| **Socket server** | `C:\laragon\www\eventos-socket\` | Node.js + Socket.IO + Redis DB 2 | Broker central de eventos |
+| **Docs hub (aca)** | `C:\laragon\www\APP EVENTOS\` | Markdown | Documentacion + memoria (via .claude/) |
+| Kiosk (irrelevante W.11) | `C:\laragon\www\eventos-kiosko\` | Vite + React | Check-in tablets |
+
+### Docs a leer en el hub `APP EVENTOS\`
+
+**Nivel maestro (obligatorios):**
+- `docs/NEXT-SESSION.md` — continuidad de la ultima sesion (leelo primero)
+- `docs/living/PENDIENTES-WEBAPP.md` — ventana operativa unica con TODOS los W.X y su estado real (12 modulos cerrados 100%, seccion W.11 con detalle de items)
+- `docs/webapp/PARITY-MATRIX.md` — fuente unica de verdad Expo↔Webapp↔Backend, cruce endpoint por endpoint
+- `docs/webapp/BACKEND-API-MAP.md` — inventario ~197 endpoints backend con shape reference
+
+**Detalle por modulo webapp** (todos en `docs/webapp/W.X-*.md`):
+- Especialmente relevantes para W.11: los que ya tienen socket funcionando o esperan RT
+- `docs/webapp/W.4-streaming.md`, `W.9-engagement.md`, `W.14-anuncios.md`, `W.17-soporte.md`, `W.6-social.md`, `W.8-networking.md`
+- `docs/webapp/PLAN.md` — plan maestro de sprints
+
+**Otros docs:**
+- `docs/COMPLETADO.md` — lo que se cerro cronologicamente
+- `docs/BUG-LOG.md` — bugs registrados
+- `docs/QA-MASTER.md` — QA final Fase 1
+- 7 ROADMAP-*.md en `docs/` — planes tacticos por area
+- `docs/infra/DISPONIBILIDAD-HA.md` — arquitectura HA prod (Cloudflare R2, etc)
+
+### Memoria persistente Claude Code
+
+**Location:** `C:\Users\Kasproduction\.claude\projects\C--laragon-www-APP-EVENTOS\memory\`
+
+- `MEMORY.md` — index de todas las memorias, se carga AUTOMATICO en cada sesion. Ya lo tenes en el system prompt
+- ~90 memorias divididas en:
+  - **project_*** — decisiones tecnicas/arquitectura por feature
+  - **feedback_*** — reglas DaVinci vivas (~50 memorias con convenciones)
+  - **reference_*** — pointers a sistemas externos
+  - **sessions_*** — log historico de sesiones
+  - **user_*** — perfil de Kamilo
+
+**Memorias criticas para W.11:**
+- `project_sockets_realtime_status.md` (NUEVA — leelo, tiene el plan pre-Fable)
+- `project_socket_notes.md` — ioredis v5, Redis DB 2, puerto 3001
+- `project_socket_architecture.md` — 1 conexion, 4 eventos, debounce, entity keys
+- `project_backend_api_map.md` — inventario ~197 endpoints, 0 gaps bloqueantes
+- `project_parity_matrix.md` — 117/117 endpoints OK
+- `project_scaling_10k.md` — Cache Redis, PM2 cluster
+- `project_w4_streaming_implementation.md` — como funciona el socket streaming actual webapp
+- `project_realtime_notes.md` — focusManager, socket invalidation, push contingencia
+
+**Memorias DaVinci criticas** (feedback vivo):
+- `feedback_davinci.md`, `feedback_davinci_workflow.md`, `feedback_quality_first.md`
+- `feedback_no_extra_sockets.md` (1 socket rooms aislados)
+- `feedback_webapp_mirror_expo.md` (webapp = espejo Expo en comportamiento)
+- `feedback_no_emoji_icons_ui.md`, `feedback_no_pulsing_dots.md`
+- `feedback_webapp_fonts.md` (Plus Jakarta + Urbanist)
+- `feedback_no_date_now_in_usestate.md` (SSR-safe patterns)
+- `feedback_no_fabricate.md` — no inventar cosas
+- `feedback_analyze_before_code.md`
+- `feedback_no_plan_mode.md`
+
+### Design/prototipos aprobados
+
+`design/` — HTMLs de referencia aprobados por Kamilo:
+- `design/W.18-perfil/index.html` — perfil demo (referencia patron reciente)
+- `design/features/webapp/Login/iteraciones/login-v7-davinci-FINAL.html` — login incluye rotate overlay
+- `design/features/webapp/W0-spatial/home-v2-C-cinematic-MUTE.html` — shell base
+- Muchos otros por feature
+
+### Historia — 12 modulos ya cerrados 100% (patterns replicables)
+
+Estos ya tienen split layout wall+detail que W.11 debe respetar (no romper):
+- **W.7 Sponsors** (23/23) — `project_w7_sponsors_webapp.md`
+- **W.9 Engagement** (35/35) — `project_w9_engagement_webapp.md`
+- **W.13 Documents** (15/15) — `project_w13_documents.md`
+- **W.14 Anuncios+Cartel** (17/17) — `project_w14_cartel_digital.md`
+- **W.17 Soporte** (13/13) — subflow del Asistente
+- **W.18 Perfil** (19/19) — `project_w18_hub_personal_blueprint.md`
+
+Todos usan mismo shell W.0 (`CanvasCard` + `SpatialShell` + `SidebarPill`). El hook global W.11 tiene que montar en `(app)/layout.tsx` que envuelve TODOS ellos sin romper.
+
+### Estado git actual
+
+- `eventos-web` main: `f28b4ff` — feature link identity + E2E ampliado
+- `eventos-backend` feature/magic-link-auth: `2849fdc` — validator flexible profile
+- `APP EVENTOS` main: `74285a0` — este brief + memoria sockets + docs cierre 12 modulos
+
+Todo pusheado. Working tree limpio salvo ruido (screenshots ERRORES + .claude/settings.local.json).
+
+### Perfil del usuario (Kamilo)
+
+- Solo founder + dev + diseñador
+- Modo DaVinci — artesano, esencia antes que forma
+- Odia: emojis en UI, dots pulsantes, `useState(Date.now())` en SSR, JSZip cliente, fabricar features
+- Prefiere: espejo Expo literal, cero inventos, cards visuales agrupando
+- Comunicacion: directa, sin rodeos. No preguntar cada 3 pasos. Aprobar propuesta antes de codear pero no micro-pedir permisos
+
+---
+
 ## Contexto: por que Fable 5
 
 Kamilo cambio temporalmente a Fable 5 porque Opus 4.7/4.8 no tiene suficiente context para leer TODO el codebase cross-repo (6 repos, muchos archivos por leer). Fable 5 con 1M tokens puede leer:
