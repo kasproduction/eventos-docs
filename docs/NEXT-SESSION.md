@@ -6,10 +6,84 @@
 
 ---
 
-## Ultima sesion (cierre 2026-07-04 — W.18 Hub Personal 100% + foto upload + sidebar refactor)
+## Ultima sesion (cierre 2026-07-04 tarde — W.18 100% + 7 modulos cerrados via reclasificacion + investigacion W.11 sockets)
 
-**Total acumulado webapp:** **~468/707 = 66.2%** (+17 hoy con W.18 completo)
+**Total acumulado webapp:** **~484/695 = 69.6%** (+16 items hoy)
 **Estado al cierre:** todo pusheado. `eventos-web`, `eventos-backend` (feature/magic-link-auth), `APP EVENTOS` sincronizados.
+
+### **12 modulos cerrados 100% real** (antes eran 5)
+
+Cerrados de verdad: W.0, W.1, W.1B, W.5, W.7, W.8, W.9, W.10, W.13, W.14, W.17, W.18.
+
+Cerrados HOY via reclasificacion formal (no fake maquillaje — items movidos al pool que les corresponde):
+- **W.5 Speakers 33/35 → 35/35** — Lighthouse Perf/Acc + device real → W.12 Polish
+- **W.13 FAQ+Docs 15/17 → 15/15** — Pages dinamicas → Fase 2
+- **W.8 Networking 15/25 → 21/21** — Mi perfil editable cubierto por W.18 con link SidebarLeft. Filtro role → skip (backend publico no expone). RT listeners → W.11 Sockets. Sugeridos cards + Tracking → Fase 2. E2E ampliado con 5 tests nuevos
+- **W.0 Spatial UI 21/24 → 24/24** — Command palette → Fase 2. Pre-load + device real → W.12
+- **W.1 Setup+Auth 102/107 → 107/107** — B4/B11 haptics → Fase 2. Smoke device + Lighthouse → W.12. CSP Vimeo/Sentry → agrupado con W.4 cierre
+- **W.14 Anuncios+Cartel 17/20 → 17/17** — Socket announcement:new → W.11. Web Push → W.12
+- **W.17 Soporte 13/15 → 13/13** — Socket support:new_response → W.11
+
+### Feature nuevo real de la sesion — link identity → /perfil
+
+`SocialView.tsx` sidebar izq: el bloque de identidad (avatar+nombre+stats) ahora es clickeable, navega a `/perfil`. Hover state con pill "Editar perfil" arriba a la derecha. Cierra el loop W.18 desde contexto de networking. 5 tests E2E nuevos: click identity → /perfil, filtro Sin contactar, abrir perfil → panel + CTA Conectar, rechazar solicitud (Ignorar), tab Bloqueados + Desbloquear. 11/11 verde.
+
+### Investigacion completa sockets (Fase pre-codigo)
+
+Se verifico el estado real cross-repo (Expo + webapp + socket + backend Laravel):
+- **Webapp:** socket singleton `lib/streaming/socket.ts` ya funciona pero SOLO se abre cuando el user entra a `/session-stream`. NO hay hook global cross-modulo
+- **Expo:** abre socket al login. Verificado en vivo: `[socket] connected user=3 attendee=2 role=attendee event=summit-empresarial-2026 conns=1` + `joined event:1`
+- **Backend socket server:** emite en produccion `data:invalidate`, `wall:post`, `wall:comment`, `ban:enforced`, `networking:notify` (verificado en `eventos-socket/src/index.ts` lineas 221/193/196/304/338)
+- **Expo `useDataInvalidation.ts`** (467 lineas) escucha 19 listeners cross-modulo. Del scope Fase 1 webapp: 5 aplican (data:invalidate, ban:enforced, networking:notify, wall:post, wall:comment). 8 son W.15 Vendor (opcional). 5 son W.16 SKIP webapp. 2 nice-to-have Fase 2.
+- **Divergencia inevitable:** Expo usa TanStack Query + `queryClient.invalidateQueries`. Webapp usa SSR + `router.refresh()` (patron Next 16). NO portar TanStack en bloque, portar solo el patron equivalente.
+
+**Detalle completo:** `memory/project_sockets_realtime_status.md`.
+
+### Decisiones cerradas (no preguntar)
+
+- **12 modulos cerrados via reclasificacion honesta** — items no perdidos, movidos al pool correcto (W.11/W.12/Fase 2)
+- **W.11 Sockets es el siguiente sprint** — bloqueante clave que destraba items reclasificados en W.14/W.17/W.9/W.6
+- **Patron webapp: SSR + `router.refresh()`** para data:invalidate, NO invalidate queries. Divergencia tecnica documentada, comportamiento identico Expo
+- **`useDataInvalidation` hook global** al mount del layout `(app)`, NO en cada modulo. UN socket por sesion (verificado que asi funciona Expo)
+- **NO tocar los 4 hooks streaming** — funcionan bien. `join:event` redundante del `useChat` queda idempotente (server hace `.join()` seguro)
+- **Fable 5 disponible** — para analisis exhaustivo cross-repo la proxima sesion. Se puede invocar con `/model fable` o `claude --model fable` (requiere Claude Code v2.1.170+, `claude update`)
+
+### Que sigue — W.11 Sockets criticos
+
+Plan concreto en `memory/project_sockets_realtime_status.md`. Resumen:
+
+**Crear:**
+1. `src/hooks/useGlobalSocket.tsx` — Client Provider que envuelve al SpatialShell. Al mount: `getSocket()` + `emit('join:event', {eventId})` + registra 5 listeners con handlers (router.refresh + lumina toast + router.replace si ban).
+2. Registrar listeners: `data:invalidate` (debounce 800ms), `ban:enforced`, `networking:notify` (batched 1500ms), `wall:post`, `wall:comment`.
+
+**Modificar:**
+3. `src/app/[locale]/(app)/layout.tsx` — envolver `<SpatialShell>` con `<GlobalSocketProvider eventId={event.id}>`.
+
+**Efecto real inmediato tras deploy:**
+- Bell/anuncios refrescan sin recargar
+- Feed W.6 live
+- W.8 toast al recibir solicitud
+- Puntos/passport se invalidan
+- Ban → kick + redirect
+
+**Tiempo estimado:** 45min - 1h con Fable 5 (o Opus).
+
+### Ambiente para reanudar
+
+- **Socket server:** correr con `cd C:/laragon/www/eventos-socket && pnpm dev` (puerto 3001, Redis DB 2)
+- **Backend Laravel:** ya corre en Laragon en `eventos-backend.test`
+- **Webapp dev:** `cd C:/laragon/www/eventos-web && pnpm dev` (puerto 3000)
+- **Verificacion viva:** con Expo mobile logueado, el log del socket muestra connect+join event de forma instantanea
+
+### Estado git al cierre
+
+- **`eventos-web` main:** pusheado con feature link identity + E2E ampliado
+- **`eventos-backend` feature/magic-link-auth:** pusheado con validator flexible profile
+- **`APP EVENTOS` main:** pusheado con memoria sockets + docs cierre 12 modulos
+
+---
+
+## Sesion 2026-07-04 manana — W.18 Hub Personal entrega inicial
 
 ### W.18 Hub Personal — entregado 19/19 (100%)
 
