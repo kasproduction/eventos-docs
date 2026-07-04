@@ -4,6 +4,177 @@
 
 ---
 
+## 0. ONBOARDING — que es EventOS, que hacemos, como trabajamos
+
+### El producto: EventOS
+
+**Que es:** SaaS de gestion de eventos corporativos. Plataforma multi-superficie que se vende a organizadores de eventos (empresariales, congresos, summits). Compite feature-por-feature con Cisco Webex Events (referencia de precio ~$88K USD/evento).
+
+**Empresa:** Kasproduction (bundle ID `com.kasproduction.eventos`).
+
+**Equipo:** 1 persona. Kamilo (Colombia, Medellin) — solo founder + developer + diseñador. Modo DaVinci — artesano, esencia antes que forma, referencias externas obligatorias antes de reusar patrones internos.
+
+**Contexto comercial:** el cliente ancla original (Bancolombia) se cayo — el producto sigue construyendose generico para el proximo cliente. Estimacion de cliente meta: `docs/negocio/CLIENT-TARGET.md` (Eventos Efectivos, sept 2026) — pero no bloqueante, se sigue construyendo producto.
+
+**Idiomas:** es-CO (primario), en, pt-BR — i18n desde Fase 1.
+
+**Temas:** Noir (dark, teatral, cinematico) + Lux (light, galeria de arte). NO son inversion — son ambientes distintos. Ver memoria `project_lux_v2_design.md`.
+
+### Las 5 superficies del producto
+
+| Superficie | Path | Stack | Rol de negocio |
+|---|---|---|---|
+| **Backend + Admin** | `C:\laragon\www\eventos-backend\` | Laravel 12 + Filament 3 + PostgreSQL | El organizador configura el evento, sube contenido, ve dashboards. ~197 endpoints REST. |
+| **App movil (asistente)** | `C:\Users\Kasproduction\Projects\eventos-app\` | Expo SDK 55 + React Native + NativeWind + TanStack Query + MMKV + FlashList | Lo que descarga el asistente. Feature completa Fase 1. **Fuente de verdad del comportamiento.** |
+| **Webapp (asistente)** | `C:\laragon\www\eventos-web\` | Next 16 + React 19 + Tailwind 4 (pnpm) | Espejo Expo pero para escritorio/laptop. Para clientes que NO quieran forzar app movil. Sesion en curso. |
+| **Socket server (broker)** | `C:\laragon\www\eventos-socket\` | Node.js + Socket.IO + @socket.io/redis-adapter | RT centralizado. Puerto 3001. Redis DB 2. Backend Laravel dispara emits via HTTP `/internal/*` endpoints. |
+| **Kiosk (check-in)** | `C:\laragon\www\eventos-kiosko\` | Vite + React + TypeScript | Tablets en la entrada. Escanea QR fisico del asistente. |
+
+### Entorno de desarrollo Kamilo
+
+**Stack local (Laragon):**
+- Nginx + PHP 8.3 + MySQL 8 corren via Laragon (Windows 11 Pro)
+- Backend Laravel accesible en `http://eventos-backend.test` (vhost auto de Laragon)
+- Admin Filament en `http://eventos-backend.test/admin`
+- Redis local corriendo (DB 2 para socket adapter, DB 0 para cache, DB 1 para queues Laravel)
+- Mailpit en `http://localhost:8025` (SMTP de dev)
+- Socket server dev: `cd C:/laragon/www/eventos-socket && pnpm dev` — puerto 3001
+- Webapp dev: `cd C:/laragon/www/eventos-web && pnpm dev` — puerto 3000, con Turbopack
+
+**Deps:**
+- Node ~20-25 (usado con pnpm)
+- Composer para Laravel deps
+- ext-redis + ext-pdo_mysql
+
+**Proyecto legacy referencia:** `C:\laragon\www\checki\` — sistema original PHP check-in que dio origen a EventOS. Info en memoria `reference_checki_system.md`.
+
+### Estado global del proyecto (2026-07-04)
+
+**Fase 1 (funcional completo antes del UI barrido final):**
+- Backend: ~100% (197/197 endpoints, migrations, observers, jobs verificados)
+- Expo mobile: ~100% Fase 1 (sesiones 1.1 → 1.21 funcionales)
+- Webapp Next: **484/695 = 69.6%** (12 modulos cerrados 100%, 5 modulos parciales, otros bloqueados o skip)
+- Socket server: funcional en dev con Redis, emite todos los eventos verificados
+- Kiosk: funcional MVP
+
+**Modulos webapp cerrados 100% (12):** W.0, W.1, W.1B, W.5, W.7, W.8, W.9, W.10, W.13, W.14, W.17, W.18.
+
+**Modulos webapp pendientes:**
+- W.2 Home 12/20 (60%) — 8 items lifecycle states
+- W.3 Agenda 25/30 (83%) — 5 items socket + nice-to-have
+- W.4 Streaming 83/111 (75%) — Replay + in-stream anuncios + polish socket
+- W.6 Social Wall 18/40 (45%) — Stories + Photo Contest (skip) + Pagination + comments lazy + socket dedup
+- **W.11 Sockets RT 8/42 (20%) — TU MISSION AHORA**
+- W.12 Polish + PWA 0/43 — QA final Fase 1 pre-deploy
+- W.15 Vendor Dashboard 0/35 — OPCIONAL Fase 1
+- W.16 Live Moments 0/23 — SKIP webapp (mobile-first)
+- W.X Welcome Showcase 0/7 — BLOQUEADO
+
+### Modo DaVinci — como trabaja Kamilo
+
+**11 pasos (memoria `feedback_davinci_workflow.md`):**
+1. Analizar feature analogo primero antes de codear
+2. Buscar referencias externas reales (Dribbble, apps premium, competitors) — NO reusar patrones del propio repo sin justificar
+3. Proponer en texto/composicion antes de codear
+4. Esperar aprobacion explicita
+5. Codear solo tras aprobacion
+6. Verificar type + lint + tests + build
+7. Probar en dev server (o si UI, en browser)
+8. Guardar memoria si aprendimos algo
+9. Actualizar `PENDIENTES-WEBAPP.md` (marcar items done + reclasificar si aplica)
+10. Actualizar `NEXT-SESSION.md` con continuidad
+11. Commit + push (auto-triggered con "Guardar mi DaVinci")
+
+**Cosas que Kamilo ODIA:**
+- Emojis como iconos UI (usar lucide-react)
+- Dots pulsantes en badges/indicators
+- `useState(() => Date.now())` en componentes SSR (hydration mismatch)
+- Client-side JSZip para bulk downloads (no escala, backend pre-genera)
+- Reusar patrones del propio repo sin verificar (`feedback_no_reinvent`, `feedback_analyze_before_code`)
+- Fabricar features que no existen en Expo o inventar shapes de backend (`feedback_no_fabricate`)
+- Toast "+X pts" al ganar puntos (silencioso como Expo)
+- Accents del cliente en gamification (usar TEAL/GOLD/CYAN fijos)
+- Dots o slash `·` como separadores (usar jerarquia tipografica)
+- Repetir informacion en el panel derecho (`feedback_no_repetir_info_en_panel`)
+- Modal en desktop (usar panel der salvo caso especifico)
+- Fuentes distintas a Plus Jakarta Sans (display) + Urbanist (body)
+
+**Cosas que Kamilo APRUEBA:**
+- Espejo Expo literal en comportamiento (`feedback_webapp_mirror_expo`)
+- Split layout wall+detail (patron establecido W.7/W.13/W.14/W.17/W.18)
+- Cards visuales agrupando (patron W.18 datos con 3 cards)
+- Iconografia lucide-react (`feedback_no_emoji_icons_ui`)
+- Split de responsabilidades cliente/server con proxy Next.js `/api/*` → backend
+- Referencias externas premium antes de disenar (Vercel, Linear, Notion, Cal.com, Superhuman)
+- Un solo boton save por unidad conceptual (no save-por-card como Vercel/Stripe salvo casos legitimos)
+- Framer-motion `layout` spring para animaciones interactivas
+
+### Herramientas comunes disponibles
+
+**Frontend webapp:**
+- shadcn/ui componentes (Popover, Dialog, Avatar, Button, etc)
+- next-intl para i18n
+- next-themes para Lux/Noir
+- framer-motion para animaciones
+- Radix UI (via shadcn)
+- Lucide-react iconos
+- Playwright para E2E
+- Vitest para unit
+
+**Backend Laravel:**
+- Filament 3 para admin
+- Sanctum para auth API
+- Spatie Permission
+- Horizon para queues
+- Telescope solo local
+- Sentry en prod
+- Argon2id hashing
+
+**Socket:**
+- socket.io-client v4 en cliente
+- @socket.io/redis-adapter server-side
+- Redis pub/sub (DB 2)
+- Backend Laravel emite via HTTP a `/internal/*` (nunca conecta directo)
+
+### Workflow git
+
+- Repos separados: `eventos-web`, `eventos-backend`, `eventos-socket`, `APP EVENTOS`, `eventos-app`, `eventos-kiosko`
+- Cada uno con su propio remote en github.com/kasproduction
+- **NUNCA** `--no-verify` en commits
+- **NUNCA** `git push --force` a main
+- Commit messages: prefijo conventional (feat/fix/docs/refactor) + scope entre parentesis + descripcion + `Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>` (o el modelo que estes usando)
+- Kamilo dice "Guardar mi DaVinci" = commit + push + memoria + roadmap update
+
+### QA workflow
+
+- **Typecheck:** `pnpm typecheck` (webapp) o `pnpm typecheck` (socket server)
+- **Lint:** `pnpm lint` (webapp)
+- **Vitest:** `pnpm vitest run` (webapp — 391/391 tests actualmente)
+- **E2E Playwright:** `pnpm playwright test` — modo serial para modulos con SSR pesado (W.13, W.7, W.18, ver `test.describe.configure({ mode: "serial" })`)
+- **Mock backend E2E:** `e2e/_helpers/mockBackend.mjs` sirve el backend REST. Para tests que necesitan socket real, decidir strategy
+
+### Docs / roadmaps del hub (leer en profundidad si aplica)
+
+Ademas de lo que ya lista la seccion "Docs a leer" mas abajo, considera:
+
+- `docs/webapp/PLAN.md` — plan maestro de sprints webapp
+- `docs/COMPLETADO.md` — cronologico de cierres
+- `docs/BUG-LOG.md` — bugs registrados con root cause
+- `docs/QA-MASTER.md` — QA final Fase 1
+- `docs/webapp/BACKEND-API-MAP.md` — inventario 197 endpoints backend con shape reference
+- `docs/webapp/PARITY-MATRIX.md` — cruce Expo↔Webapp↔Backend feature-por-feature
+- `docs/infra/DISPONIBILIDAD-HA.md` — arquitectura HA prod (Cloudflare R2, PM2 cluster, ~$80-120/mes)
+- `docs/seguridad/*.md` — SEC-1/SEC-2/SEC-3 audit
+- 7 ROADMAP-*.md en `docs/` — planes tacticos por area
+- `docs/negocio/*.md` — competitive analysis, growth strategy, cliente target
+
+**Memorias del sistema Claude Code** (auto-cargadas):
+- Path: `C:\Users\Kasproduction\.claude\projects\C--laragon-www-APP-EVENTOS\memory\`
+- `MEMORY.md` es index — se carga auto en cada sesion. Ya lo tenes en tu system prompt
+- ~90 archivos categorizados. Ver seccion mas abajo para las criticas de W.11
+
+---
+
 ## MAPA COMPLETO DE CONTEXTO — lee esto primero
 
 ### Repos (todos los paths absolutos)
