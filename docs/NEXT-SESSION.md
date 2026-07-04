@@ -6,12 +6,12 @@
 
 ---
 
-## Ultima sesion (cierre 2026-07-04 — W.18 Hub Personal + sidebar refactor)
+## Ultima sesion (cierre 2026-07-04 — W.18 Hub Personal 100% + foto upload + sidebar refactor)
 
-**Total acumulado webapp:** **~466/707 = 65.9%** (+15 hoy con W.18)
+**Total acumulado webapp:** **~468/707 = 66.2%** (+17 hoy con W.18 completo)
 **Estado al cierre:** todo pusheado. `eventos-web`, `eventos-backend` (feature/magic-link-auth), `APP EVENTOS` sincronizados.
 
-### W.18 Hub Personal — entregado 17/19 (89%)
+### W.18 Hub Personal — entregado 19/19 (100%)
 
 **Que es:** ruta `/perfil` split layout 35/65 (wall + panel der) espejo directo de `ProfileScreen.tsx` mobile (927 lineas Expo, ~85% completo).
 
@@ -84,10 +84,17 @@ Backend PUT `/me/profile` NO devuelve `email` y usa nombres con sufijo (`linkedi
 - Typecheck limpio
 - Lint 0 errores en modulo perfil
 
-### Que falta W.18 (2 items, nice-to-have Fase 2)
+### Foto upload + shuffle beam (cerrado en la misma sesion)
 
-- Foto upload UI (input file + preview + submit multipart). Backend endpoint listo. Riesgo BAJO, ~30-45 min
-- Shuffle avatar (beam variations) — mobile-only, no vale la pena en webapp
+Al final de la sesion se cerraron los 2 items restantes:
+- **`PerfilAvatarMenu.tsx`** — Radix Popover anchored al avatar. Sin foto → 2 opciones (subir + shuffle). Con foto → 2 opciones (subir + eliminar rojo)
+- **Beam avatar** ahora es el fallback (reemplaza las iniciales del webapp previo). URL espejo LITERAL Expo: `hostedboringavatars.vercel.app/api/beam` con colores `0EA5E9,6366F1,14B8A6,A855F7,38BDF8`
+- **Shuffle** cicla seed 0→1→2→3→1 (nunca vuelve a 0 sin reset). Persistido en `localStorage` key `eventos:avatar_seed:{email}` (mismo modelo MMKV Expo)
+- **Upload** via input file oculto → POST multipart al proxy `/api/profile/photo`. Max 5MB. Toast error si excede
+- **Delete** DELETE al mismo endpoint → resetea seed a 0 (vuelve al beam base)
+- **CSS `.pf-avatar-menu`** — Radix Popover con item hover surface-medium, item danger accent color
+- `next.config.ts` agregado `hostedboringavatars.vercel.app` a `images.remotePatterns`
+- i18n +7 keys (photoUpload/photoShuffle/photoDelete + toasts)
 
 ### Estado git al cierre
 
