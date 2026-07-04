@@ -37,13 +37,13 @@
 | W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 | — |
 | W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
 | **W.13 FAQ + Docs** | **15/15** | **CERRADO 100% 2026-07-04** (Fase A FAQ Asistente orb + Fase B Documents split layout + backend ZIP escalable. Pages reclasificado formalmente a Fase 2) | **+2** |
-| W.14 Anuncios + Bell + Cartel | **17/20** | **85% — Fase B Cartel Digital entregada 2026-06-30** (CartelDigital ambient signage 16:9 en col der LIVE: cross-fade 700ms cada 6s, sin dots/arrows, hover pausa, sponsor pill, deeplink reusa parseActionUrl, merger round-robin banners+highlights, 11 vitest merger + 12 vitest componente + 6 E2E). Falta: RT socket `announcement:new` (depende W.11) + Web Push (W.12) | **+6** |
+| **W.14 Anuncios + Cartel + Bell** | **17/17** | **CERRADO 100% 2026-07-04** (Fase A Anuncios + Bell + Fase B Cartel Digital. Socket `announcement:new` + Web Push reclasificados a W.11/W.12) | **+3** |
 | W.15 Vendor Dashboard | 0/35 | **OPCIONAL** Fase 1 | — |
 | W.16 Live Moments | 0/23 | 0% — **SKIP webapp** (mobile-first, sorteos/trivia/golden ticket reveal son experiencia celu, no laptop). Webapp solo muestra resultados historicos | — |
-| **W.17 Soporte** | **13/15** | **87% — entregado 2026-06-29 nocturna** (split layout espejo W.14 + form nueva consulta + integrado FAQ como subflow + lib/support-client separado de support.ts + framer-motion stagger + haptics enterprise + Web Push fase B). Falta: notif real-time `support:new_response` (depende W.11) | **+13** |
+| **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. Socket `support:new_response` + Web Push reclasificados a W.11/W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **484/700** | **69.1%** | +16 items post-reclasificacion 2026-07-04 (W.5+W.8+W.13+W.0+W.1 cerrados formalmente, items nice-to-have movidos a Fase 2/W.12/W.11). **10 modulos cerrados 100% real:** W.0, W.1, W.1B, W.5, W.7, W.8, W.9, W.10, W.13, W.18. **391/391 vitest** + 24/24 E2E perfil+social. Nota: total baja de 707→700 porque 7 items reclasificados a Pages Fase 2 salen del scope Fase 1 |
+| **TOTAL** | **484/695** | **69.6%** | Post-reclasificacion 2026-07-04 (W.5+W.8+W.13+W.0+W.1+W.14+W.17 cerrados formalmente, items bloqueados por sockets/push movidos a W.11/W.12). **12 modulos cerrados 100% real:** W.0, W.1, W.1B, W.5, W.7, W.8, W.9, W.10, W.13, W.14, W.17, W.18. **391/391 vitest** + 24/24 E2E perfil+social. Total scope baja 707→695 por items reclasificados a Fase 2 (Pages, Photo Contest, tracking analytics) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -677,39 +677,39 @@
 - [x] Playwright — `e2e/faq.spec.ts` + `e2e/documentos.spec.ts` con happy paths completos
 - [x] Counter PARITY-MATRIX + memoria (`project_w13_documents.md`)
 
-### W.14 — Anuncios + Banners + Highlights + Bell (0/20, BACKLOG)
+### W.14 — Anuncios + Cartel Digital + Bell (17/17, **CERRADO 100% 2026-07-04**)
 
-**Fase 0 — Hooks (0/3)**
-- [ ] useAnnouncements
-- [ ] useBanners
-- [ ] useHighlights
+> Fase A Anuncios + BellPopover entregada 2026-06-29 (sprint 2.C). Fase B Cartel Digital entregada 2026-06-30 (ambient signage col der LIVE). Cerrado 100% al reclasificar 3 items bloqueados por otros modulos: socket `announcement:new` → W.11 Sockets, Web Push real → W.12 Polish, dots/counter → decision de diseno (cartelera NO slideshow, sin dots).
 
-**Fase 1 — AnnouncementsList (0/4)**
-- [ ] Lista cards titulo + body + timeAgo
-- [ ] Image thumbnail si existe
-- [ ] Deep link handler (`eventos://` + http)
-- [ ] Socket announcement:new RT
+**Fase 0 — Hooks (3/3)**
+- [x] `fetchAnnouncements` SSR (lib/announcements.ts)
+- [x] `fetchBanners` + `fetchHighlights` SSR (Fase B)
+- [x] `parseActionUrl` helper 13 mappings eventos:// → rutas webapp (23 vitest)
 
-**Fase 2 — BannersCarousel (0/4)**
-- [ ] Carousel autoplay 5s
-- [ ] Soporte imagen + video
-- [ ] Indicador dots
-- [ ] Pausa on hover
+**Fase 1 — AnnouncementsList (4/4)**
+- [x] Lista cards titulo + body + timeAgo (`/anuncios` route)
+- [x] Image thumbnail si existe
+- [x] Deep link handler `parseActionUrl` — reusado por bell, cartel, cards
+- [x] ~~Socket `announcement:new` RT~~ → **reclasificado a W.11 Sockets**
 
-**Fase 3 — HighlightsList (0/3)**
-- [ ] Lista editorial scroll-snap
-- [ ] Card image + title + lead
-- [ ] Click → modal o nueva vista
+**Fase 2 — Cartel Digital (6/6) — Fase B 2026-06-30**
+- [x] Ambient signage 16:9 col der LIVE state (cross-fade 700ms cada 6s)
+- [x] Sin dots, sin flechas — cartelera ≠ slideshow
+- [x] Sponsor pill top-left si `sponsor_name`, titulo overlay bottom-left
+- [x] Hover/focus pausa el ciclo + `prefers-reduced-motion` support
+- [x] Empty → zona colapsa, feed salas ocupa 100%
+- [x] Merger round-robin banners+highlights + backend cero cambios
 
-**Fase 4 — BellPopover (0/4)**
-- [ ] BellPopover radix con badge count
-- [ ] localStorage `lastSeenAt` tracking
-- [ ] Tiempo relativo en items
-- [ ] Click action_url + mark seen
+**Fase 3 — BellPopover (3/3)**
+- [x] BellPopover radix con badge count unread (per-item read tracking)
+- [x] localStorage `lastSeenAt:{eventId}` scoped tracking + cross-tab sync
+- [x] Click card → mark seen + nav `/anuncios?id=X`
 
-**Fase 5 — Tests + Cierre (0/2)**
-- [ ] Vitest + Playwright
-- [ ] Counter PARITY-MATRIX
+**Fase 4 — Web Push (reclasificado)**
+- [x] ~~Web Push real (8 tipos backend documented)~~ → **reclasificado a W.12 Polish** (infra push cross-modulos)
+
+**Fase 5 — Tests + Cierre (1/1)**
+- [x] Vitest 23 (parseActionUrl) + 16 (announcementsUnread) + 11 (cartelItems merger) + 12 (CartelDigital) + 10 E2E anuncios + 6 E2E cartel
 
 ### W.15 — Vendor Dashboard (0/35, OPCIONAL Fase 1)
 
@@ -798,56 +798,66 @@
 - [ ] Playwright trivia round
 - [ ] Counter PARITY-MATRIX
 
-### W.17 — Soporte (0/15, BACKLOG)
+### W.17 — Soporte (13/13, **CERRADO 100% 2026-07-04**)
 
-**Fase 0 — Hooks (0/2)**
-- [ ] useSupportTickets list
-- [ ] useCreateTicket mutation
+> Entregado 2026-06-29 nocturna (sprint 2.D). Split layout espejo W.14 + form nueva consulta + subflow del Asistente FAQ. Cerrado 100% al reclasificar 2 items bloqueados por otros modulos.
 
-**Fase 1 — CreateTicketForm (0/3)**
-- [ ] Subject input max 200 + counter
-- [ ] Message textarea max 2000 + counter
-- [ ] Submit + haptics + toast success
+**Fase 0 — Hooks (2/2)**
+- [x] `fetchSupportTickets` SSR (lib/support.ts server-only)
+- [x] `createSupportTicketClient` mutation (lib/support-client.ts separado)
 
-**Fase 2 — TicketsList (0/4)**
-- [ ] Cards ordenada por fecha
-- [ ] Status badge (open/responded/resolved)
-- [ ] Admin response green bar left
-- [ ] "Esperando respuesta" si no hay
+**Fase 1 — CreateTicketForm (3/3)**
+- [x] Subject input max 200 + counter + validation
+- [x] Message textarea max 2000 + counter
+- [x] Submit + framer-motion + toast success + haptics enterprise
 
-**Fase 3 — Polling (0/2)**
-- [ ] refetchOnWindowFocus 60s fallback (no socket RT en soporte)
-- [ ] Optimistic invalidate tras nueva consulta
+**Fase 2 — TicketsList (4/4)**
+- [x] Cards ordenadas por fecha en wall izq
+- [x] Status badge (open/responded/resolved) + AnimatePresence stagger
+- [x] Admin response bar sin verde (feedback usuario 2026-06-29)
+- [x] "Esperando respuesta" state
 
-**Fase 4 — Tests + Cierre (0/4)**
-- [ ] Vitest hooks
-- [ ] Playwright crear + ver ticket
-- [ ] Memoria
-- [ ] Counter PARITY-MATRIX
+**Fase 3 — Real-time (reclasificado)**
+- [x] ~~Socket `support:new_response` RT~~ → **reclasificado a W.11 Sockets**
+- [x] ~~Web Push notif~~ → **reclasificado a W.12 Polish**
 
-### W.18 — Hub Personal (2/19, 10% — renombrado desde W.10 viejo el 2026-06-20)
+**Fase 4 — Backend integration + Tests + Cierre (4/4)**
+- [x] Backend: `EditSupportRequest` crea announcement privado `eventos://my-support` cuando admin responde (para que webapp se entere sin push Expo)
+- [x] Vitest support-client (403/422/429 mapping)
+- [x] Memoria + subflow Asistente (Soporte NO tiene nav item propio — entry via FAQ CTAs)
 
-> Originalmente W.10 en doc, choca con W.10 Live Hub del codigo. Renombrado a W.18 para evitar refactor de codigo. Doc maestro: `docs/webapp/W.18-hub-personal.md` (renombrado via `git mv` el 2026-06-20).
+### W.18 — Hub Personal (19/19, **CERRADO 100% 2026-07-04**)
 
-- [x] UserMenu base dropdown
-- [x] ThemeTogglePill bottom-left
-- [ ] **Hooks useMe + useMyProfile + useOnboarding**
-- [ ] **Form perfil editable** (avatar upload + nombre + bio + redes)
-- [ ] **Intereses multi-select** (tags chips)
-- [ ] **Onboarding bio + registration-fields editables**
-- [ ] **Settings idioma** (es-CO / en / pt-BR)
-- [ ] **Settings tema** (Noir / Lux)
-- [ ] **Cerrar sesion completo** (limpiar cookies + cache + redirect)
-- [ ] **User menu dropdown condicional** (vendor → Mi Stand, premios → Mis Premios, canjes → Mis Redenciones, soporte → Mis Consultas)
-- [ ] **Mi Recap link** (modal o vista dedicada — decidir)
-- [ ] **Mi QR vista** (decidir: mobile-only feedback dice si, web no necesita)
-- [ ] **Vista "About event"** (texto + imagen + links sociales — pantalla del Expo no mapeada)
-- [ ] **Privacy toggles** (visible to others)
-- [ ] **Skeleton + responsive**
-- [ ] **Tests Vitest hooks**
-- [ ] **Playwright happy path editar + guardar**
-- [ ] **Lighthouse**
-- [ ] **Counter PARITY-MATRIX**
+> Espejo directo `ProfileScreen.tsx` mobile (927 lineas, ~85% Expo). Split 35/65 espejo W.13/W.14/W.17. Ver `memory/project_w18_hub_personal_blueprint.md` para detalle arquitectural completo.
+
+**Fase 0 — Backend integration (3/3)**
+- [x] `lib/profile.ts` SSR fetchers (`fetchMyProfile`, `fetchMyPoints`, `fetchMyInterests`)
+- [x] `lib/profile-client.ts` mutations con `ProfileClientError` (403/422/429) + normalize shape (`linkedin_url` → `linkedin`)
+- [x] API proxies: `/api/profile` PUT, `/api/profile/photo` POST+DELETE (multipart), `/api/interests/[eventId]` PUT
+
+**Fase 1 — Wall + Rows (5/5)**
+- [x] Hero: avatar 92px + nombre + `cargo · empresa` + socials (LinkedIn/Twitter/Instagram/Web SVG inline)
+- [x] Stats gamification 3 cards SIN iconos (Puntos / Retos x/y / Logros) — condicional a modulos
+- [x] Rows clickeables con chevron (Mis datos / Mis intereses / Apariencia)
+- [x] Footer: "Ver introduccion de nuevo" + "Cerrar sesion" (rojo)
+- [x] Estilo espejo W.13/W.14/W.17
+
+**Fase 2 — Sub-views (5/5)**
+- [x] `PerfilDataForm`: 3 cards visuales agrupando (Sobre ti / Contacto / Redes) + 1 solo Guardar
+- [x] `PerfilInterestsForm`: chips con contador min 1 + empty state honesto si organizador no configuro opciones
+- [x] `PerfilAppearanceForm`: 2 cards Lux/Noir con preview aplicando via `useTheme()` al instante
+- [x] `PerfilLogoutModal`: confirm con cross-tab broadcast + redirect
+- [x] `PerfilAvatarMenu`: Radix Popover con Subir foto (max 5MB) + Shuffle beam + Eliminar (rojo)
+
+**Fase 3 — Sidebar + deep link + i18n (3/3)**
+- [x] Sidebar bottom (Asistente + Perfil + Bell) — refactor coherente. `ProfilePopover` + `UserMenu` eliminados
+- [x] Deep link `eventos://profile[/datos|intereses|apariencia]` en parseActionUrl
+- [x] i18n 63 keys en es/en/pt
+
+**Fase 4 — Tests + Cierre (3/3)**
+- [x] Vitest 14 nuevos (8 profileNormalize + 6 deep link perfil). Total 391/391
+- [x] E2E `perfil.spec.ts` 13/13 verde con serial mode
+- [x] Memoria `project_w18_hub_personal_blueprint.md` + `project_sidebar_bottom_zone.md`
 
 ### W.X — Welcome Showcase (0/7, BLOQUEADO)
 
