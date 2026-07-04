@@ -6,6 +6,18 @@
 
 ---
 
+## 🎯 SI ARRANCAS CON FABLE 5 — LEER PRIMERO
+
+`docs/FABLE-5-BRIEF.md` — brief especifico de investigacion cross-repo aprovechando el 1M context. Fable NO codea webapp — solo produce `docs/W.11-SOCKETS-PLAN.md` con codigo listo-para-pegar + tests + decisiones. Opus 4.8 ejecuta despues.
+
+**Objetivo unico Fable:** investigar exhaustivo con 1M context (Expo + webapp + socket server + backend Laravel) y producir plan tan completo que Opus solo tenga que copiar-pegar-testear.
+
+**Tiempo estimado Fable:** 30-60 min de investigacion. Cero codigo webapp durante esta ventana.
+
+Si arrancas con Opus 4.8 normal: ignora el brief Fable y sigue el flujo estandar de `/siguiente` (leer esta pagina + PENDIENTES-WEBAPP).
+
+---
+
 ## Ultima sesion (cierre 2026-07-04 tarde — W.18 100% + 7 modulos cerrados via reclasificacion + investigacion W.11 sockets)
 
 **Total acumulado webapp:** **~484/695 = 69.6%** (+16 items hoy)
