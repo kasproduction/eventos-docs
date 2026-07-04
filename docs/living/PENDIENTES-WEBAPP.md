@@ -41,9 +41,9 @@
 | W.15 Vendor Dashboard | 0/35 | **OPCIONAL** Fase 1 | — |
 | W.16 Live Moments | 0/23 | 0% — **SKIP webapp** (mobile-first, sorteos/trivia/golden ticket reveal son experiencia celu, no laptop). Webapp solo muestra resultados historicos | — |
 | **W.17 Soporte** | **13/15** | **87% — entregado 2026-06-29 nocturna** (split layout espejo W.14 + form nueva consulta + integrado FAQ como subflow + lib/support-client separado de support.ts + framer-motion stagger + haptics enterprise + Web Push fase B). Falta: notif real-time `support:new_response` (depende W.11) | **+13** |
-| **W.18 Hub Personal** (renombrado desde W.10 viejo) | 2/19 | 10% — backlog | renumerado para evitar choque |
+| **W.18 Hub Personal** | **17/19** | **89% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E). Falta: foto upload UI (patron web estandar 30-45 min) + shuffle avatar (mobile-only) | **+15** |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **451/707** | **63.8%** | +13 sesion 2026-06-30 (W.14 Fase B +6 + W.2 Home +2 + W.13 Fase B +5). Cartel Digital + Documents split layout + backend ZIP pre-generado escalable (job + observer + endpoint). Bug fix useNow snapshot inestable (agenda hydration). 377/377 vitest verde |
+| **TOTAL** | **466/707** | **65.9%** | +15 sesion 2026-07-04 (W.18 Hub Personal). Split layout espejo W.13/W.14/W.17. Validator flexible sitio web (`nullable\|string` sin exigir `https://`). Sidebar reorg: nav top + zona personal bottom. Bug fix critico: `updateProfile` normaliza shape backend (linkedin_url→linkedin) + preserva email en merge. **391/391 vitest** + 13/13 E2E |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,14 +51,7 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 2.F — W.18 Hub Personal** (~2-3h, 1 sesion) — perfil editable + intereses + logout. **CRITICO** para vender webapp standalone. **Riesgo BAJO** (blueprint claro tras investigacion Expo).
-
-  **Blueprint listo** en `memory/project_w18_hub_personal_blueprint.md`:
-  - Expo `ProfileScreen.tsx` (927 lineas, ~85% completo) sirve como espejo directo
-  - 11 endpoints backend listos: `/me/profile` GET/PUT, `/me/photo` POST/DELETE, `/me/points`, `/events/{id}/my-interests` GET/PUT, etc.
-  - Componentes Expo replicables: `StatCard`, `DataRow`, `EditField`, `BottomSheet`
-  - **Decision DaVinci pendiente al arrancar:** layout single-column centrado max-w-640 vs split layout wall + panel. Mi voto tentativo single-column (es tu perfil personal, no navegador de listas). Definir al inicio, NO codear antes.
-  - Divergencias Expo → Webapp confirmadas: FAQ ya en sidebar (no duplicar entry), Toggle tema global existe (no duplicar aca), idioma toggle nuevo webapp (i18n ya en 3 idiomas)
+- [ ] **Sprint 2.G — W.8 Networking completar** (~1.5-2h, 1 sesion) — items pendientes del modulo social/networking segun PARITY-MATRIX. Bloqueadas list ya cerrada (2026-06-20). Falta: revisar que gaps quedan por cerrar contra el detalle W.8 del PARITY.
 
 > **Orden recomendado (re-estimado 2026-06-30 tarde tras investigar W.18):**
 > 1. ~~W.14 Fase B~~ → CERRADO 2026-06-30 (17/20, falta solo RT socket)
@@ -110,7 +103,7 @@
 - [x] ~~Sprint 2.C — W.14 Anuncios + Banners + Bell~~ — **CERRADO 17/20 (2026-06-30)**. Fase A 2026-06-29 (Anuncios + BellPopover + deeplink + E2E 13). Fase B 2026-06-30 (CartelDigital ambient signage 16:9 col der LIVE: cross-fade 700ms cada 6s, sin dots/arrows, hover pausa, sponsor pill, merger round-robin banners+highlights, backend reusado cero cambios, 23 vitest + 6 E2E). Falta: socket `announcement:new` (depende W.11) + Web Push (W.12)
 - [x] ~~Sprint 2.D — W.17 Soporte~~ — **CERRADO 13/15 (2026-06-29)** (split layout espejo W.14 + subflow Asistente + EditSupportRequest crea announcement privado). Falta RT response (W.11)
 - [x] ~~Sprint 2.E — W.13 Fase B Documents~~ — **CERRADO 15/17 (2026-06-30 tarde)** (split layout wall + preview embed + skeleton shimmer + descarga individual + bulk ZIP pre-generado backend con job + observer + endpoint escalable a 10K users, backend migration + Model fillable + composer maennchen/zipstream-php pure PHP). Falta: Pages dinamicas (skip Fase 2)
-- [ ] Sprint 2.F — W.18 Hub Personal (perfil editable + intereses + logout) (~2-3h, 1 sesion, riesgo BAJO) — 0/19. **Blueprint en `memory/project_w18_hub_personal_blueprint.md`** — espejo Expo `ProfileScreen.tsx` + 11 endpoints backend listos + componentes reusables identificados. Decision DaVinci pendiente: layout single-column vs split
+- [x] ~~Sprint 2.F — W.18 Hub Personal~~ — **CERRADO 17/19 (2026-07-04)** — split 35/65 espejo W.13/W.14/W.17. Wall: hero (avatar 92px + nombre + `cargo · empresa` + socials) + stats gamification 3 cards sin iconos + rows clickeables + footer (Ver introduccion + Cerrar sesion). Panel der: empty state espejo + 3 sub-views con AnimatePresence. `PerfilDataForm` con 3 cards visuales (Sobre ti / Contacto / Redes sociales) + 1 solo Guardar (patron unidad no save-por-card). `PerfilInterestsForm` chips min 1 + empty honesto si organizador no configuro opciones. `PerfilAppearanceForm` cards Lux/Noir con preview aplicando via `useTheme()`. `PerfilLogoutModal` confirm con cross-tab broadcast + redirect. Backend cero cambios en endpoints (11 existentes) — solo validator `linkedin/website` de `url:http,https` → `nullable|string` para aceptar sin protocolo. Deep link `eventos://profile[/sub]` en parseActionUrl (5 variantes). Sidebar refactor: `ProfilePopover` + `UserMenu` eliminados, nav reorg top (modulos) + bottom (Asistente+Perfil+Bell). Bug fix critico: `updateProfile` cliente normaliza shape backend (`linkedin_url` → `linkedin`) y devuelve `Partial<MyProfile>` para merge preservando email. i18n 56 keys en es/en/pt. **391/391 vitest** (+14 nuevos: 8 profileNormalize + 6 deep link) + 13/13 E2E serial mode. Typecheck limpio. Falta: foto upload UI + shuffle avatar (Fase 2 nice-to-have)
 
 ### Sprint 3 — W.6 completar (Stories + Photo Contest + Hashtags) (~3-4h, 1 sesion) — 0/19
 ### Sprint 4 — W.16 Live Moments (Trivia + Sorteo + Golden Ticket reveal) (~6h, 1-2 sesiones) — 0/23

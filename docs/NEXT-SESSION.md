@@ -6,7 +6,98 @@
 
 ---
 
-## Ultima sesion (cierre 2026-06-30 tarde — W.13 Fase B Documents + arquitectura ZIP escalable)
+## Ultima sesion (cierre 2026-07-04 — W.18 Hub Personal + sidebar refactor)
+
+**Total acumulado webapp:** **~466/707 = 65.9%** (+15 hoy con W.18)
+**Estado al cierre:** todo pusheado. `eventos-web`, `eventos-backend` (feature/magic-link-auth), `APP EVENTOS` sincronizados.
+
+### W.18 Hub Personal — entregado 17/19 (89%)
+
+**Que es:** ruta `/perfil` split layout 35/65 (wall + panel der) espejo directo de `ProfileScreen.tsx` mobile (927 lineas Expo, ~85% completo).
+
+**Wall izq (35%):**
+- Hero: avatar 92px + nombre + `cargo · empresa` + socials (LinkedIn/Twitter/Instagram/Web con SVG inline por licencias lucide)
+- Stats gamification opcional (3 cards SIN iconos — solo valor + label, evita redundancia con el texto)
+- Rows clickeables con chevron: Mis datos / Mis intereses / Apariencia
+- Footer: "Ver introduccion de nuevo" (link discreto) + "Cerrar sesion" (rojo)
+
+**Panel der (65%):**
+- Empty state espejo W.13/W.14/W.17 (`<h3>` label + `<p>` desc para heading role accesible)
+- AnimatePresence entre 3 sub-views con transicion 240ms cubic-bezier(0.16, 1, 0.3, 1)
+- **PerfilDataForm**: 3 cards visuales agrupando por concepto ("Sobre ti" nombre+cargo+empresa · "Contacto" telefono+email disabled · "Redes sociales" 4 fields). **UN solo boton "Guardar"** al final (patron unidad — no save-por-card tipo Vercel/Stripe porque no son mundos aparte, es la misma persona)
+- **PerfilInterestsForm**: chips con contador `<N> seleccionados · minimo 1`. Empty state honesto si el organizador no configuro opciones (`options.length === 0`)
+- **PerfilAppearanceForm**: 2 cards grandes Lux/Noir con preview visual mini. Aplica al instante via `useTheme()` de next-themes. Sin boton Guardar
+
+**PerfilLogoutModal**: confirm modal con cross-tab broadcast + redirect a /login.
+
+### Decisiones DaVinci del layout (proceso)
+
+Descartamos 3 falsos caminos antes de acertar:
+1. **Single column max-w-560** — dejaba espacio muerto a la derecha en 65% del panel
+2. **Living preview + form** — la preview era invento decorativo, no aportaba
+3. **Save-por-card (Vercel/Stripe pattern)** — overkill para perfil de asistente (no son settings de mundos distintos)
+
+**Layout final aprobado:** cards visuales agrupando + un solo Guardar. Cero max-width interno del contenido. Padding panel `22px 28px 28px` espejo W.13/W.14/W.17.
+
+### Sidebar refactor (misma sesion)
+
+- **Borrado:** `ProfilePopover.tsx` (reemplazado por `/perfil`) + `UserMenu.tsx` (huerfano)
+- **Reordenado:** top nav (modulos del evento: Home/Agenda/Live/Speakers/Social/Sponsors/Desafio/Documentos) → separador → **bottom zona personal** (Asistente + Perfil + Bell)
+- **Coherencia tonal:** Bell placeholder + BellPopover usan `--text-muted` (igual que nav items), no `--text-label`. Hover unificado a `--text-primary`
+- Sacado `user` prop de `SidebarPill` y `SpatialShell` (ya no lo necesitan)
+
+### Backend cambio (feature/magic-link-auth)
+
+`ProfileController@update`: validator `linkedin/website` de `nullable|url:http,https` → `nullable|string|max:500`. **Espejo Expo** — acepta `linkedin.com/in/kamilo` sin exigir `https://`. Cliente normaliza con `normalizeUrl()` al renderizar el href del link.
+
+### Bug fix critico dentro de la sesion — email undefined post-save
+
+Backend PUT `/me/profile` NO devuelve `email` y usa nombres con sufijo (`linkedin_url`, `website_url`). Primera version del `setProfile(next)` reemplazaba el prev completo con la respuesta → `profile.email = undefined` → input controlled se rompia con warning "changing controlled to uncontrolled".
+
+**Fix:** `updateProfile` cliente normaliza shape (`_url` → sin sufijo) y devuelve `Partial<MyProfile>`. `PerfilView.onSaved` hace merge `{ ...prev, ...patch }` preservando el email.
+
+### Deep link nuevo
+
+`eventos://profile[/subseccion]` en `parseActionUrl`:
+- `eventos://profile` → `/perfil`
+- `eventos://profile/datos` → `/perfil?section=datos`
+- `eventos://profile/intereses` → `/perfil?section=intereses`
+- `eventos://profile/apariencia` → `/perfil?section=apariencia`
+- `eventos://perfil` (alias es) tambien mapeado
+
+### Decisiones cerradas (no preguntar)
+
+- **W.18 layout = split 35/65 con cards visuales + un solo Guardar** — coherencia W.13/W.14/W.17
+- **Cero emojis en intereses UI** — la BD mantiene emojis para Expo, webapp los ignora
+- **Stats sin iconos redundantes** — solo valor + label
+- **Perfil vive en el bottom del sidebar** junto a Asistente y Bell, NO en el nav principal (zona personal ≠ modulos del evento)
+- **`ProfilePopover` eliminado** — todo lo que ofrecia (tema + logout) ahora vive en `/perfil`
+- **Validator website/linkedin flexible** — `nullable|string`, cliente normaliza protocolo al renderizar
+- **Notificaciones opt-in FUERA del perfil** — no existe en Expo ni backend (invento inicial mio, corregido tras auditoria)
+- **FAQ NO se duplica dentro del perfil** — ya vive en sidebar `/faq`
+- **Idioma toggle FUERA por ahora** — i18n del usuario aun no configurado; sumar cuando aplique
+
+### Verificacion
+
+- **Vitest: 391/391** verde (+14 nuevos: 8 profileNormalize + 6 deep link perfil)
+- **E2E `perfil.spec.ts`: 13/13** verde (serial mode como W.13/W.7 por saturacion turbopack)
+- Typecheck limpio
+- Lint 0 errores en modulo perfil
+
+### Que falta W.18 (2 items, nice-to-have Fase 2)
+
+- Foto upload UI (input file + preview + submit multipart). Backend endpoint listo. Riesgo BAJO, ~30-45 min
+- Shuffle avatar (beam variations) — mobile-only, no vale la pena en webapp
+
+### Estado git al cierre
+
+- **`eventos-web` main:** pusheado (W.18 modulo completo + sidebar refactor + tests)
+- **`eventos-backend` feature/magic-link-auth:** pusheado (validator flexible ProfileController)
+- **`APP EVENTOS` main:** pusheado (memoria W.18 actualizada + sidebar_bottom_zone + PENDIENTES + NEXT-SESSION + design demo)
+
+---
+
+## Sesion 2026-06-30 tarde — W.13 Fase B Documents + arquitectura ZIP escalable
 
 **Total acumulado webapp:** **~451/707 = 63.8%** (+13 hoy entre 2 sesiones: cartel manana + documents tarde)
 **Estado al cierre:** todo pusheado. `eventos-web`, `eventos-backend` (main + feature/magic-link-auth), `APP EVENTOS` (docs + memoria) sincronizados.
