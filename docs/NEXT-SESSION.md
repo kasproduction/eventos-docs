@@ -6,6 +6,96 @@
 
 ---
 
+## SESION 2026-07-05 TARDE — BLOQUE 5 (W.12) Fases A+B: Web Push + PWA + hardening (Fable 5)
+
+**TOTAL: 541/576 = 93.9%. W.12 salto de 8/43 a 25/48 (+17).** Decision de arranque:
+Kamilo pregunto donde valia la pena gastar Fable → Bloque 5 (transversal, toca
+modulos cerrados, cierre de Fase 1). Se salto Bloque 2 a proposito (apto para Opus).
+
+### Fase A — Web Push + PWA end-to-end (`b9aa4df` backend + `2dc43a3` web)
+
+1. **Backend Web Push completo**: minishlink/web-push + VAPID + tabla
+   `push_subscriptions` + endpoints espejo expo-token + `SendWebPushJob`
+   (subscription POR VALOR, simetria token Expo, prune 410) +
+   **`SendPushToAttendeeJob::toAttendee()` como choke point multi-canal**
+   — 13 call-sites migrados, filtros masivos incluyen web-only, event_id
+   inyectado al payload para tracking. 15 Pest nuevos + 178 regresion verdes.
+2. **Fix aprobado — scheduled → Announcement**: "la push es el golpe en la
+   puerta, el announcement es la carta". Las programadas ya no se pierden;
+   el Bell enciende live (AnnouncementObserver ya emitia data:invalidate).
+   Auditoria previa: era el UNICO tipo durable sin persistencia (prize/golden/
+   support ya creaban announcement; recordatorios/delays son efimeros a proposito).
+3. **Bug pre-existente cazado**: ban desde Filament limpiaba el token ANTES
+   del `if ($record->expo_push_token)` → la push de ban nunca salia. Corregido
+   (orden push → clear, ambos canales).
+4. **Webapp**: `public/sw.js` (push + PUSH_ROUTES espejo LITERAL de Expo
+   useNotifications.ts + supresion si pestana enfocada + track push_open +
+   offline fallback estatico) + **PushPrompt soft pill** una-vez-por-evento
+   (divergencia aprobada vs auto-prompt Expo: Chrome penaliza) + resync
+   silencioso con granted + manifest + iconos (anillo dorado noir, generados
+   con Playwright) + install prompt SOLO >=1024px en /perfil + proxies.
+5. **VERIFICADO VIVO con Kamilo**: suscripcion Chrome real → push FCM entregada
+   → click navego a /anuncios → scheduled creo la carta en el Bell (live con
+   socket arriba; el primer intento parecia fallar porque el socket server
+   estaba APAGADO — ambiente, no codigo).
+
+### Fase B — Hardening + perf (`471cf94`)
+
+- **CSP completo**: 13 directivas, connect-src backend+socket desde env, dev
+  relajado por NODE_ENV. Verificado vivo + suite E2E entera bajo la politica.
+- **SEO recortado con higiene** (decision): robots.ts noindex TOTAL + title
+  por ruta (13 paginas, template `%s — EventOS`). OG/sitemap → Fase 2.
+- **Print agenda**: documento imprimible real, 2 iteraciones visuales
+  (screenshot print-media): papel blanco, sin chrome, break-inside avoid.
+- **Code splitting** (habia 0 dynamic): 7 componentes post-interaccion
+  (AttendeeProfilePanel, viewers, crop, RedeemModal + GoldenTicketPanel con
+  qrcode.react, DocumentPreview). FileKindIcon extraido a archivo propio
+  (import estatico compartido anulaba el split).
+
+### Verificacion
+
+Typecheck + lint limpios · 444/444 vitest (+14) · Pest 28 push + 178 regresion ·
+E2E suite completa verde (181+29+14; 3 rojos intermedios = cache turbopack
+corrupta por taskkill /F + 1 flake saturacion conocido, verdes en frio).
+
+### Decisiones cerradas (no re-preguntar)
+
+- **No-optimistas (agenda rating / ticket soporte / forms perfil): SKIP formal.**
+  Optimista es para toggles; un form con 422 por campo o que necesita id del
+  server DEBE esperar.
+- **SEO completo → Fase 2**; queda robots noindex + titles.
+- **Soft prompt de push** (no auto-prompt) — patron Slack/Notion web.
+- **Push suprimida con pestana enfocada** (Bell + socket cubren in-app).
+- **Install prompt solo desktop/tablet** — mobile no se canibaliza.
+- **Lazy framer-motion global descartado** (33 archivos, riesgo > ganancia).
+
+### Gotchas nuevos (con memoria)
+
+- **Next 16 dev es single-instance por proyecto**: correr playwright con el
+  dev :3000 vivo → el webServer E2E no arranca (colision). Matar :3000 antes.
+- **taskkill /F a next dev corrompe la cache turbopack** → "SyntaxError:
+  Unexpected end of JSON input" en SSR aleatorio. Fix: borrar .next.
+- **PowerShell 5.1 Set-Content corrompe UTF-8 sin BOM** (mojibake en
+  messages/*.json) — usar Node fs o el tool Edit para archivos con acentos.
+- **OPENSSL_CONF requerido en Windows** para la crypto EC de web-push
+  (seteado a nivel usuario; Laragon debe reiniciarse para que Apache lo herede).
+
+### Commits (todos PUSHEADOS)
+
+- `eventos-backend` feature/magic-link-auth: `b9aa4df`
+- `eventos-web` main: `2dc43a3` (Fase A) + `471cf94` (Fase B)
+- `APP EVENTOS` main: este cierre + PENDIENTES + memorias
+
+### PROXIMA SESION — BLOQUE 2: W.2 Home → 100% (~1.5-2h, apto Opus)
+
+GamificationHud preview LIVE (espejo `index.tsx:103-129` Expo) + post-event
+survey prompt ENDED + EventArchive ENDED (espejo `EventArchive.tsx`). Despues
+Bloque 4 Trivia (~3-4h). **B5 Fase C cuando Kamilo tenga ~2h presenciales**
+(QA device + Lighthouse + WCAG + E2E cross-tab + DSN prod). Pendiente corto:
+reiniciar Laragon (OPENSSL_CONF → push desde Filament) + probar install PWA.
+
+---
+
 ## SESION 2026-07-05 — BLOQUE 1 CERRADO: Momentos + Memorias + barrido de pulido (Fable 5)
 
 **TOTAL: 524/571 = 91.8%. 16 modulos cerrados** (W.6 cierra con Bloque 1; denominador W.6 re-baseado 41→28, los 13 extra eran items eliminados en auditoria que seguian contando).

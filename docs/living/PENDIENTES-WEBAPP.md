@@ -35,7 +35,7 @@
 | **W.9 Engagement** | **35/35** | **CERRADO 2026-06-29 (Sprint 2.B)** | **+5** (2026-06-29: redemptions inline + E2E 11/11 verde con viewports desktop/tablet H/mobile + 8 tests vitest. counter PARITY sync) |
 | **W.10 Live Hub** | **16/16** | **CERRADO por consenso 2026-06-20** | **+16** (creado en commit `0e185e6`, validado visual con seeder) |
 | **W.11 Sockets RT** | **22/22** | **CERRADO 2026-07-04 noche** (GlobalSocketProvider 6 listeners + prop-sync 3 vistas + 11 vitest + 2 E2E + verificacion viva pipeline Laravel→socket→cliente. Scope 42→22: game/staff/cross-tab RT/stress reclasificados a W.12/W.15/W.16) | **+14** |
-| W.12 Polish + E2E + PWA | **8/43** | **19%** — recount 2026-07-04 contra codigo: Sentry completo + source maps + security headers + focus-visible + reduced-motion + 20 specs E2E YA existian. **2026-07-05: loading.tsx 13/13 rutas CERRADO + barrido haptics 13 modulos + token --heart unico (`29fce3d`)**. Falta real: Web Push, PWA, CSP completo, QA device, Lighthouse, WCAG audit | **+8** |
+| W.12 Polish + E2E + PWA | **25/48** | **52%** — **2026-07-05 tarde BLOQUE 5 Fases A+B (`b9aa4df` backend + `2dc43a3` + `471cf94` web)**: Web Push COMPLETO (VAPID + push_subscriptions + transporte multi-canal en 13 call-sites + SW + soft prompt + scheduled→announcement, verificado vivo Chrome+FCM) + PWA 5/5 (manifest, SW, install desktop/tablet, offline) + CSP completo 13 directivas + robots noindex + titles 13 rutas (SEO OG/sitemap → Fase 2) + print agenda + code splitting 7 componentes. Falta real (Fase C): QA device, Lighthouse batch, WCAG audit, E2E cross-tab, DSN prod | **+17** |
 | **W.13 FAQ + Docs** | **15/15** | **CERRADO 100% 2026-07-04** (Fase A FAQ Asistente orb + Fase B Documents split layout + backend ZIP escalable. Pages reclasificado formalmente a Fase 2) | **+2** |
 | **W.14 Anuncios + Cartel + Bell** | **19/19** | **RE-CERRADO 2026-07-05** — cartel solo-highlights (espejo Expo) + feature banners muerta de raiz (BLOQUE 3: ruta+controller+Filament+modelo+migration drop). BD dedup + vigencias frescas | **+5** |
 | W.15 Vendor Dashboard | 0/35 | **MOVIDO a Mobile parity (decision Kamilo 2026-07-05)**: el staff del stand NO va a instalar app para un evento — vendor se hace como feature del webapp MOBILE (viewport celular espejo Expo, patron Mi QR), incluyendo scanner QR con camara en browser (prior art: eventos-kiosko). Fuera del denominador Fase 1 desktop. Procedencia verificada: ~3.000 lineas Expo + 18 endpoints | — |
@@ -43,7 +43,7 @@
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
 | ~~W.X Welcome Showcase~~ | **ELIMINADO** | Invento de planeacion (auditoria 2026-07-04): el onboarding Expo es un wizard de REGISTRO, no un carrusel de features. Boton perfil oculto (`4325f05`). Fase 2 si se quiere espejo del wizard | — |
-| **TOTAL** | **524/571** | **91.8%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05) | **2026-07-05 BLOQUE 1 CERRADO**: W.6 +7 items reales (denominador re-baseado 41→28) + W.12 +2 (loading.tsx 13/13 + heart/haptics dentro del pool polish). Quedan ~17 items reales en 3 bloques: B2 Home (3, ~1.5-2h) + B4 Trivia (5, ~3-4h) + B5 W.12 (~9 gruesos, ~5-7h). **16 modulos cerrados:** W.0, W.1, W.1B, W.3, W.4, W.5, **W.6**, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.17, W.18 |
+| **TOTAL** | **541/576** | **93.9%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05) | **2026-07-05 tarde BLOQUE 5 Fases A+B**: W.12 +17 (Web Push end-to-end + PWA + CSP + SEO higiene + print + splitting; denominador 43→48 por Fase 10 Web Push explicitada). Quedan: B2 Home (3, ~1.5-2h) + B4 Trivia (5, ~3-4h) + B5 Fase C QA (~2h CON Kamilo presente). **16 modulos cerrados:** W.0, W.1, W.1B, W.3, W.4, W.5, W.6, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.17, W.18 |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -52,6 +52,8 @@
 ## QUE SIGUE (1 sola tarea concreta)
 
 - [ ] **BLOQUE 2 — W.2 Home → 100%** (~1.5-2h): GamificationHud preview LIVE (espejo `index.tsx:103-129` Expo) + post-event survey prompt ENDED + EventArchive ENDED (espejo `EventArchive.tsx`).
+
+> Paralelo cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device real iPad/iPhone/Edge/Firefox + Lighthouse batch + WCAG + E2E cross-tab + DSN prod). Pendiente corto de Fase A: reiniciar Laragon para que Apache herede OPENSSL_CONF (push desde Filament) + probar install PWA real.
 
 > Deuda menor anotada 2026-07-05: `ProfileSecurityTest` 2 tests rojos PRE-existentes
 > (esperan 422 para linkedin/website sin http; el validator W.18 se relajo a proposito
@@ -114,18 +116,18 @@
 - [ ] Listeners `game:launched`/`game:result` → toasts espejo ("Ruleta en curso", "+X pts en la ruleta") + invalidar puntos/anuncios
 - [ ] Tests vitest + E2E
 
-### BLOQUE 5 — W.12 Polish/cierre (~5-7h) — 0/10
-- [ ] Web Push real (SW + VAPID + subscription + 8 tipos backend; incluye recordatorio sesion)
-- [ ] PWA: manifest + service worker + install prompt desktop/tablet (NO mobile)
-- [ ] CSP completo script-src/connect-src (desbloqueado por W.11 cerrado)
+### BLOQUE 5 — W.12 Polish/cierre — 8/11 (Fases A+B CERRADAS 2026-07-05 tarde; falta Fase C QA)
+- [x] **Web Push real CERRADO** (`b9aa4df` backend + `2dc43a3` web): VAPID + tabla push_subscriptions + endpoints + `SendWebPushJob` + transporte multi-canal `toAttendee()` en 13 call-sites + filtros web-only + SW con PUSH_ROUTES espejo Expo + soft prompt pill (divergencia web aprobada) + track push_open + recordatorios de sesion incluidos. **Fix aprobado: scheduled → Announcement** (la push es el golpe, el announcement es la carta). Verificado VIVO: Chrome real + FCM + click routing + Bell live. Bug pre-existente cazado: ban Filament limpiaba token antes de la push
+- [x] **PWA CERRADO** (`2dc43a3`): manifest + iconos (anillo dorado noir) + install prompt via useInstallPrompt en /perfil SOLO >=1024px + offline.html estatico + SW
+- [x] **CSP completo CERRADO** (`471cf94`): 13 directivas, connect-src backend+socket desde env, dev relajado por NODE_ENV. Verificado vivo + suite E2E bajo la politica
 - [x] ~~`loading.tsx` en 7 rutas sin cubrir~~ — **HECHO 2026-07-05** (`29fce3d`): soporte, faq (shape del orb), anuncios, desafio (cards heterogeneas), documentos, session-stream (tokens --st-*), perfil. 13/13 rutas con skeleton que calca el layout real
-- [x] **EXTRA 2026-07-05** (`29fce3d`): token global `--heart: #ff5d6c` (todos los corazones de like/favorito al rosa de agenda — feed era slate, memorias era accent) + barrido haptics 13 modulos (auditoria completa; pendiente no aplicado: agenda rating / soporte ticket / forms perfil no-optimistas, evaluar aqui)
-- [ ] Code splitting `dynamic()` (framer-motion y pesados; hoy 0 imports dinamicos)
-- [ ] Print stylesheet (agenda + ratings)
-- [ ] SEO per-page + OG + sitemap — CANDIDATO A RECORTE (app auth-gated)
-- [ ] QA device real 3 viewports + Edge/Firefox + Lighthouse batch + WCAG audit
-- [ ] E2E cross-tab (streaming Q&A, social conectar)
-- [ ] DSN prod Sentry + validacion (config completa ya en codigo)
+- [x] **EXTRA 2026-07-05** (`29fce3d`): token global `--heart: #ff5d6c` + barrido haptics 13 modulos. **No-optimistas (agenda rating / soporte ticket / forms perfil): SKIP FORMAL 2026-07-05** — optimista es para toggles; forms con validacion 422 o que necesitan id del server DEBEN esperar (decision Kamilo)
+- [x] **Code splitting CERRADO** (`471cf94`): dynamic() ssr:false en 7 componentes post-interaccion (AttendeeProfilePanel, PhotoViewer, MomentosViewer, CropUploadModal, RedeemModal + GoldenTicketPanel con qrcode.react, DocumentPreview + FileKindIcon extraido). Lazy framer-motion global NO (33 archivos, riesgo > ganancia)
+- [x] **Print agenda CERRADO** (`471cf94`): documento imprimible (papel blanco, sin chrome, break-inside avoid), verificado visual 2 iteraciones
+- [x] **SEO recortado con higiene** (decision Kamilo 2026-07-05): robots.ts noindex total + title por ruta 13 paginas. OG images + sitemap → **Fase 2 formal** (app auth-gated)
+- [ ] **Fase C** — QA device real 3 viewports + Edge/Firefox + Lighthouse batch + WCAG audit (CON Kamilo)
+- [ ] **Fase C** — E2E cross-tab (streaming Q&A, social conectar)
+- [ ] **Fase C** — DSN prod Sentry + validacion (item de deploy; config completa ya en codigo)
 
 ### ~~BLOQUE 6 — W.15 Vendor Dashboard~~ → **MOVIDO a Mobile parity (decision Kamilo 2026-07-05)**
 > El staff del stand no instala app para un evento — vendor sera feature del webapp
@@ -609,7 +611,7 @@
 - [x] **E2E degradacion** — 2 specs (provider monta + 401 no rompe) + regresion suite completa
 - Reclasificados fuera del modulo: game events → W.16 (skip webapp) · staff listeners → W.15 · token refresh durante conexion → W.12 (deuda D.5 del plan) · Playwright RT cross-tab con socket real + stress 10K → W.12 · counter PARITY → N/A (doc historico)
 
-### W.12 — Polish + E2E + PWA (0/43, BACKLOG cierre Fase 1)
+### W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)
 
 **Fase 0 — Audit responsive (0/4)**
 - [ ] 3 viewports en device real (laptop / iPad / iPhone)
@@ -629,31 +631,31 @@
 - [ ] Tab order logico
 - [ ] ARIA labels iconos sin texto
 
-**Fase 3 — Performance (0/8)**
+**Fase 3 — Performance (2/8)**
 - [ ] Bundle <200KB gzipped
-- [ ] Code splitting por modulo
-- [ ] Lazy @dnd-kit + framer-motion
+- [x] Code splitting por modulo — **HECHO 2026-07-05** (`471cf94`): dynamic() ssr:false en 7 componentes post-interaccion; FileKindIcon extraido para split real de documentos
+- [x] ~~Lazy @dnd-kit + framer-motion~~ — @dnd-kit NO se usa (verificado); lazy framer global descartado (33 archivos estaticos, riesgo > ganancia; qrcode.react SI salio del bundle /desafio via splitting)
 - [ ] next/image sizes correcto
-- [ ] Lighthouse Performance >=85 desktop
-- [ ] Lighthouse Performance >=75 mobile
-- [ ] TTI <3s 4G Bogota
+- [ ] Lighthouse Performance >=85 desktop (Fase C)
+- [ ] Lighthouse Performance >=75 mobile (Fase C)
+- [ ] TTI <3s 4G Bogota (Fase C)
 - [ ] Migrar SSR → TanStack Query infinite cache (post-W.11)
 
-**Fase 4 — SEO (0/3)**
-- [ ] Meta tags por pagina
-- [ ] OG images
-- [ ] sitemap.xml
+**Fase 4 — SEO (3/3 — recortado con higiene, decision Kamilo 2026-07-05)**
+- [x] Meta tags por pagina — **HECHO** (`471cf94`): title template `%s — EventOS` + generateMetadata en 13 rutas via lib/pageMetadata (nav.* i18n)
+- [x] ~~OG images~~ → **Fase 2 formal** (app auth-gated, nadie comparte rutas privadas)
+- [x] ~~sitemap.xml~~ → **Fase 2 formal**; en su lugar robots.ts noindex TOTAL (antes las rutas privadas de eventos eran indexables)
 
-**Fase 5 — PWA (0/5)**
-- [ ] Manifest
-- [ ] Service Worker
-- [ ] Install prompt condicional desktop/tablet
-- [ ] Install prompt NO en mobile (no canibalizar app)
-- [ ] Offline fallback page
+**Fase 5 — PWA (5/5 — CERRADA 2026-07-05, `2dc43a3`)**
+- [x] Manifest — src/app/manifest.ts + iconos anillo dorado #B5A68B sobre noir (sin tipografia, generados con Playwright)
+- [x] Service Worker — public/sw.js (push + click routing + offline; cache eventos-sw-v1)
+- [x] Install prompt condicional desktop/tablet — useInstallPrompt (beforeinstallprompt) + entry "Instalar aplicacion" en /perfil footer
+- [x] Install prompt NO en mobile — gate matchMedia >=1024px (no canibalizar app nativa)
+- [x] Offline fallback page — public/offline.html estatico Lumina Noir (sin red, sin middleware, cero superficie XSS)
 
-**Fase 6 — Print (0/2)**
-- [ ] Stylesheet print friendly
-- [ ] Imprimir agenda + ratings
+**Fase 6 — Print (2/2 — CERRADA 2026-07-05, `471cf94`)**
+- [x] Stylesheet print friendly — globals (canvas liberado, pills/ambient print:hidden) + agenda.css @media print
+- [x] Imprimir agenda — documento real: papel blanco/tinta negra, sin chrome, sesiones break-inside avoid, verificado visual 2 iteraciones (ratings viven en el detail panel = fuera del papel a proposito)
 
 **Fase 7 — E2E (2/4)**
 - [x] ~~Smoke test critical paths~~ — YA EXISTE (verificado 2026-07-04: **20 specs** en e2e/ cubriendo todos los modulos: auth-gate, login, verify, home, agenda 16 tests, streaming, speakers, social, sponsors, desafio, live, global-socket, faq, documentos, cartel, anuncios, soporte, perfil)
@@ -665,14 +667,22 @@
 - [ ] DSN prod
 - [x] ~~Source maps subidos en build (no en cliente)~~ — YA CONFIGURADO (verificado 2026-07-04: `withSentryConfig` con `deleteSourcemapsAfterUpload: true` + tunnelRoute /monitoring + release via GIT_SHA. Sentry client/server/edge completo con PII scrub)
 
-**Fase 9 — Cierre (2/7)**
-- [ ] CSP estricto (hoy solo frame-src; script/connect-src desbloqueados por W.11)
+**Fase 9 — Cierre (3/7)**
+- [x] CSP estricto — **HECHO 2026-07-05** (`471cf94`): 13 directivas (script/style/img/font/connect/media/frame/worker/object/base-uri/form-action/frame-ancestors), connect-src backend+socket desde env, dev relajado por NODE_ENV, verificado vivo + suite E2E bajo la politica
 - [x] ~~X-Frame-Options~~ — YA EXISTE (verificado 2026-07-04: SAMEORIGIN + nosniff + Referrer-Policy + HSTS en `next.config.ts:76-84`)
 - [x] ~~Reduced motion verificado~~ — YA EXISTE (verificado 2026-07-04: media query global `globals.css:470` + hook `useReducedMotionPref` + ~18 componentes/CSS)
 - [ ] reduced-motion serie estatica W.X
 - [ ] ~~Bancolombia embed test~~ → N/A (cliente perdido — validar si algun embed test aplica al proximo cliente)
 - [ ] Memoria
 - [ ] Counter PARITY-MATRIX → N/A (doc historico desde 2026-07-04)
+
+**Fase 10 — Web Push (5/5 — CERRADA 2026-07-05, `b9aa4df` backend + `2dc43a3` web, verificado VIVO)**
+- [x] Backend: minishlink/web-push + VAPID keys + tabla push_subscriptions (endpoint hash unico, multi-device) + WebPushSubscriptionController (GET key + POST/DELETE) espejo expo-token
+- [x] Transporte multi-canal: `SendPushToAttendeeJob::toAttendee()` choke point (Expo + web), 13 call-sites migrados, filtros de jobs masivos incluyen web-only, subscription por valor (simetria token Expo, prune 410). Recordatorios de sesion (SendAgendaRemindersJob) y TODOS los triggers incluidos. Fix bug pre-existente: ban Filament limpiaba token ANTES de la push
+- [x] **Scheduled → Announcement persistente** (decision Kamilo: "la push es el golpe en la puerta, el announcement es la carta") — notificaciones programadas ya no se pierden si nadie las vio; Bell enciende live via AnnouncementObserver
+- [x] SW cliente: push handler con supresion si pestana enfocada (Bell+socket cubren in-app), notificationclick con PUSH_ROUTES espejo LITERAL Expo useNotifications.ts, track push_open, pushsubscriptionchange re-subscribe
+- [x] Soft prompt pill una-vez-por-evento (divergencia web aprobada vs auto-prompt Expo: Chrome penaliza el prompt automatico y un bloqueo es permanente) + resync silencioso con permiso granted. 15 Pest + 14 vitest + 3 E2E
+> Pendiente corto: reiniciar Laragon (Apache hereda OPENSSL_CONF → push desde Filament) + probar install PWA real. NO commiteado: nada — todo pusheado.
 
 ### W.13 — FAQ + Documentos (15/15, **CERRADO 100% 2026-07-04**)
 
