@@ -6,6 +6,67 @@
 
 ---
 
+## SESION 2026-07-04/05 — AUDITORIA DE PROCEDENCIA + BLOQUES 0 y 3 CERRADOS (Fable 5)
+
+**TOTAL: 516/619 = 83.4%. 15 modulos cerrados** (W.3 cerrado via auditoria, W.14 re-cerrado 19/19).
+
+### Que se hizo
+
+1. **Inventario TOTAL contra codigo (7 agentes en 2 tandas):** 4 barrieron eventos-web
+   (~13 victorias sin marcar: Sentry completo, 20 specs E2E, security headers,
+   reduced-motion, etc.) y 3 auditaron PROCEDENCIA contra el Expo REAL
+   (`C:\Users\Kasproduction\Projects\eventos-app` — OJO: NO vive en laragon/www).
+2. **~12 INVENTOS DE PLANEACION eliminados** (nunca existieron en Expo ni backend):
+   hashtags click-to-filter (+ parser borrado del codigo), badges AJUSTADA/CANCELADA,
+   conflict detector, self check-in, sorteo ceremony GSAP, golden reveal full-screen,
+   W.X showcase 6 beats ENTERO, sponsors band home, multi-sede, proximos eventos org,
+   dedupe happening-now, invite staff sin login. **Regla nueva en PENDIENTES-WEBAPP:
+   todo item cita procedencia o no se codea** (memoria `feedback_regla_procedencia`).
+3. **Scope REAL descubierto:** Stories="Momentos" (~470 lineas Expo, backend+cron listos),
+   **tab Memorias** (PhotoGrid+PhotoViewer+ContestBanner — Expo la tiene, webapp NO),
+   TriviaPanel 340 lineas como referencia W.16, W.15 vendor ~3.000 lineas mapeadas
+   con 18 endpoints, Mi QR mobile-only (→ workstream Mobile parity, diferido).
+4. **BLOQUE 0 cerrado:** alias `sessions` en KNOWN_ENTITIES (`3e73b29`) + boton
+   "Ver introduccion" oculto — navegaba a /onboarding 404 (`4325f05`).
+5. **W.6 paginacion CERRADA** (`7afb5d0`): infinite scroll cursor-based (el wall usa
+   cursorPaginate, NO ?page=) + appendFeedPage dedup + sentinel IntersectionObserver.
+   Verificado vivo con 99 posts (50 seedeados). +5 vitest, 12/12 E2E.
+   Hashtags ELIMINADO (decision Kamilo; idea menciones → Event Pulse, en memoria).
+6. **Fix foto speaker** (`d2ec891`): RoomAvatar usa speaker_photo_url (QA vivo Kamilo).
+7. **BLOQUE 3 cerrado — feature BANNERS MUERTA:** Kamilo detecto que Expo nunca mostro
+   banners (highlights la reemplazo; home Expo solo renderiza highlights). Webapp
+   cartel → solo highlights (`ba630b1`), backend TODO fuera con migration drop
+   (`eba0609`), BD dedup (highlights estaban x2 por seed doble) + vigencias frescas.
+
+### Commits (todos PUSHEADOS)
+
+- `eventos-web` main: `3e73b29` `4325f05` `7afb5d0` `f0bedaa` `d2ec891` `ba630b1`
+- `eventos-backend` feature/magic-link-auth: `eba0609` (banners drop + migration corrida)
+- `APP EVENTOS` main: re-baseline PENDIENTES-WEBAPP (plan BLOQUES + procedencia)
+
+### PROXIMA SESION — BLOQUE 1: Momentos + Memorias (~4-6h)
+
+**Arranca por diseño DaVinci, NO por codigo:** refs externas (Instagram web/Telegram/
+LinkedIn desktop stories), definir composicion (donde vive la barra Momentos en el
+split /social, viewer 9:16 en desktop = modal centrado flancos oscuros?, Memorias
+como 5ta vista del sidebar social espejo del tab Expo), proponer, aprobar, codear.
+Espejo: `MomentosRow`/`MomentosViewer`/`useStories` + `PhotoGrid`/`PhotoViewer`/
+`ContestBanner` en el Expo. Backend 100% listo (AttendeeStoryController + cron +
+EventPhotoController /photos/contest).
+
+Despues: Bloque 2 Home (GamificationHud+survey+EventArchive ~1.5-2h) → Bloque 4
+Trivia (~3-4h) → Bloque 5 W.12 (~5-7h) → Bloque 6 Vendor (~6-8h). Paralelo: Pulse.
+
+### Deuda anotada (no bloqueante)
+
+- `ProfileSecurityTest` 2 rojos PRE-existentes (validator W.18 relajado sin actualizar
+  tests) — decidir: aceptar string + rechazar schemes `javascript:`/`data:`
+- Backlog Expo: borrar banners.tsx/BannerCarousel/bannersApi + ENTITY_KEYS `modules`
+  + double-count comment useWall
+- Event Pulse cliente 4 items (sesion dedicada)
+
+---
+
 ## W.11 SOCKETS WEBAPP — IMPLEMENTADO (2026-07-04 noche, Fable 5)
 
 **W.11 CERRADO 22/22.** Los 12 archivos del plan aplicados en `eventos-web`:

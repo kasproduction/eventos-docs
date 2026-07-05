@@ -37,13 +37,13 @@
 | **W.11 Sockets RT** | **22/22** | **CERRADO 2026-07-04 noche** (GlobalSocketProvider 6 listeners + prop-sync 3 vistas + 11 vitest + 2 E2E + verificacion viva pipeline Laravel→socket→cliente. Scope 42→22: game/staff/cross-tab RT/stress reclasificados a W.12/W.15/W.16) | **+14** |
 | W.12 Polish + E2E + PWA | **6/43** | **14%** — recount 2026-07-04 contra codigo: Sentry completo + source maps + security headers + focus-visible + reduced-motion + 20 specs E2E YA existian. Falta real: Web Push, PWA, CSP completo, QA device, Lighthouse, WCAG audit | **+6** |
 | **W.13 FAQ + Docs** | **15/15** | **CERRADO 100% 2026-07-04** (Fase A FAQ Asistente orb + Fase B Documents split layout + backend ZIP escalable. Pages reclasificado formalmente a Fase 2) | **+2** |
-| W.14 Anuncios + Cartel + Bell | **17/19** | **RE-ABIERTO 2026-07-04 (+2 items espejo)**: el cartel mergea banners+highlights pero Expo solo renderiza HIGHLIGHTS (banners = feature legacy reemplazada, confirmado Kamilo). Falta: cartel solo-highlights con vigencia + matar feature banners (BLOQUE 3) | **+3** |
+| **W.14 Anuncios + Cartel + Bell** | **19/19** | **RE-CERRADO 2026-07-05** — cartel solo-highlights (espejo Expo) + feature banners muerta de raiz (BLOQUE 3: ruta+controller+Filament+modelo+migration drop). BD dedup + vigencias frescas | **+5** |
 | W.15 Vendor Dashboard | 0/35 | 0% — **ENTRA al cierre total**. Procedencia VERIFICADA: ~3.000 lineas Expo (8 pantallas) + 18 endpoints. Invite "sin login" corregido a con-sesion (Fase 6). Gating `has_vendor_access` del /auth/me | — |
 | W.16 Live Moments | **0/5** | 0% — **RE-SCOPEADO por auditoria** (23→5): espejo real = TriviaPanel completo + toasts ruleta/jackpot. Ceremonias GSAP/golden-reveal eran inventos; photo contest movido a W.6 Memorias. Backend listo | — |
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
 | ~~W.X Welcome Showcase~~ | **ELIMINADO** | Invento de planeacion (auditoria 2026-07-04): el onboarding Expo es un wizard de REGISTRO, no un carrusel de features. Boton perfil oculto (`4325f05`). Fase 2 si se quiere espejo del wizard | — |
-| **TOTAL** | **514/619** | **83.0%** | **Post-auditoria de procedencia 2026-07-04** (3 agentes contra Expo real + backend): inventos eliminados del denominador (W.2 -4, W.3 -5, W.16 23→5, W.X -7, banners), scope real agregado (W.6 Memorias +3, W.14 cartel espejo +2). Meta: cierre TOTAL — quedan ~24 items reales en 6 bloques (~21-28h, 5-6 sesiones). **14 modulos cerrados:** W.0, W.1, W.1B, **W.3**, W.4, W.5, W.7, W.8, W.9, W.10, W.11, W.13, W.17, W.18 (W.14 re-abierto por 2 items espejo) |
+| **TOTAL** | **516/619** | **83.4%** | **Post-auditoria de procedencia 2026-07-04** (3 agentes contra Expo real + backend): inventos eliminados del denominador (W.2 -4, W.3 -5, W.16 23→5, W.X -7, banners), scope real agregado (W.6 Memorias +3, W.14 cartel espejo +2). Meta: cierre TOTAL — quedan ~24 items reales en 6 bloques (~21-28h, 5-6 sesiones). **14 modulos cerrados:** W.0, W.1, W.1B, **W.3**, W.4, W.5, W.7, W.8, W.9, W.10, W.11, W.13, W.17, W.18 (W.14 re-abierto por 2 items espejo) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,7 +51,12 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **BLOQUE 3 — Cartel espejo + BD limpia** (~1h, el mas corto y destraba QA vivo) o **BLOQUE 1 — Momentos + Memorias** (arranca por diseño DaVinci). Kamilo elige orden.
+- [ ] **BLOQUE 1 — Momentos + Memorias** (~4-6h) — arranca por diseño DaVinci: refs externas de stories/galeria en desktop web + propuesta de composicion ANTES de codigo.
+
+> Deuda menor anotada 2026-07-05: `ProfileSecurityTest` 2 tests rojos PRE-existentes
+> (esperan 422 para linkedin/website sin http; el validator W.18 se relajo a proposito
+> espejo Expo y los tests no se actualizaron). Decidir: aceptar string plano en tests
+> + agregar rechazo de schemes peligrosos (`javascript:`/`data:`) al validator.
 
 ---
 
@@ -96,10 +101,10 @@
 - [ ] Post-event survey prompt estado ENDED (espejo card "Encuesta de satisfaccion" + estado completada)
 - [ ] EventArchive en ENDED (espejo `EventArchive.tsx` Expo: links agenda/memorias/gamification/speakers + stats)
 
-### BLOQUE 3 — Cartel espejo + BD limpia (~1h) — 0/3
-- [ ] CartelDigital → **solo highlights** (quitar banners del merger; respetar `starts_at/expires_at` como Expo). `lib/banners.ts` + fetcher fuera
-- [ ] **Matar feature banners**: BannerController + ruta + BannerResource Filament fuera (o hidden); backlog Expo: borrar `banners.tsx` huerfana
-- [ ] Limpiar BD: duplicados x2 en `event_highlights` y `banners` (seed corrio doble) + refrescar `expires_at` del seeder para contenido vigente
+### BLOQUE 3 — Cartel espejo + BD limpia — 3/3 **CERRADO 2026-07-05**
+- [x] CartelDigital → **solo highlights** (`highlightsToCartelItems`, merger round-robin y sponsor pill eliminados; backend ya filtra vigencia con scope active). `lib/banners.ts` borrado
+- [x] **Feature banners MUERTA de raiz**: ruta + BannerController + BannerResource Filament + modelo + BannerTest + seeders (Content/ModuleTemplate) + catalogo modulos (CreateEvent/ModuleResource) + migration `drop_banners_feature` (tabla + module_templates + modules slug=banners). Endpoint verificado 404. stress-full.js → highlights
+- [x] BD limpia: 4 duplicados de `event_highlights` borrados + vigencias refrescadas (4 highlights activos 3 dias). Verificacion: 401/401 vitest + 12/12 E2E cartel+home + suite backend Content (2 fallos PRE-existentes de ProfileSecurityTest, ajenos — validator W.18 relajado sin actualizar tests, anotado abajo)
 
 ### BLOQUE 4 — W.16 Live Moments espejo real (~3-4h) — 0/5
 > Espejo estricto de lo que Expo HACE: trivia completa + toasts de ruleta/jackpot. Backend listo.
