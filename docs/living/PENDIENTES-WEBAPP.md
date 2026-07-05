@@ -2,7 +2,7 @@
 
 > Vista operativa unica. Todo lo faltante para vender webapp standalone — desde tu cama, transporte o cualquier device sin abrir otros docs.
 >
-> **Re-auditado:** 2026-06-20 (recount realidad codigo vs doc despues de 1 mes de pausa)
+> **Re-auditado:** 2026-07-04 (inventario TOTAL contra codigo con 4 agentes — meta: cierre 100% webapp, plan en BLOQUES abajo)
 > **Pivote comercial:** Bancolombia se perdio — el producto sigue, ahora generico para el proximo cliente
 > **Fuente de detalle:** `docs/webapp/PARITY-MATRIX.md` (cruce Expo↔Webapp↔Backend, 117/117 endpoints backend OK)
 > **Detalle por modulo:** `docs/webapp/W.X-*.md`
@@ -26,24 +26,24 @@
 | **W.1 Setup + Auth + UI Foundation** | **107/107** | **CERRADO 100% 2026-07-04** (5 items diferidos reclasificados formalmente: 2 a Fase 2, 2 a W.12, 1 agrupado con W.4) | **+5** |
 | W.1B Backend magic link | 10/10 | **CERRADO** | — |
 | W.2 Home | **12/20** | **60% — en proceso** (split adaptive col der LIVE: cartel arriba si hay items, feed salas ocupa 100% si no — 2026-06-30) | **+2** |
-| W.3 Agenda | **25/30** | **83%** — en proceso | **+1** (Sprint 1 item 8 — bulk .ics) |
+| W.3 Agenda | **27/30** | **90%** — en proceso (+2 recount 2026-07-04: RT invalidation cubierta por W.11 + E2E 16 tests ya existia) | **+3** |
 | **W.4 Streaming** | **92/92** | **CERRADO 2026-07-04 noche** (recount contra codigo: replay + rating auto + anuncios in-stream + custom panel + slow mode + floating emojis + mobile/tablet layouts YA estaban implementados y sin marcar. Fix race auto-rate e1b0c9a. Reclasificados: trivia→W.16, E2E cross-tab→W.12, 17 menores→QA W.12) | **+9** |
 | **W.5 Speakers** | **35/35** | **CERRADO 100% 2026-07-04** (reclasificado Lighthouse + device fisico a W.12 Polish cross-modulos) | **+2** |
-| W.6 Social Wall | **18/40** | **45%** — feed+composer+likes+comments+tabs filtros hechos | **+18** (Sprint 1 item 7 cerrado) |
+| W.6 Social Wall | **21/40** | **53%** — feed+composer+likes+comments+tabs hechos (+3 recount 2026-07-04: comments lazy real + dedup wall:post/comment via W.11 + parser hashtags ya existia). Falta: load-more UI, hashtags click-to-filter, Stories, Photo Contest | **+21** |
 | **W.7 Sponsors** | **23/23** | **CERRADO 2026-06-21** | **+23** (Sprint 2.A entero — skeleton + tooltip + E2E 12/12 + Lighthouse acc 98) |
 | **W.8 Networking** | **21/21** | **CERRADO 100% 2026-07-04** (link sidebar identity → /perfil + 5 E2E nuevos + 4 items reclasificados formalmente: filtro role skip por privacy, RT listeners → W.11, sugeridos cards → Fase 2, tracking → Fase 2) | **+6** |
 | **W.9 Engagement** | **35/35** | **CERRADO 2026-06-29 (Sprint 2.B)** | **+5** (2026-06-29: redemptions inline + E2E 11/11 verde con viewports desktop/tablet H/mobile + 8 tests vitest. counter PARITY sync) |
 | **W.10 Live Hub** | **16/16** | **CERRADO por consenso 2026-06-20** | **+16** (creado en commit `0e185e6`, validado visual con seeder) |
 | **W.11 Sockets RT** | **22/22** | **CERRADO 2026-07-04 noche** (GlobalSocketProvider 6 listeners + prop-sync 3 vistas + 11 vitest + 2 E2E + verificacion viva pipeline Laravel→socket→cliente. Scope 42→22: game/staff/cross-tab RT/stress reclasificados a W.12/W.15/W.16) | **+14** |
-| W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
+| W.12 Polish + E2E + PWA | **6/43** | **14%** — recount 2026-07-04 contra codigo: Sentry completo + source maps + security headers + focus-visible + reduced-motion + 20 specs E2E YA existian. Falta real: Web Push, PWA, CSP completo, QA device, Lighthouse, WCAG audit | **+6** |
 | **W.13 FAQ + Docs** | **15/15** | **CERRADO 100% 2026-07-04** (Fase A FAQ Asistente orb + Fase B Documents split layout + backend ZIP escalable. Pages reclasificado formalmente a Fase 2) | **+2** |
 | **W.14 Anuncios + Cartel + Bell** | **17/17** | **CERRADO 100% 2026-07-04** (Fase A Anuncios + Bell + Fase B Cartel Digital. RT anuncios → W.11 via `data:invalidate{announcements}` (OJO: `announcement:new` NO se emite en prod, dead type — auditoria 2026-07-04) + Web Push → W.12) | **+3** |
-| W.15 Vendor Dashboard | 0/35 | **OPCIONAL** Fase 1 | — |
-| W.16 Live Moments | 0/23 | 0% — **SKIP webapp** (mobile-first, sorteos/trivia/golden ticket reveal son experiencia celu, no laptop). Webapp solo muestra resultados historicos | — |
+| W.15 Vendor Dashboard | 0/35 | 0% — **ENTRA al cierre total** (decision 2026-07-04: meta 95%+ global). Verificado contra codigo: 0 real, `stand`/`join-team` mapeados a toast "pronto". Backend parcial listo (StaffInvitationController) | — |
+| W.16 Live Moments | 0/23 | 0% — **ENTRA al cierre total** (decision 2026-07-04, revierte skip). Verificado contra codigo: 0 real, deep-links de games colapsan a /desafio estatico. Backend 100% listo (GameController + EventPhotoResource + GoldenTicketResource emiten todo) | — |
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
-| W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **507/656** | **77.3%** | Post-reclasificacion 2026-07-04 (W.5+W.8+W.13+W.0+W.1+W.14+W.17 cerrados formalmente, items bloqueados por sockets/push movidos a W.11/W.12). **12 modulos cerrados 100% real:** W.0, W.1, W.1B, W.5, W.7, W.8, W.9, W.10, W.13, W.14, W.17, W.18. **391/391 vitest** + 24/24 E2E perfil+social. Total scope baja 707→695 por items reclasificados a Fase 2 (Pages, Photo Contest, tracking analytics) |
+| W.X Welcome Showcase | 0/7 | **BLOQUEADO — va de ULTIMO por diseño** (reusa componentes reales en miniatura de todos los modulos cerrados). BUG activo: boton "Ver introduccion de nuevo" en PerfilView navega a /onboarding → 404 (ocultar en Bloque 0) | — |
+| **TOTAL** | **518/656** | **79.0%** | Recount contra codigo 2026-07-04 (4 agentes): +10 items ya hechos sin marcar (W.3 +2, W.6 +2, W.12 +6). **META NUEVA: cierre TOTAL 95-100% incluyendo W.15 + W.16 + W.X** — plan en BLOQUES abajo, ~30-38h en 6-8 sesiones. **14 modulos cerrados:** W.0, W.1, W.1B, W.4, W.5, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.17, W.18 |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,69 +51,80 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **Sprint 2.G — W.8 Networking completar** (~1.5-2h, 1 sesion) — items pendientes del modulo social/networking segun PARITY-MATRIX. Bloqueadas list ya cerrada (2026-06-20). Falta: revisar que gaps quedan por cerrar contra el detalle W.8 del PARITY.
-
-> **Orden recomendado (re-estimado 2026-06-30 tarde tras investigar W.18):**
-> 1. ~~W.14 Fase B~~ → CERRADO 2026-06-30 (17/20, falta solo RT socket)
-> 2. ~~W.13 Fase B Documents~~ → CERRADO 2026-06-30 tarde (15/17, backend ZIP escalable)
-> 3. **W.18 Hub Personal (~2-3h, riesgo BAJO)** — espejo Expo directo confirmado
-> 4. W.8 Networking completar (~1.5-2h)
-> 5. W.4 Replay + in-stream (~3h) — riesgo MEDIO backend replay
-> 6. W.11 sockets criticos 6 items (~1-1.5h) — riesgo ALTO E2E flaky
-> 7. W.12 Web Push + Sentry (~2-3h)
-> 4. W.8 Networking (~1.5-2h, antes ~3h)
-> 5. W.4 Replay + anuncios in-stream (~3h, antes ~5h) — riesgo MEDIO si backend replay no listo
-> 6. W.11 sockets criticos 6 items (~1-1.5h, antes ~2h) — riesgo ALTO E2E flaky
-> 7. W.12 Web Push + Sentry (~2-3h, antes ~4h)
->
-> **Re-estimacion 2026-06-30:** `project_velocity_analysis_2026_06_30.md`. Roadmap original 22h → realista **11-14h en 3 sesiones DaVinci**. Velocidad subio por reuso de patrones (parseActionUrl, lumina, useNow, framer split layout) — no por atajos. Riesgos vigilados: W.18 sin espejo, W.11 sockets, W.4 backend replay.
->
-> **Skips confirmados:** W.16 entero (mobile-first), W.6 Stories+Photo Contest (mobile-first, nicho), W.2 sponsors band + lifecycle states (ya hay /sponsors, cinematic ya esta), W.11 reducido de 42 a ~6 items, W.12 reducido a Web Push+Sentry (PWA installable + offline + Lighthouse100 + E2E full → Fase 1.5 o skip).
+- [ ] **BLOQUE 1 — W.6 Social → 100%** (~4-6h): load-more UI + hashtags click-to-filter + Stories + Photo Contest
 
 ---
 
-## SPRINTS PROPUESTOS (orden recomendado, recalculado 2026-06-20)
+## PLAN DE CIERRE TOTAL — BLOQUES (definido 2026-07-04, inventario 4 agentes contra codigo)
 
-### Sprint 0 — Hygiene (~2-3h, urgente) — 4/4 **CERRADO**
-> Bloqueante. Sin esto cualquier cierre formal es mentira.
+> **Meta:** cierre 95-100% del scope COMPLETO (656 items), incluyendo W.15 + W.16 + W.X.
+> Decision Kamilo 2026-07-04: revierte skips de W.16 y W.15. Total ~30-38h en 6-8 sesiones DaVinci.
+> W.X va de ULTIMO por diseño (reusa componentes reales en miniatura de todos los modulos cerrados).
+> Los sprints historicos cerrados (Sprint 0-2, 2026-06-20 → 2026-07-04) viven en git de este doc.
 
-- [x] ~~Reparar suite vitest (194/194 fallando)~~ → 194/194 verdes (fix `tests/setup.ts` localStorage stub, 2026-06-20)
-- [x] ~~Verificar Laragon backend~~ → health 200 OK (2026-06-20)
-- [x] ~~Smoke test 6 rutas~~ → todas 307 (auth gate funcionando), login 200, cero 500, cero warnings runtime
-- [x] ~~Decidir screenshot~~ → borrado (era captura Valorant random, sin relacion con la webapp, 2026-06-20)
+### BLOQUE 0 — Contabilidad + fixes rapidos — 3/3 **CERRADO 2026-07-04**
+- [x] Marcar las ~11 victorias gratis en counters (W.3 +2, W.6 +3, W.12 +6) — validado 402/402 vitest + typecheck
+- [x] Fix alias `sessions` en `KNOWN_ENTITIES` de `useGlobalSocket.tsx:124` (backend puede emitir `agenda` o `sessions`)
+- [x] Boton "Ver introduccion de nuevo" OCULTO en PerfilView (navegaba a /onboarding → 404). E2E perfil 13/13 ajustado (asserts toHaveCount(0)). Re-habilitar en BLOQUE 7
 
-### Sprint 1 — Cierres formales modulos casi-hechos (~2-3h, 1 sesion) — 9/9 **CERRADO 2026-06-21**
-> Cosechar lo que ya esta al 80-90%. Cierra modulos completos = sube % global y baja stress mental.
+### BLOQUE 1 — W.6 Social → 100% (~4-6h) — 0/4
+- [ ] Load-more/paginacion UI del feed (fetcher ya pagina `?page=`, falta estado cliente + boton/observer + append)
+- [ ] Hashtags click-to-filter (parser + estilo `.ht` ya existen en PostCard, falta onClick + filtro en FeedView)
+- [ ] Stories completo: StoriesBar + StoryViewer full-screen + upload 9:16 + expire 24h (CSS `.sn-stories` existe, 0 componentes)
+- [ ] Photo Contest: banner con countdown + podio top 3 + CTA subir foto
 
-- [x] ~~**W.5 Speakers — cierre formal**~~: hecho 2026-06-20 (Sprint 1 item 1) — tests 27/27 verde, memoria `project_w5_speakers_v2.md` actualizada, counters PARITY+PENDIENTES sincronizados (94%). Lighthouse + device fisico → batch QA final cross-modulos
-- [x] ~~**W.10 Live Hub — cierre formal**~~: hecho 2026-06-20 (Sprint 1 item 2) — validacion visual con `LiveHubDemoSeeder` (3 lives + 6 upcoming + 4 past) OK. Skip vitest componente + doc maestro (anti-regadero: info ya vive en commit `0e185e6` + JSDoc + E2E + esta seccion)
-- [x] ~~**W.10 (viejo) → W.18 Hub Personal — renombrar doc**~~: hecho 2026-06-20 (git mv + actualizadas refs en _index, PARITY-MATRIX, BACKEND-API-MAP, PLAN)
-- [x] ~~**W.8 — AlertDialog DaVinci reemplazando `window.confirm` Bloquear**~~: hecho 2026-06-20 (Sprint 1 item 4) — v1 shadcn AlertDialog rechazada por generica; v2 final con `ui/confirm-pop.tsx` + CSS global espejo patron `rating-pop`, Plus Jakarta 700 20px + Urbanist 14px, copy honesto "El bloqueo es reversible". Memoria `feedback_analyze_before_code.md` actualizada
-- [x] ~~**W.8 — Skeleton mejor AttendeeProfilePanel**~~: hecho 2026-06-20 (Sprint 1 item 6) — v1 con 3 secciones estructuradas (Sobre+Intereses+Asistira) rechazada (over-promesa visual, campos condicionales pueden no aparecer). v2 final honesto: 1 titulo chico + 3 lineas tipo bio. Reusa `.sn-sk-shape` shimmer existente
-- [x] ~~**W.6 — Tabs filtros Recientes/Mas likes/Mis posts**~~: hecho 2026-06-20 (Sprint 1 item 7) — `FeedTab` type + helper `sortAndFilterFeed` pure en socialDerive. FeedView con state local + 3 empty states distintos. Reusa `.sn-rqx-tabs` global. 6 tests vitest agregados
-- [x] ~~**W.3 — Bulk .ics download**~~: hecho 2026-06-21. Reemplazado handler fake `handleTodas` con `downloadAgendaIcs()` real. Generador puro `lib/ics.ts` (RFC 5545: VCALENDAR + N VEVENT con UID determinista, DTSTAMP UTC, escape comas/semicolons/backslash). Boton "Todas" del AgendaHeader ahora visible cuando hay favoritas en CUALQUIER dia (`countMine > 0`, antes era `visibleSessions.length > 0` del dia). Filename `mi-agenda-{event.slug}.ics`. +16 tests vitest (218 verde, typecheck OK)
-- [x] ~~**W.0 — Wire modulos top-level a sidebar**~~: hecho 2026-06-21. Verificado smoke 5/5 items (home, agenda, live, speakers, social) navegan sin error. Patron `available: boolean` ya implementado: `/sponsors` correctamente disabled con tooltip "proximamente" + opacidad 55%. Logica decidida: **conforme aparece cada modulo, se cambia `available: false` → `true` en `SidebarPill.tsx`** (no agregamos items fantasma futuros). Bonus: quitado el brand letter inicial (`event.name?.charAt(0)`) — generaba ruido visual tipo debug en eventos sin logo elaborado
+### BLOQUE 2 — W.2 Home → 100% (~2.5-3.5h) — 0/9
+- [ ] Foto real speaker en feed salas (dato `speaker_photo_url` YA llega, `RoomCard` lo ignora — win facil)
+- [ ] Post-event survey prompt estado ENDED
+- [ ] Sponsors logo band discreta
+- [ ] GamificationHud preview LIVE (puntos + posicion mini)
+- [ ] Anuncios mini con count badge
+- [ ] EventArchive link estado ENDED
+- [ ] Proximos eventos org estado ENDED
+- [ ] Multi-sede pill
+- [ ] Dedupe en happening-now
 
-### Sprint 2 — Modulos criticos no empezados, orden CRITICO PARITY (~25h, 4-5 sesiones DaVinci) — 23/N
-> "Lo que falta para vender webapp standalone" segun PARITY-MATRIX seccion 5.
+### BLOQUE 3 — W.3 Agenda → 100% (~2-3h) — 0/4
+- [ ] Badges lifecycle AJUSTADA/CANCELADA (extender tipo+fetcher con 3 tiempos original/adjusted/actual + UI en SessionCard; backend ya los maneja)
+- [ ] Room check-in boton (endpoint backend listo)
+- [ ] Conflict detector visual favoritas solapadas
+- [ ] URL state shareable (track/search/tab/day en query params)
 
-- [x] ~~Sprint 2.A — W.7 Sponsors~~ — **CERRADO 23/23 (2026-06-21)** — Sprint 2.A entero en una sesion DaVinci larga: wall espejo Expo + framer-motion shuffle + DetailPanel (Hero/Sessions/Trivia/Contact/Actions) + skeleton SSR + tooltip radix + 14 vitest + **12 E2E Playwright verde** + Lighthouse acc 98 + CLS 0
-- [x] ~~Sprint 2.B — W.9 Engagement~~ — **CERRADO 35/35 (2026-06-29)** — hub split + 6 cards + 6 panels + RGB ring + QR + lazy fetch + redeem optimistic + redemptions inline + bloque orphans. 270/270 vitest + 11/11 E2E (incluye desktop 1600 / tablet H 1130 / mobile 390 sin overflow horizontal)
+### BLOQUE 4 — W.16 Live Moments → 100% (~5-6h) — 0/5
+> Backend 100% listo (GameController + EventPhotoResource + GoldenTicketResource). Hoy los deep-links colapsan a /desafio estatico (`announcement-deeplink.ts:62-65`).
+- [ ] Trivia panel: pregunta + 4 opciones + countdown + result + leaderboard socket
+- [ ] Sorteo/spin/jackpot ceremony full-screen + confetti
+- [ ] Photo contest display (grid + likes optimistic + podio)
+- [ ] Golden Ticket reveal ceremony announcement-driven (distinto del GoldenTicketPanel de /desafio)
+- [ ] Tests vitest + Playwright
 
-- [x] ~~Sprint 2.C — W.14 Anuncios + Banners + Bell~~ — **CERRADO 17/20 (2026-06-30)**. Fase A 2026-06-29 (Anuncios + BellPopover + deeplink + E2E 13). Fase B 2026-06-30 (CartelDigital ambient signage 16:9 col der LIVE: cross-fade 700ms cada 6s, sin dots/arrows, hover pausa, sponsor pill, merger round-robin banners+highlights, backend reusado cero cambios, 23 vitest + 6 E2E). Falta: RT anuncios via `data:invalidate{announcements}` (depende W.11 — `announcement:new` no se emite en prod) + Web Push (W.12)
-- [x] ~~Sprint 2.D — W.17 Soporte~~ — **CERRADO 13/15 (2026-06-29)** (split layout espejo W.14 + subflow Asistente + EditSupportRequest crea announcement privado). Falta RT response (W.11)
-- [x] ~~Sprint 2.E — W.13 Fase B Documents~~ — **CERRADO 15/17 (2026-06-30 tarde)** (split layout wall + preview embed + skeleton shimmer + descarga individual + bulk ZIP pre-generado backend con job + observer + endpoint escalable a 10K users, backend migration + Model fillable + composer maennchen/zipstream-php pure PHP). Falta: Pages dinamicas (skip Fase 2)
-- [x] ~~Sprint 2.F — W.18 Hub Personal~~ — **CERRADO 19/19 100% (2026-07-04)** — split 35/65 espejo W.13/W.14/W.17. Wall: hero + stats gamification 3 cards sin iconos + rows clickeables + footer (Ver introduccion + Cerrar sesion). Panel der: empty state espejo + 3 sub-views con AnimatePresence. `PerfilDataForm` con 3 cards visuales (Sobre ti / Contacto / Redes sociales) + 1 solo Guardar. `PerfilInterestsForm` chips min 1 + empty honesto. `PerfilAppearanceForm` Lux/Noir aplicando via `useTheme()`. `PerfilLogoutModal` confirm con cross-tab broadcast. **`PerfilAvatarMenu` popover** con subir foto (input file oculto max 5MB), cambiar variante (shuffle beam seed 0→1→2→3), eliminar foto (rojo, reset seed). Beam avatar espejo Expo `hostedboringavatars.vercel.app/api/beam` con mismos colores `0EA5E9,6366F1,14B8A6,A855F7,38BDF8`. Seed persistido en localStorage scopeado por email (modelo MMKV Expo). Backend cero cambios endpoints (11 existentes) — solo validator flexible `linkedin/website` de `url:http,https` → `nullable|string`. Deep link `eventos://profile[/sub]`. Sidebar refactor: ProfilePopover + UserMenu eliminados, nav reorg top (modulos) + bottom (Asistente+Perfil+Bell). Bug fix critico updateProfile normaliza shape backend (`linkedin_url` → `linkedin`) + merge preserva email. i18n 63 keys en es/en/pt. **391/391 vitest** + 13/13 E2E serial mode. Typecheck limpio
+### BLOQUE 5 — W.12 Polish/cierre (~5-7h) — 0/10
+- [ ] Web Push real (SW + VAPID + subscription + 8 tipos backend)
+- [ ] PWA: manifest + service worker + install prompt desktop/tablet (NO mobile)
+- [ ] CSP completo script-src/connect-src (desbloqueado por W.11 cerrado)
+- [ ] `loading.tsx` en 7 rutas sin cubrir (soporte, faq, anuncios, desafio, documentos, streaming, perfil)
+- [ ] Code splitting `dynamic()` (framer-motion y pesados; hoy 0 imports dinamicos)
+- [ ] Print stylesheet (agenda + ratings)
+- [ ] SEO per-page + OG + sitemap — CANDIDATO A RECORTE (app auth-gated)
+- [ ] QA device real 3 viewports + Edge/Firefox + Lighthouse batch + WCAG audit
+- [ ] E2E cross-tab (streaming Q&A, social conectar)
+- [ ] DSN prod Sentry + validacion (config completa ya en codigo)
 
-### Sprint 3 — W.6 completar (Stories + Photo Contest + Hashtags) (~3-4h, 1 sesion) — 0/19
-### Sprint 4 — W.16 Live Moments (Trivia + Sorteo + Golden Ticket reveal) (~6h, 1-2 sesiones) — 0/23
-### Sprint 5 — W.13 FAQ + Documentos + Pages (~3h, 1 sesion) — 0/17
-### Sprint 6 — W.8 Networking completar (bloqueados + mi perfil + filtros role) (~3h, 1 sesion) — 0/10
-### Sprint 7 — W.2/W.3/W.4 completar (sponsors band + lifecycle + replay + anuncios in-stream) (~10h, 2 sesiones) — 0/30
-### Sprint 8 — W.11 Sockets RT consolidacion (~6h, 1-2 sesiones) — 0/34
-### Sprint 9 — W.12 Polish + E2E + PWA (cierre Fase 1) (~8-10h, 2 sesiones) — 0/43
+### BLOQUE 6 — W.15 Vendor Dashboard → 100% (~6-8h) — 0/7
+- [ ] Hooks (useMyStand / useMyLeads / useStandStats / usePendingInvitations)
+- [ ] Mi Stand dashboard (hero + stats row + tabs Acerca/Leads/Equipo)
+- [ ] Mis Leads (lista grouped + drawer editable + historial + export CSV)
+- [ ] Visitantes stand + acciones contacto (whatsapp/email/llamar)
+- [ ] Stats (StatRow + TierBar + MemberBar)
+- [ ] Team management (slots + invitar attendee/email + share link + transfer/remove)
+- [ ] Pagina publica `/staff-invite/{token}` + tests
 
-**Total estimado para webapp standalone vendible:** ~70-80h sin W.15 vendor (10-12 sesiones DaVinci)
+### BLOQUE 7 — W.X Welcome Showcase (ULTIMO — depende de TODOS los bloques) (~3-4h) — 0/2
+- [ ] Engine timeline 6 beats + skip + reduced-motion fallback + `onboarding_completed` + componentes reales miniatura + routing post-login + tests
+- [ ] Re-habilitar boton "Ver introduccion de nuevo" del perfil (oculto en Bloque 0)
+
+### PARALELO — Event Pulse cliente (sesion dedicada ~1-2h) — 0/4
+> Detalle en `docs/living/PENDIENTES.md` seccion Event Pulse. Formula counter ratings live≠F5 · Charlas vacia (room_id PulseController:102) · verificar leads/connections · poll:closed room null
 
 ---
 
@@ -247,10 +258,10 @@
 - [ ] **Conflict detector visual** (calcular client-side, depende W.12)
 - [ ] **Room check-in boton** (endpoint backend listo)
 - [x] ~~**Bulk .ics download**~~ (todas mis favoritas un solo archivo) — hecho 2026-06-21 (Sprint 1 item 8): `lib/ics.ts` generador puro RFC 5545 (VCALENDAR + N VEVENT con UID determinista, DTSTAMP UTC, escape comas/semicolons/backslash). Boton "Todas" del AgendaHeader visible cuando `countMine > 0` en CUALQUIER dia. Filename `mi-agenda-{event.slug}.ics`. +16 tests vitest
-- [ ] **Recordatorio push 10min antes** (depende W.10 settings)
-- [ ] **RT socket invalidation** (depende W.11)
+- [ ] **Recordatorio push 10min antes** (depende Web Push BLOQUE 5)
+- [x] ~~**RT socket invalidation**~~ — CUBIERTO por W.11 (verificado 2026-07-04: `data:invalidate{agenda}` → router.refresh + prop-sync `AgendaView:62`. Pendiente fix alias `sessions` en KNOWN_ENTITIES — Bloque 0)
 - [ ] **URL state shareable** (filtros en query params)
-- [ ] **Playwright E2E happy path**
+- [x] ~~**Playwright E2E happy path**~~ — YA EXISTIA (verificado 2026-07-04: `agenda.spec.ts` 300 lineas, 16 tests: days strip, tabs, filtros, search, DetailPanel, favoritos 200/500, rating, live, highlight x3, Esc)
 
 ### W.4 — Streaming (92/92 — CERRADO 2026-07-04 noche, recount contra codigo)
 
@@ -324,9 +335,9 @@
 
 > Recount 2026-06-20: el feed editorial implementado en `/social` (compartido con W.8 Networking) es W.6 Wall. Doc anterior listaba 0% por error de auditoria. Lo IMPLEMENTADO marcado [x] aqui.
 
-**Fase 0 — Hooks (2/3)**
+**Fase 0 — Hooks (3/3)**
 - [x] `fetchWallFeed` SSR (lib/social.ts) — backend usa `?page=` (paginacion pendiente UI)
-- [ ] `usePostComments` lazy (hoy carga al expandir InlineComments — verificar si es lazy real)
+- [x] ~~`usePostComments` lazy~~ — ES LAZY REAL (verificado 2026-07-04: `InlineComments` solo monta al expandir + fetch en useEffect `InlineComments.tsx:50-69`; feed inicial solo trae `comments_count`)
 - [x] `createWallPost` mutation con foto opcional + manejo `pending` (post en moderacion)
 
 **Fase 1 — Feed (3/4)**
@@ -342,11 +353,11 @@
 - [x] Click "X comentarios" expande sub-thread (estado `expandedComments`)
 - [x] Input crear comentario inline (Composer + handleCommentAdded)
 
-**Fase 3 — Crear post (3/4)**
+**Fase 3 — Crear post (4/4)**
 - [x] Composer textarea max 500
 - [x] **Imagen upload** preview antes enviar (File API en createWallPost)
 - [x] Post optimistic aparece + lumina toast
-- [ ] Listener `wall:post` deduplica propio via socket (depende W.11)
+- [x] ~~Listener `wall:post` deduplica propio via socket~~ — HECHO por W.11 (verificado 2026-07-04: dedup por server ID `SocialView.tsx:131-136` + `wall:comment` skip propio `:141-150`)
 
 **Fase 4 — Stories (0/4)**
 - [ ] **StoriesBar arriba feed con avatares ring + upload "+"**
@@ -358,9 +369,9 @@
 - [ ] **Photo Contest banner** (status active/ended, countdown timer, podio top 3 con medallas)
 - [ ] CTA → vista concurso / sube tu foto
 
-**Fase 6 — Hashtags client-side (0/2)**
-- [ ] Parser regex `/#[\w_-]+/g`
-- [ ] Click filtra feed client-side
+**Fase 6 — Hashtags client-side (1/2)**
+- [x] ~~Parser regex~~ — YA EXISTE (verificado 2026-07-04: `renderHashtags()` con escape HTML `PostCard.tsx:111-120` + estilo `.ht` `social.css:624`)
+- [ ] Click filtra feed client-side (el span no tiene onClick ni hay estado de filtro hashtag)
 
 **Fase 7 — Filtros (2/2)**
 - [x] View switch Feed/Personas/Solicitudes/Mis posts (sidebar izq) — funcional pero NO son tabs sticky en feed
@@ -575,9 +586,9 @@
 - [ ] Empty states consistentes
 - [ ] Loading transitions
 
-**Fase 2 — Accesibilidad (0/5)**
+**Fase 2 — Accesibilidad (1/5)**
 - [ ] WCAG AA contraste 4.5:1
-- [ ] Focus visible :focus-visible outline accent
+- [x] ~~Focus visible :focus-visible outline accent~~ — YA EXISTE (verificado 2026-07-04: regla global `globals.css:493` con color-mix + offset 2px)
 - [ ] Keyboard nav completa
 - [ ] Tab order logico
 - [ ] ARIA labels iconos sin texto
@@ -608,24 +619,24 @@
 - [ ] Stylesheet print friendly
 - [ ] Imprimir agenda + ratings
 
-**Fase 7 — E2E (0/4)**
-- [ ] Smoke test critical paths
-- [ ] Login + home + agenda
-- [ ] Streaming + Q&A cross-tab
+**Fase 7 — E2E (2/4)**
+- [x] ~~Smoke test critical paths~~ — YA EXISTE (verificado 2026-07-04: **20 specs** en e2e/ cubriendo todos los modulos: auth-gate, login, verify, home, agenda 16 tests, streaming, speakers, social, sponsors, desafio, live, global-socket, faq, documentos, cartel, anuncios, soporte, perfil)
+- [x] ~~Login + home + agenda~~ — YA EXISTE (auth-gate.spec + login-form.spec + home.spec + agenda.spec)
+- [ ] Streaming + Q&A cross-tab (requiere socket server real en CI)
 - [ ] Social conectar cross-tab
 
-**Fase 8 — Sentry validation (0/2)**
+**Fase 8 — Sentry validation (1/2)**
 - [ ] DSN prod
-- [ ] Source maps subidos en build (no en cliente)
+- [x] ~~Source maps subidos en build (no en cliente)~~ — YA CONFIGURADO (verificado 2026-07-04: `withSentryConfig` con `deleteSourcemapsAfterUpload: true` + tunnelRoute /monitoring + release via GIT_SHA. Sentry client/server/edge completo con PII scrub)
 
-**Fase 9 — Cierre (0/7)**
-- [ ] CSP estricto
-- [ ] X-Frame-Options
-- [ ] Reduced motion verificado
+**Fase 9 — Cierre (2/7)**
+- [ ] CSP estricto (hoy solo frame-src; script/connect-src desbloqueados por W.11)
+- [x] ~~X-Frame-Options~~ — YA EXISTE (verificado 2026-07-04: SAMEORIGIN + nosniff + Referrer-Policy + HSTS en `next.config.ts:76-84`)
+- [x] ~~Reduced motion verificado~~ — YA EXISTE (verificado 2026-07-04: media query global `globals.css:470` + hook `useReducedMotionPref` + ~18 componentes/CSS)
 - [ ] reduced-motion serie estatica W.X
-- [ ] Bancolombia embed test
+- [ ] ~~Bancolombia embed test~~ → N/A (cliente perdido — validar si algun embed test aplica al proximo cliente)
 - [ ] Memoria
-- [ ] Counter PARITY-MATRIX
+- [ ] Counter PARITY-MATRIX → N/A (doc historico desde 2026-07-04)
 
 ### W.13 — FAQ + Documentos (15/15, **CERRADO 100% 2026-07-04**)
 
