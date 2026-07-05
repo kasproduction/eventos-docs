@@ -34,7 +34,7 @@
 | **W.8 Networking** | **21/21** | **CERRADO 100% 2026-07-04** (link sidebar identity → /perfil + 5 E2E nuevos + 4 items reclasificados formalmente: filtro role skip por privacy, RT listeners → W.11, sugeridos cards → Fase 2, tracking → Fase 2) | **+6** |
 | **W.9 Engagement** | **35/35** | **CERRADO 2026-06-29 (Sprint 2.B)** | **+5** (2026-06-29: redemptions inline + E2E 11/11 verde con viewports desktop/tablet H/mobile + 8 tests vitest. counter PARITY sync) |
 | **W.10 Live Hub** | **16/16** | **CERRADO por consenso 2026-06-20** | **+16** (creado en commit `0e185e6`, validado visual con seeder) |
-| W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 | — |
+| **W.11 Sockets RT** | **22/22** | **CERRADO 2026-07-04 noche** (GlobalSocketProvider 6 listeners + prop-sync 3 vistas + 11 vitest + 2 E2E + verificacion viva pipeline Laravel→socket→cliente. Scope 42→22: game/staff/cross-tab RT/stress reclasificados a W.12/W.15/W.16) | **+14** |
 | W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
 | **W.13 FAQ + Docs** | **15/15** | **CERRADO 100% 2026-07-04** (Fase A FAQ Asistente orb + Fase B Documents split layout + backend ZIP escalable. Pages reclasificado formalmente a Fase 2) | **+2** |
 | **W.14 Anuncios + Cartel + Bell** | **17/17** | **CERRADO 100% 2026-07-04** (Fase A Anuncios + Bell + Fase B Cartel Digital. RT anuncios → W.11 via `data:invalidate{announcements}` (OJO: `announcement:new` NO se emite en prod, dead type — auditoria 2026-07-04) + Web Push → W.12) | **+3** |
@@ -43,7 +43,7 @@
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
-| **TOTAL** | **484/695** | **69.6%** | Post-reclasificacion 2026-07-04 (W.5+W.8+W.13+W.0+W.1+W.14+W.17 cerrados formalmente, items bloqueados por sockets/push movidos a W.11/W.12). **12 modulos cerrados 100% real:** W.0, W.1, W.1B, W.5, W.7, W.8, W.9, W.10, W.13, W.14, W.17, W.18. **391/391 vitest** + 24/24 E2E perfil+social. Total scope baja 707→695 por items reclasificados a Fase 2 (Pages, Photo Contest, tracking analytics) |
+| **TOTAL** | **498/675** | **73.8%** | Post-reclasificacion 2026-07-04 (W.5+W.8+W.13+W.0+W.1+W.14+W.17 cerrados formalmente, items bloqueados por sockets/push movidos a W.11/W.12). **12 modulos cerrados 100% real:** W.0, W.1, W.1B, W.5, W.7, W.8, W.9, W.10, W.13, W.14, W.17, W.18. **391/391 vitest** + 24/24 E2E perfil+social. Total scope baja 707→695 por items reclasificados a Fase 2 (Pages, Photo Contest, tracking analytics) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -550,7 +550,12 @@
 - [x] **Skip vitest componente LiveHubView** — E2E + JSDoc + visual cubren (anti-overengineering)
 - [x] **Skip doc maestro `W.10-live-hub.md`** — anti-regadero, info vive en commit `0e185e6` + JSDoc + esta seccion
 
-### W.11 — Sockets RT (8/42, 20%)
+### W.11 — Sockets RT (22/22 — CERRADO 2026-07-04 noche)
+
+> Implementado segun `docs/W.11-SOCKETS-PLAN.md` (investigacion + auditorias Fable 5).
+> Verificacion viva: pipeline Laravel→socket→cliente confirmado (tinker broadcast →
+> cliente recibio `data:invalidate entity=announcements`; contrato roto reprodujo
+> `EVENT_ACCESS_DENIED`). 402 vitest + suite E2E.
 
 - [x] socket.io-client instalado
 - [x] Auth bearer via socket-token endpoint
@@ -560,26 +565,21 @@
 - [x] Pinned message socket-driven
 - [x] Optimistic + revert chat
 - [x] Connection status pill
-- [ ] **Setup singleton centralizado** (extraer de W.4)
-- [ ] **Connection management** exponential backoff
-- [ ] **Reconnect on focus**
-- [ ] **useSocketRoom join/leave hook generico**
-- [ ] **Listener wall:post** prepend feed dedup
-- [ ] **Listener wall:comment** invalidate comments
-- [ ] **Listener networking:notify** toast + invalidate
-- [ ] **Anuncios RT** via `data:invalidate{announcements}` (`announcement:new` es dead type sin emisores — auditoria 2026-07-04) + display:project (W.16)
-- [ ] **Listener data:invalidate** generico (entities reales: agenda/announcements/sponsors/speakers/highlights/branding/modules/onboarding/gamification/passport)
-- [ ] **Listener ban:enforced** force logout (antes decia `auth:ban` — nombre incorrecto)
-- [ ] **Listener agenda:delayed** toast espejo Expo (SI se emite — `SessionConfigController:393`; `agenda:updated` tambien se emite pero es dead emit, el lifecycle viaja por data:invalidate agenda)
-- [ ] **Listener game events** (W.16 trivia/spin/jackpot)
-- [ ] **Long-polling fallback** (corporate firewalls)
-- [ ] **Skip-self** en eventos propios broadcast
-- [ ] **Auth token refresh** durante conexion abierta
-- [ ] **(...19 listeners adicionales del catalogo 28 eventos S→C)**
-- [ ] **Tests Vitest singleton + dedup + reconnect**
-- [ ] **Playwright RT cross-tab**
-- [ ] **Performance 10K concurrent stress test**
-- [ ] **Counter PARITY-MATRIX**
+- [x] **GlobalSocketProvider** en `(app)/layout.tsx` — singleton global (antes solo streaming)
+- [x] **Connection management** — reconnection Infinity, backoff 1s→5s cap (espejo Expo)
+- [x] **Reconnect on visibilitychange** (tab dormida re-conecta al volver)
+- [x] **Listener wall:post** — bus cliente → SocialView prepend dedup por server ID
+- [x] **Listener wall:comment** — +1 count (skip propio, sin double-count Expo) + refetch InlineComments
+- [x] **Listener networking:notify** — batch 1500ms espejo Expo + toasts lumina + refetch requests via proxy nuevo `/api/social/requests`
+- [x] **Anuncios RT** via `data:invalidate{announcements}` — bell + lista refrescan
+- [x] **Listener data:invalidate** generico — 10 entities, debounce 800ms → router.refresh + prop-sync AgendaView/SponsorsView/SoporteView (vistas sordas arregladas)
+- [x] **Listener ban:enforced** — logout + toast + redirect /login
+- [x] **Listener agenda:delayed** — toast espejo Expo literal
+- [x] **Long-polling fallback** — transports websocket+polling en singleton
+- [x] **Skip-self** — dedup server-id (wall:post) + author check (wall:comment)
+- [x] **Tests Vitest** — 11 nuevos (402/402 total verde)
+- [x] **E2E degradacion** — 2 specs (provider monta + 401 no rompe) + regresion suite completa
+- Reclasificados fuera del modulo: game events → W.16 (skip webapp) · staff listeners → W.15 · token refresh durante conexion → W.12 (deuda D.5 del plan) · Playwright RT cross-tab con socket real + stress 10K → W.12 · counter PARITY → N/A (doc historico)
 
 ### W.12 — Polish + E2E + PWA (0/43, BACKLOG cierre Fase 1)
 

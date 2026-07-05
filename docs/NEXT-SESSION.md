@@ -6,6 +6,35 @@
 
 ---
 
+## W.11 SOCKETS WEBAPP — IMPLEMENTADO (2026-07-04 noche, Fable 5)
+
+**W.11 CERRADO 22/22.** Los 12 archivos del plan aplicados en `eventos-web`:
+GlobalSocketProvider (6 listeners) + bus useSocketEvent + proxy /api/social/requests
++ prop-sync AgendaView/SponsorsView/SoporteView + disposeSocket en logout +
+reconnection Infinity. **Total webapp: 498/675 = 73.8%. 13 modulos cerrados.**
+
+Verificado:
+- Typecheck limpio + lint 0 errores (fix drive-by PerfilView set-state-in-effect)
+- **402/402 vitest** (+11 GlobalSocketProvider)
+- E2E: global-socket 2/2 + agenda/soporte/faq/speakers re-verificados
+- **Verificacion viva del pipeline**: tinker `InvalidationService::broadcast(1,'announcements')`
+  → socket server `[invalidate]` → cliente recibio el evento. Contrato roto
+  (`event_id`) reprodujo `EVENT_ACCESS_DENIED` en vivo — fixes kiosko/attendance validados
+
+Aprendizajes de la implementacion (importan para proximas sesiones):
+1. **prop-sync via useEffect, NO setState-in-render**: el tracker R19 en AgendaView
+   rompia el flujo `?highlight` (E2E rojo). Re-seed post-commit con
+   `useEffect(() => setX(initialX), [initialX])` + eslint-disable.
+2. **mockBackend ahora persiste POST /support** (in-memory por bearer) — el prop-sync
+   re-seedea desde el refetch SSR y el mock debia espejar la persistencia real.
+3. **E2E local con socket server dev corriendo = flake**: los pages con retries
+   Infinity martillan 3001 con tokens mock. Apagar 3001 antes de `playwright test`.
+4. **agenda.spec en serial mode** (saturacion paralela cronica, igual W.13/W.7/W.18).
+5. Suite E2E completa: correr con TODOS los node zombie muertos (taskkill node) —
+   dev servers viejos causan aborts fantasma ("100 did not run").
+
+---
+
 ## MISION FABLE 5 COMPLETADA — 2026-07-04
 
 **La investigacion W.11 Sockets esta HECHA.** Fable 5 leyo cross-repo (Expo + webapp +
