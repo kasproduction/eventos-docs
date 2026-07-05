@@ -198,9 +198,22 @@ W.11 queda validada CON este contexto completo: no era del Pulse.
    - `PointsService::award` → `broadcast(eventId, 'leaderboard')` junto al directed
    PHP lint verde en los 5 archivos. Expo/webapp ignoran estas entities (verificado
    contra sus mapas) — unico consumidor: Event Pulse.
-4. **RIESGO-D Expo** — backlog Expo: unificar los 6 `io()` en singleton (patron
-   webapp `lib/streaming/socket.ts`). No urgente pero hacer antes del primer evento
-   grande con streaming + encuestas simultaneas.
+4. **RIESGO-D Expo — APLICADO** (Kamilo lo subio a prioridad 1, commit `0d9a754`):
+   `lib/socket.ts` singleton nuevo + 6 consumidores migrados. Decisiones de diseno:
+   - `join:event` centralizado en el singleton (lee eventId del authStore en cada connect)
+   - `join:session` con REF-COUNT: re-emite por consumidor (el server es idempotente
+     y re-envia chat:history — mismo comportamiento que cuando cada hook tenia socket
+     propio); `leave:session` solo al salir el ULTIMO (sin esto el unmount de Q&A
+     sacaba al user del room del chat compartido)
+   - Re-join automatico de rooms tras reconexion (Socket.IO no los recuerda)
+   - `disposeSocket()` solo por el owner `useDataInvalidation` (login/logout)
+   - Cada consumidor registra/remueve SOLO sus listeners (patron useChat webapp)
+   - Reconnection unificada a Infinity (antes: 5 en chat/qna/mode, 3 en encuestas —
+     una tab con red inestable perdia esos hooks para siempre)
+   Typecheck: los 7 archivos del refactor limpios (5 errores pre-existentes del WIP
+   recap/leaderboard, verificado con git stash).
+   **PENDIENTE verificacion viva**: regresion streaming (chat + Q&A + polls + emojis
+   + pinned) + wall RT + encuestas + log server debe mostrar `conns=1` estable.
 5. **Dead emits** (`session:started/ended/cancelled`, `agenda:updated`,
    `room:occupancy`) — decision futura: consumirlos (MC podria usar session lifecycle)
    o removerlos. No rompen nada hoy.

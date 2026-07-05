@@ -90,7 +90,16 @@ Center) + matriz socket completa evento × emisor × consumidor. Hallazgos nuevo
   PHP lint verde + tests Networking/Rating/Lead corridos
 - Verificacion viva pendiente al proximo arranque de ambiente (ver seccion 5 de la
   auditoria superficies)
-- RIESGO-D Expo (6 sockets → singleton) queda en backlog Expo
+- **RIESGO-D Expo APLICADO** (Kamilo lo subio a prioridad 1): `eventos-app` commit
+  `0d9a754` — `lib/socket.ts` singleton (ref-count de session rooms, join:event
+  centralizado, re-join tras reconexion, dispose solo en logout) + 6 consumidores
+  migrados (useDataInvalidation/useChat/useQnA/useSessionMode/useWall/encuestas).
+  Typecheck limpio (5 errores pre-existentes del WIP recap sin relacion).
+  **VERIFICACION VIVA PENDIENTE** al proximo arranque: regresion streaming completa
+  (chat/Q&A/polls/emojis/pinned), wall RT, encuestas, y log del socket server con
+  `conns=1` estable navegando entre modulos.
+  OJO: el repo Expo tiene WIP sin commitear de Kamilo (recap/ + useAgenda/usePhotos/
+  useSponsors/useNetworking/lib/api) — NO tocado, sigue en working tree.
 
 ---
 
