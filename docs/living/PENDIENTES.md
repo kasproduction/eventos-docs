@@ -48,6 +48,24 @@
 - [ ] `ENTITY_KEYS` no mapea entity `modules` (backend la emite, Expo la pierde) — agregar `modules: ['modules']` en `useDataInvalidation.ts`
 - [ ] Double-count de comment propio (optimistic +1 + socket +1 en `useWall`) — la webapp ya no lo hereda; fix Expo pendiente
 
+### Event Pulse — bugs del CLIENTE destapados en QA vivo 2026-07-04 (sesion dedicada ~1-2h) — 0/4
+
+> Los emits backend YA funcionan (GAP-C verificado: ratings/connections/leads/leaderboard
+> llegan al Pulse en <2s — server log con 9 ratings reales). Lo roto es el refresh
+> client-side de `public/event-pulse/` (construido en abril, validado solo con simulador).
+
+- [ ] **Formula inconsistente del counter ratings**: `socket.js refreshStat` suma counts
+      del top-6 sesiones del endpoint `/ratings`, pero el bootstrap (F5) usa
+      `stats.ratings` (total real). Live y F5 dan numeros distintos — unificar a total
+      (endpoint deberia exponer total, o refreshStat usar bootstrap parcial)
+- [ ] **Charlas vacia**: `PulseController:102` exige `whereNotNull('room_id')` — sesiones
+      sin sala no aparecen ("no hay sesiones programadas" con el LiveHubDemoSeeder).
+      Decidir: relajar filtro o exigir salas en eventos reales (y que el seeder las asigne)
+- [ ] Verificar mismo patron de formula en counters leads/connections (refreshStat
+      calcula desde endpoints parciales)
+- [ ] Menor: `poll:closed` emite a `room=session:null` cuando el poll scope=session
+      no tiene session_id (visto en server log — payload del PollController)
+
 ### Recap compartible — post-evento (~26h, 3-4 dias) — 0/75
 
 > Plan completo: `docs/ROADMAP-RECAP.md` (DaVinci mode, con tests + refs).
