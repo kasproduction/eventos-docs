@@ -6,20 +6,34 @@
 
 ---
 
-## SI ARRANCAS CON FABLE 5 — LEER PRIMERO
+## MISION FABLE 5 COMPLETADA — 2026-07-04
 
-**Archivo:** `docs/FABLE-5-BRIEF.md`
+**La investigacion W.11 Sockets esta HECHA.** Fable 5 leyo cross-repo (Expo + webapp +
+socket server + backend Laravel) y produjo:
 
-Brief exhaustivo de investigacion cross-repo aprovechando el 1M context. Incluye:
+**`docs/W.11-SOCKETS-PLAN.md`** — plan listo-para-ejecutar con:
+- Seccion A: mapa real de los 5 eventos verificado con archivo:linea (payloads literales,
+  disparadores backend, handlers Expo copiados)
+- Seccion B: codigo listo-para-pegar — 9 archivos (2 nuevos + 5 diffs + 2 tests)
+- Seccion C: vitest completo (~10 tests) + estrategia E2E decidida (sin socket server,
+  degradacion graceful) + checklist de verificacion viva
+- Seccion D: 10 items de deuda tecnica (incluye 3 bugs Expo detectados)
+- Seccion E: checklist de ejecucion para Opus 4.8
 
-- **Mapa completo de contexto** — 6 repos con paths absolutos, todos los docs del hub (`PARITY-MATRIX.md`, `BACKEND-API-MAP.md`, `PLAN.md`, `COMPLETADO.md`, `BUG-LOG.md`, 7 ROADMAP-*.md, 20+ W.X-*.md), memoria completa Claude Code (~90 archivos en `.claude/projects/.../memory/`), designs aprobados, patterns de los 12 modulos ya cerrados
-- **Mision unica** — investigar exhaustivo Expo + webapp + socket server + backend Laravel y producir `docs/W.11-SOCKETS-PLAN.md` con codigo listo-para-pegar + tests + decisiones
-- **Reglas duras** — NO codear webapp durante esta ventana, solo el documento plan. Opus 4.8 ejecuta despues copiando el plan
-- **Perfil del usuario** — modo DaVinci, cero fabricacion, espejo Expo literal
+**Proxima sesion (Opus 4.8 o el modelo que sea): abrir `docs/W.11-SOCKETS-PLAN.md`
+y ejecutar la Seccion E.** No re-investigar, no re-decidir — todo esta verificado
+y decidido. Estimacion: 60-90 min incluyendo tests + verificacion viva.
 
-**Tiempo estimado Fable:** 30-60 min de investigacion. Cero codigo webapp.
+Hallazgos clave que CORRIGIERON el plan previo (detalle en el doc + memoria
+`project_sockets_realtime_status.md`):
+1. `router.refresh()` NO actualiza SocialView (copia props a useState) → el plan
+   incluye bus cliente `useSocketEvent` para wall/networking
+2. `disposeSocket()` nunca se llamaba — logout dejaba el socket vivo (fix incluido)
+3. `reconnectionAttempts: 5` — tab dormida perdia RT para siempre (fix: Infinity +
+   visibilitychange)
+4. La webapp no tiene handling de ban (Expo tiene /banned) — Fase 1: toast + logout
 
-Si arrancas con Opus 4.8 normal: ignora el brief Fable y sigue flujo estandar `/siguiente` (leer esta pagina + `docs/living/PENDIENTES-WEBAPP.md`).
+El brief `docs/FABLE-5-BRIEF.md` queda como referencia historica — su mision ya se cumplio.
 
 ---
 
