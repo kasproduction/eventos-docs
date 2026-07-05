@@ -6,6 +6,81 @@
 
 ---
 
+## SESION 2026-07-05 — BLOQUE 1 CERRADO: Momentos + Memorias + barrido de pulido (Fable 5)
+
+**TOTAL: 524/571 = 91.8%. 16 modulos cerrados** (W.6 cierra con Bloque 1; denominador W.6 re-baseado 41→28, los 13 extra eran items eliminados en auditoria que seguian contando).
+
+### Que se hizo
+
+1. **BLOQUE 1 — W.6 Momentos + Memorias CERRADO** (`50a0f79` eventos-web). Flujo DaVinci
+   completo: 3 agentes leyeron el espejo Expo real + refs externas (Instagram desktop
+   carousel, Telegram Web, galerias lightbox) + mockup HTML interactivo aprobado
+   (artifact `3e4cba5f`) ANTES de codear.
+   - **Momentos**: barra sobre el feed (visible en Feed y Memorias), anillo accent/tenue
+     por visto, viewer card 9:16 centrada DENTRO del CanvasCard, auto-advance 5s,
+     click zones 40/60, visto-al-abrir en localStorage
+     `eventos:social:story-seen:{eventId}` (par story-seen.ts + use-story-seen.ts,
+     patron announcements-unread). Upload con preview + center-crop canvas
+     (`lib/image-crop.ts`, reusable 9:16 y 1:1).
+   - **Memorias**: 5ta vista del sidebar social. Grid 3 col (oficial 2x2 badge),
+     ContestBanner espejo (countdown useNow, podio medallas 72/56, solo active o
+     ended<24h), orden por likes client-side con contest activo. PhotoViewer con
+     **marco FIJO 16:9 o 9:16 por orientacion natural + foto contain** (iterado 3
+     veces en QA vivo con Kamilo: primero desbordaba, luego cover cortaba caras —
+     decision final: marco consistente, foto INTEGRA con franjas negras).
+   - **Like foto propia**: backend rechaza (anti-gaming EventPhotoController:175) —
+     el corazon NO se deshabilita (parece roto), responde con toast informativo sin red.
+   - 4 proxies + 3 fetchers SSR + prop-sync (leccion W.11). +29 vitest +12 E2E.
+     Verificado vivo contra backend real (shapes identicos, SSR con story real).
+2. **Barrido de pulido transversal** (`29fce3d`) por QA Kamilo "la idea era algo
+   super pulido":
+   - **Skeletons 13/13 rutas**: creados los 7 loading.tsx que faltaban (documentos,
+     faq con shape del orb, anuncios, desafio, soporte, perfil, session-stream con
+     tokens --st-* propios). Patron social/loading.tsx: clases reales + shapes pulse.
+   - **Corazon rosa UNICO**: token global `--heart: #ff5d6c` (el de favoritos agenda
+     es el canonico — decision Kamilo). Feed era slate, memorias era accent rojo,
+     sponsors ya era rosa hardcodeado. El upvote Q&A streaming NO se toco (es voto).
+   - **Haptics**: auditoria 13 modulos (agente) + gaps aplicados — vibrate en likes,
+     favoritos, ratings, votos polls, upvote/submit Q&A, chat, comentarios,
+     solicitudes, chips/saves perfil, tema, anuncios, documentos, exito de canje.
+     El upvote Q&A gano su pop de corazon (unico toggle sin anim).
+3. **Momentos QA sembrados**: 8 stories para los 7 contactos de presencial@eventos.test
+   (imagenes GD 9:16 generadas; borrar con `AttendeeStory::where('photo_url','like','%qa-momento%')->delete()`).
+
+### Verificacion
+
+Typecheck + lint limpios · 430/430 vitest · suite E2E completa 170 verdes (4 flakes
+de saturacion paralela conocida, re-corridos en frio 54/54) · smoke SSR vivo.
+
+### Commits (todos PUSHEADOS)
+
+- `eventos-web` main: `50a0f79` (Bloque 1) + `29fce3d` (polish)
+- `APP EVENTOS` main: este cierre + PENDIENTES actualizado + memorias
+
+### Decisiones cerradas (no re-preguntar)
+
+- **Viewer de fotos = marco fijo 16:9/9:16 + contain** (nunca cover/recorte).
+- **Overlays del social viven DENTRO del CanvasCard** (absolute, no fixed viewport).
+- **--heart #ff5d6c global** para todo corazon de like/favorito.
+- **Like a foto propia = toast informativo**, no boton disabled.
+- **Upload Memorias = boton pill en header** (webapp no usa FAB).
+- **Crop de upload = center-crop automatico con preview** (sin cropper interactivo).
+
+### Deuda anotada (no bloqueante)
+
+- No-optimistas pendientes (cambian semantica de modulos cerrados, evaluar en W.12):
+  agenda rating, soporte ticket creacion, forms de perfil.
+- Backend expone `DELETE /stories/{id}` pero Expo no lo usa — espejo lo omite (correcto).
+- `ProfileSecurityTest` 2 rojos pre-existentes (sin cambio).
+
+### PROXIMA SESION — BLOQUE 2: W.2 Home → 100% (~1.5-2h)
+
+GamificationHud preview LIVE (espejo `index.tsx:103-129` Expo) + post-event survey
+prompt ENDED + EventArchive ENDED (espejo `EventArchive.tsx`). Despues: Bloque 4
+Trivia W.16 (~3-4h) → Bloque 5 W.12 cierre (~5-7h). Paralelo: Event Pulse cliente.
+
+---
+
 ## SESION 2026-07-04/05 — AUDITORIA DE PROCEDENCIA + BLOQUES 0 y 3 CERRADOS (Fable 5)
 
 **TOTAL: 516/619 = 83.4%. 15 modulos cerrados** (W.3 cerrado via auditoria, W.14 re-cerrado 19/19).
