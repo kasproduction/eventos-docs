@@ -24,6 +24,30 @@
 
 ## 1. App movil (Expo) — features pendientes
 
+### ⚠ WIP SIN COMMITEAR en el working tree de eventos-app (estado 2026-07-04)
+
+> Trabajo del recap a medio hacer, quedo en el working tree (NO commiteado
+> porque rompe typecheck). Retomar ANTES de cualquier otra sesion Expo:
+>
+> - **Untracked:** `app/(app)/recap/`, `components/recap/`, `hooks/useRecap.ts`, `lib/recapColors.ts`
+> - **Modificados:** `hooks/useAgenda.ts`, `useNetworking.ts`, `usePhotos.ts`, `useSponsors.ts`, `lib/api.ts`
+> - **5 errores typecheck a resolver antes de commit:**
+>   1. `app/(app)/leaderboard.tsx:1387-1388` — object literal con propiedades duplicadas (x2)
+>   2. `components/recap/RecapCard.tsx:59` — `image_url` no existe en type `RecapData`
+>   3. `components/social/ContestBanner.tsx:25` — `border` no existe en `ThemeTokens`
+>   4. `components/ui/AttendanceCheckModal.tsx:24` — `useRef` espera 1 argumento
+>
+> El commit `0d9a754` (singleton socket, 2026-07-04) NO incluyo nada de esto —
+> verificado con git stash que los errores son previos.
+
+### Deudas Expo detectadas en auditoria sockets 2026-07-04
+
+> Detalle: `docs/AUDITORIA-SOCKETS-SUPERFICIES-2026-07-04.md` + plan W.11 Seccion D.
+
+- [x] ~~6 conexiones socket paralelas vs MAX_CONNECTIONS=5~~ — **RESUELTO** `0d9a754`: `lib/socket.ts` singleton + 6 consumidores migrados. **Pendiente verificacion viva en device**: regresion streaming (chat/Q&A/polls/emojis/pinned) + wall + encuestas + log server `conns=1`
+- [ ] `ENTITY_KEYS` no mapea entity `modules` (backend la emite, Expo la pierde) — agregar `modules: ['modules']` en `useDataInvalidation.ts`
+- [ ] Double-count de comment propio (optimistic +1 + socket +1 en `useWall`) — la webapp ya no lo hereda; fix Expo pendiente
+
 ### Recap compartible — post-evento (~26h, 3-4 dias) — 0/75
 
 > Plan completo: `docs/ROADMAP-RECAP.md` (DaVinci mode, con tests + refs).
