@@ -38,12 +38,12 @@
 | W.12 Polish + E2E + PWA | **6/43** | **14%** — recount 2026-07-04 contra codigo: Sentry completo + source maps + security headers + focus-visible + reduced-motion + 20 specs E2E YA existian. Falta real: Web Push, PWA, CSP completo, QA device, Lighthouse, WCAG audit | **+6** |
 | **W.13 FAQ + Docs** | **15/15** | **CERRADO 100% 2026-07-04** (Fase A FAQ Asistente orb + Fase B Documents split layout + backend ZIP escalable. Pages reclasificado formalmente a Fase 2) | **+2** |
 | **W.14 Anuncios + Cartel + Bell** | **19/19** | **RE-CERRADO 2026-07-05** — cartel solo-highlights (espejo Expo) + feature banners muerta de raiz (BLOQUE 3: ruta+controller+Filament+modelo+migration drop). BD dedup + vigencias frescas | **+5** |
-| W.15 Vendor Dashboard | 0/35 | 0% — **ENTRA al cierre total**. Procedencia VERIFICADA: ~3.000 lineas Expo (8 pantallas) + 18 endpoints. Invite "sin login" corregido a con-sesion (Fase 6). Gating `has_vendor_access` del /auth/me | — |
+| W.15 Vendor Dashboard | 0/35 | **MOVIDO a Mobile parity (decision Kamilo 2026-07-05)**: el staff del stand NO va a instalar app para un evento — vendor se hace como feature del webapp MOBILE (viewport celular espejo Expo, patron Mi QR), incluyendo scanner QR con camara en browser (prior art: eventos-kiosko). Fuera del denominador Fase 1 desktop. Procedencia verificada: ~3.000 lineas Expo + 18 endpoints | — |
 | W.16 Live Moments | **0/5** | 0% — **RE-SCOPEADO por auditoria** (23→5): espejo real = TriviaPanel completo + toasts ruleta/jackpot. Ceremonias GSAP/golden-reveal eran inventos; photo contest movido a W.6 Memorias. Backend listo | — |
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
 | ~~W.X Welcome Showcase~~ | **ELIMINADO** | Invento de planeacion (auditoria 2026-07-04): el onboarding Expo es un wizard de REGISTRO, no un carrusel de features. Boton perfil oculto (`4325f05`). Fase 2 si se quiere espejo del wizard | — |
-| **TOTAL** | **516/619** | **83.4%** | **Post-auditoria de procedencia 2026-07-04** (3 agentes contra Expo real + backend): inventos eliminados del denominador (W.2 -4, W.3 -5, W.16 23→5, W.X -7, banners), scope real agregado (W.6 Memorias +3, W.14 cartel espejo +2). Meta: cierre TOTAL — quedan ~24 items reales en 6 bloques (~21-28h, 5-6 sesiones). **14 modulos cerrados:** W.0, W.1, W.1B, **W.3**, W.4, W.5, W.7, W.8, W.9, W.10, W.11, W.13, W.17, W.18 (W.14 re-abierto por 2 items espejo) |
+| **TOTAL** | **516/584** | **88.4%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05) | **Post-auditoria de procedencia 2026-07-04** (3 agentes contra Expo real + backend): inventos eliminados del denominador (W.2 -4, W.3 -5, W.16 23→5, W.X -7, banners), scope real agregado (W.6 Memorias +3, W.14 cartel espejo +2). Meta: cierre TOTAL — quedan ~24 items reales en 6 bloques (~21-28h, 5-6 sesiones). **14 modulos cerrados:** W.0, W.1, W.1B, **W.3**, W.4, W.5, W.7, W.8, W.9, W.10, W.11, W.13, W.17, W.18 (W.14 re-abierto por 2 items espejo) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -126,7 +126,12 @@
 - [ ] E2E cross-tab (streaming Q&A, social conectar)
 - [ ] DSN prod Sentry + validacion (config completa ya en codigo)
 
-### BLOQUE 6 — W.15 Vendor Dashboard → 100% (~6-8h) — 0/7
+### ~~BLOQUE 6 — W.15 Vendor Dashboard~~ → **MOVIDO a Mobile parity (decision Kamilo 2026-07-05)**
+> El staff del stand no instala app para un evento — vendor sera feature del webapp
+> MOBILE (viewport celular espejo Expo, patron Mi QR) con scanner QR en browser
+> (prior art eventos-kiosko). Se construye en el workstream Mobile parity, donde
+> ademas la captura (scanner) SI entra al scope — en desktop nunca tuvo sentido.
+> Items de referencia (procedencia verificada, para cuando arranque):
 > Procedencia verificada: ~3.000 lineas Expo (8 pantallas) + 18 endpoints backend mapeados (auditoria 2026-07-04). Gating: `attendee.has_vendor_access` del `GET /auth/me` (`isVendor = role==='vendedor' || hasVendorAccess`).
 - [ ] Hooks + gating hasVendorAccess (espejo `useStand`/`useLeads`/`standApi`/`leadsApi`)
 - [ ] Mi Stand dashboard (espejo `mi-stand.tsx` 288: hero logo/tier/rol + 3 stat cards navegables — NO tabs)
@@ -889,6 +894,7 @@
 > quien no descarga la app en el evento presencial, donde mas se usan estos features.
 > Diferido para despues del cierre Fase 1. Nada construido aun.
 
+- [ ] **W.15 Vendor COMPLETO como feature mobile-web** (decision 2026-07-05: staff de stand no instala app — abre el webapp en el celular y trabaja): las 7 fases del bloque W.15 + **scanner QR con camara en browser** (prior art eventos-kiosko). Espejo estetico Expo
 - [ ] **Mi QR del asistente en perfil — SOLO viewport mobile (<640px)**: espejo `MiQrScreen.tsx` Expo (502 lineas) — QR grande pieza principal + nombre + caducidad, token rota 60s via `GET /me/qr` (hook `useQrToken` refetch 50s). Desktop NO lo muestra (decision `feedback_qr_only_mobile`: el staff escanea el celular). qrcode.react ya esta en el bundle (desafio)
 - [ ] Portar "click sesion → agenda highlight" del webapp W.5 al Expo
 - [ ] Otros gaps mobile que aparezcan en sesiones futuras

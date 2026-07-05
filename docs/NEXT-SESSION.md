@@ -55,7 +55,14 @@ Espejo: `MomentosRow`/`MomentosViewer`/`useStories` + `PhotoGrid`/`PhotoViewer`/
 EventPhotoController /photos/contest).
 
 Despues: Bloque 2 Home (GamificationHud+survey+EventArchive ~1.5-2h) → Bloque 4
-Trivia (~3-4h) → Bloque 5 W.12 (~5-7h) → Bloque 6 Vendor (~6-8h). Paralelo: Pulse.
+Trivia (~3-4h) → Bloque 5 W.12 (~5-7h). Paralelo: Pulse.
+
+**DECISION post-cierre (2026-07-05, chat final): W.15 Vendor SALE de Fase 1 desktop
+→ Mobile parity.** Razon Kamilo: el staff del stand no va a instalar app para un
+evento — vendor se hace como feature del webapp MOBILE (viewport celular espejo
+Expo, patron Mi QR) incluyendo scanner QR con camara en browser (prior art
+eventos-kiosko). **Fase 1 desktop queda 516/584 = 88.4%**, 100% a ~14-19h
+(Bloques 1+2+4+5). NO re-preguntar.
 
 ### Deuda anotada (no bloqueante)
 
