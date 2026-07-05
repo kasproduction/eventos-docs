@@ -1,4 +1,4 @@
-# Pendientes — Webapp (post-Bancolombia, producto propio)
+﻿# Pendientes — Webapp (post-Bancolombia, producto propio)
 
 > Vista operativa unica. Todo lo faltante para vender webapp standalone — desde tu cama, transporte o cualquier device sin abrir otros docs.
 >
@@ -27,7 +27,7 @@
 | W.1B Backend magic link | 10/10 | **CERRADO** | — |
 | W.2 Home | **12/20** | **60% — en proceso** (split adaptive col der LIVE: cartel arriba si hay items, feed salas ocupa 100% si no — 2026-06-30) | **+2** |
 | W.3 Agenda | **25/30** | **83%** — en proceso | **+1** (Sprint 1 item 8 — bulk .ics) |
-| W.4 Streaming | 83/111 | 75% — en proceso | — |
+| **W.4 Streaming** | **92/92** | **CERRADO 2026-07-04 noche** (recount contra codigo: replay + rating auto + anuncios in-stream + custom panel + slow mode + floating emojis + mobile/tablet layouts YA estaban implementados y sin marcar. Fix race auto-rate e1b0c9a. Reclasificados: trivia→W.16, E2E cross-tab→W.12, 17 menores→QA W.12) | **+9** |
 | **W.5 Speakers** | **35/35** | **CERRADO 100% 2026-07-04** (reclasificado Lighthouse + device fisico a W.12 Polish cross-modulos) | **+2** |
 | W.6 Social Wall | **18/40** | **45%** — feed+composer+likes+comments+tabs filtros hechos | **+18** (Sprint 1 item 7 cerrado) |
 | **W.7 Sponsors** | **23/23** | **CERRADO 2026-06-21** | **+23** (Sprint 2.A entero — skeleton + tooltip + E2E 12/12 + Lighthouse acc 98) |
@@ -252,38 +252,19 @@
 - [ ] **URL state shareable** (filtros en query params)
 - [ ] **Playwright E2E happy path**
 
-### W.4 — Streaming (83/111, 75%)
+### W.4 — Streaming (92/92 — CERRADO 2026-07-04 noche, recount contra codigo)
 
-- [x] Detector source YouTube/Vimeo/iframe/generic/empty (19 tests)
-- [x] StreamPlayer 16:9 universal
-- [x] Tracking view analytics
-- [x] useSessionDetail hook
-- [x] useSessionLiveConfig hook (polling fresh stream_url)
-- [x] useSessionRating hook
-- [x] Q&A panel submit
-- [x] Q&A upvote
-- [x] Q&A filtros (approved/my)
-- [x] Chat panel optimistic tempId
-- [x] Chat dedup contra socket propio
-- [x] Pinned banner socket-driven
-- [x] Polls voting multiple_choice
-- [x] Polls voting open
-- [x] Polls voting star
-- [x] Layout spatial desktop 60/20/20
-- [x] Socket singleton + auth bearer
-- [x] (...60+ items implementados)
-- [ ] **Trivia integration panel** (delegado W.16)
-- [ ] **Anuncios in-stream pinned/announcement/display overlay**
-- [ ] **Custom panel iframe**
-- [ ] **Replay detection automatica** post-stream
-- [ ] **Rating modal auto** si finished + no rated
-- [ ] **Mobile layout** stream + paneles
-- [ ] **Tablet layout** stream + paneles
-- [ ] **Floating emojis** en chat (Animated parallel translateY/scale/rotate)
-- [ ] **Slow mode chat** configurable
-- [ ] **CSP Vimeo embed** whitelist
-- [ ] **Playwright E2E** stream + Q&A + chat cross-tab
-- [ ] (...17 items menores: tablet pinning, edge cases stream broken, AppState background tracking, ...)
+> Recount en QA vivo: la mayoria de items abiertos YA estaban implementados en
+> StreamShell.tsx + hooks y el doc no se habia actualizado. Replay verificado
+> en vivo. Items hechos hoy confirmados:
+> anuncios in-stream (useAnnouncementOverlay + chat:pinned banner) · custom
+> panel iframe (StreamShell:316) · replay (boton agenda → player, paneles off) ·
+> rating auto con gate ratingsLoaded (fix race e1b0c9a) · mobile + tablet
+> layouts (StreamShellMobile/Tablet) · floating emojis 5 paths · slow mode
+> threaded a 3 variantes · CSP Vimeo via frame-src https (W.13).
+> Reclasificados fuera: Trivia panel → W.16 (skip webapp) · Playwright
+> cross-tab con socket real → W.12 · 17 items menores sin detalle → QA W.12.
+> El detalle historico de items [x] previos quedo en git (commit anterior).
 
 ### W.5 — Speakers (35/35, **CERRADO 100% 2026-07-04**)
 
