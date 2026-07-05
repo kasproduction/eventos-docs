@@ -25,11 +25,11 @@
 | **W.0 Spatial UI base** | **24/24** | **CERRADO 100% 2026-07-04** (Command palette + Pre-load + device real reclasificados a Fase 2/W.12) | **+3** |
 | **W.1 Setup + Auth + UI Foundation** | **107/107** | **CERRADO 100% 2026-07-04** (5 items diferidos reclasificados formalmente: 2 a Fase 2, 2 a W.12, 1 agrupado con W.4) | **+5** |
 | W.1B Backend magic link | 10/10 | **CERRADO** | — |
-| W.2 Home | **12/20** | **60% — en proceso** (split adaptive col der LIVE: cartel arriba si hay items, feed salas ocupa 100% si no — 2026-06-30) | **+2** |
-| W.3 Agenda | **27/30** | **90%** — en proceso (+2 recount 2026-07-04: RT invalidation cubierta por W.11 + E2E 16 tests ya existia) | **+3** |
+| W.2 Home | **13/16** | **81%** — auditoria 2026-07-04: 4 inventos eliminados (sponsors band, multi-sede, proximos org, dedupe) + badge anuncios cubierto por Bell + foto speaker HECHA. Falta real: GamificationHud + survey + EventArchive | **+3** |
+| **W.3 Agenda** | **25/25** | **CERRADO 2026-07-04 via auditoria procedencia** — badges/conflict/check-in eran inventos (Expo no los tiene; el espejo real del lifecycle es el toast agenda:delayed YA hecho en W.11). URL state → Fase 2, recordatorio → W.12 Push | **+3** |
 | **W.4 Streaming** | **92/92** | **CERRADO 2026-07-04 noche** (recount contra codigo: replay + rating auto + anuncios in-stream + custom panel + slow mode + floating emojis + mobile/tablet layouts YA estaban implementados y sin marcar. Fix race auto-rate e1b0c9a. Reclasificados: trivia→W.16, E2E cross-tab→W.12, 17 menores→QA W.12) | **+9** |
 | **W.5 Speakers** | **35/35** | **CERRADO 100% 2026-07-04** (reclasificado Lighthouse + device fisico a W.12 Polish cross-modulos) | **+2** |
-| W.6 Social Wall | **21/38** | **55%** — feed+composer+likes+comments+tabs+**infinite scroll** (`7afb5d0` 2026-07-04, verificado vivo 99 posts). Hashtags click-to-filter ELIMINADO del scope (decision Kamilo — idea menciones va a Pulse). Falta: Stories + Photo Contest | **+21** |
+| W.6 Social Wall | **21/41** | **51%** — feed+composer+likes+comments+tabs+**infinite scroll** (`7afb5d0`, verificado vivo 99 posts). Hashtags eliminado (codigo incluido `f0bedaa`). Falta (procedencia verificada): Momentos (3) + **Memorias descubierta en auditoria** (galeria+viewer+contest, 4) | **+21** |
 | **W.7 Sponsors** | **23/23** | **CERRADO 2026-06-21** | **+23** (Sprint 2.A entero — skeleton + tooltip + E2E 12/12 + Lighthouse acc 98) |
 | **W.8 Networking** | **21/21** | **CERRADO 100% 2026-07-04** (link sidebar identity → /perfil + 5 E2E nuevos + 4 items reclasificados formalmente: filtro role skip por privacy, RT listeners → W.11, sugeridos cards → Fase 2, tracking → Fase 2) | **+6** |
 | **W.9 Engagement** | **35/35** | **CERRADO 2026-06-29 (Sprint 2.B)** | **+5** (2026-06-29: redemptions inline + E2E 11/11 verde con viewports desktop/tablet H/mobile + 8 tests vitest. counter PARITY sync) |
@@ -37,13 +37,13 @@
 | **W.11 Sockets RT** | **22/22** | **CERRADO 2026-07-04 noche** (GlobalSocketProvider 6 listeners + prop-sync 3 vistas + 11 vitest + 2 E2E + verificacion viva pipeline Laravel→socket→cliente. Scope 42→22: game/staff/cross-tab RT/stress reclasificados a W.12/W.15/W.16) | **+14** |
 | W.12 Polish + E2E + PWA | **6/43** | **14%** — recount 2026-07-04 contra codigo: Sentry completo + source maps + security headers + focus-visible + reduced-motion + 20 specs E2E YA existian. Falta real: Web Push, PWA, CSP completo, QA device, Lighthouse, WCAG audit | **+6** |
 | **W.13 FAQ + Docs** | **15/15** | **CERRADO 100% 2026-07-04** (Fase A FAQ Asistente orb + Fase B Documents split layout + backend ZIP escalable. Pages reclasificado formalmente a Fase 2) | **+2** |
-| **W.14 Anuncios + Cartel + Bell** | **17/17** | **CERRADO 100% 2026-07-04** (Fase A Anuncios + Bell + Fase B Cartel Digital. RT anuncios → W.11 via `data:invalidate{announcements}` (OJO: `announcement:new` NO se emite en prod, dead type — auditoria 2026-07-04) + Web Push → W.12) | **+3** |
-| W.15 Vendor Dashboard | 0/35 | 0% — **ENTRA al cierre total** (decision 2026-07-04: meta 95%+ global). Verificado contra codigo: 0 real, `stand`/`join-team` mapeados a toast "pronto". Backend parcial listo (StaffInvitationController) | — |
-| W.16 Live Moments | 0/23 | 0% — **ENTRA al cierre total** (decision 2026-07-04, revierte skip). Verificado contra codigo: 0 real, deep-links de games colapsan a /desafio estatico. Backend 100% listo (GameController + EventPhotoResource + GoldenTicketResource emiten todo) | — |
+| W.14 Anuncios + Cartel + Bell | **17/19** | **RE-ABIERTO 2026-07-04 (+2 items espejo)**: el cartel mergea banners+highlights pero Expo solo renderiza HIGHLIGHTS (banners = feature legacy reemplazada, confirmado Kamilo). Falta: cartel solo-highlights con vigencia + matar feature banners (BLOQUE 3) | **+3** |
+| W.15 Vendor Dashboard | 0/35 | 0% — **ENTRA al cierre total**. Procedencia VERIFICADA: ~3.000 lineas Expo (8 pantallas) + 18 endpoints. Invite "sin login" corregido a con-sesion (Fase 6). Gating `has_vendor_access` del /auth/me | — |
+| W.16 Live Moments | **0/5** | 0% — **RE-SCOPEADO por auditoria** (23→5): espejo real = TriviaPanel completo + toasts ruleta/jackpot. Ceremonias GSAP/golden-reveal eran inventos; photo contest movido a W.6 Memorias. Backend listo | — |
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
-| W.X Welcome Showcase | 0/7 | **BLOQUEADO — va de ULTIMO por diseño** (reusa componentes reales en miniatura de todos los modulos cerrados). BUG activo: boton "Ver introduccion de nuevo" en PerfilView navega a /onboarding → 404 (ocultar en Bloque 0) | — |
-| **TOTAL** | **518/654** | **79.2%** | Recount contra codigo 2026-07-04 (4 agentes): +10 items ya hechos sin marcar (W.3 +2, W.6 +2, W.12 +6). **META NUEVA: cierre TOTAL 95-100% incluyendo W.15 + W.16 + W.X** — plan en BLOQUES abajo, ~30-38h en 6-8 sesiones. **14 modulos cerrados:** W.0, W.1, W.1B, W.4, W.5, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.17, W.18 |
+| ~~W.X Welcome Showcase~~ | **ELIMINADO** | Invento de planeacion (auditoria 2026-07-04): el onboarding Expo es un wizard de REGISTRO, no un carrusel de features. Boton perfil oculto (`4325f05`). Fase 2 si se quiere espejo del wizard | — |
+| **TOTAL** | **514/619** | **83.0%** | **Post-auditoria de procedencia 2026-07-04** (3 agentes contra Expo real + backend): inventos eliminados del denominador (W.2 -4, W.3 -5, W.16 23→5, W.X -7, banners), scope real agregado (W.6 Memorias +3, W.14 cartel espejo +2). Meta: cierre TOTAL — quedan ~24 items reales en 6 bloques (~21-28h, 5-6 sesiones). **14 modulos cerrados:** W.0, W.1, W.1B, **W.3**, W.4, W.5, W.7, W.8, W.9, W.10, W.11, W.13, W.17, W.18 (W.14 re-abierto por 2 items espejo) |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -51,7 +51,7 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **BLOQUE 1 — W.6 Social → 100%** (~4-6h): load-more UI + hashtags click-to-filter + Stories + Photo Contest
+- [ ] **BLOQUE 3 — Cartel espejo + BD limpia** (~1h, el mas corto y destraba QA vivo) o **BLOQUE 1 — Momentos + Memorias** (arranca por diseño DaVinci). Kamilo elige orden.
 
 ---
 
@@ -67,39 +67,50 @@
 - [x] Fix alias `sessions` en `KNOWN_ENTITIES` de `useGlobalSocket.tsx:124` (backend puede emitir `agenda` o `sessions`)
 - [x] Boton "Ver introduccion de nuevo" OCULTO en PerfilView (navegaba a /onboarding → 404). E2E perfil 13/13 ajustado (asserts toHaveCount(0)). Re-habilitar en BLOQUE 7
 
-### BLOQUE 1 — W.6 Social → 100% (~3.5-5h) — 1/3
+> **AUDITORIA DE PROCEDENCIA 2026-07-04 (3 agentes contra Expo real + backend):** todo
+> item del plan quedo verificado contra codigo. INVENTOS DE PLANEACION eliminados
+> (nunca existieron en Expo ni backend): W.2 sponsors band + multi-sede + proximos
+> eventos org + dedupe · W.3 badges AJUSTADA/CANCELADA (API no expone los 3 tiempos,
+> Expo NO pinta badges — el espejo real es el toast agenda:delayed que YA tenemos) +
+> conflict detector + boton self check-in (el asistente presenta QR, staff escanea) +
+> URL state (→Fase 2) · W.16 sorteo ceremony + golden reveal full-screen (Expo solo
+> hace toast + anuncio + modal por tap en hub — eso SI se espeja) · W.15 invite sin
+> login (backend exige sesion) · W.X showcase 6 beats (el onboarding Expo es un wizard
+> de REGISTRO, no un carrusel de features) · Banners (feature legacy — highlights la
+> reemplazo; el home Expo solo renderiza highlights).
+> Regla nueva: **todo item de backlog debe citar procedencia** (pantalla Expo
+> archivo:linea, endpoint backend, o decision explicita de Kamilo).
+
+### BLOQUE 1 — W.6 Social → 100% (~4-6h) — 2/7
 - [x] ~~Load-more/paginacion~~ — **HECHO 2026-07-04** (`7afb5d0`): infinite scroll cursor-based + dedup + sentinel. Verificado vivo 99 posts
-- [x] ~~Hashtags click-to-filter~~ → **ELIMINADO del scope** (decision Kamilo 2026-07-04: nice-to-have sin uso real aca; la analitica de menciones pertenece a Event Pulse — idea en memoria)
-- [ ] Stories completo: StoriesBar + StoryViewer full-screen + upload 9:16 + expire 24h (CSS `.sn-stories` existe, 0 componentes)
-- [ ] Photo Contest: banner con countdown + podio top 3 + CTA subir foto
+- [x] ~~Hashtags click-to-filter~~ → **ELIMINADO** (decision Kamilo; parser tambien borrado del codigo `f0bedaa`. Idea menciones → Event Pulse, en memoria)
+- [ ] **Stories = "Momentos"** espejo Expo (`MomentosRow` + `MomentosViewer` + `useStories`, ~470 lineas; backend `AttendeeStoryController` + cron 24h LISTOS): barra circulos anillo visto/no-visto + boton "Tu momento"
+- [ ] **MomentosViewer** full-screen 9:16: auto-advance 5s + tap izq/der + dots + timeAgo + marca visto (localStorage espejo MMKV)
+- [ ] **Upload momento** 9:16 → `POST /events/{id}/stories` + toast "Visible por 24h"
+- [ ] **Tab/vista Memorias** (galeria fotos evento — descubierta en auditoria: Expo la tiene en social, webapp NO): `PhotoGrid` + `PhotoViewer` + likes espejo (`usePhotos` 129 lineas Expo)
+- [ ] **ContestBanner** en Memorias (espejo 202 lineas Expo): podio top-3 medallas + countdown vivo + "N fotos participando" + orden por likes si contest activo (`GET /events/{id}/photos/contest`)
 
-### BLOQUE 2 — W.2 Home → 100% (~2.5-3.5h) — 0/9
-- [ ] Foto real speaker en feed salas (dato `speaker_photo_url` YA llega, `RoomCard` lo ignora — win facil)
-- [ ] Post-event survey prompt estado ENDED
-- [ ] Sponsors logo band discreta
-- [ ] GamificationHud preview LIVE (puntos + posicion mini)
-- [ ] Anuncios mini con count badge
-- [ ] EventArchive link estado ENDED
-- [ ] Proximos eventos org estado ENDED
-- [ ] Multi-sede pill
-- [ ] Dedupe en happening-now
+### BLOQUE 2 — W.2 Home → 100% (~1.5-2h) — 1/4
+- [x] ~~Foto real speaker en feed salas~~ — **HECHO 2026-07-04**: `RoomAvatar` usa `speaker_photo_url` con gradiente fallback (espejo Expo session-stream:272)
+- [ ] GamificationHud preview LIVE (espejo `index.tsx:103-129` Expo: slide en carrusel con rank + puntos + retos)
+- [ ] Post-event survey prompt estado ENDED (espejo card "Encuesta de satisfaccion" + estado completada)
+- [ ] EventArchive en ENDED (espejo `EventArchive.tsx` Expo: links agenda/memorias/gamification/speakers + stats)
 
-### BLOQUE 3 — W.3 Agenda → 100% (~2-3h) — 0/4
-- [ ] Badges lifecycle AJUSTADA/CANCELADA (extender tipo+fetcher con 3 tiempos original/adjusted/actual + UI en SessionCard; backend ya los maneja)
-- [ ] Room check-in boton (endpoint backend listo)
-- [ ] Conflict detector visual favoritas solapadas
-- [ ] URL state shareable (track/search/tab/day en query params)
+### BLOQUE 3 — Cartel espejo + BD limpia (~1h) — 0/3
+- [ ] CartelDigital → **solo highlights** (quitar banners del merger; respetar `starts_at/expires_at` como Expo). `lib/banners.ts` + fetcher fuera
+- [ ] **Matar feature banners**: BannerController + ruta + BannerResource Filament fuera (o hidden); backlog Expo: borrar `banners.tsx` huerfana
+- [ ] Limpiar BD: duplicados x2 en `event_highlights` y `banners` (seed corrio doble) + refrescar `expires_at` del seeder para contenido vigente
 
-### BLOQUE 4 — W.16 Live Moments → 100% (~5-6h) — 0/5
-> Backend 100% listo (GameController + EventPhotoResource + GoldenTicketResource). Hoy los deep-links colapsan a /desafio estatico (`announcement-deeplink.ts:62-65`).
-- [ ] Trivia panel: pregunta + 4 opciones + countdown + result + leaderboard socket
-- [ ] Sorteo/spin/jackpot ceremony full-screen + confetti
-- [ ] Photo contest display (grid + likes optimistic + podio)
-- [ ] Golden Ticket reveal ceremony announcement-driven (distinto del GoldenTicketPanel de /desafio)
-- [ ] Tests vitest + Playwright
+### BLOQUE 4 — W.16 Live Moments espejo real (~3-4h) — 0/5
+> Espejo estricto de lo que Expo HACE: trivia completa + toasts de ruleta/jackpot. Backend listo.
+- [ ] TriviaPanel espejo (`TriviaPanel.tsx` 340 lineas Expo): fase question (opciones A-F + countdown + rojo ≤5s) + result (+X pts, distribucion votos, top 3) + finished (podio top 5)
+- [ ] Store trivia (equivalente `useTriviaStore`) alimentado por sockets `game:question`/`game:round-result`/`game:finished` via GlobalSocketProvider
+- [ ] `POST /events/games/{gameId}/answer` proxy + optimistic
+- [ ] Listeners `game:launched`/`game:result` → toasts espejo ("Ruleta en curso", "+X pts en la ruleta") + invalidar puntos/anuncios
+- [ ] Tests vitest + E2E
 
 ### BLOQUE 5 — W.12 Polish/cierre (~5-7h) — 0/10
-- [ ] Web Push real (SW + VAPID + subscription + 8 tipos backend)
+- [ ] Web Push real (SW + VAPID + subscription + 8 tipos backend; incluye recordatorio sesion)
 - [ ] PWA: manifest + service worker + install prompt desktop/tablet (NO mobile)
 - [ ] CSP completo script-src/connect-src (desbloqueado por W.11 cerrado)
 - [ ] `loading.tsx` en 7 rutas sin cubrir (soporte, faq, anuncios, desafio, documentos, streaming, perfil)
@@ -111,20 +122,28 @@
 - [ ] DSN prod Sentry + validacion (config completa ya en codigo)
 
 ### BLOQUE 6 — W.15 Vendor Dashboard → 100% (~6-8h) — 0/7
-- [ ] Hooks (useMyStand / useMyLeads / useStandStats / usePendingInvitations)
-- [ ] Mi Stand dashboard (hero + stats row + tabs Acerca/Leads/Equipo)
-- [ ] Mis Leads (lista grouped + drawer editable + historial + export CSV)
-- [ ] Visitantes stand + acciones contacto (whatsapp/email/llamar)
-- [ ] Stats (StatRow + TierBar + MemberBar)
-- [ ] Team management (slots + invitar attendee/email + share link + transfer/remove)
-- [ ] Pagina publica `/staff-invite/{token}` + tests
+> Procedencia verificada: ~3.000 lineas Expo (8 pantallas) + 18 endpoints backend mapeados (auditoria 2026-07-04). Gating: `attendee.has_vendor_access` del `GET /auth/me` (`isVendor = role==='vendedor' || hasVendorAccess`).
+- [ ] Hooks + gating hasVendorAccess (espejo `useStand`/`useLeads`/`standApi`/`leadsApi`)
+- [ ] Mi Stand dashboard (espejo `mi-stand.tsx` 288: hero logo/tier/rol + 3 stat cards navegables — NO tabs)
+- [ ] Mis Leads (espejo `leads.tsx` 195 + `lead-detail.tsx` 317: grouped Hoy/Ayer/fecha + tier hot/warm/cold + notas + historial ediciones) + export CSV (`GET /me/leads/export`)
+- [ ] Solicitudes stand (espejo `stand-contacts.tsx` 211: servicios interes + mensaje + acciones tel/mailto/wa.me)
+- [ ] Stats (espejo `stand-stats.tsx` 360: overview + trend vs ayer + TierBar + MemberBar + top services)
+- [ ] Team management (espejo `mi-equipo.tsx` 567: slots + invitar busqueda/email + share link + transfer + remove, owner-only)
+- [ ] Join-team CON SESION (espejo `join-team/[token].tsx` 276 — auth requerido, NO publico) + tests
 
-### BLOQUE 7 — W.X Welcome Showcase (ULTIMO — depende de TODOS los bloques) (~3-4h) — 0/2
-- [ ] Engine timeline 6 beats + skip + reduced-motion fallback + `onboarding_completed` + componentes reales miniatura + routing post-login + tests
-- [ ] Re-habilitar boton "Ver introduccion de nuevo" del perfil (oculto en Bloque 0)
+### ~~BLOQUE 7 — W.X Welcome Showcase~~ — **ELIMINADO 2026-07-04**
+> El "showcase 6 beats" era invento: el onboarding real de Expo (~4.500 lineas) es un
+> wizard de REGISTRO (welcome hero + auth + foto + forms dinamicos + survey). La webapp
+> ya cubre su parte con W.1 magic link. Boton "Ver introduccion" queda oculto (Bloque 0).
+> Si Fase 2 pide espejo del wizard completo, se disena entonces.
 
 ### PARALELO — Event Pulse cliente (sesion dedicada ~1-2h) — 0/4
 > Detalle en `docs/living/PENDIENTES.md` seccion Event Pulse. Formula counter ratings live≠F5 · Charlas vacia (room_id PulseController:102) · verificar leads/connections · poll:closed room null
+
+### PARALELO — Backlog Expo (sesion Expo futura)
+- [ ] Borrar `banners.tsx` + `BannerCarousel` + `bannersApi` (feature legacy muerta)
+- [ ] `ENTITY_KEYS` sin `modules` (backend la emite, Expo la pierde)
+- [ ] Double-count comment propio en `useWall`
 
 ---
 
@@ -217,16 +236,16 @@
 - [x] Recap stats 2x2 + tier Gold + CTA "Ver mi recap" (2026-05-06)
 - [x] EventPoster compartido 3 estados
 - [x] Canvas raiz universal aplicado
-- [ ] **Sponsors logo band sutil** (strip discreto)
-- [ ] **GamificationHud preview LIVE** (puntos + posicion mini)
-- [ ] **Anuncios mini con count badge** (punto rojo)
-- [ ] **Post-event survey prompt** estado ENDED
-- [ ] **EventArchive link** estado ENDED
-- [ ] **Multi-sede pill** (si aplica)
-- [ ] **Foto real speaker** (hoy gradient placeholder)
-- [ ] **Proximos eventos org en estado ENDED**
-- [ ] **Atmosfera dinamica por estado** (luz, partículas sutiles)
-- [ ] **useHappeningNow hook refinado** con dedupe
+- [x] ~~Sponsors logo band~~ → **INVENTO eliminado** (auditoria 2026-07-04: home Expo no tiene strip de sponsors)
+- [ ] **GamificationHud preview LIVE** (espejo `index.tsx:103-129` Expo — slide en carrusel rank+puntos+retos)
+- [x] ~~Anuncios mini con count badge~~ → **CUBIERTO por Bell sidebar W.14** (divergencia intencional ya decidida: Expo badge en campana del header = webapp badge en BellPopover)
+- [ ] **Post-event survey prompt** estado ENDED (espejo `usePostEventSurvey` + card Expo)
+- [ ] **EventArchive** estado ENDED (espejo `EventArchive.tsx` Expo: 4 links + stats)
+- [x] ~~Multi-sede pill~~ → **INVENTO eliminado** (backend solo tiene UN venue string)
+- [x] ~~Foto real speaker~~ — **HECHO 2026-07-04** (`RoomAvatar` con `speaker_photo_url` + gradiente fallback, espejo Expo)
+- [x] ~~Proximos eventos org en ENDED~~ → **INVENTO eliminado** (Expo no lo tiene)
+- [x] ~~Atmosfera dinamica por estado~~ → **INVENTO eliminado** (nice-to-have sin espejo; la cinematic ya existe)
+- [x] ~~useHappeningNow dedupe~~ → **INVENTO eliminado** (Expo no dedupea; filtra por estado y corta a 2)
 
 ### W.3 — Agenda (25/30, 83%)
 
@@ -254,13 +273,13 @@
 - [x] Stream/Recording CTA
 - [x] Session detail page individual
 - [x] Tests Vitest 55
-- [ ] **Lifecycle badges ORIGINAL/AJUSTADA/CANCELADA** (depende W.11 socket)
-- [ ] **Conflict detector visual** (calcular client-side, depende W.12)
-- [ ] **Room check-in boton** (endpoint backend listo)
+- [x] ~~Lifecycle badges AJUSTADA/CANCELADA~~ → **INVENTO eliminado** (auditoria 2026-07-04: el API de agenda NO expone los 3 tiempos como campos y la agenda Expo NO pinta badges. El espejo real es el toast `agenda:delayed` — YA implementado en W.11)
+- [x] ~~Conflict detector visual~~ → **INVENTO eliminado** (cero rastro en Expo y backend)
+- [x] ~~Room check-in boton~~ → **INVENTO eliminado** (el asistente nunca se auto-checkea: presenta su QR y el staff escanea via `/staff-checkin/*`. El "Mi QR" mobile vive en Mobile parity)
 - [x] ~~**Bulk .ics download**~~ (todas mis favoritas un solo archivo) — hecho 2026-06-21 (Sprint 1 item 8): `lib/ics.ts` generador puro RFC 5545 (VCALENDAR + N VEVENT con UID determinista, DTSTAMP UTC, escape comas/semicolons/backslash). Boton "Todas" del AgendaHeader visible cuando `countMine > 0` en CUALQUIER dia. Filename `mi-agenda-{event.slug}.ics`. +16 tests vitest
-- [ ] **Recordatorio push 10min antes** (depende Web Push BLOQUE 5)
-- [x] ~~**RT socket invalidation**~~ — CUBIERTO por W.11 (verificado 2026-07-04: `data:invalidate{agenda}` → router.refresh + prop-sync `AgendaView:62`. Pendiente fix alias `sessions` en KNOWN_ENTITIES — Bloque 0)
-- [ ] **URL state shareable** (filtros en query params)
+- [x] ~~Recordatorio push 10min antes~~ → **movido a W.12 Web Push** (vive con la infra push, no es item de agenda)
+- [x] ~~**RT socket invalidation**~~ — CUBIERTO por W.11 (verificado 2026-07-04: `data:invalidate{agenda}` → router.refresh + prop-sync `AgendaView:62`. Alias `sessions` agregado en Bloque 0 `3e73b29`)
+- [x] ~~URL state shareable~~ → **reclasificado Fase 2** (concepto webapp-only sin espejo, nice-to-have)
 - [x] ~~**Playwright E2E happy path**~~ — YA EXISTIA (verificado 2026-07-04: `agenda.spec.ts` 300 lineas, 16 tests: days strip, tabs, filtros, search, DetailPanel, favoritos 200/500, rating, live, highlight x3, Esc)
 
 ### W.4 — Streaming (92/92 — CERRADO 2026-07-04 noche, recount contra codigo)
@@ -359,15 +378,19 @@
 - [x] Post optimistic aparece + lumina toast
 - [x] ~~Listener `wall:post` deduplica propio via socket~~ — HECHO por W.11 (verificado 2026-07-04: dedup por server ID `SocialView.tsx:131-136` + `wall:comment` skip propio `:141-150`)
 
-**Fase 4 — Stories (0/4)**
-- [ ] **StoriesBar arriba feed con avatares ring + upload "+"**
-- [ ] **StoryViewer modal full screen progress bars + tap next**
-- [ ] Upload story foto 9:16
-- [ ] Auto-expire 24h (backend cleanup)
+**Fase 4 — Stories "Momentos" (0/3) — PROCEDENCIA VERIFICADA (espejo completo en Expo)**
+> Expo: `MomentosRow.tsx` (~87) + `MomentosViewer.tsx` (~257) + `useStories` + social.tsx wiring.
+> Backend LISTO: `AttendeeStoryController` (index/store/destroy) + cron `stories:cleanup` hourly.
+- [ ] Barra Momentos (circulos anillo accent=no visto / gris=visto + boton "Tu momento")
+- [ ] Viewer full-screen 9:16 (auto-advance 5s, tap izq/der, dots, timeAgo, visto en localStorage)
+- [ ] Upload 9:16 → `POST /events/{id}/stories` + toast "Visible por 24h"
 
-**Fase 5 — Photo Contest (0/2)**
-- [ ] **Photo Contest banner** (status active/ended, countdown timer, podio top 3 con medallas)
-- [ ] CTA → vista concurso / sube tu foto
+**Fase 5 — Memorias + Photo Contest (0/4) — PROCEDENCIA VERIFICADA**
+> Descubierto en auditoria: Expo tiene tab Memorias (galeria fotos) dentro del social — webapp NO la tiene.
+- [ ] Vista Memorias: `PhotoGrid` espejo (215 lineas Expo) + upload foto
+- [ ] `PhotoViewer` espejo (200 lineas) + likes optimistic
+- [ ] `ContestBanner` espejo (202 lineas): podio top-3 medallas + countdown + entries + estados scheduled/active/ended
+- [ ] Orden por likes cuando contest activo (`GET /events/{id}/photos/contest`)
 
 **Fase 6 — Hashtags (ELIMINADA del scope, decision Kamilo 2026-07-04)**
 > Click-to-filter borrado del scope: no aporta en este contexto. El parser
@@ -746,10 +769,12 @@
 - [ ] Share link modal (whatsapp/copy)
 - [ ] Transfer ownership / Remove member
 
-**Fase 6 — Invitaciones publicas (0/3)**
-- [ ] Pagina sin-login `/staff-invite/{token}`
-- [ ] Validar token automatico
-- [ ] Aceptar / No gracias + actualizar hasVendorAccess
+**Fase 6 — Invitaciones staff (0/3) — CORREGIDO por auditoria: CON sesion, NO publicas**
+> El backend exige sanctum para aceptar (`/staff-invitations/{token}/*` dentro del grupo auth).
+> Espejo `join-team/[token].tsx` Expo (276 lineas). "Sin login" era invento.
+- [ ] Pagina `/join-team/{token}` autenticada (info de la invitacion via `GET .../info`)
+- [ ] Aceptar / No gracias (`POST .../accept|reject`) + actualizar hasVendorAccess + invalidar modules
+- [ ] Modal invitacion socket `staff:invited` (espejo `StaffInvitationModal` 216 lineas)
 
 **Fase 7 — Tests + Cierre (0/4)**
 - [ ] Vitest hooks
@@ -757,42 +782,21 @@
 - [ ] Memoria
 - [ ] Counter PARITY-MATRIX
 
-### W.16 — Live Moments (0/23, BACKLOG)
+### W.16 — Live Moments espejo real (0/5, re-scopeado por auditoria 2026-07-04)
 
-**Fase 0 — Hooks (0/4)**
-- [ ] useActiveGame
-- [ ] useAnswerGame
-- [ ] usePhotoContest
-- [ ] usePhotoLike
+> **Auditoria de procedencia:** el scope viejo (23 items) tenia inventos. Lo REAL en Expo:
+> TriviaPanel completo (340 lineas, la referencia) + toasts de ruleta/jackpot
+> (`useDataInvalidation:436-454`). NO existen en Expo: ceremonia GSAP de sorteo (solo
+> toast), golden reveal announcement-driven (solo modal por tap en hub — webapp ya lo
+> tiene en /desafio), `display:project` (evento inexistente). Photo contest se movio a
+> W.6 Fase 5 (vive en el social, no en live moments). Ceremonias cinematograficas: si
+> algun dia se quieren, se disenan para AMBAS plataformas como feature nuevo.
 
-**Fase 1 — Trivia panel (0/6)**
-- [ ] Pregunta + 4 opciones A-B-C-D
-- [ ] Countdown timer en vivo
-- [ ] Leaderboard via socket display:project
-- [ ] Result feedback (green/red)
-- [ ] Running total points
-- [ ] Auto-close 2.5s
-
-**Fase 2 — Sorteo / Spin / Jackpot ceremony (0/4)**
-- [ ] GSAP full-screen modal
-- [ ] Animacion ceremony (3 tipos: spin wheel readonly / jackpot reveal / random pick)
-- [ ] Confetti winner
-- [ ] Auto-close
-
-**Fase 3 — Photo contest display (0/4)**
-- [ ] Feed grid fotos
-- [ ] Likes simples optimistic
-- [ ] Podio top 3 con medallas
-- [ ] Countdown si active
-
-**Fase 4 — Golden Ticket reveal (0/2)**
-- [ ] Announcement-driven modal
-- [ ] Confetti + claim_code + QR + sponsor + estado
-
-**Fase 5 — Tests + Cierre (0/3)**
-- [ ] Vitest hooks
-- [ ] Playwright trivia round
-- [ ] Counter PARITY-MATRIX
+- [ ] TriviaPanel espejo (fases question/result/finished: opciones A-F + countdown rojo ≤5s + "+X pts" + distribucion votos + podio top 5 + sponsor badge)
+- [ ] Store trivia (equivalente `useTriviaStore` Zustand) alimentado por `game:question`/`game:round-result`/`game:finished` via GlobalSocketProvider
+- [ ] `POST /events/games/{gameId}/answer` proxy + respuesta optimistic
+- [ ] Listeners `game:launched`/`game:result` → toasts espejo + invalidar my-points/anuncios
+- [ ] Tests vitest + E2E trivia round
 
 ### W.17 — Soporte (13/13, **CERRADO 100% 2026-07-04**)
 
@@ -855,17 +859,14 @@
 - [x] E2E `perfil.spec.ts` 13/13 verde con serial mode
 - [x] Memoria `project_w18_hub_personal_blueprint.md` + `project_sidebar_bottom_zone.md`
 
-### W.X — Welcome Showcase (0/7, BLOQUEADO)
+### ~~W.X — Welcome Showcase~~ — **ELIMINADO 2026-07-04 (invento de planeacion)**
 
-> Espera W.3 + W.4 + W.5 + W.7 + W.8 + W.9 cerrados para reusar componentes reales en miniatura.
-
-- [ ] Engine timeline 6 beats
-- [ ] Skip siempre visible
-- [ ] Reduced motion fallback (serie screenshots estaticos)
-- [ ] localStorage `onboarding_completed`
-- [ ] Componentes reales en miniatura (Speakers/Agenda/Streaming/Connect/Gamification/Sponsors)
-- [ ] Post-login routing condicional
-- [ ] Tests Vitest + Playwright
+> Auditoria de procedencia: el onboarding real de Expo (~4.500 lineas) es un **wizard de
+> REGISTRO** (welcome hero + auth + foto + forms dinamicos por admin + survey + done),
+> NO un carrusel de features con miniaturas. El "showcase 6 beats" no espejaba nada.
+> La webapp ya cubre su lado con W.1 magic link. Boton "Ver introduccion" del perfil
+> queda OCULTO (Bloque 0, `4325f05`). Si Fase 2 pide espejo del wizard completo
+> (registro con foto/forms/survey en webapp), se disena entonces como feature real.
 
 ---
 
@@ -877,6 +878,13 @@
 - [ ] Validar si `banners.tsx` Expo es vista dedicada o solo carousel embebido
 
 ### Mobile parity (cuando webapp este al dia)
+
+> **Workstream confirmado por Kamilo 2026-07-04:** la webapp/PWA abierta en celular debe
+> verse y COMPORTARSE exactamente igual a Expo (misma estetica) — es el fallback para
+> quien no descarga la app en el evento presencial, donde mas se usan estos features.
+> Diferido para despues del cierre Fase 1. Nada construido aun.
+
+- [ ] **Mi QR del asistente en perfil — SOLO viewport mobile (<640px)**: espejo `MiQrScreen.tsx` Expo (502 lineas) — QR grande pieza principal + nombre + caducidad, token rota 60s via `GET /me/qr` (hook `useQrToken` refetch 50s). Desktop NO lo muestra (decision `feedback_qr_only_mobile`: el staff escanea el celular). qrcode.react ya esta en el bundle (desafio)
 - [ ] Portar "click sesion → agenda highlight" del webapp W.5 al Expo
 - [ ] Otros gaps mobile que aparezcan en sesiones futuras
 - [ ] **Mobile webapp split Social vs Networking (2026-06-20):** webapp desktop unifica `/social` con sidebar (Feed + Personas + Solicitudes + Mis posts). Mobile webapp debe SEPARAR como en Expo: `/social` (Wall + Memorias + Momentos) + `/networking` (directorio + solicitudes + contactos + bloqueados). Ver `project_social_unified_notes.md` en memoria para arquitectura completa. Trabajo futuro, NO en scope actual
