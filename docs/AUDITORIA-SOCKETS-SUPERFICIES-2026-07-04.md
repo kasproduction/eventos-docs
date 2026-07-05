@@ -185,18 +185,27 @@ W.11 queda validada CON este contexto completo: no era del Pulse.
 
 ---
 
-## 5. Recomendaciones priorizadas
+## 5. Recomendaciones priorizadas — ESTADO (aplicadas 2026-07-04, aprobacion Kamilo)
 
-1. **BUG-A + BUG-B (fix 3 lineas total)** — kiosko + attendance-check son superficies
-   de evento EN VIVO; hoy su RT esta muerto. Arreglar antes del proximo evento real.
-   Repos: `eventos-kiosko` + `eventos-backend/public`.
-2. **GAP-C (fix 4 lineas backend)** — sin esto, el Event Pulse que se le muestra al
-   cliente en un evento real tiene metricas con 5 min de lag. Es el "ojo de dios"
-   comercial: merece RT real. Puede ir en el mismo commit backend que BUG-B.
-3. **W.11 webapp** — sigue igual (plan listo, nada de esta pasada lo cambia).
-4. **RIESGO-D Expo** — backlog Expo: unificar sockets en singleton. No urgente
-   (el escenario requiere stream + encuestas + wall montado simultaneos), pero
-   documentado.
+1. **BUG-A — APLICADO** (`eventos-kiosko/src/hooks/useAttendance.ts`): join dentro de
+   `connect` (sobrevive reconexiones) + `{ eventId }` + `payload.checkedIn`.
+   Typecheck verde.
+2. **BUG-B — APLICADO** (`attendance-check.html:275`): `{ eventId: EVENT_ID }`.
+3. **GAP-C — APLICADO** (backend, 4 puntos + 2 imports):
+   - `NetworkingController` accept → `broadcast(event_id, 'connections')`
+   - `LeadController@store` → `broadcast(event_id, 'leads')`
+   - `RatingController@store` + `SpeakerRatingController@store` → `broadcast(eventId, 'ratings')`
+   - `PointsService::award` → `broadcast(eventId, 'leaderboard')` junto al directed
+   PHP lint verde en los 5 archivos. Expo/webapp ignoran estas entities (verificado
+   contra sus mapas) — unico consumidor: Event Pulse.
+4. **RIESGO-D Expo** — backlog Expo: unificar los 6 `io()` en singleton (patron
+   webapp `lib/streaming/socket.ts`). No urgente pero hacer antes del primer evento
+   grande con streaming + encuestas simultaneas.
 5. **Dead emits** (`session:started/ended/cancelled`, `agenda:updated`,
    `room:occupancy`) — decision futura: consumirlos (MC podria usar session lifecycle)
    o removerlos. No rompen nada hoy.
+
+**Verificacion viva pendiente (proximo arranque de ambiente):** kiosko + attendance-check
+conectados deben loguear `joined event:X` en el socket server (antes: `[security] ...
+tried to join event=undefined`). Pulse con accion real (aceptar contacto / rating)
+debe mover el counter en <2s sin esperar el bootstrap de 5min.

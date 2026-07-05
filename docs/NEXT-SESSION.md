@@ -82,8 +82,15 @@ Center) + matriz socket completa evento × emisor × consumidor. Hallazgos nuevo
 - `room:occupancy`: contexto cerrado — Pulse usa `checkin:update`, este evento nunca
   tuvo consumidor (D.13 validada con contexto completo).
 
-**PENDIENTE DECISION KAMILO:** aplicar fixes BUG-A + BUG-B + GAP-C (~7 lineas en
-eventos-kiosko + eventos-backend). Recomendado antes del proximo evento real.
+**FIXES APLICADOS (Kamilo aprobo "dale aplica todo", misma fecha):**
+- BUG-A kiosko: `useAttendance.ts` corregido (join en connect + eventId + checkedIn). Typecheck verde
+- BUG-B: `attendance-check.html` corregido (`eventId`)
+- GAP-C: 4 broadcasts agregados en backend (NetworkingController accept, LeadController
+  store, RatingController + SpeakerRatingController store, PointsService award).
+  PHP lint verde + tests Networking/Rating/Lead corridos
+- Verificacion viva pendiente al proximo arranque de ambiente (ver seccion 5 de la
+  auditoria superficies)
+- RIESGO-D Expo (6 sockets → singleton) queda en backlog Expo
 
 ---
 
