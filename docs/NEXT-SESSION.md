@@ -580,3 +580,15 @@ No lo hice porque el usuario quiso cerrar primero — pedir actualizar al abrir 
 ## Sesiones anteriores
 
 Resumen movido a `memory/sessions_index.md` para no inflar este archivo. Cargar manualmente cuando se necesite contexto historico.
+
+### QA vivo final 2026-07-04 (Kamilo, Expo Go + laptop + MC + Pulse) — resultados
+
+VERDE: singleton Expo (conns=1, chat, modos MC, reconexion wifi), polls ambas superficies, wall/bell/soporte/agenda silenciosa webapp (prop-sync OK), agenda:delayed toast ambos (tras fix nombre), ban/unban kick, pipeline ratings/leaderboard emitiendo (9 ratings visibles en server log).
+
+BUGS CAZADOS EN QA (todos arreglados y pusheados): recursion helper on() Expo (0ca10b6), dispose del owner mataba socket compartido (460dca8), resolveLiveStatus columnas inexistentes started_at (backend 888b155 — bug latente de produccion), agenda:delayed sin nombre de sala (645b7e4).
+
+DEUDA NUEVA — Event Pulse cliente (pre-existente de abril, destapada hoy; SESION DEDICADA):
+1. Charlas vacia: PulseController:102 exige room_id (sesiones del seeder no tienen sala) — decidir si el filtro es correcto
+2. Formula inconsistente: counter ratings live suma solo top-6 sesiones (socket.js refreshStat) vs bootstrap que cuenta todas — F5 y live dan numeros distintos
+3. Los emits backend YA llegan (GAP-C verificado) — lo roto es el refresh client-side del Pulse
+4. Menor: poll:closed con room=session:null en polls scope session sin session_id (server log)
