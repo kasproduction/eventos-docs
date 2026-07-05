@@ -16,8 +16,10 @@
 **Que se construye:** hook global de socket (`GlobalSocketProvider`) montado en
 `(app)/layout.tsx` que abre la conexion singleton al entrar a cualquier modulo
 post-login (hoy solo se abre en `/session-stream`), hace `join:event`, y escucha
-los 5 eventos criticos Fase 1: `data:invalidate`, `ban:enforced`,
-`networking:notify`, `wall:post`, `wall:comment`.
+los 6 eventos criticos Fase 1: `data:invalidate`, `ban:enforced`,
+`networking:notify`, `wall:post`, `wall:comment`, `agenda:delayed`
+(el sexto agregado por decision de Kamilo 2026-07-04 tras la auditoria espejo —
+existe en produccion aunque types.ts no lo tipa, y Expo lo toastea).
 
 **Efecto UX real tras deploy:**
 - Organizador publica/edita anuncio, sesion, sponsor, speaker, highlight →
@@ -30,12 +32,16 @@ los 5 eventos criticos Fase 1: `data:invalidate`, `ban:enforced`,
 
 **Los 4 hallazgos que corrigen el plan previo** (memoria `project_sockets_realtime_status.md`):
 
-1. **`router.refresh()` NO actualiza `/social`.** `SocialView` copia las props SSR
-   a `useState` una sola vez (`useState(initialFeed)` — `SocialView.tsx:93`).
-   Un refresh re-renderiza el server component pero React ignora el initial value
-   en re-renders. Por eso `wall:post`/`wall:comment`/`networking:notify` necesitan
-   un **bus cliente** (`useSocketEvent`) ademas del refresh. `BellPopover` en cambio
-   SI deriva de props con `useMemo` (`BellPopover.tsx:50`) → refresh le funciona.
+1. **`router.refresh()` NO actualiza las vistas que copian props SSR a `useState`.**
+   React ignora el initial value en re-renders. Auditoria completa 2026-07-04
+   (`docs/AUDITORIA-ESPEJO-2026-07-04.md` hallazgo A1) — vistas sordas al refresh:
+   `SocialView` (`:93-100`), **`AgendaView` (`:59` — el propio comentario del codigo
+   esperaba TanStack en W.11)**, **`SponsorsView` (`:29` — copia frozen sin setter)**,
+   **`SoporteView` (`:39`)**. Sin fix, `data:invalidate` no tiene efecto visible en
+   /agenda, /sponsors ni /soporte. Fix: bus cliente para social (Archivos 4-5) +
+   patron R19 prop-sync tracker para las otras 3 (Archivos 8-10). Vistas que SI
+   derivan de props y funcionan con refresh: `AnnouncementsView`, `BellPopover`,
+   `SpeakersView` (lista), `DesafioView` (overview), `DocumentosView`.
 2. **`disposeSocket()` existe pero NADIE lo llama** (grep: 0 call sites). Logout
    deja el socket autenticado vivo. Fix incluido (Archivo 8).
 3. **`reconnectionAttempts: 5` en webapp vs `Infinity` en Expo.** Una tab dormida
@@ -45,9 +51,18 @@ los 5 eventos criticos Fase 1: `data:invalidate`, `ban:enforced`,
    `src/`). Expo redirige a `/banned`. Fase 1 webapp: toast + logout + redirect
    `/login`. Pantalla dedicada queda como deuda (Seccion D).
 
-**Estimacion honesta de implementacion:** 60-90 min (copiar archivos 15min,
+**Estimacion honesta de implementacion:** 75-105 min (copiar archivos 20min,
 vitest verde 20min, E2E + regresion 25min, verificacion viva con socket server
-dev 15min).
+dev 20min). Subio ~15min vs la primera version por los 3 prop-sync (Archivos 8-10)
+que la auditoria espejo demostro obligatorios.
+
+**Correccion post-auditoria (2026-07-04 tarde):** la primera version de este plan
+prometia "organizador edita sesion/sponsor → la webapp refresca sola" — era falso
+para /agenda, /sponsors y /soporte (hallazgo A1 de `AUDITORIA-ESPEJO-2026-07-04.md`).
+Esta version incluye los prop-sync que lo hacen verdad. Ademas: los docs que
+mencionaban `announcement:new` y `support:new_response` como eventos socket
+nombraban eventos que NO se emiten en produccion — la cobertura real de ambos es
+`data:invalidate {entity:announcements}`, que este plan ya escucha.
 
 ---
 
@@ -62,6 +77,7 @@ dev 15min).
 | `networking:notify` | `{ type: 'request_received'\|'request_accepted', fromName: string, fromAttendeeId: number }` | directed | `NetworkingController:308` (request) y `:354` (accept) | batch 1500ms → toast + bus + refresh | Medio (batch logic) |
 | `wall:post` | `{ id, body, photo_url, likes_count: 0, comments_count: 0, author, author_photo, created_at }` — SIN `liked`/`is_mine` | room `event:{id}` | `WallController:110` (solo si `status === 'published'`) + `WallPostResource.php:148` (aprobacion Filament) | bus → prepend dedup por id en SocialView | Bajo |
 | `wall:comment` | `{ id, post_id, body, author, author_photo, created_at }` | room `event:{id}` | `WallController:208` (siempre — comments no se moderan) | bus → +1 count + refetch comments si abiertos | Medio (double count, ver A.6) |
+| `agenda:delayed` | `{ room_name: string, minutes: number, affected_sessions: number }` | room `event:{id}` | `SessionConfigController:393` (delay de agenda desde admin) — via `/internal/broadcast` generico, NO esta en types.ts | toast info espejo Expo literal (la data de agenda llega por el `data:invalidate {entity:agenda}` que se emite en paralelo, linea 301) | Bajo |
 
 ### A.2 `data:invalidate` — disparadores backend completos
 
@@ -258,6 +274,24 @@ onCommentAdded` ya conto). El refetch de la lista de comments SI es
 incondicional (idempotente — el server ya commiteo antes de broadcastear, asi
 que el refetch siempre trae la verdad, incluso en carrera con el optimistic).
 
+### A.6b `agenda:delayed` (agregado por decision Kamilo 2026-07-04)
+
+Handler Expo literal (`useDataInvalidation.ts:368-374`):
+
+```ts
+socket.on('agenda:delayed', (payload: { room_name: string; minutes: number }) => {
+  toast.show({
+    message: `${payload.room_name}: agenda retrasada ${payload.minutes} min`,
+    variant: 'info',
+  });
+});
+```
+
+Solo toast — Expo ignora `affected_sessions` del payload y NO invalida agenda aca
+(el backend emite `data:invalidate {entity:agenda}` en paralelo,
+`SessionConfigController:301`, que ya dispara el refresh). Webapp identico:
+`lumina.info` con el mismo mensaje.
+
 ### A.7 Contratos de conexion verificados
 
 - **Auth:** bearer Sanctum en `handshake.auth.token`. La webapp lo obtiene de
@@ -282,7 +316,9 @@ que el refetch siempre trae la verdad, incluso en carrera con el optimistic).
 
 ## B. Codigo listo-para-pegar
 
-Orden de aplicacion: 1 → 8. Los archivos 1-4 son nuevos, 5-8 son diffs.
+Orden de aplicacion: 1 → 10. Archivos 1-2 nuevos, 3-10 diffs. Los prop-sync
+(8-10) son OBLIGATORIOS — sin ellos `data:invalidate` no tiene efecto visible
+en /agenda, /sponsors ni /soporte (auditoria espejo A1).
 
 ### Archivo 1 (NUEVO) — `eventos-web/src/hooks/useGlobalSocket.tsx`
 
@@ -531,6 +567,19 @@ export function GlobalSocketProvider({
           emitBus("wall:comment", comment);
         };
 
+        // Espejo Expo literal (useDataInvalidation.ts:368-374). Solo toast:
+        // la agenda se refresca por el data:invalidate {entity:agenda} que el
+        // backend emite en paralelo. Evento via /internal/broadcast generico
+        // (no esta en types.ts del socket server — verificado en produccion).
+        const handleAgendaDelayed = (payload: {
+          room_name: string;
+          minutes: number;
+        }) => {
+          lumina.info({
+            message: `${payload.room_name}: agenda retrasada ${payload.minutes} min`,
+          });
+        };
+
         const subs: [string, (...args: unknown[]) => void][] = [
           ["connect", handleConnect as (...a: unknown[]) => void],
           ["data:invalidate", handleInvalidate as (...a: unknown[]) => void],
@@ -538,6 +587,7 @@ export function GlobalSocketProvider({
           ["networking:notify", handleNetworking as (...a: unknown[]) => void],
           ["wall:post", handleWallPost as (...a: unknown[]) => void],
           ["wall:comment", handleWallComment as (...a: unknown[]) => void],
+          ["agenda:delayed", handleAgendaDelayed as (...a: unknown[]) => void],
         ];
         subs.forEach(([event, fn]) => {
           s.on(event, fn);
@@ -782,7 +832,86 @@ conexion quedaba viva y autenticada con el token viejo.
      router.replace("/login");
 ```
 
-### Archivo 8 — NO tocar
+### Archivo 8 (DIFF) — `eventos-web/src/components/app/agenda/AgendaView.tsx`
+
+Prop-sync tracker R19 (mismo patron que `useChat.ts:128-135`): sin esto,
+`data:invalidate {entity:agenda}` → refresh baja `initialDays` fresco pero la
+vista no se entera (hallazgo A1 auditoria espejo). El comentario original del
+codigo (lineas 56-58) esperaba TanStack en W.11 — decision cambiada a SSR+refresh.
+
+```diff
+   // Snapshot mutable solo para flips de favoritos optimistas. El SSR es
+-  // estatico per-request, asi que solo seedeamos en mount; las invalidaciones
+-  // por socket llegan en F5 (W.11) y reemplazaran este state via TanStack.
++  // estatico per-request; los flips optimistas viven en este state. Cuando
++  // W.11 dispara router.refresh() (data:invalidate agenda), el server baja
++  // un initialDays con referencia nueva y el tracker re-seedea (patron R19,
++  // mismo que useChat). Race optimistic-vs-refresh: semantica identica Expo.
+   const [days, setDays] = useState<AgendaData>(initialDays);
++  const [trackedDays, setTrackedDays] = useState(initialDays);
++  if (initialDays !== trackedDays) {
++    setTrackedDays(initialDays);
++    setDays(initialDays);
++  }
+```
+
+### Archivo 9 (DIFF) — `eventos-web/src/components/app/sponsors/SponsorsView.tsx`
+
+`sponsors` esta copiado SIN setter (frozen) — se reemplaza por prop directa.
+`favorites` se re-seedea con la verdad del server cuando llega snapshot nuevo.
+
+```diff
+ export function SponsorsView({ event, initialSponsors }: SponsorsViewProps) {
+-  const [sponsors] = useState<Sponsor[]>(initialSponsors);
++  const sponsors = initialSponsors;
+   const [search, setSearch] = useState("");
+```
+
+```diff
+   const [favorites, setFavorites] = useState<Set<number>>(
+     () => new Set(initialSponsors.filter((s) => s.is_favorite).map((s) => s.id)),
+   );
+   const [contactsSent, setContactsSent] = useState<Set<number>>(new Set());
++  // W.11 prop-sync: refresh (data:invalidate sponsors) baja snapshot nuevo —
++  // re-seedear favorites con la verdad del server (espejo refetch Expo).
++  const [trackedSponsors, setTrackedSponsors] = useState(initialSponsors);
++  if (initialSponsors !== trackedSponsors) {
++    setTrackedSponsors(initialSponsors);
++    setFavorites(
++      new Set(initialSponsors.filter((s) => s.is_favorite).map((s) => s.id)),
++    );
++  }
+```
+
+### Archivo 10 (DIFF) — `eventos-web/src/components/app/soporte/SoporteView.tsx`
+
+Con esto, la respuesta del admin aparece EN VIVO si el user esta sentado en
+/soporte: `EditSupportRequest` crea announcement con `published_at` →
+`data:invalidate {entity:announcements}` → refresh → `initialTickets` fresco →
+tracker re-seedea. Tambien corrige el JSDoc que prometia un "refetch on window
+focus" que nunca existio (hallazgo A2 auditoria).
+
+```diff
+- * Tickets son read-only en webapp (espejo Expo — backend no soporta
+- * multi-mensaje en un mismo ticket). Para "respuesta del admin"
+- * refetch on window focus (sin polling agresivo).
++ * Tickets son read-only en webapp (espejo Expo — backend no soporta
++ * multi-mensaje en un mismo ticket). La "respuesta del admin" llega en
++ * vivo via W.11: announcement privado → data:invalidate → router.refresh
++ * → prop-sync re-seedea tickets.
+```
+
+```diff
+   const [tickets, setTickets] = useState<SupportTicket[]>(initialTickets);
++  // W.11 prop-sync (patron R19): refresh baja snapshot nuevo del SSR.
++  const [trackedTickets, setTrackedTickets] = useState(initialTickets);
++  if (initialTickets !== trackedTickets) {
++    setTrackedTickets(initialTickets);
++    setTickets(initialTickets);
++  }
+```
+
+### NO tocar
 
 Los 4 hooks streaming (`useChat`, `useQnA`, `useAnnouncementOverlay`,
 `useSessionLiveConfig`) quedan intactos. El `join:event` de `useChat:216` es
@@ -997,6 +1126,19 @@ describe("GlobalSocketProvider", () => {
     });
   });
 
+  it("agenda:delayed → toast info espejo Expo", async () => {
+    await mountProvider();
+    act(() =>
+      mocks.fakeSocket.fire("agenda:delayed", {
+        room_name: "Sala Principal",
+        minutes: 15,
+      }),
+    );
+    expect(mocks.luminaInfo).toHaveBeenCalledWith({
+      message: "Sala Principal: agenda retrasada 15 min",
+    });
+  });
+
   it("wall:post llega a los subscribers de useSocketEvent", async () => {
     const received: WallPostSocket[] = [];
     function Listener() {
@@ -1123,6 +1265,9 @@ sesion dedicada con `eventos-socket` + Redis en el webServer array. Deuda D.7.
    `joined event:1` **al entrar a /home** (antes solo pasaba en streaming)
 4. Filament: editar un anuncio → log `[invalidate] entity=announcements` →
    la webapp refresca el bell sin recargar (~800ms despues)
+4b. Con `/agenda` abierta: editar horario de una sesion en Filament → la agenda
+   se actualiza sin recargar (valida el prop-sync Archivo 8). Repetir con
+   `/soporte` abierta + responder ticket desde Filament (Archivo 10).
 5. Con Expo logueado como otro attendee: mandar solicitud de contacto → toast
    webapp en <2s; postear en el wall → post aparece en `/social` en vivo
 6. Filament: banear al attendee de la webapp → kick + toast + login
@@ -1144,24 +1289,30 @@ sesion dedicada con `eventos-socket` + Redis en el webServer array. Deuda D.7.
 | D.8 | Pantalla `/banned` dedicada webapp | Menor | Expo tiene screen con reason+expiry persistido en authStore. Webapp Fase 1: toast 6s + login (el backend rechaza re-login del baneado via CheckBan). Pantalla dedicada → Fase 2. |
 | D.9 | `networking:notify` se pierde si la tab esta cerrada | Por diseno | Igual que Expo con app cerrada (ahi lo cubre push nativo). Webapp: Web Push es W.12. |
 | D.10 | Toasts networking hardcoded es-CO | Menor | Espejo literal Expo (tambien hardcoded). Precedente: toasts de SocialView ya estan en espanol sin i18n. Migrar a next-intl cuando se haga el barrido i18n de toasts. |
+| D.11 | `DesafioView` lazy panels nunca refetchean | Menor | Guard `length === 0` (`DesafioView.tsx:103,115`) — ranking/rewards/stamps quedan stale tras `data:invalidate {entity:gamification}` incluso reabriendo el panel. El overview (puntos wall) SI refresca via prop directa. Fix futuro: resetear los arrays en el prop-sync del overview. |
+| D.12 | `attendees`/`suggested` sordos en SocialView | Menor | State copiado sin sync — el directorio no refleja registros nuevos en vivo. Cambia poco durante un evento; Fase 2. |
+| D.13 | `room:occupancy` dead emit backend | No (nadie lo consume) | `RoomCheckinService:373` emite al room `event:{id}:admin` que NO existe en `Rooms.ts` ni tiene join handler — nadie puede recibirlo. Decidir: implementar room admin o remover el emit. |
+| D.14 | `announcement:new` dead type en types.ts | No (confunde docs) | Tipado en `types.ts:19` con payload completo pero CERO emisores en todos los repos. Ya confundio 2 reclasificaciones de docs (ver `AUDITORIA-ESPEJO-2026-07-04.md` B2). Decidir: remover el type o implementar el emit. |
 
 ---
 
 ## E. Handoff a Opus 4.8 — checklist de ejecucion
 
 1. Leer Seccion 0 (hallazgos) y B (codigo). No re-investigar — todo esta
-   verificado con archivo:linea.
-2. Crear Archivos 1 y 2 (nuevos), aplicar diffs 3-7. Orden: 1 → 7.
+   verificado con archivo:linea. Contexto adicional de la auditoria espejo:
+   `docs/AUDITORIA-ESPEJO-2026-07-04.md`.
+2. Crear Archivos 1 y 2 (nuevos), aplicar diffs 3-10. Orden: 1 → 10.
+   Los prop-sync 8-10 NO son opcionales.
 3. Crear tests C.1 (vitest) y C.2 (E2E spec).
 4. `pnpm typecheck && pnpm lint` — cero errores nuevos.
 5. `pnpm vitest run` — 391 existentes + ~10 nuevos verdes.
 6. `pnpm playwright test e2e/global-socket.spec.ts` y despues **suite completa**
    (regresion: el provider monta en todos los modulos).
 7. Verificacion viva C.3 con socket server dev corriendo.
-8. Actualizar `docs/living/PENDIENTES-WEBAPP.md` (W.11: los 5 criticos done —
+8. Actualizar `docs/living/PENDIENTES-WEBAPP.md` (W.11: los 6 criticos done —
    recontar seccion) + memoria `project_sockets_realtime_status.md` (status:
    implementado) + `docs/NEXT-SESSION.md`.
-9. Commit `eventos-web`: `feat(sockets): W.11 global socket provider - 5 listeners criticos`
+9. Commit `eventos-web`: `feat(sockets): W.11 global socket provider - 6 listeners criticos`
    — push tras confirmacion de Kamilo (`feedback_git_workflow`).
 
 **Decisiones ya tomadas (NO re-preguntar a Kamilo):**

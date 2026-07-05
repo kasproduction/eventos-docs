@@ -1,6 +1,14 @@
 # PARITY MATRIX — Expo ↔ Webapp ↔ Backend
 
-> **Fuente unica de verdad** para responder: ¿que falta en webapp para que un evento corra 100% sin app mobile?
+> ⚠ **DOC HISTORICO desde 2026-07-04** (decision Kamilo, auditoria `docs/AUDITORIA-ESPEJO-2026-07-04.md`).
+> Los counters y estados de modulos estan CONGELADOS en junio 2026 y contienen
+> contradicciones internas (ej: W.7 aparece 23/23 en §1.1 y 0% en §3).
+> **NO usar para decidir "que sigue" — la fuente operativa unica es
+> `docs/living/PENDIENTES-WEBAPP.md`.**
+> Se conserva por el valor de la matriz pantalla-por-pantalla (§2) y el inventario
+> de endpoints verificados (§4), que siguen siendo referencia valida de shapes.
+
+> ~~**Fuente unica de verdad**~~ para responder: ¿que falta en webapp para que un evento corra 100% sin app mobile?
 >
 > Cruza cada feature/pantalla del Expo con su modulo webapp planeado (W.X), su estado real implementado en `eventos-web`, los endpoints backend que usa, y los gaps concretos.
 >

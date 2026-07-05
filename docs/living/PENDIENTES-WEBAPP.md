@@ -37,10 +37,10 @@
 | W.11 Sockets RT | 8/42 | 20% — usado parcial en W.4 | — |
 | W.12 Polish + E2E + PWA | 0/43 | 0% — cierre Fase 1 | — |
 | **W.13 FAQ + Docs** | **15/15** | **CERRADO 100% 2026-07-04** (Fase A FAQ Asistente orb + Fase B Documents split layout + backend ZIP escalable. Pages reclasificado formalmente a Fase 2) | **+2** |
-| **W.14 Anuncios + Cartel + Bell** | **17/17** | **CERRADO 100% 2026-07-04** (Fase A Anuncios + Bell + Fase B Cartel Digital. Socket `announcement:new` + Web Push reclasificados a W.11/W.12) | **+3** |
+| **W.14 Anuncios + Cartel + Bell** | **17/17** | **CERRADO 100% 2026-07-04** (Fase A Anuncios + Bell + Fase B Cartel Digital. RT anuncios → W.11 via `data:invalidate{announcements}` (OJO: `announcement:new` NO se emite en prod, dead type — auditoria 2026-07-04) + Web Push → W.12) | **+3** |
 | W.15 Vendor Dashboard | 0/35 | **OPCIONAL** Fase 1 | — |
 | W.16 Live Moments | 0/23 | 0% — **SKIP webapp** (mobile-first, sorteos/trivia/golden ticket reveal son experiencia celu, no laptop). Webapp solo muestra resultados historicos | — |
-| **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. Socket `support:new_response` + Web Push reclasificados a W.11/W.12) | **+2** |
+| **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO** | — |
 | **TOTAL** | **484/695** | **69.6%** | Post-reclasificacion 2026-07-04 (W.5+W.8+W.13+W.0+W.1+W.14+W.17 cerrados formalmente, items bloqueados por sockets/push movidos a W.11/W.12). **12 modulos cerrados 100% real:** W.0, W.1, W.1B, W.5, W.7, W.8, W.9, W.10, W.13, W.14, W.17, W.18. **391/391 vitest** + 24/24 E2E perfil+social. Total scope baja 707→695 por items reclasificados a Fase 2 (Pages, Photo Contest, tracking analytics) |
@@ -100,7 +100,7 @@
 - [x] ~~Sprint 2.A — W.7 Sponsors~~ — **CERRADO 23/23 (2026-06-21)** — Sprint 2.A entero en una sesion DaVinci larga: wall espejo Expo + framer-motion shuffle + DetailPanel (Hero/Sessions/Trivia/Contact/Actions) + skeleton SSR + tooltip radix + 14 vitest + **12 E2E Playwright verde** + Lighthouse acc 98 + CLS 0
 - [x] ~~Sprint 2.B — W.9 Engagement~~ — **CERRADO 35/35 (2026-06-29)** — hub split + 6 cards + 6 panels + RGB ring + QR + lazy fetch + redeem optimistic + redemptions inline + bloque orphans. 270/270 vitest + 11/11 E2E (incluye desktop 1600 / tablet H 1130 / mobile 390 sin overflow horizontal)
 
-- [x] ~~Sprint 2.C — W.14 Anuncios + Banners + Bell~~ — **CERRADO 17/20 (2026-06-30)**. Fase A 2026-06-29 (Anuncios + BellPopover + deeplink + E2E 13). Fase B 2026-06-30 (CartelDigital ambient signage 16:9 col der LIVE: cross-fade 700ms cada 6s, sin dots/arrows, hover pausa, sponsor pill, merger round-robin banners+highlights, backend reusado cero cambios, 23 vitest + 6 E2E). Falta: socket `announcement:new` (depende W.11) + Web Push (W.12)
+- [x] ~~Sprint 2.C — W.14 Anuncios + Banners + Bell~~ — **CERRADO 17/20 (2026-06-30)**. Fase A 2026-06-29 (Anuncios + BellPopover + deeplink + E2E 13). Fase B 2026-06-30 (CartelDigital ambient signage 16:9 col der LIVE: cross-fade 700ms cada 6s, sin dots/arrows, hover pausa, sponsor pill, merger round-robin banners+highlights, backend reusado cero cambios, 23 vitest + 6 E2E). Falta: RT anuncios via `data:invalidate{announcements}` (depende W.11 — `announcement:new` no se emite en prod) + Web Push (W.12)
 - [x] ~~Sprint 2.D — W.17 Soporte~~ — **CERRADO 13/15 (2026-06-29)** (split layout espejo W.14 + subflow Asistente + EditSupportRequest crea announcement privado). Falta RT response (W.11)
 - [x] ~~Sprint 2.E — W.13 Fase B Documents~~ — **CERRADO 15/17 (2026-06-30 tarde)** (split layout wall + preview embed + skeleton shimmer + descarga individual + bulk ZIP pre-generado backend con job + observer + endpoint escalable a 10K users, backend migration + Model fillable + composer maennchen/zipstream-php pure PHP). Falta: Pages dinamicas (skip Fase 2)
 - [x] ~~Sprint 2.F — W.18 Hub Personal~~ — **CERRADO 19/19 100% (2026-07-04)** — split 35/65 espejo W.13/W.14/W.17. Wall: hero + stats gamification 3 cards sin iconos + rows clickeables + footer (Ver introduccion + Cerrar sesion). Panel der: empty state espejo + 3 sub-views con AnimatePresence. `PerfilDataForm` con 3 cards visuales (Sobre ti / Contacto / Redes sociales) + 1 solo Guardar. `PerfilInterestsForm` chips min 1 + empty honesto. `PerfilAppearanceForm` Lux/Noir aplicando via `useTheme()`. `PerfilLogoutModal` confirm con cross-tab broadcast. **`PerfilAvatarMenu` popover** con subir foto (input file oculto max 5MB), cambiar variante (shuffle beam seed 0→1→2→3), eliminar foto (rojo, reset seed). Beam avatar espejo Expo `hostedboringavatars.vercel.app/api/beam` con mismos colores `0EA5E9,6366F1,14B8A6,A855F7,38BDF8`. Seed persistido en localStorage scopeado por email (modelo MMKV Expo). Backend cero cambios endpoints (11 existentes) — solo validator flexible `linkedin/website` de `url:http,https` → `nullable|string`. Deep link `eventos://profile[/sub]`. Sidebar refactor: ProfilePopover + UserMenu eliminados, nav reorg top (modulos) + bottom (Asistente+Perfil+Bell). Bug fix critico updateProfile normaliza shape backend (`linkedin_url` → `linkedin`) + merge preserva email. i18n 63 keys en es/en/pt. **391/391 vitest** + 13/13 E2E serial mode. Typecheck limpio
@@ -494,7 +494,7 @@
 - [x] `PasaporteCard` grid 6 + `PasaportePanel` grid completo
 - [x] Cada stamp: logo sponsor + nombre + tier + stamped_at
 - [x] Solo VIEW (earning via QR fisico mobile, correcto)
-- [ ] Socket `data:invalidate{entity:passport}` → animacion + toast — depende W.11 sockets RT
+- [ ] Socket `data:invalidate{entity:passport}` → refresh silencioso (espejo Expo: sin animacion ni toast, `feedback_no_points_diff_toast`) — depende W.11 sockets RT
 
 **Fase 5 — Rewards (6/6)**
 - [x] `RewardsPreviewCard` wall + `RewardsPanel` catalogo completo grid
@@ -567,10 +567,10 @@
 - [ ] **Listener wall:post** prepend feed dedup
 - [ ] **Listener wall:comment** invalidate comments
 - [ ] **Listener networking:notify** toast + invalidate
-- [ ] **Listener announcement:new** + display:project
-- [ ] **Listener data:invalidate** generico (points/leaderboard/passport)
-- [ ] **Listener auth:ban** force logout
-- [ ] **Listener agenda:updated** (futuro lifecycle)
+- [ ] **Anuncios RT** via `data:invalidate{announcements}` (`announcement:new` es dead type sin emisores — auditoria 2026-07-04) + display:project (W.16)
+- [ ] **Listener data:invalidate** generico (entities reales: agenda/announcements/sponsors/speakers/highlights/branding/modules/onboarding/gamification/passport)
+- [ ] **Listener ban:enforced** force logout (antes decia `auth:ban` — nombre incorrecto)
+- [ ] **Listener agenda:delayed** toast espejo Expo (SI se emite — `SessionConfigController:393`; `agenda:updated` tambien se emite pero es dead emit, el lifecycle viaja por data:invalidate agenda)
 - [ ] **Listener game events** (W.16 trivia/spin/jackpot)
 - [ ] **Long-polling fallback** (corporate firewalls)
 - [ ] **Skip-self** en eventos propios broadcast
@@ -679,7 +679,7 @@
 
 ### W.14 — Anuncios + Cartel Digital + Bell (17/17, **CERRADO 100% 2026-07-04**)
 
-> Fase A Anuncios + BellPopover entregada 2026-06-29 (sprint 2.C). Fase B Cartel Digital entregada 2026-06-30 (ambient signage col der LIVE). Cerrado 100% al reclasificar 3 items bloqueados por otros modulos: socket `announcement:new` → W.11 Sockets, Web Push real → W.12 Polish, dots/counter → decision de diseno (cartelera NO slideshow, sin dots).
+> Fase A Anuncios + BellPopover entregada 2026-06-29 (sprint 2.C). Fase B Cartel Digital entregada 2026-06-30 (ambient signage col der LIVE). Cerrado 100% al reclasificar 3 items bloqueados por otros modulos: RT anuncios (`data:invalidate{announcements}` — `announcement:new` no se emite) → W.11 Sockets, Web Push real → W.12 Polish, dots/counter → decision de diseno (cartelera NO slideshow, sin dots).
 
 **Fase 0 — Hooks (3/3)**
 - [x] `fetchAnnouncements` SSR (lib/announcements.ts)
@@ -690,7 +690,7 @@
 - [x] Lista cards titulo + body + timeAgo (`/anuncios` route)
 - [x] Image thumbnail si existe
 - [x] Deep link handler `parseActionUrl` — reusado por bell, cartel, cards
-- [x] ~~Socket `announcement:new` RT~~ → **reclasificado a W.11 Sockets**
+- [x] ~~Socket anuncios RT~~ → **reclasificado a W.11 Sockets** (mecanismo real: `data:invalidate{announcements}` — `announcement:new` es dead type, auditoria 2026-07-04)
 
 **Fase 2 — Cartel Digital (6/6) — Fase B 2026-06-30**
 - [x] Ambient signage 16:9 col der LIVE state (cross-fade 700ms cada 6s)
@@ -818,7 +818,7 @@
 - [x] "Esperando respuesta" state
 
 **Fase 3 — Real-time (reclasificado)**
-- [x] ~~Socket `support:new_response` RT~~ → **reclasificado a W.11 Sockets**
+- [x] ~~Socket respuesta admin RT~~ → **reclasificado a W.11 Sockets** (mecanismo real: announcement privado → `data:invalidate{announcements}` — `support:new_response` no existe como evento, auditoria 2026-07-04)
 - [x] ~~Web Push notif~~ → **reclasificado a W.12 Polish**
 
 **Fase 4 — Backend integration + Tests + Cierre (4/4)**

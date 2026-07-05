@@ -21,6 +21,16 @@
 
 Version previa de este doc usaba naming dot-notation (`session.updated`, `qa.question.new`, `wall.post.banned`) y listaba eventos inventados (`points.awarded`, `leaderboard.updated`, `badge.unlocked`, `notification.new`, `wall.like.updated`, `chat.dm.message.new`, etc.). El backend usa **colon-notation** (`session:started`, `question:submitted`, `wall:post`) y muchos eventos no existen — la gamification y notif in-app llegan via `data:invalidate` (invalidacion generica de queries).
 
+## Drift corregido v2 (2026-07-04 — auditoria Fable 5, ver `docs/AUDITORIA-ESPEJO-2026-07-04.md`)
+
+**La premisa "types.ts = LISTA AUTORITATIVA" es falsa en ambas direcciones:**
+
+1. El endpoint generico `/internal/broadcast` (`eventos-socket/src/index.ts:380`) emite CUALQUIER nombre de evento que Laravel mande — bypasea types.ts. Eventos REALES emitidos en produccion que NO estan tipados: `agenda:delayed` (`SessionConfigController:393` — Expo lo escucha y toastea), `agenda:updated` (`:300` — dead emit, nadie escucha), `session:cancelled` (`:266` — dead emit), `game:launched/question/round-result/finished/result/answer-count/update` (GameService — Expo escucha 5), `attendance:check` + `attendance:check:update` (RoomCheckinController), `room:occupancy` (RoomCheckinService:373 — emitido a room `event:{id}:admin` que NO existe en Rooms.ts, nadie puede recibirlo), `staff:assignment_request/accepted`, `staff:room_unassigned/room_changed`.
+2. `announcement:new` esta tipado en `types.ts:19` pero tiene CERO emisores en todos los repos — dead type. Los anuncios RT viajan por `data:invalidate {entity:'announcements'}` (AnnouncementObserver). Expo tampoco lo escucha. Este dead type causo 2 reclasificaciones erroneas en PENDIENTES-WEBAPP (W.14 y W.17) — ya corregidas.
+3. `support:new_response` (nombrado en reclasificacion W.17) nunca existio — la respuesta del admin crea un announcement privado con `published_at` (`EditSupportRequest.php:43`) que dispara `data:invalidate {entity:'announcements'}`.
+
+**Lista autoritativa real** = `types.ts` ∪ call sites de `/internal/broadcast`, `/internal/emit-to-user` y `/internal/staff/notify` en `eventos-backend/app/`.
+
 ---
 
 ## Catalogo real de eventos
@@ -75,7 +85,7 @@ Lista verificada contra `eventos-socket/src/types.ts` (2026-05-07). 28 eventos s
 #### Anuncios
 | Evento | Payload | Notas |
 |---|---|---|
-| `announcement:new` | `AnnouncementPayload` `{id, title, body, eventId, createdAt}` | Anuncio global del evento (room `event:{id}`) |
+| `announcement:new` | `AnnouncementPayload` `{id, title, body, eventId, createdAt}` | **DEAD TYPE (2026-07-04): tipado pero CERO emisores en backend/socket. Los anuncios RT viajan por `data:invalidate {entity:'announcements'}`. NO escuchar este evento.** |
 
 #### Networking
 | Evento | Payload | Notas |
@@ -149,7 +159,7 @@ Lista para referencia historica + auditoria de otros docs que aun los mencionen:
 - ~~`streak.bonus.awarded`~~ — usar `data:invalidate {entity:'streak'}`
 - ~~`notification.new`~~ — no existe modulo notif in-app (ver W.10 scope decision)
 - ~~`session.revoked`~~ — el backend no emite esto; logout multi-device se valida REST en cada request
-- ~~`agenda:updated`, `agenda:delayed`~~ — el BACKEND-API-MAP los lista pero NO estan en `types.ts`. Se manejan via `data:invalidate {entity:'agenda'}`
+- ~~CORREGIDO 2026-07-04~~ `agenda:updated` y `agenda:delayed` **SI se emiten** via `/internal/broadcast` (no estan en types.ts pero son reales — ver Drift v2). `agenda:delayed` lo escucha Expo (toast); `agenda:updated` es dead emit (el lifecycle viaja por `data:invalidate {entity:'agenda'}` emitido en paralelo)
 - ~~`wall.like.updated`~~ — los likes se reconcilian por refetch on focus / invalidacion
 - ~~`chat.dm.message.new`~~ — chat 1:1 NO existe
 - ~~`connection.request.new`, `connection.accepted`~~ — usar `networking:notify`
@@ -157,7 +167,7 @@ Lista para referencia historica + auditoria de otros docs que aun los mencionen:
 - ~~`qa.question.*`~~ — naming real `question:*`
 - ~~`poll.*` (dot)~~ — naming real `poll:*` (colon)
 - ~~`wall.post.new`, `wall.post.banned`, `wall.comment.new`~~ — naming real `wall:post`, `wall:comment`
-- ~~`session.updated`, `session.cancelled`~~ — naming real `session:started`, `session:ended`, `session:mode_changed`, `session:config_updated`
+- ~~`session.updated`~~ — naming real `session:started`, `session:ended`, `session:mode_changed`, `session:config_updated`. OJO 2026-07-04: `session:cancelled` (colon) **SI se emite** (`SessionConfigController:266` via broadcast generico) aunque nadie lo escucha — ver Drift v2
 
 ---
 

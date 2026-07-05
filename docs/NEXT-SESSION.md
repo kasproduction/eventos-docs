@@ -35,6 +35,31 @@ Hallazgos clave que CORRIGIERON el plan previo (detalle en el doc + memoria
 
 El brief `docs/FABLE-5-BRIEF.md` queda como referencia historica — su mision ya se cumplio.
 
+### Segunda pasada Fable (misma fecha) — auditoria espejo + revision de docs
+
+Kamilo pidio buscar errores concretos que rompan el espejo + revisar todos los docs.
+Resultado en **`docs/AUDITORIA-ESPEJO-2026-07-04.md`**:
+
+- **A1 (bug real, el grande):** 4 vistas copian props SSR a useState y quedan SORDAS
+  a `router.refresh()` — AgendaView, SponsorsView, SoporteView, SocialView. El plan
+  W.11 v1 overprometia; ya esta parcheado con 3 diffs prop-sync nuevos (Archivos 8-10,
+  ahora OBLIGATORIOS).
+- **B (docs con eventos fantasma):** `announcement:new` es dead type (cero emisores),
+  `support:new_response` no existe — ambas reclasificaciones nombraban eventos falsos;
+  la cobertura real es `data:invalidate{announcements}` que el plan ya escucha.
+  `agenda:delayed` SI existe (el doc W.11-sockets-rt lo negaba) y Expo lo toastea.
+  PENDIENTES-WEBAPP + W.11-sockets-rt.md corregidos quirurgicamente.
+- **Decisiones tomadas (Kamilo aprobo las 4 recomendaciones, misma fecha):**
+  (1) `agenda:delayed` INCLUIDO en W.11 — el plan ahora tiene 6 listeners;
+  (2) PARITY-MATRIX degradado a DOC HISTORICO (banner agregado, fuente unica =
+  PENDIENTES-WEBAPP); (3) dead type `announcement:new` REMOVIDO de
+  `eventos-socket/src/types.ts` (typecheck verde, commit en eventos-socket);
+  (4) `room:occupancy` dead emit queda como deuda D.13 — decidir al tocar MC/admin.
+
+**El unico doc a abrir para implementar: `docs/W.11-SOCKETS-PLAN.md`** (ya absorbio
+todas las correcciones de la auditoria — 6 listeners + 10 archivos + tests +
+checklist Seccion E). La auditoria es registro de hallazgos, no doc operativo.
+
 ---
 
 ## Ultima sesion (cierre 2026-07-04 tarde — W.18 100% + 7 modulos cerrados via reclasificacion + investigacion W.11 sockets)
