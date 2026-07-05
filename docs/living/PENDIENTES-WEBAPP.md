@@ -29,7 +29,7 @@
 | W.3 Agenda | **27/30** | **90%** — en proceso (+2 recount 2026-07-04: RT invalidation cubierta por W.11 + E2E 16 tests ya existia) | **+3** |
 | **W.4 Streaming** | **92/92** | **CERRADO 2026-07-04 noche** (recount contra codigo: replay + rating auto + anuncios in-stream + custom panel + slow mode + floating emojis + mobile/tablet layouts YA estaban implementados y sin marcar. Fix race auto-rate e1b0c9a. Reclasificados: trivia→W.16, E2E cross-tab→W.12, 17 menores→QA W.12) | **+9** |
 | **W.5 Speakers** | **35/35** | **CERRADO 100% 2026-07-04** (reclasificado Lighthouse + device fisico a W.12 Polish cross-modulos) | **+2** |
-| W.6 Social Wall | **21/40** | **53%** — feed+composer+likes+comments+tabs hechos (+3 recount 2026-07-04: comments lazy real + dedup wall:post/comment via W.11 + parser hashtags ya existia). Falta: load-more UI, hashtags click-to-filter, Stories, Photo Contest | **+21** |
+| W.6 Social Wall | **21/38** | **55%** — feed+composer+likes+comments+tabs+**infinite scroll** (`7afb5d0` 2026-07-04, verificado vivo 99 posts). Hashtags click-to-filter ELIMINADO del scope (decision Kamilo — idea menciones va a Pulse). Falta: Stories + Photo Contest | **+21** |
 | **W.7 Sponsors** | **23/23** | **CERRADO 2026-06-21** | **+23** (Sprint 2.A entero — skeleton + tooltip + E2E 12/12 + Lighthouse acc 98) |
 | **W.8 Networking** | **21/21** | **CERRADO 100% 2026-07-04** (link sidebar identity → /perfil + 5 E2E nuevos + 4 items reclasificados formalmente: filtro role skip por privacy, RT listeners → W.11, sugeridos cards → Fase 2, tracking → Fase 2) | **+6** |
 | **W.9 Engagement** | **35/35** | **CERRADO 2026-06-29 (Sprint 2.B)** | **+5** (2026-06-29: redemptions inline + E2E 11/11 verde con viewports desktop/tablet H/mobile + 8 tests vitest. counter PARITY sync) |
@@ -43,7 +43,7 @@
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
 | W.X Welcome Showcase | 0/7 | **BLOQUEADO — va de ULTIMO por diseño** (reusa componentes reales en miniatura de todos los modulos cerrados). BUG activo: boton "Ver introduccion de nuevo" en PerfilView navega a /onboarding → 404 (ocultar en Bloque 0) | — |
-| **TOTAL** | **518/656** | **79.0%** | Recount contra codigo 2026-07-04 (4 agentes): +10 items ya hechos sin marcar (W.3 +2, W.6 +2, W.12 +6). **META NUEVA: cierre TOTAL 95-100% incluyendo W.15 + W.16 + W.X** — plan en BLOQUES abajo, ~30-38h en 6-8 sesiones. **14 modulos cerrados:** W.0, W.1, W.1B, W.4, W.5, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.17, W.18 |
+| **TOTAL** | **518/654** | **79.2%** | Recount contra codigo 2026-07-04 (4 agentes): +10 items ya hechos sin marcar (W.3 +2, W.6 +2, W.12 +6). **META NUEVA: cierre TOTAL 95-100% incluyendo W.15 + W.16 + W.X** — plan en BLOQUES abajo, ~30-38h en 6-8 sesiones. **14 modulos cerrados:** W.0, W.1, W.1B, W.4, W.5, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.17, W.18 |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -67,9 +67,9 @@
 - [x] Fix alias `sessions` en `KNOWN_ENTITIES` de `useGlobalSocket.tsx:124` (backend puede emitir `agenda` o `sessions`)
 - [x] Boton "Ver introduccion de nuevo" OCULTO en PerfilView (navegaba a /onboarding → 404). E2E perfil 13/13 ajustado (asserts toHaveCount(0)). Re-habilitar en BLOQUE 7
 
-### BLOQUE 1 — W.6 Social → 100% (~4-6h) — 0/4
-- [ ] Load-more/paginacion UI del feed (fetcher ya pagina `?page=`, falta estado cliente + boton/observer + append)
-- [ ] Hashtags click-to-filter (parser + estilo `.ht` ya existen en PostCard, falta onClick + filtro en FeedView)
+### BLOQUE 1 — W.6 Social → 100% (~3.5-5h) — 1/3
+- [x] ~~Load-more/paginacion~~ — **HECHO 2026-07-04** (`7afb5d0`): infinite scroll cursor-based + dedup + sentinel. Verificado vivo 99 posts
+- [x] ~~Hashtags click-to-filter~~ → **ELIMINADO del scope** (decision Kamilo 2026-07-04: nice-to-have sin uso real aca; la analitica de menciones pertenece a Event Pulse — idea en memoria)
 - [ ] Stories completo: StoriesBar + StoryViewer full-screen + upload 9:16 + expire 24h (CSS `.sn-stories` existe, 0 componentes)
 - [ ] Photo Contest: banner con countdown + podio top 3 + CTA subir foto
 
@@ -340,10 +340,10 @@
 - [x] ~~`usePostComments` lazy~~ — ES LAZY REAL (verificado 2026-07-04: `InlineComments` solo monta al expandir + fetch en useEffect `InlineComments.tsx:50-69`; feed inicial solo trae `comments_count`)
 - [x] `createWallPost` mutation con foto opcional + manejo `pending` (post en moderacion)
 
-**Fase 1 — Feed (3/4)**
+**Fase 1 — Feed (4/4)**
 - [x] PostCard render
 - [x] InlineComments expandible
-- [ ] Paginacion page-based UI (SSR carga primera, falta load-more / infinite scroll)
+- [x] ~~Paginacion~~ — **HECHO 2026-07-04** (`7afb5d0`): infinite scroll cursor-based (fetchWallFeed corregido a `?cursor=`, proxy `/api/social/wall`, `appendFeedPage` dedup, sentinel IntersectionObserver + shimmer). Verificado vivo con 99 posts (5 paginas). +5 vitest + E2E `wall-paged`
 - [x] Empty hint en SidebarRight ("Conecta con asistentes desde Personas")
 
 **Fase 2 — Like + Comments (5/5)**
@@ -369,9 +369,11 @@
 - [ ] **Photo Contest banner** (status active/ended, countdown timer, podio top 3 con medallas)
 - [ ] CTA → vista concurso / sube tu foto
 
-**Fase 6 — Hashtags client-side (1/2)**
-- [x] ~~Parser regex~~ — YA EXISTE (verificado 2026-07-04: `renderHashtags()` con escape HTML `PostCard.tsx:111-120` + estilo `.ht` `social.css:624`)
-- [ ] Click filtra feed client-side (el span no tiene onClick ni hay estado de filtro hashtag)
+**Fase 6 — Hashtags (ELIMINADA del scope, decision Kamilo 2026-07-04)**
+> Click-to-filter borrado del scope: no aporta en este contexto. El parser visual
+> (`renderHashtags()` PostCard) se queda como decoracion. La idea buena derivada
+> — analitica de menciones/hashtags — pertenece a Event Pulse, anotada en memoria
+> `project_webapp_ideas`.
 
 **Fase 7 — Filtros (2/2)**
 - [x] View switch Feed/Personas/Solicitudes/Mis posts (sidebar izq) — funcional pero NO son tabs sticky en feed
