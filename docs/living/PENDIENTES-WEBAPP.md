@@ -370,10 +370,12 @@
 - [ ] CTA → vista concurso / sube tu foto
 
 **Fase 6 — Hashtags (ELIMINADA del scope, decision Kamilo 2026-07-04)**
-> Click-to-filter borrado del scope: no aporta en este contexto. El parser visual
-> (`renderHashtags()` PostCard) se queda como decoracion. La idea buena derivada
-> — analitica de menciones/hashtags — pertenece a Event Pulse, anotada en memoria
-> `project_webapp_ideas`.
+> Click-to-filter borrado del scope: no aporta en este contexto. El parser
+> `renderHashtags()` tambien ELIMINADO del codigo (`f0bedaa`) — feature muerto =
+> codigo muerto, y de paso se fue el `dangerouslySetInnerHTML` (superficie XSS
+> innecesaria); el body volvio a texto plano React. La idea buena derivada —
+> analitica de menciones/hashtags trending — pertenece a Event Pulse, anotada
+> en memoria `project_webapp_ideas`.
 
 **Fase 7 — Filtros (2/2)**
 - [x] View switch Feed/Personas/Solicitudes/Mis posts (sidebar izq) — funcional pero NO son tabs sticky en feed
