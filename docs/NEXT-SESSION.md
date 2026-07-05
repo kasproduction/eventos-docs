@@ -592,3 +592,14 @@ DEUDA NUEVA — Event Pulse cliente (pre-existente de abril, destapada hoy; SESI
 2. Formula inconsistente: counter ratings live suma solo top-6 sesiones (socket.js refreshStat) vs bootstrap que cuenta todas — F5 y live dan numeros distintos
 3. Los emits backend YA llegan (GAP-C verificado) — lo roto es el refresh client-side del Pulse
 4. Menor: poll:closed con room=session:null en polls scope session sin session_id (server log)
+
+### Cierre final 2026-07-04 (post-QA): W.4 CERRADO 92/92 via recount
+
+Replay/rating-auto/anuncios-in-stream/custom-panel/slow-mode/emojis/mobile-tablet YA estaban implementados sin marcar en el doc. Fix race auto-rate (web e1b0c9a, cazado en QA: modal aparecia aunque ya calificaste). **TOTAL: 507/656 = 77.3%, 14 modulos cerrados.**
+
+**PROXIMA SESION — barrido final webapp (~5-7h en 2 sesiones):**
+1. W.6 Social: paginacion/load-more + comments lazy + hashtags (~1-2h)
+2. W.2 Home: lifecycle PRE/ENDED + survey prompt (~1-2h)
+3. W.3 Agenda: badges AJUSTADA/CANCELADA + bulk .ics (~30min)
+4. W.12 Cierre Fase 1: Web Push + Sentry + QA device + Lighthouse (~2-3h)
+Paralelo corto: Event Pulse cliente 4 items (PENDIENTES.md) + WIP recap Expo.
