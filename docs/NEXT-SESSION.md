@@ -60,6 +60,31 @@ Resultado en **`docs/AUDITORIA-ESPEJO-2026-07-04.md`**:
 todas las correcciones de la auditoria — 6 listeners + 10 archivos + tests +
 checklist Seccion E). La auditoria es registro de hallazgos, no doc operativo.
 
+### Tercera pasada Fable (misma fecha) — auditoria TODAS las superficies
+
+Kamilo detecto que la auditoria espejo no cubria las superficies organizador. Resultado
+en **`docs/AUDITORIA-SOCKETS-SUPERFICIES-2026-07-04.md`**: mapa de las 10 superficies
+del producto + inventario de modulos (Expo, webapp W.X, 50 resources Filament, Event
+Pulse, Mission Control, Display LED, Chat Monitor, Attendance Check, Kiosko, Data
+Center) + matriz socket completa evento × emisor × consumidor. Hallazgos nuevos:
+
+- **BUG-A Kiosko** (`useAttendance.ts:27-30`): `join:event` con `{event_id}` (server
+  espera `{eventId}`) + lee `payload.checked_in` (server emite `checkedIn`) → aforo
+  RT del kiosko muerto. Fix 2 lineas en `eventos-kiosko`.
+- **BUG-B Attendance Check** (`attendance-check.html:275`): mismo mismatch
+  `event_id`→`eventId` → counters silent disco no suben en vivo. Fix 1 palabra.
+- **GAP-C Event Pulse**: escucha entities `leads/connections/ratings/leaderboard`
+  que SOLO emite PulseSimulate — en evento real esas 4 metricas tienen lag de hasta
+  5 min (bootstrap fallback). Fix 4 broadcasts en backend (Networking accept, Lead
+  scan, ratings, PointsService).
+- **RIESGO-D Expo**: 6 puntos de conexion socket vs MAX_CONNECTIONS_PER_USER=5 —
+  stream + encuestas + wall montado puede exceder y perder RT aleatorio. Backlog Expo.
+- `room:occupancy`: contexto cerrado — Pulse usa `checkin:update`, este evento nunca
+  tuvo consumidor (D.13 validada con contexto completo).
+
+**PENDIENTE DECISION KAMILO:** aplicar fixes BUG-A + BUG-B + GAP-C (~7 lineas en
+eventos-kiosko + eventos-backend). Recomendado antes del proximo evento real.
+
 ---
 
 ## Ultima sesion (cierre 2026-07-04 tarde — W.18 100% + 7 modulos cerrados via reclasificacion + investigacion W.11 sockets)
