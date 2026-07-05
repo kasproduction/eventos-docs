@@ -53,7 +53,7 @@
 
 - [ ] **BLOQUE 2 — W.2 Home → 100%** (~1.5-2h): GamificationHud preview LIVE (espejo `index.tsx:103-129` Expo) + post-event survey prompt ENDED + EventArchive ENDED (espejo `EventArchive.tsx`).
 
-> Paralelo cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device real iPad/iPhone/Edge/Firefox + Lighthouse batch + WCAG + E2E cross-tab + DSN prod). Pendiente corto de Fase A: reiniciar Laragon para que Apache herede OPENSSL_CONF (push desde Filament) + probar install PWA real.
+> Paralelo cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device real iPad/iPhone/Edge/Firefox + Lighthouse batch + WCAG + E2E cross-tab + DSN prod). Fase A 100% validada 2026-07-05: Kamilo probo push desde Filament post-reinicio Laragon (Apache heredo OPENSSL_CONF OK) + install PWA real OK.
 
 > Deuda menor anotada 2026-07-05: `ProfileSecurityTest` 2 tests rojos PRE-existentes
 > (esperan 422 para linkedin/website sin http; el validator W.18 se relajo a proposito
@@ -682,7 +682,7 @@
 - [x] **Scheduled → Announcement persistente** (decision Kamilo: "la push es el golpe en la puerta, el announcement es la carta") — notificaciones programadas ya no se pierden si nadie las vio; Bell enciende live via AnnouncementObserver
 - [x] SW cliente: push handler con supresion si pestana enfocada (Bell+socket cubren in-app), notificationclick con PUSH_ROUTES espejo LITERAL Expo useNotifications.ts, track push_open, pushsubscriptionchange re-subscribe
 - [x] Soft prompt pill una-vez-por-evento (divergencia web aprobada vs auto-prompt Expo: Chrome penaliza el prompt automatico y un bloqueo es permanente) + resync silencioso con permiso granted. 15 Pest + 14 vitest + 3 E2E
-> Pendiente corto: reiniciar Laragon (Apache hereda OPENSSL_CONF → push desde Filament) + probar install PWA real. NO commiteado: nada — todo pusheado.
+> Validado por Kamilo mismo dia: push desde Filament post-reinicio Laragon (Apache + OPENSSL_CONF OK) + install PWA real OK. Todo pusheado.
 
 ### W.13 — FAQ + Documentos (15/15, **CERRADO 100% 2026-07-04**)
 

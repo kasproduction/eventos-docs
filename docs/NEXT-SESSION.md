@@ -91,8 +91,9 @@ corrupta por taskkill /F + 1 flake saturacion conocido, verdes en frio).
 GamificationHud preview LIVE (espejo `index.tsx:103-129` Expo) + post-event
 survey prompt ENDED + EventArchive ENDED (espejo `EventArchive.tsx`). Despues
 Bloque 4 Trivia (~3-4h). **B5 Fase C cuando Kamilo tenga ~2h presenciales**
-(QA device + Lighthouse + WCAG + E2E cross-tab + DSN prod). Pendiente corto:
-reiniciar Laragon (OPENSSL_CONF → push desde Filament) + probar install PWA.
+(QA device + Lighthouse + WCAG + E2E cross-tab + DSN prod). Fase A validada
+100% mismo dia por Kamilo: push desde Filament (Apache + OPENSSL_CONF OK
+post-reinicio Laragon) + install PWA real OK.
 
 ---
 
