@@ -86,6 +86,35 @@ corrupta por taskkill /F + 1 flake saturacion conocido, verdes en frio).
 - `eventos-web` main: `2dc43a3` (Fase A) + `471cf94` (Fase B)
 - `APP EVENTOS` main: este cierre + PENDIENTES + memorias
 
+### ADDENDUM — QA vivo post-guardar (misma tarde, `899646b` backend + `a1fabf3` web)
+
+Kamilo QA-eo en vivo y cayeron 4 errores (imgs 113-116 en design/ERRORES):
+1. **CSP bloqueaba TODAS las imagenes en dev** (keyvisual, perfiles, docs):
+   el backend sirve por http:// y el comodin https: no lo cubria → apiOrigin
+   explicito en img-src/media-src.
+2. **429 en QA con F5 seguidos**: PushPrompt re-sincronizaba en CADA carga
+   (guard sessionStorage) + throttle api local subido a 240/min (convencion
+   isLocal existente).
+3. **CANON DE TITULOS DE MODULO (decision Kamilo): sponsors = referencia.**
+   24px / 800 / -0.5px, header a 26px/28px del canvas. Aplicado a los 11
+   modulos (agenda/speakers bajaron del clamp 38px). Agenda/speakers:
+   titulo DESACOPLADO de la columna del card pero el header TERMINA en el
+   borde derecho de la lista (err 114: full-width ponia las tabs sobre el
+   panel). DayStrip: scrollTo (scrollIntoView scrollea ancestros y cortaba
+   el titulo, err 113).
+4. **Live Hub sin detalle (err 115)**: cadena de posters — upload Filament >
+   frame YouTube derivado en backend (EventSession::thumbnail_url, aplica a
+   Expo gratis) > retrato del speaker + wash hex-validado del track >
+   gradiente. Hora en overline de proximas. Titulo FIJO "En vivo" ("Por
+   arrancar" eliminado — decision Kamilo). Tags de track descartados en QA.
+5. **Agenda demo re-baseada**: `ReseedSessionsSeeder` NUEVO (re-ejecutable:
+   borra sesiones y siembra los 3 dias relativos a HOY sin duplicar tracks/
+   speakers). ContentSeeder refactor: seedSessions() extraido.
+
+Gotcha nuevo: `php artisan tinker script.php` ejecuta y SE QUEDA EN EL REPL
+(proceso zombie eterno) — para scripts one-shot usar bootstrap directo
+(`require vendor/autoload + bootstrap/app + Kernel->bootstrap`).
+
 ### PROXIMA SESION — BLOQUE 2: W.2 Home → 100% (~1.5-2h, apto Opus)
 
 GamificationHud preview LIVE (espejo `index.tsx:103-129` Expo) + post-event
