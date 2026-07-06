@@ -115,14 +115,21 @@ Gotcha nuevo: `php artisan tinker script.php` ejecuta y SE QUEDA EN EL REPL
 (proceso zombie eterno) — para scripts one-shot usar bootstrap directo
 (`require vendor/autoload + bootstrap/app + Kernel->bootstrap`).
 
-### PROXIMA SESION — BLOQUE 2: W.2 Home → 100% (~1.5-2h, apto Opus)
+### PROXIMA SESION — MOBILE PARITY baseline + arranque (100% FABLE)
 
-GamificationHud preview LIVE (espejo `index.tsx:103-129` Expo) + post-event
-survey prompt ENDED + EventArchive ENDED (espejo `EventArchive.tsx`). Despues
-Bloque 4 Trivia (~3-4h). **B5 Fase C cuando Kamilo tenga ~2h presenciales**
-(QA device + Lighthouse + WCAG + E2E cross-tab + DSN prod). Fase A validada
-100% mismo dia por Kamilo: push desde Filament (Apache + OPENSSL_CONF OK
-post-reinicio Laragon) + install PWA real OK.
+**Decision Kamilo (2026-07-05 noche): la proxima sesion Fable va entera a
+Mobile parity** (dedica el 50% de cuota restante). Enfoque acordado — NO
+portar componentes RN; capa de presentacion mobile NUEVA (shell bottom tabs
+espejo Expo + transcripcion pantalla-por-pantalla) sobre la capa de datos
+que ya existe en eventos-web. **Arrancar por el BASELINE**: inventario
+modulo-por-modulo contra el Expo real → counters en PENDIENTES → bloques.
+Detalle completo en PENDIENTES-WEBAPP seccion MOBILE PARITY.
+
+Sesiones NO-Fable mientras tanto: Bloque 2 Home (~1.5-2h, apto Opus:
+GamificationHud + survey ENDED + EventArchive) → Bloque 4 Trivia (~3-4h).
+**B5 Fase C cuando Kamilo tenga ~2h presenciales** (QA device + Lighthouse +
+WCAG + E2E cross-tab + DSN prod). Fase A validada 100% mismo dia: push desde
+Filament (Apache + OPENSSL_CONF OK post-reinicio Laragon) + install PWA OK.
 
 ---
 

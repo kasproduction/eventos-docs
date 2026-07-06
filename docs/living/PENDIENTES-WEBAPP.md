@@ -51,9 +51,10 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **BLOQUE 2 — W.2 Home → 100%** (~1.5-2h): GamificationHud preview LIVE (espejo `index.tsx:103-129` Expo) + post-event survey prompt ENDED + EventArchive ENDED (espejo `EventArchive.tsx`).
+- [ ] **MOBILE PARITY — sesion baseline + arranque (decision Kamilo 2026-07-05: trabajo 100% Fable, dedica el 50% de cuota restante).** Arranca por el baseline: inventario modulo-por-modulo contra el Expo real (que se adapta responsive, que necesita vista mobile dedicada, que es nativo del workstream) + diseno del shell mobile → counters → bloques. Ver seccion MOBILE PARITY abajo para el enfoque tecnico acordado.
 
-> Paralelo cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device real iPad/iPhone/Edge/Firefox + Lighthouse batch + WCAG + E2E cross-tab + DSN prod). Fase A 100% validada 2026-07-05: Kamilo probo push desde Filament post-reinicio Laragon (Apache heredo OPENSSL_CONF OK) + install PWA real OK.
+> Alternativa si la sesion NO es Fable: **BLOQUE 2 — W.2 Home → 100%** (~1.5-2h, apto Opus): GamificationHud preview LIVE (espejo `index.tsx:103-129`) + survey prompt ENDED + EventArchive ENDED.
+> Cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device iPad/iPhone/Edge/Firefox + Lighthouse + WCAG + E2E cross-tab + DSN prod). Fase A 100% validada 2026-07-05 (push desde Filament OK + install PWA OK).
 
 > Deuda menor anotada 2026-07-05: `ProfileSecurityTest` 2 tests rojos PRE-existentes
 > (esperan 422 para linkedin/website sin http; el validator W.18 se relajo a proposito
@@ -129,11 +130,24 @@
 - [ ] **Fase C** — E2E cross-tab (streaming Q&A, social conectar)
 - [ ] **Fase C** — DSN prod Sentry + validacion (item de deploy; config completa ya en codigo)
 
-### ~~BLOQUE 6 — W.15 Vendor Dashboard~~ → **MOVIDO a Mobile parity (decision Kamilo 2026-07-05)**
-> El staff del stand no instala app para un evento — vendor sera feature del webapp
-> MOBILE (viewport celular espejo Expo, patron Mi QR) con scanner QR en browser
-> (prior art eventos-kiosko). Se construye en el workstream Mobile parity, donde
-> ademas la captura (scanner) SI entra al scope — en desktop nunca tuvo sentido.
+### MOBILE PARITY — workstream (proxima sesion, 100% Fable — decision Kamilo 2026-07-05 noche)
+
+> **Enfoque acordado (conversacion 2026-07-05):** NO es portar componentes RN
+> (View/Pressable/Reanimated no corren en DOM; react-native-web descartado —
+> pelearia con Next 16 + Tailwind). ES una capa de PRESENTACION mobile nueva
+> sobre la capa de datos que YA existe en eventos-web (117 endpoints, proxies,
+> types, derive helpers, socket bus, tokens, i18n — todo agnostico del layout):
+> - **Shell mobile propio** (bottom tabs espejo Expo; deteccion de viewport —
+>   celular recibe shell mobile, desktop conserva el spatial shell)
+> - **Transcripcion pantalla-por-pantalla** del Expo real (metodo probado en
+>   Momentos/Memorias/perfil), esta vez espejando el layout MOBILE literal
+> - **Baseline PRIMERO**: inventario por modulo (responsive casi-solo vs vista
+>   mobile dedicada vs nativo del workstream) → counters → bloques. Nada de
+>   estimar sin inventario (regla de procedencia).
+> - Nativos del workstream: **Mi QR** (mobile-only) + **W.15 Vendor** con
+>   scanner QR en browser (prior art eventos-kiosko).
+>
+> W.15 Vendor (movido aqui 2026-07-05: el staff del stand no instala app).
 > Items de referencia (procedencia verificada, para cuando arranque):
 > Procedencia verificada: ~3.000 lineas Expo (8 pantallas) + 18 endpoints backend mapeados (auditoria 2026-07-04). Gating: `attendee.has_vendor_access` del `GET /auth/me` (`isVendor = role==='vendedor' || hasVendorAccess`).
 - [ ] Hooks + gating hasVendorAccess (espejo `useStand`/`useLeads`/`standApi`/`leadsApi`)
