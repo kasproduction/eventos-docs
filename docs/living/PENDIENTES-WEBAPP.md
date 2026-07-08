@@ -25,7 +25,7 @@
 | **W.0 Spatial UI base** | **24/24** | **CERRADO 100% 2026-07-04** (Command palette + Pre-load + device real reclasificados a Fase 2/W.12) | **+3** |
 | **W.1 Setup + Auth + UI Foundation** | **107/107** | **CERRADO 100% 2026-07-04** (5 items diferidos reclasificados formalmente: 2 a Fase 2, 2 a W.12, 1 agrupado con W.4) | **+5** |
 | W.1B Backend magic link | 10/10 | **CERRADO** | — |
-| W.2 Home | **13/16** | **81%** — auditoria 2026-07-04: 4 inventos eliminados (sponsors band, multi-sede, proximos org, dedupe) + badge anuncios cubierto por Bell + foto speaker HECHA. Falta real: GamificationHud + survey + EventArchive | **+3** |
+| **W.2 Home** | **16/16** | **CERRADO 100% 2026-07-08** — GamificationHud LIVE (slide del carrusel espejo Expo, borde RGB + deeplink /desafio) + EventArchive ENDED (espejo Expo puro: banner + stats evento + prompt encuesta + 4 links archivo) + prompt encuesta → **/encuestas** (SurveyDeck por slides: cascada estrellas, spring, cierre verde). Recap/certificado → pantalla aparte (Fase 2) | **+3** |
 | **W.3 Agenda** | **25/25** | **CERRADO 2026-07-04 via auditoria procedencia** — badges/conflict/check-in eran inventos (Expo no los tiene; el espejo real del lifecycle es el toast agenda:delayed YA hecho en W.11). URL state → Fase 2, recordatorio → W.12 Push | **+3** |
 | **W.4 Streaming** | **92/92** | **CERRADO 2026-07-04 noche** (recount contra codigo: replay + rating auto + anuncios in-stream + custom panel + slow mode + floating emojis + mobile/tablet layouts YA estaban implementados y sin marcar. Fix race auto-rate e1b0c9a. Reclasificados: trivia→W.16, E2E cross-tab→W.12, 17 menores→QA W.12) | **+9** |
 | **W.5 Speakers** | **35/35** | **CERRADO 100% 2026-07-04** (reclasificado Lighthouse + device fisico a W.12 Polish cross-modulos) | **+2** |
@@ -43,7 +43,7 @@
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
 | ~~W.X Welcome Showcase~~ | **ELIMINADO** | Invento de planeacion (auditoria 2026-07-04): el onboarding Expo es un wizard de REGISTRO, no un carrusel de features. Boton perfil oculto (`4325f05`). Fase 2 si se quiere espejo del wizard | — |
-| **TOTAL** | **541/576** | **93.9%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05) | **2026-07-05 tarde BLOQUE 5 Fases A+B**: W.12 +17 (Web Push end-to-end + PWA + CSP + SEO higiene + print + splitting; denominador 43→48 por Fase 10 Web Push explicitada). Quedan: B2 Home (3, ~1.5-2h) + B4 Trivia (5, ~3-4h) + B5 Fase C QA (~2h CON Kamilo presente). **16 modulos cerrados:** W.0, W.1, W.1B, W.3, W.4, W.5, W.6, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.17, W.18 |
+| **TOTAL** | **544/576** | **94.4%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05) | **2026-07-08 BLOQUE 2 CERRADO**: W.2 Home 13→16 (GamificationHud LIVE + EventArchive ENDED + encuestas por slides). Quedan: B4 Trivia (5, ~3-4h) + B5 Fase C QA (~2h CON Kamilo presente) + Mobile parity. **17 modulos cerrados:** W.0, W.1, W.1B, W.2, W.3, W.4, W.5, W.6, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.17, W.18 |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -53,8 +53,10 @@
 
 - [ ] **MOBILE PARITY — sesion baseline + arranque (decision Kamilo 2026-07-05: trabajo 100% Fable, dedica el 50% de cuota restante).** Arranca por el baseline: inventario modulo-por-modulo contra el Expo real (que se adapta responsive, que necesita vista mobile dedicada, que es nativo del workstream) + diseno del shell mobile → counters → bloques. Ver seccion MOBILE PARITY abajo para el enfoque tecnico acordado.
 
-> Alternativa si la sesion NO es Fable: **BLOQUE 2 — W.2 Home → 100%** (~1.5-2h, apto Opus): GamificationHud preview LIVE (espejo `index.tsx:103-129`) + survey prompt ENDED + EventArchive ENDED.
+> Alternativa si la sesion NO es Fable: **BLOQUE 4 — W.16 Trivia** (~3-4h, apto Opus): TriviaPanel espejo + store sockets game:* + proxy answer + toasts ruleta. (BLOQUE 2 Home YA cerrado 2026-07-08.)
 > Cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device iPad/iPhone/Edge/Firefox + Lighthouse + WCAG + E2E cross-tab + DSN prod). Fase A 100% validada 2026-07-05 (push desde Filament OK + install PWA OK).
+
+> Deuda menor W.2 (no bloqueante): E2E Playwright de /encuestas (tengo vitest 9 tests) · verificar Lux con ojo · recap/certificado como pantalla aparte (Fase 2, hoy el codigo recap sigue en lib/recap sin consumir desde Home) · streaming poll-vote proxy pega a /polls/{id}/vote sin prefijo /events (posible bug latente pre-existente, la ruta real unica es /events/polls/{id}/vote).
 
 > Deuda menor anotada 2026-07-05: `ProfileSecurityTest` 2 tests rojos PRE-existentes
 > (esperan 422 para linkedin/website sin http; el validator W.18 se relajo a proposito
@@ -98,11 +100,12 @@
 - [x] **Vista Memorias** — 5ta vista sidebar: grid 3 col oficial 2x2, PhotoViewer marco FIJO 16:9/9:16 con contain (nunca recorta), like optimistic+haptic+pop, foto propia → toast informativo (anti-gaming), upload header crop 1:1
 - [x] **ContestBanner** — solo active/ended<24h, countdown vivo useNow, podio oro/plata/bronce 72/56, orden por likes client-side (grid+viewer indices compartidos)
 
-### BLOQUE 2 — W.2 Home → 100% (~1.5-2h) — 1/4
+### BLOQUE 2 — W.2 Home → 100% — 4/4 **CERRADO 2026-07-08** (`c30b55d` web + `127693a` backend)
 - [x] ~~Foto real speaker en feed salas~~ — **HECHO 2026-07-04**: `RoomAvatar` usa `speaker_photo_url` con gradiente fallback (espejo Expo session-stream:272)
-- [ ] GamificationHud preview LIVE (espejo `index.tsx:103-129` Expo: slide en carrusel con rank + puntos + retos)
-- [ ] Post-event survey prompt estado ENDED (espejo card "Encuesta de satisfaccion" + estado completada)
-- [ ] EventArchive en ENDED (espejo `EventArchive.tsx` Expo: links agenda/memorias/gamification/speakers + stats)
+- [x] **GamificationHud LIVE** — slide extra del carrusel de highlights (`CartelDigital`), espejo Expo `GamificationHud`: borde RGB girando 6s + barra segmentada de 10 + rank/puntos/retos/stamps, toda la card deeplink a /desafio. Tamano fluido cqw+em (no desborda el slot 16:9). Datos SSR via `fetchDesafioOverview` → `deriveHudData`. Paleta teal fija (no accent). Dwell 10s vs 6s highlights
+- [x] **Post-event survey prompt ENDED** — tarjeta en el EventArchive (pendiente "Responder"→/encuestas / completada). Estado via `fetchPostEventSurvey` (GET /events/{id}/post-event-survey)
+- [x] **EventArchive ENDED** (espejo Expo puro, decision Kamilo: recap/certificado fuera del Home) — banner "Evento finalizado" + fecha, 3 stats del evento (asistentes/sesiones/fotos, `photo_count` nuevo en by-slug), 4 links archivo (agenda/social/desafio/speakers). Reemplaza el recap-col
+- [x] **DESTINO /encuestas** (no estaba en el plan; el prompt sin destino era boton muerto) — `SurveyDeck` por slides espejo Expo `PollSlides` elevado a EventOS: 1 pregunta/slide, transicion spring, opciones en cards con pop + check dibujado, **estrellas que se llenan en cascada** al seleccionar, cierre verde de exito (NO accent que puede ser rojo=alarma), voto **optimista** (feedback instantaneo). Reutiliza el sistema de polls + proxies /api/surveys. Deeplink eventos://encuestas. Cero dots, tokens Lux+Noir
 
 ### BLOQUE 3 — Cartel espejo + BD limpia — 3/3 **CERRADO 2026-07-05**
 - [x] CartelDigital → **solo highlights** (`highlightsToCartelItems`, merger round-robin y sponsor pill eliminados; backend ya filtra vigencia con scope active). `lib/banners.ts` borrado

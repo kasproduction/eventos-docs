@@ -6,6 +6,80 @@
 
 ---
 
+## SESION 2026-07-08 — BLOQUE 2 W.2 HOME CERRADO 100% + encuestas por slides (Opus 4.8)
+
+**TOTAL: 544/576 = 94.4%. 17 modulos cerrados** (W.2 se une). Sesion Opus (no Fable),
+enfoque DaVinci con harto ida-y-vuelta de QA vivo con Kamilo.
+
+### Que se hizo (`c30b55d` web + `127693a` backend)
+
+1. **GamificationHud LIVE** — slide extra del carrusel de highlights del Home LIVE
+   (`CartelDigital`), espejo Expo `GamificationHud`: borde RGB girando 6s + barra
+   segmentada de 10 tramos + rank/puntos/retos/stamps. **Toda la card es deeplink a
+   /desafio** (decision Kamilo). Tamano **fluido `cqw`+`em`** (bug cazado en QA: a
+   ancho de columna desbordaba el slot 16:9 — imagen 117). Datos SSR via
+   `fetchDesafioOverview` → `deriveHudData` (cero calls nuevas). Paleta teal FIJA
+   (no accent). Dwell 10s vs 6s de highlights.
+2. **ENDED = EventArchive (espejo Expo puro)** — decision Kamilo tras revisar el Expo
+   real: el Home ended de Expo muestra `HomeHero` + `EventArchive` (banner "Evento
+   finalizado" + 3 stats del evento + prompt encuesta + 4 links archivo). **El
+   certificado/recap NO va en el Home** (es pantalla aparte en Expo). Se REEMPLAZO el
+   recap-col de la webapp (que divergia) por el EventArchive. `photo_count` nuevo en
+   el by-slug del backend. El recap/certificado queda para pantalla aparte Fase 2.
+3. **Prompt de encuesta + /encuestas** — el prompt vive en el Home ENDED porque al
+   finalizar el evento es lo primero que ve la gente (razon Kamilo, espejo Expo). El
+   prompt necesitaba destino → se creo la ruta **/encuestas** reutilizando el sistema
+   de polls del backend. **SurveyDeck por slides** (espejo Expo `PollSlides`, elevado
+   a EventOS): 1 pregunta/slide, transicion spring, opciones en cards con pop + check
+   dibujado, **estrellas que se llenan en cascada** al seleccionar, cierre con anillo
+   verde de exito. Voto **optimista** (feedback instantaneo, red en segundo plano).
+
+### Proceso DaVinci (importa para la proxima)
+
+- **2 rechazos del UI de encuesta antes de acertar.** Primero reuse el `PollPanel`
+  plano del streaming (cuestionario tieso) → Kamilo: "horrible, plano". Segundo intento
+  con slides pero con dots + tabular-nums (leia monospace) + sin motion → "no hay
+  animaciones, odio los dots, las fuentes monospace, asi no es EventOS". Recien ahi
+  PARE y segui el flujo correcto: **mockup HTML interactivo** (Typeform-grade,
+  aprobado) ANTES de tocar codigo. Leccion: no codear UI sin diseno aprobado.
+- El espejo correcto de encuestas era `PollSlides.tsx` (Expo), no el PollPanel. Casi lo
+  paso por alto por reusar el componente comodo.
+
+### Gotchas nuevos
+
+- **HUD en slot 16:9 desbordaba** con fuentes fijas → tamano fluido `cqw` (base) + `em`
+  (todo lo demas), con la card como `container-type: inline-size`. Escala con el slot.
+- **Verde de exito, NO accent, en el cierre de encuesta**: el accent del evento puede
+  ser rojo → un check rojo en "Gracias por responder" lee como alarma/error.
+- **TabletRotateOverlay** no dispara en desktop a ningun ancho: pide `pointer: coarse`
+  (touch real) + portrait + 640-1023px. A ancho de celular en desktop no hay guard
+  (mobile = Mobile parity, aun no).
+- **Voto de encuesta = optimista** (recordAnswer antes de la red). Antes esperaba el
+  backend → laggeaba.
+
+### Decisiones cerradas (no re-preguntar)
+
+- **EventArchive espejo Expo PURO** — recap/certificado sale del Home, va a pantalla
+  aparte (Fase 2). El panel ENDED = banner + stats evento + encuesta + archivo.
+- **El prompt de encuesta vive en el Home ENDED** (primera cosa que ve la gente al
+  finalizar). El destino es /encuestas.
+- **/encuestas por slides** (SurveyDeck espejo PollSlides), NO el PollPanel plano.
+- **Cierre de encuesta en verde**, no accent. **Cero dots** en todo el modulo.
+- **HUD = card entera clickeable** a /desafio (no solo el boton).
+
+### Deuda anotada (no bloqueante)
+
+- E2E Playwright de /encuestas (hay 9 vitest). Verificar Lux con ojo. Recap como
+  pantalla aparte. Bug latente: streaming poll-vote proxy pega a `/polls/{id}/vote`
+  sin `/events` (ruta real unica `/events/polls/{id}/vote`).
+
+### PROXIMA SESION
+
+**Si NO es Fable:** BLOQUE 4 W.16 Trivia (~3-4h, Opus). **Si es Fable:** Mobile parity
+baseline. **Con Kamilo 2h presenciales:** B5 Fase C QA.
+
+---
+
 ## SESION 2026-07-05 TARDE — BLOQUE 5 (W.12) Fases A+B: Web Push + PWA + hardening (Fable 5)
 
 **TOTAL: 541/576 = 93.9%. W.12 salto de 8/43 a 25/48 (+17).** Decision de arranque:
