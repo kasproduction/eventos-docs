@@ -134,7 +134,7 @@
 - [ ] **Fase C** — E2E cross-tab (streaming Q&A, social conectar)
 - [ ] **Fase C** — DSN prod Sentry + validacion (item de deploy; config completa ya en codigo)
 
-### MOBILE PARITY — workstream 26/58 (baseline CERRADO 2026-07-09, 100% Fable)
+### MOBILE PARITY — workstream 33/58 (baseline CERRADO 2026-07-09, 100% Fable)
 
 > **Enfoque acordado (2026-07-05):** NO portar componentes RN (react-native-web
 > descartado). Capa de PRESENTACION mobile nueva sobre la capa de datos existente
@@ -226,14 +226,15 @@
 > QA fixes 2026-07-09 (feedback Kamilo img-less): halo avatar attendee centrado (grid 88) · sheets con slide-up+backdrop fade+sombra · vibrate en enviar solicitud/bloquear/desbloquear · active:scale en filas/cards · fade-up sutil en filas de directorio (divergencia minima, Expo no anima — vetable). Intereses en comun: shape backend verificado OK, pendiente cross-check Kamilo vs panel desktop
 > Verificacion 2026-07-09: typecheck+lint 0 errores · 517/517 vitest · E2E mobile-shell 12/12 (+networking: 3 tabs + tap directorio → /attendee/{id}) · mockBackend +/attendees/{id}/profile · screenshots 390 revisados (networking + attendee fieles)
 
-#### M.4 — Social mobile — 0/7
-- [ ] Header sticky blur + SegmentedControl Feed/Memorias (espejo `social.tsx:183-240`)
-- [ ] MomentosRow + viewer stories mobile (viewer 9:16 W.6 ya existe — adaptar a viewport completo)
-- [ ] Feed mobile: lista virtual + pull-to-refresh (espejo FlashList `:305-328`; infinite scroll cursor W.6 ya existe)
-- [ ] SocialFAB contextual (espejo `SocialFAB`: crear post o subir foto segun segmento — webapp desktop NO usa FAB, mobile SI es espejo)
-- [ ] CommentsSheet bottom sheet mobile (espejo `CommentsSheet`)
-- [ ] CreatePostModal + upload foto 1:1 mobile (crop W.6 reusable)
-- [ ] Memorias mobile: PhotoGrid + PhotoViewer marco fijo + ContestBanner (W.6 ya espejo en desktop — layout mobile)
+#### M.4 — Social mobile — 7/7 **IMPLEMENTADO 2026-07-09 (QA vivo pendiente)**
+- [x] **Header sticky blur** (espejo `social.tsx:183-214`): back + Social + MomentosRow + SegmentedControl con indicador framer layoutId — contenido scrollea POR DETRAS del blur
+- [x] **Momentos**: row espejo (upload circle + "Tu" + anillos accent/tenue reactivos via STORY_SEEN_EVENT external store) + **MomentosViewerM full-screen** (espejo Expo: negro, dots barra, auto-advance 5s, tap zones 40/60, marca visto). Upload = input file + centerCropImage 9:16 W.6
+- [x] **Feed**: PostCardM espejo (autor+timeAgo, body, foto 240, corazon --heart pop spring, comentarios) + infinite scroll cursor reuso W.6 (`/api/social/wall`) + like optimista con rollback (pull-refresh = gesto nativo del browser)
+- [x] **SocialFAB contextual** espejo: crear post (Feed) / subir foto (Memorias), press scale + vibrate medium
+- [x] **CommentsSheetM**: SheetM + burbujas + auto-scroll fondo + input redondo con send accent
+- [x] **CreatePostSheetM** espejo pageSheet: header Cancelar/Publicar pill, textarea autofocus, foto opcional con preview+quitar (object URL en handler — sin setState-in-effect), toasts published/en-revision
+- [x] **Memorias**: ContestBannerM (countdown useNow 1s, podio medallas 72/56, corona winner) + PhotoGridM (triples + OFICIAL 2-col + corona rank) + **PhotoViewerM full-screen** (fade, swipe scroll-snap, counter, footer autor/caption/heart). Regla W.6: like a foto propia = toast informativo
+> Verificacion 2026-07-09: typecheck+lint 0 errores (3 violaciones react-hooks corregidas) · 517/517 vitest · E2E mobile-shell 14/14 (+social: momentos+segmented+FAB contextual) · screenshots 390 revisados (feed + memorias fieles). QA vivo: momentos con stories reales, viewers, uploads con crop, comentarios
 
 #### M.5 — Speakers + Sponsors mobile — 0/5
 - [ ] Speakers mobile (espejo `speakers.tsx` 308: search debounce + Destacados carousel + lista con badge sesiones)
