@@ -51,7 +51,7 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **MOBILE PARITY — QA vivo M.0+M.1 con Kamilo, luego M.2 Agenda mobile.** 15/58: M.0 shell 6/7 + **M.1 Home + Mi QR 8/8 IMPLEMENTADO 2026-07-09** (+ /about adelantado). QA vivo pendiente contra backend real: shell (tabs/burbuja/badge), Home live (HUD slide con datos reales, hero imagen, Lux), Mi QR rotacion real. Despues M.2: DayStrip + SessionCard timeline + Mi Agenda favoritos + detalle sesion (decidir ruta vs sheet). Item M.0 restante (gates banned/aprobacion + deeplinks) se verifica en el QA.
+- [ ] **MOBILE PARITY — QA vivo M.2 con Kamilo, luego M.3 Networking + Perfil.** 20/58: M.0 shell 6/7 + M.1 Home/MiQR 8/8 (commiteado `ab416fd`, QA vivo OK con fix HUD img 118) + **M.2 Agenda 5/5 IMPLEMENTADO 2026-07-09** (pendiente commit + QA vivo: /mi-agenda favoritos + /agenda stack + /session/{id} detalle + corazon particulas + ICS). Despues M.3: NetworkingScreen 3 tabs + attendee/[id] + ProfileScreen. Item M.0 restante (gates banned/aprobacion + deeplinks) se verifica en QA.
 
 > BLOQUE 4 (W.16 Trivia) YA cerrado 2026-07-09. BLOQUE 2 (Home) cerrado 2026-07-08. Quedan solo Mobile parity + B5 Fase C.
 > Cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device iPad/iPhone/Edge/Firefox + Lighthouse + WCAG + E2E cross-tab + DSN prod). Fase A 100% validada 2026-07-05 (push desde Filament OK + install PWA OK).
@@ -134,7 +134,7 @@
 - [ ] **Fase C** — E2E cross-tab (streaming Q&A, social conectar)
 - [ ] **Fase C** — DSN prod Sentry + validacion (item de deploy; config completa ya en codigo)
 
-### MOBILE PARITY — workstream 15/58 (baseline CERRADO 2026-07-09, 100% Fable)
+### MOBILE PARITY — workstream 20/58 (baseline CERRADO 2026-07-09, 100% Fable)
 
 > **Enfoque acordado (2026-07-05):** NO portar componentes RN (react-native-web
 > descartado). Capa de PRESENTACION mobile nueva sobre la capa de datos existente
@@ -208,12 +208,13 @@
 > BONUS M.1: **/about implementado** (adelantado de M.7 — la card About del Home registration lo necesitaba; `AboutView` espejo `about.tsx` 175: imagen 16:9 + texto + links, back pill, desktop redirige) + **MobileHeader** patron header (cierra item 3 de M.0).
 > Verificacion 2026-07-09: typecheck+lint 0 errores · 509/509 vitest (+12: MiQrView 6 + HomeMobile/status visual 6) · E2E mobile-shell 9/9 (home mobile hero+4 modulos+bell, mi-qr badge+fullscreen+tab activa) · screenshots 390 revisados (home live + mi-qr fieles al Expo). QA vivo pendiente: HUD slide con datos reales, estados published/ended/registration con backend real, hero imagen, Lux
 
-#### M.2 — Agenda mobile (tab 2 + stack) — 0/5
-- [ ] DayStrip pills auto-scroll + TrackFilter chips mobile (espejo `AgendaScreen.tsx:60-209`)
-- [ ] SessionCard timeline mobile (espejo `:400-624`: hora + TimelineDot pulso live + heart pop + badges + speakers stack + acciones Calendario/Evaluar/UNIRTE/grabacion)
-- [ ] Mi Agenda = misma vista favoritesOnly como tab (espejo `mi-agenda.tsx` → `AgendaScreen favoritesOnly`)
-- [ ] Detalle de sesion mobile (espejo `session/[id].tsx` 458: badges + card info + favorito + calendario + speakers + boton stream + rating) — webapp NO tiene ruta detalle, en desktop es panel: decidir ruta vs sheet en el diseno del bloque
-- [ ] RatingModal mobile (espejo `RatingModal` — ya hay rating en desktop W.3)
+#### M.2 — Agenda mobile (tab 2 + stack) — 5/5 **IMPLEMENTADO 2026-07-09 (QA vivo Kamilo pendiente)**
+- [x] **DayStrip Fever + TrackFilter** (`AgendaMobile.tsx` espejo `AgendaScreen.tsx:60-209`): pills 52x76 con dia activo accent + dot dia-con-eventos + relleno ±1 deshabilitado + auto-scroll centrado (scrollTo, NO scrollIntoView — leccion err 113); chips de track con dot color + "Todos"
+- [x] **SessionCard timeline** (espejo `:400-624`): hora 12h es-CO + TimelineDot pulso live + conector + badges EN VIVO/check/track + **corazon --heart con pop + ring + 6 particulas** (canon webapp, divergencia aprobada del accent Expo) + finished tachada/atenuada + speakers stack + Calendario (.ics W.3 reuso) / Evaluar / UNIRTE / Ver grabacion + DaySlide 280ms + highlight deeplink glow 2.5s
+- [x] **Rutas espejo estructura Expo**: tab = `/mi-agenda` NUEVA (favoritesOnly, con tab bar, boton "Todas" = downloadAgendaIcs bulk W.3, quitar favorito saca de la lista) · `/agenda` completa = stack (back pill, SIN tab bar) con dual render CSS · desktop /mi-agenda → /agenda
+- [x] **Detalle de sesion `/session/[id]` NUEVA** (`SessionDetailM` espejo `session/[id].tsx` 458): badges live/tipo/track + titulo 26 + card fecha/hora/lugar/capacidad + Favorita/Calendario/Evaluar + stream full-width + "Acerca de" + speakers clickeables (→ /speakers hasta M.5) — **decision: ruta (espejo), en desktop redirige a /agenda?highlight={id}** (el panel ES el detalle desktop)
+- [x] **RatingModalM**: reuso del RatingModal W.3 con wrapper fixed `.agenda-root` (los estilos del pop estan scopeados — bug QA cazado en screenshot: renderizaba inline; +fix bg transparent)
+> Verificacion 2026-07-09: typecheck + lint 0 errores (2 violaciones react-hooks refactorizadas: dia activo derivado + slide dir en state) · 517/517 vitest (+8: AgendaMobile 5 + tabbar/gate updates) · E2E mobile-shell 11/11 (mi-agenda tab activa + agenda stack sin tab bar + tap card → /session/{id}) · screenshots 390 revisados (timeline/pills/detalle fieles). QA vivo pendiente: heart particulas, DaySlide, rating real, "Todas" ICS, Lux
 
 #### M.3 — Networking + Perfil (tabs 4 y 5) — 0/6
 - [ ] Networking 3 tabs internas directorio/contactos/solicitudes con badges animados (espejo `NetworkingScreen.tsx:139-176`)
