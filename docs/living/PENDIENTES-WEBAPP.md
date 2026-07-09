@@ -51,7 +51,7 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **MOBILE PARITY — sesion baseline + arranque (decision Kamilo 2026-07-05: trabajo 100% Fable, dedica el 50% de cuota restante).** Arranca por el baseline: inventario modulo-por-modulo contra el Expo real (que se adapta responsive, que necesita vista mobile dedicada, que es nativo del workstream) + diseno del shell mobile → counters → bloques. Ver seccion MOBILE PARITY abajo para el enfoque tecnico acordado.
+- [ ] **MOBILE PARITY — QA vivo M.0+M.1 con Kamilo, luego M.2 Agenda mobile.** 15/58: M.0 shell 6/7 + **M.1 Home + Mi QR 8/8 IMPLEMENTADO 2026-07-09** (+ /about adelantado). QA vivo pendiente contra backend real: shell (tabs/burbuja/badge), Home live (HUD slide con datos reales, hero imagen, Lux), Mi QR rotacion real. Despues M.2: DayStrip + SessionCard timeline + Mi Agenda favoritos + detalle sesion (decidir ruta vs sheet). Item M.0 restante (gates banned/aprobacion + deeplinks) se verifica en el QA.
 
 > BLOQUE 4 (W.16 Trivia) YA cerrado 2026-07-09. BLOQUE 2 (Home) cerrado 2026-07-08. Quedan solo Mobile parity + B5 Fase C.
 > Cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device iPad/iPhone/Edge/Firefox + Lighthouse + WCAG + E2E cross-tab + DSN prod). Fase A 100% validada 2026-07-05 (push desde Filament OK + install PWA OK).
@@ -134,29 +134,133 @@
 - [ ] **Fase C** — E2E cross-tab (streaming Q&A, social conectar)
 - [ ] **Fase C** — DSN prod Sentry + validacion (item de deploy; config completa ya en codigo)
 
-### MOBILE PARITY — workstream (proxima sesion, 100% Fable — decision Kamilo 2026-07-05 noche)
+### MOBILE PARITY — workstream 15/58 (baseline CERRADO 2026-07-09, 100% Fable)
 
-> **Enfoque acordado (conversacion 2026-07-05):** NO es portar componentes RN
-> (View/Pressable/Reanimated no corren en DOM; react-native-web descartado —
-> pelearia con Next 16 + Tailwind). ES una capa de PRESENTACION mobile nueva
-> sobre la capa de datos que YA existe en eventos-web (117 endpoints, proxies,
-> types, derive helpers, socket bus, tokens, i18n — todo agnostico del layout):
-> - **Shell mobile propio** (bottom tabs espejo Expo; deteccion de viewport —
->   celular recibe shell mobile, desktop conserva el spatial shell)
-> - **Transcripcion pantalla-por-pantalla** del Expo real (metodo probado en
->   Momentos/Memorias/perfil), esta vez espejando el layout MOBILE literal
-> - **Baseline PRIMERO**: inventario por modulo (responsive casi-solo vs vista
->   mobile dedicada vs nativo del workstream) → counters → bloques. Nada de
->   estimar sin inventario (regla de procedencia).
-> - Nativos del workstream: **Mi QR** (mobile-only) + **W.15 Vendor** con
->   scanner QR en browser (prior art eventos-kiosko).
+> **Enfoque acordado (2026-07-05):** NO portar componentes RN (react-native-web
+> descartado). Capa de PRESENTACION mobile nueva sobre la capa de datos existente
+> (fetchers SSR + proxies + clients: 100% agnostica del layout — verificado en
+> baseline). Transcripcion pantalla-por-pantalla del Expo real.
 >
-> W.15 Vendor (movido aqui 2026-07-05: el staff del stand no instala app).
-> Items de referencia (procedencia verificada, para cuando arranque):
+> **Baseline 2026-07-09 (5 agentes: 4 sobre Expo real + 1 sobre eventos-web):**
+> - **Molde arquitectonico ya existe**: `StreamShell.tsx:187-193` bifurca con
+>   `useIsMobile()` (client matchMedia, SSR-safe) en 3 variantes; logica en el
+>   padre, variantes = puro layout. Breakpoint canonico `mobile <640px`
+>   (`globals.css:8`). NO hay UA sniffing en el repo — la bifurcacion es client.
+> - **Hoy a 390px la webapp esta ROTA sin guard**: canvas ~240px
+>   (`globals.css:449` asume sidebar desktop) + SidebarPill flotando encima.
+>   TabletRotateOverlay NO cubre <640px.
+> - **Shell Expo a espejar**: `FloatingTabBar.tsx` (354) — pill flotante blur,
+>   burbuja deslizante spring, badge rojo networking, 5 tabs:
+>   Inicio / Mi Agenda / Mi QR / Networking / Perfil. Sin headers nativos
+>   (cada pantalla dibuja el suyo; bell solo en Home). Scrolls reservan
+>   `useTabBarHeight` (68 + safe area) como padding inferior.
+> - **MAPA DE NAVEGACION ESPEJO (correccion Kamilo 2026-07-09 — la webapp
+>   mobile NO inventa entradas de menu que Expo no tiene):** ModuleMenu del
+>   Home = SOLO 4 modulos hardcoded Agenda/Speakers/Social/Sponsors
+>   (`ModuleMenu.tsx:26-31`) + Room Check-in (staff) / Asignar Staff (admin)
+>   por rol. El resto se alcanza asi: Anuncios = campana del Home; Desafio =
+>   slide JUGAR del HUD (`GamificationHud.tsx:163`) + deeplink + EventArchive;
+>   FAQ = boton Ayuda del Perfil (`ProfileScreen.tsx:275`); Soporte = via FAQ;
+>   Encuestas = EventArchive ENDED (`EventArchive.tsx:49`) + PollSlides
+>   overlay en chat/stream; About = card del Home SOLO registration/draft
+>   (`index.tsx:170-185`); **Documentos/Pages = SIN navegacion propia** — solo
+>   via highlights `link_url` / anuncios `action_url` (deeplinks internos,
+>   `HappeningNow.tsx:347-356`). El modulo existe pero es opcional/invisible.
+>
+> **NO se espeja (procedencia verificada):** `passport.tsx` standalone
+> (huerfana — cero navegaciones entrantes; el pasaporte real es sheet del hub
+> Desafio) · `banners.tsx` (muerta) · onboarding wizard (decision W.1/W.X) ·
+> `recap/[eventId]` → Fase 2 (decision W.2) · `pages/[id]` → Fase 2 (decision
+> W.13) · **staff-checkin + assign-staff → FUERA (decision Kamilo 2026-07-09:
+> el staff no va en el workstream mobile; kiosko cubre check-in)** ·
+> activate-account/pending-approval (auth webapp = magic link W.1; revisar en
+> M.0 si el gate de aprobacion aplica).
+>
+> **Decisiones cerradas 2026-07-09 (no re-preguntar):**
+> - **session-chat = comportamiento espejo OBLIGATORIO como modo de
+>   StreamShellMobile**: el routing de UNIRTE es por stream configurado
+>   (`HappeningNow.tsx:182-186`) — sesion CON `stream_url`/`stream_iframe` →
+>   player (+ placeholder si retrasada); sesion SIN stream → chat full-height.
+>   NO se crea ruta `/session-chat` aparte (mismos sockets/paneles).
+> - **about.tsx entra** como pantalla chica en M.7 (webapp no tiene /about).
+> - **Orden de bloques M.0→M.8; M.0 primero y bloqueante.** Mockup DaVinci del
+>   tab bar aprobado ANTES de codear.
+
+#### M.0 — Shell mobile (fundacion, bloquea todo) — 5/7
+- [x] **Bifurcacion shell CSS-first** (2026-07-09): chrome desktop (`AmbientBackground`/`SidebarPill`/`ThemeTogglePill`) en wrapper `contents mobile:hidden`; `Stage` con variantes `mobile:block p-0`; `MobileGate` oculta la vista desktop <640px y muestra placeholder digno (CTA volver al inicio) hasta que cada ruta entregue su vista mobile (`MOBILE_READY`, /session-stream ya bifurca solo). Cero flash de hidratacion (CSS decide, no JS)
+- [x] **MobileTabBar espejo `FloatingTabBar.tsx`** (2026-07-09, mockup DaVinci aprobado + 3 decisiones: blur espejo en Noir / accent en activa / con labels): pill flotante blur 380 max, burbuja lente framer spring damping22/stiffness340 + highlight especular 45%, lift -3px, press scale 0.88, labels 9px, badge rojo solicitudes (SSR + auto-refresh via router.refresh de networking:notify), vibrate soft. **Solo visible en las 5 rutas tab** (espejo: stack screens sin tab bar). Rutas nuevas /mi-qr y /networking con `DesktopRedirect` (>=640 → /home y /social)
+- [ ] Patron header mobile por pantalla (espejo: header propio + back pill; bell con badge/shake SOLO en Home — `HomeHeader.tsx`) — llega con las primeras pantallas M.1
+- [x] Reserva altura tab bar: `--m-tabbar-reserve` (68 + safe area + 15, espejo `useTabBarHeight.ts`) en mobile-shell.css — usada por placeholder y PushPrompt
+- [x] Guard CSS mobile: canvas/Stage neutralizados <640px (vista desktop ademas oculta por MobileGate)
+- [x] PushPrompt: bottom sube sobre el tab bar en mobile (`calc(var(--m-tabbar-reserve) + 12px)`)
+- [ ] Deep links `eventos://` operativos en shell mobile (parseActionUrl existente) + gates banned/aprobacion espejo `(app)/_layout.tsx:63-73` — verificar al cerrar M.1
+> Verificacion 2026-07-09: typecheck + lint 0 errores · 497/497 vitest (+9: MobileTabBar 6 + MobileGate 3) · **E2E nuevo `mobile-shell.spec.ts` 7/7** (tab bar 5 tabs + activo, navegacion, placeholder + desktop oculto, stack sin tab bar, redirects desktop) · screenshots 390px OK (badge, burbuja accent, placeholder)
+
+#### M.1 — Home + Mi QR (tabs 1 y 3) — 8/8 **IMPLEMENTADO 2026-07-09 (QA vivo Kamilo pendiente)**
+- [x] **Home mobile por status** (`HomeMobile.tsx` espejo `(tabs)/index.tsx:143-271`): registration/draft = hero+countdown+info card+about · published = countdown compact+HappeningNow+modulos compact · live = HappeningNow+modulos · ended = EventArchive (reuso componente espejo W.2). Datos: `fetchEventBranding` NUEVO (GET /events/{id}/branding — la MISMA fuente que Expo useBranding) + agenda flatten + announcements. Dual render CSS en home/page.tsx
+- [x] HomeHeader mobile: logo/header_title + bell → /anuncios con badge unread (localStorage lastSeenAt reuso W.14) + shake CSS cada 5s + badge pop spring
+- [x] HappeningNow mobile (`HappeningNowM.tsx` espejo 573): dark island NOIR fijo, carrusel crossfade 400ms con rotacion 6s/10s HUD, dots por tipo (accent/teal/rosa), PulseDot, SpeakerRow stack + favoritos "+N asistiran", HighlightCard con link_url interno/externo, UNIRTE → /session-stream (chat-mode M.7). Status visual: `session-visual-status.ts` transcrito de `sessionStatus.ts` Expo, derivado con useNow (sin setState-in-effect)
+- [x] ModuleMenu mobile: SOLO 4 cards espejo (`ModuleMenu.tsx:26-31`), ratio 0.58, stagger 60ms, compact published
+- [x] GamificationHud slide: reuso del componente espejo W.2 dentro del carrusel (verificar tamano en QA vivo)
+- [x] Proxy `/api/mi-qr` + fetcher `fetchQrToken` (GET /me/qr?event_id)
+- [x] Mi QR espejo `MiQrScreen.tsx` (503): badge card negra siempre + DashedLine + **RgbWaveBorder pastel girando 6s (CSS)** + QR rotativo countdown 60s auto-refetch + tap fullscreen bg 0.88 + identidad beam avatar + formatEventDates transcrito
+- [x] Wallet pill "Pronto" disabled (espejo)
+> BONUS M.1: **/about implementado** (adelantado de M.7 — la card About del Home registration lo necesitaba; `AboutView` espejo `about.tsx` 175: imagen 16:9 + texto + links, back pill, desktop redirige) + **MobileHeader** patron header (cierra item 3 de M.0).
+> Verificacion 2026-07-09: typecheck+lint 0 errores · 509/509 vitest (+12: MiQrView 6 + HomeMobile/status visual 6) · E2E mobile-shell 9/9 (home mobile hero+4 modulos+bell, mi-qr badge+fullscreen+tab activa) · screenshots 390 revisados (home live + mi-qr fieles al Expo). QA vivo pendiente: HUD slide con datos reales, estados published/ended/registration con backend real, hero imagen, Lux
+
+#### M.2 — Agenda mobile (tab 2 + stack) — 0/5
+- [ ] DayStrip pills auto-scroll + TrackFilter chips mobile (espejo `AgendaScreen.tsx:60-209`)
+- [ ] SessionCard timeline mobile (espejo `:400-624`: hora + TimelineDot pulso live + heart pop + badges + speakers stack + acciones Calendario/Evaluar/UNIRTE/grabacion)
+- [ ] Mi Agenda = misma vista favoritesOnly como tab (espejo `mi-agenda.tsx` → `AgendaScreen favoritesOnly`)
+- [ ] Detalle de sesion mobile (espejo `session/[id].tsx` 458: badges + card info + favorito + calendario + speakers + boton stream + rating) — webapp NO tiene ruta detalle, en desktop es panel: decidir ruta vs sheet en el diseno del bloque
+- [ ] RatingModal mobile (espejo `RatingModal` — ya hay rating en desktop W.3)
+
+#### M.3 — Networking + Perfil (tabs 4 y 5) — 0/6
+- [ ] Networking 3 tabs internas directorio/contactos/solicitudes con badges animados (espejo `NetworkingScreen.tsx:139-176`)
+- [ ] Directorio mobile: search debounce 400ms + infinite scroll (`useInfiniteQuery` espejo — fetchers directory ya existen) + sugeridos carousel + quick-connect por relation (`:477-575`)
+- [ ] Contactos mobile: lista + export .vcf + bloqueados colapsable con desbloquear (`:693-933`; "guardar en telefono" nativo → download .vcf en web)
+- [ ] Solicitudes mobile: aceptar/ignorar + mensaje + timeAgo (`:948-1097`)
+- [ ] Perfil de asistente mobile (espejo `attendee/[id].tsx` 613: hero + CTA por relation + sheets Connect/Block + redes + contacto mutuo) — AttendeeProfilePanel desktop existe, mobile = pantalla/sheet
+- [ ] Perfil propio mobile (espejo `ProfileScreen.tsx` 927: hero avatar upload + stats gamification + mis datos + intereses + toggle tema + logout — PerfilView 387 ya tiene la logica)
+
+#### M.4 — Social mobile — 0/7
+- [ ] Header sticky blur + SegmentedControl Feed/Memorias (espejo `social.tsx:183-240`)
+- [ ] MomentosRow + viewer stories mobile (viewer 9:16 W.6 ya existe — adaptar a viewport completo)
+- [ ] Feed mobile: lista virtual + pull-to-refresh (espejo FlashList `:305-328`; infinite scroll cursor W.6 ya existe)
+- [ ] SocialFAB contextual (espejo `SocialFAB`: crear post o subir foto segun segmento — webapp desktop NO usa FAB, mobile SI es espejo)
+- [ ] CommentsSheet bottom sheet mobile (espejo `CommentsSheet`)
+- [ ] CreatePostModal + upload foto 1:1 mobile (crop W.6 reusable)
+- [ ] Memorias mobile: PhotoGrid + PhotoViewer marco fijo + ContestBanner (W.6 ya espejo en desktop — layout mobile)
+
+#### M.5 — Speakers + Sponsors mobile — 0/5
+- [ ] Speakers mobile (espejo `speakers.tsx` 308: search debounce + Destacados carousel + lista con badge sesiones)
+- [ ] Detalle speaker mobile (espejo `speaker/[id].tsx` 295: hero foto cuadrada + rating + LinkedIn + bio + sus sesiones)
+- [ ] Sponsors mobile (espejo `sponsors.tsx` 427: tiers platinum→media, living shuffle 7s pausado en scroll/search, pull-to-refresh, search 350ms)
+- [ ] Detalle sponsor mobile (espejo `sponsor/[id].tsx` 690: hero logo + sesiones + servicios/contacto chips + banner trivia + modal trivia + website/email)
+- [ ] Contacto sponsor mobile (espejo `sponsor-contact.tsx` 215: chips servicios + mensaje + enviar — ruta o sheet, decidir en diseno)
+
+#### M.6 — Desafio mobile — 0/3
+- [ ] Hub espejo `leaderboard.tsx` (1421): hero HUD (posicion + puntos + SegmentedBar + mini-ranking top-3 con RGB ring) + cards Premios/Golden/Retos/Pasaporte + MotivationalTip — **Noir forzado ("dark island"), DesafioView 368 tiene la logica**
+- [ ] 6 bottom sheets espejo: Retos / Ranking (podio + confeti) / Pasaporte / Rewards / Redeem-confirm / Rules (snap points `:590-813`)
+- [ ] Modales QR espejo: RedeemQrModal (QR + countdown expiracion en vivo `:843-898`) + GoldenTicketModal (QR + claim_code `:900-993`)
+
+#### M.7 — Comunicacion + streaming QA — 1/8
+- [ ] Anuncios mobile (espejo `anuncios.tsx` 149: cards imagen+timeAgo + deep links + pull-to-refresh)
+- [ ] Encuestas mobile (espejo `encuestas.tsx` 187: lista activas/cerradas + PollSlides — SurveyDeck W.2 ya es slides, adaptar viewport)
+- [ ] Soporte mobile (espejo `my-support.tsx` 131 + `support-contact.tsx` 149: consultas con status + respuesta admin + form)
+- [ ] FAQ/Asistente mobile (espejo `faq.tsx` 335: orb + state machine browsing/thinking/answering + chips categoria)
+- [ ] Documentos mobile (espejo `documentos.tsx` 111: lista + abrir) — SIN entrada de menu, solo deeplink (espejo)
+- [x] About — ruta NUEVA /about **HECHO en M.1 2026-07-09** (espejo `about.tsx` 175: imagen 16:9 + texto + links branding; entrada = card del Home SOLO registration/draft, espejo `index.tsx:170-185`)
+- [ ] Chat full-height sin stream: StreamShellMobile modo sin video = chat pantalla completa (espejo `session-chat/[id].tsx` 204 + routing `HappeningNow.tsx:182-186` — comportamiento OBLIGATORIO, sin ruta nueva)
+- [ ] QA StreamShellMobile existente contra Expo `session-stream/[id].tsx` (356): speaker row header, 3 estrategias de player, RatingModal delay, tracking
+
+#### M.8 — Vendor W.15 (cierre del workstream) — 0/9
 > Procedencia verificada: ~3.000 lineas Expo (8 pantallas) + 18 endpoints backend mapeados (auditoria 2026-07-04). Gating: `attendee.has_vendor_access` del `GET /auth/me` (`isVendor = role==='vendedor' || hasVendorAccess`).
 - [ ] Hooks + gating hasVendorAccess (espejo `useStand`/`useLeads`/`standApi`/`leadsApi`)
 - [ ] Mi Stand dashboard (espejo `mi-stand.tsx` 288: hero logo/tier/rol + 3 stat cards navegables — NO tabs)
 - [ ] Mis Leads (espejo `leads.tsx` 195 + `lead-detail.tsx` 317: grouped Hoy/Ayer/fecha + tier hot/warm/cold + notas + historial ediciones) + export CSV (`GET /me/leads/export`)
+- [ ] **Scanner stand QR con camara browser** (espejo `scanner-stand.tsx` 542: CameraView frame + scanline + sheet resultado — web: getUserMedia + BarcodeDetector, prior art eventos-kiosko)
+- [ ] Scanner invite equipo (espejo `scanner-invite.tsx` 282: resolver QR asistente → invitar al stand, gating owner)
 - [ ] Solicitudes stand (espejo `stand-contacts.tsx` 211: servicios interes + mensaje + acciones tel/mailto/wa.me)
 - [ ] Stats (espejo `stand-stats.tsx` 360: overview + trend vs ayer + TierBar + MemberBar + top services)
 - [ ] Team management (espejo `mi-equipo.tsx` 567: slots + invitar busqueda/email + share link + transfer + remove, owner-only)
@@ -167,6 +271,15 @@
 > wizard de REGISTRO (welcome hero + auth + foto + forms dinamicos + survey). La webapp
 > ya cubre su parte con W.1 magic link. Boton "Ver introduccion" queda oculto (Bloque 0).
 > Si Fase 2 pide espejo del wizard completo, se disena entonces.
+
+### PARALELO — PARIDAD DE CONFIG admin ↔ 3 superficies (detectado Kamilo 2026-07-09) — 0/3
+> Gap real verificado en baseline: el admin configura modulos/branding pero las superficies
+> obedecen a medias. Requiere diseno con Kamilo ANTES de codear (toca backend + Filament +
+> Expo + webapp a la vez). NO bloquea Mobile parity (el espejo replica el comportamiento
+> actual; al unificar se corrige en ambos lados en un movimiento).
+- [ ] **Modulos fuente unica**: visibilidad de modulos por superficie desde config Filament. Hoy: Expo hardcodea 4 (`ModuleMenu.tsx:26-31`, solo gamification consulta `modules.enabled`), sidebar desktop hardcodea items (documentos gated por count). Cada superficie renderiza su layout, la visibilidad sale del admin
+- [ ] **Keyvisual por superficie**: branding con `keyvisual_desktop` + `keyvisual_mobile` (fallback: desktop con crop focal si falta mobile) + Filament 2 uploads con preview por superficie. Expo consume el mobile. **Idealmente ANTES de M.1 Home mobile** (es cuando se necesita)
+- [ ] **Hero modo texto**: contrato unico de branding (type image|text) renderizado a escala en las 3 superficies. Modo texto = fallback digno sin arte, keyvisual = camino premium (decision desktop vigente). Flag: revisar que hace hoy la webapp desktop sin keyvisual
 
 ### PARALELO — Event Pulse cliente (sesion dedicada ~1-2h) — 0/4
 > Detalle en `docs/living/PENDIENTES.md` seccion Event Pulse. Formula counter ratings live≠F5 · Charlas vacia (room_id PulseController:102) · verificar leads/connections · poll:closed room null
