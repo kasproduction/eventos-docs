@@ -6,6 +6,67 @@
 
 ---
 
+## SESION 2026-07-09 — BLOQUE 4 W.16 TRIVIA CERRADO 100% + validado en vivo (Opus 4.8)
+
+**TOTAL: 549/576 = 95.3%. 18 modulos cerrados** (W.16 se une). Enfoque DaVinci:
+mockup HTML interactivo aprobado (4 iteraciones) ANTES de codear, luego QA vivo.
+
+### Que se hizo (commit eventos-web `main` + backend `feature/magic-link-auth`)
+
+**W.16 Trivia en vivo** — TriviaPanel espejo Expo DENTRO de la columna interactiva del
+streaming (modo `activePanel=trivia`, NO ruta aparte). 4 fases idle/question/result/
+finished: countdown drenante rojo ≤5s, opciones A-F color Kahoot, reveal de distribucion
+animada, mini-leaderboard top 3 + podio top 5.
+
+- **`lib/trivia.ts`** reducer puro + tipos + helpers. **`useTrivia`** hook LOCAL del panel
+  (patron useQnA, NO zustand — la webapp no tiene store; useReducer + sockets
+  `game:question`/`game:round-result`/`game:finished`). Respuesta NO optimista (backend
+  devuelve correct/score).
+- **Proxy** `/api/streaming/game-answer/[gameId]` → `POST /events/games/{id}/answer`
+  (prefijo `/events` explicito — NO repite el bug del poll-vote).
+- **Toasts ruleta/jackpot** (`game:launched`/`game:result`) en `GlobalSocketProvider`.
+- Wire desktop + mobile/tablet en `StreamShell` (reemplaza los 2 placeholders).
+- 10 vitest (reducer + helpers). 488→ suite verde. Typecheck + lint limpios.
+
+### Diseno (Kamilo, 4 iteraciones del mockup)
+
+Noir puro via `--st-*` (adapta Lux). **Sin teal** (v1 lo usaba, rechazado). **Unico color =
+letras A-F**. **Cero iconos** en el cuerpo. Estado por relleno de superficie, NO borde neon.
+Verde/rojo semantico SUAVE (`color-mix` 5-12%), incorrecto casi imperceptible. Leccion:
+mockup interactivo aprobado antes de codear (misma leccion que /encuestas).
+
+### Gotchas nuevos
+
+- **Bug cascada CSS**: `.opt>*{position:relative}` pisaba el `absolute` de la barra de
+  distribucion → entraba al flujo flex y empujaba la letra A-F. Fix: `.tv-opt > .tv-opt-dist`
+  (mas especifico) + `position:relative` solo a letter/text/count explicitos.
+- **`setState`-en-effect prohibido por el lint**: el countdown de Expo lo hace sincrono en
+  effect → reescrito a **derived-state R19** (setState en render por cambio de roundKey) +
+  interval que solo tickea.
+- `noUncheckedIndexedAccess`: indice dinamico en tupla `as const` → blindar con `?? [0]`.
+
+### Validado EN VIVO (QA con Kamilo)
+
+`QaTriviaSeeder` (re-ejecutable) sembro sesion LIVE modo trivia (id 183) + LiveGame trivia
+draft (id 72, 4 preguntas, sponsor AWS) en `summit-empresarial-2026`. Kamilo lanzo desde
+Mission Control (launch/next-question/close-round) y respondio desde el webapp: ronda 1,
+opcion correcta, **score 135**. Sockets `game:launched/question/answer-count/round-result`
+confirmados en el log del socket server. Kamilo: **"para mi funciono perfecto"**.
+
+### Deuda (no bloqueante)
+
+E2E Playwright de trivia (hay 10 vitest) — mismo criterio /encuestas. Estado trivia es local
+del panel (no global): si se lanza la pregunta antes de abrir el stream se pierde esa ronda
+(en el flujo real no pasa). Servidores dev quedaron arriba (socket 3001 + web 3000).
+
+### PROXIMA SESION
+
+Quedan solo 2 frentes: **Mobile parity** (100% Fable, baseline primero) y **B5 Fase C QA**
+(~2h CON Kamilo presente: device iPad/iPhone/Edge/Firefox + Lighthouse + WCAG + E2E cross-tab
++ DSN prod). BLOQUES 2 (Home) y 4 (Trivia) ya cerrados.
+
+---
+
 ## SESION 2026-07-08 — BLOQUE 2 W.2 HOME CERRADO 100% + encuestas por slides (Opus 4.8)
 
 **TOTAL: 544/576 = 94.4%. 17 modulos cerrados** (W.2 se une). Sesion Opus (no Fable),

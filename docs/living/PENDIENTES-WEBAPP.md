@@ -39,11 +39,11 @@
 | **W.13 FAQ + Docs** | **15/15** | **CERRADO 100% 2026-07-04** (Fase A FAQ Asistente orb + Fase B Documents split layout + backend ZIP escalable. Pages reclasificado formalmente a Fase 2) | **+2** |
 | **W.14 Anuncios + Cartel + Bell** | **19/19** | **RE-CERRADO 2026-07-05** — cartel solo-highlights (espejo Expo) + feature banners muerta de raiz (BLOQUE 3: ruta+controller+Filament+modelo+migration drop). BD dedup + vigencias frescas | **+5** |
 | W.15 Vendor Dashboard | 0/35 | **MOVIDO a Mobile parity (decision Kamilo 2026-07-05)**: el staff del stand NO va a instalar app para un evento — vendor se hace como feature del webapp MOBILE (viewport celular espejo Expo, patron Mi QR), incluyendo scanner QR con camara en browser (prior art: eventos-kiosko). Fuera del denominador Fase 1 desktop. Procedencia verificada: ~3.000 lineas Expo + 18 endpoints | — |
-| W.16 Live Moments | **0/5** | 0% — **RE-SCOPEADO por auditoria** (23→5): espejo real = TriviaPanel completo + toasts ruleta/jackpot. Ceremonias GSAP/golden-reveal eran inventos; photo contest movido a W.6 Memorias. Backend listo | — |
+| **W.16 Live Moments** | **5/5** | **CERRADO 100% 2026-07-09 (BLOQUE 4)** — TriviaPanel espejo Expo en la columna interactiva del streaming (4 fases idle/question/result/finished): countdown drenante rojo <=5s, opciones A-F color Kahoot, reveal de distribucion animada, mini-leaderboard + podio top 5. **Noir puro via --st-* (adapta Lux), UNICO color = letras A-F, cero iconos (decision Kamilo)**. Hook local `useTrivia` (patron useQnA) + reducer puro. Proxy `/events/games/{id}/answer`. Toasts ruleta/jackpot en GlobalSocketProvider. 10 vitest. **Validado en vivo** (launch->question->answer correcto score 135->result) via Mission Control + QaTriviaSeeder | **+5** |
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
 | ~~W.X Welcome Showcase~~ | **ELIMINADO** | Invento de planeacion (auditoria 2026-07-04): el onboarding Expo es un wizard de REGISTRO, no un carrusel de features. Boton perfil oculto (`4325f05`). Fase 2 si se quiere espejo del wizard | — |
-| **TOTAL** | **544/576** | **94.4%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05) | **2026-07-08 BLOQUE 2 CERRADO**: W.2 Home 13→16 (GamificationHud LIVE + EventArchive ENDED + encuestas por slides). Quedan: B4 Trivia (5, ~3-4h) + B5 Fase C QA (~2h CON Kamilo presente) + Mobile parity. **17 modulos cerrados:** W.0, W.1, W.1B, W.2, W.3, W.4, W.5, W.6, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.17, W.18 |
+| **TOTAL** | **549/576** | **95.3%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05) | **2026-07-09 BLOQUE 4 CERRADO**: W.16 Trivia 0→5 (TriviaPanel espejo + useTrivia + proxy + toasts, validado en vivo). Quedan: B5 Fase C QA (~2h CON Kamilo presente) + Mobile parity. **18 modulos cerrados:** W.0, W.1, W.1B, W.2, W.3, W.4, W.5, W.6, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.16, W.17, W.18 |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
@@ -53,8 +53,9 @@
 
 - [ ] **MOBILE PARITY — sesion baseline + arranque (decision Kamilo 2026-07-05: trabajo 100% Fable, dedica el 50% de cuota restante).** Arranca por el baseline: inventario modulo-por-modulo contra el Expo real (que se adapta responsive, que necesita vista mobile dedicada, que es nativo del workstream) + diseno del shell mobile → counters → bloques. Ver seccion MOBILE PARITY abajo para el enfoque tecnico acordado.
 
-> Alternativa si la sesion NO es Fable: **BLOQUE 4 — W.16 Trivia** (~3-4h, apto Opus): TriviaPanel espejo + store sockets game:* + proxy answer + toasts ruleta. (BLOQUE 2 Home YA cerrado 2026-07-08.)
+> BLOQUE 4 (W.16 Trivia) YA cerrado 2026-07-09. BLOQUE 2 (Home) cerrado 2026-07-08. Quedan solo Mobile parity + B5 Fase C.
 > Cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device iPad/iPhone/Edge/Firefox + Lighthouse + WCAG + E2E cross-tab + DSN prod). Fase A 100% validada 2026-07-05 (push desde Filament OK + install PWA OK).
+> Deuda menor W.16 (no bloqueante): E2E Playwright de trivia (tengo 10 vitest del reducer/helpers) — mismo criterio que /encuestas.
 
 > Deuda menor W.2 (no bloqueante): E2E Playwright de /encuestas (tengo vitest 9 tests) · verificar Lux con ojo · recap/certificado como pantalla aparte (Fase 2, hoy el codigo recap sigue en lib/recap sin consumir desde Home) · streaming poll-vote proxy pega a /polls/{id}/vote sin prefijo /events (posible bug latente pre-existente, la ruta real unica es /events/polls/{id}/vote).
 
@@ -112,13 +113,13 @@
 - [x] **Feature banners MUERTA de raiz**: ruta + BannerController + BannerResource Filament + modelo + BannerTest + seeders (Content/ModuleTemplate) + catalogo modulos (CreateEvent/ModuleResource) + migration `drop_banners_feature` (tabla + module_templates + modules slug=banners). Endpoint verificado 404. stress-full.js → highlights
 - [x] BD limpia: 4 duplicados de `event_highlights` borrados + vigencias refrescadas (4 highlights activos 3 dias). Verificacion: 401/401 vitest + 12/12 E2E cartel+home + suite backend Content (2 fallos PRE-existentes de ProfileSecurityTest, ajenos — validator W.18 relajado sin actualizar tests, anotado abajo)
 
-### BLOQUE 4 — W.16 Live Moments espejo real (~3-4h) — 0/5
-> Espejo estricto de lo que Expo HACE: trivia completa + toasts de ruleta/jackpot. Backend listo.
-- [ ] TriviaPanel espejo (`TriviaPanel.tsx` 340 lineas Expo): fase question (opciones A-F + countdown + rojo ≤5s) + result (+X pts, distribucion votos, top 3) + finished (podio top 5)
-- [ ] Store trivia (equivalente `useTriviaStore`) alimentado por sockets `game:question`/`game:round-result`/`game:finished` via GlobalSocketProvider
-- [ ] `POST /events/games/{gameId}/answer` proxy + optimistic
-- [ ] Listeners `game:launched`/`game:result` → toasts espejo ("Ruleta en curso", "+X pts en la ruleta") + invalidar puntos/anuncios
-- [ ] Tests vitest + E2E
+### BLOQUE 4 — W.16 Live Moments espejo real — 5/5 CERRADO 2026-07-09
+> Espejo estricto de lo que Expo HACE: trivia completa + toasts de ruleta/jackpot. Validado en vivo (MC + QaTriviaSeeder). Commit eventos-web `main`.
+- [x] TriviaPanel espejo (`TriviaPanel.tsx`): fases idle/question (A-F + countdown rojo ≤5s) / result (+X pts, distribucion animada, top 3) / finished (podio top 5). **Noir --st-*, unico color letras A-F, cero iconos (Kamilo)**
+- [x] `useTrivia` (hook local patron useQnA, NO store global — la webapp no tiene zustand) + reducer puro `lib/trivia.ts`, alimentado por `game:question`/`game:round-result`/`game:finished`
+- [x] `POST /events/games/{gameId}/answer` proxy (prefijo /events explicito) — NO optimista (backend devuelve correct/score, espejo Expo)
+- [x] Listeners `game:launched`/`game:result` → toasts en GlobalSocketProvider + router.refresh (puntos/premios)
+- [x] 10 vitest (reducer + helpers). Deuda menor: E2E Playwright (mismo criterio /encuestas)
 
 ### BLOQUE 5 — W.12 Polish/cierre — 8/11 (Fases A+B CERRADAS 2026-07-05 tarde; falta Fase C QA)
 - [x] **Web Push real CERRADO** (`b9aa4df` backend + `2dc43a3` web): VAPID + tabla push_subscriptions + endpoints + `SendWebPushJob` + transporte multi-canal `toAttendee()` en 13 call-sites + filtros web-only + SW con PUSH_ROUTES espejo Expo + soft prompt pill (divergencia web aprobada) + track push_open + recordatorios de sesion incluidos. **Fix aprobado: scheduled → Announcement** (la push es el golpe, el announcement es la carta). Verificado VIVO: Chrome real + FCM + click routing + Bell live. Bug pre-existente cazado: ban Filament limpiaba token antes de la push
@@ -818,7 +819,17 @@
 - [ ] Memoria
 - [ ] Counter PARITY-MATRIX
 
-### W.16 — Live Moments espejo real (0/5, re-scopeado por auditoria 2026-07-04)
+### W.16 — Live Moments espejo real (5/5, CERRADO 2026-07-09)
+
+> **CERRADO.** Trivia en vivo en la columna interactiva del streaming. Archivos eventos-web:
+> `hooks/streaming/useTrivia.ts`, `lib/trivia.ts` (reducer puro + tipos + helpers),
+> `components/app/streaming/TriviaPanel.tsx`, `streaming.css` (seccion `.tv-*`),
+> `app/api/streaming/game-answer/[gameId]/route.ts`, wire en `StreamShell.tsx`, toasts en
+> `useGlobalSocket.tsx`. Backend seeder `QaTriviaSeeder`. Validado en vivo via Mission
+> Control (launch/next-question/close-round) + respuesta desde webapp (score 135 correcto).
+> Decisiones Kamilo: noir puro (sin teal), unico color = letras A-F, cero iconos, estado por
+> relleno no borde (no "neon"). Fix cascada: `.tv-opt > .tv-opt-dist` especificidad para que
+> la barra no empuje la letra. `setState`-en-effect del countdown → derived-state R19 (lint).
 
 > **Auditoria de procedencia:** el scope viejo (23 items) tenia inventos. Lo REAL en Expo:
 > TriviaPanel completo (340 lineas, la referencia) + toasts de ruleta/jackpot
@@ -828,11 +839,11 @@
 > W.6 Fase 5 (vive en el social, no en live moments). Ceremonias cinematograficas: si
 > algun dia se quieren, se disenan para AMBAS plataformas como feature nuevo.
 
-- [ ] TriviaPanel espejo (fases question/result/finished: opciones A-F + countdown rojo ≤5s + "+X pts" + distribucion votos + podio top 5 + sponsor badge)
-- [ ] Store trivia (equivalente `useTriviaStore` Zustand) alimentado por `game:question`/`game:round-result`/`game:finished` via GlobalSocketProvider
-- [ ] `POST /events/games/{gameId}/answer` proxy + respuesta optimistic
-- [ ] Listeners `game:launched`/`game:result` → toasts espejo + invalidar my-points/anuncios
-- [ ] Tests vitest + E2E trivia round
+- [x] TriviaPanel espejo (fases idle/question/result/finished: opciones A-F + countdown rojo ≤5s + "+X pts" + distribucion animada + podio top 5 + sponsor badge)
+- [x] `useTrivia` hook local + reducer puro (NO zustand — la webapp usa useReducer + sockets como useQnA)
+- [x] `POST /events/games/{gameId}/answer` proxy — NO optimista (backend devuelve correct/score)
+- [x] Listeners `game:launched`/`game:result` → toasts + router.refresh (puntos/premios)
+- [x] 10 vitest (reducer + helpers). E2E trivia → deuda menor
 
 ### W.17 — Soporte (13/13, **CERRADO 100% 2026-07-04**)
 
