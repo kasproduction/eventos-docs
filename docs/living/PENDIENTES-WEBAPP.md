@@ -134,7 +134,7 @@
 - [ ] **Fase C** — E2E cross-tab (streaming Q&A, social conectar)
 - [ ] **Fase C** — DSN prod Sentry + validacion (item de deploy; config completa ya en codigo)
 
-### MOBILE PARITY — workstream 33/58 (baseline CERRADO 2026-07-09, 100% Fable)
+### MOBILE PARITY — workstream 38/58 (baseline CERRADO 2026-07-09, 100% Fable)
 
 > **Enfoque acordado (2026-07-05):** NO portar componentes RN (react-native-web
 > descartado). Capa de PRESENTACION mobile nueva sobre la capa de datos existente
@@ -236,12 +236,13 @@
 - [x] **Memorias**: ContestBannerM (countdown useNow 1s, podio medallas 72/56, corona winner) + PhotoGridM (triples + OFICIAL 2-col + corona rank) + **PhotoViewerM full-screen** (fade, swipe scroll-snap, counter, footer autor/caption/heart). Regla W.6: like a foto propia = toast informativo
 > Verificacion 2026-07-09: typecheck+lint 0 errores (3 violaciones react-hooks corregidas) · 517/517 vitest · E2E mobile-shell 14/14 (+social: momentos+segmented+FAB contextual) · screenshots 390 revisados (feed + memorias fieles). QA vivo: momentos con stories reales, viewers, uploads con crop, comentarios
 
-#### M.5 — Speakers + Sponsors mobile — 0/5
-- [ ] Speakers mobile (espejo `speakers.tsx` 308: search debounce + Destacados carousel + lista con badge sesiones)
-- [ ] Detalle speaker mobile (espejo `speaker/[id].tsx` 295: hero foto cuadrada + rating + LinkedIn + bio + sus sesiones)
-- [ ] Sponsors mobile (espejo `sponsors.tsx` 427: tiers platinum→media, living shuffle 7s pausado en scroll/search, pull-to-refresh, search 350ms)
-- [ ] Detalle sponsor mobile (espejo `sponsor/[id].tsx` 690: hero logo + sesiones + servicios/contacto chips + banner trivia + modal trivia + website/email)
-- [ ] Contacto sponsor mobile (espejo `sponsor-contact.tsx` 215: chips servicios + mensaje + enviar — ruta o sheet, decidir en diseno)
+#### M.5 — Speakers + Sponsors mobile — 5/5 **IMPLEMENTADO 2026-07-09 (QA vivo pendiente)**
+- [x] **SpeakersM** (espejo `speakers.tsx` 308): search client 400ms + Destacados (keynotes>=2 o top-5, cards 200 foto 4:5 + badge Keynote, ocultas al buscar, "Ver todos" con window.scrollTo) + Todos con contador y rows foto 56 + badge sesiones
+- [x] **SpeakerDetailM `/speaker/[id]` NUEVA** (espejo 295): hero cuadrado + nombre 28 + "en" empresa + estrellas avg·votos + LinkedIn (blanco en noir espejo) + Calificar dorado #B5A68B + bio + sesiones → /session/{id}. Rating reusa SpeakersRatingModal W.5 via wrapper `.speakers-root` (patron RatingModalM). Desktop redirige a /speakers
+- [x] **SponsorsM** (espejo `sponsors.tsx` 391): tiers platinum(2col glass)/gold(3col grad)/circulos(4col), **living shuffle 7s** con framer layout spring pausado en scroll/busqueda, search 350ms, gradientes TIER_ACCENT literales
+- [x] **SponsorDetailM `/sponsor/[id]` NUEVA** (espejo 690): nav flotante (back + corazon --heart canon), hero logo 100, sesiones, servicios glass + solicitud enviada verde, **trivia auto-abre** al llegar de visit-stand (modal espejo :527-689: A-D estados verde/rojo, progress violeta, +pts, resumen 48 auto-close 2.5s, vibrate success/error), web/email. visit-stand + recordView al montar (una vez, sin toast +pts — regla)
+- [x] **Contacto sponsor como sheet** (espejo `sponsor-contact.tsx` 201 — misma pantalla SIN ruta aparte, divergencia estructural minima): handshake + chips con check + mensaje condicional + Enviar (N) + ALREADY_CONTACTED → sent
+> Verificacion 2026-07-09: typecheck+lint 0 errores · 517/517 vitest · E2E mobile-shell 16/16 (+speakers/sponsors: listas + tap → detalles) · screenshots 390 revisados (sponsor detail fiel). QA vivo: shuffle 7s, trivia con preguntas reales, contacto, rating speaker
 
 #### M.6 — Desafio mobile — 0/3
 - [ ] Hub espejo `leaderboard.tsx` (1421): hero HUD (posicion + puntos + SegmentedBar + mini-ranking top-3 con RGB ring) + cards Premios/Golden/Retos/Pasaporte + MotivationalTip — **Noir forzado ("dark island"), DesafioView 368 tiene la logica**
