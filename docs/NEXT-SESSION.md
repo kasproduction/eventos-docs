@@ -6,6 +6,73 @@
 
 ---
 
+## SESION 2026-07-09 (Fable) — MOBILE PARITY M.0-M.5: shell + 5 tabs + Social/Speakers/Sponsors (38/58)
+
+**Workstream MOBILE PARITY 38/58 en una sola sesion Fable.** Capa de presentacion mobile
+NUEVA (<640px) espejo 1:1 del Expo, sobre la capa de datos existente. NO react-native-web.
+
+### Que se hizo (eventos-web `ab416fd` → `4a59ea9`, 6 commits pusheados)
+
+- **M.0 Shell (6/7)**: `@custom-variant mobile`, MobileTabBar (5 tabs espejo FloatingTabBar,
+  bubble framer layoutId, SOLO en rutas tab), MobileGate (placeholder "Muy pronto" en rutas
+  sin vista), MobileHeader, SheetM, DesktopRedirect, dual render en pages
+  (`contents mobile:hidden` + `hidden mobile:block`). Falta: gates banned/aprobacion +
+  deeplinks (se verifica en QA).
+- **M.1 Home + Mi QR (8/8)**: HomeMobile por estado + HappeningNowM + MiQrView (qr-wave,
+  fullscreen, brillo) + /about. Proxy /api/mi-qr. Fix QA: HUD explotaba en LIVE (img 118).
+- **M.2 Agenda (5/5)**: /mi-agenda (favoritos) + /agenda stack + /session/[id]
+  (SessionDetailM) + corazon particulas --heart + ICS. RatingModalM wrapper scoped.
+- **M.3 Networking + Perfil (6/6)**: NetworkingM 3 tabs + attendee/[id] + PerfilM (hero
+  violeta, stats, edit sheet espejo EXACTO :862-925, brand icons en inputs) + fade
+  Facebook rows (nm-in). LAS 5 TABS COMPLETAS.
+- **M.4 Social (7/7)**: SocialM feed/momentos segmented + FAB contextual + optimistic UI
+  ESCANEADO COMPLETO espejo useWall (like/comment rollback, tempId, socket bus W.11
+  skip-own-echo) + compressImage pre-upload + crop momentos.
+- **M.5 Speakers + Sponsors (5/5)**: SpeakersM destacados/todos + SpeakerDetailM (rating
+  reuso wrapper) + SponsorsM brand wall shuffle 7s + SponsorDetailM (trivia auto-abre
+  post visit-stand, contacto sheet).
+- **Fix skeletons (3 rondas QA, `4a59ea9`)**: (1) recorte izq → dual render + safety net
+  `.canvas-card-root{width:100%}` <640; (2) genericos rechazados → **skeletons espejo
+  por modulo transcritos de Expo `components/ui/Skeleton.tsx`** (Home :286, Agenda :53,
+  SpeakerList :91, SpeakerDetail :133 — reusado por /session igual que Expo, Sponsors
+  :184, SponsorDetail :219, ContentList :166 para attendee; Social/Perfil/MiQr calcan su
+  vista M; base `BoneM` pulse 0.06→0.14 900ms) + 6 loading.tsx nuevos en rutas stack;
+  (3) doble skeleton (generico → propio al navegar) → root `(app)/loading.tsx` mobile
+  SIN shapes (stage oscuro + tab bar) y el generico MobileSkeletonM ELIMINADO.
+
+### Verificacion
+
+Typecheck + lint 0 errores · 517/517 vitest (42 files) · E2E mobile-shell 16/16 serial
+· 7 screenshots loading 390px + screenshots por modulo revisados contra Expo.
+
+### Gotchas nuevos (con memoria)
+
+- **credentials en fetch**: `omit` SOLO contra Laravel con Bearer; en proxies Next propios
+  la cookie `eventos_auth` ES la auth → nunca omit (rompio likes/comentarios silencioso).
+- Stacking: Stage `z-[2]` atrapaba overlays fixed bajo la tab bar → `mobile:z-auto`.
+- Hydration: chips `disabled={!editing}` server/client → onClick condicional; resolvedTheme
+  → gate useIsClient.
+- Root loading boundary SIEMPRE aparece antes que el del segmento al navegar → root sin
+  shapes o se ve doble skeleton.
+- Expo `Skeleton.tsx` tiene los skeletons pre-armados por pantalla = fuente de transcripcion.
+- PowerShell no lee rutas con `[locale]` (wildcard) → Read tool / Node / -LiteralPath.
+- MOCK_SLOW_PATH/MOCK_SLOW_MS en mockBackend E2E = QA visual de loading states.
+
+### PROXIMA SESION — M.6 Desafio mobile (0/3)
+
+1. **QA vivo Kamilo M.2-M.5** (pendiente: heart particulas, DaySlide, rating real, ICS,
+   momentos/uploads/viewers, shuffle 7s, trivia sponsor, rating speaker, intereses en
+   comun vs desktop).
+2. **M.6 Desafio**: hub espejo `leaderboard.tsx` (1421 lineas) **Noir forzado "dark
+   island"** — DesafioView 368 tiene la logica. Hero HUD + cards + 6 bottom sheets
+   (:590-813) + RedeemQrModal (:843) + GoldenTicketModal (:900). Flujo DaVinci: leer
+   leaderboard.tsx COMPLETO antes de codear.
+3. Despues: M.7 Comunicacion (1/8) → M.8 Vendor (0/9, cierra workstream).
+4. Deuda: i18n strings mobile hardcodeados es · E2E trivia/encuestas · B5 Fase C (2h
+   presenciales Kamilo).
+
+---
+
 ## SESION 2026-07-09 — BLOQUE 4 W.16 TRIVIA CERRADO 100% + validado en vivo (Opus 4.8)
 
 **TOTAL: 549/576 = 95.3%. 18 modulos cerrados** (W.16 se une). Enfoque DaVinci:
