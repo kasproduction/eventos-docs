@@ -134,7 +134,7 @@
 - [ ] **Fase C** — E2E cross-tab (streaming Q&A, social conectar)
 - [ ] **Fase C** — DSN prod Sentry + validacion (item de deploy; config completa ya en codigo)
 
-### MOBILE PARITY — workstream 20/58 (baseline CERRADO 2026-07-09, 100% Fable)
+### MOBILE PARITY — workstream 26/58 (baseline CERRADO 2026-07-09, 100% Fable)
 
 > **Enfoque acordado (2026-07-05):** NO portar componentes RN (react-native-web
 > descartado). Capa de PRESENTACION mobile nueva sobre la capa de datos existente
@@ -216,13 +216,15 @@
 - [x] **RatingModalM**: reuso del RatingModal W.3 con wrapper fixed `.agenda-root` (los estilos del pop estan scopeados — bug QA cazado en screenshot: renderizaba inline; +fix bg transparent)
 > Verificacion 2026-07-09: typecheck + lint 0 errores (2 violaciones react-hooks refactorizadas: dia activo derivado + slide dir en state) · 517/517 vitest (+8: AgendaMobile 5 + tabbar/gate updates) · E2E mobile-shell 11/11 (mi-agenda tab activa + agenda stack sin tab bar + tap card → /session/{id}) · screenshots 390 revisados (timeline/pills/detalle fieles). QA vivo pendiente: heart particulas, DaySlide, rating real, "Todas" ICS, Lux
 
-#### M.3 — Networking + Perfil (tabs 4 y 5) — 0/6
-- [ ] Networking 3 tabs internas directorio/contactos/solicitudes con badges animados (espejo `NetworkingScreen.tsx:139-176`)
-- [ ] Directorio mobile: search debounce 400ms + infinite scroll (`useInfiniteQuery` espejo — fetchers directory ya existen) + sugeridos carousel + quick-connect por relation (`:477-575`)
-- [ ] Contactos mobile: lista + export .vcf + bloqueados colapsable con desbloquear (`:693-933`; "guardar en telefono" nativo → download .vcf en web)
-- [ ] Solicitudes mobile: aceptar/ignorar + mensaje + timeAgo (`:948-1097`)
-- [ ] Perfil de asistente mobile (espejo `attendee/[id].tsx` 613: hero + CTA por relation + sheets Connect/Block + redes + contacto mutuo) — AttendeeProfilePanel desktop existe, mobile = pantalla/sheet
-- [ ] Perfil propio mobile (espejo `ProfileScreen.tsx` 927: hero avatar upload + stats gamification + mis datos + intereses + toggle tema + logout — PerfilView 387 ya tiene la logica)
+#### M.3 — Networking + Perfil (tabs 4 y 5) — 6/6 **IMPLEMENTADO 2026-07-09 (QA vivo pendiente) — LAS 5 TABS DEL SHELL COMPLETAS**
+- [x] **Networking 3 tabs** (`NetworkingM.tsx` espejo `NetworkingScreen.tsx:139-176`): pills segmented accent + badge rojo count solicitudes (badge verde contactos-nuevos requiere store socket → nota deuda)
+- [x] **Directorio**: search server-side debounce 400ms + **infinite scroll IntersectionObserver** via proxy NUEVO `/api/social/attendees` + contador "N asistentes" + footers espejo + sugeridos carousel horizontal (cards 160x260: comun + tags + CTA por relation) + quick-connect optimista con relation override
+- [x] **Contactos**: rows + "Guardar contacto" = .vcf single + "Exportar todos (.vcf)" multi-card + bloqueados colapsable con desbloquear optimista
+- [x] **Solicitudes**: cards con mensaje quote + timeAgo + Aceptar/Ignorar optimista ("Conectado con X")
+- [x] **Perfil de asistente `/attendee/[id]` NUEVA** (`AttendeeDetailM` espejo `attendee/[id].tsx` 613): hero horizontal 80 + CTA por relation + sheets Connect (mensaje 500) / Block (confirm rojo) + bio + intereses comunes resaltados + sus sesiones → /session/{id} + redes (SVGs inline, licencias lucide) + Contactar mutuos (wa.me/mailto/.vcf) — desktop redirige a /social. Nota espejo: los botones Aceptar/Ignorar de Expo ahi NO tienen handler; web enlaza al tab Solicitudes
+- [x] **Perfil propio `PerfilM` IMPLEMENTADO 2026-07-09** (espejo `ProfileScreen.tsx` 927): hero centrado avatar 96 + badge camara → SheetM foto (input capture)/galeria/shuffle beam x3 (seed W.18 por email)/volver-al-avatar · redes brand SVG → abren edit · stats Puntos/Retos/Logros · Mis datos + modal Editar full-sheet (basicos + redes, merge patch preservando email — leccion W.18) · Mis intereses inline espejo MyInterests (violeta semantico FIJO, min 1) · toggle tema next-themes · logout reusa PerfilLogoutModal (cross-tab + disposeSocket). "Ver introduccion" OMITIDO (decision Bloque 0). SheetM extraido a shell/mobile (compartido con attendee)
+> QA fixes 2026-07-09 (feedback Kamilo img-less): halo avatar attendee centrado (grid 88) · sheets con slide-up+backdrop fade+sombra · vibrate en enviar solicitud/bloquear/desbloquear · active:scale en filas/cards · fade-up sutil en filas de directorio (divergencia minima, Expo no anima — vetable). Intereses en comun: shape backend verificado OK, pendiente cross-check Kamilo vs panel desktop
+> Verificacion 2026-07-09: typecheck+lint 0 errores · 517/517 vitest · E2E mobile-shell 12/12 (+networking: 3 tabs + tap directorio → /attendee/{id}) · mockBackend +/attendees/{id}/profile · screenshots 390 revisados (networking + attendee fieles)
 
 #### M.4 — Social mobile — 0/7
 - [ ] Header sticky blur + SegmentedControl Feed/Memorias (espejo `social.tsx:183-240`)
