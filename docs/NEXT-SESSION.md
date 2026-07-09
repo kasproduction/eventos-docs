@@ -59,11 +59,24 @@ E2E Playwright de trivia (hay 10 vitest) — mismo criterio /encuestas. Estado t
 del panel (no global): si se lanza la pregunta antes de abrir el stream se pierde esa ronda
 (en el flujo real no pasa). Servidores dev quedaron arriba (socket 3001 + web 3000).
 
+### ADDENDUM — Event Pulse (misma sesion, QA vivo con Kamilo)
+
+Se probo Event Pulse en vivo. **GAP-C (no actualizaba RT) RESUELTO + verificado** (probe recibe,
+check-ins de Amy/Pedro visibles). Se implemento **motor de momentos v2** en
+`eventos-backend/public/event-pulse/js/moments.js` (cola fresca con prioridad + ventana 90s +
+ambiente fallback, `?v=22` cache-bust) pero **NO quedo verificado**: el navegador de Kamilo
+seguia mostrando el comportamiento viejo (sospecha: cache/Service Worker sirviendo el JS viejo
+pese al `?v=22`). **2 pendientes de Pulse** (detalle en `docs/roadmaps/ROADMAP-EVENT-PULSE.md`
+seccion PENDIENTE 2026-07-09):
+1. Diagnosticar por que no carga el moments.js v2 (DevTools Network / console.log / incognito / SW).
+2. Decision Kamilo: cada interaccion = momento hero (cambio backend) vs dejar contadores+hero checkin/post.
+Datos QA sembrados en dev (event 1), `pulse:simulate` funcional. Servidores dev quedaron arriba.
+
 ### PROXIMA SESION
 
 Quedan solo 2 frentes: **Mobile parity** (100% Fable, baseline primero) y **B5 Fase C QA**
 (~2h CON Kamilo presente: device iPad/iPhone/Edge/Firefox + Lighthouse + WCAG + E2E cross-tab
-+ DSN prod). BLOQUES 2 (Home) y 4 (Trivia) ya cerrados.
++ DSN prod). BLOQUES 2 (Home) y 4 (Trivia) ya cerrados. **+ 2 pendientes de Event Pulse** (arriba).
 
 ---
 
