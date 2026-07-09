@@ -255,7 +255,7 @@
 - [x] Mailable branded por evento
 - [x] Pest tests happy path + 8 edge cases
 
-### W.2 — Home (10/20, 50%)
+### W.2 — Home (16/16, CERRADO 100% 2026-07-08)
 
 - [x] Hooks useEvent base
 - [x] Hero cinematic + wordmark
@@ -268,17 +268,17 @@
 - [x] EventPoster compartido 3 estados
 - [x] Canvas raiz universal aplicado
 - [x] ~~Sponsors logo band~~ → **INVENTO eliminado** (auditoria 2026-07-04: home Expo no tiene strip de sponsors)
-- [ ] **GamificationHud preview LIVE** (espejo `index.tsx:103-129` Expo — slide en carrusel rank+puntos+retos)
+- [x] **GamificationHud preview LIVE** — HECHO 2026-07-08 (slide del carrusel Home LIVE, borde RGB girando, card entera deeplink /desafio, tamano fluido cqw, datos SSR)
 - [x] ~~Anuncios mini con count badge~~ → **CUBIERTO por Bell sidebar W.14** (divergencia intencional ya decidida: Expo badge en campana del header = webapp badge en BellPopover)
-- [ ] **Post-event survey prompt** estado ENDED (espejo `usePostEventSurvey` + card Expo)
-- [ ] **EventArchive** estado ENDED (espejo `EventArchive.tsx` Expo: 4 links + stats)
+- [x] **Post-event survey prompt** ENDED — HECHO 2026-07-08 (prompt dentro de EventArchive → ruta /encuestas SurveyDeck por slides)
+- [x] **EventArchive** ENDED — HECHO 2026-07-08 (espejo Expo puro: banner "Evento finalizado" + 3 stats + prompt encuesta + 4 links archivo)
 - [x] ~~Multi-sede pill~~ → **INVENTO eliminado** (backend solo tiene UN venue string)
 - [x] ~~Foto real speaker~~ — **HECHO 2026-07-04** (`RoomAvatar` con `speaker_photo_url` + gradiente fallback, espejo Expo)
 - [x] ~~Proximos eventos org en ENDED~~ → **INVENTO eliminado** (Expo no lo tiene)
 - [x] ~~Atmosfera dinamica por estado~~ → **INVENTO eliminado** (nice-to-have sin espejo; la cinematic ya existe)
 - [x] ~~useHappeningNow dedupe~~ → **INVENTO eliminado** (Expo no dedupea; filtra por estado y corta a 2)
 
-### W.3 — Agenda (25/30, 83%)
+### W.3 — Agenda (25/25, **CERRADO 100% 2026-07-04** — badges/conflict/check-in eran inventos; URL state → Fase 2)
 
 - [x] Tipos + fetcher SSR
 - [x] Lista sesiones agrupada por dia
@@ -381,7 +381,7 @@
 - [x] PARITY-MATRIX seccion W.5 actualizada
 - [x] ~~Validar device real~~ → **reclasificado a W.12 Fase 0** (QA responsive cross-modulos)
 
-### W.6 — Social Wall (18/40, 45% — feed editorial implementado, faltan Stories+Contest+Hashtags)
+### W.6 — Social Wall (28/28, **CERRADO 100% 2026-07-05** — Momentos + Memorias + Contest hechos (BLOQUE 1); Hashtags eliminado del scope; denominador re-baseado 40→28)
 
 > Recount 2026-06-20: el feed editorial implementado en `/social` (compartido con W.8 Networking) es W.6 Wall. Doc anterior listaba 0% por error de auditoria. Lo IMPLEMENTADO marcado [x] aqui.
 
@@ -542,7 +542,7 @@
 - [x] `PasaporteCard` grid 6 + `PasaportePanel` grid completo
 - [x] Cada stamp: logo sponsor + nombre + tier + stamped_at
 - [x] Solo VIEW (earning via QR fisico mobile, correcto)
-- [ ] Socket `data:invalidate{entity:passport}` → refresh silencioso (espejo Expo: sin animacion ni toast, `feedback_no_points_diff_toast`) — depende W.11 sockets RT
+- [x] Socket `data:invalidate{entity:passport}` → refresh silencioso — HECHO via W.11 (GlobalSocketProvider mapea `passport` en KNOWN_ENTITIES → router.refresh, sin animacion ni toast, espejo Expo)
 
 **Fase 5 — Rewards (6/6)**
 - [x] `RewardsPreviewCard` wall + `RewardsPanel` catalogo completo grid

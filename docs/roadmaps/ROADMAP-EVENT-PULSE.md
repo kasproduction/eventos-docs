@@ -11,6 +11,56 @@
 
 ---
 
+## PENDIENTE — Motor de momentos v2 + verificacion (2026-07-09)
+
+### GAP-C (Pulse no actualizaba en tiempo real) — RESUELTO + VERIFICADO EN VIVO
+El bug que documento Fable (entities `leads/connections/ratings/leaderboard` solo las
+emitia PulseSimulate → lag 5min). Hoy se **verifico en vivo**: los 4 broadcasts backend
+EXISTEN (`LeadController:148`, `NetworkingController:358`, `RatingController:45`,
+`SpeakerRatingController:46`, `PointsService:112`), el check-in emite via
+`CheckinService::broadcastCheckin`, el socket emite `data:invalidate`/`checkin:update` a
+`event:{id}`, y Pulse joinea ese room (`socket.js:47 join:event`). Un probe socket conectado
+como `pulse` **recibio** los eventos, y las llegadas de Pedro/Amy se vieron en el dashboard.
+Conclusion: RT funciona. Antes no actualizaba por ambiente (socket apagado / test pre-fix).
+
+### Motor de momentos v2 — IMPLEMENTADO, NO VERIFICADO (bloqueado por cache)
+Problema reportado por Kamilo: el inicio muestra momentos **al azar** (resurge lo viejo, ej.
+"Trivia en vivo" de hace rato) en vez de priorizar lo fresco. Rediseno aprobado + aplicado en
+`public/event-pulse/js/moments.js`:
+- **Cola en vivo (prioridad):** cada interaccion real entra en orden; se muestran FIFO.
+- **Ventana de frescura 90s:** lo que paso hace > 90s se descarta (no resurge).
+- **Ambiente = fallback:** rotacion aleatoria del pool solo cuando no hay nada fresco.
+- Version de scripts subida `?v=21` → `?v=22` en `index.html` (cache-bust). Sesion #183 cerrada
+  (`actual_end_at`) para sacar "Trivia en vivo" del ambiente.
+
+**NO VERIFICADO:** en el navegador de Kamilo el burst seguia mostrando comportamiento viejo
+(solo un momento / ambiente). Sospecha #1: **el navegador sigue sirviendo el `moments.js`
+viejo** pese al `?v=22` + hard-refresh (posible Service Worker, cache de Apache/Laragon, o CDN
+local). Sospecha #2: bug en el motor v2. Sospecha #3: `window.currentSection` no es `'ambient'`.
+**Proximos pasos de diagnostico:** (1) confirmar que se sirve el archivo nuevo — ver source de
+`moments.js?v=22` en Network/DevTools, o agregar `console.log('moments v2')` al arranque;
+(2) probar en incognito; (3) revisar si hay Service Worker registrado; (4) confirmar
+`currentSection==='ambient'` en el inicio.
+
+### HALLAZGO DE DISENO — decision pendiente de Kamilo
+`socket.js` solo dispara **momento hero** para **check-in** y **post** (los unicos que el backend
+manda con detalle: nombre/foto/texto). `rating/connection/lead/points` solo **suben contadores**
++ alimentan el pool del ambiente — `data:invalidate` no trae el "quien/que". Entonces un burst
+de 6 = 2 momentos + 4 contadores, no 6 momentos.
+**DECISION PENDIENTE:** dejar el diseno actual (contadores para todo + hero checkin/post +
+ambiente curado) **o** hacer que **cada interaccion sea un momento hero** (ticker en vivo) —
+esto ultimo es cambio de backend: emitir actor+accion por evento como ya hacen checkin/post,
++ builders nuevos en `moments.js`. Toca 3 capas.
+
+### Datos QA sembrados (dev, event 1 summit-empresarial-2026) — no versionados
+`pulse_token` de event 1 = `ep_cewFZ693eIJrATAEYLGyMiTIz1j7l8g3`. URL dashboard:
+`http://eventos-backend.test/event-pulse/?slug=summit-empresarial-2026&token=ep_cewFZ693eIJrATAEYLGyMiTIz1j7l8g3`.
+Sembrado: 30 sesiones con `room_id`, ~20 attendees "inside" sala 1, Amy Gonzalez (attendee #55),
+leads/ratings/connections/checkins de demo. `php artisan pulse:simulate {checkin|lead|connection|post|rating|points}`
+dispara un evento. Comando probado y funcional.
+
+---
+
 ## Resumen sesion 2026-04-24
 
 ### COMPLETADO
