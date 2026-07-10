@@ -51,7 +51,7 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **MOBILE PARITY — M.6 Desafio mobile (0/3).** 38/58: M.0 6/7 + M.1-M.5 CERRADOS (commits `ab416fd` `31377ba` `ab22428` `d0615e5` `d63ec51` + fix skeletons espejo `4a59ea9`). M.6 = hub espejo `leaderboard.tsx` (1421) **Noir forzado "dark island"** (DesafioView 368 tiene la logica): hero HUD (posicion + puntos + SegmentedBar + mini-ranking top-3 RGB ring) + cards Premios/Golden/Retos/Pasaporte + MotivationalTip → luego 6 bottom sheets (:590-813) → modales QR (RedeemQrModal :843 + GoldenTicketModal :900). Despues M.7 Comunicacion (1/8) y M.8 Vendor (0/9). Pendiente QA vivo Kamilo M.2-M.5 (heart particulas, DaySlide, momentos/uploads, shuffle 7s, trivia sponsor, rating speaker) + item M.0 restante (gates banned/aprobacion + deeplinks).
+- [ ] **MOBILE PARITY — M.8 Vendor (0/9, cierra el workstream).** 48/58: M.0 6/7 + M.1-M.7 CERRADOS. M.7 Comunicacion cerrado 2026-07-10 (Fable, eventos-web `51857d8` + `572ea1a` M.6 + `5ed3343` fix slide, pusheados): Documentos/Anuncios/Soporte/FAQ/Encuestas mobile + QA streaming. Pendiente QA vivo Kamilo M.2-M.7 (heart particulas, DaySlide, momentos/uploads, shuffle 7s, trivia sponsor, rating speaker, desafio, anuncios detail slide, soporte form, orb FAQ, encuestas deck) + item M.0 restante (gates banned/aprobacion + deeplinks). Deuda nueva: panel `custom` streaming placeholder (CSP) + Expo documentos legacy por alinear.
 
 > BLOQUE 4 (W.16 Trivia) YA cerrado 2026-07-09. BLOQUE 2 (Home) cerrado 2026-07-08. Quedan solo Mobile parity + B5 Fase C.
 > Cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device iPad/iPhone/Edge/Firefox + Lighthouse + WCAG + E2E cross-tab + DSN prod). Fase A 100% validada 2026-07-05 (push desde Filament OK + install PWA OK).
@@ -134,7 +134,7 @@
 - [ ] **Fase C** — E2E cross-tab (streaming Q&A, social conectar)
 - [ ] **Fase C** — DSN prod Sentry + validacion (item de deploy; config completa ya en codigo)
 
-### MOBILE PARITY — workstream 38/58 (baseline CERRADO 2026-07-09, 100% Fable)
+### MOBILE PARITY — workstream 48/58 (baseline CERRADO 2026-07-09, 100% Fable)
 
 > **Enfoque acordado (2026-07-05):** NO portar componentes RN (react-native-web
 > descartado). Capa de PRESENTACION mobile nueva sobre la capa de datos existente
@@ -177,11 +177,11 @@
 > M.0 si el gate de aprobacion aplica).
 >
 > **Decisiones cerradas 2026-07-09 (no re-preguntar):**
-> - **session-chat = comportamiento espejo OBLIGATORIO como modo de
->   StreamShellMobile**: el routing de UNIRTE es por stream configurado
->   (`HappeningNow.tsx:182-186`) — sesion CON `stream_url`/`stream_iframe` →
->   player (+ placeholder si retrasada); sesion SIN stream → chat full-height.
->   NO se crea ruta `/session-chat` aparte (mismos sockets/paneles).
+> - ~~session-chat como modo chat full-height de StreamShellMobile~~ —
+>   **REVOCADA 2026-07-10 (Kamilo)**: sesion SIN stream entra igual a
+>   /session-stream y el player muestra el aviso "Transmision no
+>   disponible aun" (StreamPlayer EmptyState, ya implementado). NO hay
+>   modo chat pantalla completa ni ruta `/session-chat`.
 > - **about.tsx entra** como pantalla chica en M.7 (webapp no tiene /about).
 > - **Orden de bloques M.0→M.8; M.0 primero y bloqueante.** Mockup DaVinci del
 >   tab bar aprobado ANTES de codear.
@@ -246,20 +246,22 @@
 
 > **Fix QA Kamilo 2026-07-09 — skeletons mobile (2 rondas)**: (a) recortados a la izquierda: los `loading.tsx` desktop renderizan CanvasCard (`width: calc(100vw - 150px)`) que a 390px quedaba pegado a la izquierda → dual render + safety net CSS `<640px` `.canvas-card-root { width:100% }`. (b) Rechazo del generico ("ni siquiera son los propios de los componentes") → **skeletons espejo por modulo**, transcripcion de los pre-built de Expo `Skeleton.tsx`: `HomeSkeletonM` (:286 hero+carrusel 172+dots+grid 2x2), `AgendaSkeletonM` (:53 day pills 56x64+track pills+timeline hora, usado por /mi-agenda y /agenda), `SpeakersSkeletonM`+`SpeakerDetailSkeletonM` (:91/:133 — el detail lo reusa /session/[id] igual que Expo session:176), `SponsorsSkeletonM`+`SponsorDetailSkeletonM` (:184/:219 brand wall tiers), `ContentListSkeletonM` (:166, attendee/[id] rows=4 espejo attendee:93). Social/Perfil/MiQr sin skeleton Expo → calcan su vista M (segmented+momentos+posts / hero+stats+datos / badge card+QR). Base comun `BoneM` (pulse 0.06→0.14 900ms = SkeletonGroup). +6 loading.tsx nuevos (mi-agenda, mi-qr, session, speaker, sponsor, attendee) con shell desktop minimo; `MobileSkeletonM` generico queda SOLO como fallback del root (/about, placeholders). Hook `MOCK_SLOW_PATH` (lista por comas) + `MOCK_SLOW_MS` en mockBackend para QA visual. Ronda 3 (QA "cargan los genericos y despues los propios"): el root `(app)/loading.tsx` mostraba el generico en la fase 1 de la navegacion antes del loading del segmento → root mobile ahora SIN shapes (stage oscuro + tab bar, misma filosofia que el shell minimo desktop) y `MobileSkeletonM` generico ELIMINADO. De paso: 2 errores lint colados en M.5 (SpeakersM memoization → derivado por compiler; SponsorsM setState-in-effect → shuffle guarda orden de ids, display derivado). Verificado: typecheck+lint 0 err · 517/517 vitest · E2E 16/16 · 7 screenshots loading 390px revisados (todos calcan su modulo, sin recorte).
 
-#### M.6 — Desafio mobile — 0/3
-- [ ] Hub espejo `leaderboard.tsx` (1421): hero HUD (posicion + puntos + SegmentedBar + mini-ranking top-3 con RGB ring) + cards Premios/Golden/Retos/Pasaporte + MotivationalTip — **Noir forzado ("dark island"), DesafioView 368 tiene la logica**
-- [ ] 6 bottom sheets espejo: Retos / Ranking (podio + confeti) / Pasaporte / Rewards / Redeem-confirm / Rules (snap points `:590-813`)
-- [ ] Modales QR espejo: RedeemQrModal (QR + countdown expiracion en vivo `:843-898`) + GoldenTicketModal (QR + claim_code `:900-993`)
+#### M.6 — Desafio mobile — 3/3 (implementado 2026-07-10, Fable)
+- [x] **Hub espejo `leaderboard.tsx`** (1421): `DesafioM` pantalla stack **Noir forzado "dark island"** — `.dxm-root` redefine en scope los tokens de tema globales (MobileHeader/SheetM/BoneM van noir gratis) + los `--dx-*` (reusa RgbRing/RgbRect/RedeemModal/Avatar del W.9 desktop sin cambios). Hero HUD (borde RGB conic si top-3, rank cyan 40, SegmentedBar 10 con glow, mini top-3 con RgbRing en #1, Ver ranking) + golden tickets rows + Premios preview (afford/agotado) + MotivationalTip 7 estados + Retos (Proximo: X) + Pasaporte (stamps 5 + "+N"). Entrada stagger FadeIn espejo (delays 0-450). Misma capa de datos W.9 (`desafio-client` + lazy fetch por sheet). Skeleton `DesafioSkeletonM` calca la vista (island oscura tambien en loading)
+- [x] **6 bottom sheets espejo** (SheetM gana prop `snap` = snapPercent Expo): Retos 75 (completados ARRIBA espejo :594, orden inverso al panel desktop) / Ranking 60 (podio 72/56 + confeti 14 dots determinista + filas 4-5 + MyPositionPop spring si >5) / Pasaporte 80 / Premios 80 (5 estados CTA espejo: Canjear/Ver ticket/Canjeado/Agotado/Faltan X) / Redeem-confirm 32 (confirm-first espejo Expo, "Canjeando…" en el sheet — divergencia deliberada del optimista desktop) / Rules 70 (reglas + tabla puntos por accion)
+- [x] **Modales QR espejo**: canje reusa `RedeemModal` W.9 (QR RgbRect + countdown m:ss en vivo, dynamic import = qrcode.react fuera del bundle) + `GoldenTicketModalM` NUEVO (:900-993: linea accent + overline Ganador/Reclamado, claim_code XL espaciado, QR marco blanco borde platino solo pending, fecha reclamo; accent dual GOLD/TEAL)
+> **+ Slide de navegacion stack (M.0, gap cazado por Kamilo 2026-07-10)**: espejo `(app)/_layout.tsx:81` Expo — MobileGate envuelve rutas stack en wrapper keyed por pathname con slide CSS 300ms desde la derecha (push), desde la izquierda -30% (popstate = back), session-stream desde abajo (:108 fullScreenModal); tabs instantaneas, primer mount sin anim, reduced-motion off, `overflow-x: clip` en html/body <640. Derived-state R19 con `popped` en useState (leer refs en render lo veta el lint).
+> Verificacion 2026-07-10: typecheck+lint 0 errores · 518/518 vitest (+1 slide push/pop) · E2E mobile-shell 19/19 serial (+3 M.6: hub+ranking, premios 5 estados, golden modal) · desafio.spec desktop 11/11 (test 390px re-apuntado a DesafioM) · 8 screenshots 390px revisados contra Expo. Gotcha nuevo: strict violation de Playwright NO se reintenta — esperar `toHaveCount` del catalogo full antes de assertar CTAs (el fallback preview duplica "Canjear").
 
-#### M.7 — Comunicacion + streaming QA — 1/8
-- [ ] Anuncios mobile (espejo `anuncios.tsx` 149: cards imagen+timeAgo + deep links + pull-to-refresh)
-- [ ] Encuestas mobile (espejo `encuestas.tsx` 187: lista activas/cerradas + PollSlides — SurveyDeck W.2 ya es slides, adaptar viewport)
-- [ ] Soporte mobile (espejo `my-support.tsx` 131 + `support-contact.tsx` 149: consultas con status + respuesta admin + form)
-- [ ] FAQ/Asistente mobile (espejo `faq.tsx` 335: orb + state machine browsing/thinking/answering + chips categoria)
-- [ ] Documentos mobile (espejo `documentos.tsx` 111: lista + abrir) — SIN entrada de menu, solo deeplink (espejo)
+#### M.7 — Comunicacion + streaming QA — 8/8 (CERRADO 2026-07-10, Fable — eventos-web `51857d8`)
+- [x] Anuncios mobile: espejo `anuncios.tsx:46-47` (body COMPLETO inline; SOLO action_url tocable, dot violeta/dorado) + **detail full-screen slide desde la derecha** con CTA via parseActionUrl (decision Kamilo: ver el anuncio antes de saltar; en Expo el tap navega directo). Mark-read total al montar. SIN pull-to-refresh (divergencia aprobada — data:invalidate cubre)
+- [x] Encuestas mobile: lista activas (tocables, progreso X/Y + Respondida) / cerradas (atenuadas) espejo + **SurveyDeck W.2 en overlay slide** full-screen. Voto optimista identico desktop. **RT nuevo: poll:new/poll:closed → refresh en GlobalSocketProvider** (espejo Expo :37-51, beneficia desktop). Mock E2E gano surveys+vote (deuda desktop saldada)
+- [x] Soporte mobile: my-support + support-contact en /soporte — lista (badges Pendiente/Leido/Resuelto, respuesta admin barra verde, "Esperando respuesta…") + form slide `?nueva=1` (asunto 200 + mensaje 2000, errores tipados 429/403/422). **Gotcha staleTimes**: al volver de una URL visitada el payload RSC cacheado re-seedeaba la lista pre-creacion → `router.refresh()` tras crear
+- [x] FAQ/Asistente mobile: espejo `faq.tsx` — OrbBlob desktop reusado (idle/active/settled), state machine 800ms sin red, response card mordida + barra cian #5DE4D4, chips solo browsing, contacto → /soporte?nueva=1 + Mis consultas (N). **Cadena Perfil → Ayuda → FAQ → Soporte completa**
+- [x] Documentos mobile: **adaptacion del W.13 desktop (canon — decision Kamilo: la pantalla Expo es legacy huerfana y queda pendiente de adoptar este diseno, deuda backlog Expo)**. Lista compacta + ZIP bulk pill + preview en SheetM 92dvh reusando DocumentPreview + URL state ?id. `lib/documents-client.ts` compartido. Solo deeplink (sin entrada de menu, espejo alcance)
 - [x] About — ruta NUEVA /about **HECHO en M.1 2026-07-09** (espejo `about.tsx` 175: imagen 16:9 + texto + links branding; entrada = card del Home SOLO registration/draft, espejo `index.tsx:170-185`)
-- [ ] Chat full-height sin stream: StreamShellMobile modo sin video = chat pantalla completa (espejo `session-chat/[id].tsx` 204 + routing `HappeningNow.tsx:182-186` — comportamiento OBLIGATORIO, sin ruta nueva)
-- [ ] QA StreamShellMobile existente contra Expo `session-stream/[id].tsx` (356): speaker row header, 3 estrategias de player, RatingModal delay, tracking
+- [x] ~~Chat full-height sin stream~~ **DESCARTADO (decision Kamilo 2026-07-10)**: sesion sin stream entra igual a /session-stream y el player muestra "Transmision no disponible aun" (ya implementado, StreamPlayer EmptyState). El modo chat pantalla completa NO va
+- [x] QA StreamShellMobile vs Expo `session-stream/[id].tsx`: player (iframe custom → YouTube → generica → placeholder, + Vimeo dedicado que Expo no tiene) / RatingModal 1.5s finished+no-calificada (con gate anti-carrera superior a Expo) / tracking session_stream_view ≥3s una vez (+ pagehide/keepalive) / speaker row (fix separador " · ") / paneles OK. **GAP anotado: panel `custom` es placeholder** (Expo monta WebView a custom_url; en web implica decidir CSP frame-src) — deuda W.4, decision pendiente
 
 #### M.8 — Vendor W.15 (cierre del workstream) — 0/9
 > Procedencia verificada: ~3.000 lineas Expo (8 pantallas) + 18 endpoints backend mapeados (auditoria 2026-07-04). Gating: `attendee.has_vendor_access` del `GET /auth/me` (`isVendor = role==='vendedor' || hasVendorAccess`).

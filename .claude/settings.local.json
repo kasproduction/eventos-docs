@@ -653,7 +653,19 @@
       "PowerShell(Get-ChildItem \"C:\\\\laragon\\\\www\\\\eventos-web\\\\test-results\" -Recurse -Filter \"error-context.md\" | Select-Object -First 1 | ForEach-Object { Get-Content $_.FullName | Select-String -Pattern \"Error:|waiting|resolved|hidden|visible\" | Select-Object -First 8 })",
       "PowerShell(Get-ChildItem C:\\\\laragon\\\\www\\\\eventos-web\\\\src\\\\app -Recurse -Filter loading.tsx | ForEach-Object { $_.FullName.Replace\\('C:\\\\laragon\\\\www\\\\eventos-web\\\\src\\\\app\\\\',''\\) })",
       "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:3000/es/login\" -UseBasicParsing -TimeoutSec 20 -MaximumRedirection 3; $r.StatusCode } catch { $_.Exception.Message })",
-      "PowerShell(Start-Sleep -Seconds 10; try { $r = Invoke-WebRequest -Uri \"http://localhost:3000/es/login\" -UseBasicParsing -TimeoutSec 25; $r.StatusCode } catch { $_.Exception.Message })"
+      "PowerShell(Start-Sleep -Seconds 10; try { $r = Invoke-WebRequest -Uri \"http://localhost:3000/es/login\" -UseBasicParsing -TimeoutSec 25; $r.StatusCode } catch { $_.Exception.Message })",
+      "PowerShell($deadline=\\(Get-Date\\).AddSeconds\\(45\\); do { $ok3000=Test-NetConnection -ComputerName localhost -Port 3000 -InformationLevel Quiet -WarningAction SilentlyContinue; $ok3001=Test-NetConnection -ComputerName localhost -Port 3001 -InformationLevel Quiet -WarningAction SilentlyContinue; if \\($ok3000 -and $ok3001\\) { break } ; Start-Sleep -Seconds 3 } while \\(\\(Get-Date\\) -lt $deadline\\); \"web3000=$ok3000 socket3001=$ok3001\")",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:3000/es/login\" -UseBasicParsing -TimeoutSec 30; \"HTTP $\\($r.StatusCode\\)\" } catch { \"FALLO: $\\($_.Exception.Message\\)\" })",
+      "PowerShell($pids = Get-NetTCPConnection -LocalPort 3000,3001 -State Listen -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique; foreach \\($p in $pids\\) { taskkill /F /T /PID $p 2>&1 | Out-Null }; Start-Sleep -Seconds 2; $left = Get-Process node -ErrorAction SilentlyContinue | Measure-Object | Select-Object -ExpandProperty Count; \"node vivos: $left\")",
+      "PowerShell($deadline=\\(Get-Date\\).AddSeconds\\(60\\); do { $ok3000=Test-NetConnection -ComputerName localhost -Port 3000 -InformationLevel Quiet -WarningAction SilentlyContinue; $ok3001=Test-NetConnection -ComputerName localhost -Port 3001 -InformationLevel Quiet -WarningAction SilentlyContinue; if \\($ok3000 -and $ok3001\\) { break }; Start-Sleep -Seconds 3 } while \\(\\(Get-Date\\) -lt $deadline\\); \"web3000=$ok3000 socket3001=$ok3001\"; cd C:\\\\laragon\\\\www\\\\eventos-web; git status --short | Select-Object -First 25)",
+      "PowerShell(netstat *)",
+      "Bash(ls src *)",
+      "Bash(ls src/app)",
+      "Bash(ls src/components)",
+      "Bash(find src *)",
+      "Bash(grep -rl \"StreamShellMobile\" src)",
+      "PowerShell($dirs = Get-ChildItem C:\\\\laragon\\\\www\\\\eventos-web\\\\test-results -Directory; foreach \\($d in $dirs\\) { $f = Join-Path $d.FullName \"error-context.md\"; if \\(Test-Path $f\\) { \"=== $\\($d.Name\\)\"; Get-Content $f | Select-String -Pattern \"Error|Expected|Received|Timeout\" | Select-Object -First 6 } })",
+      "PowerShell(Get-ChildItem *)"
     ]
   }
 }
