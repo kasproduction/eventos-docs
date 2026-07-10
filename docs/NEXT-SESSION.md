@@ -6,6 +6,80 @@
 
 ---
 
+## SESION 2026-07-10 (Fable) — MOBILE PARITY M.6+M.7 CERRADOS (48/58): Desafio + Comunicacion completa
+
+**Workstream 48/58 — solo queda M.8 Vendor.** La sesion cerro el fix del slide
+stack (bug del dia anterior), M.6 Desafio (venia implementado sin commit) y
+M.7 Comunicacion ENTERO (5 modulos + QA streaming), con QA visual de Kamilo
+por modulo (screenshots 390px del harness E2E).
+
+### Que se hizo (eventos-web `572ea1a` + `5ed3343` + `51857d8`, pusheados)
+
+1. **Fix slide stack** (`5ed3343`): la animacion salia con duration 0s — el
+   minifier CSS descarta el shorthand `animation` partido (shorthand completo
+   por clase + keyframes fuera del media query + sombra de ataque). Verificado
+   vivo por Kamilo (la lentitud restante era compilacion dev, no el slide).
+2. **M.7 Documentos**: adaptacion del W.13 desktop (CANON — decision Kamilo:
+   el `documentos.tsx` Expo es legacy huerfano pre-tema y queda pendiente de
+   alinearse, deuda backlog Expo). Lista compacta + ZIP pill + preview SheetM
+   92dvh reusando DocumentPreview + `lib/documents-client.ts` compartido.
+3. **M.7 Anuncios** (2 iteraciones QA Kamilo): espejo `anuncios.tsx:46-47` —
+   body COMPLETO inline, SOLO cards con action_url son tocables (dot dorado;
+   informativas dot violeta estaticas) + **detail full-screen slide** con CTA
+   (decision Kamilo: ver el anuncio antes de saltar; Expo navega directo).
+   Mark-read total al montar. Bell del Home sin circulo de fondo.
+4. **M.7 Soporte**: my-support + support-contact en /soporte (form slide
+   `?nueva=1`, badges status, respuesta admin, errores tipados 429/403/422).
+5. **M.7 FAQ/Asistente**: OrbBlob desktop reusado (3 estados), state machine
+   800ms, response card mordida + barra cian, cadena Perfil→Ayuda→FAQ→Soporte.
+6. **M.7 Encuestas**: lista activas/cerradas espejo + SurveyDeck W.2 en
+   overlay slide + voto optimista + **RT poll:new/poll:closed en
+   GlobalSocketProvider** (beneficia desktop). Mock E2E gano surveys+vote.
+7. **QA StreamShellMobile vs Expo**: player/rating/tracking/paneles espejo o
+   superior; fix separador speaker row. **GAP anotado: panel `custom` es
+   placeholder** (Expo monta WebView a custom_url; en web implica CSP).
+
+### Verificacion
+
+Typecheck + lint 0 · 547/547 vitest (+29) · E2E mobile-shell 24/24 serial
+(+5) · screenshots 390px por modulo revisados con Kamilo en vivo.
+
+### Decisiones cerradas (no re-preguntar)
+
+- **Chat full-height sin stream REVOCADO**: sesion sin stream entra a
+  /session-stream y el player muestra "Transmision no disponible aun".
+- **Documentos mobile = adaptacion del desktop W.13** (fuente canon), no del
+  Expo legacy. Expo se alinea despues (otro modulo/backlog).
+- **Anuncios: detail slide** para cards con accion; informativas inline puras.
+- **Densidad web = medidas Expo un punto abajo** (RN se ve exagerado en
+  browser) — aplicar de entrada en M.8.
+- **Sin pull-to-refresh en mobile web** (sockets + reload cubren).
+- **M.8 Vendor va en SESION DEDICADA** (decision Kamilo al cierre).
+
+### Gotchas nuevos (con memoria)
+
+- **staleTimes** (`feedback_staletimes_router_cache`): volver a una URL
+  visitada sirve el payload RSC cacheado → el prop-sync re-seedea con datos
+  pre-mutacion y borra el optimista. Fix: `router.refresh()` tras mutar.
+- Client components importan de `lib/*-client.ts`, NUNCA del lib server con
+  `next/headers` (build error runtime — cazado en SoporteM).
+- Sub-pantalla dentro de una ruta (detail/form/deck con ?query): el slide del
+  MobileGate no aplica (mismo pathname) → overlay fixed + framer x:100%→0.
+- E2E: matar node + borrar .next entre runs (cache turbopack corrupta =
+  Internal Server Error aleatorios); flakes de compilacion fria se re-corren
+  en caliente antes de diagnosticar codigo.
+
+### PROXIMA SESION — M.8 Vendor (0/9, cierra el workstream)
+
+**Sesion dedicada** (~3.000 lineas Expo, 8 pantallas, 18 endpoints): hooks +
+gating hasVendorAccess → Mi Stand → Leads + export CSV → **scanner QR camara
+browser** (getUserMedia + BarcodeDetector, prior art eventos-kiosko) →
+solicitudes → stats → team → join-team. Flujo DaVinci: leer las 8 pantallas
+Expo ANTES de proponer. Paralelo pendiente: QA vivo Kamilo M.2-M.7 en device
++ B5 Fase C (2h presenciales) + 2 pendientes Event Pulse.
+
+---
+
 ## SESION 2026-07-09 (Fable) — MOBILE PARITY M.0-M.5: shell + 5 tabs + Social/Speakers/Sponsors (38/58)
 
 **Workstream MOBILE PARITY 38/58 en una sola sesion Fable.** Capa de presentacion mobile
