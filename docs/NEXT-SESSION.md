@@ -6,6 +6,75 @@
 
 ---
 
+## SESION 2026-07-11 NOCHE (Fable) — W.X: contexto de sesion bugueada RECONSTRUIDO + QA proporcion + rumbo corregido
+
+**La sesion de la tarde se bugueo DESPUES del cierre documentado y avanzo mas de lo
+registrado.** Esta sesion reconstruyo ese estado, Kamilo QA-eo la implementacion viva,
+y se corrigio el rumbo del diseño. Cerrada por cansancio, sin codear la correccion.
+
+### 1. Lo que la sesion bugueada dejo (reconstruido por evidencia en disco)
+
+- **W.X Showcase IMPLEMENTADO ENTERO en eventos-web, SIN COMMIT**, sobre `99baf79`:
+  `ShowcaseFilm.tsx` (1677 lineas, pelicula completa: opening keyvisual FLIP + 6 beats +
+  finale) + `showcase.css` (1815 lineas, tokens reales) + `WelcomeShowcase.tsx` (gate) +
+  wiring (SpatialShell monta overlay con userName, layout (app) lo pasa, Perfil gana boton
+  "Ver introduccion" con Clapperboard que borra el visto) + `/api/showcase` + lib
+  showcase-seen + tipos + 7 assets `public/showcase/` + 7 vitest + `e2e/showcase.spec.ts`.
+  **Sano: typecheck 0, lint 0, vitest showcase 7/7.**
+- **Decision Kamilo v12 (solo estaba en el codigo)**: el keyvisual del opening se
+  TRANSFORMA en el canvas de la app (FLIP) y el marco queda como escenario de todos los
+  beats. Mockups v10 (data real) y v11 (tokens reales globals.css + streaming.css)
+  guardados en design/; artifact republicado como v11.
+- ERRORES 119/120 son de esa sesion (fase mockup, ~12:30). No revisados (regla).
+
+### 2. QA vivo de Kamilo (dev server localhost:3000) — 2 problemas
+
+- **Beats desproporcionados**: el canvas espejo CanvasCard llega a 1600x920 pero los
+  componentes de los beats quedaron a escala mockup (ej. `.ws-agv` 490px) CENTRADOS →
+  "estampilla en teatro vacio", pierde toda la gracia. Causa: v11 no tenia canvas (escenas
+  sobre viewport abierto); la decision v12 los metio al marco sin re-proporcionar.
+- **Day-slide agenda se sobrepone**: paginas `absolute` una sobre otra, crossfade 240/300ms
+  con solo 26px de offset (los dos dias visibles a la vez), dia 2 mete filas de golpe
+  (dia 1 si escalona), dwell 900ms. Atropellado por diseño.
+
+### 3. Iteracion de diseño de esta sesion
+
+- Propuse 3 composiciones; **Kamilo eligio A — "habitar el canvas"**: cada beat llena el
+  marco con la composicion real del modulo (agenda = header canon + day pills + timeline
+  izq + DetailPanel der; streaming = player + columna; etc.).
+- **Mockup v12 (estudio beat Agenda con velo+spotlight) RECHAZADO**: (a) proporciones
+  inventadas (escenario logico 1240x740 escalado ≠ el CanvasCard real del monitor);
+  (b) el velo + nota anclada lee como **product tour generico** "click siguiente paso" —
+  mato la energia de trailer. Archivo en design/, artifact quedo mostrando v12.
+- **Leccion cerrada: NO mas mockups paralelos para W.X.** El marco real y la energia de
+  pelicula ya existen en la implementacion; cualquier HTML aparte miente en proporcion.
+  Iterar DIRECTO en eventos-web con QA vivo.
+
+### Decisiones cerradas W.X nuevas (no re-preguntar)
+
+- **Opcion A**: los beats HABITAN el canvas con la composicion real de cada modulo,
+  "igualito" a la app (rechazada 75/25 y rechazado solo-escalar).
+- **Cero velos / cero spotlight-tooltip / cero pasos**: se mantienen los callouts
+  flotantes del film + cursor fantasma + particulas + compresion al rail.
+- Day-slide correcto: pill pop primero (~120ms), salida completa del dia, entrada con
+  retraso, filas escalonadas, dwell ~1600ms.
+- Sigue viva la decision v12 (keyvisual → FLIP → canvas escenario).
+
+### PROXIMA SESION — Re-componer escena Agenda EN LA IMPLEMENTACION (plan aprobado)
+
+1. **Leer el modulo /agenda real** (composicion, medidas) antes de componer.
+2. Re-componer SOLO la escena Agenda de `ShowcaseFilm` para llenar el marco igualito al
+   modulo real (datos SSR reales) + fix day-slide. UNA escena, QA Kamilo en
+   localhost:3000 (Perfil → "Ver introduccion").
+3. Aprobada → replicar el lenguaje a las otras 5 escenas (Speakers, En vivo, Social,
+   Desafio, Sponsors) + finale.
+4. **OJO estado repos**: showcase SIN COMMIT en eventos-web (intencional, mid-iteracion);
+   `99baf79` (nav) SIN PUSH; APP EVENTOS con commits de cierre SIN PUSH. Dev server :3000
+   quedo ARRIBA (si esta zombie: matar node + borrar .next, gotcha conocido).
+5. Paralelos: QA vivo device M.2-M.8 + B5 Fase C, DEPLOY DEMO 0/6, 2 pendientes Event Pulse.
+
+---
+
 ## SESION 2026-07-11 TARDE (Fable) — Nav dock magnify IMPLEMENTADO + W.X Showcase diseño (mockup v9 pendiente QA)
 
 **Sesion de diseño DaVinci con 2 frentes.** Cerrada abrupta: Kamilo se quedo sin creditos.

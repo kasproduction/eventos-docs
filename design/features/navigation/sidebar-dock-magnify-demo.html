@@ -1,0 +1,392 @@
+<title>SidebarPill — Direcciones de motion</title>
+<style>
+  :root {
+    --bg: #0b0b0f;
+    --glass-sheet: rgba(20, 20, 27, 0.55);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --surface-high: rgba(255, 255, 255, 0.10);
+    --text-primary: #f4f4f6;
+    --text-muted: rgba(244, 244, 246, 0.55);
+    --text-label: rgba(244, 244, 246, 0.38);
+    --accent: #b5a68b;
+    --live: #ff5d5d;
+    --spring: cubic-bezier(0.32, 0.72, 0, 1);
+    --spring-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --spring-rubber: cubic-bezier(0.3, 1.9, 0.4, 1);
+  }
+
+  * { margin: 0; box-sizing: border-box; }
+
+  body {
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(181, 166, 139, 0.06), transparent 60%),
+      var(--bg);
+    color: var(--text-primary);
+    font-family: Urbanist, "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 48px clamp(20px, 4vw, 64px) 64px;
+  }
+
+  .intro { max-width: 720px; margin-bottom: 40px; }
+  .intro .eyebrow {
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: 10px;
+  }
+  .intro h1 {
+    font-family: "Plus Jakarta Sans", Urbanist, "Segoe UI", system-ui, sans-serif;
+    font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+    text-wrap: balance; margin-bottom: 10px;
+  }
+  .intro p { color: var(--text-muted); font-size: 14.5px; line-height: 1.55; }
+  .intro p strong { color: var(--text-primary); font-weight: 600; }
+
+  .stations {
+    display: flex; gap: 20px; align-items: stretch;
+    overflow-x: auto; padding-bottom: 24px;
+    scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent;
+  }
+
+  .station {
+    flex: 1 0 248px; min-width: 248px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.015);
+    padding: 20px 18px 18px;
+    display: flex; flex-direction: column;
+  }
+  .station h2 {
+    font-family: "Plus Jakarta Sans", Urbanist, system-ui, sans-serif;
+    font-size: 15.5px; font-weight: 800; letter-spacing: -0.2px;
+    display: flex; align-items: center; gap: 9px; margin-bottom: 7px;
+  }
+  .station h2 .tag {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.04em;
+    color: var(--bg); background: var(--accent);
+    border-radius: 7px; padding: 2px 7px 1px;
+  }
+  .station .desc {
+    color: var(--text-muted); font-size: 12.5px; line-height: 1.5;
+    min-height: 57px; margin-bottom: 14px;
+  }
+
+  .railwrap {
+    position: relative; flex: 1; min-height: 460px;
+    border-radius: 14px;
+    background:
+      radial-gradient(400px 260px at 60% 20%, rgba(181,166,139,0.045), transparent 70%),
+      #0a0a0e;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    overflow: hidden;
+  }
+
+  /* ============ rail base: Dock Magnify (C) ============ */
+  .rail {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    width: 60px;
+    display: flex; flex-direction: column; align-items: stretch; gap: 4px;
+    padding: 10px 0;
+    border-radius: 28px;
+    border: 1px solid var(--border-strong);
+    background: var(--glass-sheet);
+    backdrop-filter: blur(22px) saturate(1.2);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .item {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: center;
+    height: 40px; flex: none;
+    color: var(--text-muted);
+    text-decoration: none; cursor: pointer;
+    will-change: height;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 12px; }
+  .item:hover { color: var(--text-primary); }
+  .item.active { color: var(--text-primary); }
+  .item.active::before {
+    content: ""; position: absolute; left: 4px; top: 50%;
+    transform: translateY(-50%);
+    height: 18px; width: 2px; border-radius: 2px; background: var(--accent);
+  }
+
+  .ic { display: block; width: 19px; height: 19px; will-change: transform; }
+  .ic svg { display: block; width: 100%; height: 100%; }
+
+  .livedot {
+    position: absolute; top: 7px; right: 16px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--live);
+    box-shadow: 0 0 6px rgba(255, 93, 93, 0.8);
+    animation: breathe 2.4s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.55; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  .sep {
+    border: none; height: 1px; width: 24px; flex: none;
+    margin: 6px auto; background: var(--border);
+  }
+
+  /* ============ C1 · Chip Onda ============ */
+  .chip-onda {
+    position: absolute; z-index: 4; pointer-events: none;
+    left: 90px; top: 0; height: 32px;
+    display: flex; align-items: center;
+    padding: 0 13px;
+    border-radius: 11px;
+    border: 1px solid var(--border-strong);
+    background: rgba(28, 28, 36, 0.92);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    font-size: 13px; font-weight: 700; white-space: nowrap;
+    opacity: 0;
+    transform-origin: left center;
+    transform: translateX(-8px) scale(0.9);
+    transition: opacity 0.2s ease, transform 0.35s var(--spring-pop);
+  }
+  .chip-onda.on { opacity: 1; transform: translateX(0) scale(var(--s, 1)); }
+
+  /* ============ C2 · Cascada de letras ============ */
+  .cascada {
+    position: absolute; z-index: 4; pointer-events: none;
+    left: 92px; top: 0; height: 24px;
+    display: flex; align-items: center;
+    font-size: 14.5px; font-weight: 800; letter-spacing: 0.02em;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+    white-space: pre;
+  }
+  .cascada .ltr {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(10px) scale(0.4) rotate(8deg);
+  }
+  .cascada.on .ltr {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+    transition: opacity 0.18s ease, transform 0.4s var(--spring-rubber);
+    transition-delay: calc(var(--l) * 28ms);
+  }
+
+  /* ============ C3 · Cortina ============ */
+  .cortina {
+    position: absolute; z-index: 1; pointer-events: none;
+    left: 78px; top: 0; height: 30px;
+    overflow: hidden;
+    display: flex; align-items: center;
+  }
+  .cortina .inner {
+    display: flex; align-items: center; height: 100%;
+    padding: 0 14px 0 16px;
+    border-radius: 0 11px 11px 0;
+    background: linear-gradient(90deg, rgba(28,28,36,0.95), rgba(28,28,36,0.75));
+    border: 1px solid var(--border-strong); border-left: none;
+    font-size: 13px; font-weight: 700; white-space: nowrap;
+    transform: translateX(-108%);
+    transition: transform 0.45s var(--spring);
+  }
+  .cortina.on .inner { transform: translateX(0); }
+
+  /* ============ C4 · Elastico ============ */
+  .elastico {
+    position: absolute; z-index: 4; pointer-events: none;
+    left: 90px; top: 0; height: 32px;
+    display: flex; align-items: center;
+    padding: 0 13px;
+    border-radius: 11px;
+    border: 1px solid rgba(181, 166, 139, 0.35);
+    background: rgba(28, 28, 36, 0.92);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    font-size: 13px; font-weight: 700; white-space: nowrap;
+    opacity: 0;
+    transform-origin: left center;
+    transform: scaleX(0.15) scaleY(1.4) rotate(-4deg);
+    transition: opacity 0.15s ease, transform 0.5s var(--spring-rubber);
+  }
+  .elastico.on { opacity: 1; transform: scaleX(1) scaleY(1) rotate(0deg); }
+
+  /* ============ C5 · Niebla visionOS ============ */
+  .niebla {
+    position: absolute; z-index: 4; pointer-events: none;
+    left: 92px; top: 0; height: 26px;
+    display: flex; align-items: center;
+    font-family: "Plus Jakarta Sans", Urbanist, system-ui, sans-serif;
+    font-size: 17px; font-weight: 800; letter-spacing: 0.32em;
+    white-space: nowrap;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    filter: blur(12px);
+    transition: opacity 0.4s ease, filter 0.45s ease, letter-spacing 0.5s var(--spring);
+  }
+  .niebla.on { opacity: 1; filter: blur(0); letter-spacing: 0.01em; }
+
+  .footnote {
+    margin-top: 8px; max-width: 760px;
+    color: var(--text-label); font-size: 12px; line-height: 1.6;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0.01ms !important; animation: none !important; }
+  }
+</style>
+
+<div class="intro">
+  <div class="eyebrow">EventOS · SidebarPill — iteración 2</div>
+  <h1>Dock Magnify + el nombre: cinco formas de aparecer</h1>
+  <p><strong>Las cinco tienen la misma onda del dock (la C que elegiste).</strong>
+  Lo que cambia es cómo se revela el nombre del módulo al lado del icono.
+  Deslizá el cursor de arriba a abajo sin salir del rail para sentir cómo el nombre acompaña la onda.</p>
+</div>
+
+<div class="stations" id="stations"></div>
+
+<p class="footnote">
+  Tipografías y accent aproximados (el accent real es por evento; acá la dorada #B5A68B).
+  El nombre sigue al icono magnificado mientras recorrés el rail. Click cambia el activo (barrita dorada).
+</p>
+
+<script>
+  const I = {
+    home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    agenda: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>',
+    live: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>',
+    mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>',
+    users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg>',
+    trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+    user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
+  };
+
+  const ITEMS = [
+    { icon: 'home', label: 'Inicio' },
+    { icon: 'agenda', label: 'Agenda' },
+    { icon: 'live', label: 'En vivo', live: true },
+    { icon: 'mic', label: 'Speakers' },
+    { icon: 'users', label: 'Social' },
+    { icon: 'building', label: 'Sponsors' },
+    { icon: 'trophy', label: 'Desafío' },
+    { sep: true },
+    { icon: 'user', label: 'Perfil' }
+  ];
+
+  const VARIANTS = [
+    {
+      key: 'chip-onda', tag: 'C1', name: 'Chip Onda',
+      desc: 'Un chip de vidrio surfea la onda: aparece con pop al lado del icono y crece con la magnificación mientras recorrés el rail.'
+    },
+    {
+      key: 'cascada', tag: 'C2', name: 'Cascada',
+      desc: 'Las letras del nombre caen una a una con rebote, como fichas de dominó al revés. Texto libre, sin chip.'
+    },
+    {
+      key: 'cortina', tag: 'C3', name: 'Cortina',
+      desc: 'El nombre se asoma desde atrás del rail como un cajón que se abre — sale del vidrio mismo y vuelve a esconderse.'
+    },
+    {
+      key: 'elastico', tag: 'C4', name: 'Elástico',
+      desc: 'El chip sale disparado con banda elástica: squash & stretch de cartoon, borde dorado. El más juguetón.'
+    },
+    {
+      key: 'niebla', tag: 'C5', name: 'Niebla',
+      desc: 'El nombre se materializa desde el desenfoque y las letras se compactan — el efecto gaze de visionOS. Grande y etéreo.'
+    }
+  ];
+
+  const stations = document.getElementById('stations');
+
+  VARIANTS.forEach(v => {
+    const st = document.createElement('section');
+    st.className = 'station';
+    st.innerHTML = `
+      <h2><span class="tag">${v.tag}</span>${v.name}</h2>
+      <p class="desc">${v.desc}</p>
+      <div class="railwrap" data-variant="${v.key}">
+        <nav class="rail" aria-label="Demo ${v.name}">
+          ${ITEMS.map((it, idx) => it.sep
+            ? '<hr class="sep">'
+            : `<a href="#" class="item${idx === 0 ? ' active' : ''}" aria-label="${it.label}">
+                 <span class="ic">${I[it.icon]}</span>${it.live ? '<span class="livedot"></span>' : ''}
+               </a>`).join('')}
+        </nav>
+        <span class="labelnode ${v.key}" aria-hidden="true">${v.key === 'cortina' ? '<span class="inner"></span>' : ''}</span>
+      </div>`;
+    stations.appendChild(st);
+  });
+
+  // ---- base magnify compartida + tracking del item bajo el cursor ----
+  function setupRail(wrap) {
+    const rail = wrap.querySelector('.rail');
+    const label = wrap.querySelector('.labelnode');
+    const variant = wrap.dataset.variant;
+    const items = [...rail.querySelectorAll('.item')];
+    const BASE = 40, MAX = 66, RANGE = 105;
+    const cur = items.map(() => BASE);
+    let mouseY = Infinity;
+    let hovered = null;
+
+    rail.addEventListener('mousemove', e => {
+      mouseY = e.clientY - rail.getBoundingClientRect().top;
+    });
+    rail.addEventListener('mouseleave', () => {
+      mouseY = Infinity;
+      hovered = null;
+      label.classList.remove('on');
+    });
+
+    items.forEach((it, i) => {
+      it.addEventListener('mouseenter', () => {
+        if (hovered === i) return;
+        hovered = i;
+        setLabel(it.getAttribute('aria-label'));
+      });
+      it.addEventListener('click', e => {
+        e.preventDefault();
+        items.forEach(o => o.classList.remove('active'));
+        it.classList.add('active');
+      });
+    });
+
+    function setLabel(text) {
+      if (variant === 'cascada') {
+        label.innerHTML = [...text].map((ch, i) =>
+          `<span class="ltr" style="--l:${i}">${ch === ' ' ? '&nbsp;' : ch}</span>`).join('');
+      } else if (variant === 'cortina') {
+        label.querySelector('.inner').textContent = text;
+      } else {
+        label.textContent = text;
+      }
+      // reinicia la animacion al cambiar de item
+      label.classList.remove('on');
+      void label.offsetWidth;
+      label.classList.add('on');
+    }
+
+    (function frame() {
+      items.forEach((it, i) => {
+        const c = it.offsetTop + it.offsetHeight / 2;
+        const d = Math.abs(mouseY - c);
+        const t = d > RANGE ? BASE : BASE + (MAX - BASE) * (1 - (d / RANGE) ** 2);
+        cur[i] += (t - cur[i]) * 0.28;
+        it.style.height = cur[i].toFixed(2) + 'px';
+        it.querySelector('.ic').style.transform = `scale(${(cur[i] / BASE).toFixed(3)})`;
+      });
+      if (hovered !== null) {
+        const it = items[hovered];
+        // top visual del rail: offsetTop es el 50% del wrap; el translateY(-50%) no entra en offsetTop
+        const railTop = rail.offsetTop - rail.offsetHeight / 2;
+        const cy = railTop + it.offsetTop + it.offsetHeight / 2;
+        const h = label.offsetHeight || 30;
+        label.style.top = (cy - h / 2).toFixed(1) + 'px';
+        if (variant === 'chip-onda') {
+          label.style.setProperty('--s', (0.92 + (cur[hovered] / BASE - 1) * 0.28).toFixed(3));
+        }
+      }
+      requestAnimationFrame(frame);
+    })();
+  }
+
+  document.querySelectorAll('.railwrap').forEach(setupRail);
+</script>

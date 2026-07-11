@@ -1,0 +1,711 @@
+<title>Showcase v12 — Beat Agenda full-canvas (estudio de lenguaje)</title>
+<style>
+  /* Tokens REALES de eventos-web: globals.css (Noir root / [data-theme=lux]) + streaming.css (--st-*) */
+  :root {
+    --bg: #0a0a0a;
+    --bg-elevated: #141414;
+    --border: rgba(255, 255, 255, 0.06);
+    --border-light: rgba(255, 255, 255, 0.12);
+    --border-strong: rgba(255, 255, 255, 0.18);
+    --text: rgba(255, 255, 255, 0.85);
+    --text-secondary: rgba(255, 255, 255, 0.5);
+    --muted: rgba(255, 255, 255, 0.35);
+    --label: rgba(255, 255, 255, 0.25);
+    --accent: #ffffff;
+    --heart: #ff5d6c;
+    --chipbg: #141414;
+    --glass-rail: rgba(20, 20, 22, 0.55);
+    --st-card: #181818; --st-low: #1a1a1a; --st-med: #1f1f1f; --st-high: #262626;
+    --st-fg: #f5f5f4; --st-dim: #a8a8a3; --st-mute: #6b6b66;
+    /* Noir: sombras NONE — el borde luminoso hace el trabajo */
+    --shadow-card: none;
+    --canvas-shadow: none;
+    --veil: rgba(4, 4, 7, 0.55);
+    --pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --rubber: cubic-bezier(0.3, 1.9, 0.4, 1);
+    --font-body: Urbanist, "Segoe UI", system-ui, sans-serif;
+    --font-display: "Plus Jakarta Sans", Urbanist, "Segoe UI", system-ui, sans-serif;
+  }
+  html[data-lux] {
+    --bg: #f6f8fa;
+    --bg-elevated: #ffffff;
+    --border: rgba(0, 0, 0, 0.08);
+    --border-light: rgba(0, 0, 0, 0.04);
+    --border-strong: rgba(0, 0, 0, 0.14);
+    --text: #1a1b1e;
+    --text-secondary: #4a4b50;
+    --muted: #7c7d82;
+    --label: #a8a9ae;
+    --accent: #1a1a1a;
+    --chipbg: #ffffff;
+    --glass-rail: #ffffff;
+    --st-card: #ffffff; --st-low: #fafaf9; --st-med: #f5f5f4; --st-high: #e7e5e4;
+    --st-fg: #1c1c1c; --st-dim: #4a4a48; --st-mute: #6b6b66;
+    /* Lux: las sombras REEMPLAZAN a los bordes */
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --canvas-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+    --veil: rgba(32, 30, 26, 0.38);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: var(--bg);
+    font-family: var(--font-body);
+    color: var(--text);
+    transition: background 0.4s;
+  }
+  .disp { font-family: var(--font-display); }
+
+  /* ===== Escenario logico 1340x760, escala proporcional al viewport ===== */
+  #center { position: fixed; inset: 0; display: grid; place-items: center; }
+  #stage {
+    width: 1340px; height: 760px;
+    display: flex; align-items: center; gap: 24px;
+    flex: none;
+  }
+
+  /* ===== Rail real (SidebarPill) — contexto espacial ===== */
+  #rail {
+    width: 64px; padding: 14px 0;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    background: var(--glass-rail);
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    backdrop-filter: blur(2px);
+  }
+  .ritem {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: var(--muted);
+  }
+  .ritem svg { width: 19px; height: 19px; }
+  .ritem.lit {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--border-light);
+  }
+
+  /* ===== CANVAS: el marco real de la app (CanvasCard, cap 1600) ===== */
+  #canvas {
+    position: relative;
+    width: 1240px; height: 740px;
+    border-radius: 26px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    box-shadow: var(--canvas-shadow);
+    overflow: hidden;
+  }
+
+  /* ===== SET AGENDA: la composicion real del modulo llena el marco ===== */
+  #set {
+    position: absolute; inset: 0;
+    padding: 34px 48px 40px;
+    display: flex; flex-direction: column;
+  }
+  .ag-head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    opacity: 0; transform: translateY(14px);
+  }
+  .ag-head.in { animation: riseIn 0.55s var(--rubber) forwards; }
+  /* canon titulos modulo: 24 / 800 / -0.5 */
+  .ag-title { font-family: var(--font-display); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+  .ag-tabs {
+    display: inline-flex; padding: 3px; gap: 2px;
+    background: var(--st-low); border: 1px solid var(--border-light); border-radius: 11px;
+  }
+  .ag-tab {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 13px; border-radius: 8px;
+    font-size: 12px; font-weight: 600; color: var(--st-dim);
+    transition: background 0.25s, color 0.25s;
+  }
+  .ag-tab svg { width: 13px; height: 13px; }
+  .ag-tab.active { background: var(--st-high); color: var(--st-fg); box-shadow: var(--shadow-card); }
+
+  .daystrip { display: flex; gap: 10px; margin-top: 18px; }
+  .daypill {
+    width: 42px; height: 60px; border-radius: 999px;
+    background: var(--st-low); border: 1px solid var(--border-light);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    opacity: 0; transform: scale(0);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .daypill.in { animation: popIn 0.4s var(--pop) forwards; }
+  .daypill .dow { font-size: 8.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--st-mute); }
+  .daypill .num { font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--st-dim); }
+  .daypill.active { background: var(--accent); border-color: var(--accent); }
+  .daypill.active .dow { color: color-mix(in srgb, var(--bg-elevated) 70%, transparent); }
+  .daypill.active .num { color: var(--bg-elevated); }
+  html[data-lux] .daypill.active .dow { color: rgba(255,255,255,0.6); }
+  html[data-lux] .daypill.active .num { color: #fff; }
+
+  /* split real del modulo: timeline izquierda + panel detalle derecha */
+  .ag-body {
+    margin-top: 22px; flex: 1; min-height: 0;
+    display: grid; grid-template-columns: 1fr 396px; gap: 28px;
+  }
+  .list-col { position: relative; overflow: hidden; }
+  .ag-page {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; gap: 13px;
+  }
+  .tl-row {
+    display: grid; grid-template-columns: 58px 1fr; gap: 12px;
+    opacity: 0; transform: translateY(22px) scale(0.98);
+  }
+  .tl-row.in { animation: riseIn 0.45s var(--rubber) forwards; }
+  .tl-time-col { display: flex; flex-direction: column; align-items: center; padding-top: 12px; }
+  .tl-time { font-family: var(--font-display); font-size: 12.5px; font-weight: 700; color: var(--st-dim); }
+  .tl-time.live { color: var(--text); }
+  .tl-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--st-high); margin-top: 7px; }
+  .tl-dot.live { background: var(--accent); box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 60%, transparent); }
+  .tl-conn { width: 1.5px; flex: 1; background: var(--border-light); margin-top: 6px; }
+
+  .sess-card {
+    border-radius: 15px;
+    background: var(--st-card); border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-card);
+    transition: border-color 0.35s;
+  }
+  .sess-card.faved { border-color: color-mix(in srgb, var(--heart) 45%, transparent); }
+  .sc-top { display: flex; align-items: center; justify-content: space-between; padding: 10px 10px 6px 13px; }
+  .sc-badges { display: flex; gap: 6px; }
+  .sc-tag {
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em;
+    padding: 3px 8px; border-radius: 7px; align-self: center;
+  }
+  .sc-tag.live {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--st-fg);
+    border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .sc-tag.live::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .sc-heart {
+    width: 32px; height: 32px; border-radius: 10px; flex: none;
+    background: var(--st-high); border: 1px solid var(--border-light);
+    display: grid; place-items: center; color: var(--st-dim);
+    transition: background 0.25s, color 0.25s, border-color 0.25s;
+  }
+  .sc-heart svg { width: 16px; height: 16px; display: block; }
+  .sc-heart.active {
+    background: color-mix(in srgb, var(--heart) 16%, transparent);
+    color: var(--heart);
+    border-color: color-mix(in srgb, var(--heart) 40%, transparent);
+    animation: hpop 0.55s var(--rubber);
+  }
+  .sc-heart.active svg { fill: currentColor; }
+  .sc-info { padding: 0 13px 12px; }
+  .sc-title {
+    font-family: var(--font-display); font-size: 14.5px; font-weight: 700;
+    line-height: 1.3; letter-spacing: -0.01em;
+  }
+  .sc-loc { font-size: 11.5px; color: var(--st-mute); margin-top: 3px; }
+
+  /* panel detalle derecha — DetailPanel real */
+  #detail {
+    border-radius: 18px;
+    background: var(--st-low); border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-card);
+    padding: 24px 26px;
+    display: flex; flex-direction: column;
+    opacity: 0; transform: translateX(26px);
+  }
+  #detail.in { animation: slideIn 0.55s var(--rubber) forwards; }
+  #dt-inner { transition: opacity 0.22s; }
+  .dt-tags { display: flex; gap: 6px; margin-bottom: 12px; }
+  .dt-title { font-family: var(--font-display); font-size: 19px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.25; }
+  .dt-meta { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .dt-mrow { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--st-dim); }
+  .dt-mrow svg { width: 14px; height: 14px; color: var(--st-mute); flex: none; }
+  .dt-lab {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.09em;
+    color: var(--label); text-transform: uppercase;
+    margin: 20px 0 9px;
+  }
+  .dt-spk { display: flex; align-items: center; gap: 11px; }
+  .dt-av {
+    width: 40px; height: 40px; border-radius: 50%; flex: none;
+    background: var(--st-high); border: 1px solid var(--border-light);
+    display: grid; place-items: center;
+    font-family: var(--font-display); font-size: 13px; font-weight: 800; color: var(--st-dim);
+  }
+  .dt-spk-name { font-size: 13.5px; font-weight: 700; }
+  .dt-spk-role { font-size: 11.5px; color: var(--st-mute); margin-top: 1px; }
+  .dt-desc { font-size: 12.5px; line-height: 1.6; color: var(--st-dim); }
+  .dt-fav {
+    margin-top: auto; padding-top: 18px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; color: var(--st-mute);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .dt-fav svg { width: 14px; height: 14px; color: var(--heart); fill: var(--heart); }
+  .dt-fav.on { opacity: 1; }
+
+  /* ===== SPOTLIGHT: velo + elemento actuando encima + nota anclada ===== */
+  #veil {
+    position: absolute; inset: 0; z-index: 40;
+    background: var(--veil);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.45s ease;
+  }
+  #veil.on { opacity: 1; }
+  .lift { position: relative; z-index: 45; }
+  .note {
+    position: absolute; z-index: 60; width: 330px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+    padding: 16px 18px 17px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+    opacity: 0; transform: translateY(12px) scale(0.94);
+  }
+  html[data-lux] .note { box-shadow: 0 18px 50px rgba(40, 38, 32, 0.22); }
+  .note.in { animation: notePop 0.5s var(--pop) forwards; }
+  .note.out { animation: noteOut 0.28s ease-in forwards; }
+  .note-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .note-ic {
+    width: 34px; height: 34px; border-radius: 11px; flex: none;
+    background: var(--st-high); border: 1px solid var(--border-light);
+    display: grid; place-items: center; color: var(--note-col, var(--text));
+  }
+  .note-ic svg { width: 17px; height: 17px; }
+  .note-title { font-family: var(--font-display); font-size: 15.5px; font-weight: 800; letter-spacing: -0.2px; }
+  .note-desc { font-size: 13px; line-height: 1.55; color: var(--text-secondary); }
+
+  /* cursor fantasma */
+  #cur {
+    position: absolute; z-index: 70; width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid color-mix(in srgb, var(--accent) 60%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    opacity: 0; pointer-events: none;
+    transition: left 0.6s cubic-bezier(0.3, 0.8, 0.3, 1), top 0.6s cubic-bezier(0.3, 0.8, 0.3, 1), opacity 0.3s, transform 0.15s;
+  }
+  #cur.tap { transform: scale(0.72); }
+
+  /* particulas del corazon */
+  .pt {
+    position: absolute; z-index: 65; width: 5px; height: 5px;
+    border-radius: 50%; background: var(--heart); pointer-events: none;
+    animation: ptFly 0.55s ease-out forwards;
+  }
+
+  /* ===== chrome del estudio (fuera del canvas) ===== */
+  #bar {
+    position: fixed; top: 18px; right: 20px; z-index: 90;
+    display: flex; gap: 8px;
+  }
+  .tbtn {
+    font: 600 12.5px var(--font-body); color: var(--muted);
+    background: color-mix(in srgb, var(--accent) 4%, transparent);
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 7px 14px; cursor: pointer; transition: color 0.2s;
+  }
+  .tbtn:hover, .tbtn:focus-visible { color: var(--text); outline: none; }
+  #cap {
+    position: fixed; left: 20px; bottom: 16px; z-index: 90;
+    font-size: 11.5px; color: var(--label); line-height: 1.6; max-width: 520px;
+  }
+  #cap b { color: var(--muted); font-weight: 700; }
+
+  @keyframes riseIn { to { opacity: 1; transform: none; } }
+  @keyframes slideIn { to { opacity: 1; transform: none; } }
+  @keyframes popIn { 0% { opacity: 0; transform: scale(0); } 70% { opacity: 1; transform: scale(1.18); } 100% { opacity: 1; transform: scale(1); } }
+  @keyframes notePop { to { opacity: 1; transform: none; } }
+  @keyframes noteOut { to { opacity: 0; transform: translateY(6px) scale(0.96); } }
+  @keyframes hpop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  @keyframes ptFly { to { transform: translate(var(--dx), var(--dy)) scale(0.3); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+
+<div id="center"><div id="stage">
+  <nav id="rail" aria-hidden="true"></nav>
+  <div id="canvas">
+    <div id="set">
+      <div class="ag-head" id="ag-head">
+        <div class="ag-title">Agenda</div>
+        <div class="ag-tabs">
+          <span class="ag-tab active" id="tab-ag">Agenda</span>
+          <span class="ag-tab" id="tab-mi"></span>
+        </div>
+      </div>
+      <div class="daystrip" id="daystrip"></div>
+      <div class="ag-body">
+        <div class="list-col" id="list-col">
+          <div class="ag-page" id="pg0"></div>
+          <div class="ag-page" id="pg1" style="visibility:hidden"></div>
+          <div class="ag-page" id="pgmi" style="visibility:hidden"></div>
+        </div>
+        <aside id="detail"><div id="dt-inner"></div>
+          <div class="dt-fav" id="dt-fav"></div>
+        </aside>
+      </div>
+    </div>
+    <div id="veil"></div>
+    <div id="cur"></div>
+  </div>
+</div></div>
+
+<div id="bar">
+  <button class="tbtn" id="b-replay" type="button">Replay</button>
+  <button class="tbtn" id="b-theme" type="button">Lux</button>
+</div>
+<div id="cap">
+  <b>v12 · estudio de lenguaje — beat Agenda "habitar el canvas" (opción A)</b><br>
+  El marco es el CanvasCard real (cap 1600px) y todo el escenario escala proporcional al monitor.
+  El set usa la composición real del módulo: timeline + panel detalle. Spotlight = velo + nota anclada.
+  Day-slide corregido: salida completa, entrada con retraso, filas escalonadas.
+</div>
+
+<script>
+/* ================= iconos lucide inline ================= */
+const I = {
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>',
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>',
+  radio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>',
+  users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+  bldg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>',
+};
+
+/* ================= data demo (mismo summit del seeder) ================= */
+const DAYS = [
+  { dow: 'VIE', num: '12', sessions: [
+    { time: '09:00', title: 'Registro y café de bienvenida', loc: 'Lobby principal' },
+    { time: '10:30', title: 'Keynote — El futuro de la industria', loc: 'Auditorio Principal', live: true, track: ['KEYNOTE', '#8b5cf6'], fav: true },
+    { time: '12:00', title: 'Panel — IA aplicada al negocio', loc: 'Sala 2', track: ['PRODUCTO', '#38bdf8'] },
+    { time: '14:30', title: 'Workshop — Prototipado rápido', loc: 'Lab Creativo', track: ['TALLER', '#f59e0b'] },
+    { time: '16:00', title: 'Networking — Rueda de contactos', loc: 'Terraza' },
+  ]},
+  { dow: 'SÁB', num: '13', sessions: [
+    { time: '09:30', title: 'Casos de éxito regionales', loc: 'Auditorio Principal', track: ['KEYNOTE', '#8b5cf6'] },
+    { time: '11:00', title: 'Charla — Diseño de experiencias', loc: 'Sala 2', track: ['PRODUCTO', '#38bdf8'] },
+    { time: '13:00', title: 'Almuerzo con sponsors', loc: 'Terraza' },
+    { time: '15:30', title: 'Demo day — Startups invitadas', loc: 'Auditorio Principal', track: ['TALLER', '#f59e0b'] },
+  ]},
+  { dow: 'DOM', num: '14', sessions: [] },
+];
+const DETAILS = [
+  { tags: [['KEYNOTE', '#8b5cf6'], ['live']], title: 'Keynote — El futuro de la industria',
+    time: '10:30 – 11:20', loc: 'Auditorio Principal',
+    spk: ['MG', 'María García', 'CEO y Fundadora · Kasproduction'],
+    desc: 'Una mirada a los cambios que vienen para el sector: tecnología, talento y los modelos de negocio que van a definir la próxima década.' },
+  { tags: [['KEYNOTE', '#8b5cf6']], title: 'Casos de éxito regionales',
+    time: '09:30 – 10:20', loc: 'Auditorio Principal',
+    spk: ['MG', 'María García', 'CEO y Fundadora · Kasproduction'],
+    desc: 'Tres historias reales de empresas de la región que transformaron su operación — qué funcionó, qué no y qué aprendieron en el camino.' },
+];
+
+/* ================= build ================= */
+const $ = (id) => document.getElementById(id);
+const rail = $('rail');
+[['cal', true], ['mic'], ['radio'], ['users'], ['trophy'], ['bldg']].forEach(([k, lit]) => {
+  const d = document.createElement('div');
+  d.className = 'ritem' + (lit ? ' lit' : '');
+  d.innerHTML = I[k];
+  rail.appendChild(d);
+});
+$('tab-mi').innerHTML = I.heart + 'Mi agenda';
+
+DAYS.forEach((d, i) => {
+  const p = document.createElement('span');
+  p.className = 'daypill' + (i === 0 ? ' active' : '');
+  p.id = 'dp' + i;
+  p.innerHTML = `<span class="dow">${d.dow}</span><span class="num">${d.num}</span>`;
+  $('daystrip').appendChild(p);
+});
+
+function rowHTML(s, pg, i) {
+  const tags = [];
+  if (s.live) tags.push('<span class="sc-tag live">EN VIVO</span>');
+  if (s.track) tags.push(`<span class="sc-tag" style="background:color-mix(in srgb, ${s.track[1]} 12%, transparent);color:${s.track[1]}">${s.track[0]}</span>`);
+  return `<div class="tl-row">
+    <div class="tl-time-col">
+      <span class="tl-time${s.live ? ' live' : ''}">${s.time}</span>
+      <span class="tl-dot${s.live ? ' live' : ''}"></span><span class="tl-conn"></span>
+    </div>
+    <div class="sess-card${s.live ? ' live' : ''}" ${s.fav && pg === 0 ? 'id="ag-card"' : ''}>
+      <div class="sc-top">
+        <div class="sc-badges">${tags.join('')}</div>
+        <span class="sc-heart" ${s.fav && pg === 0 ? 'id="ag-heart"' : ''}>${I.heart}</span>
+      </div>
+      <div class="sc-info"><div class="sc-title">${s.title}</div><div class="sc-loc">${s.loc}</div></div>
+    </div>
+  </div>`;
+}
+$('pg0').innerHTML = DAYS[0].sessions.map((s, i) => rowHTML(s, 0, i)).join('');
+$('pg1').innerHTML = DAYS[1].sessions.map((s, i) => rowHTML(s, 1, i)).join('');
+const fav = DAYS[0].sessions.find((s) => s.fav);
+$('pgmi').innerHTML = rowHTML({ ...fav, fav: false }, 9, 0)
+  .replace('sess-card live', 'sess-card live faved')
+  .replace('class="sc-heart"', 'class="sc-heart active"');
+
+function detailHTML(d) {
+  const tags = d.tags.map(([a, b]) =>
+    a === 'live' && !b
+      ? '<span class="sc-tag live">EN VIVO</span>'
+      : `<span class="sc-tag" style="background:color-mix(in srgb, ${b} 12%, transparent);color:${b}">${a}</span>`,
+  ).join('');
+  return `<div class="dt-tags">${tags}</div>
+    <div class="dt-title disp">${d.title}</div>
+    <div class="dt-meta">
+      <div class="dt-mrow">${I.clock}<span>${d.time}</span></div>
+      <div class="dt-mrow">${I.pin}<span>${d.loc}</span></div>
+    </div>
+    <div class="dt-lab">Speaker</div>
+    <div class="dt-spk">
+      <span class="dt-av">${d.spk[0]}</span>
+      <span><div class="dt-spk-name">${d.spk[1]}</div><div class="dt-spk-role">${d.spk[2]}</div></span>
+    </div>
+    <div class="dt-lab">Sobre esta sesión</div>
+    <div class="dt-desc">${d.desc}</div>`;
+}
+$('dt-inner').innerHTML = detailHTML(DETAILS[0]);
+$('dt-fav').innerHTML = I.heart + 'Guardada en Mi agenda';
+
+/* ================= escala proporcional del escenario ================= */
+const LOGICAL_W = 1340, LOGICAL_H = 760, MAX_SCALE = 1600 / 1240;
+let scale = 1;
+function fit() {
+  scale = Math.min((innerWidth - 48) / LOGICAL_W, (innerHeight - 96) / LOGICAL_H, MAX_SCALE);
+  $('stage').style.transform = `scale(${scale})`;
+}
+addEventListener('resize', fit);
+fit();
+
+/* ================= helpers de coreografia ================= */
+let runId = 0;
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const canvas = $('canvas');
+const cRect = () => canvas.getBoundingClientRect();
+/* coords logicas dentro del canvas (compensa la escala) */
+function at(el) {
+  const r = el.getBoundingClientRect(), c = cRect();
+  return { x: (r.left - c.left + r.width / 2) / scale, y: (r.top - c.top + r.height / 2) / scale };
+}
+const cur = $('cur');
+function curTo(el, dy = 0) {
+  const p = at(el);
+  cur.style.left = p.x - 15 + 'px';
+  cur.style.top = p.y - 15 + dy + 'px';
+  cur.style.opacity = '0.9';
+}
+async function curTap() {
+  cur.classList.add('tap');
+  await wait(150);
+  cur.classList.remove('tap');
+}
+const curHide = () => { cur.style.opacity = '0'; };
+
+let noteEl = null;
+function note(anchor, side, icon, title, desc, col) {
+  noteOff(true);
+  const n = document.createElement('div');
+  n.className = 'note';
+  if (col) n.style.setProperty('--note-col', col);
+  n.innerHTML = `<div class="note-head"><span class="note-ic">${icon}</span><span class="note-title disp">${title}</span></div>
+    <div class="note-desc">${desc}</div>`;
+  canvas.appendChild(n);
+  const p = at(anchor), W = 1240, H = 740;
+  let x = side === 'right' ? p.x + 120 : side === 'left' ? p.x - 120 - 330 : p.x - 165;
+  let y = side === 'below' ? p.y + 70 : p.y - 46;
+  x = Math.max(28, Math.min(x, W - 358));
+  y = Math.max(24, Math.min(y, H - 150));
+  n.style.left = x + 'px';
+  n.style.top = y + 'px';
+  requestAnimationFrame(() => n.classList.add('in'));
+  noteEl = n;
+}
+function noteOff(now) {
+  if (!noteEl) return;
+  const n = noteEl;
+  noteEl = null;
+  if (now) { n.remove(); return; }
+  n.classList.remove('in');
+  n.classList.add('out');
+  setTimeout(() => n.remove(), 300);
+}
+const veilOn = (...lift) => { $('veil').classList.add('on'); lift.forEach((el) => el && el.classList.add('lift')); };
+function veilOff() {
+  $('veil').classList.remove('on');
+  canvas.querySelectorAll('.lift').forEach((el) => el.classList.remove('lift'));
+}
+function burst(el) {
+  const p = at(el);
+  for (let i = 0; i < 12; i++) {
+    const s = document.createElement('span');
+    s.className = 'pt';
+    const a = Math.random() * Math.PI * 2, v = 26 + Math.random() * 34;
+    s.style.left = p.x + 'px';
+    s.style.top = p.y + 'px';
+    s.style.setProperty('--dx', Math.cos(a) * v + 'px');
+    s.style.setProperty('--dy', Math.sin(a) * v + 'px');
+    canvas.appendChild(s);
+    setTimeout(() => s.remove(), 600);
+  }
+}
+
+/* ===== DAY SLIDE corregido: salida completa → entrada con retraso → filas escalonadas ===== */
+async function daySlide(fromId, toId, dir, run) {
+  const OUT = $(fromId), IN = $(toId);
+  OUT.animate(
+    [{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${-9 * dir}%)`, opacity: 0 }],
+    { duration: 380, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' },
+  );
+  await wait(160);
+  if (run !== runId) return;
+  IN.querySelectorAll('.tl-row').forEach((r) => r.classList.remove('in'));
+  IN.style.visibility = 'visible';
+  IN.animate(
+    [{ transform: `translateX(${14 * dir}%)`, opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }],
+    { duration: 460, easing: 'cubic-bezier(0.3, 1.3, 0.4, 1)', fill: 'forwards' },
+  );
+  for (const r of IN.querySelectorAll('.tl-row')) {
+    r.classList.add('in');
+    await wait(60);
+  }
+  await wait(120);
+  if (run !== runId) return;
+  OUT.style.visibility = 'hidden';
+}
+async function detailSwap(idx, run) {
+  const box = $('dt-inner');
+  box.style.opacity = '0';
+  await wait(220);
+  if (run !== runId) return;
+  box.innerHTML = detailHTML(DETAILS[idx]);
+  box.style.opacity = '1';
+}
+
+/* ================= EL BEAT ================= */
+function resetAll() {
+  runId++;
+  noteOff(true);
+  veilOff();
+  curHide();
+  $('ag-head').classList.remove('in');
+  document.querySelectorAll('.daypill').forEach((p, i) => {
+    p.classList.remove('in');
+    p.classList.toggle('active', i === 0);
+  });
+  $('detail').classList.remove('in');
+  $('dt-fav').classList.remove('on');
+  ['pg0', 'pg1', 'pgmi'].forEach((id) => {
+    const pg = $(id);
+    pg.getAnimations().forEach((a) => a.cancel());
+    pg.style.visibility = id === 'pg0' ? 'visible' : 'hidden';
+    pg.querySelectorAll('.tl-row').forEach((r) => r.classList.remove('in'));
+  });
+  $('pg0').style.transform = '';
+  const h = $('ag-heart');
+  if (h) h.classList.remove('active');
+  const c = $('ag-card');
+  if (c) c.classList.remove('faved');
+  $('tab-ag').classList.add('active');
+  $('tab-mi').classList.remove('active');
+  $('dt-inner').innerHTML = detailHTML(DETAILS[0]);
+}
+
+async function play() {
+  resetAll();
+  const run = runId;
+  const alive = () => run === runId;
+  await wait(400);
+  if (!alive()) return;
+
+  /* 1 — el set entra: cabecera, pills, timeline escalonado, panel detalle */
+  $('ag-head').classList.add('in');
+  await wait(200);
+  for (const p of document.querySelectorAll('.daypill')) {
+    p.classList.add('in');
+    await wait(70);
+  }
+  for (const r of $('pg0').querySelectorAll('.tl-row')) {
+    r.classList.add('in');
+    await wait(90);
+  }
+  $('detail').classList.add('in');
+  await wait(650);
+  if (!alive()) return;
+
+  /* 2 — spotlight: tu agenda */
+  veilOn($('daystrip'), $('list-col'));
+  note($('dp1'), 'right', I.cal, 'Tu agenda',
+    'Toda la programación por días. Explorá las sesiones y armá tu propio recorrido.');
+  await wait(3200);
+  if (!alive()) return;
+  noteOff();
+  veilOff();
+  await wait(350);
+
+  /* 3 — day slide corregido: VIE → SÁB, dwell real, y de vuelta */
+  $('dp0').classList.remove('active');
+  $('dp1').classList.add('active');
+  $('dp1').animate(
+    [{ transform: 'scale(1)' }, { transform: 'scale(1.09)' }, { transform: 'scale(1)' }],
+    { duration: 300, easing: 'ease-out' },
+  );
+  await wait(120);
+  await daySlide('pg0', 'pg1', 1, run);
+  detailSwap(1, run);
+  await wait(1600);
+  if (!alive()) return;
+  $('dp1').classList.remove('active');
+  $('dp0').classList.add('active');
+  await wait(120);
+  await daySlide('pg1', 'pg0', -1, run);
+  detailSwap(0, run);
+  await wait(600);
+  if (!alive()) return;
+
+  /* 4 — favorito: cursor → pop corazon → spotlight */
+  const heart = $('ag-heart');
+  curTo(heart);
+  await wait(700);
+  if (!alive()) return;
+  await curTap();
+  heart.classList.add('active');
+  $('ag-card').classList.add('faved');
+  burst(heart);
+  $('dt-fav').classList.add('on');
+  await wait(300);
+  veilOn($('ag-card').closest('.tl-row'), $('detail'));
+  note(heart, 'left', I.heart, 'Marcá tus favoritas',
+    'El corazón guarda la sesión en “Mi agenda”: tu selección personal del evento.', 'var(--heart)');
+  await wait(3200);
+  if (!alive()) return;
+  curHide();
+  noteOff();
+  veilOff();
+  await wait(300);
+
+  /* 5 — tab Mi agenda: queda tu recorrido */
+  $('tab-ag').classList.remove('active');
+  $('tab-mi').classList.add('active');
+  $('tab-mi').animate(
+    [{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }, { transform: 'scale(1)' }],
+    { duration: 280, easing: 'ease-out' },
+  );
+  await wait(120);
+  await daySlide('pg0', 'pgmi', 1, run);
+  await wait(2400);
+  if (!alive()) return;
+
+  /* loop suave */
+  play();
+}
+
+$('b-replay').addEventListener('click', () => play());
+$('b-theme').addEventListener('click', () => {
+  const lux = document.documentElement.hasAttribute('data-lux');
+  document.documentElement.toggleAttribute('data-lux', !lux);
+  $('b-theme').textContent = lux ? 'Lux' : 'Noir';
+});
+play();
+</script>
