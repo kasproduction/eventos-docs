@@ -6,6 +6,73 @@
 
 ---
 
+## SESION 2026-07-11 TARDE (Fable) — Nav dock magnify IMPLEMENTADO + W.X Showcase diseño (mockup v9 pendiente QA)
+
+**Sesion de diseño DaVinci con 2 frentes.** Cerrada abrupta: Kamilo se quedo sin creditos.
+
+### 1. SidebarPill animado — IMPLEMENTADO Y APROBADO (eventos-web `99baf79`, SIN PUSH)
+
+Kamilo pidio nav "visionOS premium". Flujo: demo HTML con 5 variantes → eligio **C (dock
+magnify)** → segundo demo con 5 formas de revelar el nombre → eligio **C4 Elástico**.
+Implementado en `SidebarPill.tsx`: fisica dock vertical framer (useMotionValue+useSpring,
+40→64px, RANGE 105), chip elastico squash&stretch con nombre del modulo (hijo del slot,
+surfea la onda), Bell en la misma onda, dot live estatico c/glow, reduced-motion fallback,
+hit target completo. **QA vivo Kamilo: "perfecto".** Typecheck+lint 0, 556/556 vitest.
+Gotcha: el dev server viejo crasheo con "Jest worker exceptions" → matar :3000 + borrar
+.next (cache turbopack corrupta, gotcha conocido).
+Demo nav: https://claude.ai/code/artifact/fba1ddf5-7202-4bf3-8ba9-41fdf5aabd2d
+
+### 2. W.X Showcase — diseño en iteracion, mockup v9 PUBLICADO SIN QA
+
+**Prototipos historicos encontrados**: `design/features/onboarding/` (early + 11
+iteraciones + refs Stitch). **`showcase-onboarding-v6.html` = referencia FUNCIONAL** (doc
+`docs/webapp/W.X-welcome-showcase.md`): pelicula GSAP ~45s, escenas que se COMPRIMEN al
+pill bar encendiendo iconos, cursor fantasma, TNT finale.
+
+**Iteraciones de esta sesion (todas con feedback Kamilo):**
+- v7 (opening "Hola Kamilo" + 2 beats): RECHAZADO — "lento, corporativo, timido".
+- 4 openings explosivos (Impacto/Golden Ticket/Spotlight/Big Bang):
+  https://claude.ai/code/artifact/fcdd8aca-1e04-4e16-a5e9-eb5f741a81ba
+  → **eligio Big Bang + Impacto combinados**.
+- v8 (trailer completo 6 beats energia v6): opening gustó PERO 3 correcciones:
+  (a) opening debe usar **KEYVISUAL del cliente, no tipografia CSS** (regla
+  feedback_keyvisual_not_typography); (b) beats con **aspecto REAL de cada modulo**, no
+  aproximaciones; (c) **finale espectacular pero SIN colores dorados**.
+- **v9 (ultimo, PUBLICADO pero Kamilo NO lo vio)**: 2 agentes extrajeron specs visuales
+  literales de los modulos reales (tokens --ag-*/--st-*/--sp-*, session card timeline,
+  day-pills 42x60, feat-cards 200px, feed editorial 50px, anillos momentos 2px, HUD
+  TEAL #39d2c0/CYAN #5eead4 banda RGB, trivia Kahoot letras, EventPoster
+  home_card_image_url object-cover + overlay). v9 = opening keyvisual (canvas placeholder
+  con wordmark horneado) + 6 beats look real + finale plata/blanco.
+  URL: https://claude.ai/code/artifact/f278f221-3b03-4757-959c-29e41962d7ce
+
+### Decisiones cerradas W.X (no re-preguntar)
+
+- **La BIENVENIDA personalizada va AL FINAL** (como v6): TNT crescendo → BOOM → Big Bang
+  particulas → "BIENVENIDO, {NOMBRE}" gigante → rail renace → CTA Explorar.
+- **Opening = keyvisual del evento** (imagen protagonista, wordmark horneado en el arte;
+  fallback EventPoster cinematografico). NO tipografia CSS gigante para el nombre evento.
+- Beats (6): Agenda → Speakers → En vivo (CON juegos MC: trivia + toast ruleta) → Social
+  → Desafio (HUD real) → Sponsors. Escenas se comprimen al **rail izquierdo real** (no
+  pill bar inventado); "En vivo" NACE desde su icono.
+- **Match % de networking del v6 = INVENTO** (no existe en modulo real) — eliminado en v9;
+  Social real = feed editorial + momentos + like + toast solicitud.
+- Arranca SOLO (sin boton play). Click = acelerar. Skip siempre. Sin dorados en finale.
+- Beats con componentes/estetica REALES de cada modulo (en implementacion: componentes
+  reales en miniatura, datos SSR del evento).
+
+### PROXIMA SESION — QA del mockup v9 + seguir iteracion W.X
+
+1. **Kamilo abre el v9** (URL arriba) y da feedback. Ajustar hasta aprobar ANTES de codear.
+2. Al aprobar: implementar en eventos-web (framer, componentes reales, localStorage
+   una-vez-por-evento, boton "Ver introduccion" perfil re-habilitar, reduced-motion
+   fallback estatico, mobile = variante stories 9:16).
+3. **Pendiente de decidir**: push de `99baf79` (nav) — Kamilo no alcanzo a pedirlo.
+4. Paralelos que siguen vivos: QA vivo device M.2-M.8 + B5 Fase C, DEPLOY DEMO 0/6,
+   2 pendientes Event Pulse.
+
+---
+
 ## SESION 2026-07-11 (Fable) — MOBILE PARITY CERRADO 60/60: M.8 Vendor + M.0 gates. Workstream completo
 
 **MOBILE PARITY 100% implementado en una sesion** (falta solo QA vivo Kamilo).
