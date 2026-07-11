@@ -42,7 +42,7 @@
 | **W.16 Live Moments** | **5/5** | **CERRADO 100% 2026-07-09 (BLOQUE 4)** — TriviaPanel espejo Expo en la columna interactiva del streaming (4 fases idle/question/result/finished): countdown drenante rojo <=5s, opciones A-F color Kahoot, reveal de distribucion animada, mini-leaderboard + podio top 5. **Noir puro via --st-* (adapta Lux), UNICO color = letras A-F, cero iconos (decision Kamilo)**. Hook local `useTrivia` (patron useQnA) + reducer puro. Proxy `/events/games/{id}/answer`. Toasts ruleta/jackpot en GlobalSocketProvider. 10 vitest. **Validado en vivo** (launch->question->answer correcto score 135->result) via Mission Control + QaTriviaSeeder | **+5** |
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
-| ~~W.X Welcome Showcase~~ | **ELIMINADO** | Invento de planeacion (auditoria 2026-07-04): el onboarding Expo es un wizard de REGISTRO, no un carrusel de features. Boton perfil oculto (`4325f05`). Fase 2 si se quiere espejo del wizard | — |
+| W.X Showcase/Onboarding | 0/1 | **RE-ABIERTO 2026-07-11 (decision Kamilo)** — feature propia webapp (NO espejo Expo): explicar al usuario que es cada cosa. Diseño DaVinci desde cero antes de codear. Historia: eliminado 2026-07-04 por falta de procedencia; procedencia ahora = decision explicita Kamilo | — |
 | **TOTAL** | **549/576** | **95.3%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05) | **2026-07-09 BLOQUE 4 CERRADO**: W.16 Trivia 0→5 (TriviaPanel espejo + useTrivia + proxy + toasts, validado en vivo). Quedan: B5 Fase C QA (~2h CON Kamilo presente) + Mobile parity. **18 modulos cerrados:** W.0, W.1, W.1B, W.2, W.3, W.4, W.5, W.6, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.16, W.17, W.18 |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
@@ -51,9 +51,10 @@
 
 ## QUE SIGUE (1 sola tarea concreta)
 
-- [ ] **MOBILE PARITY — M.8 Vendor (0/9, cierra el workstream).** 48/58: M.0 6/7 + M.1-M.7 CERRADOS. M.7 Comunicacion cerrado 2026-07-10 (Fable, eventos-web `51857d8` + `572ea1a` M.6 + `5ed3343` fix slide, pusheados): Documentos/Anuncios/Soporte/FAQ/Encuestas mobile + QA streaming. Pendiente QA vivo Kamilo M.2-M.7 (heart particulas, DaySlide, momentos/uploads, shuffle 7s, trivia sponsor, rating speaker, desafio, anuncios detail slide, soporte form, orb FAQ, encuestas deck) + item M.0 restante (gates banned/aprobacion + deeplinks). Deuda nueva: panel `custom` streaming placeholder (CSP) + Expo documentos legacy por alinear.
+- [ ] **W.X SHOWCASE/ONBOARDING explicativo (decision Kamilo 2026-07-11) — diseño DaVinci PRIMERO** (refs externas + propuesta + mockup aprobado antes de codear; ver seccion W.X). **MOBILE PARITY CERRADO 60/60 2026-07-11** (eventos-web `3f7e4dc` M.8 Vendor 11/11 + `ef1c757` M.0 gates/deeplinks, pusheados). QA vivo Kamilo pendiente M.2-M.8 en device (heart particulas, momentos/uploads, shuffle, trivia sponsor, desafio, anuncios detail, soporte form, orb FAQ, encuestas deck, **vendor: scanner camara real via HTTPS, export share sheet, invitacion socket en vivo, gates ban/pending con datos reales**). Deuda: panel `custom` streaming placeholder (CSP) + Expo documentos legacy por alinear.
 
 > BLOQUE 4 (W.16 Trivia) YA cerrado 2026-07-09. BLOQUE 2 (Home) cerrado 2026-07-08. Quedan solo Mobile parity + B5 Fase C.
+> **Orden decidido 2026-07-11 (Kamilo): M.8 Vendor primero → despues W.X Showcase/Onboarding explicativo (re-abierto, ver seccion W.X).**
 > Cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device iPad/iPhone/Edge/Firefox + Lighthouse + WCAG + E2E cross-tab + DSN prod). Fase A 100% validada 2026-07-05 (push desde Filament OK + install PWA OK).
 > Deuda menor W.16 (no bloqueante): E2E Playwright de trivia (tengo 10 vitest del reducer/helpers) — mismo criterio que /encuestas.
 
@@ -134,7 +135,7 @@
 - [ ] **Fase C** — E2E cross-tab (streaming Q&A, social conectar)
 - [ ] **Fase C** — DSN prod Sentry + validacion (item de deploy; config completa ya en codigo)
 
-### MOBILE PARITY — workstream 48/58 (baseline CERRADO 2026-07-09, 100% Fable)
+### MOBILE PARITY — workstream 60/60 **CERRADO 2026-07-11 (implementacion 100%; queda QA vivo Kamilo M.2-M.8)**
 
 > **Enfoque acordado (2026-07-05):** NO portar componentes RN (react-native-web
 > descartado). Capa de PRESENTACION mobile nueva sobre la capa de datos existente
@@ -186,14 +187,14 @@
 > - **Orden de bloques M.0→M.8; M.0 primero y bloqueante.** Mockup DaVinci del
 >   tab bar aprobado ANTES de codear.
 
-#### M.0 — Shell mobile (fundacion, bloquea todo) — 5/7
+#### M.0 — Shell mobile (fundacion, bloquea todo) — 7/7 **CERRADO 2026-07-11**
 - [x] **Bifurcacion shell CSS-first** (2026-07-09): chrome desktop (`AmbientBackground`/`SidebarPill`/`ThemeTogglePill`) en wrapper `contents mobile:hidden`; `Stage` con variantes `mobile:block p-0`; `MobileGate` oculta la vista desktop <640px y muestra placeholder digno (CTA volver al inicio) hasta que cada ruta entregue su vista mobile (`MOBILE_READY`, /session-stream ya bifurca solo). Cero flash de hidratacion (CSS decide, no JS)
 - [x] **MobileTabBar espejo `FloatingTabBar.tsx`** (2026-07-09, mockup DaVinci aprobado + 3 decisiones: blur espejo en Noir / accent en activa / con labels): pill flotante blur 380 max, burbuja lente framer spring damping22/stiffness340 + highlight especular 45%, lift -3px, press scale 0.88, labels 9px, badge rojo solicitudes (SSR + auto-refresh via router.refresh de networking:notify), vibrate soft. **Solo visible en las 5 rutas tab** (espejo: stack screens sin tab bar). Rutas nuevas /mi-qr y /networking con `DesktopRedirect` (>=640 → /home y /social)
-- [ ] Patron header mobile por pantalla (espejo: header propio + back pill; bell con badge/shake SOLO en Home — `HomeHeader.tsx`) — llega con las primeras pantallas M.1
+- [x] Patron header mobile por pantalla — **HECHO en M.1 2026-07-09** (`MobileHeader` back pill + canon titulos; bell con badge/shake solo en Home via `HomeHeaderM`)
 - [x] Reserva altura tab bar: `--m-tabbar-reserve` (68 + safe area + 15, espejo `useTabBarHeight.ts`) en mobile-shell.css — usada por placeholder y PushPrompt
 - [x] Guard CSS mobile: canvas/Stage neutralizados <640px (vista desktop ademas oculta por MobileGate)
 - [x] PushPrompt: bottom sube sobre el tab bar en mobile (`calc(var(--m-tabbar-reserve) + 12px)`)
-- [ ] Deep links `eventos://` operativos en shell mobile (parseActionUrl existente) + gates banned/aprobacion espejo `(app)/_layout.tsx:63-73` — verificar al cerrar M.1
+- [x] **Deep links + gates de acceso — CERRADO 2026-07-11** (eventos-web `ef1c757`): `parseActionUrl` con `eventos://join-team/{token}` y `eventos://stand` como rutas internas reales (M.8; solo recap queda internal-future) + **gates espejo `(app)/_layout.tsx:63-73`**: `getAccessGate` (ban + registration_approved_at de la MISMA llamada /auth/me cacheada) en el layout (app) → `/banned` (motivo + expiracion/Permanente + Entendido=logout, espejo banned.tsx 152) y `/pending-approval` (Verificar estado via proxy /api/auth/status + Cerrar sesion, espejo pending-approval.tsx 191 — divergencia documentada: aprobado → /home, la webapp no tiene onboarding wizard). Ambas en (auth), fuera del shell (sin loop), universales de viewport. Verificacion: 556/556 vitest · E2E 34/34 serial (+3 gates: redirect ban, redirect pending, usuario normal rebota a /home) · screenshots 390px revisados
 > Verificacion 2026-07-09: typecheck + lint 0 errores · 497/497 vitest (+9: MobileTabBar 6 + MobileGate 3) · **E2E nuevo `mobile-shell.spec.ts` 7/7** (tab bar 5 tabs + activo, navegacion, placeholder + desktop oculto, stack sin tab bar, redirects desktop) · screenshots 390px OK (badge, burbuja accent, placeholder)
 
 #### M.1 — Home + Mi QR (tabs 1 y 3) — 8/8 **IMPLEMENTADO 2026-07-09 (QA vivo Kamilo pendiente)**
@@ -263,23 +264,39 @@
 - [x] ~~Chat full-height sin stream~~ **DESCARTADO (decision Kamilo 2026-07-10)**: sesion sin stream entra igual a /session-stream y el player muestra "Transmision no disponible aun" (ya implementado, StreamPlayer EmptyState). El modo chat pantalla completa NO va
 - [x] QA StreamShellMobile vs Expo `session-stream/[id].tsx`: player (iframe custom → YouTube → generica → placeholder, + Vimeo dedicado que Expo no tiene) / RatingModal 1.5s finished+no-calificada (con gate anti-carrera superior a Expo) / tracking session_stream_view ≥3s una vez (+ pagehide/keepalive) / speaker row (fix separador " · ") / paneles OK. **GAP anotado: panel `custom` es placeholder** (Expo monta WebView a custom_url; en web implica decidir CSP frame-src) — deuda W.4, decision pendiente
 
-#### M.8 — Vendor W.15 (cierre del workstream) — 0/9
-> Procedencia verificada: ~3.000 lineas Expo (8 pantallas) + 18 endpoints backend mapeados (auditoria 2026-07-04). Gating: `attendee.has_vendor_access` del `GET /auth/me` (`isVendor = role==='vendedor' || hasVendorAccess`).
-- [ ] Hooks + gating hasVendorAccess (espejo `useStand`/`useLeads`/`standApi`/`leadsApi`)
-- [ ] Mi Stand dashboard (espejo `mi-stand.tsx` 288: hero logo/tier/rol + 3 stat cards navegables — NO tabs)
-- [ ] Mis Leads (espejo `leads.tsx` 195 + `lead-detail.tsx` 317: grouped Hoy/Ayer/fecha + tier hot/warm/cold + notas + historial ediciones) + export CSV (`GET /me/leads/export`)
-- [ ] **Scanner stand QR con camara browser** (espejo `scanner-stand.tsx` 542: CameraView frame + scanline + sheet resultado — web: getUserMedia + BarcodeDetector, prior art eventos-kiosko)
-- [ ] Scanner invite equipo (espejo `scanner-invite.tsx` 282: resolver QR asistente → invitar al stand, gating owner)
-- [ ] Solicitudes stand (espejo `stand-contacts.tsx` 211: servicios interes + mensaje + acciones tel/mailto/wa.me)
-- [ ] Stats (espejo `stand-stats.tsx` 360: overview + trend vs ayer + TierBar + MemberBar + top services)
-- [ ] Team management (espejo `mi-equipo.tsx` 567: slots + invitar busqueda/email + share link + transfer + remove, owner-only)
-- [ ] Join-team CON SESION (espejo `join-team/[token].tsx` 276 — auth requerido, NO publico) + tests
+#### M.8 — Vendor W.15 (cierre del workstream) — 11/11 **IMPLEMENTADO 2026-07-11 (Fable, QA vivo Kamilo pendiente)** (re-baseado 0/9→0/11 tras lectura completa Expo)
+> Procedencia verificada: ~3.000 lineas Expo (8 pantallas) + 18 endpoints backend mapeados (auditoria 2026-07-04). Gating: `attendee.has_vendor_access` del `GET /auth/me` (`isVendor = role==='vendedor' || hasVendorAccess`, espejo `(tabs)/index.tsx:64`).
+> **Decisiones Kamilo 2026-07-11**: TODO NATIVO espejo Expo — `navigator.share` (share sheet nativo browser) para export CSV y link equipo, `tel:`/`mailto:` links nativos. **WhatsApp dedicado APLAZADO** (sin botones wa.me por ahora — mas adelante). Scanner = **@zxing/browser** (prior art REAL de eventos-kiosko `useQrScanner.ts` — BarcodeDetector era error del backlog: no existe en Safari/Firefox). Scanners siempre oscuros #0e0e0e (espejo); resto adapta Lux/Noir. Join-team sin redirect desktop (card centrada universal). Modal invitacion staff GLOBAL (espejo layout Expo).
+> QA nota: getUserMedia exige contexto seguro — camara NO funciona via IP de red; QA device del scanner requiere `next dev --experimental-https` o flag Chrome.
+- [x] Capa de datos + gating: proxies `/api/stand/*` + `/api/leads/*` + `lib/stand-client.ts`/`lib/leads-client.ts` + exponer `attendee.has_vendor_access` en getCurrentUser (hoy se descarta) (espejo `standApi`/`leadsApi`/`useStand`/`useLeads`)
+- [x] **Vendor Home** (NUEVO — espejo `(tabs)/index.tsx:249` + `VendorHappeningNow.tsx` 467): HomeMobile isVendor reemplaza HappeningNowM por split 65/32 — carrusel sesion compacta+HUD / MiStandCard noir (QR breathing, pill N leads, Abrir → /mi-stand)
+- [x] Mi Stand dashboard (espejo `mi-stand.tsx` 288: hero logo/tier/rol + 3 stat cards navegables + FAB scanner breathing con scanline + empty state)
+- [x] Mis Leads (espejo `leads.tsx` 195 + `lead-detail.tsx` 317: grouped Hoy/Ayer/fecha + tier hot/warm/cold + notas + historial ediciones + Guardar solo dirty)
+- [x] Export CSV (`GET /me/leads/export`) — navigator.share con File si disponible, fallback descarga directa + toast
+- [x] **Scanner stand QR camara browser** (espejo `scanner-stand.tsx` 542: frame 4 esquinas + scanline + sheet resultado 55/error 38 + tier chips post-captura + DUPLICATE_LEAD warning — @zxing/browser)
+- [x] Scanner invite equipo (espejo `scanner-invite.tsx` 282: resolve-qr → sheet invitar, gating owner)
+- [x] Solicitudes stand (espejo `stand-contacts.tsx` 211: chips servicios interes + mensaje quote + acciones tel/mailto — wa.me aplazado)
+- [x] Stats (espejo `stand-stats.tsx` 360: overview rows + trend vs ayer up/down + TierBar + MemberBar + top services + sheet export)
+- [x] Team management (espejo `mi-equipo.tsx` 567: 3 vias invitar QR/busqueda/email + share link navigator.share/clipboard + transfer + remove, owner-only, sheets confirmar/acciones/compartir)
+- [x] Join-team CON SESION (espejo `join-team/[token].tsx` 276: card centrada 5 estados, auth requerido) + **sockets `staff:invited`/`staff:removed` en GlobalSocketProvider + modal invitacion global + fetch pending-invitations al montar** (NUEVO — espejo `useDataInvalidation.ts:329,403` + `useStaffInvitations` + `StaffInvitationModal`) + tests
+> Verificacion 2026-07-11: typecheck + lint 0 errores · 555/555 vitest (+8 groupLeadsByDay/leadTimeAgo) · E2E mobile-shell 31/31 serial (+7 M.8: home vendor, mi-stand, leads+detail, mi-equipo, stats→contacts, gating no-vendor, redirect desktop) · 9 screenshots 390px revisados (home split 65/32, stand, leads Hoy/Ayer, detail tier/historial, equipo owner, stats barras, contacts, join-team, scanner permiso). Gotchas nuevos: **eventos-web usa pnpm** (npm install revienta contra node_modules .pnpm) · **toLocaleString es-CO en Node != Chrome → hydration mismatch** (formateo manual de fechas, patron formatShortDate) · fixtures E2E con offsets de HORAS cruzan medianoche y flakean (lead "Hoy" = now-5min). QA vivo Kamilo pendiente: scanner con camara real (getUserMedia exige localhost/HTTPS — `next dev --experimental-https` para device), export CSV share sheet en celular real, flujo invitacion socket en vivo, Lux.
 
 ### ~~BLOQUE 7 — W.X Welcome Showcase~~ — **ELIMINADO 2026-07-04**
 > El "showcase 6 beats" era invento: el onboarding real de Expo (~4.500 lineas) es un
 > wizard de REGISTRO (welcome hero + auth + foto + forms dinamicos + survey). La webapp
 > ya cubre su parte con W.1 magic link. Boton "Ver introduccion" queda oculto (Bloque 0).
 > Si Fase 2 pide espejo del wizard completo, se disena entonces.
+
+### DEPLOY DEMO — 0/6 (anotado 2026-07-11, decision Kamilo — prioridad estrategica post-pivote)
+> El pivote comercial (2026-07-08) puso "completitud + deploy demo" como prioridad para
+> prospectos oct-nov. Hasta hoy el deploy solo existia como el item DSN Sentry de Fase C —
+> este bloque lo hace explicito. Alcance por definir en sesion propia (hosting/costo).
+- [ ] Hosting + dominio: decidir stack (VPS unico con Laravel+Next+socket+Redis vs managed) y costo mensual objetivo (ref project_scaling_10k: $80-120/mes es el techo 10K; una demo necesita MUCHO menos)
+- [ ] Backend Laravel prod: env + queue worker + cron + storage (S3/local) + Mailgun/SES real (magic links)
+- [ ] eventos-web prod: build Next standalone + env (API_INTERNAL_URL, socket, VAPID) + HTTPS (requisito del scanner vendor)
+- [ ] eventos-socket prod: PM2 + Redis DB 2 + CORS al dominio real
+- [ ] Evento demo curado: seeders existentes (ReseedSessionsSeeder relativo a HOY + QaTriviaSeeder + LiveHubDemoSeeder) + branding pulido + cuentas de demo por rol (asistente/vendor/staff)
+- [ ] DSN Sentry prod + validacion (item que ya vivia en B5 Fase C — se ejecuta aca)
 
 ### PARALELO — PARIDAD DE CONFIG admin ↔ 3 superficies (detectado Kamilo 2026-07-09) — 0/3
 > Gap real verificado en baseline: el admin configura modulos/branding pero las superficies
@@ -1028,14 +1045,18 @@
 - [x] E2E `perfil.spec.ts` 13/13 verde con serial mode
 - [x] Memoria `project_w18_hub_personal_blueprint.md` + `project_sidebar_bottom_zone.md`
 
-### ~~W.X — Welcome Showcase~~ — **ELIMINADO 2026-07-04 (invento de planeacion)**
+### W.X — Showcase / Onboarding explicativo — **RE-ABIERTO 2026-07-11 (decision Kamilo)** — 0/1
 
-> Auditoria de procedencia: el onboarding real de Expo (~4.500 lineas) es un **wizard de
-> REGISTRO** (welcome hero + auth + foto + forms dinamicos por admin + survey + done),
-> NO un carrusel de features con miniaturas. El "showcase 6 beats" no espejaba nada.
-> La webapp ya cubre su lado con W.1 magic link. Boton "Ver introduccion" del perfil
-> queda OCULTO (Bloque 0, `4325f05`). Si Fase 2 pide espejo del wizard completo
-> (registro con foto/forms/survey en webapp), se disena entonces como feature real.
+> Historia: eliminado 2026-07-04 en auditoria de procedencia porque NO espejaba Expo
+> (el onboarding Expo es un wizard de REGISTRO, no un carrusel de features).
+> **RE-ABIERTO 2026-07-11 con procedencia = decision explicita de Kamilo**: "en webapp
+> si es necesario hacer ese showcase — es la forma en que a la gente se le explica
+> todo, que es cada cosa". NO es espejo — es feature propia de la webapp.
+- [ ] **Showcase/onboarding explicativo del evento** — explicar al usuario que es cada
+  modulo/que puede hacer. Alcance, formato y momento (primer login? boton perfil?
+  desktop+mobile?) SIN definir — **diseño DaVinci completo primero** (refs externas +
+  propuesta + mockup aprobado) antes de codear. Al implementarse: re-habilitar el
+  boton "Ver introduccion" del perfil (oculto en Bloque 0, `4325f05`)
 
 ---
 

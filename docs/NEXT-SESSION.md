@@ -6,6 +6,88 @@
 
 ---
 
+## SESION 2026-07-11 (Fable) — MOBILE PARITY CERRADO 60/60: M.8 Vendor + M.0 gates. Workstream completo
+
+**MOBILE PARITY 100% implementado en una sesion** (falta solo QA vivo Kamilo).
+M.8 Vendor entero (re-baseado 9→11 items tras leer las ~3.000 lineas Expo) +
+el item M.0 final (gates + deeplinks). Global webapp: **609/636 ≈ 95.8%**
+(desktop 549/576 + mobile 60/60); los 27 restantes son QA operacional (Fase C).
+
+### Que se hizo (eventos-web `3f7e4dc` + `ef1c757`, PUSHEADOS)
+
+1. **M.8 Vendor 11/11** (`3f7e4dc`, 60 archivos ~6.550 lineas): capa de datos
+   (lib/stand + lib/leads + 13 proxies + `getVendorAccess` en lib/auth — el
+   /auth/me ahora expone el attendee) · **Vendor Home** split 65/32 espejo
+   `VendorHappeningNow` (MiStandCard noir QR breathing; el HUD fluido cqw se
+   reusa en el slot chico — RN necesito variante aparte) · Mi Stand (hero +
+   3 stats + FAB scanline) · Leads Hoy/Ayer + detail (tier/notas/historial,
+   Guardar solo dirty) · export CSV **navigator.share nativo** + fallback
+   descarga · **2 scanners @zxing/browser** (prior art REAL kiosko;
+   BarcodeDetector del backlog era error — no existe en Safari/FF) ·
+   Solicitudes (tel:/mailto:, **WhatsApp APLAZADO** decision Kamilo) · Stats
+   (trend + TierBar/MemberBar) · Mi Equipo (3 vias invitar + share link
+   nativo + transfer/remove + sheets) · Join-team 5 estados (universal, sin
+   redirect desktop) · **sockets `staff:invited`/`staff:removed`** en
+   GlobalSocketProvider + StaffInvitationModalM global + fetch pendientes.
+2. **M.0 cierre** (`ef1c757`): **gates espejo `(app)/_layout.tsx:63-73`** —
+   `getAccessGate` (ban + registration_approved_at, misma llamada /auth/me
+   cacheada) en el layout (app) → `/banned` y `/pending-approval` (en (auth),
+   sin loop; divergencia doc: aprobado → /home, no hay wizard) +
+   `parseActionUrl` con join-team/{token} y stand como rutas REALES.
+3. **W.X Showcase/Onboarding RE-ABIERTO** (decision Kamilo: "es la forma en
+   que a la gente se le explica todo") — procedencia = decision explicita.
+   Eliminado 2026-07-04 por no espejar Expo; vuelve como feature propia.
+4. **Bloque DEPLOY DEMO 0/6 anotado** en PENDIENTES (hosting/dominio, backend
+   prod, Next prod + HTTPS, socket PM2, evento demo curado, DSN Sentry) —
+   prioridad estrategica post-pivote que solo existia como el item DSN.
+5. Login mobile: falso gap — Kamilo ya lo habia hecho responsive antes.
+
+### Verificacion
+
+Typecheck + lint 0 · **556/556 vitest** (+9) · **E2E mobile-shell 34/34
+serial** (+10: 7 vendor + 3 gates) · 11 screenshots 390px revisados contra
+Expo (home vendor, stand, leads, detail, equipo, stats, contacts, join-team,
+scanner permiso, banned, pending).
+
+### Decisiones cerradas (no re-preguntar)
+
+- **TODO NATIVO espejo Expo**: navigator.share = el shareAsync de Expo (su
+  sheet de 4 opciones era pre-menu al mismo share). **WhatsApp dedicado
+  aplazado** (sin botones wa.me por ahora).
+- **Orden**: M.8 Vendor primero → W.X Showcase despues (diseño DaVinci
+  completo ANTES de codear; re-habilitar boton "Ver introduccion" al salir).
+- Join-team y las pantallas de gate son **universales de viewport** (links
+  llegan por fuera / estados de cuenta).
+- Modal invitacion staff **global** (espejo layout Expo).
+- Pending aprobado → **/home** (webapp sin onboarding wizard, Fase 2).
+
+### Gotchas nuevos (para memoria)
+
+- **eventos-web usa pnpm** — `npm install` revienta ("Cannot read properties
+  of null (reading 'matches')") contra node_modules .pnpm. `pnpm add`.
+- **`toLocaleString("es-CO")` en Node != Chrome → hydration mismatch** (el
+  dev overlay lo marca como Issue). Fix: formateo manual de fechas con array
+  de meses (patron formatShortDate de HomeMobile). Cazado en lead-detail.
+- **Fixtures E2E con offsets de HORAS cruzan medianoche y flakean** (el test
+  corrio a la 1 AM: "hace 2h" = Ayer). Fechas relativas: minutos para "Hoy".
+- mobile-shell.spec DEBE correr `--workers=1` (fullyParallel del config
+  satura y tumba 5-6 specs; en serial 34/34 estable).
+- getUserMedia exige contexto seguro: el scanner NO enciende via IP de red —
+  QA device requiere `next dev --experimental-https` o flag Chrome.
+
+### PROXIMA SESION — W.X Showcase/Onboarding (diseño primero) o QA vivo
+
+**Opcion A — W.X Showcase** (siguiente en la fila, decision Kamilo): flujo
+DaVinci COMPLETO — entender que debe sentir el usuario al entrar, 2-3 refs
+externas de product tours premium (Linear/Notion/Arc, NO carruseles
+genericos), propuesta de composicion + mockup aprobado ANTES de codear.
+**Opcion B — QA vivo M.2-M.8 con Kamilo en device** (scanner vendor via
+HTTPS, export share sheet, invitacion socket, gates con datos reales) —
+puede combinarse con B5 Fase C (~2h presenciales). Paralelos: Event Pulse
+(2 pendientes) + DEPLOY DEMO 0/6 (sesion propia de alcance/costo).
+
+---
+
 ## SESION 2026-07-10 (Fable) — MOBILE PARITY M.6+M.7 CERRADOS (48/58): Desafio + Comunicacion completa
 
 **Workstream 48/58 — solo queda M.8 Vendor.** La sesion cerro el fix del slide
