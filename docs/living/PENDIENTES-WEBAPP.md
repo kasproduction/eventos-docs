@@ -63,9 +63,10 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 - [ ] **W.X Showcase**: QA final de la pelicula de corrido (el QA fue por escena).
 
 > Deuda menor webapp (no bloqueante): E2E Playwright /encuestas y /trivia (hay vitest) ·
-> panel `custom` streaming = placeholder (decision pendiente CSP frame-src) · bug latente
-> proxy poll-vote sin prefijo /events · 2 tests ProfileSecurityTest rojos pre-existentes ·
-> Expo documentos legacy por alinear.
+> panel `custom` streaming = placeholder (decision pendiente CSP frame-src) ·
+> ~~bug proxy poll-vote sin /events~~ **CORREGIDO 2026-07-14** (`c4f6293`) ·
+> ~~2 tests ProfileSecurityTest rojos~~ **CORREGIDO 2026-07-14** (`2eaf11c`: validator
+> blindado vs schemes XSS + tests actualizados, 11/11) · Expo documentos legacy por alinear.
 >
 > **FUERA de "webapp only"** (superficies/infra aparte — NO son pendiente de webapp):
 > **DEPLOY DEMO 0/6** (infra: hosting/backend prod/Next prod/socket PM2/evento demo/DSN) ·
@@ -74,12 +75,12 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 > cache del `moments.js` v2 + 1 decision de diseño (cada-interaccion-hero vs actual);
 > ver [[project_event_pulse_complete]].
 
-> Deuda menor W.2 (no bloqueante): E2E Playwright de /encuestas (tengo vitest 9 tests) · verificar Lux con ojo · recap/certificado como pantalla aparte (Fase 2, hoy el codigo recap sigue en lib/recap sin consumir desde Home) · streaming poll-vote proxy pega a /polls/{id}/vote sin prefijo /events (posible bug latente pre-existente, la ruta real unica es /events/polls/{id}/vote).
+> Deuda menor W.2 (no bloqueante): E2E Playwright de /encuestas (tengo vitest 9 tests) · verificar Lux con ojo · recap/certificado como pantalla aparte (Fase 2, hoy el codigo recap sigue en lib/recap sin consumir desde Home) · ~~streaming poll-vote proxy sin prefijo /events~~ **CORREGIDO 2026-07-14 (`c4f6293`)**: ahora pega a /events/polls/{id}/vote.
 
-> Deuda menor anotada 2026-07-05: `ProfileSecurityTest` 2 tests rojos PRE-existentes
-> (esperan 422 para linkedin/website sin http; el validator W.18 se relajo a proposito
-> espejo Expo y los tests no se actualizaron). Decidir: aceptar string plano en tests
-> + agregar rechazo de schemes peligrosos (`javascript:`/`data:`) al validator.
+> ~~Deuda ProfileSecurityTest 2 tests rojos~~ **CORREGIDO 2026-07-14 (`2eaf11c`)**: el
+> validator ahora acepta string plano (conducta relajada W.18) PERO rechaza schemes XSS
+> (`javascript:`/`data:`/`vbscript:`); los 2 tests actualizados a "rechaza scheme peligroso"
+> + 2 tests nuevos de la conducta relajada. 11/11 verde.
 
 ---
 
