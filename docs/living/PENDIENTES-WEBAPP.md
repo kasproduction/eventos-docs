@@ -1055,6 +1055,13 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 
 ## PENDIENTES PARALELOS (sin bloquear sprints)
 
+> ⚠️ **NADA de esta seccion es feature de webapp Fase 1.** Son backlog de otras
+> superficies o nice-to-have tecnicos que NO cuentan para el cierre de webapp:
+> backend nice-to-have (verificados NO construidos, no bloqueantes), analytics
+> tracking (= la decision de W.8: Fase 2, no existe infra de analytics aun),
+> trabajo del Expo, y decisiones documentales. Los `[ ]` de aca NO son webapp
+> pendiente — la webapp Fase 1 (W.0-W.18 + W.X) esta cerrada; solo queda su QA.
+
 ### Documentales
 - [ ] Decidir W.X para `recap/[eventId]` del Expo (no mapeado a ningun modulo webapp)
 - [x] ~~Decidir W.X para `about.tsx`~~ — **HECHO**: /about implementado en Mobile parity M.1 (AboutView espejo `about.tsx`, entrada = card del Home registration/draft)
