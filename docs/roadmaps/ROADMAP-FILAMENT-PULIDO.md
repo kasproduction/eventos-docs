@@ -1,8 +1,18 @@
 # Roadmap Filament Pulido — Event Switcher + UX Enterprise
 
 > Plan para llevar el admin Filament de "funciona pero feo" a "production-ready enterprise".
-> Estado: PENDIENTE. No iniciar antes de cerrar features de negocio criticas (Web App, Landing).
-> Prioridad dentro de Filament Pulido: Event Switcher es el unico bloqueante real de UX. El resto es polish.
+> ~~Estado: PENDIENTE. No iniciar antes de cerrar features de negocio criticas.~~
+> **Estado 2026-07-14: PRIORIDAD 1 (decision Kamilo).** La webapp Fase 1 quedo cerrada;
+> el admin es lo siguiente. La paridad config↔superficies va DESPUES del admin.
+>
+> **Direccion visual APROBADA — "Lumina Admin"** (demo interactivo, Kamilo: "mucho mejor"):
+> https://claude.ai/code/artifact/16012924-0767-4c76-8001-c984306df9bd
+> Suma a este roadmap: tema Lumina Noir custom (tokens Data Center, Plus Jakarta/Urbanist,
+> acento del evento tine el panel) + dashboard "¿Que quieres hacer?" orientado a tareas +
+> nav en 6 grupos por intencion (Sistema colapsado) + **ModuleResource = lista FIJA de
+> features con toggles y drag & drop** (se elimina "crear modulo" y los ordenes 0/1/2/3).
+> Detalle en memoria `project_admin_filament_redesign`. Copy es-CO tuteo.
+> Prioridad dentro de Filament Pulido: Event Switcher es el unico bloqueante real de UX.
 
 ---
 

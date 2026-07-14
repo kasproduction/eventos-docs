@@ -6,6 +6,57 @@
 
 ---
 
+## SESION 2026-07-14 PARTE 2 (Opus→Fable) — Deuda codigo webapp EN CERO + docs reconciliados + PRIORIDAD 1: ADMIN FILAMENT (demo aprobado)
+
+Continuacion de la misma jornada tras el guardar del showcase. Tres frentes:
+
+### 1. Deuda de codigo webapp → CERO (todo pusheado)
+
+- **Fix poll-vote** (`eventos-web c4f6293`): el proxy pegaba a `/polls/{id}/vote` sin
+  `/events` → votar encuestas EN el streaming daba 404. Corregido.
+- **ProfileSecurity** (`eventos-backend 2eaf11c`): validator linkedin/website acepta
+  string plano (relajado W.18) pero rechaza schemes XSS (javascript:/data:/vbscript:).
+  2 tests rojos actualizados + 2 nuevos. 11/11 verde.
+- **Panel custom streaming** (`eventos-web 62ebfbd`): monta el iframe del custom_url
+  (Slido/Mentimeter/Slides/Miro… — para eso existia) en tablet+mobile; desktop ya lo
+  hacia. CSP ya permitia frame-src https:, backend valida dominio.
+- **E2E /encuestas y /trivia: NO SE HARA** (decision Kamilo, documentada): cobertura no
+  bug, flujos verificados en vivo + vitest; E2E trivia flaky por sockets.
+
+### 2. Docs reconciliados (auditoria doc vs realidad)
+
+- PENDIENTES-WEBAPP: W.15 Vendor 0/35→35/35 (hecho via M.8) + W.X 0/1→1/1 + items
+  sueltos marcados (Mi QR, split social/networking, /about, skeletons, reduced-motion).
+  TOTAL 550/576 (95.5%), 19 modulos cerrados, **ningun modulo de features abierto**.
+- **Paralelos MOVIDOS a PENDIENTES.md** ("Webapp — paralelos / backlog"): paridad config,
+  Event Pulse (COMPLETO — solo cache moments.js v2 + 1 decision), backlog Expo, backend
+  nice-to-have, analytics. El doc de webapp quedo SOLO con webapp: QA presencial + deploy.
+- Titulos de sesiones demo mejorados en BD + ContentSeeder (parte 1 de la jornada).
+
+### 3. PRIORIDAD 1 NUEVA: Admin Filament usable + tema Lumina (decision Kamilo)
+
+- Kamilo: "el admin es un desastre… alguien entra a cambiar un logo y se pierde";
+  "crear modulo no tiene sentido"; orden 0/1/2/3. **La paridad superficies va DESPUES.**
+- Investigado: backend modules YA existe y esta bien (tabla + ModuleController con
+  visibility). El problema es Filament UX (49 resources/10 grupos) + superficies hardcoded.
+- **Demo interactivo APROBADO ("mucho mejor")**:
+  https://claude.ai/code/artifact/16012924-0767-4c76-8001-c984306df9bd
+  Event Switcher + dashboard por tareas + Modulos lista fija con toggles/drag&drop +
+  acento del evento re-tine el panel en vivo. Detalle: memoria
+  `project_admin_filament_redesign` + addendum en `ROADMAP-FILAMENT-PULIDO.md`.
+- El "demo viejo" de Filament que Kamilo recordaba NO existe en repos (fue efimero de
+  chat) — no volver a buscarlo.
+
+### PROXIMA SESION — Implementar Lumina Admin (fase 1)
+
+1. **Event Switcher + scoping** (ROADMAP-FILAMENT-PULIDO F1-F3, ~4.5h core) — el
+   bloqueante real. Luego tema Lumina custom + nav por tareas + ModuleResource lista fija.
+   ~3-4 sesiones total. Flujo: el demo ES la direccion aprobada; iterar contra el con QA.
+2. Paralelos vivos: QA presencial webapp (mobile M.2-M.8 + Fase C + W.X de corrido) +
+   DEPLOY DEMO (sesion propia) + paridad superficies (post-admin).
+
+---
+
 ## SESION 2026-07-14 (Opus 4.8) — W.X WELCOME SHOWCASE CERRADO + commiteado/pusheado
 
 **La pelicula entera quedo cerrada: TODAS las escenas habitan el canvas espejando su
