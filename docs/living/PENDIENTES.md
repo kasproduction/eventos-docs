@@ -337,6 +337,44 @@ toca revisar la autenticacion aca como funciona y tener claro los token cuando e
 
 ---
 
+## Webapp — paralelos / backlog (movido de PENDIENTES-WEBAPP.md 2026-07-14)
+
+> Estas secciones vivian en `docs/living/PENDIENTES-WEBAPP.md` pero NO son features de
+> webapp Fase 1 (que ya esta cerrada: W.0-W.18 + W.X). Se movieron aca para que el doc de
+> webapp quede solo con lo de webapp (features + QA + deploy). Ninguno bloquea el cierre.
+
+### Paridad config admin ↔ 3 superficies — 0/3 (diseño con Kamilo; toca backend+Filament+Expo+webapp)
+- [ ] **Modulos fuente unica**: visibilidad de modulos por superficie desde config Filament (hoy Expo hardcodea 4, sidebar desktop hardcodea items).
+- [ ] **Keyvisual por superficie**: `keyvisual_desktop` + `keyvisual_mobile` en branding + 2 uploads Filament con preview.
+- [ ] **Hero modo texto**: contrato unico de branding (type image|text) a escala en las 3 superficies.
+
+### Event Pulse cliente — 0/4 (display propio del backend, NO webapp)
+> EP esta COMPLETO (ver `project_event_pulse_complete` en memoria); solo queda: formula counter
+> ratings live≠F5 · Charlas vacia (room_id PulseController:102) · verificar leads/connections ·
+> poll:closed room null · + diagnosticar cache del `moments.js` v2 + decision cada-interaccion-hero.
+
+### Backlog Expo (sesion Expo futura)
+- [ ] Borrar `banners.tsx` + `BannerCarousel` + `bannersApi` del Expo (feature legacy muerta)
+- [ ] `ENTITY_KEYS` sin `modules` (backend la emite, Expo la pierde)
+- [ ] Double-count comment propio en `useWall` (Expo)
+- [ ] Portar "click sesion → agenda highlight" del webapp W.5 al Expo
+- [ ] Validar si `banners.tsx` Expo es vista dedicada o solo carousel embebido
+- [ ] Decidir recap/[eventId] del Expo (→ Fase 2, no mapeado a webapp)
+
+### Backend nice-to-have (NO bloqueante — verificados 2026-07-14 como NO construidos)
+- [ ] Search server-side params standardizados
+- [ ] AttendeeResource unificado
+- [ ] Endpoint cancelar solicitud (`DELETE /contacts/request/{id}`)
+- [ ] Score numerico match en suggested-contacts
+- [ ] Sort server-side wall `?sort=likes_count`
+- [ ] Endpoint paginado leaderboard >50
+- [ ] Evento socket `points:awarded {amount, action, total}` informativo
+
+### Analytics tracking — Fase 2 (= decision W.8; no existe infra de analytics aun)
+- [ ] `social.profile_opened` · `connection_sent` · `connection_message_added` · `contact_method_clicked` · `profile_closed` · views por sponsor/speaker/sesion
+
+---
+
 ## Documentos de referencia
 
 | Doc                                       | Contenido                                                        |

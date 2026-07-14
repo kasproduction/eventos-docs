@@ -324,22 +324,9 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 - [ ] Evento demo curado: seeders existentes (ReseedSessionsSeeder relativo a HOY + QaTriviaSeeder + LiveHubDemoSeeder) + branding pulido + cuentas de demo por rol (asistente/vendor/staff)
 - [ ] DSN Sentry prod + validacion (item que ya vivia en B5 Fase C — se ejecuta aca)
 
-### PARALELO — PARIDAD DE CONFIG admin ↔ 3 superficies (detectado Kamilo 2026-07-09) — 0/3
-> Gap real verificado en baseline: el admin configura modulos/branding pero las superficies
-> obedecen a medias. Requiere diseno con Kamilo ANTES de codear (toca backend + Filament +
-> Expo + webapp a la vez). NO bloquea Mobile parity (el espejo replica el comportamiento
-> actual; al unificar se corrige en ambos lados en un movimiento).
-- [ ] **Modulos fuente unica**: visibilidad de modulos por superficie desde config Filament. Hoy: Expo hardcodea 4 (`ModuleMenu.tsx:26-31`, solo gamification consulta `modules.enabled`), sidebar desktop hardcodea items (documentos gated por count). Cada superficie renderiza su layout, la visibilidad sale del admin
-- [ ] **Keyvisual por superficie**: branding con `keyvisual_desktop` + `keyvisual_mobile` (fallback: desktop con crop focal si falta mobile) + Filament 2 uploads con preview por superficie. Expo consume el mobile. **Idealmente ANTES de M.1 Home mobile** (es cuando se necesita)
-- [ ] **Hero modo texto**: contrato unico de branding (type image|text) renderizado a escala en las 3 superficies. Modo texto = fallback digno sin arte, keyvisual = camino premium (decision desktop vigente). Flag: revisar que hace hoy la webapp desktop sin keyvisual
-
-### PARALELO — Event Pulse cliente (sesion dedicada ~1-2h) — 0/4
-> Detalle en `docs/living/PENDIENTES.md` seccion Event Pulse. Formula counter ratings live≠F5 · Charlas vacia (room_id PulseController:102) · verificar leads/connections · poll:closed room null
-
-### PARALELO — Backlog Expo (sesion Expo futura)
-- [ ] Borrar `banners.tsx` + `BannerCarousel` + `bannersApi` (feature legacy muerta)
-- [ ] `ENTITY_KEYS` sin `modules` (backend la emite, Expo la pierde)
-- [ ] Double-count comment propio en `useWall`
+> **Paralelos movidos fuera de este doc (2026-07-14):** Paridad config admin↔superficies,
+> Event Pulse cliente, y Backlog Expo NO son features de webapp — viven ahora en
+> `docs/living/PENDIENTES.md` seccion "Webapp — paralelos / backlog".
 
 ---
 
@@ -1053,49 +1040,12 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 
 ---
 
-## PENDIENTES PARALELOS (sin bloquear sprints)
+## PENDIENTES PARALELOS → movidos a PENDIENTES.md (2026-07-14)
 
-> ⚠️ **NADA de esta seccion es feature de webapp Fase 1.** Son backlog de otras
-> superficies o nice-to-have tecnicos que NO cuentan para el cierre de webapp:
-> backend nice-to-have (verificados NO construidos, no bloqueantes), analytics
-> tracking (= la decision de W.8: Fase 2, no existe infra de analytics aun),
-> trabajo del Expo, y decisiones documentales. Los `[ ]` de aca NO son webapp
-> pendiente — la webapp Fase 1 (W.0-W.18 + W.X) esta cerrada; solo queda su QA.
-
-### Documentales
-- [ ] Decidir W.X para `recap/[eventId]` del Expo (no mapeado a ningun modulo webapp)
-- [x] ~~Decidir W.X para `about.tsx`~~ — **HECHO**: /about implementado en Mobile parity M.1 (AboutView espejo `about.tsx`, entrada = card del Home registration/draft)
-- [ ] Validar si `banners.tsx` Expo es vista dedicada o solo carousel embebido
-
-### Mobile parity (cuando webapp este al dia)
-
-> **Workstream confirmado por Kamilo 2026-07-04:** la webapp/PWA abierta en celular debe
-> verse y COMPORTARSE exactamente igual a Expo (misma estetica) — es el fallback para
-> quien no descarga la app en el evento presencial, donde mas se usan estos features.
-> Diferido para despues del cierre Fase 1. Nada construido aun.
-
-- [x] **W.15 Vendor COMPLETO como feature mobile-web** — **HECHO Mobile parity M.8 2026-07-11** (eventos-web `3f7e4dc`): las 7 fases + scanner QR camara browser (@zxing). QA vivo device pendiente
-- [x] **Mi QR del asistente en perfil — SOLO viewport mobile** — **HECHO Mobile parity M.1 2026-07-09** (MiQrView espejo MiQrScreen: badge + RgbWaveBorder + QR rota 60s + fullscreen; desktop no lo muestra)
-- [ ] Portar "click sesion → agenda highlight" del webapp W.5 al Expo
-- [ ] Otros gaps mobile que aparezcan en sesiones futuras
-- [x] **Mobile webapp split Social vs Networking** — **HECHO Mobile parity M.3+M.4 2026-07-09**: `/social` (Feed + Memorias + Momentos, M.4) y `/networking` (directorio + solicitudes + contactos + bloqueados, M.3) separados como en Expo
-
-### Backend nice-to-have (NO bloqueante)
-- [ ] Search server-side params standardizados
-- [ ] AttendeeResource unificado
-- [ ] Endpoint cancelar solicitud (`DELETE /contacts/request/{id}`)
-- [ ] Score numerico match en suggested-contacts
-- [ ] Sort server-side wall `?sort=likes_count`
-- [ ] Endpoint paginado leaderboard >50
-- [ ] Evento socket `points:awarded {amount, action, total}` informativo
-
-### Analytics tracking
-- [ ] `social.profile_opened`
-- [ ] `social.connection_sent`
-- [ ] `social.connection_message_added`
-- [ ] `social.contact_method_clicked` (whatsapp/email/vcard)
-- [ ] `social.profile_closed`
-- [ ] Tracking views por sponsor / speaker / sesion
+> Documentales, Backend nice-to-have, Analytics tracking y el backlog de Mobile-parity→Expo
+> NO son features de webapp Fase 1. Se movieron a `docs/living/PENDIENTES.md` seccion
+> "Webapp — paralelos / backlog". Lo que M.8/M.1/M.3/M.4 hicieron (vendor, Mi QR, split
+> Social/Networking) queda registrado en la seccion Mobile parity de arriba.
 
 ---
 
