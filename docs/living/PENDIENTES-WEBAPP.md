@@ -38,7 +38,7 @@
 | W.12 Polish + E2E + PWA | **25/48** | **52%** — **2026-07-05 tarde BLOQUE 5 Fases A+B (`b9aa4df` backend + `2dc43a3` + `471cf94` web)**: Web Push COMPLETO (VAPID + push_subscriptions + transporte multi-canal en 13 call-sites + SW + soft prompt + scheduled→announcement, verificado vivo Chrome+FCM) + PWA 5/5 (manifest, SW, install desktop/tablet, offline) + CSP completo 13 directivas + robots noindex + titles 13 rutas (SEO OG/sitemap → Fase 2) + print agenda + code splitting 7 componentes. Falta real (Fase C): QA device, Lighthouse batch, WCAG audit, E2E cross-tab, DSN prod | **+17** |
 | **W.13 FAQ + Docs** | **15/15** | **CERRADO 100% 2026-07-04** (Fase A FAQ Asistente orb + Fase B Documents split layout + backend ZIP escalable. Pages reclasificado formalmente a Fase 2) | **+2** |
 | **W.14 Anuncios + Cartel + Bell** | **19/19** | **RE-CERRADO 2026-07-05** — cartel solo-highlights (espejo Expo) + feature banners muerta de raiz (BLOQUE 3: ruta+controller+Filament+modelo+migration drop). BD dedup + vigencias frescas | **+5** |
-| W.15 Vendor Dashboard | 0/35 | **MOVIDO a Mobile parity (decision Kamilo 2026-07-05)**: el staff del stand NO va a instalar app para un evento — vendor se hace como feature del webapp MOBILE (viewport celular espejo Expo, patron Mi QR), incluyendo scanner QR con camara en browser (prior art: eventos-kiosko). Fuera del denominador Fase 1 desktop. Procedencia verificada: ~3.000 lineas Expo + 18 endpoints | — |
+| **W.15 Vendor** | **35/35** | **HECHO via Mobile parity M.8 (2026-07-11, eventos-web `3f7e4dc`, pusheado)** — el vendor se hizo como feature del webapp MOBILE (celular espejo Expo): Mi Stand + Leads + Export CSV + scanner QR camara browser (@zxing) + Stats + Team + join-team + sockets staff. QA vivo device pendiente. Ver seccion Mobile parity M.8 (267-282) | **+35** |
 | **W.16 Live Moments** | **5/5** | **CERRADO 100% 2026-07-09 (BLOQUE 4)** — TriviaPanel espejo Expo en la columna interactiva del streaming (4 fases idle/question/result/finished): countdown drenante rojo <=5s, opciones A-F color Kahoot, reveal de distribucion animada, mini-leaderboard + podio top 5. **Noir puro via --st-* (adapta Lux), UNICO color = letras A-F, cero iconos (decision Kamilo)**. Hook local `useTrivia` (patron useQnA) + reducer puro. Proxy `/events/games/{id}/answer`. Toasts ruleta/jackpot en GlobalSocketProvider. 10 vitest. **Validado en vivo** (launch->question->answer correcto score 135->result) via Mission Control + QaTriviaSeeder | **+5** |
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
@@ -793,7 +793,7 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 - [ ] Validar Firefox 115+
 
 **Fase 1 — Skeletons + empty (0/3)**
-- [ ] Skeleton consistente todos los modulos
+- [x] Skeleton consistente todos los modulos — **HECHO** (13/13 rutas desktop + skeletons mobile por modulo que calcan el layout real)
 - [ ] Empty states consistentes
 - [ ] Loading transitions
 
@@ -844,7 +844,7 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 - [x] CSP estricto — **HECHO 2026-07-05** (`471cf94`): 13 directivas (script/style/img/font/connect/media/frame/worker/object/base-uri/form-action/frame-ancestors), connect-src backend+socket desde env, dev relajado por NODE_ENV, verificado vivo + suite E2E bajo la politica
 - [x] ~~X-Frame-Options~~ — YA EXISTE (verificado 2026-07-04: SAMEORIGIN + nosniff + Referrer-Policy + HSTS en `next.config.ts:76-84`)
 - [x] ~~Reduced motion verificado~~ — YA EXISTE (verificado 2026-07-04: media query global `globals.css:470` + hook `useReducedMotionPref` + ~18 componentes/CSS)
-- [ ] reduced-motion serie estatica W.X
+- [x] reduced-motion serie estatica W.X — **HECHO 2026-07-14** (Showcase: variante estatica sin pelicula via useReducedMotionPref)
 - [ ] ~~Bancolombia embed test~~ → N/A (cliente perdido — validar si algun embed test aplica al proximo cliente)
 - [ ] Memoria
 - [ ] Counter PARITY-MATRIX → N/A (doc historico desde 2026-07-04)
@@ -922,57 +922,22 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 **Fase 5 — Tests + Cierre (1/1)**
 - [x] Vitest 23 (parseActionUrl) + 16 (announcementsUnread) + 11 (cartelItems merger) + 12 (CartelDigital) + 10 E2E anuncios + 6 E2E cartel
 
-### W.15 — Vendor Dashboard (0/35, OPCIONAL Fase 1)
+### W.15 — Vendor Dashboard — **HECHO via Mobile parity M.8 (35/35, 2026-07-11)**
 
-> Solo si cliente lo pide. Backlog por default.
+> El vendor NO se hizo como desktop: se movio a **Mobile parity M.8** (decision Kamilo
+> 2026-07-05: el staff del stand abre el webapp en el CELULAR y trabaja). Implementado
+> 11/11 en eventos-web `3f7e4dc`, pusheado. Detalle en la seccion **Mobile parity M.8**
+> arriba (267-282). Todas las fases de este spec quedaron cubiertas:
 
-**Fase 0 — Hooks (0/4)**
-- [ ] useMyStand
-- [ ] useMyLeads
-- [ ] useStandStats
-- [ ] usePendingInvitations
-
-**Fase 1 — Mi Stand dashboard (0/4)**
-- [ ] Hero sponsor + logo + descripcion + tier + role badge
-- [ ] Stats row clickables (leads / hoy / equipo)
-- [ ] Empty state guideline
-- [ ] Tabs Acerca / Leads / Equipo
-
-**Fase 2 — Mis Leads (0/5)**
-- [ ] Lista grouped por fecha (Hoy/Ayer/dd mmm)
-- [ ] Tier badge + nota italic + timeAgo
-- [ ] Detail drawer notas / tier editable
-- [ ] Historial ediciones (field_label + old→new + edited_by + fecha)
-- [ ] Export CSV
-
-**Fase 3 — Visitantes stand (0/2)**
-- [ ] Cards lead avatar + nombre + job + timestamp
-- [ ] Acciones whatsapp / email / llamar
-
-**Fase 4 — Stats (0/3)**
-- [ ] StatRow pairs (totals + diff vs ayer trend)
-- [ ] TierBar (hot/warm/cold/unclassified % stacked)
-- [ ] MemberBar (each team member lead count)
-
-**Fase 5 — Team management (0/5)**
-- [ ] Slots indicator (usado/max)
-- [ ] Invitar by attendee search
-- [ ] Invitar by email
-- [ ] Share link modal (whatsapp/copy)
-- [ ] Transfer ownership / Remove member
-
-**Fase 6 — Invitaciones staff (0/3) — CORREGIDO por auditoria: CON sesion, NO publicas**
-> El backend exige sanctum para aceptar (`/staff-invitations/{token}/*` dentro del grupo auth).
-> Espejo `join-team/[token].tsx` Expo (276 lineas). "Sin login" era invento.
-- [ ] Pagina `/join-team/{token}` autenticada (info de la invitacion via `GET .../info`)
-- [ ] Aceptar / No gracias (`POST .../accept|reject`) + actualizar hasVendorAccess + invalidar modules
-- [ ] Modal invitacion socket `staff:invited` (espejo `StaffInvitationModal` 216 lineas)
-
-**Fase 7 — Tests + Cierre (0/4)**
-- [ ] Vitest hooks
-- [ ] Playwright happy path
-- [ ] Memoria
-- [ ] Counter PARITY-MATRIX
+- [x] **Fase 0 Hooks**: `lib/stand-client` + `lib/leads-client` + `getVendorAccess`
+  (`has_vendor_access` expuesto en /auth/me) + sockets staff + fetch pending-invitations
+- [x] **Fase 1 Mi Stand**: hero logo/tier/rol + 3 stat cards navegables + FAB scanner + empty
+- [x] **Fase 2 Leads**: grouped Hoy/Ayer/fecha + tier + nota + historial ediciones + Export CSV (navigator.share)
+- [x] **Fase 3 Visitantes**: cards lead + acciones tel/mailto (**WhatsApp APLAZADO**, decision Kamilo)
+- [x] **Fase 4 Stats**: StatRow + trend vs ayer + TierBar + MemberBar
+- [x] **Fase 5 Team**: slots + invitar search/email + share link nativo + transfer/remove (owner-only)
+- [x] **Fase 6 Invitaciones**: `/join-team/{token}` auth + accept/reject + modal socket `staff:invited` global
+- [x] **Fase 7 Tests**: +8 vitest + E2E mobile-shell (7 vendor). QA vivo device pendiente (scanner HTTPS, share sheet)
 
 ### W.16 — Live Moments espejo real (5/5, CERRADO 2026-07-09)
 
@@ -1061,18 +1026,20 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 - [x] E2E `perfil.spec.ts` 13/13 verde con serial mode
 - [x] Memoria `project_w18_hub_personal_blueprint.md` + `project_sidebar_bottom_zone.md`
 
-### W.X — Showcase / Onboarding explicativo — **RE-ABIERTO 2026-07-11 (decision Kamilo)** — 0/1
+### W.X — Welcome Showcase — **CERRADO 2026-07-14 (eventos-web `9d02140`, pusheado) — 1/1**
 
-> Historia: eliminado 2026-07-04 en auditoria de procedencia porque NO espejaba Expo
-> (el onboarding Expo es un wizard de REGISTRO, no un carrusel de features).
-> **RE-ABIERTO 2026-07-11 con procedencia = decision explicita de Kamilo**: "en webapp
-> si es necesario hacer ese showcase — es la forma en que a la gente se le explica
-> todo, que es cada cosa". NO es espejo — es feature propia de la webapp.
-- [ ] **Showcase/onboarding explicativo del evento** — explicar al usuario que es cada
-  modulo/que puede hacer. Alcance, formato y momento (primer login? boton perfil?
-  desktop+mobile?) SIN definir — **diseño DaVinci completo primero** (refs externas +
-  propuesta + mockup aprobado) antes de codear. Al implementarse: re-habilitar el
-  boton "Ver introduccion" del perfil (oculto en Bloque 0, `4325f05`)
+> Feature propia de la webapp (NO espejo Expo): pelicula de bienvenida que explica que es
+> cada modulo. Historia: eliminado 2026-07-04 (no espejaba Expo) → re-abierto 2026-07-11
+> (decision Kamilo) → cerrado 2026-07-14.
+- [x] **Welcome Showcase implementado** — opening keyvisual → invitacion crossfade → FLIP
+  al canvas + 6 beats que HABITAN el canvas espejando su modulo real (Agenda: popups
+  tip+sesion SINCRONIZADOS a la accion + payoff Mi Agenda / En vivo: player 16:9
+  poster+controles + About / Social: hub 3col / Desafio: hub+ranking / Sponsors: por tier
+  REAL + detalle / Speakers) + finale nombre completo. Saltar se retira en finale. Copy
+  es-CO tuteo. `/api/showcase` sponsors por tier real. Callouts clampean al canvas.
+  Favorito bloom suave. Boton "Ver introduccion" del perfil **re-habilitado**. reduced-motion
+  fallback estatico. typecheck/lint 0, vitest 7/7. **Falta solo QA final end-to-end.**
+  Ver [[project_wx_showcase_design]]
 
 ---
 
@@ -1080,7 +1047,7 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 
 ### Documentales
 - [ ] Decidir W.X para `recap/[eventId]` del Expo (no mapeado a ningun modulo webapp)
-- [ ] Decidir W.X para `about.tsx` del Expo (texto + imagen + links sociales)
+- [x] ~~Decidir W.X para `about.tsx`~~ — **HECHO**: /about implementado en Mobile parity M.1 (AboutView espejo `about.tsx`, entrada = card del Home registration/draft)
 - [ ] Validar si `banners.tsx` Expo es vista dedicada o solo carousel embebido
 
 ### Mobile parity (cuando webapp este al dia)
@@ -1090,11 +1057,11 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 > quien no descarga la app en el evento presencial, donde mas se usan estos features.
 > Diferido para despues del cierre Fase 1. Nada construido aun.
 
-- [ ] **W.15 Vendor COMPLETO como feature mobile-web** (decision 2026-07-05: staff de stand no instala app — abre el webapp en el celular y trabaja): las 7 fases del bloque W.15 + **scanner QR con camara en browser** (prior art eventos-kiosko). Espejo estetico Expo
-- [ ] **Mi QR del asistente en perfil — SOLO viewport mobile (<640px)**: espejo `MiQrScreen.tsx` Expo (502 lineas) — QR grande pieza principal + nombre + caducidad, token rota 60s via `GET /me/qr` (hook `useQrToken` refetch 50s). Desktop NO lo muestra (decision `feedback_qr_only_mobile`: el staff escanea el celular). qrcode.react ya esta en el bundle (desafio)
+- [x] **W.15 Vendor COMPLETO como feature mobile-web** — **HECHO Mobile parity M.8 2026-07-11** (eventos-web `3f7e4dc`): las 7 fases + scanner QR camara browser (@zxing). QA vivo device pendiente
+- [x] **Mi QR del asistente en perfil — SOLO viewport mobile** — **HECHO Mobile parity M.1 2026-07-09** (MiQrView espejo MiQrScreen: badge + RgbWaveBorder + QR rota 60s + fullscreen; desktop no lo muestra)
 - [ ] Portar "click sesion → agenda highlight" del webapp W.5 al Expo
 - [ ] Otros gaps mobile que aparezcan en sesiones futuras
-- [ ] **Mobile webapp split Social vs Networking (2026-06-20):** webapp desktop unifica `/social` con sidebar (Feed + Personas + Solicitudes + Mis posts). Mobile webapp debe SEPARAR como en Expo: `/social` (Wall + Memorias + Momentos) + `/networking` (directorio + solicitudes + contactos + bloqueados). Ver `project_social_unified_notes.md` en memoria para arquitectura completa. Trabajo futuro, NO en scope actual
+- [x] **Mobile webapp split Social vs Networking** — **HECHO Mobile parity M.3+M.4 2026-07-09**: `/social` (Feed + Memorias + Momentos, M.4) y `/networking` (directorio + solicitudes + contactos + bloqueados, M.3) separados como en Expo
 
 ### Backend nice-to-have (NO bloqueante)
 - [ ] Search server-side params standardizados
