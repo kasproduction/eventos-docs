@@ -42,21 +42,37 @@
 | **W.16 Live Moments** | **5/5** | **CERRADO 100% 2026-07-09 (BLOQUE 4)** — TriviaPanel espejo Expo en la columna interactiva del streaming (4 fases idle/question/result/finished): countdown drenante rojo <=5s, opciones A-F color Kahoot, reveal de distribucion animada, mini-leaderboard + podio top 5. **Noir puro via --st-* (adapta Lux), UNICO color = letras A-F, cero iconos (decision Kamilo)**. Hook local `useTrivia` (patron useQnA) + reducer puro. Proxy `/events/games/{id}/answer`. Toasts ruleta/jackpot en GlobalSocketProvider. 10 vitest. **Validado en vivo** (launch->question->answer correcto score 135->result) via Mission Control + QaTriviaSeeder | **+5** |
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
-| W.X Showcase/Onboarding | 0/1 | **RE-ABIERTO 2026-07-11 (decision Kamilo)** — feature propia webapp (NO espejo Expo): explicar al usuario que es cada cosa. Diseño DaVinci desde cero antes de codear. Historia: eliminado 2026-07-04 por falta de procedencia; procedencia ahora = decision explicita Kamilo | — |
-| **TOTAL** | **549/576** | **95.3%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05) | **2026-07-09 BLOQUE 4 CERRADO**: W.16 Trivia 0→5 (TriviaPanel espejo + useTrivia + proxy + toasts, validado en vivo). Quedan: B5 Fase C QA (~2h CON Kamilo presente) + Mobile parity. **18 modulos cerrados:** W.0, W.1, W.1B, W.2, W.3, W.4, W.5, W.6, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.16, W.17, W.18 |
+| **W.X Welcome Showcase** | **1/1** | **CERRADO 2026-07-14** (eventos-web `9d02140`, pusheado) — pelicula de bienvenida: opening keyvisual → invitacion crossfade → FLIP al canvas + 6 beats que HABITAN el canvas espejando su modulo real (Agenda: popups tip+sesion SINCRONIZADOS a la accion + payoff Mi Agenda / En vivo: player 16:9 poster+controles + About / Social: hub 3col / Desafio: hub+ranking / Sponsors: por tier REAL + detalle / Speakers) + finale nombre completo. Saltar se retira en finale. Copy es-CO tuteo. `/api/showcase` sponsors por tier real. typecheck/lint 0, vitest 7/7. **Falta solo QA final end-to-end.** Ver [[project_wx_showcase_design]] | **+1** |
+| **TOTAL** | **550/576** | **95.5%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05) | **2026-07-14: W.X Welcome Showcase CERRADO 0→1** (pelicula bienvenida, todas las escenas habitan el canvas). **Ya no queda ningun modulo de features abierto.** Lo que resta es QA presencial (Mobile parity M.2-M.8 + B5 Fase C + QA final W.X) + DEPLOY DEMO. **19 modulos cerrados:** W.0, W.1, W.1B, W.2, W.3, W.4, W.5, W.6, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.16, W.17, W.18, W.X |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
 ---
 
-## QUE SIGUE (1 sola tarea concreta)
+## QUE SIGUE — features CERRADAS, queda QA presencial (webapp only)
 
-- [ ] **W.X SHOWCASE/ONBOARDING explicativo (decision Kamilo 2026-07-11) — diseño DaVinci PRIMERO** (refs externas + propuesta + mockup aprobado antes de codear; ver seccion W.X). **MOBILE PARITY CERRADO 60/60 2026-07-11** (eventos-web `3f7e4dc` M.8 Vendor 11/11 + `ef1c757` M.0 gates/deeplinks, pusheados). QA vivo Kamilo pendiente M.2-M.8 en device (heart particulas, momentos/uploads, shuffle, trivia sponsor, desafio, anuncios detail, soporte form, orb FAQ, encuestas deck, **vendor: scanner camara real via HTTPS, export share sheet, invitacion socket en vivo, gates ban/pending con datos reales**). Deuda: panel `custom` streaming placeholder (CSP) + Expo documentos legacy por alinear.
+**Ya no hay modulos de features abiertos** (2026-07-14: W.X fue el ultimo). Lo que resta
+de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 
-> BLOQUE 4 (W.16 Trivia) YA cerrado 2026-07-09. BLOQUE 2 (Home) cerrado 2026-07-08. Quedan solo Mobile parity + B5 Fase C.
-> **Orden decidido 2026-07-11 (Kamilo): M.8 Vendor primero → despues W.X Showcase/Onboarding explicativo (re-abierto, ver seccion W.X).**
-> Cuando Kamilo tenga 2h presenciales: **B5 Fase C** (QA device iPad/iPhone/Edge/Firefox + Lighthouse + WCAG + E2E cross-tab + DSN prod). Fase A 100% validada 2026-07-05 (push desde Filament OK + install PWA OK).
-> Deuda menor W.16 (no bloqueante): E2E Playwright de trivia (tengo 10 vitest del reducer/helpers) — mismo criterio que /encuestas.
+- [ ] **Mobile parity M.2-M.8 QA vivo en device** (implementacion 60/60 cerrada 2026-07-11):
+  heart particulas, momentos/uploads, shuffle, trivia sponsor, desafio, anuncios detail,
+  soporte form, orb FAQ, encuestas deck, **vendor** (scanner camara via HTTPS, export
+  share sheet, invitacion socket en vivo, gates ban/pending con datos reales).
+- [ ] **W.12 Fase C** (~2h presenciales): QA device iPad/iPhone/Edge/Firefox + Lighthouse
+  batch + WCAG audit + E2E cross-tab. (Fase A/B validadas 2026-07-05: push+PWA OK.)
+- [ ] **W.X Showcase**: QA final de la pelicula de corrido (el QA fue por escena).
+
+> Deuda menor webapp (no bloqueante): E2E Playwright /encuestas y /trivia (hay vitest) ·
+> panel `custom` streaming = placeholder (decision pendiente CSP frame-src) · bug latente
+> proxy poll-vote sin prefijo /events · 2 tests ProfileSecurityTest rojos pre-existentes ·
+> Expo documentos legacy por alinear.
+>
+> **FUERA de "webapp only"** (superficies/infra aparte — NO son pendiente de webapp):
+> **DEPLOY DEMO 0/6** (infra: hosting/backend prod/Next prod/socket PM2/evento demo/DSN) ·
+> **Paridad config admin↔superficies 0/3** (toca backend/Filament/Expo/webapp a la vez) ·
+> **Event Pulse** = display propio del backend, **COMPLETO** — solo queda diagnosticar el
+> cache del `moments.js` v2 + 1 decision de diseño (cada-interaccion-hero vs actual);
+> ver [[project_event_pulse_complete]].
 
 > Deuda menor W.2 (no bloqueante): E2E Playwright de /encuestas (tengo vitest 9 tests) · verificar Lux con ojo · recap/certificado como pantalla aparte (Fase 2, hoy el codigo recap sigue en lib/recap sin consumir desde Home) · streaming poll-vote proxy pega a /polls/{id}/vote sin prefijo /events (posible bug latente pre-existente, la ruta real unica es /events/polls/{id}/vote).
 
