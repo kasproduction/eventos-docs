@@ -62,11 +62,20 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
   batch + WCAG audit + E2E cross-tab. (Fase A/B validadas 2026-07-05: push+PWA OK.)
 - [ ] **W.X Showcase**: QA final de la pelicula de corrido (el QA fue por escena).
 
-> Deuda menor webapp (no bloqueante): E2E Playwright /encuestas y /trivia (hay vitest) ·
-> panel `custom` streaming = placeholder (decision pendiente CSP frame-src) ·
-> ~~bug proxy poll-vote sin /events~~ **CORREGIDO 2026-07-14** (`c4f6293`) ·
-> ~~2 tests ProfileSecurityTest rojos~~ **CORREGIDO 2026-07-14** (`2eaf11c`: validator
-> blindado vs schemes XSS + tests actualizados, 11/11) · Expo documentos legacy por alinear.
+> Deuda menor webapp:
+> · ~~panel `custom` streaming = placeholder~~ **CORREGIDO 2026-07-14** (`62ebfbd`): monta
+>   el iframe del `custom_url` (Slido/Mentimeter/Google Slides/Miro/Figma…) en tablet+mobile
+>   (desktop ya lo hacia); la CSP ya permite `frame-src https:` y el backend valida el dominio.
+> · ~~bug proxy poll-vote sin /events~~ **CORREGIDO 2026-07-14** (`c4f6293`).
+> · ~~2 tests ProfileSecurityTest rojos~~ **CORREGIDO 2026-07-14** (`2eaf11c`: validator
+>   blindado vs schemes XSS + tests, 11/11).
+> · **E2E Playwright /encuestas y /trivia — NO SE HARA (decision Kamilo 2026-07-14).**
+>   Razon: es cobertura de regresion, NO un bug — ambos flujos funcionan (verificados EN
+>   VIVO) y ya tienen vitest del reducer/helpers. El E2E de trivia exige simular eventos de
+>   socket (`game:question`…) que quedan **flaky** (falsos negativos + ruido de CI y
+>   mantenimiento). Post-pivote la prioridad es completitud + deploy, no cobertura de 2
+>   flujos ya validados. Si a futuro un cliente lo exige, se reevalua.
+> · Expo documentos legacy por alinear.
 >
 > **FUERA de "webapp only"** (superficies/infra aparte — NO son pendiente de webapp):
 > **DEPLOY DEMO 0/6** (infra: hosting/backend prod/Next prod/socket PM2/evento demo/DSN) ·
