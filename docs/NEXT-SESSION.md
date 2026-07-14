@@ -6,6 +6,56 @@
 
 ---
 
+## SESION 2026-07-14 (Opus 4.8) — W.X WELCOME SHOWCASE CERRADO + commiteado/pusheado
+
+**La pelicula entera quedo cerrada: TODAS las escenas habitan el canvas espejando su
+modulo real** (antes eran maquetas centradas = "estampilla en teatro vacio"). Sesion
+larga de iteracion con QA vivo de Kamilo escena por escena. Guardado DaVinci al cierre.
+
+### Que se hizo (eventos-web `9d02140` + backend `2d04081`, PUSHEADOS)
+
+1. **Escena Agenda** re-compuesta: split 60/40 real; el panel der hospeda **popups
+   tip+sesion SINCRONIZADOS a la accion** (cursor toca dia/chip/corazon → aparece el
+   popup en ese momento); climax favorito → "Crea tu propia agenda" → payoff Mi Agenda.
+   Day-slide corregido (pill pop, salida completa, filas escalonadas, dwell ~1600ms).
+2. **En vivo**: grid `1fr+320`; player 16:9 con **poster+play+scrubber** + About real
+   (titulo/meta/speaker/desc) + columna interactiva propia (chat→trivia).
+3. **Social**: hub 3 columnas (nav / feed+composer / Personas para conectar).
+4. **Desafio**: split hub (HUD hero + Retos) / Ranking (sube #14→#6).
+5. **Sponsors**: wall por **tier REAL** + panel detalle. **Bug de fondo**: `/api/showcase`
+   repartia 2/3/5 por posicion ignorando el tier (capaba a 10) → reescrito, agrupa por
+   tier real (platinum/gold/silver+bronze+media), sin recorte; fetch no-store +
+   force-dynamic; wall top-align. El evento demo tiene 30 sponsors reales.
+6. **Callouts**: clampeaban al viewport y anclaban al wrap full-width → caian fuera del
+   canvas / en los mismos bordes. Ahora clampean DENTRO del canvas y anclan a la pieza.
+7. **Opening**: invitacion "Descubre..." con crossfade del date antes del FLIP.
+   **Saltar se retira en el finale** (solo Explorar evento). Nombre completo en el saludo.
+8. **Favorito**: bloom suave + halo (no explosion cortada), agenda + social.
+9. **Copy en español de Colombia (tuteo)** en toda la pelicula.
+10. **Titulos de sesiones del demo mejorados** (BD 8 sesiones + `ContentSeeder`): p.ej.
+    "Almuerzo con mentores"→"Mentoria 1:1 con lideres", "Networking Lunch: speed
+    dating"→"Speed networking: 20 conexiones en 40 min", etc.
+
+### Verificacion
+
+typecheck 0 · lint 0 · vitest showcase 7/7 · php -l seeder ok. QA vivo Kamilo escena
+por escena en localhost:3000 (Perfil → "Ver introduccion"). Incluye el nav 99baf79.
+
+### Decisiones cerradas (ver [[project_wx_showcase_design]])
+
+- Beats habitan el canvas espejando el modulo real; popups tip+sesion son de Agenda,
+  el resto conserva callouts flotantes. Cero velos/spotlight. Copy es-CO tuteo.
+  NO mas mockups HTML paralelos (iterar en la implementacion).
+
+### PROXIMA SESION — QA final W.X + lo que sigue en PENDIENTES
+
+1. **QA final W.X end-to-end** de Kamilo (la pelicula completa de corrido; QA fue por
+   escena). Afinables: acentuar la data del demo si se quiere (hoy sin tildes por estilo).
+2. Frentes vivos: QA vivo device M.2-M.8 + B5 Fase C, DEPLOY DEMO 0/6, 2 pendientes
+   Event Pulse. Ver `docs/living/PENDIENTES-WEBAPP.md`.
+
+---
+
 ## SESION 2026-07-11 NOCHE (Fable) — W.X: contexto de sesion bugueada RECONSTRUIDO + QA proporcion + rumbo corregido
 
 **La sesion de la tarde se bugueo DESPUES del cierre documentado y avanzo mas de lo

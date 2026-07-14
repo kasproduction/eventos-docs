@@ -665,7 +665,24 @@
       "Bash(find src *)",
       "Bash(grep -rl \"StreamShellMobile\" src)",
       "PowerShell($dirs = Get-ChildItem C:\\\\laragon\\\\www\\\\eventos-web\\\\test-results -Directory; foreach \\($d in $dirs\\) { $f = Join-Path $d.FullName \"error-context.md\"; if \\(Test-Path $f\\) { \"=== $\\($d.Name\\)\"; Get-Content $f | Select-String -Pattern \"Error|Expected|Received|Timeout\" | Select-Object -First 6 } })",
-      "PowerShell(Get-ChildItem *)"
+      "PowerShell(Get-ChildItem *)",
+      "Bash(awk '{print $5, $9}')",
+      "Read(//c/laragon/www/APP EVENTOS/**)",
+      "PowerShell($paths = @\\('C:\\\\laragon\\\\www\\\\eventos-web', 'C:\\\\Users\\\\Kasproduction\\\\Projects\\\\eventos-web'\\); foreach \\($p in $paths\\) { if \\(Test-Path $p\\) { Write-Output \"== $p ==\"; git -C $p status -sb; git -C $p log --oneline -3 } })",
+      "PowerShell(Select-String *)",
+      "PowerShell(Copy-Item *)",
+      "Bash(mkdir -p /c/laragon/www/eventos-web/public/showcase)",
+      "Bash(cp a1.jpg a2.jpg a3.jpg m1.jpg m2.jpg m3.jpg post.jpg /c/laragon/www/eventos-web/public/showcase/)",
+      "Bash(xargs head -60)",
+      "Bash(xargs sed -n 60,140p)",
+      "PowerShell(Set-Location *)",
+      "PowerShell($html = Get-Content \"design\\\\features\\\\onboarding\\\\iteraciones\\\\showcase-onboarding-v11.html\" -Raw; $i = $html.IndexOf\\('sc-ag'\\); if \\($i -ge 0\\) { $html.Substring\\([Math]::Max\\(0,$i-200\\), 4200\\) } else { \"sc-ag not found\" })",
+      "Bash(php spq.php)",
+      "Bash(php sq2.php)",
+      "Bash(php sq3.php)",
+      "Bash(php sq4.php)",
+      "Bash(php upd.php)",
+      "Bash(php sq5.php)"
     ]
   }
 }
