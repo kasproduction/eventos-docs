@@ -6,6 +6,47 @@
 
 ---
 
+## SESION 2026-07-18 PARTE 2 (Fable) — F-NAV sub-nav superior + INT.1 form de sesion CERRADOS
+
+**Misma jornada, segunda sesion. TODO commiteado y PUSHEADO** (backend `a8452cc` +
+`440d9ca` en feature/magic-link-auth). Roadmap: **27/65**.
+
+### Que se hizo (QA vivo Kamilo iteracion por iteracion)
+
+1. **F-NAV (correccion Kamilo al arbol)**: la sub-nav de hermanos del cluster
+   (columna "atravesada") paso a TABS SUPERIORES — `SubNavigationPosition::Top`
+   en 38 resources + 3 pages, contenedor espejo `.mc-tabs` del Mission Control.
+   OJO: primero entendi mal (mova la sidebar principal con topNavigation() —
+   revertido); la queja era la sub-nav de los hijos.
+2. **INT.1 Agenda — form de sesion** (demo artifact cc53725b, 3 iteraciones
+   aprobadas ANTES de codear): Editorial 2+1 (izq la pieza / rail propiedades) ·
+   speakers chips con foto + X instantanea + popup CheckboxList 2 columnas
+   buscable que persiste AL INSTANTE · card Mission Control en el rail (boton
+   violeta-soft + tiempos en vivo) · pickers fecha+hora `native(false)` ·
+   estado ToggleButtons chips · header Eliminar(rojo)/Guardar(ink)/X ·
+   crear→redirect al edit para asignar speakers.
+3. **Decisiones de alcance**: seccion Mission Control FUERA del form (era debug;
+   MC escribe las mismas columnas = espejo automatico verificado en
+   SessionConfigController) · Preguntas/Q&A FUERA (session_questions + dataset
+   DC questions_qa + export) · **Resumen/ViewSessionStats BORRADO como feature**
+   (DC reporta; servicio de stats queda para API/exports).
+4. **Bugs reales cazados**: AttachAction de speakers reventaba
+   (`Speaker::eventSessions()` inexistente — Filament adivina la inversa;
+   `$inverseRelationship='sessions'`) · ToggleButtons todas "activas" (override
+   ink pintaba labels) · spinner invisible en Noir (icono text-white sobre ink
+   blanco) · secciones colapsadas reabriendose al guardar (persistCollapsed).
+5. Memorias: [[project_lumina_int_patterns]] NUEVA (lenguaje F-INT + gotchas) +
+   estado maestro actualizado.
+
+### PROXIMA SESION
+
+**INT.1b Tipos de sesion + Tracks** (pase ligero, mismo lenguaje — rapido) o
+**INT.2 Identidad** (Branding por superficie, el grande). Paralelos vivos: QA
+presencial webapp + DEPLOY DEMO 0/6 + decision Highlights→"Destacados" +
+LANDING + widget registro embebible (PENDIENTES.md).
+
+---
+
 ## SESION 2026-07-18 (Opus 4.8) — LUMINA ADMIN F0-F8 CERRADAS: contexto evento + tema Noir/Lux + arbol de features (menu 45→18)
 
 **Sesion maratonica del admin. TODO commiteado y PUSHEADO** (backend

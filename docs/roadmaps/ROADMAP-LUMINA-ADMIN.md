@@ -33,6 +33,13 @@ Los 6 grupos + 30 renames es-CO + iconos sin duplicar quedaron aplicados y
 sirven de estado intermedio, pero la reorganizacion REAL es el arbol de
 features (F3-F8). Sin commit propio — se commitea con cada cluster.
 
+### F-NAV — Sub-nav de clusters como tabs superiores — CERRADA (commit `a8452cc`)
+Correccion Kamilo 2026-07-18: la columna de hermanos del cluster quitaba ancho.
+`SubNavigationPosition::Top` en 38 resources + 3 pages → tabs sobre el contenido,
+contenedor espejo `.mc-tabs` de Mission Control (card + hairline + activo violeta
+suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
+(`use FilamentPagesSubNavigationPosition` paso php -l — verificar con ojos).
+
 ---
 
 ## EL ARBOL (18 entradas · grupos: Contenido / Personas / Comunicacion /
@@ -92,14 +99,19 @@ features (F3-F8). Sin commit propio — se commitea con cada cluster.
       final con Staff y permisos + Limites de uso
 - [ ] F8.2 QA + commit
 
-## F-INT — Interiores por feature — 0/14
+## F-INT — Interiores por feature — 1/15
 
 > Los clusters ordenaron las PUERTAS; esta fase rediseña lo de ADENTRO:
 > forms genericos de Filament → interiores DaVinci por feature (secciones con
 > jerarquia, tabs donde aplique, vistas pensadas, cero "form crudo").
 > Flujo por feature: leer el interior actual → proponer composicion → QA Kamilo.
 
-- [ ] INT.1 Agenda (form sesion es el mas usado — prioridad)
+- [x] INT.1 Agenda — form de sesion CERRADO 2026-07-18 (commit `440d9ca`, demo
+      aprobado artifact cc53725b): Editorial 2+1 · speakers chips+popup instantaneo
+      · card Mission Control en rail · pickers fecha+hora · header Eliminar/Guardar/X
+      · FUERA seccion MC (debug), Preguntas/Q&A y Resumen (borrado como feature,
+      DC reporta). Fix bug real: AttachAction reventaba (inverseRelationship).
+- [ ] INT.1b Tipos de sesion + Tracks (pase ligero, mismo lenguaje del form sesion)
 - [ ] INT.2 Identidad (Branding por superficie: Identidad comun / App / Webapp
       — aqui aterriza tambien F11.1 conceptualmente)
 - [ ] INT.3 Entrada (registro + campos + codigos)
@@ -152,7 +164,7 @@ features (F3-F8). Sin commit propio — se commitea con cada cluster.
 
 ---
 
-## TOTAL: 26/64
+## TOTAL: 27/65 (F-INT gano INT.1b; F-NAV extra cerrada fuera de numeracion)
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature
