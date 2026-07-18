@@ -125,6 +125,9 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       sin guardar (global, no confirm() nativo). QA vivo browser por Claude.
 - [ ] INT.2b Hermanos de Identidad: Slides del login + Encuesta de intereses
       (candidatos a absorberse igual) · FAQ / Highlights / Recap (pase ligero)
+      · previews de las otras pantallas del onboarding (Bienvenida ya lo tiene,
+      commit `1c348f8` — Login y registro / Foto / Pantalla final reusan el
+      telefono)
 - [ ] INT.3 Entrada (registro + campos + codigos)
 - [ ] INT.4 Asistentes (perfil del asistente digno, tabs datos/actividad)
 - [ ] INT.5 Sponsors (+ mover seccion Equipo de stands desde Branding)
