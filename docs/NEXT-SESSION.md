@@ -52,6 +52,12 @@ por **INT.1 Agenda** (form de sesion, el mas usado) o **INT.2 Identidad**
 (Branding por superficie). Paralelos vivos: QA presencial webapp + DEPLOY
 DEMO 0/6 + decision Highlights→"Destacados".
 
+**Frentes recordados al cierre (Kamilo)**: LANDING (PENDIENTES.md seccion 3,
+roadmap propio, ~2-3 sesiones) + **WIDGET de registro embebible** (NUEVO,
+decision 2026-07-18, anotado en PENDIENTES.md seccion 3 — prior art:
+dc-embed tokens + allowed_embed_domains ya en el modelo Event; ~1-2 sesiones).
+Cuenta total honesta a "todo desplegado": ~10-14 sesiones.
+
 ---
 
 ## SESION 2026-07-14 PARTE 2 (Opus→Fable) — Deuda codigo webapp EN CERO + docs reconciliados + PRIORIDAD 1: ADMIN FILAMENT (demo aprobado)

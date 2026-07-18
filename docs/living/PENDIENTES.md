@@ -148,6 +148,19 @@
 
 - [ ] Form integrado, progressive profiling, social proof, CAPTCHA, rate limiting
 
+### Widget de registro embebible (decision Kamilo 2026-07-18)
+
+> Registro insertable en CUALQUIER sitio de terceros (pagina del organizador,
+> intranet corporativa), no solo en nuestra landing.
+> **Prior art interno**: patron `/dc-embed/{token}` del Data Center (embed con
+> token + tabla dc_embed_tokens) y campo `allowed_embed_domains` que YA existe
+> en el modelo Event — la arquitectura esta semi-prevista.
+
+- [ ] Script/iframe embebible `<script src=".../widget.js" data-event="slug">` con token
+- [ ] Validacion de dominio contra allowed_embed_domains + rate limit + CAPTCHA
+- [ ] Tema del widget: hereda branding del evento (accent/logo), Noir/Lux auto
+- [ ] Config en admin: cluster Entrada → tab "Widget" (generar snippet + dominios)
+
 ### Post-registro
 
 - [ ] Confirmacion web + QR descarga app
