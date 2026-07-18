@@ -124,10 +124,11 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       "Recorrido" arrastrable legible). + Modal Lumina de salida con cambios
       sin guardar (global, no confirm() nativo). QA vivo browser por Claude.
 - [ ] INT.2b Hermanos de Identidad: Slides del login + Encuesta de intereses
-      (candidatos a absorberse igual) · FAQ / Highlights / Recap (pase ligero)
-      · previews de las otras pantallas del onboarding (Bienvenida ya lo tiene,
-      commit `1c348f8` — Login y registro / Foto / Pantalla final reusan el
-      telefono)
+      (candidatos a absorberse igual) · FAQ / Highlights / Recap (pase ligero).
+      NOTA: previews de TODAS las pantallas del onboarding YA CERRADOS
+      (`1c348f8` Bienvenida + `7b3cd13` Login/Foto/Intereses/Final) + fix
+      hidratacion toggles con defaults reales de la app (`c53fb5c`, incl.
+      reparacion de 10 falses accidentales en BD dev que el preview destapo)
 - [ ] INT.3 Entrada (registro + campos + codigos)
 - [ ] INT.4 Asistentes (perfil del asistente digno, tabs datos/actividad)
 - [ ] INT.5 Sponsors (+ mover seccion Equipo de stands desde Branding)

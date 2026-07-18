@@ -6,6 +6,58 @@
 
 ---
 
+## SESION 2026-07-18 PARTE 3 (Fable) — INT.1b + INT.2 nucleo CERRADOS: Branding por superficie + previews onboarding + modal salida
+
+**Continuacion de la misma jornada. TODO commiteado y PUSHEADO** (backend
+`6eab4e3` `6268279` `1c348f8` `c53fb5c` `7b3cd13` en feature/magic-link-auth).
+Roadmap: **29/66**. Kamilo queda AUSENTE UNA SEMANA — todo estable.
+
+### Que se hizo (QA vivo: Claude manejo el browser de Kamilo via extension Chrome)
+
+1. **INT.1b Tipos de sesion + Tracks**: lenguaje INT.1, Orden→drag&drop con
+   boton explicito "Ordenar/Listo", slug FUERA del form (se genera en servidor
+   con unicidad — el live(onBlur) se tragaba el primer click de Crear),
+   modelLabel es (mata "Crear Session Type"), sin "crear otro".
+2. **Dirty-guard de Guardar** (trait HasDirtySaveAction + Alpine.data
+   `luminaDirtySave` por render hook): apagado sin cambios, enciende al tipear,
+   re-basa tras save exitoso. GOTCHA CLAVE: extraAttributes ESCAPA HTML —
+   expresiones JS inline llegan rotas a Alpine (&& → &amp;&amp;), siempre
+   componente Alpine nombrado.
+3. **INT.2 Branding**: tabs por superficie (Lo esencial/Identidad comun/App
+   movil/Onboarding app/Webapp), entrada DIRECTA (listado de 1 fila muere,
+   Edit hereda sub-nav del cluster), 3 previews en vivo (telefono hero, card
+   16:9 con keyvisual real, panes accent Noir/Lux), Equipo stands colapsado
+   (se muda en INT.5).
+4. **Onboarding ABSORBIDO y organizado**: tab de Branding (mismo registro
+   Event; resource oculto, deep-merge+invalidacion migrados), 8 sub-tabs por
+   pantalla del recorrido (NO wizard), "Orden de steps" criptico → "Recorrido"
+   arrastrable legible. **Previews en vivo de las 5 pantallas** (Bienvenida
+   con pills flotantes/highlight/botones, Login+stats, Foto, Intereses con
+   pregunta real, Final con QR).
+5. **Modal Lumina de salida** con cambios sin guardar (global admin): evento
+   cancelable `livewire:navigate` (interceptar clicks NO sirve — nav queda
+   encolada), Seguir editando / Salir sin guardar. Nada de confirm() nativo.
+6. **Bug de datos destapado por el preview**: 10 toggles en false explicito
+   en BD (guardado viejo del form vacio con la hidratacion null→false) —
+   reparados + `mutateFormDataBeforeFill` siembra los defaults reales de la
+   app cuando la key no existe.
+7. Fix spinner invisible en Noir (icono text-white sobre boton ink) +
+   ToggleButtons pintados todos activos (override ink en labels) + titulo
+   wrap en listado sesiones + `unsavedChangesAlerts` nativo descartado por
+   feo ("no ajax default").
+
+### PROXIMA SESION (Kamilo vuelve ~2026-07-25)
+
+**INT.2b hermanos de Identidad**: Slides del login + Encuesta de intereses
+(candidatos a absorberse como tabs igual que onboarding) · FAQ/Highlights/
+Recap (pase ligero) · o seguir con INT.3 Entrada / INT.4 Asistentes. Patrones
+listos en [[project_lumina_int_patterns]] (Editorial 2+1, chips+popup,
+absorcion, previews Alpine, dirty-guard heredable con una linea).
+Paralelos vivos: QA presencial webapp + DEPLOY DEMO 0/6 + LANDING + widget
+registro embebible (PENDIENTES.md).
+
+---
+
 ## SESION 2026-07-18 PARTE 2 (Fable) — F-NAV sub-nav superior + INT.1 form de sesion CERRADOS
 
 **Misma jornada, segunda sesion. TODO commiteado y PUSHEADO** (backend `a8452cc` +
