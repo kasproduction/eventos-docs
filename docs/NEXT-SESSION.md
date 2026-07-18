@@ -31,9 +31,11 @@ Roadmap: **29/66**. Kamilo queda AUSENTE UNA SEMANA — todo estable.
 4. **Onboarding ABSORBIDO y organizado**: tab de Branding (mismo registro
    Event; resource oculto, deep-merge+invalidacion migrados), 8 sub-tabs por
    pantalla del recorrido (NO wizard), "Orden de steps" criptico → "Recorrido"
-   arrastrable legible. **Previews en vivo de las 5 pantallas** (Bienvenida
-   con pills flotantes/highlight/botones, Login+stats, Foto, Intereses con
-   pregunta real, Final con QR).
+   arrastrable legible. **Previews en vivo de las 6 pantallas** (Bienvenida
+   con pills flotantes/highlight/botones, Login+stats, Foto, Formularios con
+   nombres reales de campos (`fc605c8`), Intereses con pregunta real, Final
+   con QR). GOTCHA: live(onBlur) mata el tiempo real de los previews (con
+   .blur el store cliente no sincroniza al tipear).
 5. **Modal Lumina de salida** con cambios sin guardar (global admin): evento
    cancelable `livewire:navigate` (interceptar clicks NO sirve — nav queda
    encolada), Seguir editando / Salir sin guardar. Nada de confirm() nativo.
