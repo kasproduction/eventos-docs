@@ -99,7 +99,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       final con Staff y permisos + Limites de uso
 - [ ] F8.2 QA + commit
 
-## F-INT — Interiores por feature — 1/15
+## F-INT — Interiores por feature — 2/15
 
 > Los clusters ordenaron las PUERTAS; esta fase rediseña lo de ADENTRO:
 > forms genericos de Filament → interiores DaVinci por feature (secciones con
@@ -111,7 +111,11 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       · card Mission Control en rail · pickers fecha+hora · header Eliminar/Guardar/X
       · FUERA seccion MC (debug), Preguntas/Q&A y Resumen (borrado como feature,
       DC reporta). Fix bug real: AttachAction reventaba (inverseRelationship).
-- [ ] INT.1b Tipos de sesion + Tracks (pase ligero, mismo lenguaje del form sesion)
+- [x] INT.1b Tipos de sesion + Tracks — CERRADO 2026-07-18 (commit `6eab4e3`):
+      lenguaje INT.1, Orden→drag&drop (trigger "Ordenar/Listo"), slug al servidor
+      (fix race live(onBlur) que exigia doble click en Crear), modelLabel es,
+      sin "crear otro". + Dirty-guard de Guardar (trait HasDirtySaveAction,
+      verificado en vivo browser) + titulo wrap en listado sesiones.
 - [ ] INT.2 Identidad (Branding por superficie: Identidad comun / App / Webapp
       — aqui aterriza tambien F11.1 conceptualmente)
 - [ ] INT.3 Entrada (registro + campos + codigos)
@@ -164,7 +168,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 27/65 (F-INT gano INT.1b; F-NAV extra cerrada fuera de numeracion)
+## TOTAL: 28/65 (F-NAV extra cerrada fuera de numeracion)
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature
