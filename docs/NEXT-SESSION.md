@@ -6,6 +6,54 @@
 
 ---
 
+## SESION 2026-07-18 (Opus 4.8) — LUMINA ADMIN F0-F8 CERRADAS: contexto evento + tema Noir/Lux + arbol de features (menu 45→18)
+
+**Sesion maratonica del admin. TODO commiteado y PUSHEADO** (backend
+`823b8a8`+`5ea8373`+`5844cff` en feature/magic-link-auth). Ventana operativa
+del frente: `docs/roadmaps/ROADMAP-LUMINA-ADMIN.md` — **26/64**.
+
+### Que se hizo (QA vivo Kamilo fase por fase)
+
+1. **F0 Contexto de evento**: EventContext + middleware (default evento activo
+   real) + scoping de 44 resources (26 Selects "Evento" eliminados, Premios/
+   LiveGameResults/Canjes revividos) + switcher invisible con 1 evento +
+   eventos de prueba borrados (solo Summit; webhook verificado del Summit) +
+   pase rendimiento dev (icons/components cache — GOTCHA: resource nuevo no
+   aparece sin `filament:clear-cached-components`).
+2. **F1 Tema Lumina**: paletas sistemicas (gray = escala Lumina, semanticos DC
+   muted — badges sin neon), theme.css tokens literales DC (White Chrome,
+   glow Noir, Jakarta titulos canon), login, toggles ink, Noir default.
+   3 rechazos antes de acertar: la leccion fue ESTUDIAR el DC real
+   (app.css clases concretas), no iterar de memoria. Lux mas oscuro DIFERIDO
+   (pase global app).
+3. **F3-F8 Arbol de features** (arquitectura aprobada): 12 Clusters Filament,
+   menu 45→18 entradas en 6 grupos. **Identidad** = todo el layout del tema
+   (Branding+Onboarding app+Slides login+Encuesta intereses+Destacados+FAQ+
+   Recap — decision: onboarding/login son layout, NO "Entrada").
+   **Principio "el admin administra, el DC reporta"**: Evaluaciones, Live
+   Moments, Historial emails, Logs webhooks y Leads FUERA del nav (el Data
+   Center los cubre con datasets verificados). Locale ya era es; nombres en
+   ingles = marca del gremio.
+4. **Panel Modulos DISEÑADO Y APROBADO** (demo v6.2, artifact f3ebd7a8, 6
+   iteraciones): pagina pura lista+preview vivo (telefono con tab bar real +
+   rail webapp), ubicaciones CANON por superficie (grid/tab/HUD/campana/card
+   en vivo — el catalogo JAMAS inventa accesos), audiencias en lenguaje humano
+   sobre check-in dinamico (arquitectura tags existente). Implementacion = F10.
+5. Memorias nuevas: `project_lumina_admin_state` (estado maestro),
+   `project_lumina_admin_modulos_design`, `feedback_admin_noir_lux_no_accent`
+   (accent del evento JAMAS tine el admin), `project_filament_perf_caches`.
+
+### PROXIMA SESION — F-INT: interiores por feature
+
+Los clusters ordenaron las puertas; **los interiores siguen siendo forms
+genericos feos** (Kamilo). F-INT.1-14 del roadmap: rediseñar cada interior
+con flujo DaVinci (leer actual → proponer composicion → QA vivo). Arrancar
+por **INT.1 Agenda** (form de sesion, el mas usado) o **INT.2 Identidad**
+(Branding por superficie). Paralelos vivos: QA presencial webapp + DEPLOY
+DEMO 0/6 + decision Highlights→"Destacados".
+
+---
+
 ## SESION 2026-07-14 PARTE 2 (Opus→Fable) — Deuda codigo webapp EN CERO + docs reconciliados + PRIORIDAD 1: ADMIN FILAMENT (demo aprobado)
 
 Continuacion de la misma jornada tras el guardar del showcase. Tres frentes:

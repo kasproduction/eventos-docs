@@ -682,7 +682,19 @@
       "Bash(php sq3.php)",
       "Bash(php sq4.php)",
       "Bash(php upd.php)",
-      "Bash(php sq5.php)"
+      "Bash(php sq5.php)",
+      "Bash(php scripts/smoke-event-context.php)",
+      "Bash(php scripts/audit-event-references.php)",
+      "Bash(php scripts/delete-test-events.php)",
+      "Bash(php -l app/Livewire/EventContextSwitcher.php)",
+      "Bash(xargs -n1 basename)",
+      "Bash(cp php.ini php.ini.bak-perf)",
+      "Bash(sed -i 's/^;realpath_cache_size = 4096k/realpath_cache_size = 8192k\\\\nrealpath_cache_ttl = 600/' php.ini)",
+      "Bash(php -l app/Providers/Filament/AdminPanelProvider.php)",
+      "Bash(sed -i 's|protected static ?string $navigationGroup = '\\\\''Contenido'\\\\'';|protected static ?string $cluster = \\\\\\\\App\\\\\\\\Filament\\\\\\\\Clusters\\\\\\\\Agenda::class;|' app/Filament/Resources/SessionTrackResource.php app/Filament/Resources/SessionTypeResource.php)",
+      "Bash(php -l app/Filament/Resources/SessionTrackResource.php)",
+      "Bash(php -l app/Filament/Resources/SessionTypeResource.php)",
+      "Bash(php -l app/Filament/Clusters/Agenda.php)"
     ]
   }
 }
