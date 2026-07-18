@@ -99,7 +99,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       final con Staff y permisos + Limites de uso
 - [ ] F8.2 QA + commit
 
-## F-INT — Interiores por feature — 2/15
+## F-INT — Interiores por feature — 3/16
 
 > Los clusters ordenaron las PUERTAS; esta fase rediseña lo de ADENTRO:
 > forms genericos de Filament → interiores DaVinci por feature (secciones con
@@ -116,8 +116,15 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       (fix race live(onBlur) que exigia doble click en Crear), modelLabel es,
       sin "crear otro". + Dirty-guard de Guardar (trait HasDirtySaveAction,
       verificado en vivo browser) + titulo wrap en listado sesiones.
-- [ ] INT.2 Identidad (Branding por superficie: Identidad comun / App / Webapp
-      — aqui aterriza tambien F11.1 conceptualmente)
+- [x] INT.2 Identidad nucleo — CERRADO 2026-07-18 (commit `6268279`): Branding
+      = tabs por superficie (Lo esencial/Identidad comun/App movil/Onboarding
+      app/Webapp) con 3 PREVIEWS EN VIVO (telefono hero + card 16:9 + panes
+      accent Noir/Lux), entrada directa sin listado, Onboarding ABSORBIDO como
+      tab (8 sub-tabs por pantalla del recorrido, "Orden de steps" criptico →
+      "Recorrido" arrastrable legible). + Modal Lumina de salida con cambios
+      sin guardar (global, no confirm() nativo). QA vivo browser por Claude.
+- [ ] INT.2b Hermanos de Identidad: Slides del login + Encuesta de intereses
+      (candidatos a absorberse igual) · FAQ / Highlights / Recap (pase ligero)
 - [ ] INT.3 Entrada (registro + campos + codigos)
 - [ ] INT.4 Asistentes (perfil del asistente digno, tabs datos/actividad)
 - [ ] INT.5 Sponsors (+ mover seccion Equipo de stands desde Branding)
@@ -168,7 +175,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 28/65 (F-NAV extra cerrada fuera de numeracion)
+## TOTAL: 29/66 (F-NAV extra cerrada fuera de numeracion)
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature
