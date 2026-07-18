@@ -48,15 +48,49 @@ Roadmap: **29/66**. Kamilo queda AUSENTE UNA SEMANA — todo estable.
    wrap en listado sesiones + `unsavedChangesAlerts` nativo descartado por
    feo ("no ajax default").
 
-### PROXIMA SESION (Kamilo vuelve ~2026-07-25)
+### ADDENDUM (cierre real de la jornada, Kamilo vuelve en ~3h y luego semana fuera)
 
-**INT.2b hermanos de Identidad**: Slides del login + Encuesta de intereses
-(candidatos a absorberse como tabs igual que onboarding) · FAQ/Highlights/
-Recap (pase ligero) · o seguir con INT.3 Entrada / INT.4 Asistentes. Patrones
-listos en [[project_lumina_int_patterns]] (Editorial 2+1, chips+popup,
-absorcion, previews Alpine, dirty-guard heredable con una linea).
-Paralelos vivos: QA presencial webapp + DEPLOY DEMO 0/6 + LANDING + widget
-registro embebible (PENDIENTES.md).
+- **Formularios del onboarding**: pase completo + preview con nombres reales
+  de campos (`fc605c8`). Duda resuelta y documentada: los campos que llena el
+  asistente NACEN en Personas → Entrada → Campos de Registro con visibilidad
+  "Onboarding" o "Ambos"; el formulario solo elige cuales y en que pantalla.
+- Ultimo gotcha del dia: `live(onBlur)` mata el tiempo real de los previews.
+
+### PROXIMA SESION — cola completa para "arrancar con todo"
+
+**Frente principal (F-INT, patrones listos en [[project_lumina_int_patterns]]):**
+1. **INT.2b hermanos de Identidad**: Slides del login + Encuesta de intereses
+   — candidatos a ABSORBERSE como tabs de Branding (mismo patron sections() +
+   shouldRegisterNavigation false + preview; la Encuesta alimenta la pantalla
+   Intereses cuyo preview YA existe). FAQ / Highlights / Recap: pase ligero
+   (lenguaje INT + header canon + dirty-guard, son listas simples).
+2. **INT.3 Entrada** (registro + campos + codigos): incluir el detalle anotado
+   — estado vacio con link directo en "Campos que llena el asistente" del
+   onboarding (patron del popup de speakers) y el espejo inverso (desde
+   Campos de Registro ver en que formularios se usa).
+3. **INT.4 Asistentes** (perfil digno, tabs datos/actividad) · **INT.5
+   Sponsors** (MOVER la seccion "Equipo de stands" desde Branding — ya quedo
+   rotulada "Se mudara a Sponsors") · INT.6-13 restantes.
+4. Despues de F-INT: **F9 dashboard** "¿Que quieres hacer?" → **F10 panel
+   Modulos** (demo v6.2 aprobado, artifact f3ebd7a8) → **F11 wizard v2**
+   (los previews por superficie de INT.2 son la semilla de F11.1).
+
+**Limpiezas menores anotadas (no urgentes):**
+- EventOnboardingResource: table()/pages() ya muertos (resource oculto) —
+  borrar en una limpieza futura.
+- Lux mas oscuro DIFERIDO (pase global app, decision F1).
+- Decision Kamilo pendiente: Highlights → "Destacados" (nombre).
+
+**Paralelos vivos (fuera del admin):**
+- QA presencial webapp (device M.2-M.8 + Fase C, ~2h con Kamilo).
+- DEPLOY DEMO 0/6 (sesion propia).
+- LANDING (~2-3 sesiones) + WIDGET registro embebible (~1-2, prior art
+  dc-embed) — PENDIENTES.md seccion 3.
+- Event Pulse: 2 pendientes (cache moments.js v2 + decision hero).
+
+**Estado de repos al cierre**: backend `feature/magic-link-auth` limpio y
+pusheado (8 commits hoy: a8452cc 440d9ca 6eab4e3 6268279 1c348f8 c53fb5c
+7b3cd13 fc605c8) · APP EVENTOS main pusheado · Lumina Admin **29/66**.
 
 ---
 
