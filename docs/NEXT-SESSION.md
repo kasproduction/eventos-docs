@@ -6,6 +6,35 @@
 
 ---
 
+## SESION 2026-07-19 NOCHE 2 (Fable) — INT.9 Emails rescatado y cerrado
+
+La sesion que hizo INT.9 se cerro ANTES de commitear — el codigo quedo
+completo en el arbol de trabajo. Esta sesion lo reviso, verifico tests
+(EmailTemplatesTest **12/12**) y lo guardo: backend `c63ba9a` PUSHEADO
+(`feature/magic-link-auth`). Roadmap: **36/66 → 37/66**.
+
+### INT.9 Emails (titulares)
+
+1. **Catalogo FIJO de 16 correos** en 5 grupos por momento (Registro y
+   llegada / Antes y durante / Networking / Cierre / Sistema), cada tipo
+   cableado a su trigger real — no se crean tipos. Cards agrupadas, muere
+   la tabla CRUD (patron catalogo de acciones INT.7).
+2. **Editor por tipo** (`EditEmail`): tabs es/en, chips de variables,
+   preview en vivo con datos del evento real, "Enviar prueba" (incluye
+   cambios sin guardar), **fork por evento** + "Volver a la del sistema".
+3. **EmailLayout**: body guarda solo el contenido interior; layout
+   responsive se aplica al renderizar (guardia legacy anti doble-wrap).
+4. **Apagar es apagar**: fork apagado ENMASCARA al del sistema (`resolve`
+   null) y SendEmailJob ya no envia el placeholder "No template
+   configured". Essential no apagables: magic link, reset, verificacion.
+5. Grupo Sistema solo super_admin; seeders alineados; Create/Edit viejos
+   eliminados (tambien OrganizationEmailSettings).
+
+**PENDIENTE**: QA vivo de Kamilo en navegador (catalogo + editor + preview
++ enviar prueba). Sigue **INT.10 En vivo** (moderacion chat/Q&A).
+
+---
+
 ## SESION 2026-07-19 TARDE/NOCHE (Fable) — INT.3→INT.8 + White Chrome total en UNA jornada. Kamilo AUSENTE UNA SEMANA
 
 **Jornada maratonica #2 del admin. TODO commiteado y PUSHEADO** (backend

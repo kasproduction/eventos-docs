@@ -181,7 +181,15 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       como "Lleva a" (Agenda/sesion/Speakers/premios/URL — round-trip
       eventos:// que las apps parsean) · rail Publicacion narrada + boton
       Publicar ahora en el edit · push unificada + tabla con Estado
-- [ ] INT.9 Emails (editor de plantillas digno)
+- [x] INT.9 Emails (`c63ba9a` 2026-07-19): catalogo FIJO de 16 correos en
+      5 grupos por momento (cableados a triggers reales, no se crean
+      tipos) — cards, muere la tabla CRUD · editor por tipo: tabs es/en,
+      chips de variables, preview en vivo con datos del evento real,
+      enviar prueba, fork por evento + "Volver a la del sistema" ·
+      EmailLayout al renderizar (body solo interior) · apagar es apagar
+      (fork apagado enmascara al sistema, SendEmailJob no envia
+      placeholder) · essential no apagables (magic link, reset,
+      verificacion) · grupo Sistema solo super_admin. Tests 12/12
 - [ ] INT.10 En vivo (chat/Q&A moderacion comoda)
 - [ ] INT.11 Encuestas (builder de preguntas claro)
 - [ ] INT.12 Salas (+ tótems con su QR visible)
@@ -225,7 +233,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 36/66 (F-NAV extra cerrada fuera de numeracion)
+## TOTAL: 37/66 (F-NAV extra cerrada fuera de numeracion)
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature
