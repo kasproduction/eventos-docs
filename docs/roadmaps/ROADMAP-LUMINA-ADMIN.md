@@ -251,13 +251,15 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       Chrome + recorridos Claude) — un pase integral aparte repetiria.
       **F-INT COMPLETO 17/17.**
 
-## F9 — Dashboard "¿Que quieres hacer?" — 0/4
+## F9 — Dashboard "¿Que quieres hacer?" — 4/4 CERRADO (commit 2fc4a25)
 
-- [ ] F9.1 Accesos por tarea (Cambiar logo o colores / Editar agenda / Enviar
-      anuncio / Modulos / Asistentes / Mission Control)
-- [ ] F9.2 4 stats del evento activo
-- [ ] F9.3 Widgets Lumina (cardIn, tokens DC)
-- [ ] F9.4 QA + commit
+- [x] F9.1 Accesos por tarea — 5 cards de intencion (logo/colores, agenda,
+      anuncio directo al composer, asistentes, modulos). SIN Mission Control
+      (decision Kamilo: muchas sesiones, MC vive en cada sesion de Agenda)
+- [x] F9.2 Stats: Registrados / Ya llegaron / Sesiones hoy / Requieren accion
+      con ACCESOS DIRECTOS por fuente (decision Kamilo, rojo cuando >0)
+- [x] F9.3 Blade custom tokens lum-* (mueren AccountWidget/FilamentInfoWidget)
+- [x] F9.4 QA vivo (stats reales Summit, links verificados) + commit
 
 ## F10 — Panel Modulos (demo v6.2) — 0/7
 
@@ -295,7 +297,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 43/67 (F-NAV extra cerrada fuera de numeracion; F10 gano el
+## TOTAL: 47/67 (F-NAV extra cerrada fuera de numeracion; F10 gano el
 item de la decision Paginas). F-INT CERRADO — sigue F9 dashboard
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
