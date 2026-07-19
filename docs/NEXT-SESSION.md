@@ -52,6 +52,32 @@ las imagenes de correos viejos apuntaran al dominio anterior.
 
 Sigue **INT.10 En vivo** (moderacion chat/Q&A).
 
+## SESION 2026-07-19 NOCHE 2 (continuacion) — INT.10 En vivo CERRADO (38/66)
+
+**Decision de alcance Kamilo** (pregunta suya, verificada a fondo): Mission
+Control YA lanza encuestas, modera Q&A y modera chat (feed/borrar/pin) por
+socket real, y el Data Center guarda y exporta todo (exports
+chat_messages, questions_qa, poll_votes + stats). El admin NO duplica la
+operacion en vivo. Backend `9da60ee` PUSHEADO:
+
+1. **Mueren del admin** (auditoria de referencias limpia): ModerarQnA
+   (pagina pre-Lumina con selector manual de evento, sobreviviente F0,
+   polling 2s) y LivePollResource completo. El cluster EnVivo muere; el
+   grupo del sidebar queda **Chat + Soporte** (Live Moments sigue oculto).
+2. **Chat** = la unica pieza admin real de En vivo: singleton entrada
+   directa (canon INT), Editorial 2+1 — Moderacion automatica (palabras
+   bloqueadas) + Control de flujo (slow mode, pausar) / rail con **card
+   Mission Control** (muestra sesion en curso o proxima; boton abre
+   /monitor con token HMAC; estado vacio honesto si no hay) + nota "el
+   DC reporta". Dirty-save verificado en vivo (BD), invalidacion socket
+   preservada en afterSave.
+3. `sessionIsLive` respeta los 3 tiempos (actual_start/adjusted_end/
+   original) — 6 casos verificados con modelos en memoria.
+
+**Consecuencia**: INT.11 Encuestas se encoge a SOLO builder post-evento.
+
+Sigue **INT.11 Encuestas** (builder post-evento digno).
+
 ---
 
 ## SESION 2026-07-19 TARDE/NOCHE (Fable) — INT.3→INT.8 + White Chrome total en UNA jornada. Kamilo AUSENTE UNA SEMANA

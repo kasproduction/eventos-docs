@@ -201,8 +201,17 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       public disk email-images/, URL absoluta APP_URL/storage — el
       correo se lee fuera del dominio) + .body img max-width movil.
       Upload real verificado en vivo
-- [ ] INT.10 En vivo (chat/Q&A moderacion comoda)
-- [ ] INT.11 Encuestas (builder de preguntas claro)
+- [x] INT.10 En vivo (`9da60ee` 2026-07-19): **decision Kamilo — MC opera,
+      el admin administra, el DC reporta**. Verificado: Mission Control ya
+      lanza encuestas, modera Q&A y chat (borrar/pin) por socket; DC
+      guarda y exporta todo (chat_messages, questions_qa, poll_votes).
+      MUEREN del admin: ModerarQnA (pre-Lumina, selector manual F0) y
+      LivePollResource (launcher duplicado); cluster EnVivo muere, grupo
+      queda Chat + Soporte. Chat = singleton entrada directa Editorial
+      2+1 con card MC (sesion en curso/proxima, 3 tiempos verificados) y
+      nota DC. Auditoria de referencias limpia
+- [ ] INT.11 Encuestas — SOLO builder post-evento (encuestas en vivo se
+      lanzan desde MC, decision INT.10)
 - [ ] INT.12 Salas (+ tótems con su QR visible)
 - [ ] INT.13 Standalone: Speakers · Documentos · Páginas · Soporte
 - [ ] INT.14 QA integral de interiores + commit
@@ -244,7 +253,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 37/66 (F-NAV extra cerrada fuera de numeracion)
+## TOTAL: 38/66 (F-NAV extra cerrada fuera de numeracion)
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature
