@@ -30,8 +30,22 @@ completo en el arbol de trabajo. Esta sesion lo reviso, verifico tests
 5. Grupo Sistema solo super_admin; seeders alineados; Create/Edit viejos
    eliminados (tambien OrganizationEmailSettings).
 
-**PENDIENTE**: QA vivo de Kamilo en navegador (catalogo + editor + preview
-+ enviar prueba). Sigue **INT.10 En vivo** (moderacion chat/Q&A).
+**QA vivo HECHO (agente, misma sesion) → INT.9b `63918c7`**: catalogo,
+tabs es/en, chips, ciclo fork/restore (BD verificada en ambos extremos),
+enviar prueba llego a Mailpit con variables sustituidas, esenciales sin
+toggle. Bug real cazado y arreglado: header con `<img src="">` roto
+cuando el evento no tiene logo (los clientes de correo NO ejecutan JS,
+el onerror jamas corria) → `EmailLayout::wrap()` ahora recibe vars y
+resuelve el header server-side (logo si hay, nombre del evento en texto
+si no). + fecha de muestra localizada por tab (gotcha: wire:key en el
+panel preview, Alpine conservaba el x-data inicial), titulo "Envío
+(SMTP)", catalogo sin breadcrumb redundante. Tests 13/13. Unico hueco:
+403 del grupo Sistema con admin normal (requiere login no-super-admin).
+
+**Decision pendiente Kamilo**: imagenes personalizadas dentro del cuerpo
+del correo (RichEditor attachFiles) — ofrecido, sin respuesta aun.
+
+Sigue **INT.10 En vivo** (moderacion chat/Q&A).
 
 ---
 

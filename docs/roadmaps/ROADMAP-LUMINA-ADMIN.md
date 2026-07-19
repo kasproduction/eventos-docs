@@ -189,7 +189,14 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       EmailLayout al renderizar (body solo interior) · apagar es apagar
       (fork apagado enmascara al sistema, SendEmailJob no envia
       placeholder) · essential no apagables (magic link, reset,
-      verificacion) · grupo Sistema solo super_admin. Tests 12/12
+      verificacion) · grupo Sistema solo super_admin. Tests 12/12.
+      **INT.9b QA** (`63918c7` 2026-07-19): QA vivo agente — catalogo,
+      tabs es/en, chips, fork/restore (BD verificada), prueba a Mailpit.
+      Bug cazado: header con <img src=\"\"> roto sin logo (clients no
+      ejecutan JS) → wrap() resuelve header server-side (logo o nombre en
+      texto) · muestras localizadas por tab (wire:key preview) · titulo
+      Envío (SMTP) · catalogo sin breadcrumb. Tests 13/13. Falta solo
+      403 grupo Sistema con admin normal (no probado en vivo)
 - [ ] INT.10 En vivo (chat/Q&A moderacion comoda)
 - [ ] INT.11 Encuestas (builder de preguntas claro)
 - [ ] INT.12 Salas (+ tótems con su QR visible)
