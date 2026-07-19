@@ -77,9 +77,13 @@ YouTube/iframes/HTML propio) o se demuele entera con release del Expo.
 Total roadmap paso a 42/67 (F10 gano el item).
 
 ### PROXIMA SESION
-**INT.14 QA integral de interiores** (ultimo item F-INT) → F9
-dashboard → F10 Modulos (demo v6.2 aprobado) → F11 wizard. El kiosko
-dev quedo corriendo en background esa sesion (matar si zombie).
+**F-INT quedo CERRADO 17/17** (INT.14 cerrado por decision Kamilo: el
+QA fue incremental pieza por pieza, un pase integral repetiria).
+Sigue: **F9 Dashboard "¿Que quieres hacer?"** (accesos por tarea + 4
+stats del evento + widgets Lumina) → F10 Modulos (demo v6.2 aprobado,
+incluye decision F10.6 Paginas) → F11 wizard. Roadmap 43/67.
+Paginas quedo EN PAUSA total: listado solo-lectura + sidebar gris sin
+click (`4cd43d4` + `52f4522`).
 
 ---
 

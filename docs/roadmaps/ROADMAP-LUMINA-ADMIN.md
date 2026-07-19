@@ -99,7 +99,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       final con Staff y permisos + Limites de uso
 - [ ] F8.2 QA + commit
 
-## F-INT — Interiores por feature — 16/17
+## F-INT — Interiores por feature — 17/17 CERRADO
 
 > Los clusters ordenaron las PUERTAS; esta fase rediseña lo de ADENTRO:
 > forms genericos de Filament → interiores DaVinci por feature (secciones con
@@ -246,7 +246,10 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       + fix MC `be4af06`: [object Object] en ubicacion (session->room
       es relacion EventRoom; ahora room?->name ?? location).
       Tests 22/22
-- [ ] INT.14 QA integral de interiores + commit
+- [x] INT.14 CERRADO POR DECISION Kamilo 2026-07-19: el QA vivo se hizo
+      INCREMENTAL pieza por pieza durante INT.1-13 (Kamilo via extension
+      Chrome + recorridos Claude) — un pase integral aparte repetiria.
+      **F-INT COMPLETO 17/17.**
 
 ## F9 — Dashboard "¿Que quieres hacer?" — 0/4
 
@@ -292,8 +295,8 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 42/67 (F-NAV extra cerrada fuera de numeracion; F10 gano el
-item de la decision Paginas)
+## TOTAL: 43/67 (F-NAV extra cerrada fuera de numeracion; F10 gano el
+item de la decision Paginas). F-INT CERRADO — sigue F9 dashboard
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature
