@@ -211,8 +211,15 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       (Moderacion automatica + Control de flujo). INT.10b (`a52b839`):
       fuera card MC y nota DC del rail (decision Kamilo — el acceso MC ya
       vive en cada sesion de Agenda). Auditoria de referencias limpia
-- [ ] INT.11 Encuestas — SOLO builder post-evento (encuestas en vivo se
-      lanzan desde MC, decision INT.10)
+- [x] INT.11 Encuestas (`c47ba79` 2026-07-19) — SOLO builder post-evento:
+      **singleton entrada directa** (contrato real: UNA por evento —
+      webapp first(), observer activa; siembra borrador con 3 preguntas
+      base). Muere cluster Encuestas y el Repeater anidado → **tabla
+      ordenada patron Campos + modal por pregunta formato MC** (chips
+      tipo, opciones lista simple, persiste al instante; borrar con
+      respuestas advierte). Header Activar/Cerrar + estado narrado.
+      Fuera Exportar CSV (DC reporta) y titulo "Editar Live Poll".
+      QA vivo con 5 preguntas reales. Tests Poll 29/29
 - [ ] INT.12 Salas (+ tótems con su QR visible)
 - [ ] INT.13 Standalone: Speakers · Documentos · Páginas · Soporte
 - [ ] INT.14 QA integral de interiores + commit
@@ -254,7 +261,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 38/66 (F-NAV extra cerrada fuera de numeracion)
+## TOTAL: 39/66 (F-NAV extra cerrada fuera de numeracion)
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature

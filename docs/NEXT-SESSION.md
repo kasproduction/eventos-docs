@@ -76,7 +76,33 @@ operacion en vivo. Backend `9da60ee` PUSHEADO:
 
 **Consecuencia**: INT.11 Encuestas se encoge a SOLO builder post-evento.
 
-Sigue **INT.11 Encuestas** (builder post-evento digno).
+## SESION 2026-07-19 NOCHE 2 (continuacion) — INT.10b + INT.11 CERRADOS (39/66)
+
+**INT.10b (`a52b839`)**: Kamilo tumbo el rail entero de Chat (card MC +
+nota DC) — "sobra". Chat = config pura full width. El acceso MC ya vive
+en cada sesion de Agenda.
+
+**INT.11 Encuestas (`c47ba79`)**: builder post-evento singleton.
+- Contrato real verificado: UNA encuesta por evento (webapp `first()`,
+  observer activa todas las draft al pasar a Finalizado) — el List que
+  permitia varias mentia. Entrada directa; siembra borrador con 3
+  preguntas base (estrellas + multiple con 4 opciones + texto libre).
+- Muere el cluster Encuestas (quedaba 1 hijo tras INT.10) y muere el
+  Repeater anidado (scroll infinito). Ahora: **tabla ordenada patron
+  Campos** (drag, badges tipo neutros, nº opciones/respuestas) + **modal
+  por pregunta formato MC** (pregunta lum-in-lg, tipo chips
+  ToggleButtons live, opciones Repeater->simple() con drag y "+ Opcion",
+  toggle multi solo en multiple_choice). Persiste al instante
+  (RelationManager). Borrar pregunta con respuestas advierte cuantas.
+- Header: Activar ahora (draft, con nota "se activa sola") / Cerrar
+  (active, danger link) + dirty-save titulo + estado narrado con conteo.
+- Fuera: Exportar CSV del admin (DC tiene encuestas_post_evento),
+  DeleteAction del edit, titulo "Editar Live Poll".
+- QA vivo en pestana propia (Kamilo navegaba la suya): redirect, tabla
+  5 preguntas reales del Summit, modal editar con chips y opciones.
+  Tests Poll 29/29 (API intacta).
+
+Sigue **INT.12 Salas** (+ totems con su QR visible).
 
 ---
 
