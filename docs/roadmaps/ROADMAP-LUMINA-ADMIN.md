@@ -207,9 +207,10 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       guarda y exporta todo (chat_messages, questions_qa, poll_votes).
       MUEREN del admin: ModerarQnA (pre-Lumina, selector manual F0) y
       LivePollResource (launcher duplicado); cluster EnVivo muere, grupo
-      queda Chat + Soporte. Chat = singleton entrada directa Editorial
-      2+1 con card MC (sesion en curso/proxima, 3 tiempos verificados) y
-      nota DC. Auditoria de referencias limpia
+      queda Chat + Soporte. Chat = singleton entrada directa, config pura
+      (Moderacion automatica + Control de flujo). INT.10b (`a52b839`):
+      fuera card MC y nota DC del rail (decision Kamilo — el acceso MC ya
+      vive en cada sesion de Agenda). Auditoria de referencias limpia
 - [ ] INT.11 Encuestas — SOLO builder post-evento (encuestas en vivo se
       lanzan desde MC, decision INT.10)
 - [ ] INT.12 Salas (+ tótems con su QR visible)
