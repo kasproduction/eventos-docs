@@ -256,7 +256,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 - [ ] F9.3 Widgets Lumina (cardIn, tokens DC)
 - [ ] F9.4 QA + commit
 
-## F10 — Panel Modulos (demo v6.2) — 0/6
+## F10 — Panel Modulos (demo v6.2) — 0/7
 
 - [ ] F10.1 Migracion keys: patrocinadores→sponsors, fotos→config social,
       chat→config live, nacen desafio/live, formalizar scanner
@@ -265,7 +265,14 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 - [ ] F10.3 Preview vivo (rail webapp + telefono, ubicaciones canon, alturas fijas)
 - [ ] F10.4 Saltos "Administrar contenido" → cluster de cada feature
 - [ ] F10.5 Matar el CRUD viejo de Modulos
-- [ ] F10.6 QA vivo + commit
+- [ ] F10.6 **DECISION Paginas (quedo EN PAUSA en INT.13, commit
+      `4cd43d4`)**: hoy visible+deshabilitada en el admin porque NINGUNA
+      app la lista (Expo solo detalle pages/[id], webapp sin modulo,
+      Anuncios sin destino). Aqui se decide: entra como modulo colocable
+      (grid/tab Expo + rail webapp — el feature es contenido embebido:
+      YouTube/iframes/HTML) o se demuele entera (resource + API + tabla
+      + pantalla Expo, requiere release)
+- [ ] F10.7 QA vivo + commit
 
 ## F11 — Wizard de creacion v2 — 0/5
 
@@ -285,7 +292,8 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 42/66 (F-NAV extra cerrada fuera de numeracion)
+## TOTAL: 42/67 (F-NAV extra cerrada fuera de numeracion; F10 gano el
+item de la decision Paginas)
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature

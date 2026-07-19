@@ -63,14 +63,18 @@ QA vivo de TODO via extension Chrome (Claude manejo el browser).
 - Duplicado "Informacion del recinto" borrado de BD (id 2).
 - Tests Document/CustomPage/Support/Speaker 22/22.
 
-### DECISION ABIERTA — Paginas no tiene acceso real en las apps
+### DECIDIDO (addendum misma sesion) — Paginas EN PAUSA (`4cd43d4`)
 Verificado a fondo: el Expo solo tiene el DETALLE `pages/[id]` (nadie
 lo lista ni navega ahi), la webapp no tiene el modulo, y Anuncios no
-ofrece "pagina" como destino. Un organizador puede crear su iframe
-personalizado y ningun asistente lo encuentra. Caminos propuestos a
-Kamilo (sin decidir): (a) F10 panel Modulos como lugar natural,
-(b) destino "Pagina" en Anuncios (el mas corto), (c) listado en apps.
-Mientras: Paginas sigue VISIBLE en el nav del admin.
+ofrece "pagina" como destino — crear paginas era promesa falsa.
+**Decision Kamilo: NI ocultar NI demoler — visible pero DESHABILITADA**
+(que no se olvide ni se vuelva codigo muerto): subheading "EN PAUSA"
+con la explicacion, Nueva pagina y Editar disabled con tooltip, click
+de fila muerto, solo lectura. Backend/API/pantalla Expo quedan
+dormidos intactos. La decision final vive en el roadmap como **F10.6**:
+entra como modulo colocable (el feature es contenido embebido —
+YouTube/iframes/HTML propio) o se demuele entera con release del Expo.
+Total roadmap paso a 42/67 (F10 gano el item).
 
 ### PROXIMA SESION
 **INT.14 QA integral de interiores** (ultimo item F-INT) → F9
