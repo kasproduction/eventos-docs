@@ -261,15 +261,27 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 - [x] F9.3 Blade custom tokens lum-* (mueren AccountWidget/FilamentInfoWidget)
 - [x] F9.4 QA vivo (stats reales Summit, links verificados) + commit
 
-## F10 — Panel Modulos (demo v6.2) — 0/7
+## F10 — Panel Modulos (demo v6.2) — 6/7 (falta SOLO F10.6 decision Paginas)
 
-- [ ] F10.1 Migracion keys: patrocinadores→sponsors, fotos→config social,
-      chat→config live, nacen desafio/live, formalizar scanner
-- [ ] F10.2 Page custom Livewire: lista fija + toggles + drag&drop + audiencias
-      humanas (Todos / Ya llegaron / A distancia + grupos)
-- [ ] F10.3 Preview vivo (rail webapp + telefono, ubicaciones canon, alturas fijas)
-- [ ] F10.4 Saltos "Administrar contenido" → cluster de cada feature
-- [ ] F10.5 Matar el CRUD viejo de Modulos
+- [x] F10.1 CERRADO (backend 3b4ec91 + Expo 82d930e): ModuleCatalog canon
+      (12 keys, ubicaciones fijas por superficie, saltos admin) + comando
+      modules:migrate-catalog idempotente (eventos + templates SOLO
+      renames — el dry cazo que feria no debe ganar speakers) + wizard y
+      seeder re-basados + compat Expo (desafio en gates HUD)
+- [x] F10.2 CERRADO (706173f): /admin/modulos pagina pura — lista canon con
+      grip drag x-sortable, switch ink, fila expandida (chips Quien lo ve +
+      Limitar a grupos con tags reales + Donde vive). Mutaciones al instante
+      + BUMP DE VERSION del cache /modules + broadcast socket
+- [x] F10.3 CERRADO: preview vivo alturas fijas (navegador webapp rail+campana
+      +live-card / telefono HUD+grid+tabs) — re-renderiza con cada mutacion
+- [x] F10.4 CERRADO: saltos en fila expandida desde el catalogo
+- [x] F10.5 CERRADO: ModuleResource muerto; Escritorio F9 re-apuntado
+- [x] F10.5b EXTRA (aprobado Kamilo): enforcement minimo webapp (eventos-web
+      7f22593) — el rail OCULTA modulos apagados (fail-open si el fetch
+      falla), RT socket→router.refresh. QA end-to-end: toggle Speakers →
+      mic desaparece del rail en ~2s sin recargar. + fix dev 4788414:
+      SOCKET_SERVER_URL default 127.0.0.1 (localhost=::1 en Windows,
+      broadcasts morian en timeout silencioso)
 - [ ] F10.6 **DECISION Paginas (quedo EN PAUSA en INT.13, commit
       `4cd43d4`)**: hoy visible+deshabilitada en el admin porque NINGUNA
       app la lista (Expo solo detalle pages/[id], webapp sin modulo,
@@ -277,7 +289,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       (grid/tab Expo + rail webapp — el feature es contenido embebido:
       YouTube/iframes/HTML) o se demuele entera (resource + API + tabla
       + pantalla Expo, requiere release)
-- [ ] F10.7 QA vivo + commit
+- [x] F10.7 QA vivo incremental durante la construccion (patron INT.14) + commits
 
 ## F11 — Wizard de creacion v2 — 0/5
 

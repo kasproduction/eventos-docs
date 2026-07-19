@@ -6,6 +6,56 @@
 
 ---
 
+## SESION 2026-07-19 TARDE 3 (continuacion) — F9 + F10 CERRADOS (49/67): Escritorio + Panel Modulos COMPLETO con enforcement webapp
+
+**Maraton final de la jornada. Todo commiteado y PUSHEADO** (backend
+`2fc4a25` F9 · `3b4ec91` F10.1 · `706173f` F10.2-5 · `4788414` fix
+socket · Expo `82d930e` compat (SIN push — repo tiene cambios de Kamilo)
+· eventos-web `7f22593` enforcement). Roadmap **49/67**.
+
+### F9 Escritorio (`2fc4a25`)
+Evento protagonista + estado narrado · 4 stats DC (Registrados/Ya
+llegaron/Sesiones hoy/**Requieren accion con ACCESOS DIRECTOS por
+fuente** — decision Kamilo: el numero solo era ambiguo; rojo >0) ·
+5 tareas de intencion. SIN card Mission Control (decision Kamilo:
+muchas sesiones, vive en Agenda). Mueren widgets stock Filament.
+
+### F10 Panel Modulos (a falta SOLO de F10.6 decision Paginas)
+1. **F10.1 catalogo canon + migracion** (`3b4ec91`): ModuleCatalog (12
+   keys, ubicaciones FIJAS por superficie, saltos admin) + comando
+   `modules:migrate-catalog` idempotente. patrocinadores→sponsors ·
+   leads→scanner · leaderboard+passport→desafio · chat→live · fotos
+   muere. Templates SOLO renames (el dry cazo: feria no gana speakers
+   — protegido por test). Wizard + seeder re-basados. Compat Expo:
+   'desafio' en los 2 gates HUD (`82d930e`).
+2. **F10.2-5 el panel** (`706173f`): /admin/modulos pagina pura split
+   lista+preview vivo (demo v6.2): drag x-sortable, switch ink, fila
+   expandida (Quien lo ve / Limitar a grupos con tags reales / Donde
+   vive / salto Administrar). Preview webapp+telefono re-renderiza con
+   cada mutacion. **Invalidacion instantanea: version bump del cache
+   /modules** (claves por rol/presencia/tags no enumerables) +
+   broadcast socket. ModuleResource CRUD muerto, Escritorio re-apuntado.
+3. **Enforcement minimo webapp** (`7f22593`, aprobado Kamilo): el rail
+   OCULTA modulos apagados (lib/modules.ts fail-open → SpatialShell →
+   SidebarPill; distinto de available:false='proximamente'). RT ya
+   cerraba: 'modules' estaba en KNOWN_ENTITIES → router.refresh().
+   **QA end-to-end verificado: toggle Speakers en el panel → el mic
+   desaparece del rail en ~2s sin recargar.**
+
+### GOTCHA DEV NUEVO (`4788414`)
+**`localhost` en Windows resuelve ::1 (IPv6) y el socket escucha solo
+IPv4** → los broadcast de InvalidationService morian en cURL timeout
+SILENCIOSO (fire-and-forget). Default y .env ahora `127.0.0.1:3001`.
+Si "el RT no llega" en dev: revisar laravel.log por estos warnings.
+
+### PROXIMA SESION
+**F10.6**: Kamilo decide Paginas CON el panel en la mano (modulo
+colocable o demolicion). Luego **F11 wizard v2** y F12 cierre.
+Servers dev quedaron ARRIBA: webapp :3000, socket :3001 (matar si
+zombies). Expo `82d930e` sin push (cambios de Kamilo en el repo).
+
+---
+
 ## SESION 2026-07-19 TARDE 3 (Fable) — INT.11b + INT.12 + INT.13 CERRADOS (42/66). F-INT queda a UN item (INT.14 QA integral)
 
 **Backend `feature/magic-link-auth` PUSHEADO**: `27647e2` INT.11b ·
