@@ -196,7 +196,11 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       ejecutan JS) → wrap() resuelve header server-side (logo o nombre en
       texto) · muestras localizadas por tab (wire:key preview) · titulo
       Envío (SMTP) · catalogo sin breadcrumb. Tests 13/13. Falta solo
-      403 grupo Sistema con admin normal (no probado en vivo)
+      403 grupo Sistema con admin normal (no probado en vivo).
+      **INT.9c** (`5aabb86`): imagenes en el cuerpo (attachFiles →
+      public disk email-images/, URL absoluta APP_URL/storage — el
+      correo se lee fuera del dominio) + .body img max-width movil.
+      Upload real verificado en vivo
 - [ ] INT.10 En vivo (chat/Q&A moderacion comoda)
 - [ ] INT.11 Encuestas (builder de preguntas claro)
 - [ ] INT.12 Salas (+ tótems con su QR visible)

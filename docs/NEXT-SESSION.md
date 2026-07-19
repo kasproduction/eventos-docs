@@ -42,8 +42,13 @@ panel preview, Alpine conservaba el x-data inicial), titulo "Envío
 (SMTP)", catalogo sin breadcrumb redundante. Tests 13/13. Unico hueco:
 403 del grupo Sistema con admin normal (requiere login no-super-admin).
 
-**Decision pendiente Kamilo**: imagenes personalizadas dentro del cuerpo
-del correo (RichEditor attachFiles) — ofrecido, sin respuesta aun.
+**INT.9c HECHO (`5aabb86`, decision Kamilo)**: imagenes en el cuerpo del
+correo — boton de imagen en el RichEditor (attachFiles), sube a public
+disk `email-images/` y Trix inserta URL ABSOLUTA (APP_URL/storage;
+obligatorio: el correo se lee fuera del dominio). `.body img` con
+max-width 100% en el layout. Upload real verificado en vivo (editor +
+preview). OJO deploy: en produccion APP_URL debe ser el dominio real o
+las imagenes de correos viejos apuntaran al dominio anterior.
 
 Sigue **INT.10 En vivo** (moderacion chat/Q&A).
 
