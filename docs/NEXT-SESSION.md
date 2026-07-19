@@ -6,6 +6,79 @@
 
 ---
 
+## SESION 2026-07-19 TARDE 3 (Fable) — INT.11b + INT.12 + INT.13 CERRADOS (42/66). F-INT queda a UN item (INT.14 QA integral)
+
+**Backend `feature/magic-link-auth` PUSHEADO**: `27647e2` INT.11b ·
+`fe36c45`+`439f8f7` INT.12 · `4cd5ff9` INT.13 · `be4af06` fix MC.
+QA vivo de TODO via extension Chrome (Claude manejo el browser).
+
+### INT.11b Encuestas como LISTA (`27647e2`)
+- `PostEventSurveyResource` → **`EventSurveyResource` slug /encuestas**.
+  Lista: post-evento SIEMPRE primera (badge, se sigue sembrando de
+  oficio) + generales scope=event debajo. Columnas titulo/tipo/estado/
+  preguntas/respuestas (personas distintas).
+- Activar/Cerrar POR FILA con copy por scope (la post-evento conserva
+  "se activa sola al Finalizado"). **Sin eliminar — solo cerrar
+  (decision Kamilo)**. Nueva encuesta = modal solo titulo → borrador
+  event vacio → builder (que quedo intacto de INT.11).
+- QA ciclo completo en vivo; encuestas de prueba borradas de BD
+  (una mia + "Prueba" de Kamilo, pedida por el). Tests Poll 29/29.
+
+### INT.12 Salones (`fe36c45` + renombre `439f8f7`)
+- **Nombres finales Kamilo: "Salones" (slug /admin/salones) y
+  "kioskos"** (antes Salas/totems). Entrada directa, muere el cluster
+  de 2 tabs y RoomTotemResource con su Select generico.
+- Lista: Salon/Capacidad/**Ocupacion ahora**/Puertas ("X de Y en
+  linea" heartbeat 30s). Salon por dentro: form chico + kioskos
+  tabla+modal; eliminar advierte sesiones que quedan sin salon +
+  movimientos que se borran (FKs reales).
+- **"Conectar tablet"**: modal QR grande (SVG server-side,
+  `bacon/bacon-qr-code` NUEVA dep composer — instalar con
+  `--ignore-platform-req=ext-pcntl --ignore-platform-req=ext-intl
+  --ignore-platform-req=ext-posix` en Windows) de la URL completa del
+  kiosko. **`KIOSK_URL` nuevo en config/services** (default dev
+  localhost:5173; anotado en .env.production.example — OJO deploy).
+- Config muerta FUERA de UI (BD intacta, aprobado): checkin_enabled
+  del salon, type entrada/salida/bidireccional y ip_local del kiosko
+  (cero consumidores — el servicio decide checkin/checkout por estado).
+- **GOTCHA NUEVO: `navigator.clipboard` NO EXISTE en HTTP no-localhost**
+  (eventos-backend.test) — fallback textarea+execCommand en el blade.
+- QA end-to-end REAL: QR → kiosko abre autenticado (ONLINE, 54
+  cached) → heartbeat enciende "En linea" en el admin. La duda de
+  Kamilo "no abre" era el kiosko sin correr (pnpm dev en
+  eventos-kiosko). Tests RoomCheckin 23/23.
+
+### INT.13 standalone (`4cd5ff9`) + badges rojos + fix MC (`be4af06`)
+- **Badges sidebar TODOS rojos patron Social (decision Kamilo)**:
+  GoldenTicket/SessionRating/Soporte ganan getNavigationBadgeColor.
+- Speakers: fotos circulares + cargo·empresa, crear→edit (asignar
+  sesiones), eliminar advierte sesiones. Documentos: **mime/size AUTO
+  del archivo** (ImageUploadField::fileField gana onUpload callback),
+  tipo/tamano humanos, drag. Paginas: fuera icon/iframe_height/
+  fullscreen (muertos), chips, roles humanos. Soporte: interior
+  conversacion, abrir=Leida, Marcar resuelta siempre, titulos es.
+- **Fix MC**: [object Object] como ubicacion — `$session->room` es la
+  RELACION EventRoom desde el sistema de salas; el monitor inyecta
+  ahora `room?->name ?? location`. Verificado en vivo sesion 154.
+- Duplicado "Informacion del recinto" borrado de BD (id 2).
+- Tests Document/CustomPage/Support/Speaker 22/22.
+
+### DECISION ABIERTA — Paginas no tiene acceso real en las apps
+Verificado a fondo: el Expo solo tiene el DETALLE `pages/[id]` (nadie
+lo lista ni navega ahi), la webapp no tiene el modulo, y Anuncios no
+ofrece "pagina" como destino. Un organizador puede crear su iframe
+personalizado y ningun asistente lo encuentra. Caminos propuestos a
+Kamilo (sin decidir): (a) F10 panel Modulos como lugar natural,
+(b) destino "Pagina" en Anuncios (el mas corto), (c) listado en apps.
+Mientras: Paginas sigue VISIBLE en el nav del admin.
+
+### PROXIMA SESION
+**INT.14 QA integral de interiores** (ultimo item F-INT) → F9
+dashboard → F10 Modulos (demo v6.2 aprobado) → F11 wizard. El kiosko
+dev quedo corriendo en background esa sesion (matar si zombie).
+
+---
+
 ## SESION 2026-07-19 NOCHE 2 (Fable) — INT.9 Emails rescatado y cerrado
 
 La sesion que hizo INT.9 se cerro ANTES de commitear — el codigo quedo

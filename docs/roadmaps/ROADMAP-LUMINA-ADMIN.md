@@ -99,7 +99,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       final con Staff y permisos + Limites de uso
 - [ ] F8.2 QA + commit
 
-## F-INT — Interiores por feature — 3/16
+## F-INT — Interiores por feature — 16/17
 
 > Los clusters ordenaron las PUERTAS; esta fase rediseña lo de ADENTRO:
 > forms genericos de Filament → interiores DaVinci por feature (secciones con
@@ -220,15 +220,32 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       respuestas advierte). Header Activar/Cerrar + estado narrado.
       Fuera Exportar CSV (DC reporta) y titulo "Editar Live Poll".
       QA vivo con 5 preguntas reales. Tests Poll 29/29
-- [ ] **INT.11b (hallazgo Kamilo al cierre — PRIMERA tarea)**: el
-      singleton quedo corto. Existen encuestas GENERALES scope='event'
-      (webapp /encuestas lista event+post_event en plural) y su unico
-      creador era LivePollResource (muerto en INT.10). Rehacer:
-      Encuestas = LISTA (generales + post-evento especial) con
-      Activar/Cerrar por encuesta + crear scope event; cada una reusa
-      el builder tabla+modal ya construido
-- [ ] INT.12 Salas (+ tótems con su QR visible)
-- [ ] INT.13 Standalone: Speakers · Documentos · Páginas · Soporte
+- [x] INT.11b CERRADO 2026-07-19 (commit `27647e2`): Encuestas = LISTA
+      (post-evento especial siempre primera + generales scope=event con
+      crear por modal titulo → builder). Activar/Cerrar por fila con
+      copy por scope. Sin eliminar — solo cerrar (decision Kamilo).
+      Resource renombrado EventSurveyResource slug /encuestas. QA vivo
+      ciclo completo + tests Poll 29/29
+- [x] INT.12 Salones CERRADO 2026-07-19 (commits `fe36c45` + `439f8f7`
+      renombre Salones/kioskos): entrada directa, salon contiene sus
+      kioskos (tabla+modal), "Conectar tablet" = QR de la URL del
+      kiosko (bacon-qr-code SVG + KIOSK_URL en services). Config
+      muerta fuera de UI: checkin_enabled salon, type/ip_local kiosko.
+      Fix navigator.clipboard inexistente en HTTP no-localhost
+      (fallback execCommand). QA end-to-end: QR → kiosko ONLINE →
+      heartbeat enciende "En linea" en admin. Tests RoomCheckin 23/23
+- [x] INT.13 standalone CERRADO 2026-07-19 (commit `4cd5ff9`):
+      Speakers (fotos circulares, crear→edit, eliminar advierte
+      sesiones) · Documentos (mime/size AUTO del archivo — mueren los
+      campos manuales; tipo/tamano humanos; drag) · Paginas (fuera
+      icon/iframe_height/fullscreen sin consumidores; chips; HALLAZGO:
+      ninguna superficie lista las paginas — acceso real pendiente:
+      F10 Modulos / destino Anuncios / listado apps) · Soporte
+      (conversacion, auto-Leida al abrir, Marcar resuelta, es).
+      Badges sidebar TODOS rojos patron Social (decision Kamilo).
+      + fix MC `be4af06`: [object Object] en ubicacion (session->room
+      es relacion EventRoom; ahora room?->name ?? location).
+      Tests 22/22
 - [ ] INT.14 QA integral de interiores + commit
 
 ## F9 — Dashboard "¿Que quieres hacer?" — 0/4
@@ -268,7 +285,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 39/66 (F-NAV extra cerrada fuera de numeracion)
+## TOTAL: 42/66 (F-NAV extra cerrada fuera de numeracion)
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature
