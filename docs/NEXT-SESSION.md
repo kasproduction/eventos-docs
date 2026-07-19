@@ -6,6 +6,78 @@
 
 ---
 
+## SESION 2026-07-19 TARDE/NOCHE (Fable) — INT.3→INT.8 + White Chrome total en UNA jornada. Kamilo AUSENTE UNA SEMANA
+
+**Jornada maratonica #2 del admin. TODO commiteado y PUSHEADO** (backend
+`feature/magic-link-auth`: `0c14668` INT.3 · `7407ff6` INT.4 · `0b00346`
+INT.5 · `82a3461` `461ba79` `2f9103c` INT.6/6b · `ecc41d7` `511cdde`
+INT.7/7b · `8891dbe` `7e5fad3` INT.8/8b · fixes `e44e5d5` `e2fbbbc`).
+Roadmap: **30/66 → 36/66**. QA vivo Kamilo pieza por pieza via extension
+Chrome. Detalle completo en memoria `project_lumina_admin_state` +
+patrones/gotchas en `project_lumina_int_patterns`.
+
+### Que se cerro (titulares)
+
+1. **INT.3 Entrada**: Registro entrada directa + card viva "La puerta hoy";
+   Campos con "Donde aparece" (espejo inverso) + "Mostrar solo si…"
+   humanizado + estado vacio en Branding→Formularios con link; Codigos por
+   modales + "Ver usos" salta a Asistentes filtrado.
+2. **INT.4 Asistentes**: perfil digno (persona + estado + acceso + acciones
+   auditadas); tags chips+popup; DOMINIOS: admin* solo en Staff y permisos,
+   vendedor via invitacion stand; bugs de auditoria cerrados; fix global del
+   falso "cambios sin guardar" al guardar.
+3. **INT.5 Sponsors**: marca/stand operativo, equipo real con quitar
+   (espejo removeMember+socket), trivia con respuesta como Select,
+   "Ajustes de equipos" modal (mudado de Branding).
+4. **INT.6 Social**: 2 ajustes fusionados + card "El social hoy" + badges
+   ROJOS #FF3B30 de moderacion pendiente (sidebar suma, tabs por separado).
+5. **INT.7 Gamificacion**: absorbe Pasaporte y Concurso de fotos (mudado de
+   Social, decision Kamilo); **Acciones y puntos = grid de cards + modal
+   instantaneo** (diseno Kamilo); Golden Tickets EventContext real + Motivo
+   Select+Otro; catalogo de acciones FIJO (cableadas a triggers — NO se
+   crean nuevas); Silent Disco toggle eliminado (config muerta; el feature
+   es de Agenda via silent_disco_group_id).
+6. **INT.8 Anuncios**: composer con "Lleva a" (action_url expuesto, destinos
+   eventos:// que las apps parsean) + preview en vivo de la card; push
+   unificada; Recordatorios entrada directa + defaults del job.
+7. **White Chrome TOTAL (decision Kamilo)**: violeta muerto como accent
+   (solo card MC), primary Zinc, activos pill de tinta, tablas sin neon
+   global (solo rojo destructivo), Lux legible (escalera texto + hairlines +
+   gray palette), grupos sidebar Jakarta sentence-case, hover fila solido,
+   hover tab activa arreglado.
+
+### GOTCHA TRANSVERSAL para INT.9-13 (revisar de oficio)
+
+**Hidratacion de singletons MIENTE**: config JSON nunca guardada → toggles
+false cuando el motor usa defaults activos; un Guardar apaga el feature en
+silencio. Cazado 3 veces (Onboarding, gamification_config, reminder_config).
+Fix: sembrar defaults reales del motor en mutateFormDataBeforeFill.
+
+### Leccion de proceso (Kamilo lo reclamo — no repetir)
+
+Silent Disco: explique el hallazgo y CODEE la eliminacion en el mismo
+mensaje sin esperar ok. Regla dura reafirmada: hallazgo → proponer →
+ESPERAR aprobacion → codear, aunque el cambio parezca obvio.
+
+### PROXIMA SESION
+
+**INT.9 Emails** (editor de plantillas digno) → INT.10 En vivo (moderacion
+chat/Q&A comoda) → INT.11 Encuestas (builder claro) → INT.12 Salas (+ QR de
+totems visible) → INT.13 standalone (Speakers/Documentos/Paginas/Soporte).
+Despues F9 dashboard → F10 Modulos (demo v6.2 aprobado) → F11 wizard.
+
+**Decisiones Kamilo pendientes**: Highlights→"Destacados" · "Otorgar puntos
+manuales" (motor lo soporta; ofrecido, falta decidir donde vive) · si el
+toggle de Silent Disco se queria de vuelta (eliminado por config muerta).
+
+**Anotados**: humanizar silent_disco_group_id en form de sesion (pase
+Agenda futuro) · barrido visual Kamilo de 3-4 secciones al volver.
+
+**Paralelos vivos**: QA presencial webapp (device M.2-M.8 + Fase C) ·
+DEPLOY DEMO 0/6 · LANDING + widget registro · Event Pulse 2 pendientes.
+
+---
+
 ## SESION 2026-07-19 (Fable) — INT.2b CERRADO + Recorrido eliminado con auditoria completa (cierre tras crash)
 
 **La sesion de la noche del 18 crasheo DESPUES del guardar documentado y avanzo

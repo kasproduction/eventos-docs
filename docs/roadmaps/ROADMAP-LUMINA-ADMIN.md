@@ -138,12 +138,49 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       (`1c348f8` Bienvenida + `7b3cd13` Login/Foto/Intereses/Final) + fix
       hidratacion toggles con defaults reales de la app (`c53fb5c`, incl.
       reparacion de 10 falses accidentales en BD dev que el preview destapo)
-- [ ] INT.3 Entrada (registro + campos + codigos)
-- [ ] INT.4 Asistentes (perfil del asistente digno, tabs datos/actividad)
-- [ ] INT.5 Sponsors (+ mover seccion Equipo de stands desde Branding)
-- [ ] INT.6 Social (fusionar los 2 forms de ajustes en uno)
-- [ ] INT.7 Gamificación (5 caras coherentes)
-- [ ] INT.8 Anuncios (composer de anuncio decente, no textarea cruda)
+- [x] INT.3 Entrada (`0c14668` 2026-07-19): Registro entrada directa +
+      Editorial 2+1 + card "La puerta hoy" en vivo · Campos Editorial 2+1 +
+      "Donde aparece" (espejo inverso onboarding) + "Mostrar solo si..."
+      humanizado + orden fuera del form · Codigos por modales + "Ver usos"
+      salta a Asistentes filtrado + banner cross-link. EXTRA mismo commit:
+      White Chrome sin violeta (primary Zinc, activos pill de tinta),
+      tablas sin neon global, Lux legible (escalera texto + gray 300-600),
+      grupos sidebar Jakarta sentence-case
+- [x] INT.4 Asistentes (`7407ff6` 2026-07-19): perfil digno Editorial 2+1
+      (header persona + datos de registro + rail Estado/Acceso/Acciones +
+      historial) · tags chips+popup patron speakers (persiste al instante) ·
+      DOMINIOS: admin* solo en Staff y permisos, Cambiar rol solo roles del
+      evento, vendedor via invitacion stand (equipo → INT.5), stand desde
+      Sponsors · bugs: rol sin auditoria, bulk sin audit log, Crear attendee
+      roto, falso "cambios sin guardar" al guardar (guard global + no
+      redirect en saves INT)
+- [x] INT.5 Sponsors (`0b00346` 2026-07-19): Editorial 2+1 (marca izq /
+      stand operativo rail) · trivia con toggle al mando + respuesta
+      correcta como Select (muere indice criptico) · repeaters colapsados
+      (sin scroll infinito) · Equipo del stand con miembros reales +
+      quitar (espejo removeMember: revoca acceso + socket) · MUDANZA:
+      "Ajustes de equipos" modal en lista Sponsors (sale de Branding) ·
+      tabla drag Ordenar/Listo + tiers sin neon. Tests 49/49
+- [x] INT.6 Social (`82a3461` 2026-07-19): ajustes FUSIONADOS en uno
+      (EventPhotoSettingsResource muere) con entrada directa + Editorial
+      2+1 + card viva "El social hoy" · tabs Publicaciones/Fotos/Ajustes ·
+      badges de moderacion pendiente en ROJO SOLIDO #FF3B30 (sidebar suma
+      posts+fotos, tabs por separado; invisible en 0). Tests 35/35
+- [x] INT.7 Gamificación (`ecc41d7` 2026-07-19): settings entrada directa
+      + Editorial 2+1 + card viva · ABSORBE Pasaporte (muere resource +
+      toggle duplicado) y Concurso de fotos (mudado desde Social — decision
+      Kamilo: competencia+premio = gamification; helper explica el Golden
+      Ticket) · Golden Tickets scoping EventContext real (muere workaround
+      session pre-F0 + filtro Evento + select en Otorgar) · Premios sin
+      rewards internos type=prize + drag orden · Silent Disco toggle
+      ELIMINADO (config muerta; el feature vive en silent_disco_group_id
+      de sesiones — PENDIENTE humanizar ese campo en pase Agenda).
+      Tests Rewards 9/9
+- [x] INT.8 Anuncios (`8891dbe` 2026-07-19): composer Editorial 2+1 con
+      preview en vivo de la card (dot dorado + CTA) · action_url expuesto
+      como "Lleva a" (Agenda/sesion/Speakers/premios/URL — round-trip
+      eventos:// que las apps parsean) · rail Publicacion narrada + boton
+      Publicar ahora en el edit · push unificada + tabla con Estado
 - [ ] INT.9 Emails (editor de plantillas digno)
 - [ ] INT.10 En vivo (chat/Q&A moderacion comoda)
 - [ ] INT.11 Encuestas (builder de preguntas claro)
@@ -188,7 +225,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 30/66 (F-NAV extra cerrada fuera de numeracion)
+## TOTAL: 36/66 (F-NAV extra cerrada fuera de numeracion)
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature
