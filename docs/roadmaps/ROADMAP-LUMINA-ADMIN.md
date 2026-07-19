@@ -123,8 +123,17 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       tab (8 sub-tabs por pantalla del recorrido, "Orden de steps" criptico →
       "Recorrido" arrastrable legible). + Modal Lumina de salida con cambios
       sin guardar (global, no confirm() nativo). QA vivo browser por Claude.
-- [ ] INT.2b Hermanos de Identidad: Slides del login + Encuesta de intereses
-      (candidatos a absorberse igual) · FAQ / Highlights / Recap (pase ligero).
+- [x] INT.2b Hermanos de Identidad — CERRADO 2026-07-18/19 (commits `361a3ac`
+      `ecd9539` `b8cbeb8` `0f9da3d` `27f235b`): Encuesta de intereses ABSORBIDA
+      en Onboarding (repeater de opciones + toggle survey.enabled,
+      OnboardingSurveyOptionResource muere) · Slides del login pase INT
+      (rechazo a absorberlo como repeater en Branding) · FAQ / Highlights /
+      Recap pase ligero · **Recorrido ELIMINADO** (decision Kamilo): el orden
+      natural gobierna y el API SINTETIZA step_order con los steps vivos
+      (foto enabled / forms con campos / survey viva; sentinel `none`) — apps
+      instaladas saltan lo apagado SIN release del Expo; auditoria cazo el
+      hueco (survey apagada dejaba pantalla vacia con minimo 3 imposible),
+      +6 tests y flip verificado en vivo contra el Summit.
       NOTA: previews de TODAS las pantallas del onboarding YA CERRADOS
       (`1c348f8` Bienvenida + `7b3cd13` Login/Foto/Intereses/Final) + fix
       hidratacion toggles con defaults reales de la app (`c53fb5c`, incl.
@@ -179,7 +188,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 29/66 (F-NAV extra cerrada fuera de numeracion)
+## TOTAL: 30/66 (F-NAV extra cerrada fuera de numeracion)
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature

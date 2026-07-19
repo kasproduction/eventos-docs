@@ -6,6 +6,55 @@
 
 ---
 
+## SESION 2026-07-19 (Fable) — INT.2b CERRADO + Recorrido eliminado con auditoria completa (cierre tras crash)
+
+**La sesion de la noche del 18 crasheo DESPUES del guardar documentado y avanzo
+INT.2b entero sin registrar. Esta sesion reconstruyo, audito y cerro. TODO
+commiteado y PUSHEADO** (backend `361a3ac` `ecd9539` `b8cbeb8` `0f9da3d`
+`27f235b` en feature/magic-link-auth). Roadmap: **30/66**.
+
+### Que dejo la sesion crasheada (recuperado por commits, nada se perdio)
+
+1. **Encuesta de intereses ABSORBIDA en Onboarding** (`361a3ac`): repeater de
+   opciones (emoji+texto+activa+drag) + toggle survey.enabled espejo del step
+   Foto; OnboardingSurveyOptionResource muere; preview con chips reales.
+2. **Slides del login pase INT** (`ecd9539`) — decision Kamilo: NO absorberlo
+   como repeater en Branding, queda resource propio con lenguaje INT.
+3. **FAQ / Highlights / Recap pase ligero** (`b8cbeb8`).
+4. **Recorrido ELIMINADO** (`0f9da3d`): el sub-tab solo ordenaba lo del medio
+   y era footgun (form nuevo no aparecia hasta re-sincronizar step_order).
+
+### Que hizo esta sesion — auditoria completa pedida por Kamilo ("evitar errores")
+
+- **Hueco cazado**: la rama natural del Expo (`buildRegisterSteps`) empuja
+  `survey` INCONDICIONAL — con el toggle apagado el backend manda survey null
+  pero el asistente caia en "¿Que te interesa?" con 0 chips y minimo 3
+  imposible (semi-bloqueo). El "viceversa" (intereses off → salta) NO existia.
+- **Fix (`27f235b`, backend-only, sin release del Expo)**: resolveStepsConfig
+  SINTETIZA `step_order` con los steps vivos — photo (enabled), forms (solo
+  con >=1 campo resuelto), survey (toggle+pregunta+>=1 opcion activa) — y la
+  rama "admin order" del app instalado lo consume tal cual. **Sentinel
+  `['none']` si todo queda apagado** (lista vacia caia de vuelta a la rama
+  natural). Las Edit pages limpian el step_order viejo de BD al guardar.
+- **Huerfanos limpiados**: copy "Recorrido" (resource x3 + blade preview),
+  step_order en 2 seeders y en el deep-merge de ambas Edit pages. Webapp y
+  kiosko verificados: cero referencias.
+- **Verificacion**: 6 tests nuevos (OnboardingTest 10/10) + ThemeTest 13/13 +
+  flip en vivo contra el Summit en ambos sentidos (off → `["photo"]` +
+  survey null; on → `["photo","survey"]`).
+- Gotcha PowerShell: here-string `@'...'@` como arg de `git commit -m` se
+  rompe con comillas internas — usar `git commit -F archivo`.
+
+### PROXIMA SESION
+
+**INT.3 Entrada** (registro + campos + codigos, con el estado vacio linkeado
+desde "Campos que llena el asistente" + espejo inverso) → INT.4 Asistentes →
+INT.5 Sponsors (mudar "Equipo de stands"). La cola completa y paralelos siguen
+en la seccion de la parte 3 de abajo (sigue vigente). Decision Kamilo
+pendiente: Highlights → "Destacados".
+
+---
+
 ## SESION 2026-07-18 PARTE 3 (Fable) — INT.1b + INT.2 nucleo CERRADOS: Branding por superficie + previews onboarding + modal salida
 
 **Continuacion de la misma jornada. TODO commiteado y PUSHEADO** (backend
