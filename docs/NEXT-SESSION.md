@@ -102,7 +102,28 @@ en cada sesion de Agenda.
   5 preguntas reales del Summit, modal editar con chips y opciones.
   Tests Poll 29/29 (API intacta).
 
-Sigue **INT.12 Salas** (+ totems con su QR visible).
+### HALLAZGO DE CIERRE (Kamilo, antes de dormir) — INT.11b OBLIGATORIO PRIMERO
+
+El singleton de INT.11 esta INCOMPLETO. Panorama real de encuestas
+(verificado en codigo):
+- scope `session`: en vivo por sesion — MC las crea (scope:'session'
+  hardcoded en mission-control/app.js:774). OK muertas del admin.
+- scope `event`: **encuestas GENERALES del evento, sin sesion, en
+  cualquier momento** — el modulo /encuestas de la webapp (SurveyDeck)
+  lista scope IN (event, post_event) EN PLURAL (PollController:257).
+- scope `post_event`: la de satisfaccion, observer la activa al
+  Finalizado.
+
+**HUECO**: LivePollResource (muerto en INT.10) era el UNICO creador de
+las scope='event'. Hoy no hay UI para crear encuestas generales.
+
+**INT.11b (primera tarea proxima sesion)**: Encuestas = LISTA de
+encuestas del evento (event + post_event, la post-evento marcada
+especial con su auto-activacion) con Activar/Cerrar POR encuesta +
+crear nueva (scope event). Cada encuesta por dentro reusa el builder ya
+construido (tabla ordenada + modal por pregunta — sigue valido).
+
+Despues si: **INT.12 Salas** (+ totems con su QR visible).
 
 ---
 

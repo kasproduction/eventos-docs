@@ -220,6 +220,13 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       respuestas advierte). Header Activar/Cerrar + estado narrado.
       Fuera Exportar CSV (DC reporta) y titulo "Editar Live Poll".
       QA vivo con 5 preguntas reales. Tests Poll 29/29
+- [ ] **INT.11b (hallazgo Kamilo al cierre — PRIMERA tarea)**: el
+      singleton quedo corto. Existen encuestas GENERALES scope='event'
+      (webapp /encuestas lista event+post_event en plural) y su unico
+      creador era LivePollResource (muerto en INT.10). Rehacer:
+      Encuestas = LISTA (generales + post-evento especial) con
+      Activar/Cerrar por encuesta + crear scope event; cada una reusa
+      el builder tabla+modal ya construido
 - [ ] INT.12 Salas (+ tótems con su QR visible)
 - [ ] INT.13 Standalone: Speakers · Documentos · Páginas · Soporte
 - [ ] INT.14 QA integral de interiores + commit
