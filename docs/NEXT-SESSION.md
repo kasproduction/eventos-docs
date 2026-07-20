@@ -47,11 +47,57 @@
    double-count comment) + vigencia BUG-111/127 → enforcement Expo +
    decision Paginas F10.6 → QA device → **DEPLOY DEMO**.
 
+### ADDENDUM (cierre) — FRENTE NUEVO: SEGURIDAD DEL STAFF (`74ab493`)
+
+Kamilo pregunto por los pendientes ("¿es grave?") y luego por seguridad
+("me asusta lo del doble factor"). Le di el panorama: lo que queda NO es
+comparable a webapp/Filament (eso era construir; esto es cerrar), y la lista
+se ve enorme porque `PENDIENTES.md` mezcla bloqueantes reales del demo con
+trabajo opcional y con una lista de deseos (seccion 9) que nunca estara
+"terminada". **Riesgo real identificado: desde el pivote no hay definicion de
+"listo"** — ofrecido armar esa raya en una proxima sesion.
+
+**Decision Kamilo: la seguridad se hace AHORA, sin cliente encima.** Y pidio
+**app autenticadora (TOTP)**, no OTP por correo.
+
+- **Hallazgo que desbloquea**: SEC-3.1 llevaba aplazado desde 2026-04-07
+  porque el diseño dependia de **WhatsApp Business API**. TOTP elimina esa
+  dependencia (sin WhatsApp, sin SMS, sin depender del correo). SEC-3.1/3.2
+  de `infra/FASE-SEGURIDAD.md` quedan **SUPERSEDED**.
+- **Ventana operativa nueva: `docs/roadmaps/ROADMAP-SEGURIDAD-STAFF.md` 0/26**
+  (S.0 fundacion · S.1 activacion · S.2 reto+enforcement · S.3 recuperacion ·
+  S.4 dispositivo confianza · S.5 sesiones activas · S.6 registro accesos ·
+  S.7 endurecimiento prod con el DEPLOY · S.8 cierre). ~2-3 sesiones.
+- **Decisiones cerradas (no re-preguntar)**: solo staff del admin (el
+  asistente sigue con magic link) · **obligatorio para TODO el staff** —
+  consecuencia aceptada: setup forzado en el siguiente ingreso de cada
+  persona, **Kamilo incluido** · recuperacion critica por esa obligatoriedad
+  (8 codigos + reset por otro super_admin auditado + guarda del ultimo
+  super_admin).
+- **Terreno verificado**: Filament 3.2 / Laravel 11.31 · `bacon/bacon-qr-code`
+  YA instalado (kioskos INT.12 — el QR no cuesta dep nueva) ·
+  `SESSION_DRIVER=redis` NO enumera sesiones por usuario => tabla propia
+  obligatoria en S.5 · lockout + socket rate limiting ya existen (SEC-3.3/3.4),
+  no se rehacen. Unica dep nueva prevista: `pragmarx/google2fa`.
+- **OJO: esto quedo SOLO DOCUMENTADO, cero codigo** (Kamilo lo confirmo
+  explicitamente al cierre). No hay dependencia instalada, ni columnas, ni
+  pantallas — el admin entra hoy igual que ayer.
+
 ### PROXIMA SESION
-Arrancar con los 2 fixes chicos del Expo (OJO: working tree de eventos-app
-tiene el WIP del recap — tocar SOLO useDataInvalidation.ts y useWall.ts,
-commit selectivo). Event Pulse queda 0/2 (cache moments.js v2 + decision
-hero). Servers quedaron ARRIBA al guardar: webapp :3000, socket :3001.
+
+**Arrancar por S.0 + S.1 del frente de seguridad** (el nucleo: dep + columnas
+cifradas + `TwoFactorService` con ventana de tolerancia + pantalla de
+activacion con QR y codigos de recuperacion). Al terminar eso ya se escanea
+con Google Authenticator.
+
+En cola detras: 2 fixes chicos del Expo (OJO: working tree de eventos-app
+tiene el WIP del recap — tocar SOLO `useDataInvalidation.ts` y `useWall.ts`,
+commit selectivo) · vigencia BUG-111/127 · enforcement Expo + decision
+Paginas F10.6 · QA device · **DEPLOY DEMO**. Event Pulse queda 0/2 (cache
+moments.js v2 + decision hero). Recap WIP: DE ULTIMO (decision Kamilo).
+Manual: EN PAUSA hasta pre-produccion, re-escribir piloto con tono natural.
+
+Servers dev quedaron ABAJO al cierre (webapp :3000 y socket :3001 matados).
 
 ---
 
