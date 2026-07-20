@@ -6,6 +6,55 @@
 
 ---
 
+## SESION 2026-07-19/20 (Fable) — Manual arrancado+pausado · PENDIENTES saneado · Event Pulse 5 bugs cerrados
+
+**Commits PUSHEADOS**: APP EVENTOS `2b5844d`+`d9ed1e9`+NEXT-SESSION · backend
+`f53d8c8` (feature/magic-link-auth) · eventos-socket `c9439a8`.
+
+### 1. KNOWLEDGE BASE / Manual — M0 fundacion cerrada, EN PAUSA (decision Kamilo)
+- `ROADMAP-MANUAL.md` **5/35**: inventario 27 paginas BLINDADO con barrido de
+  4 superficies por agentes (admin 40+ superficies, ~35 rutas webapp,
+  pantallas Expo por rol, kiosko 2 modos + MC ~12 capacidades + DC ~45
+  datasets) · sitio **Starlight compilando** en `manual/` (es, Pagefind) ·
+  piloto `modulos/encuestas.md` con procedencia.
+- **Feedback Kamilo al piloto (anotado en docs/manual/README.md): lenguaje
+  mas natural/humanizado, sin tecnicismos, "como hombre de 30 años"** —
+  re-escribir piloto ANTES de producir en masa. EN PAUSA hasta pre-produccion.
+- El barrido cazo 4 huecos de producto → anotados en PENDIENTES (rail
+  /encuestas, enforcement Expo detallado, LeadResource huerfano, entrada
+  /scanner-stand).
+
+### 2. Higiene documental (pedido Kamilo: "PENDIENTES solo pendientes")
+- PENDIENTES.md sin NADA hecho (webapp Fase 1, Lumina Admin, magic link →
+  COMPLETADO.md) · EventOS_Roadmap.md **v6.0** Estado rapido re-basado ·
+  stress 10K marcado DIFERIDO post-pivote.
+
+### 3. Event Pulse — 5 bugs del CLIENTE saneados + QA vivo via Chrome
+- Counter ratings live=F5 (total real en /ratings y /leads) · Charlas con
+  grupo "Sin salon" al final (decision: relajar filtro) · poll:closed
+  post_event al room del EVENTO (antes session:null) · **hallazgo QA:
+  sectionMap tenia slugs pre-F10.1 → el Pulse habia PERDIDO Leads y
+  Gamificacion** (re-baseado a sponsors/desafio).
+- QA vivo: rating 3→4 en vivo = F5 · Sin salon renderizado · room=event:1
+  en log socket · nav 8 secciones. Tests Pulse 20/20 + tsc limpio. Datos QA
+  borrados. Gotcha: Eloquent directo NO dispara invalidacion (vive en
+  controllers) — simular con `InvalidationService::broadcast`.
+
+### DECISIONES DE ORDEN (Kamilo, no re-preguntar)
+1. **Recap WIP del Expo: DE ULTIMO** ("es un estres").
+2. **Manual: al final, pre-produccion** (primero bugs/funcionalidad/deploy).
+3. Orden de ataque acordado: fixes chicos Expo (ENTITY_KEYS modules +
+   double-count comment) + vigencia BUG-111/127 → enforcement Expo +
+   decision Paginas F10.6 → QA device → **DEPLOY DEMO**.
+
+### PROXIMA SESION
+Arrancar con los 2 fixes chicos del Expo (OJO: working tree de eventos-app
+tiene el WIP del recap — tocar SOLO useDataInvalidation.ts y useWall.ts,
+commit selectivo). Event Pulse queda 0/2 (cache moments.js v2 + decision
+hero). Servers quedaron ARRIBA al guardar: webapp :3000, socket :3001.
+
+---
+
 ## SESION 2026-07-19 TARDE 3 (continuacion) — F9 + F10 CERRADOS (49/67): Escritorio + Panel Modulos COMPLETO con enforcement webapp
 
 **Maraton final de la jornada. Todo commiteado y PUSHEADO** (backend
