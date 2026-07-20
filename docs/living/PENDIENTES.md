@@ -18,8 +18,11 @@
 
 ### ⚠ WIP SIN COMMITEAR en el working tree de eventos-app (estado 2026-07-04)
 
+> **Decision Kamilo 2026-07-20: DE ULTIMO en la cola** (es un estres; no
+> bloquear el resto del saneamiento con esto). Sigue siendo obligatorio
+> resolverlo ANTES de cualquier sesion que toque el Expo a fondo.
 > Trabajo del recap a medio hacer, quedo en el working tree (NO commiteado
-> porque rompe typecheck). Retomar ANTES de cualquier otra sesion Expo:
+> porque rompe typecheck):
 >
 > - **Untracked:** `app/(app)/recap/`, `components/recap/`, `hooks/useRecap.ts`, `lib/recapColors.ts`
 > - **Modificados:** `hooks/useAgenda.ts`, `useNetworking.ts`, `usePhotos.ts`, `useSponsors.ts`, `lib/api.ts`
@@ -38,24 +41,6 @@
       (chat/Q&A/polls/emojis/pinned) + wall + encuestas + log server `conns=1`
 - Los fixes de codigo (ENTITY_KEYS `modules`, double-count comment) estan en
   **"Backlog Expo"** al final de este doc — sin duplicar aca.
-
-### Event Pulse — bugs del CLIENTE destapados en QA vivo 2026-07-04 (sesion dedicada ~1-2h) — 0/4
-
-> Los emits backend YA funcionan (GAP-C verificado: ratings/connections/leads/leaderboard
-> llegan al Pulse en <2s — server log con 9 ratings reales). Lo roto es el refresh
-> client-side de `public/event-pulse/` (construido en abril, validado solo con simulador).
-
-- [ ] **Formula inconsistente del counter ratings**: `socket.js refreshStat` suma counts
-      del top-6 sesiones del endpoint `/ratings`, pero el bootstrap (F5) usa
-      `stats.ratings` (total real). Live y F5 dan numeros distintos — unificar a total
-      (endpoint deberia exponer total, o refreshStat usar bootstrap parcial)
-- [ ] **Charlas vacia**: `PulseController:102` exige `whereNotNull('room_id')` — sesiones
-      sin sala no aparecen ("no hay sesiones programadas" con el LiveHubDemoSeeder).
-      Decidir: relajar filtro o exigir salas en eventos reales (y que el seeder las asigne)
-- [ ] Verificar mismo patron de formula en counters leads/connections (refreshStat
-      calcula desde endpoints parciales)
-- [ ] Menor: `poll:closed` emite a `room=session:null` cuando el poll scope=session
-      no tiene session_id (visto en server log — payload del PollController)
 
 ### Recap compartible — post-evento (~26h, 3-4 dias) — 0/75
 
@@ -336,10 +321,12 @@ toca revisar la autenticacion aca como funciona y tener claro los token cuando e
 - [ ] **`/scanner-stand` webapp sin entrada de navegacion localizada** —
       verificar que el flujo vendedor llega (posible boton no cazado por grep)
 
-### Event Pulse cliente — 0/4 (display propio del backend, NO webapp)
-> EP esta COMPLETO (ver `project_event_pulse_complete` en memoria); solo queda: formula counter
-> ratings live≠F5 · Charlas vacia (room_id PulseController:102) · verificar leads/connections ·
-> poll:closed room null · + diagnosticar cache del `moments.js` v2 + decision cada-interaccion-hero.
+### Event Pulse cliente — 0/2 (display propio del backend, NO webapp)
+> Los 5 bugs del cliente quedaron saneados y verificados en vivo 2026-07-20
+> (backend `f53d8c8` + socket `c9439a8`). Solo queda:
+- [ ] Diagnosticar cache del `moments.js` v2 (motor cola fresca+decaimiento
+      aplicado 2026-07-09 pero NO verificado — cache navegador)
+- [ ] Decision cada-interaccion-hero (idea en `project_event_pulse_idea`)
 
 ### Backlog Expo (sesion Expo futura)
 - [ ] Borrar `banners.tsx` + `BannerCarousel` + `bannersApi` del Expo (feature legacy muerta)
