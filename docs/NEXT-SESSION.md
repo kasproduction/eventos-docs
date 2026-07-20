@@ -71,12 +71,48 @@ el admin. Cada pregunta del wizard tiene su casa de edicion.
    horas" + 12 modulos + siembras verificadas → evento QA borrado
    (middleware re-resuelve contexto al Summit).
 
+### ADDENDUM 2 misma sesion — Validacion es + pase SISTEMA (`bd232fc` + `20f191d`)
+
+**Bugs cazados por Kamilo probando el wizard:**
+1. **Validacion en spanglish**: APP_LOCALE=es SIN carpeta lang/ → "The
+   nombre del evento field is required." Fix: laravel-lang/common +
+   lang:add es — validacion en español para TODO el admin.
+2. **ColorPicker rompia el morph del wizard** (JS lazy evaluado antes
+   de cargar → ReferenceError que ABORTABA el morph y los mensajes ni
+   se pintaban, intermitente). Fix: inputs de color NATIVOS en el
+   wizard. GOTCHA para el canon: ColorPicker de Filament dentro de
+   contenido que aparece por morph = bomba; en paginas completas ok.
+
+**Pase Sistema (pregunta Kamilo: ¿donde se crean los roles?):**
+- **App\Support\Roles**: fuente UNICA (estaban regados como strings
+  repetidos en 12 archivos — 16 reemplazos). DOS sistemas: Spatie
+  (staff plataforma; se crean SOLO en RoleSeeder — catalogo fijo, 8
+  roles/13 permisos, sin UI de crear por diseño) y attendees.role
+  (gente del evento, INT.4). OJO gotcha repetido: Git Bash se COMIO
+  los backslashes del replace (\App\Support\Roles → AppSupportRoles,
+  php -l NO lo caza) — reparado con node desde archivo.
+- **Staff y permisos digno**: "La persona" + "Que puede hacer", roles
+  CheckboxList con etiqueta humana + descripcion (muere "Rol Spatie"),
+  super_admin solo lo otorga otro super_admin, guard anti auto-borrado,
+  dirty-save.
+- **HUECO CERRADO — puerta al wizard**: no existia NINGUNA (nav oculto,
+  link de Branding muerto, switcher invisible con 1 evento). El
+  switcher ahora SIEMPRE visible + "+ Nuevo evento" (gate
+  manage-events). Aclarado: arquitectura = 1 plataforma por droplet,
+  N eventos adentro (no 1 evento por droplet).
+- **Limites de uso**: canon singleton (entrada directa + dirty-save).
+- Tests Checkin 64/64 tras el refactor de roles.
+- **Contador roadmap re-basado por checkbox real: 47/57** (el /66-67
+  viejo contaba fases sin checkbox; el nuevo se cuenta del doc).
+
 ### PROXIMA SESION
 **F10.6** (decision Paginas; recomendacion dada: pausa + backlog
-"modulo Paginas en apps ~1 sesion") → **F12 cierre** (+ los QA-commits
-formales de clusters F3-F8 que en la practica ya se QA-earon).
-Servers dev quedaron ARRIBA: webapp :3000, socket :3001 (matar si
-zombies). Expo `82d930e` sin push (cambios de Kamilo en el repo).
+"modulo Paginas en apps ~1 sesion") → **F12 cierre** (QA integral
+Kamilo Noir+Lux, superseded del roadmap viejo, guardar) + QA-commits
+formales de clusters. Webhooks quedo revisado (ya estaba en es, F8) —
+sin pase profundo. Servers dev quedaron ARRIBA: webapp :3000, socket
+:3001 (matar si zombies). Expo `82d930e` sin push (cambios de Kamilo
+en el repo).
 
 ---
 

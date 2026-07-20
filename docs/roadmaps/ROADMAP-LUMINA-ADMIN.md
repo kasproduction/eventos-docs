@@ -315,8 +315,8 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 
 ---
 
-## TOTAL: 47/67 (F-NAV extra cerrada fuera de numeracion; F10 gano el
-item de la decision Paginas). F-INT CERRADO — sigue F9 dashboard
+## TOTAL: 47/57 items del doc (contados por checkbox). Quedan: F10.6
+(decision Paginas) + QA-commits formales de clusters + F12 cierre
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature
