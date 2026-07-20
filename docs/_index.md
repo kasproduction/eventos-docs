@@ -31,7 +31,9 @@
 | [ROADMAP-LIVE-MOMENTS.md](roadmaps/ROADMAP-LIVE-MOMENTS.md) | Cerrado | Ruleta + Sorteo + Trivia |
 | [ROADMAP-LUX-V2.md](roadmaps/ROADMAP-LUX-V2.md) | Cerrado | Lux v2 The Gallery |
 | [ROADMAP-MISSION-CONTROL.md](roadmaps/ROADMAP-MISSION-CONTROL.md) | Cerrado | Mission Control v4 |
+| [ROADMAP-MANUAL.md](roadmaps/ROADMAP-MANUAL.md) | En pausa 5/35 | Knowledge base / manual del organizador (sitio Starlight en `manual/`) |
 | [ROADMAP-RECAP.md](roadmaps/ROADMAP-RECAP.md) | Implementado | Recap post-evento (validacion visual pendiente) |
+| [ROADMAP-SEGURIDAD-STAFF.md](roadmaps/ROADMAP-SEGURIDAD-STAFF.md) | **ACTIVO 0/26** | 2FA TOTP staff + sesiones + accesos (supersede SEC-3.1/3.2) |
 | [ROADMAP-UIUX-LANDING.md](roadmaps/ROADMAP-UIUX-LANDING.md) | Pendiente | Landing publica + UIUX |
 | [ROADMAP-WEBHOOKS.md](roadmaps/ROADMAP-WEBHOOKS.md) | Cerrado | Webhooks integracion partners |
 

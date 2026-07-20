@@ -135,14 +135,20 @@
 
 ---
 
-## 5. Seguridad pre-produccion
+## 5. Seguridad del staff — **FRENTE ACTIVO** (decision Kamilo 2026-07-20)
 
-> No bloquea demo pero si bloquea Bancolombia (enterprise = compliance).
-> Ref: `docs/FASE-SEGURIDAD.md`
-
-- [ ] SEC-3.1: 2FA OTP — codigo 6 digitos por email
-- [ ] SEC-3.2: Device fingerprinting — login nuevo fuerza 2FA
-- [ ] Session management — ver/cerrar dispositivos
+> "Prefiero tener todo lo de seguridad en regla y no esperar a tener cliente
+> encima con presion." Se hace AHORA, sin deal de por medio.
+>
+> **Ventana operativa: `docs/roadmaps/ROADMAP-SEGURIDAD-STAFF.md` (0/26)**
+> — 2FA con app autenticadora (TOTP) obligatorio para todo el staff del admin
+> + recuperacion + dispositivos de confianza + sesiones activas + registro de
+> accesos. ~2-3 sesiones.
+>
+> **Desbloqueo**: SEC-3.1 llevaba aplazado desde abril por depender de
+> WhatsApp Business API; TOTP elimina esa dependencia. El diseño SEC-3.1/3.2
+> de `infra/FASE-SEGURIDAD.md` queda SUPERSEDED por el roadmap nuevo.
+> Ya hecho y NO se rehace: lockout, socket rate limiting, FormRequests (~90%).
 
 ---
 

@@ -23,7 +23,7 @@ El detalle de cada cierre vive en COMPLETADO.md y los roadmaps historicos._
 | **Data Center** | ✅ 100% | SPA standalone analytics, 9 tabs, 44 exports CSV/XLSX, comparativa periodos, goals, scheduled, comparador A/B, multi-evento, tema Lux toggle, infra prod lista |
 | **Room Check-in** | ✅ 100% | Kiosk + Staff + Silent disco + attendance tracking |
 | **Webhooks** | ✅ 100% | 5 fases, 24 tests, integracion partners |
-| **Seguridad** | ✅ 90% | SEC-1/2/3/3b/6 + magic link auth completo. Pendiente: 2FA, device fingerprinting, session mgmt, infra (SEC-4/5) |
+| **Seguridad** | ✅ 90% · 🚧 **frente activo** | SEC-1/2/3/3b/6 + magic link + lockout + socket rate limiting completos. **2FA TOTP del staff en curso**: `ROADMAP-SEGURIDAD-STAFF.md` 0/26 (decision Kamilo 2026-07-20 — hacerlo sin presion de cliente; TOTP desbloquea el SEC-3.1 que dependia de WhatsApp API). Infra SEC-4/5 va con el DEPLOY |
 | **Onboarding DaVinci** | ✅ | 6 steps, configurable, campos unificados, depends_on avanzado |
 | **Moderacion** | ✅ | Ban RT, palabras bloqueadas, chat monitor, slow mode, pin Twitch |
 | **Optimistic UI** | ✅ Audit | 30 acciones auditadas, 10 con optimistic, haptics, retry API. Plan listo |
