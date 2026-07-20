@@ -135,6 +135,25 @@
 
 ---
 
+## 2.5 KNOWLEDGE BASE / Manual del organizador (decision Kamilo 2026-07-19)
+
+> "Falta un gran instructivo de todo — como crear un asistente, importar,
+> crear evento, como funcionan los modulos, el webhook, lo que se puede y
+> no hacer." NO se arranca ya; pegado al DEPLOY DEMO (el manual es parte
+> del demo comercial y escribirlo caza huecos — hoy destapo Paginas).
+
+- [ ] **Fuente unica Markdown** (repo, versionada): un doc por modulo con
+      esqueleto fijo — que es · como se configura (admin) · que ve el
+      asistente (app/webapp) · lo que se puede y NO · gotchas. El 80% se
+      escribe DESDE EL CODIGO con procedencia (triggers de emails,
+      catalogo acciones gamificacion, eventos+payloads de webhooks del
+      WebhookDispatchService, rate limits, enforcement de modulos).
+- [ ] Sitio estatico barato (Starlight/VitePress) para servirlo.
+- [ ] Link contextual "¿Como funciona?" en cada modulo del admin → su
+      pagina del manual.
+- [ ] Estimacion honesta: 2-3 sesiones para v1 (~20 modulos + admin +
+      wizard + roles/despliegue), con capturas del admin real.
+
 ## 3. Landing Web (registro publico)
 
 > Ultimo en orden porque el registro puede hacerse por CSV/import hasta tener landing.
