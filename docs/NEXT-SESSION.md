@@ -48,9 +48,33 @@ IPv4** → los broadcast de InvalidationService morian en cURL timeout
 SILENCIOSO (fire-and-forget). Default y .env ahora `127.0.0.1:3001`.
 Si "el RT no llega" en dev: revisar laravel.log por estos warnings.
 
+### ADDENDUM misma sesion — F11 Wizard v2 CERRADO (54/67, `6ad6b3f`)
+
+**Re-definicion Kamilo**: el wizard es el CARRIL RAPIDO — de cero a
+evento funcionando en 4 pasos (~12 preguntas); lo profundo se afina en
+el admin. Cada pregunta del wizard tiene su casa de edicion.
+
+1. **HUECO CERRADO (cazado por Kamilo)**: nombre/descripcion/zona
+   horaria del evento NO se podian editar en ningun lado post-creacion
+   → seccion "El evento" en Identidad → Lo esencial.
+2. **4 pasos**: Lo esencial / Marca basica (logo + accent con preview
+   panes REUSADO + keyvisual opcional; hero FUERA — defaults del
+   nombre) / Registro (2 preguntas + nota honesta) / Modulos (checklist
+   canon). Muere el paso Confirmar. Slug al SERVIDOR (race INT.1b);
+   organizacion invisible con 1 sola.
+3. **Nace funcionando**: modulos + Empresa/Cargo (canon seeder) +
+   reminder_config DEFAULTS explicitos. **Desemboca en el Escritorio
+   del evento nuevo** (EventContext se cambia solo).
+4. F11.4: organizer_name/logo ganan UI (tab Webapp, seccion El
+   organizador); banner_url fuera del fillable.
+5. QA end-to-end: evento creado de cero → Escritorio "Empieza en 4
+   horas" + 12 modulos + siembras verificadas → evento QA borrado
+   (middleware re-resuelve contexto al Summit).
+
 ### PROXIMA SESION
-**F10.6**: Kamilo decide Paginas CON el panel en la mano (modulo
-colocable o demolicion). Luego **F11 wizard v2** y F12 cierre.
+**F10.6** (decision Paginas; recomendacion dada: pausa + backlog
+"modulo Paginas en apps ~1 sesion") → **F12 cierre** (+ los QA-commits
+formales de clusters F3-F8 que en la practica ya se QA-earon).
 Servers dev quedaron ARRIBA: webapp :3000, socket :3001 (matar si
 zombies). Expo `82d930e` sin push (cambios de Kamilo en el repo).
 

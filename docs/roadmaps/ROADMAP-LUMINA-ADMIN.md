@@ -291,15 +291,21 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       + pantalla Expo, requiere release)
 - [x] F10.7 QA vivo incremental durante la construccion (patron INT.14) + commits
 
-## F11 — Wizard de creacion v2 — 0/5
+## F11 — Wizard de creacion v2 — 5/5 CERRADO (commit 6ad6b3f)
 
-- [ ] F11.1 Apariencia POR SUPERFICIE: Identidad → App movil (hero vertical,
-      preview) → Webapp (card 16:9 + organizador, preview)
-- [ ] F11.2 Paso Registro: siembra campos base + defaults recordatorios —
-      el evento nace FUNCIONANDO
-- [ ] F11.3 Paso Modulos usa el catalogo canon (componente F10)
-- [ ] F11.4 organizer_logo gana UI · banner_url muere (columna huerfana)
-- [ ] F11.5 QA crear evento de cero + commit
+- [x] F11.1 RE-DEFINIDO por Kamilo: wizard = CARRIL RAPIDO (4 pasos ~12
+      preguntas), lo profundo en el admin. Marca basica = logo+accent (preview
+      panes reusado)+keyvisual; hero FUERA (defaults del nombre, se compone en
+      Identidad). HUECO CERRADO: nombre/descripcion/timezone sin UI de edicion
+      en ningun lado → seccion El evento en Lo esencial
+- [x] F11.2 Registro 2 preguntas + siembra invisible: Empresa/Cargo (canon
+      seeder) + reminder_config DEFAULTS explicitos del job
+- [x] F11.3 Modulos checklist canon (keys F10.1)
+- [x] F11.4 organizer_name+logo en tab Webapp (seccion El organizador);
+      banner_url fuera del fillable. + slug al servidor (race INT.1b) + org
+      invisible con 1 sola + wizard desemboca en el Escritorio del evento nuevo
+- [x] F11.5 QA vivo end-to-end: evento de cero → Escritorio con 12 modulos +
+      siembras verificadas; evento QA borrado (middleware re-resuelve contexto)
 
 ## F12 — Cierre — 0/3
 
