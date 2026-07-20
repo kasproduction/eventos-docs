@@ -115,6 +115,16 @@ wizard vive en **Sistema → Eventos** (lista del despliegue + Nuevo
 evento + "Trabajar en este"). El multi-evento del codigo queda para el
 sandbox de ensayo y un futuro SaaS. + roles de Staff a 2 columnas.
 
+### ADDENDUM 4 — ultimo sobreviviente F0 (`4a87ab0`)
+Kamilo cazo que **Webhooks y API Keys pedian seleccionar el evento**:
+sin scoping de EventContext + Selects "Evento" (form y accion Simular).
+Alineados al canon (query scopeada, Hidden default, Simular con
+confirmacion). Confirmado ademas: **crear un segundo evento (sandbox)
+via wizard SI es posible** — Sistema → Eventos → Nuevo evento; con 2+
+eventos el switcher del topbar aparece solo (verificado en el QA de
+F11). El flag is_sandbox no tiene UI (se pone por BD/seed si se quiere
+la etiqueta y la prioridad de resolveDefault).
+
 ## FRENTE LUMINA ADMIN — CERRADO 2026-07-19 (decision Kamilo)
 
 **"¿Que falto? creo que nada — el QA se fue haciendo modulo por
