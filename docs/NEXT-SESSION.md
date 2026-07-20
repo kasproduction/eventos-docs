@@ -105,14 +105,38 @@ el admin. Cada pregunta del wizard tiene su casa de edicion.
 - **Contador roadmap re-basado por checkbox real: 47/57** (el /66-67
   viejo contaba fases sin checkbox; el nuevo se cuenta del doc).
 
-### PROXIMA SESION
-**F10.6** (decision Paginas; recomendacion dada: pausa + backlog
-"modulo Paginas en apps ~1 sesion") → **F12 cierre** (QA integral
-Kamilo Noir+Lux, superseded del roadmap viejo, guardar) + QA-commits
-formales de clusters. Webhooks quedo revisado (ya estaba en es, F8) —
-sin pase profundo. Servers dev quedaron ARRIBA: webapp :3000, socket
-:3001 (matar si zombies). Expo `82d930e` sin push (cambios de Kamilo
-en el repo).
+### ADDENDUM 3 — arquitectura de despliegue re-honrada (`c43547c` + `169dbbb`)
+
+**DECISION FIRME Kamilo (no re-preguntar): UN DROPLET POR EVENTO/
+CLIENTE** — aislamiento total (si cae un VPS no arrastra a otros
+clientes). El switcher del topbar VOLVIO a invisible con 1 evento (su
+decision original; mi "siempre visible" fue un desvio). La puerta al
+wizard vive en **Sistema → Eventos** (lista del despliegue + Nuevo
+evento + "Trabajar en este"). El multi-evento del codigo queda para el
+sandbox de ensayo y un futuro SaaS. + roles de Staff a 2 columnas.
+
+## FRENTE LUMINA ADMIN — CERRADO 2026-07-19 (decision Kamilo)
+
+**"¿Que falto? creo que nada — el QA se fue haciendo modulo por
+modulo."** Todos los items del roadmap resueltos (los QA-commits de
+clusters y el QA integral cierran por el QA incremental continuo).
+ROADMAP-LUMINA-ADMIN pasa a HISTORICO (cero checkboxes abiertos);
+ROADMAP-FILAMENT-PULIDO marcado SUPERSEDED. Paginas quedo como item de
+backlog en PENDIENTES.md (paridad superficies, junto al enforcement
+Expo pendiente). En una jornada larga se cerro: INT.11b-13 + Salones/
+kioskos QR + fix MC + F9 Escritorio + F10 Panel Modulos completo (con
+enforcement webapp RT verificado) + F11 Wizard v2 + validacion es +
+Roles canon + Staff digno + modelo de despliegue.
+
+### PROXIMA SESION — el admin ya no es el frente
+Frentes vivos (PENDIENTES.md / PENDIENTES-WEBAPP.md):
+1. **DEPLOY DEMO 0/6** (la prioridad estrategica post-pivote).
+2. QA presencial webapp en device (M.2-M.8 + Fase C).
+3. LANDING + widget de registro embebible.
+4. Paralelos: paridad superficies (enforcement Expo + Paginas),
+   Event Pulse 2 pendientes.
+Servers dev quedaron ABAJO (webapp/socket/kiosko matados al cierre).
+Expo `82d930e` sin push (repo con cambios de Kamilo).
 
 ---
 

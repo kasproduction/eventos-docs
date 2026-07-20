@@ -1,3 +1,7 @@
+> **SUPERSEDED 2026-07-19** — este roadmap quedo reemplazado por
+> ROADMAP-LUMINA-ADMIN.md, que se ejecuto COMPLETO y cerro el frente
+> (F0-F12). Se conserva solo como historico.
+
 # Roadmap Filament Pulido — Event Switcher + UX Enterprise
 
 > Plan para llevar el admin Filament de "funciona pero feo" a "production-ready enterprise".

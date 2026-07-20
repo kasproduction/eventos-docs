@@ -58,7 +58,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       Evaluaciones — valida el patron Cluster para todo lo demas
 - [x] F3.2 **Sponsors**: Patrocinadores · Equipo de stands (seccion movida desde
       Branding → PENDIENTE, va con F6.1 pulido) + **Leads fuera del nav** (hecho)
-- [ ] F3.3 QA vivo + commit (Speakers/Documentos/Paginas quedan solos, ya ok)
+- [x] F3.3 QA incremental pieza por pieza (decision Kamilo al cierre)
 
 ## F4 — Clusters PERSONAS — 2/3
 
@@ -66,13 +66,13 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 - [x] F4.2 **Entrada**: Registro · Campos del formulario · Codigos de acceso
       (ajuste Kamilo 2026-07-18: Onboarding/Slides login/Encuesta intereses son
       LAYOUT → movidos a Identidad)
-- [ ] F4.3 QA + commit
+- [x] F4.3 QA incremental (cierre)
 
 ## F5 — Clusters COMUNICACION — 2/3
 
 - [x] F5.1 **Anuncios**: Anuncios · Push programadas · Recordatorios
 - [x] F5.2 **Emails**: Plantillas · Historial · SMTP
-- [ ] F5.3 QA + commit
+- [x] F5.3 QA incremental (cierre)
 
 ## F6 — Clusters EXPERIENCIA — 3/4
 
@@ -83,7 +83,7 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       de ajustes; evaluar fusionar los 2 settings en un solo form)
 - [x] F6.3 **Gamificación**: Ajustes · Premios · Golden Tickets · Canjes ·
       Pasaporte (5 entradas → 1)
-- [ ] F6.4 QA + commit
+- [x] F6.4 QA incremental (cierre)
 
 ## F7 — Clusters EN VIVO — 4/5
 
@@ -91,13 +91,13 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 - [x] F7.2 **Encuestas**: En vivo · Post-evento
 - [x] F7.3 **Salas**: Salones · Totems
 - [x] F7.4 Soporte solo + links Event Pulse / Data Center ordenados
-- [ ] F7.5 QA + commit
+- [x] F7.5 QA incremental (cierre)
 
 ## F8 — SISTEMA — 1/2
 
 - [x] F8.1 **Webhooks**: Webhooks · API Keys · Logs (cluster) + grupo colapsado
       final con Staff y permisos + Limites de uso
-- [ ] F8.2 QA + commit
+- [x] F8.2 QA incremental (cierre)
 
 ## F-INT — Interiores por feature — 17/17 CERRADO
 
@@ -282,13 +282,9 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
       mic desaparece del rail en ~2s sin recargar. + fix dev 4788414:
       SOCKET_SERVER_URL default 127.0.0.1 (localhost=::1 en Windows,
       broadcasts morian en timeout silencioso)
-- [ ] F10.6 **DECISION Paginas (quedo EN PAUSA en INT.13, commit
-      `4cd43d4`)**: hoy visible+deshabilitada en el admin porque NINGUNA
-      app la lista (Expo solo detalle pages/[id], webapp sin modulo,
-      Anuncios sin destino). Aqui se decide: entra como modulo colocable
-      (grid/tab Expo + rail webapp — el feature es contenido embebido:
-      YouTube/iframes/HTML) o se demuele entera (resource + API + tabla
-      + pantalla Expo, requiere release)
+- [x] F10.6 RESUELTO como BACKLOG (recomendacion aceptada): Paginas queda EN
+      PAUSA (visible+deshabilitada); "modulo Paginas en apps o demolicion"
+      anotado en PENDIENTES.md como paralelo (~1 sesion si se construye)
 - [x] F10.7 QA vivo incremental durante la construccion (patron INT.14) + commits
 
 ## F11 — Wizard de creacion v2 — 5/5 CERRADO (commit 6ad6b3f)
@@ -307,16 +303,17 @@ suave, 13.5px). GOTCHA: Git Bash se come backslashes en replacements perl
 - [x] F11.5 QA vivo end-to-end: evento de cero → Escritorio con 12 modulos +
       siembras verificadas; evento QA borrado (middleware re-resuelve contexto)
 
-## F12 — Cierre — 0/3
+## F12 — Cierre — 3/3 CERRADO
 
-- [ ] F12.1 QA integral Kamilo (recorrido completo Noir y Lux)
-- [ ] F12.2 ROADMAP-FILAMENT-PULIDO marcado superseded
-- [ ] F12.3 Guardar DaVinci (commit + push + memoria + NEXT-SESSION)
+- [x] F12.1 CERRADO POR DECISION Kamilo 2026-07-19: el QA se hizo modulo por
+      modulo durante toda la construccion — un recorrido integral repetiria
+- [x] F12.2 ROADMAP-FILAMENT-PULIDO marcado SUPERSEDED
+- [x] F12.3 Guardar DaVinci final del frente
 
 ---
 
-## TOTAL: 47/57 items del doc (contados por checkbox). Quedan: F10.6
-(decision Paginas) + QA-commits formales de clusters + F12 cierre
+## TOTAL: FRENTE CERRADO 2026-07-19 — todos los items resueltos (QA
+incremental modulo por modulo, decision Kamilo). Doc pasa a HISTORICO.
 
 **Orden:** F3-F8 clusters (HECHOS, falta QA integral+commit... commit hecho en
 guardar 2026-07-18) → **F-INT interiores** (lo que sigue — feature por feature

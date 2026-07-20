@@ -356,8 +356,19 @@ toca revisar la autenticacion aca como funciona y tener claro los token cuando e
 > webapp Fase 1 (que ya esta cerrada: W.0-W.18 + W.X). Se movieron aca para que el doc de
 > webapp quede solo con lo de webapp (features + QA + deploy). Ninguno bloquea el cierre.
 
-### Paridad config admin ↔ 3 superficies — 0/3 (diseño con Kamilo; toca backend+Filament+Expo+webapp)
-- [ ] **Modulos fuente unica**: visibilidad de modulos por superficie desde config Filament (hoy Expo hardcodea 4, sidebar desktop hardcodea items).
+### Paridad config admin ↔ 3 superficies — 1/3 (diseño con Kamilo; toca backend+Filament+Expo+webapp)
+- [x] **Modulos fuente unica** (PARCIAL 2026-07-19, F10 Lumina Admin): panel
+      /admin/modulos con catalogo canon + invalidacion RT; el RAIL de la
+      webapp ya obedece (oculta apagados, eventos-web 7f22593). Falta el
+      enforcement del grid del Expo y del resto de superficies (Expo aun
+      hardcodea; el HUD desafio si obedece).
+- [ ] **Paginas custom: acceso real en las apps o demolicion** (decision
+      aplazada de F10.6, 2026-07-19): el feature (iframes/HTML embebido:
+      YouTube, Slido, mapa) tiene backend+API+detalle Expo pero NINGUNA
+      superficie lo lista — quedo EN PAUSA visible+deshabilitado en el admin
+      (backend `4cd43d4`+`52f4522`). Construir el listado (~1 sesion: modulo
+      webapp + lista Expo + entrada al catalogo canon) o demoler entero
+      (incluye release Expo).
 - [ ] **Keyvisual por superficie**: `keyvisual_desktop` + `keyvisual_mobile` en branding + 2 uploads Filament con preview.
 - [ ] **Hero modo texto**: contrato unico de branding (type image|text) a escala en las 3 superficies.
 
