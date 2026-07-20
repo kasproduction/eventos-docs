@@ -1,7 +1,10 @@
 # EventOS — Roadmap
 
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
-_Actualizado: 2026-05-02 | v5.8 — ADR-026: F10 UI/UX foundation (~6.5h) agregada al final de W.1. Sistema completo de feedback (LuminaToast, FormField, EmptyState, Skeletons), microinteracciones (page transitions, AnimatedNumber, gradient breathing, scroll trigger, swipe haptics), premium polish (error boundaries, 404/500/offline, keyboard shortcuts, cross-tab sync, page exit guard). Cero refactor en modulos siguientes_
+_Actualizado: 2026-07-19 | v6.0 — Estado rapido re-basado a la realidad post-pivote:
+Webapp Fase 1 COMPLETA (19 modulos, 2026-07-14) · Mobile parity 60/60 ·
+LUMINA ADMIN F0-F12 completo (2026-07-19) · Knowledge base arrancado y pausado.
+El detalle de cada cierre vive en COMPLETADO.md y los roadmaps historicos._
 
 ---
 
@@ -20,14 +23,18 @@ _Actualizado: 2026-05-02 | v5.8 — ADR-026: F10 UI/UX foundation (~6.5h) agrega
 | **Data Center** | ✅ 100% | SPA standalone analytics, 9 tabs, 44 exports CSV/XLSX, comparativa periodos, goals, scheduled, comparador A/B, multi-evento, tema Lux toggle, infra prod lista |
 | **Room Check-in** | ✅ 100% | Kiosk + Staff + Silent disco + attendance tracking |
 | **Webhooks** | ✅ 100% | 5 fases, 24 tests, integracion partners |
-| **Seguridad** | ✅ 90% | SEC-1/2/3/3b/6 completo. Pendiente: 2FA, device, infra (SEC-4/5) |
+| **Seguridad** | ✅ 90% | SEC-1/2/3/3b/6 + magic link auth completo. Pendiente: 2FA, device fingerprinting, session mgmt, infra (SEC-4/5) |
 | **Onboarding DaVinci** | ✅ | 6 steps, configurable, campos unificados, depends_on avanzado |
 | **Moderacion** | ✅ | Ban RT, palabras bloqueadas, chat monitor, slow mode, pin Twitch |
 | **Optimistic UI** | ✅ Audit | 30 acciones auditadas, 10 con optimistic, haptics, retry API. Plan listo |
 | **QA** | ✅ | 150+ endpoints, 20 modulos, 582+ tests backend, 1664+ assertions |
-| **Deploy** | ⏳ | Docker + DO sao1 + CI/CD. Arquitectura HA definida |
-| **Fase 2** — Web app | 🚧 W.1 COMPLETA (F0-F6 + F8 + F9 + F10 + W.1B) — ~18h reales | **F10 UI/UX foundation cerrada** (~6.5h plan, 26/28 items + 2 extras): F10.A Foundation 6/6 (LuminaToast port app movil, FormField minimal, EmptyState, Skeletons, useOptimisticMutation + extras `lib/apiErrors.ts` mapper i18n + `apiFetch` Retry-After), F10.B Polish 10/11 (button micro-feedback, focus rings dynamic, page transitions con slide direccional entre steps, AnimatedNumber, smooth scroll, theme cross-fade, gradient breathing, useInView), F10.C Premium 8/9 (ErrorBoundary, 404/error pages, useKeyboardShortcut, CopyButton, ConnectionStatusPill, SaveIndicator, useCrossTabSync logout, useExitGuard). Diferidos: B4 StaggerList + B11 swipe haptics + C2 offline page. 8 bugs corregidos auditoria visual usuario (BUG-306 a BUG-313). |
-| **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion |
+| **Fase 2** — Webapp Fase 1 | ✅ 100% (2026-07-14) | **19 modulos cerrados** (W.0 shell espacial, W.1 auth magic link, W.2 home cinematic, W.3 agenda, W.4 streaming, W.5 speakers, W.6 social+momentos, W.7 sponsors, W.8 networking, W.9 desafio, W.10 live hub, W.11 sockets RT, W.13 documentos, W.14 anuncios/cartel, W.16 trivia, W.17 soporte, W.18 hub personal, W.X welcome showcase) — 550/576 items (95.5%). Detalle: `PENDIENTES-WEBAPP.md` backlog granular |
+| **Mobile parity webapp** | ✅ 60/60 (2026-07-11) | M.0-M.8 incl. Vendor 11/11 + gates. Falta solo QA vivo en device fisico |
+| **Web Push + PWA** | ✅ Fases A+B (2026-07-05) | Push multi-canal + PWA + CSP. Falta Fase C QA |
+| **LUMINA ADMIN** | ✅ F0-F12 (2026-07-19) | EventContext + scoping 44 resources · tema Noir/Lux White Chrome · arbol features 45→18 · interiores INT.1-13 · Escritorio · Panel Modulos + enforcement webapp RT · Wizard v2 · validacion es · Roles canon · UN DROPLET POR EVENTO. Historico: `ROADMAP-LUMINA-ADMIN.md` |
+| **Knowledge base / Manual** | ⏸ Pausado (5/35) | M0 fundacion cerrada (inventario 27 paginas + sitio Starlight + piloto). Se retoma pre-produccion. Ventana: `ROADMAP-MANUAL.md` |
+| **Deploy / DEPLOY DEMO** | ⏳ **PRIORIDAD** | DEPLOY DEMO 0/6 (hosting, prod x3, evento demo, Sentry). Despues: Docker + CI/CD + HA segun cliente |
+| **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion. Modelo actual: un droplet por evento/cliente |
 
 **Que falta:** ver `docs/living/PENDIENTES.md`
 **Que se hizo:** ver `docs/living/COMPLETADO.md`

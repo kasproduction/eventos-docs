@@ -4,7 +4,24 @@
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
 > **NOTA:** Los numeros BUG-XXX en este archivo son historicos. La numeracion fue reorganizada el 2026-04-23.
 > Fuente de verdad para bugs: `docs/BUG-LOG.md` (numeracion secuencial BUG-001 a BUG-232).
-> Actualizado: 2026-04-23
+> Actualizado: 2026-07-19
+
+---
+
+## Frentes grandes cerrados mayo-julio 2026 (movidos de PENDIENTES 2026-07-19)
+
+> Resumen ejecutivo; el detalle vive en los roadmaps historicos y en
+> `PENDIENTES-WEBAPP.md` (backlog granular con todos los checkboxes).
+
+| Frente | Cierre | Detalle |
+|--------|--------|---------|
+| **Webapp Fase 1 COMPLETA** (la seccion "~132h 0/18" de PENDIENTES) | 2026-07-14 | 19 modulos cerrados: W.0 shell, W.1 auth magic link, W.2 home, W.3 agenda, W.4 streaming, W.5 speakers, W.6 social+momentos, W.7 sponsors, W.8 networking, W.9 desafio, W.10 live hub, W.11 sockets RT, W.13 documentos, W.14 anuncios/cartel, W.16 trivia, W.17 soporte, W.18 hub personal, W.X welcome showcase. 550/576 items (95.5%); lo restante es QA presencial device + deploy. Ventana: `PENDIENTES-WEBAPP.md` |
+| **Mobile parity webapp 60/60** | 2026-07-11 | M.0-M.8 completos incl. Vendor 11/11 + gates banned/pending. Falta solo QA vivo en device fisico |
+| **W.12 Web Push + PWA (Fases A+B)** | 2026-07-05 | Push multi-canal (toAttendee choke point) + PWA + CSP 13 directivas + splitting. Falta Fase C QA |
+| **Magic link auth end-to-end** (item de seccion Seguridad) | mayo-julio | Backend branch `feature/magic-link-auth` + webapp W.1: token un solo uso, verify, refresh. Auth principal de la webapp en produccion de features |
+| **LUMINA ADMIN F0-F12 COMPLETO** (reemplaza "Admin Filament polish" secc. 4) | 2026-07-19 | EventContext + scoping 44 resources (mata Event Switcher pendiente) · tema Noir/Lux White Chrome · arbol features nav 45→18 · interiores INT.1-13 (Agenda, Branding por superficie, Entrada, Asistentes, Sponsors, Social, Gamificacion, Anuncios, Emails 16 tipos + fork, En vivo, Encuestas lista+builder, Salones+kioskos QR, standalone) · Escritorio · Panel Modulos con enforcement webapp RT verificado · Wizard v2 4 pasos · validacion es · Roles canon + Staff digno · decision UN DROPLET POR EVENTO. Roadmap historico: `ROADMAP-LUMINA-ADMIN.md` (FILAMENT-PULIDO superseded) |
+| **Socket singleton Expo** | 2026-07-04 | `0d9a754`: 6 conexiones paralelas → 1 singleton `lib/socket.ts`, 6 consumidores migrados + fixes `0ca10b6`/`460dca8` |
+| **Knowledge base ARRANCADO (M0 fundacion)** | 2026-07-19 | Inventario 27 paginas blindado con barrido 4 superficies + sitio Starlight compilando (`manual/`) + piloto Encuestas. Ventana: `ROADMAP-MANUAL.md` |
 
 ---
 
