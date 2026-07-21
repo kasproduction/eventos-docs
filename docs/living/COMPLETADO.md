@@ -4,7 +4,40 @@
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
 > **NOTA:** Los numeros BUG-XXX en este archivo son historicos. La numeracion fue reorganizada el 2026-04-23.
 > Fuente de verdad para bugs: `docs/BUG-LOG.md` (numeracion secuencial BUG-001 a BUG-232).
-> Actualizado: 2026-07-19
+> Actualizado: 2026-07-20
+
+---
+
+## Saneamiento facil→dificil 2026-07-20 (post-pivote, foco features/bugs)
+
+Barrido de pendientes chicos + una feature nueva. Backend `feature/magic-link-auth`
+(`bd01c66` `746d4be` `7849212` `894c3a0`) · webapp main `cb162cb` · Expo main
+`b285202` (selectivo) — TODO PUSHEADO.
+
+- **Fix `SessionLifecycleTest` (2 tests hermanos)** — no eran flaky, fallaban 5/5.
+  Montaban el delay con `end_datetime`+`adjusted_end_at` en el mismo `update()` y
+  `EventSessionObserver` borra el override → la reversion nunca se ejercitaba.
+  Fix: escenario en dos updates + `travelTo(now())` + asercion exacta. Produccion
+  intacta (el "usar assertLessThanOrEqual" del doc habria enmascarado 2 tests
+  muertos). 23/23 verde. Gotcha en [[project_backend_notes]].
+- **`/scanner-stand` webapp** — verificado: NO era hueco. Camino real Home vendedor
+  → `/mi-stand` → FAB scanner → `/scanner-stand`.
+- **LeadResource huerfano (Filament) DEMOLIDO** — nav oculto, sin accion de borrar.
+  Leads NO se pueden borrar en ningun lado (ni API ni admin — lo mas seguro para
+  data comercial), se ven en el vendor y se exportan en el DC (`leads_master` +
+  `lead_edits`). El LeadResource de la API se conserva.
+- **Encuestas por anuncio + canon 'aviso'** — el compositor de anuncios gana destino
+  "Encuestas" (`eventos://encuestas`) con **targeting por encuesta especifica**
+  (selector "¿Cual encuesta?" → `eventos://encuestas?id={id}`; webapp y Expo
+  preseleccionan, degradan a la lista si el id no existe). Canon ModuleCatalog:
+  encuestas pasa de rail/grid a `aviso` (se surfacea por aviso/push/Home finalizado,
+  no nav fija). Verificado end-to-end en Chrome. Detalle + gotcha `?id=` vs `/id`
+  en [[project_anuncios_deeplink_encuestas]].
+- **`moments.js` v2 (Event Pulse) VERIFICADO en vivo** — sin bug; cache-bust `?v=22`
+  funciona, cascada renderiza (los screenshots vacios eran los huecos de 15s).
+  Cero codigo. Event Pulse 0/2 → 0/1.
+- **Paginas F10.6** — DEFERIDO post-deploy (decision Kamilo: no aporta ni detiene,
+  no es dependencia). Sigue EN PAUSA en el admin.
 
 ---
 

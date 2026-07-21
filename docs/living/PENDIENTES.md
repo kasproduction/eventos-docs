@@ -213,8 +213,7 @@
 
 - [ ] Tests funcionales para Mission Control (~1.5h) — depende de mock de token HMAC `/monitor/{id}?token=...`
 - [ ] Tests E2E flujos criticos: aprobar Q&A, lanzar game, cancelar sesion, scheduled export trigger
-- [ ] Fix flaky test pre-existente `SessionLifecycleTest > cancel reverts delay on next session` (assertLessThan con timestamps iguales — usar assertLessThanOrEqual)
-toca revisar la autenticacion aca como funciona y tener claro los token cuando expiran etc 
+- [ ] Revisar la autenticacion del admin: como funciona + cuando expiran los tokens (nota Kamilo; encaja con el frente Seguridad del Staff)
 
 ### Unificacion SPAs (~10-12h)
 
@@ -307,31 +306,24 @@ toca revisar la autenticacion aca como funciona y tener claro los token cuando e
       webapp YA obedecen (F10, hecho); el grid del Expo sigue hardcodeado a 4
       modulos (agenda/speakers/social/sponsors) y documentos/banners/passport/
       pages/recap quedan huerfanos sin entrada. El HUD desafio si obedece.
-- [ ] **Paginas custom: acceso real en las apps o demolicion** (decision
-      aplazada de F10.6, 2026-07-19): el feature (iframes/HTML embebido:
-      YouTube, Slido, mapa) tiene backend+API+detalle Expo pero NINGUNA
-      superficie lo lista — quedo EN PAUSA visible+deshabilitado en el admin
-      (backend `4cd43d4`+`52f4522`). Construir el listado (~1 sesion: modulo
-      webapp + lista Expo + entrada al catalogo canon) o demoler entero
-      (incluye release Expo).
+- [ ] **Paginas custom: DEFERIDO POST-DEPLOY** (decision Kamilo 2026-07-20:
+      "es para el final, no aporta ni detiene, no es dependencia"). El feature
+      (iframes/HTML embebido: YouTube, Slido, mapa) tiene backend+API+detalle
+      Expo pero NINGUNA superficie lo lista (huerfano ~60% construido); quedo
+      EN PAUSA visible+deshabilitado en el admin (`4cd43d4`+`52f4522`). Al
+      retomar: construir el acceso (Filament reactivar + lista Expo + modulo
+      webapp ~1 sesion) o demoler entero. Costo mapeado, git preserva todo.
 - [ ] **Keyvisual por superficie**: `keyvisual_desktop` + `keyvisual_mobile` en branding + 2 uploads Filament con preview.
 - [ ] **Hero modo texto**: contrato unico de branding (type image|text) a escala en las 3 superficies.
 
-### Huecos cazados por el barrido del manual 2026-07-19 (decisiones Kamilo)
-> Fuente: barrido 4 superficies del ROADMAP-MANUAL M0.
-- [ ] **`/encuestas` fuera del rail webapp** aunque ModuleCatalog dice `web:'rail'`
-      — hoy solo se llega desde el Home de evento finalizado (SidebarPill no
-      la lista). ¿Agregarla al rail o corregir el canon?
-- [ ] **LeadResource del admin totalmente huerfano** (nav oculto, sin grupo) —
-      candidato a demoler: DC tiene `leads_master` y la webapp vendor lo cubre
-- [ ] **`/scanner-stand` webapp sin entrada de navegacion localizada** —
-      verificar que el flujo vendedor llega (posible boton no cazado por grep)
+> Huecos del barrido del manual 2026-07-19 CERRADOS 2026-07-20 (ver COMPLETADO):
+> `/encuestas` fuera del rail (resuelto: canon 'aviso' + anuncio con targeting) ·
+> LeadResource huerfano (demolido) · `/scanner-stand` (verificado, no era hueco).
 
-### Event Pulse cliente — 0/2 (display propio del backend, NO webapp)
-> Los 5 bugs del cliente quedaron saneados y verificados en vivo 2026-07-20
-> (backend `f53d8c8` + socket `c9439a8`). Solo queda:
-- [ ] Diagnosticar cache del `moments.js` v2 (motor cola fresca+decaimiento
-      aplicado 2026-07-09 pero NO verificado — cache navegador)
+### Event Pulse cliente — 0/1 (display propio del backend, NO webapp)
+> Los 5 bugs del cliente saneados 2026-07-20 (`f53d8c8` + `c9439a8`). El motor
+> `moments.js` v2 quedo VERIFICADO en vivo 2026-07-20 (sin bug, cache-bust OK).
+> Solo queda:
 - [ ] Decision cada-interaccion-hero (idea en `project_event_pulse_idea`)
 
 ### Backlog Expo (sesion Expo futura)
