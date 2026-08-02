@@ -1,5 +1,26 @@
 # Cómo crecemos — arquitectura de escalado
 
+> # ⚠ CORREGIDO LA MISMA NOCHE DEL 2026-08-02 — LEER ESTO PRIMERO
+>
+> Tres cosas de este documento se midieron después y resultaron falsas:
+>
+> 1. **"Los 45 ms duplican la capacidad"** (§3) — **FALSO.** El peaje real eran
+>    33 ms y este mismo documento decía que 15-25 sería sano. Ese 2x nunca
+>    estuvo disponible. Lo que sí apareció: Sanctum escribiendo en cada lectura
+>    y Filament arrancando en cada petición. Arreglados; el piso quedó en 11,4 ms.
+> 2. **Las tablas de capacidad en "personas"** (§2, §4, §7) — **están infladas
+>    ~9 veces.** Se midieron con un cliente que hace 1 petición por pantalla;
+>    una persona real con navegador hace ~9. **Medido: una máquina sirve del
+>    orden de 300 personas reales, no miles.**
+> 3. **"Separar roles solo cuando una máquina grande no alcance"** (§9) — el
+>    salto a varios nodos no es un caso extremo, es el nivel siguiente.
+>
+> **Sigue siendo cierto y no se toca:** HTTP y sockets tienen costos opuestos ·
+> MySQL y Redis nunca fueron el cuello · ya no hace falta afinidad de sesión ·
+> el cuello es CPU y no memoria.
+>
+> **Vigente: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`.**
+
 > Escrito el 2026-08-02 **desde lo medido**, no desde lo supuesto.
 > El plan viejo (`DISPONIBILIDAD-HA.md` §2) decía "2 droplets iguales detrás de
 > un balanceador". Las mediciones de esta sesión dicen que ese no es el primer

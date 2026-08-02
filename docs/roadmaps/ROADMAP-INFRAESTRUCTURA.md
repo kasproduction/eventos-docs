@@ -212,8 +212,14 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
 
 > **El canario es UNA persona real desde Bogota**, con su propio token, medida
 > aparte del promedio mientras la multitud navega. Es el usuario N+1.
-> Tiempo de servidor, sin TLS ni establecimiento de conexion. Un droplet
-> 4 vCPU / 8 GB, con todos los arreglos de hoy aplicados.
+>
+> **Los tiempos INCLUYEN el viaje de red (~93 ms Bogota-Nueva York)**: son lo
+> que siente la persona, no tiempo de servidor puro. El servidor solo son ~28 ms
+> de esos 121. Droplet 4 vCPU / 8 GB con los arreglos de hoy aplicados.
+>
+> **Y la multitud de esta tabla entra por la API, no por la webapp** — o sea que
+> son mucho mas baratos que personas reales. Para cotizar, la tabla que vale es
+> la de abajo.
 
 | Personas navegando | CPU | canario `branding` p50 | p95 | Veredicto |
 |---|---|---|---|---|
@@ -254,29 +260,53 @@ promedio esconde y el canario no.
 > Medido con `tests/load/entrar-por-la-puerta.js`, el primer escenario que entra
 > por donde entra la gente.
 
-| Personas reales por la webapp | CPU | Tiempo de pantalla | Veredicto |
+#### MEDIDO — se puede citar
+
+| Personas reales por la webapp | CPU | Tiempo de pantalla | Errores |
 |---|---|---|---|
-| **300** | 74% | **~540 ms** | funciona |
-| **550** | 87% | **p50 11.700 ms · p95 20.300 ms** | **inservible** |
+| **300** | **74%** | p50 bajando hasta **541 ms** | 0 |
+| **550** | **87%** | p50 entre **8.084 y 16.326 ms** | 0 |
 
-**El canario con 550 encima: `branding` en 4.899 ms contra 121 ms en reposo —
-cuarenta veces peor.** La agenda no respondio dentro del tiempo limite.
+- **El canario con 550 encima** (una persona en Bogota, aparte del promedio):
+  `branding` **4.899 ms** contra **121 ms** con el servidor vacio.
+- **Las 3.184 pantallas devolvieron 200.** Ni un error. **El servidor informa
+  que todo esta bien mientras la gente espera diez segundos** — por eso el
+  criterio es el canario y no el porcentaje de errores.
+- **Abrir una pantalla = 9 llamadas al backend** (contadas en nginx).
 
-**Y las 3.184 pantallas devolvieron 200.** Ese es el detalle cruel: **el
-servidor informa que todo esta bien mientras la gente espera once segundos.**
-Por eso el criterio es el canario y no el porcentaje de errores.
+**Precisiones para no citar de mas:**
+- Los tiempos del canario **incluyen ~93 ms de viaje Bogota-Nueva York**. Son la
+  experiencia real, no tiempo de servidor puro.
+- El **541 ms de las 300** venia de un percentil **acumulado** que aun bajaba, o
+  sea es un **techo**: el real es algo menor. La corrida con percentil por
+  ventana quedo sin completar.
+- El **rango de las 550** son los percentiles por ventana de 30 s. No hay un
+  numero unico.
+- El escenario **no pide archivos estaticos ni imita las precargas del
+  navegador**, asi que el costo real es **algo MAYOR**. Es un piso.
 
-> **Una maquina de 4 nucleos sostiene del orden de 300 personas reales
-> navegando. A 550 esta rota.** El catalogo decia 2.500.
+#### DERIVADO — aritmetica sobre lo medido
 
-**LO QUE ESTO SIGNIFICA PARA EL PLAN, sin adornos:** hoy se saco ~2x
-optimizando. De 300 a 5.000 hacen falta **16x**. **Ningun ajuste de codigo da
-16x.** Ese salto es la arquitectura de varios nodos — el resto es afinar.
+- **Una persona real cuesta ~9 veces un cliente del script viejo**, comparando
+  CPU por usuario (68%/2.500 contra 74%/300). No es una medicion directa.
+- **De 300 a 5.000 son 16x.**
 
-**Queda UNA pieza grande antes de tocar hardware:** cada persona gasta ~10
-peticiones por pantalla donde deberia gastar 2 o 3 (ver I.1). Si baja a 3, la
-capacidad **se triplica** — de 300 a ~900 en la misma maquina de $48. Despues de
-eso: mas nucleos, y luego separar roles.
+#### EXTRAPOLADO — NO citar a un cliente sin medirlo antes
+
+- *"1.200-1.800 personas a ritmo de evento real"* — depende de un multiplicador
+  (una pantalla cada 2-3 min en vez de cada 20-40 s) **que sigue sin medirse**.
+- *"Bajar de 10 a 3 peticiones por pantalla triplicaria la capacidad"* — es la
+  expectativa, no un resultado. **Exactamente el tipo de afirmacion que produjo
+  el "45 ms que duplican la capacidad" y resulto falsa.**
+
+> **Conclusion que si se sostiene: una maquina de 4 nucleos sirve del orden de
+> 300 personas reales navegando activamente. A 550 la experiencia esta rota.**
+> El catalogo decia 2.500.
+
+**Y el limite de lo que queda por optimizar:** hoy se saco ~2x. Llegar a 5.000
+pide 16x. **Ningun ajuste de codigo conocido da 16x** — ese salto es la
+arquitectura de varios nodos. Antes de tocar hardware queda una sola pieza con
+tamaño (las ~10 peticiones por pantalla, ver I.1), y su ganancia esta sin medir.
 
 #### La leccion de metodo, que es la mas cara del dia
 

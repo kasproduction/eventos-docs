@@ -1,5 +1,29 @@
 # Diagnóstico completo — EventOS en producción real
 
+> # ⚠ CORREGIDO LA MISMA NOCHE DEL 2026-08-02 — LEER ESTO PRIMERO
+>
+> Dos cifras centrales de este documento se volvieron a medir y son falsas:
+>
+> 1. **"Costo fijo por petición ~45 ms"** y **"bajarlo a la mitad duplica todo"**
+>    (§3, Paso 2) — **FALSO.** El peaje real eran 33 ms, y este mismo documento
+>    dice que 15-25 sería lo esperable. **Ese 2x nunca estuvo disponible.**
+>    Probablemente el 45 se midió bajo carga: no era costo fijo, era cola.
+> 2. **Todas las cifras en "personas"** — **infladas ~9 veces.** Se midieron con
+>    un cliente que hace 1 petición por pantalla; una persona real con navegador
+>    hace ~9. **Medido entrando por la webapp: una máquina sirve del orden de
+>    300 personas reales navegando.** A 550 la experiencia está rota (p50 de 8 a
+>    16 segundos) **aunque el servidor responda 200 en todo**.
+>
+> **Sigue firme:** el cuello es CPU · los 25 bugs y sus causas · las buenas
+> prácticas · la corrección de región (nyc1, no sao1) · que los 8 escenarios
+> pasaron.
+>
+> **Y la lección que faltaba: ningún test pasaba por la webapp.** Por eso
+> sobrevivieron aquí un login que solo dejaba entrar a 5 personas por minuto en
+> un recinto, y una capacidad 9 veces sobreestimada.
+>
+> **Vigente: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`.**
+
 > **2026-08-01 / 02.** Primera vez que este producto sale de desarrollo.
 > Se montó el stack completo, se ejecutaron los 8 escenarios de experiencia y
 > se corrigió todo lo que apareció. Este documento es el resultado.

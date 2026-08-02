@@ -2,7 +2,93 @@
 
 > Este archivo es **solo continuidad** (que hicimos la sesion pasada, decisiones cerradas).
 >
-> **Para saber que sigue → abrir `docs/living/PENDIENTES-WEBAPP.md`** (ventana operativa unica).
+> **Para saber que sigue → abrir `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`**
+> (ventana operativa del frente de infraestructura, 10/33). Lo de webapp sigue
+> en `docs/living/PENDIENTES-WEBAPP.md`.
+
+---
+
+## SESION 2026-08-02 TARDE/NOCHE (Opus 5) — LA CAPACIDAD REAL ES 300, NO 2.500
+
+**Ventana operativa nueva: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` (10/33).**
+Reemplaza "RENDIMIENTO Y CAPACIDAD 0/5" de PENDIENTES-WEBAPP, que nacia de una
+premisa falsa.
+
+### El numero que cambia todo
+
+Se midio la **experiencia real de un usuario** — lo que Kamilo pidio desde el
+principio y se hizo al final del dia. Escenario nuevo
+`eventos-backend/tests/load/entrar-por-la-puerta.js`: el primero que entra por
+la webapp en vez de pegarle a la API con un token ya emitido.
+
+| Personas reales por la webapp | CPU | Tiempo de pantalla | Errores |
+|---|---|---|---|
+| **300** | **74%** | p50 bajando hasta **541 ms** | 0 |
+| **550** | **87%** | p50 entre **8.084 y 16.326 ms** | 0 |
+
+Canario con 550 encima: **4.899 ms contra 121 ms con el servidor vacio** (ambos
+incluyen ~93 ms de viaje Bogota-Nueva York: son experiencia real, no tiempo de
+servidor). Y las 3.184 pantallas devolvieron **200** — el servidor dice que todo
+esta bien mientras la gente espera diez segundos.
+
+**Una maquina sostiene del orden de 300 personas reales navegando activamente.**
+Abrir una pantalla son **9 llamadas al backend** (contadas en nginx) contra 1
+del script viejo.
+
+**Ojo al citar:** el 541 ms venia de un percentil acumulado que aun bajaba (es
+un techo, el real es menor) y el escenario no pide estaticos ni imita las
+precargas, asi que **el costo real es algo mayor**. Es un piso, no un techo.
+
+### La puerta estaba cerrada (el bug mas grave del dia)
+
+El limite de ingreso contaba **por IP**, y en un recinto todos comparten el
+wifi: **solo 5 personas por minuto podian entrar al evento.** De 50, entraron 5.
+Corregido a por-cuenta (`69dd89c`): de 300, entraron 300. Mismo error en
+`magic_link` y `magic_verify`.
+
+**Sobrevivio a los 8 escenarios en verde porque ningun test pasaba por la
+webapp.**
+
+### Lo que se arreglo y midio
+
+- **Sanctum escribia en cada lectura** (`7fd3a76`) — y bloqueaba la replica.
+- **`filament:optimize` nunca se ejecuto** (`a25b2ab`): el admin arrancaba
+  entero en cada peticion de la API. 10,47 ms → 0,51.
+- Resultado: **1.500 personas pasaron de 82% a 46% de CPU.**
+- **3 bugs**: magic link sin salida, 500 en historias, imagenes del CDN.
+- **Los limites por IP contaban para toda la plataforma** (`41b8040`+`901aa12`).
+- **Un 429 expulsaba al login** a gente con sesion valida.
+- **La app pedia 51 veces por dos clics** (`ab6e6ff`) → 36.
+
+### DECISIONES / CORRECCIONES (no re-preguntar)
+
+1. **"UN DROPLET POR EVENTO" estaba MAL TRANSCRITA.** Kamilo hablaba de un
+   **combo aislado por cliente**, que adentro puede tener N maquinas. El plan de
+   crecimiento nunca se descarto: se difirio por economia.
+2. **El numero que se vende no es donde se rompe: es donde la linea del canario
+   deja de ser plana.**
+3. **Regla de metodo:** el primer escenario de cualquier medicion futura **entra
+   por la webapp**. Los tests contra la API son complemento, no medida.
+
+### PROXIMA SESION
+
+**Una sola pieza puede mover la aguja antes de tocar hardware:** abrir una
+pantalla cuesta **9 llamadas al backend**. Bajarlas es lo unico que queda con
+tamaño. Sospechoso principal, **sin verificar**: `router.refresh()` del tiempo
+real borra el cache de navegacion ENTERO en cada aviso, no solo lo que cambio.
+
+**Cuanto daria eso: NO SE.** La expectativa es que triplique, pero eso es
+expectativa — es el mismo tipo de afirmacion que produjo el "45 ms que duplican
+la capacidad" y resulto falsa. **Medir primero.**
+
+Despues ya no es codigo: **mas nucleos, y luego separar roles.** De 300 a 5.000
+son 16x y ningun ajuste conocido da 16x.
+
+Tambien abierto: el techo por IP debe contar **fallos** y no intentos (bloqueo
+450 de 1.000 al llegar rapido) · la webapp tiro **503 con UNA persona** por la
+rafaga de precarga · `messages/pt.json` sin `mobileNav`.
+
+Droplets: Kamilo hace snapshot y destruye al cierre.
 
 ---
 
@@ -107,6 +193,24 @@ con el ritmo del evento concreto.
 
 #### 1. Los 45 ms de costo fijo - EMPEZAR POR AQUI
 
+> ## ⚠ DESMENTIDO EL 2026-08-02 — NO USAR ESTA SECCION
+>
+> Se midio sobre el droplet y **el numero era falso**. El peaje real eran
+> **33 ms** (19,8 de arranque + 13 de autenticacion y guardias), y el propio
+> `DIAGNOSTICO` decia que 15-25 ms seria sano — o sea que ya estaba casi en
+> rango. **El "duplica la capacidad" que se afirma mas abajo NUNCA estuvo
+> disponible.**
+>
+> Lo probable: el 45 se midio **bajo carga**, asi que no era costo fijo sino
+> cola.
+>
+> Lo que si aparecio al buscar ahi: Sanctum escribiendo en cada lectura y el
+> panel de administracion arrancando entero en cada peticion de la API. Ambos
+> arreglados — el piso quedo en **11,4 ms**.
+>
+> **Todo lo de esta seccion queda como historico. Lo vigente:
+> `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`.**
+
 **Que es:** una ruta que NO EXISTE cuesta ~45 ms. Una que consulta la base,
 ~52 ms. **El trabajo de la app son 7 ms; los otros 45 son peaje del
 framework.**
@@ -210,6 +314,13 @@ cambia ese plan:**
 (gratis) -> mas nucleos (simple) -> separar roles **solo cuando una maquina
 grande no alcance**. **Solo la fila de hoy esta medida; el resto es
 extrapolacion y hay que verificarla antes de prometersela a un cliente.**
+
+> **⚠ CORREGIDO EL 2026-08-02.** Ese orden ya no aplica: los 45 ms eran 33 y no
+> daban el doble (ver el desmentido arriba). Y sobre todo, **"separar roles solo
+> cuando una maquina grande no alcance" quedo desactualizado**: se midio que una
+> maquina sirve **~300 personas reales**, no miles. El salto a varios nodos no es
+> un caso extremo — es el nivel siguiente del catalogo.
+> Vigente: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`.
 
 ---
 
