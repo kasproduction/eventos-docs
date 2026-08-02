@@ -1,4 +1,4 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 5/26
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 6/26
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
@@ -154,10 +154,43 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
       eventos de socket. Con eso, *"el 1320 va a 40 peticiones/minuto cuando la
       mediana es 2"* es trivial de detectar, y sirve mas.
 
-## I.3 — El catalogo vendible — 0/5
+## I.3 — El catalogo vendible — 1/5
 
-- [ ] **Correr la curva del canario** buscando **el codo** — donde la linea deja
-      de ser plana— y no el punto de rotura. Ese codo es el borde de cada nivel.
+### LA CURVA DEL CANARIO — MEDIDA 2026-08-02
+
+> **El canario es UNA persona real desde Bogota**, con su propio token, medida
+> aparte del promedio mientras la multitud navega. Es el usuario N+1.
+> Tiempo de servidor, sin TLS ni establecimiento de conexion. Un droplet
+> 4 vCPU / 8 GB, con todos los arreglos de hoy aplicados.
+
+| Personas navegando | CPU | canario `branding` p50 | p95 | Veredicto |
+|---|---|---|---|---|
+| **reposo** | 1% | **121,0 ms** | 124,5 | linea base |
+| **1.000** | 27% | **120,4 ms** | 124,5 | **plano — no lo nota** |
+| **2.000** | 55% | **121,6 ms** | 130,0 | **plano** |
+| **2.500** | 68% | **124,9 ms** | 143,6 | +3% / +15% — se empieza a sentir |
+| **3.000** | 77% | **147,6 ms** | **253,2** | **DOBLADO: +22% y el p95 al doble** |
+
+**El codo esta entre 2.500 y 3.000.** Y la señal que primero se rompe **no es
+la mediana, es el p95**: a 3.000 la mediana sube 22% pero la cola se DOBLA. Es
+decir, la mayoria sigue bien y una minoria la pasa mal — exactamente lo que un
+promedio esconde y el canario no.
+
+**Traduccion honesta a niveles, para UNA maquina:**
+
+- **hasta 2.000 — comodo.** Canario indistinguible del reposo, CPU 55%.
+- **2.500 — el borde vendible.** Todavia bien (+3%), pero sin margen.
+- **3.000 — ya no.** Una maquina deja de alcanzar aqui.
+
+> **OJO, el multiplicador:** esto es al ritmo del script — **una pantalla cada
+> 20-40 segundos, gente MUY activa**. En un evento real la gente mira el
+> telefono cada 2-3 minutos, y las mismas peticiones/segundo son 4-6 veces mas
+> personas. **Ese factor sigue sin medirse (I.2) y es el que convierte esta
+> tabla en una cotizacion.** Sin el, estos numeros son el piso pesimista.
+
+- [x] **Correr la curva del canario** buscando **el codo** — donde la linea deja
+      de ser plana— y no el punto de rotura. **HECHO: el codo esta entre 2.500 y
+      3.000 personas muy activas en una maquina de 4 nucleos.**
 - [ ] **Nivel 1.000** — una maquina. Barato, honesto, **y se dice claro: si esa
       maquina cae, el evento se cae.**
 - [ ] **Niveles 2.500 / 5.000 / 10.000+** — minimo dos nodos, sin punto unico de
