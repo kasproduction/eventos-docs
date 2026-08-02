@@ -141,12 +141,19 @@ server {
     listen 80;
     server_name $API;
     root /var/www/backend/public;
-    index index.php;
+    index index.php index.html;
     charset utf-8;
     client_max_body_size 50M;
     add_header X-Content-Type-Options "nosniff";
 
-    location / { try_files \$uri \$uri/ /index.php?\$query_string; }
+    # `index.html` y `\$uri/index.html` son OBLIGATORIOS: las SPA del backend
+    # (event-pulse, mission-control) se sirven como carpetas con index.html.
+    # Solo con `index index.php` nginx intenta listar el directorio y responde
+    # 403 — los tableros no cargan (verificado 2026-08-02).
+    location / {
+        index index.php index.html;
+        try_files \$uri \$uri/ \$uri/index.html /index.php?\$query_string;
+    }
     location = /favicon.ico { access_log off; log_not_found off; }
     location = /robots.txt  { access_log off; log_not_found off; }
 
