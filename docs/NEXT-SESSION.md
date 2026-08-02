@@ -26,7 +26,7 @@ propio, Resend, webapp Next, 4 procesos de socket, Horizon. Evento demo con
 | Sockets simultaneos | **5.000**, 0 fallos |
 | HTTP sostenido | **~70 req/s** · cuello = **CPU** |
 | Abrir la app | 8 peticiones · **0 en reposo** |
-| Capacidad real | **~1.000-2.000 navegando activamente** por droplet |
+| Capacidad **verificada** | **1.500 navegando** (CPU 82%) - **5.000 = ROTO** |
 | Latencia desde Colombia | **+100 ms** sobre lo medido en datacenter |
 
 **CORRECCION**: los docs decian "DO sao1" y justificaban con RTT de Bogota.
@@ -65,26 +65,157 @@ premios invisibles por un flag.
 4. **Seguridad del staff**: despues del deploy, con la raya escrita — la URL
    no sale a ningun prospecto sin el 2FA puesto.
 
-### PROXIMA SESION
+### PROXIMA SESION - el plan, con el porque y el como
 
-**Estado: los droplets siguen ENCENDIDOS** (`eventos-target` 134.209.116.227 ·
-`eventos-load` 104.248.53.253). Decidir snapshot+destroy — ver `COMO-VOLVER.md`.
+**Estado: droplets DESTRUIDOS el 2026-08-02** (con snapshot). Ya no facturan.
+Volver = `COMO-VOLVER.md`. Todo lo de abajo se hace **local**, sin gastar.
 
-**Pendientes por orden:**
-1. **Rotar credenciales de R2** (quedaron en el chat)
-2. **La cache de auth vence y la estampida vuelve en frio** — 832 de 1.500
-   conexiones perdidas cuando todos llegan con caché vencida. Sin resolver.
-3. **QA del Expo: cero.** Todo lo de hoy se verifico solo en webapp.
-4. Kiosko (camara en device) · streaming con publico real · push · recorrido
-   completo de una persona
-5. **Los 45 ms de costo fijo por peticion** — una ruta vacia cuesta casi lo
-   mismo que una con consulta. Bajarlo a la mitad DUPLICA la capacidad sin
-   comprar hardware. Es la palanca mas rentable que queda.
-6. Cloudflare a naranja antes de exponerlo (hoy en gris, ya hay bots)
+---
 
-**NO esta listo para un cliente pagando.** Falta QA de cliente completo, el
-recorrido de punta a punta y la seguridad del staff. Pero ya se sabe
-exactamente que falta, cuanto aguanta y cuanto cuesta.
+#### CORRECCION que Kamilo cazo al cierre - leer antes que nada
+
+Yo habia escrito **"1.000-2.000 navegando"**. El respondio: *"solo funciono
+bien con 1500 siendo yo el 1501, con 5000 ni me cargaba"*. **Tenia razon, en
+dos capas:**
+
+1. **El 2.000 nunca se midio** - lo extrapole hacia arriba.
+2. **Peor: con 1.500 el CPU ya iba al 82%** - y ese mismo documento defiende
+   no pasar del 50-60%. **El punto comodo esta POR DEBAJO de 1.500.**
+
+| Navegando | CPU | Resultado |
+|---|---|---|
+| **1.500** | **82%** | fluido - **pero sin margen** |
+| 1.500-5.000 | - | **nunca se midio** |
+| **5.000** | 100% | **roto**, respuestas de 50 s |
+
+**Y el hallazgo que mas importa: la degradacion NO avisa.** Kamilo sintio
+fluidez con el servidor al 82%. Va bien, bien, bien... y en el escalon
+siguiente son 50 segundos. No hay zona donde "se pone lento" y da tiempo de
+reaccionar. Por eso operar al 82% es peligroso aunque se sienta perfecto.
+
+**"Personas" es la unidad equivocada.** El servidor sostiene **peticiones por
+segundo**: ~30 comodas - 50 al borde - 62 roto. Cuantas personas es eso
+depende del ritmo:
+
+- muy activas (1 pantalla cada 20-40 s, lo que simule) -> **~1.000**
+- mirando cada 2-3 min, lo normal en un evento -> **4.000-5.000**
+
+**Mismo servidor, 5x de diferencia.** Cotizar en req/s; traducir a personas
+con el ritmo del evento concreto.
+
+---
+
+#### 1. Los 45 ms de costo fijo - EMPEZAR POR AQUI
+
+**Que es:** una ruta que NO EXISTE cuesta ~45 ms. Una que consulta la base,
+~52 ms. **El trabajo de la app son 7 ms; los otros 45 son peaje del
+framework.**
+
+**Por que primero, y no medir la curva antes:** porque **medir antes de
+optimizar es medir algo que estamos por cambiar.** Si el costo baja a la
+mitad, la curva se mueve entera y el numero de hoy no vale. Primero se
+arregla, despues se mide UNA vez, y ese es el numero que se vende.
+
+**Por que vale mas que cualquier otra cosa:** **duplica la capacidad de todo**
+-llegada, navegacion, reconexion- **sin comprar un nucleo.** Es la unica
+palanca gratis que queda.
+
+**Como, y por que se puede hacer local:** el desglose de a donde se van esos
+milisegundos es el mismo en Laragon; lo que cambia son los valores absolutos.
+Se diagnostica con un profiler y se verifica en produccion despues.
+
+Lista de sospechosos (**sin diagnosticar aun - no asumir que es alguno**):
+- la pila de middleware que corre en CADA peticion
+- el arranque de proveedores - la app registra **~20 observadores**
+- la sesion, que se levanta incluso en rutas de API que no la necesitan
+
+---
+
+#### 2. El ritmo real de la gente - el multiplicador de 5x
+
+**Que es:** el numero que convierte req/s en personas. **Y me lo invente**
+(asumi 1 pantalla cada 20-40 s). Es el parametro mas influyente de toda la
+cuenta comercial y es el que menos fundamento tiene.
+
+**Como NO se resuelve:** adivinando mejor.
+
+**Como si:** **instrumentando.** Que la app registre cuantas pantallas abre
+cada persona por minuto. El primer evento real entrega el numero de verdad.
+**Ademas es una funcionalidad que le sirve al cliente** - no es trabajo
+tirado.
+
+---
+
+#### 3. QA del Expo - CERO
+
+El hueco mas grande, y no es de informacion: es **superficie sin probar**.
+Todo lo de esta sesion se verifico en webapp. **No necesita droplets** -
+Laragon alcanza para QA funcional.
+
+**Y hay razon para desconfiar:** de los 25 bugs, **8 aparecieron SOLO al
+abrir el navegador**, con los 8 escenarios de carga ya en verde. Incluido el
+panel de administracion ENTERO caido mientras la API respondia perfecto.
+**Los escenarios verdes no sustituyen usar el producto.** Expo no ha tenido
+ni eso.
+
+---
+
+#### 4. La estampida en frio - sin resolver
+
+**Que pasa:** la cache de autenticacion vence y **832 de 1.500 conexiones se
+pierden** cuando todos llegan con la ficha vencida a la vez.
+
+**Cuando ocurre de verdad:** *"todos se registraron anoche"* - el caso mas
+normal del mundo. La cache dura 15 minutos; si nadie entro en la noche, el
+primer minuto del evento es una estampida.
+
+**Por que no se arreglo:** aparecio tarde y la mitigacion no es obvia
+(precalentar la cache? alargar el TTL? colas en el handshake?). **Requiere
+diseno, no un parche.**
+
+---
+
+#### 5. Lo demas
+
+- **Rotar credenciales de R2** - quedaron en el chat del 2026-08-02. R2 NO se
+  destruyo con los droplets.
+- **Cloudflare a naranja** antes de exponerle la URL a nadie (en gris se
+  registraron 125 intentos de bots buscando `/.env` desde 7 IPs).
+- **El techo propio de la webapp** - tiro 503 en el pico de 5.000 pero nunca
+  se midio por separado. No se sabe si el limite es de ella o del backend.
+- Kiosko (camara en device) - streaming con publico real - push - recorrido
+  completo de una persona de punta a punta.
+- **Verificar `deploy.sh` remontando de cero** - se escribio desde lo que se
+  hizo a mano; nunca se corrio limpio.
+
+---
+
+#### La arquitectura de crecimiento - `docs/infra/COMO-CRECEMOS.md`
+
+Kamilo reclamo que el crecimiento habia quedado inconcluso: el recordaba
+haber planteado *"Redis aparte, sockets como nodos, balanceo"*. **Lo medido
+cambia ese plan:**
+
+- **HTTP y sockets tienen costos OPUESTOS**: 5.000 sockets = **0-4% de CPU**;
+  70 req/s = **100%**. **No hay que clonar la maquina, hay que separar roles**
+  - UN nodo de sockets ($12-24) sirve a TODOS los de API.
+- **MySQL y Redis nunca fueron el problema** (2-8 hilos con 5.000 encima).
+  Sacarlos NO mejora rendimiento; **solo habilita multi-nodo**.
+- **Ya no hace falta afinidad de sesion** - pasar a WebSocket puro (hecho esta
+  sesion) elimino el obstaculo tecnico principal para crecer. Tambien ya
+  listos: adaptador Redis cross-proceso, cache de auth compartida, archivos en
+  R2. **Ese trabajo se hizo sin querer.**
+
+**Orden:** optimizar los 45 ms (gratis, duplica) -> Cloudflare naranja
+(gratis) -> mas nucleos (simple) -> separar roles **solo cuando una maquina
+grande no alcance**. **Solo la fila de hoy esta medida; el resto es
+extrapolacion y hay que verificarla antes de prometersela a un cliente.**
+
+---
+
+**NO esta listo para un cliente pagando.** Falta QA completo, el recorrido de
+punta a punta y la seguridad del staff. **Pero ya se sabe exactamente que
+falta, cuanto aguanta y cuanto cuesta** - que es mas de lo que habia ayer.
 
 ---
 
