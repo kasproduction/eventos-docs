@@ -136,10 +136,25 @@
 
 ---
 
-## 5. Seguridad del staff — **FRENTE ACTIVO** (decision Kamilo 2026-07-20)
+## 5. Seguridad del staff — **EN COLA, DESPUES DEL DEPLOY** (decision Kamilo 2026-08-01)
 
 > "Prefiero tener todo lo de seguridad en regla y no esperar a tener cliente
-> encima con presion." Se hace AHORA, sin deal de por medio.
+> encima con presion" (2026-07-20) — sigue vigente, cambia el ORDEN.
+>
+> **Movido a post-deploy el 2026-08-01.** Razones: hoy no hay puerta que proteger
+> (el admin corre local y el staff es Kamilo solo) y las passkeys exigen HTTPS,
+> que el deploy regala — hacerlo antes obligaba a montar SSL en Laragon y cambiar
+> `APP_URL`, rompiendo las imagenes de correos, todo trabajo desechable.
+>
+> **RAYA ESCRITA (el riesgo de mover esto es que "despues" se vuelva "nunca"):
+> el admin no se le muestra a ningun prospecto ni recibe datos reales de nadie
+> hasta que el 2FA este puesto.** Deploy → verificar → 2FA → recien ahi sale la URL.
+>
+> **Ampliacion de alcance 2026-08-01**: ademas de TOTP entran **passkeys**
+> (huella/Face ID). Verificado: `laravel/passkeys` funciona standalone, NO
+> requiere Fortify. La base sigue siendo `pragmarx/google2fa` a mano — es la
+> misma libreria que usa Laravel Fortify oficialmente (0 advisories, 104M
+> instalaciones). Passkeys entra como bloque S.9 (roadmap 0/26 → ~0/31).
 >
 > **Ventana operativa: `docs/roadmaps/ROADMAP-SEGURIDAD-STAFF.md` (0/26)**
 > — 2FA con app autenticadora (TOTP) obligatorio para todo el staff del admin
@@ -167,13 +182,34 @@
 
 ---
 
-## 7. Stress test 10K — **DIFERIDO post-pivote 2026-07-08**
+## 7. Stress test — **REACTIVADO 2026-08-01 (decision Kamilo)**
 
-> El pivote saco el stress 10K del alcance (era validacion Bancolombia; hoy
-> no hay cliente enterprise). Se reactiva SOLO si aparece un deal que lo
-> exija. Ref: `docs/PLAN-STRESS-TESTDO.md` v2.1. Los "Optimistic UI
-> restantes" y "Fixes pre-stress" de abajo siguen siendo mejoras validas
-> pero NO bloquean el demo.
+> **Kamilo revierte el diferido del 2026-07-08**: "necesito ya medir esto, lo
+> postergamos mucho tiempo". Y define el alcance: **NO a medias — se monta
+> como si fuera produccion** (dominio, HTTPS, Cloudflare, R2, SMTP, webapp
+> Next incluida), se mide, y se destruye. Razon: dejar piezas fuera solo
+> genera pendientes futuros ("mas adelante: ay, falto esto").
+>
+> **Ventana de ejecucion: `docs/roadmaps/ROADMAP-DEPLOY-STRESS.md`.**
+> Ref de arquitectura: `docs/infra/PLAN-STRESS-TESTDO.md` v2.1 (el HA de 2
+> droplets sigue siendo el objetivo del test de 10K real, no el de hoy).
+>
+> **Kit de carga YA EXISTE** en `eventos-backend/tests/load/`: k6
+> (`stress-full.js` 5000 personas / 9 escenarios, `stress-admin.js`,
+> `stress-local.js`) + artillery Socket.IO (`stress-sockets.yml`) +
+> `setup-tokens.php`. No se reescribe.
+
+### Bloqueantes cazados 2026-08-01 (arreglar ANTES de medir, o el numero miente)
+
+- [ ] **`eventos-socket/ecosystem.config.js`**: `instances: 1` +
+      `exec_mode: 'fork'` + `max_memory_restart: '256M'`. Bajo carga el
+      servidor se reinicia a mitad del test → se mide una caida, no una
+      capacidad. Subir el techo + cluster mode (el adaptador Redis ya esta
+      implementado, es seguro).
+- [ ] **`tests/load/tokens.json` tiene ~10 usuarios** y el script reparte
+      tokens en rueda: 5000 VUs golpearian las mismas 10 cuentas
+      (rate limits + caches por persona = resultado inventado). Sembrar
+      miles de asistentes antes de correr.
 
 ### Optimistic UI restantes (~3-4h) — pre-stress polish
 
@@ -329,7 +365,12 @@
 > Los 5 bugs del cliente saneados 2026-07-20 (`f53d8c8` + `c9439a8`). El motor
 > `moments.js` v2 quedo VERIFICADO en vivo 2026-07-20 (sin bug, cache-bust OK).
 > Solo queda:
-- [ ] Decision cada-interaccion-hero (idea en `project_event_pulse_idea`)
+- [ ] **Reglas del hero** — la decision "cada-interaccion-hero si/no" quedo
+      RESUELTA 2026-08-01 y reencuadrada por Kamilo: el hero se resuelve por
+      REGLAS que AGREGAN ("los ultimos 10 ingresos" en una sola tarjeta), no una
+      tarjeta por interaccion — y **el lead entra** como tarjeta individual.
+      Ya no es un si/no: es pieza propia (diseño de tarjetas → aprobacion →
+      codigo). Detalle en [[project_event_pulse_complete]].
 
 ### Backlog Expo (sesion Expo futura)
 - [ ] Borrar `banners.tsx` + `BannerCarousel` + `bannersApi` del Expo (feature legacy muerta)

@@ -6,6 +6,84 @@
 
 ---
 
+## SESION 2026-08-01 (Opus 5) — Sueltos cerrados · BUG-LOG a CERO · deploy+stress reactivado
+
+**TODO COMMITEADO Y PUSHEADO**: backend `8d4f5b9` (feature/magic-link-auth) ·
+socket `67a347a` (main) · Expo `2570129` (main, **commit selectivo — el WIP del
+recap sigue intacto**) · APP EVENTOS `10c0378`.
+
+### 1. Enforcement de modulos en el Expo — cierra la paridad F10 en las 3 superficies
+
+`ModuleMenu.tsx` tenia los 4 modulos clavados a mano e ignoraba `useModules()`.
+Ahora filtra contra el endpoint (que ya devuelve **solo los encendidos**), espejo
+literal del rail de la webapp (`SidebarPill.tsx:103-104`). **Fail-open** sin
+datos. **Si no queda ninguno el grid no se dibuja** (decision Kamilo: "nada, queda
+el HappeningNow, cero problema"). Los de rol (`staff_checkin`/`admin`) no se
+filtran. **No se agregaron entradas nuevas** — documentos/paginas/recap siguen
+llegando por deeplinks, HUD y Ayuda del perfil.
+
+Ademas `ENTITY_KEYS` gana `modules` (`useDataInvalidation.ts`): el backend lo
+emitia y el Expo lo descartaba en el listener — era el unico cliente sordo.
+
+### 2. Double-count del comentario propio — no se podia arreglar solo en el Expo
+
+`addComment` sumaba +1 optimista y el listener `wall:comment` volvia a sumar al
+rebotar. El payload **no decia quien comento**, y deduplicar por id llegaba tarde
+porque el backend emite el socket ANTES de responder el POST
+(`WallController.php:208` vs `:210`). Fix en 3 repos / 4 lineas: el broadcast
+manda `attendee_id`, el tipo del socket lo refleja, el Expo hace **skip-self** —
+mismo patron que ya usaba `useDataInvalidation.ts:276`.
+
+### 3. BUG-LOG en **0 pendientes de 305** (primera vez)
+
+Auditoria de vigencia: los 2 ultimos ya estaban resueltos en codigo sin marcar.
+**BUG-127** (metricas MC) — la cadena completa existe: `chat.ts:394` INCR ·
+`:289-291` emite · `app.js:926-928` adopta. **BUG-111** (PollSlides) — ya vive en
+`useTheme()`; los literales que quedan son decisiones posteriores de Kamilo
+(dorada `#B5A68B`, verde/rojo de estado criterio SurveyDeck), no deuda.
+
+### DECISIONES KAMILO (no re-preguntar)
+
+1. **Seguridad del staff se MUEVE a despues del deploy.** Razon aceptada: hoy no
+   hay puerta que proteger (admin local, staff = el solo) y las passkeys exigen
+   HTTPS que el deploy regala. **Raya escrita: la URL no sale a ningun prospecto
+   sin el 2FA puesto.**
+2. **Stress test REACTIVADO** (revierte el diferido del 2026-07-08). Y el alcance:
+   **"si vamos a hacer todo es como si ya fueramos a produccion, no quiero dejar
+   cosas a medias, eso solo causa pendientes"** — dominio, HTTPS, Cloudflare, R2,
+   SMTP y webapp Next incluidos. Se mide y se destruye el mismo dia.
+3. **Event Pulse — el hero se resuelve por REGLAS, no por tipo de evento** (idea
+   de Kamilo, mejor que la propuesta): en vez de "una tarjeta por interaccion",
+   tarjetas que agregan — *"los ultimos 10 ingresos"*. Y el **lead entra**. Queda
+   como pieza propia con diseño previo, NO es el "0/1" que decia el pendiente.
+
+### PROXIMA SESION — DEPLOY + STRESS
+
+**Ventana operativa NUEVA: `docs/roadmaps/ROADMAP-DEPLOY-STRESS.md` (0/24).**
+
+Kamilo cierra sesion porque **el dominio esta propagando a Cloudflare (~24h)**.
+Al volver, lo primero es confirmar que propago y que tiene los 6 insumos:
+2 droplets (4 vCPU / 8 GB · Ubuntu 24.04 LTS · sao1 · llave SSH), dominio,
+token Cloudflare, SMTP, DSN Sentry. Costo del dia: **~$3 USD** (DO cobra por hora).
+
+**Arrancar por D.0 — los 2 bloqueantes que falsean la medicion**, cazados leyendo
+codigo esta sesion:
+- `ecosystem.config.js`: `max_memory_restart: '256M'` + `instances: 1` → PM2
+  reinicia el socket a mitad del test; se mediria una caida, no una capacidad.
+- `tokens.json` tiene ~10 usuarios y `helpers.js` los reparte en rueda → 5000 VUs
+  contra 10 cuentas = rate limits y caches por persona falseando todo.
+
+**El kit de carga YA EXISTE** (`eventos-backend/tests/load/`: k6 `stress-full.js`
+5000 personas / 9 escenarios + artillery Socket.IO + `setup-tokens.php`). No se
+reescribe.
+
+En cola detras: DEPLOY DEMO (se alimenta de la guia que salga de este test) ·
+seguridad del staff · reglas del Event Pulse · QA device · landing.
+
+Servers dev NO se levantaron esta sesion (trabajo fue lectura de codigo + edits).
+
+---
+
 ## SESION 2026-07-19/20 (Fable) — Manual arrancado+pausado · PENDIENTES saneado · Event Pulse 5 bugs cerrados
 
 **Commits PUSHEADOS**: APP EVENTOS `2b5844d`+`d9ed1e9`+NEXT-SESSION · backend
