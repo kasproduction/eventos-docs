@@ -1,4 +1,4 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 2/26
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 5/26
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
@@ -93,23 +93,31 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
 
 # FASES
 
-## I.0 — Errores abiertos que rompen un evento — 0/3
+## I.0 — Errores que rompen un evento — 3/3 **CERRADO 2026-08-02**
 
-> Los tres salieron navegando en produccion el 2026-08-02, con los 8 escenarios
-> de carga ya en verde. **Ningun test los habria encontrado.**
+> Los tres salieron navegando en produccion, con los 8 escenarios de carga ya en
+> verde. **Ningun test los habria encontrado.**
 
-- [ ] **El magic link nunca verifica.** La pagina `/verify` carga y se queda en
-      "Verifying your link" para siempre. En el registro de nginx **no existe
-      ninguna llamada a `/api/v1/auth/verify-magic-link`** en toda la sesion: la
-      peticion no sale del navegador. Sospechoso: el `307` que reescribe
-      `/verify` a `/en/verify` (y de paso pone ingles). Vive en
-      `eventos-web/src/app/api/auth/verify/route.ts` + middleware de idioma.
-- [ ] **500 en las historias del muro.** `AttendeeStoryController.php:47` —
-      `Collection->unique()` recibe enteros donde espera modelos
-      (`Call to a member function getKey() on int`).
-- [ ] **`_next/image` devuelve 400** con las imagenes de `cdn.killjoy.pro`
-      (logo del evento y del organizador). Falta el dominio en la configuracion
-      de imagenes de Next.
+- [x] **El magic link se quedaba girando para siempre** (`317ce9e`). El `fetch`
+      no tenia tiempo limite, y el `catch` solo mostraba un aviso flotante
+      dejando el spinner puesto: cualquier fallo pasajero quedaba convertido en
+      pantalla muerta, sin explicacion y sin boton. Ahora corte a 20 s y caida a
+      la pantalla de error, con **"Reintentar" y no "pedir otro link"** — el
+      link solo se gasta cuando el backend lo valida, asi que sigue vivo.
+      **Correccion honesta:** primero dictamine que "la peticion nunca se hace",
+      basandome en un `grep | tail` que cortaba resultados. Falso: el POST si
+      sale, y no pude reproducir el colgado. La causa exacta queda sin
+      identificar — pero la ausencia de salida era un defecto real por si sola.
+- [x] **500 en las historias del muro** (`493461f`). `map()` sobre una
+      Eloquent\Collection conserva el tipo aunque adentro queden enteros, y su
+      `unique()` llama a `getKey()` sobre cada uno. Arreglado con `->toBase()`.
+- [x] **`_next/image` en 400** con las imagenes de `cdn.killjoy.pro`
+      (`317ce9e`). R2 con dominio propio no lo cubren los patrones genericos.
+      Sale de `CDN_HOSTNAME`, porque cambia con cada cliente.
+
+> **Hueco encontrado de paso, NO introducido:** `messages/pt.json` no tiene la
+> seccion `mobileNav` — el build lo reporta como `MISSING_MESSAGE`. Portugues
+> esta incompleto.
 
 ## I.1 — Rendimiento del nodo — 2/5
 
