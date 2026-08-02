@@ -89,9 +89,23 @@ Frase vendible y honesta: *"si su evento abre puertas 10 minutos antes, 5.000
 personas entran sin sentir nada"*. Si abren todos de golpe en 3 minutos, hay
 cola.
 
-## Qué aguanta hoy, en una línea
+## Qué aguanta hoy — con la distinción que importa
 
-**Un droplet de $48/mes: eventos de 1.000 a 5.000 asistentes, con margen.**
+**5.000 CONECTADAS** (la app abierta, mirando poco): sí, sobra. Una persona
+quieta genera **0 peticiones**.
+
+**5.000 NAVEGANDO activamente**: **no**. Se probó y el servidor llegó al 100%
+de CPU con respuestas de 50 segundos — no cargaba.
+
+Lo único verificado como bueno es **1.500 navegando**, y ahí el CPU ya iba al
+**82%**: funciona, pero sin margen para un pico. **El punto cómodo está por
+debajo de 1.500.**
+
+En la unidad correcta —peticiones por segundo, que es lo que el servidor
+realmente sostiene— son **~30/s cómodas**. Cuántas personas es eso depende del
+ritmo: gente muy activa ≈ 1.000; gente mirando cada 2-3 minutos ≈ 4.000-5.000.
+
+Ver `docs/infra/COMO-CRECEMOS.md`.
 
 ---
 

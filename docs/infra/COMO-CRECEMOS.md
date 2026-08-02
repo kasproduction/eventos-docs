@@ -62,9 +62,42 @@ ocurren.
               Cloudflare R2
 ```
 
-**Aguanta 1.000-2.000 personas navegando activamente.** Aislamiento total: si
-cae el VPS de un cliente, no arrastra a los demás — la decisión de un droplet
-por evento sigue siendo correcta.
+### Capacidad — SOLO lo medido
+
+| Personas navegando | CPU | Resultado |
+|---|---|---|
+| **1.500** | **82% ocupado** | funciona, navegacion fluida — **pero sin margen** |
+| entre 1.500 y 5.000 | — | **NUNCA SE MIDIO** |
+| **5.000** | **100%** | **roto**: respuestas de 50 s, no cargaba |
+
+**El punto comodo esta POR DEBAJO de 1.500, no por encima.** A 1.500 el
+servidor ya iba al 82%, y la regla que este mismo documento defiende es no
+pasar del 50-60%: por encima de ahi la latencia no crece de a poco, se
+dispara. Un pico encima de 1.500 lo tumba.
+
+### Y "personas" es la unidad equivocada
+
+Lo que el servidor sostiene son **peticiones por segundo**, no personas.
+Cuantas personas son eso depende enteramente de que tan activas esten:
+
+```
+comodo (~50-60% CPU)  ≈ 30 peticiones/segundo
+al borde (82% CPU)    ≈ 50 peticiones/segundo   ← lo medido con 1.500
+roto                  ≈ 62+ peticiones/segundo
+```
+
+Con el ritmo de la prueba —**una pantalla cada 20-40 segundos, gente muy
+activa**— eso da ~900-1.000 personas comodas.
+
+Con gente mirando el telefono cada 2-3 minutos, las mismas 30 peticiones/s
+son **4.000-5.000 personas**. La diferencia es el comportamiento, no el
+servidor.
+
+**Por eso el numero honesto para vender es peticiones/segundo, y la
+traduccion a personas hay que hacerla con el ritmo del evento concreto.**
+
+Aislamiento total: si cae el VPS de un cliente, no arrastra a los demas — la
+decision de un droplet por evento sigue siendo correcta.
 
 ---
 
@@ -91,11 +124,15 @@ gastado en hardware antes de esto es pagar por no optimizar.
 
 Lo más simple que existe: DigitalOcean redimensiona CPU sin rehacer nada.
 
-| | Capacidad estimada |
-|---|---|
-| 4 vCPU (hoy) | ~1.000-2.000 navegando |
-| 8 vCPU (+$48/mes) | ~2.000-4.000 |
-| 16 vCPU (+$144/mes) | ~4.000-8.000 |
+| | Peticiones/segundo comodas | Personas al ritmo de la prueba |
+|---|---|---|
+| 4 vCPU (hoy) | ~30 | ~900-1.000 |
+| 8 vCPU (+$48/mes) | ~60 | ~1.800-2.000 |
+| 16 vCPU (+$144/mes) | ~120 | ~3.600-4.000 |
+
+*(Extrapolacion lineal desde lo medido — el escalado por nucleos no siempre
+es perfectamente lineal. **Verificar antes de prometerlo a un cliente**: se
+redimensiona el droplet y se corre `evento-en-vivo.js`.)*
 
 **Sin cambiar una línea de código ni de arquitectura.** Y si además se hizo la
 etapa 1, cada número se duplica.
@@ -194,12 +231,15 @@ caída.
 
 # 7. Costos reales
 
-| Etapa | Capacidad | Costo/mes |
-|---|---|---|
-| **Hoy** — 1 droplet | 1.000-2.000 navegando | **$48** |
-| **+ Etapa 1** (optimizar) | 2.000-4.000 | **$48** — gratis |
-| **Etapa 2** — 8 vCPU | 4.000-8.000 con etapa 1 | **~$96** |
-| **Etapa 3** — roles separados | 10.000+ | **~$200-250** |
+| Etapa | Peticiones/s comodas | Personas (ritmo activo) | Costo/mes |
+|---|---|---|---|
+| **Hoy** — 1 droplet | ~30 (medido) | ~900-1.000 | **$48** |
+| **+ Etapa 1** (optimizar) | ~60 | ~2.000 | **$48** — gratis |
+| **Etapa 2** — 8 vCPU + etapa 1 | ~120 | ~4.000 | **~$96** |
+| **Etapa 3** — roles separados | ~240+ | ~8.000+ | **~$200-250** |
+
+**Solo la primera fila esta medida.** El resto es extrapolacion y hay que
+verificarla corriendo los escenarios antes de comprometerla con nadie.
 
 Desglose de la etapa 3: 2× API ($96) + sockets ($24) + MySQL administrado con
 réplica ($30) + Redis administrado HA ($15) + balanceador ($6) + Cloudflare Pro
@@ -209,8 +249,13 @@ réplica ($30) + Redis administrado HA ($15) + balanceador ($6) + Cloudflare Pro
 
 # 8. Cuándo NO crecer
 
-**Para 5.000 personas no hace falta arquitectura nueva.** Un droplet más grande
-lo hace. Sumar máquinas antes de atacar los 45 ms es pagar por no optimizar.
+**Para ~4.000 personas activas no hace falta arquitectura nueva** — alcanza
+con 8-16 nucleos y la optimizacion de la etapa 1. Sumar maquinas antes de
+atacar los 45 ms es pagar por no optimizar.
+
+**Pero 5.000 personas NAVEGANDO ACTIVAMENTE no entran hoy en un droplet.** Se
+probo y no cargaba. Ese numero solo es cierto para 5.000 **conectadas**, que
+es otra cosa: una persona quieta cuesta cero.
 
 Y sobre disponibilidad: **99,999% son 26 segundos de caída al año**, exigen
 multi-región y protegen las horas en que no hay nadie usando la app. Para una
@@ -224,7 +269,7 @@ ventana del evento** — alcanzable, verificable, y lo que un cliente compra.
 1. **Optimizar los 45 ms** — gratis, duplica todo
 2. **Cloudflare en naranja** — gratis, protege
 3. **Más núcleos** cuando haga falta — simple, sin arquitectura
-4. **Separar roles** solo pasadas las ~8.000 personas navegando
+4. **Separar roles** solo cuando un droplet grande ya no alcance
 
 Cada paso se justifica con una medición, no con una intuición. Y cada uno se
 puede verificar con los mismos 8 escenarios que ya existen.
