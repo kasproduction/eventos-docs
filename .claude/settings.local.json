@@ -818,7 +818,10 @@
       "Bash(base64 -w0 bootstrap/app.php)",
       "Bash(base64 -w0 app/Providers/AppServiceProvider.php)",
       "Bash(base64 -w0 app/Http/Controllers/Api/V1/AttendeeStoryController.php)",
-      "Bash(base64 -w0 \"src/components/shell/SidebarPill.tsx\")"
+      "Bash(base64 -w0 \"src/components/shell/SidebarPill.tsx\")",
+      "Bash(base64 -w0 tests/load/entrar-por-la-puerta.js)",
+      "Bash(sed -i '1s/.*/# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 10\\\\/33/' docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md)",
+      "Bash(sed -i 's|^## I.3 — El catalogo vendible — 1/5$|## I.3 — El catalogo vendible — 2/6|' docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md)"
     ]
   }
 }

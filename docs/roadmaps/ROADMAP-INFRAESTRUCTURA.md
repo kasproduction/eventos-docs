@@ -1,4 +1,4 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 8/30
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 10/33
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
@@ -169,6 +169,25 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
 > real. **Hace falta un escenario que entre por la webapp** — el mismo agujero
 > del arnes que ya escondio el bug de los limites por IP.
 
+## I.1b — La puerta del evento — 1/2
+
+> **El bug mas grave del dia, y solo aparecio al entrar por la webapp.**
+
+- [x] **El limite de ingreso protegia la red, no la cuenta** (`69dd89c`). En un
+      recinto mil personas comparten el wifi, o sea UNA IP publica. Con 5
+      ingresos por minuto por IP, **solo 5 personas por minuto podian entrar al
+      evento**. Medido: de 50, entraron 5. Ahora se cuenta por cuenta (5/min a
+      ESA cuenta, mas estricto donde importa) con un techo por red. De 300,
+      entraron 300. Mismo error corregido en `magic_link` (10 enlaces/hora para
+      todo un recinto) y `magic_verify` (ahora por token, que ya es de un solo
+      uso).
+- [ ] **El techo por IP hay que contarlo por FALLOS, no por intentos.** El techo
+      nuevo (300/min por IP) bloqueo 450 de 1.000 cuando llegaron a 25 por
+      segundo. Se cambio un absurdo por otro mas suave, pero sigue castigando al
+      recinto lleno. **Un ataque de fuerza bruta son fallos; un evento
+      empezando son aciertos** — el limitador cuenta las dos cosas igual. Hay
+      que limpiar el contador de IP en cada ingreso exitoso.
+
 ## I.2 — Instrumentacion del ritmo real — 0/3
 
 > **Una sola pieza, cuatro pagos.** Hoy no sabemos que es normal, y por eso cada
@@ -187,7 +206,7 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
       eventos de socket. Con eso, *"el 1320 va a 40 peticiones/minuto cuando la
       mediana es 2"* es trivial de detectar, y sirve mas.
 
-## I.3 — El catalogo vendible — 1/5
+## I.3 — El catalogo vendible — 2/6
 
 ### LA CURVA DEL CANARIO — MEDIDA 2026-08-02
 
@@ -220,6 +239,55 @@ promedio esconde y el canario no.
 > telefono cada 2-3 minutos, y las mismas peticiones/segundo son 4-6 veces mas
 > personas. **Ese factor sigue sin medirse (I.2) y es el que convierte esta
 > tabla en una cotizacion.** Sin el, estos numeros son el piso pesimista.
+
+---
+
+### LA CURVA QUE VALE — PERSONAS REALES POR LA WEBAPP (2026-08-02, noche)
+
+> **ESTA TABLA REEMPLAZA A LA DE ARRIBA PARA COTIZAR.**
+>
+> La de arriba se midio con un cliente que hace **1 peticion por pantalla**. Una
+> persona real con navegador hace **~10**: la pagina se renderiza en el
+> servidor y eso dispara todas las llamadas al backend. **La diferencia es de
+> unas ocho veces.**
+>
+> Medido con `tests/load/entrar-por-la-puerta.js`, el primer escenario que entra
+> por donde entra la gente.
+
+| Personas reales por la webapp | CPU | Tiempo de pantalla | Veredicto |
+|---|---|---|---|
+| **300** | 74% | **~540 ms** | funciona |
+| **550** | 87% | **p50 11.700 ms · p95 20.300 ms** | **inservible** |
+
+**El canario con 550 encima: `branding` en 4.899 ms contra 121 ms en reposo —
+cuarenta veces peor.** La agenda no respondio dentro del tiempo limite.
+
+**Y las 3.184 pantallas devolvieron 200.** Ese es el detalle cruel: **el
+servidor informa que todo esta bien mientras la gente espera once segundos.**
+Por eso el criterio es el canario y no el porcentaje de errores.
+
+> **Una maquina de 4 nucleos sostiene del orden de 300 personas reales
+> navegando. A 550 esta rota.** El catalogo decia 2.500.
+
+**LO QUE ESTO SIGNIFICA PARA EL PLAN, sin adornos:** hoy se saco ~2x
+optimizando. De 300 a 5.000 hacen falta **16x**. **Ningun ajuste de codigo da
+16x.** Ese salto es la arquitectura de varios nodos — el resto es afinar.
+
+**Queda UNA pieza grande antes de tocar hardware:** cada persona gasta ~10
+peticiones por pantalla donde deberia gastar 2 o 3 (ver I.1). Si baja a 3, la
+capacidad **se triplica** — de 300 a ~900 en la misma maquina de $48. Despues de
+eso: mas nucleos, y luego separar roles.
+
+#### La leccion de metodo, que es la mas cara del dia
+
+**Kamilo pidio desde el principio medir la experiencia real de un usuario.** Se
+midio al final. Toda la optimizacion de la jornada se hizo contra un numero
+inflado ocho veces — las correcciones siguen siendo validas, pero la foto de
+capacidad que se dio a mitad de dia estaba mal.
+
+**Regla que sale de aqui: el primer escenario de cualquier medicion futura entra
+por la webapp. Los tests contra la API con token ya emitido son un
+complemento, no la medida.**
 
 - [x] **Correr la curva del canario** buscando **el codo** — donde la linea deja
       de ser plana— y no el punto de rotura. **HECHO: el codo esta entre 2.500 y
