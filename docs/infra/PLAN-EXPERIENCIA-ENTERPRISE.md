@@ -193,7 +193,7 @@ no solo el numero final.
 |---|---|
 | **E3** la agenda cambia | **VERDE** — corrido, roto, arreglado y re-medido |
 | **E2** el anuncio | **VERDE** — mismo patron, mecanismo verificado |
-| **E4** el chat | **ROJO** — corrido; destapo perdida de datos (arreglada) + latencia pendiente |
+| **E4** el chat | **VERDE** — perfilado, diagnosticado y arreglado (ver abajo) |
 | E1, E5-E8 | sin correr |
 | Canario | **implementado** (`e3-agenda-storm.js`) |
 | Peticiones por usuario/minuto | **sin medir** (bloquea la aritmetica de capacidad) |
@@ -251,12 +251,61 @@ registro al fallo; el silencio absoluto fue lo que dejo pasar 4.241 mensajes.
 | **Canario** | p50 247 ms · **p95 1.779 ms** |
 | Limite de tasa | 128 rebotes (sano) |
 | `SESSION_NOT_JOINED` | 48 — sin investigar |
-| Veredicto | **ROJO** |
+| Veredicto inicial | **ROJO** |
 
-**Pendiente (sospecha, no conclusion):** `THROTTLE_MS = 50` por sala no
-serializa, solo agrega un retraso uniforme — `lastBroadcastTs` se actualiza
-DENTRO de `broadcast()`, asi que N mensajes simultaneos calculan el mismo
-retraso y salen juntos igual. Hay que leerlo con calma antes de tocarlo.
+#### El perfilado dio la respuesta
+
+    total=485ms  config=0ms  limite=4ms  espera_throttle=456ms  emit_a_1000=25ms
+
+El tiempo NO se iba en configuracion (cacheada), ni en el limite de tasa
+(4 ms de Redis), ni en el reparto en si (25 ms). Se iba **esperando turno**,
+y esa espera crecia sola: 98 → 124 → 150 → ... → 475 ms.
+
+**Mecanismo:** Node es de un solo hilo. Cada reparto a 1.000 sockets lo
+bloquea ~25 ms. Con 40 mensajes/s entrando, el servidor necesita 40 × 25 =
+**1.000 ms de trabajo por cada segundo** que pasa. No queda margen. Por eso
+el CPU marcaba 0-4%: no estaba calculando, estaba **haciendo fila**.
+
+(Correccion: antes se habia escrito que el throttle agregaba "como maximo
+50 ms". Falso — era el 95% del problema.)
+
+#### El arreglo: un proceso por nucleo + WebSocket puro
+
+| Canario con 1.000 en la sala | Antes | Despues |
+|---|---|---|
+| Ida y vuelta p50 | **631 ms** | **30 ms** |
+| p95 | **1.181 ms** | **43 ms** |
+| Errores reales | — | **0** |
+
+Los 4 nucleos estaban ociosos. Cada proceso entrega a ~250 en vez de 1.000.
+
+**Por que NO se agrupo mensajes** (la idea "elegante"): tocaba la UI
+optimista del chat en Expo y webapp. Al revisar salio que Expo, kiosko,
+Mission Control, Event Pulse, chat-monitor, attendance-check y display **ya
+usaban websocket puro** — solo la webapp tenia sondeo. Una linea, no una
+reescritura.
+
+**Por que NO `ip_hash`** (la solucion de manual de Socket.IO): en un evento
+todos estan detras del wifi del recinto, o sea UNA IP publica. Los 1.000
+caerian en el mismo proceso. La receta estandar falla justo en este caso.
+
+#### Regresion que introdujo el cluster (cazada por Kamilo)
+
+Pregunta suya: *"desde Mission Control o settings podemos limitar el chat,
+no?"*. El modo lento por sesion y el cache de palabras bloqueadas viven en
+la MEMORIA de cada proceso; la orden llega por HTTP a UNO solo:
+
+· subir el modo lento → solo el 25% de la gente lo recibia
+· bloquear una palabra ofensiva → el 75% la seguia viendo hasta 5 minutos
+
+Lo segundo es una falla de **moderacion**. Arreglado con un canal Redis
+(`socket:config`) que todos los procesos escuchan. Verificado: 4 de 4.
+
+Y al verificarlo salio otro: con `pubClient.duplicate()` solo 2 de 4 quedaban
+suscritos de verdad — los cuatro lo decian en el log pero
+`PUBSUB NUMSUB` reportaba 2. **El log mentia.** Causa: era el unico cliente
+Redis sin manejador de errores, se suscribia antes de registrar el manejador
+de mensajes, y no se re-suscribia al reconectar.
 
 ### Lo que el patron NO cubre (deliberado)
 
