@@ -185,6 +185,52 @@ sola: la espera iba de 98 ms a 475 ms.
 comentó, y el socket sale ANTES de responder el POST, así que deduplicar por
 id llegaba tarde.
 
+## Bugs que SOLO aparecieron abriendo el navegador
+
+> Ocho defectos que ninguna prueba de carga ni revision de codigo encontro.
+> Los 8 escenarios pasaron en verde mientras estos estaban vivos.
+
+**13. El magic link llevaba a un 404.** El backend armaba `/auth/verify`; la
+ruta real es `/verify` — en la webapp la carpeta se llama `(auth)` y los
+parentesis son un GRUPO de Next: organizan archivos, no aparecen en la URL.
+
+**14. El login con contraseña devolvia 500.** `env()` entrega TEXTO y nadie
+convertia `SANCTUM_TOKEN_EXPIRATION` a numero: `addMinutes("10080")` hacia
+fallar a Carbon. En desarrollo la variable no esta definida y se usaba el
+default (entero), por eso nunca se vio. Y el magic link emite su token SIN
+expiracion — un camino tapaba al otro.
+
+**15. Un servidor lento EXPULSABA a la gente.** `getMe()` devolvia null ante
+cualquier fallo que no fuera 401, y todas las paginas hacen
+`if (!user) redirect('/login')`. O sea que "no pude preguntarle al backend" se
+trataba igual que "no tenes sesion". Con 5.000 navegando, abrir el perfil
+cerraba la sesion. Y se retroalimenta: los expulsados vuelven todos juntos y
+agravan el pico que los echo.
+
+**16. Los tableros daban 403.** nginx con `index index.php` a secas intenta
+listar el directorio: Event Pulse y Mission Control son carpetas con
+index.html. Data Center no lo sufria porque tiene ruta propia en Laravel —
+por eso el fallo era desparejo y confundia.
+
+**17. TODO el admin estaba caido.** `Vite manifest not found`. El backend
+tiene su propio package.json para el tema de Filament y el despliegue nunca
+corria `pnpm run build`. El admin completo y el Data Center —que vive detras
+de su login— inaccesibles. La API respondia perfecto mientras tanto.
+
+**18. Las acciones masivas no avisaban nada.** Aprobar 82 publicaciones
+funcionaba, pero sin notificacion y con los contadores viejos hasta recargar.
+Lo unico que se movia era la seleccion limpiandose — y eso se ve IGUAL cuando
+funciona que cuando falla. **Una accion que funciona en silencio es
+indistinguible de una que falla.**
+
+**19. Los premios no se veian.** Sembrados y habilitados, pero el evento tenia
+`rewards_enabled` apagado: el endpoint devolvia lista vacia sin explicar nada.
+
+**20. La caché de auth vence y la estampida vuelve.** La ventana deslizante
+solo se renueva al leerse. Con 5.000 llegando de golpe contra caché frio
+—"todos se registraron anoche"— reaparecio: 832 de 1.500 conexiones perdidas
+por timeout. **Pendiente de resolver antes de un evento real.**
+
 ## Optimizaciones aplicadas
 
 **OPcache con JIT + cachés de Laravel** — pasos de producción que faltaban:
