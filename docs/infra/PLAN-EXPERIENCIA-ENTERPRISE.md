@@ -49,15 +49,43 @@ digan los promedios.
 
 ---
 
-## El dato que falta y bloquea todo lo demas
+## El dato que faltaba — MEDIDO 2026-08-02 (E1)
 
-**Nunca se midio cuantas peticiones genera una persona real por minuto.**
+| | |
+|---|---|
+| Abrir la app | **8 peticiones** (las 8 consultas de la pantalla de inicio) |
+| **1.000 personas quietas, 45 s** | **0 peticiones** |
+| Por persona por minuto en reposo | **0,000** |
 
-Toda la aritmetica de capacidad (incluida la de `DISPONIBILIDAD-HA.md`) se
-apoya en ese numero, y no existe. Es lo PRIMERO que hay que responder: sin el,
-"¿cuantos servidores para X personas?" no tiene respuesta honesta.
+**Cero literal.** Queda VALIDADO lo que `DISPONIBILIDAD-HA.md` afirmaba y
+estaba sin verificar: **la carga no es proporcional a cuanta gente hay sino a
+cuantas ACCIONES ocurren.** Alguien con la app abierta sin tocarla no le
+cuesta nada al servidor — la invalidacion por socket cumple.
 
-Sale de E1 y E6 midiendo peticiones/usuario/minuto en navegacion realista.
+### La formula, con datos medidos
+
+```
+techo del servidor    ~70 peticiones/segundo
+abrir la app           8 peticiones
+estar quieto           0 peticiones
+```
+
+**→ ~8,7 personas por segundo entrando sin degradar**
+**→ ~525 personas por minuto**
+**→ 5.000 personas entran comodas en ~10 minutos**
+
+Respuesta vendible: *"si su evento abre puertas 10 minutos antes, 5.000
+personas entran sin sentir nada"*. Si abren todos de golpe en 3 minutos, hay
+cola.
+
+**La palanca:** como el techo lo pone el costo fijo de ~45 ms por peticion,
+bajarlo a la mitad DUPLICA la capacidad de llegada sin tocar hardware.
+
+### E1 — resultado (1.000 personas)
+
+1.000/1.000 sockets · 8.000 peticiones · **0 fallidas** · primera pantalla
+p50 1,7 s (inflada porque el ritmo real de llegada dio 46 req/s, cerca del
+techo; sin cola serian ~400 ms).
 
 ---
 
@@ -194,9 +222,10 @@ no solo el numero final.
 | **E3** la agenda cambia | **VERDE** — corrido, roto, arreglado y re-medido |
 | **E2** el anuncio | **VERDE** — mismo patron, mecanismo verificado |
 | **E4** el chat | **VERDE** — perfilado, diagnosticado y arreglado (ver abajo) |
-| E1, E5-E8 | sin correr |
+| **E1** se abren las puertas | **VERDE** — y trae el dato que faltaba |
+| E5-E8 | sin correr |
 | Canario | **implementado** (`e3-agenda-storm.js`) |
-| Peticiones por usuario/minuto | **sin medir** (bloquea la aritmetica de capacidad) |
+| Peticiones por usuario/minuto | **MEDIDO**: 8 por arranque · **0 en reposo** |
 
 ### E3 — resultado (2026-08-01, 3.000 conectados)
 
