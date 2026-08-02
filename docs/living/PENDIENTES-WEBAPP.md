@@ -78,7 +78,9 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 > · Expo documentos legacy por alinear.
 >
 > **FUERA de "webapp only"** (superficies/infra aparte — NO son pendiente de webapp):
-> **DEPLOY DEMO 0/6** (infra: hosting/backend prod/Next prod/socket PM2/evento demo/DSN) ·
+> ~~DEPLOY DEMO 0/6~~ **HECHO 2026-08-01/02** (produccion real, 8 escenarios verde, 25 bugs) ·
+> **RENDIMIENTO Y CAPACIDAD 0/5** (frente nuevo — empezar por los 45 ms) ·
+> **SEGURIDAD DEL STAFF 0/2** (raya: sin 2FA no sale la URL) ·
 > **Paridad config admin↔superficies 0/3** (toca backend/Filament/Expo/webapp a la vez) ·
 > **Event Pulse** = display propio del backend, **COMPLETO** — solo queda diagnosticar el
 > cache del `moments.js` v2 + 1 decision de diseño (cada-interaccion-hero vs actual);
@@ -313,16 +315,63 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 > ya cubre su parte con W.1 magic link. Boton "Ver introduccion" queda oculto (Bloque 0).
 > Si Fase 2 pide espejo del wizard completo, se disena entonces.
 
-### DEPLOY DEMO — 0/6 (anotado 2026-07-11, decision Kamilo — prioridad estrategica post-pivote)
-> El pivote comercial (2026-07-08) puso "completitud + deploy demo" como prioridad para
-> prospectos oct-nov. Hasta hoy el deploy solo existia como el item DSN Sentry de Fase C —
-> este bloque lo hace explicito. Alcance por definir en sesion propia (hosting/costo).
-- [ ] Hosting + dominio: decidir stack (VPS unico con Laravel+Next+socket+Redis vs managed) y costo mensual objetivo (ref project_scaling_10k: $80-120/mes es el techo 10K; una demo necesita MUCHO menos)
-- [ ] Backend Laravel prod: env + queue worker + cron + storage (S3/local) + Mailgun/SES real (magic links)
-- [ ] eventos-web prod: build Next standalone + env (API_INTERNAL_URL, socket, VAPID) + HTTPS (requisito del scanner vendor)
-- [ ] eventos-socket prod: PM2 + Redis DB 2 + CORS al dominio real
-- [ ] Evento demo curado: seeders existentes (ReseedSessionsSeeder relativo a HOY + QaTriviaSeeder + LiveHubDemoSeeder) + branding pulido + cuentas de demo por rol (asistente/vendor/staff)
-- [ ] DSN Sentry prod + validacion (item que ya vivia en B5 Fase C — se ejecuta aca)
+### DEPLOY DEMO — 6/6 **HECHO 2026-08-01/02** (produccion real, luego destruida con snapshot)
+
+> Se monto el stack COMPLETO en DigitalOcean nyc1 sobre `killjoy.pro` y se
+> corrieron los 8 escenarios de experiencia. **Guia probada: `docs/infra/deploy.sh`
+> (~15 min; el primer montaje a mano tomo 3 horas).** Diagnostico completo:
+> `docs/infra/DIAGNOSTICO-2026-08-02.md`.
+- [x] Hosting + dominio — 1 droplet 4 vCPU/8 GB **$48/mes** + Cloudflare + R2 (`cdn.killjoy.pro`)
+- [x] Backend Laravel prod — env + Horizon + cron + R2 + **Resend** (magic links verificados)
+- [x] eventos-web prod — Next standalone + HTTPS + los `X-Forwarded-*` que nadie documentaba
+- [x] eventos-socket prod — **PM2 cluster 4 procesos** + Redis DB 2 + WebSocket puro
+- [x] Evento demo curado — 5.050 asistentes, 120 archivos, slides, FAQ, premios, Q&A (`DemoMediaSeeder` + `DemoCompletoSeeder`)
+- [x] DSN Sentry prod
+- [x] **BONUS: 25 bugs corregidos**, 8 de ellos visibles SOLO abriendo el navegador
+
+**Droplets DESTRUIDOS el 2026-08-02** (con snapshot, ~$0,40/mes). Ya no facturan.
+Volver: `docs/infra/COMO-VOLVER.md` — **apagar NO detiene el cobro, hay que destruir.**
+
+---
+
+### RENDIMIENTO Y CAPACIDAD — 0/5 (frente ABIERTO 2026-08-02, nace del stress test)
+
+> **Capacidad VERIFICADA: 1.500 navegando OK (CPU 82%) — 5.000 navegando ROTO.**
+> Todo este bloque se trabaja **local**, sin droplets encendidos.
+> Plan de escalado con el porque de cada paso: `docs/infra/COMO-CRECEMOS.md`.
+
+- [ ] **Los 45 ms de costo fijo por peticion** — PRIMERO. Una ruta que NO EXISTE
+      cuesta ~45 ms; el trabajo real de la app son 7 ms. **Bajarlo a la mitad
+      DUPLICA la capacidad sin comprar hardware.** Se diagnostica con profiler en
+      Laragon (el desglose es el mismo, cambian los absolutos). Sospechosos sin
+      confirmar: pila de middleware, ~20 observadores al arranque, sesion
+      levantandose en rutas de API. **Va antes que medir la curva: optimizar
+      invalida la medicion.**
+- [ ] **Instrumentar el ritmo real de navegacion** — cuantas pantallas abre una
+      persona por minuto. **Es el multiplicador de 5x de toda la cuenta comercial
+      y hoy es un supuesto mio** (asumi 1 pantalla cada 20-40 s). No se resuelve
+      adivinando mejor: se mide. Y de paso es una funcionalidad que le sirve al cliente.
+- [ ] **La estampida en frio** — la cache de auth vence y **832 de 1.500 conexiones
+      se pierden** cuando todos llegan con la ficha vencida ("todos se registraron
+      anoche", el caso mas normal). Requiere diseno, no parche: precalentar? TTL
+      mas largo? cola en el handshake?
+- [ ] **Medir la curva 1.500→5.000** — DESPUES de los 45 ms. Solo tenemos dos
+      puntos y uno roto; no se sabe donde se quiebra. Necesita droplets: se
+      remonta con `deploy.sh` y de paso se verifica que la guia funciona limpia.
+- [ ] **El techo propio de la webapp Next** — tiro 503 en el pico de 5.000 pero
+      nunca se midio por separado del backend.
+
+---
+
+### SEGURIDAD DEL STAFF — 0/2 (movido a post-deploy 2026-08-01)
+
+> **Raya escrita por Kamilo: la URL del admin no sale a NINGUN prospecto ni recibe
+> datos reales sin el 2FA puesto.** Ver [[project_security_audit]].
+- [ ] 2FA / passkeys en el panel admin (el HTTPS que exigen ya lo regala el deploy)
+- [ ] **Rotar credenciales de R2** — quedaron escritas en el chat del 2026-08-02.
+      R2 NO se destruyo con los droplets.
+- [ ] Cloudflare a **naranja** antes de exponer nada (en gris se registraron 125
+      intentos de bots buscando `/.env` desde 7 IPs)
 
 > **Paralelos movidos fuera de este doc (2026-07-14):** Paridad config admin↔superficies,
 > Event Pulse cliente, y Backlog Expo NO son features de webapp — viven ahora en
