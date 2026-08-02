@@ -6,6 +6,88 @@
 
 ---
 
+## SESION 2026-08-01/02 (Opus 5) — PRODUCCION REAL: 8 escenarios en verde + 25 bugs corregidos
+
+**Documentos maestros de esta sesion:**
+- `docs/infra/DIAGNOSTICO-2026-08-02.md` — que se monto, capacidad medida, los
+  25 errores, buenas practicas, y como se crece a varios droplets con failover
+- `docs/infra/COMO-VOLVER.md` — **apagar NO detiene el cobro**; snapshot + destroy
+- `docs/infra/deploy.sh` — montaje completo en ~15 min (el primero tomo 3 horas)
+- `docs/infra/PLAN-EXPERIENCIA-ENTERPRISE.md` — los 8 escenarios, todos VERDE
+
+### Lo que quedo probado
+
+Stack completo en **DigitalOcean nyc1** (`killjoy.pro`): HTTPS, R2 con dominio
+propio, Resend, webapp Next, 4 procesos de socket, Horizon. Evento demo con
+5.050 asistentes, 120 archivos generados, slides, FAQ, premios, Q&A.
+
+| | |
+|---|---|
+| Sockets simultaneos | **5.000**, 0 fallos |
+| HTTP sostenido | **~70 req/s** · cuello = **CPU** |
+| Abrir la app | 8 peticiones · **0 en reposo** |
+| Capacidad real | **~1.000-2.000 navegando activamente** por droplet |
+| Latencia desde Colombia | **+100 ms** sobre lo medido en datacenter |
+
+**CORRECCION**: los docs decian "DO sao1" y justificaban con RTT de Bogota.
+**DigitalOcean no tiene region en Sao Paulo.** El servidor esta en nyc1.
+
+### Los 8 escenarios — todos VERDE
+
+E1 puertas · E2 anuncio · E3 agenda (**52,5 s → 0,20 s**) · E4 chat
+(**631 → 30 ms**) · E5 fotos · E6 control · E7 caida (**100% vuelve en 11 s**)
+· E8 organizador (no afecta a nadie).
+
+**Ninguno pidio rediseño.** Los cimientos aguantan.
+
+### 25 bugs — los peores fueron SILENCIOSOS
+
+Chat perdiendo 4.241 mensajes sin una señal · magic link mudo (3 fallas
+encadenadas) · ranking roto en MySQL 8 y solo visible con miles de asistentes
+· backend sin poder instalarse con `--no-dev` · moderacion llegando al 25% ·
+un log que decia "suscrito" mintiendo · estampida de autenticacion ·
+`worker_connections` en 768 capando en 1.536 sockets.
+
+**Y 8 que SOLO aparecieron abriendo el navegador**, con los 8 escenarios ya en
+verde: el magic link a un 404 · login con contraseña en 500 · **un servidor
+lento EXPULSABA a la gente** · tableros en 403 · **TODO el admin caido** por
+falta de compilar Filament · acciones masivas funcionando en silencio ·
+premios invisibles por un flag.
+
+### DECISIONES KAMILO (no re-preguntar)
+
+1. **Alcance del stress: produccion completa, nada a medias.** Recortar solo
+   mueve el trabajo a un pendiente futuro.
+2. **Los tests miden el eje equivocado**: falta el REPARTO (una accion que se
+   propaga a miles). De ahi nacio el plan de 8 escenarios con **el canario**.
+3. **Objetivo correcto**: cero degradacion durante la ventana del evento, NO
+   99,999% anual (26 s/año, exige multi-region, protege horas sin nadie).
+4. **Seguridad del staff**: despues del deploy, con la raya escrita — la URL
+   no sale a ningun prospecto sin el 2FA puesto.
+
+### PROXIMA SESION
+
+**Estado: los droplets siguen ENCENDIDOS** (`eventos-target` 134.209.116.227 ·
+`eventos-load` 104.248.53.253). Decidir snapshot+destroy — ver `COMO-VOLVER.md`.
+
+**Pendientes por orden:**
+1. **Rotar credenciales de R2** (quedaron en el chat)
+2. **La cache de auth vence y la estampida vuelve en frio** — 832 de 1.500
+   conexiones perdidas cuando todos llegan con caché vencida. Sin resolver.
+3. **QA del Expo: cero.** Todo lo de hoy se verifico solo en webapp.
+4. Kiosko (camara en device) · streaming con publico real · push · recorrido
+   completo de una persona
+5. **Los 45 ms de costo fijo por peticion** — una ruta vacia cuesta casi lo
+   mismo que una con consulta. Bajarlo a la mitad DUPLICA la capacidad sin
+   comprar hardware. Es la palanca mas rentable que queda.
+6. Cloudflare a naranja antes de exponerlo (hoy en gris, ya hay bots)
+
+**NO esta listo para un cliente pagando.** Falta QA de cliente completo, el
+recorrido de punta a punta y la seguridad del staff. Pero ya se sabe
+exactamente que falta, cuanto aguanta y cuanto cuesta.
+
+---
+
 ## SESION 2026-08-01 NOCHE (Opus 5) — DEPLOY DE PRODUCCION REAL + STRESS TEST EJECUTADO
 
 **Informe completo: `docs/infra/INFORME-STRESS-2026-08-01.md`.** Todo
