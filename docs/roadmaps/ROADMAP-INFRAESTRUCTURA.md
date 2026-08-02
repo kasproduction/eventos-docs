@@ -1,4 +1,4 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 6/26
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 8/30
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
@@ -119,7 +119,7 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
 > seccion `mobileNav` — el build lo reporta como `MISSING_MESSAGE`. Portugues
 > esta incompleto.
 
-## I.1 — Rendimiento del nodo — 2/5
+## I.1 — Rendimiento — 4/9
 
 - [x] **La escritura de Sanctum en cada lectura** (`7fd3a76`). `last_used_at`
       hacia un UPDATE en cada peticion autenticada; con MySQL en durabilidad
@@ -135,6 +135,39 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
 - [ ] **Los tres `COUNT` de `branding`** (asistentes, sesiones, fotos) se
       recalculan en cada llamada. Cacheables.
 - [ ] **Re-medir el techo** con todo aplicado y publicar UN numero por endpoint.
+
+### La app preguntaba de mas — cazado por Kamilo navegando (2026-08-02)
+
+> Su observacion, textual: *"aunque ya hubiese abierto todos los modulos siguen
+> cargando esqueletos... el esqueleto pasa de ser algo bonito a un indicador de
+> que algo esta mal"*. Tenia razon, y no era solo estetica: **cada esqueleto es
+> una peticion al servidor.**
+>
+> Medido: una persona, dos clics = **51 llamadas al backend**.
+
+- [x] **El rail precargaba los 10 modulos en cada navegacion** (`ab6e6ff`).
+      Ahora precarga UNO al pasar el mouse. Carga completa: de 19 peticiones de
+      precarga a **0**.
+- [x] **Los datos del evento se pedian 7 veces por navegacion** (`ab6e6ff`).
+      Cache en memoria del servidor, 30 s, **con la sesion en la clave** — se
+      personalizan, y cachear por evento a secas le entregaria a una persona los
+      datos de otra. Dos clics: de 51 llamadas a **36**.
+- [ ] **El esqueleto al VOLVER sigue ahi.** Hipotesis a verificar: el cache de
+      navegacion (5 min, ya configurado) lo borra `router.refresh()`, que la app
+      llama ante cada aviso de tiempo real — y en Next eso **invalida todos los
+      modulos, no solo el que cambio**. Con un evento vivo eso pasa seguido.
+      **El arreglo es refrescar solo lo que cambio, y eso toca el tiempo real
+      entero: merece diseño, no parche.**
+- [ ] **La webapp toca su propio techo con UNA persona.** Aparecieron `503` en
+      desafio, speakers, live, social y documentos **con el servidor vacio**,
+      por la rafaga de renders simultaneos. Deberia irse con la rafaga — hay que
+      verificarlo. **Ese techo nunca se midio por separado del backend.**
+
+> **Y lo que esto le hace al catalogo:** el script de carga cuenta **1 peticion
+> por pantalla**; un usuario real de navegador costaba **10 o mas**. Las "2.500
+> personas" de I.3 se midieron con clientes que piden mucho menos que la app
+> real. **Hace falta un escenario que entre por la webapp** — el mismo agujero
+> del arnes que ya escondio el bug de los limites por IP.
 
 ## I.2 — Instrumentacion del ritmo real — 0/3
 
