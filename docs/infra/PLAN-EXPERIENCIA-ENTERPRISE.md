@@ -193,7 +193,8 @@ no solo el numero final.
 |---|---|
 | **E3** la agenda cambia | **VERDE** — corrido, roto, arreglado y re-medido |
 | **E2** el anuncio | **VERDE** — mismo patron, mecanismo verificado |
-| E1, E4-E8 | sin correr |
+| **E4** el chat | **ROJO** — corrido; destapo perdida de datos (arreglada) + latencia pendiente |
+| E1, E5-E8 | sin correr |
 | Canario | **implementado** (`e3-agenda-storm.js`) |
 | Peticiones por usuario/minuto | **sin medir** (bloquea la aritmetica de capacidad) |
 
@@ -225,6 +226,37 @@ Anuncio segmentado a un rol → `[invalidate]`, camino viejo.
 para todos. Repartir un anuncio segmentado a toda la sala no seria lentitud,
 seria una fuga. **Regla para los proximos escenarios: verificar SIEMPRE si el
 dato es identico para todos ANTES de repartirlo.**
+
+### E4 — resultado (2026-08-01, 1.000 en la sala, 100 escribiendo)
+
+**El hallazgo NO fue de rendimiento: fue perdida de datos silenciosa.**
+
+`postToLaravel` (eventos-socket/chat.ts) hablaba HTTP plano contra el puerto
+80. En produccion la API es HTTPS en el 443 y el 80 responde un redirect.
+Como el envio es fire-and-forget con `req.on('error', () => {})` **no habia
+una sola señal**: ni error, ni log, ni trabajo fallido.
+
+**Se enviaron 4.241 mensajes y la tabla quedo en 0 filas.**
+
+En un evento real: cero historial de chat, export `chat_messages` del Data
+Center vacio, moderacion sin nada que mostrar. En desarrollo funcionaba
+porque ahi la API si es HTTP — por eso nunca se vio.
+
+Arreglado y verificado: **1.817 mensajes guardados**. Ademas se le puso
+registro al fallo; el silencio absoluto fue lo que dejo pasar 4.241 mensajes.
+
+| Metrica | Valor |
+|---|---|
+| Ida y vuelta (todos) | p50 558 ms · **p95 1.877 ms** |
+| **Canario** | p50 247 ms · **p95 1.779 ms** |
+| Limite de tasa | 128 rebotes (sano) |
+| `SESSION_NOT_JOINED` | 48 — sin investigar |
+| Veredicto | **ROJO** |
+
+**Pendiente (sospecha, no conclusion):** `THROTTLE_MS = 50` por sala no
+serializa, solo agrega un retraso uniforme — `lastBroadcastTs` se actualiza
+DENTRO de `broadcast()`, asi que N mensajes simultaneos calculan el mismo
+retraso y salen juntos igual. Hay que leerlo con calma antes de tocarlo.
 
 ### Lo que el patron NO cubre (deliberado)
 
