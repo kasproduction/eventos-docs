@@ -318,6 +318,10 @@ una invalidación fallida durara una semana en vez de 15 minutos.
 
 # 7. Infraestructura: cómo crece
 
+> **Desarrollado en detalle en `docs/infra/COMO-CRECEMOS.md`** — con las cuatro
+> etapas, qué cambia en cada una, costos reales y por qué el plan viejo de
+> "dos droplets iguales" NO es el primer paso.
+
 ## Hoy — un droplet por evento (decisión firme)
 
 ```
