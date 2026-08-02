@@ -4,7 +4,41 @@
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
 > **NOTA:** Los numeros BUG-XXX en este archivo son historicos. La numeracion fue reorganizada el 2026-04-23.
 > Fuente de verdad para bugs: `docs/BUG-LOG.md` (numeracion secuencial BUG-001 a BUG-232).
-> Actualizado: 2026-07-20
+> Actualizado: 2026-08-01
+
+---
+
+## Sueltos del Expo + BUG-LOG a cero — 2026-08-01
+
+Sesion de barrido antes del deploy. Expo `main` (commit selectivo — el WIP del recap
+sigue intacto en el working tree) · backend `feature/magic-link-auth` · socket `main`.
+
+- **Enforcement de modulos en el Expo (cierra la paridad F10 en la 3a superficie)**.
+  `ModuleMenu.tsx` tenia los 4 modulos clavados a mano e ignoraba `useModules()`.
+  Ahora filtra contra el endpoint (que ya devuelve **solo los encendidos**), espejo
+  literal del rail de la webapp (`SidebarPill.tsx:103-104`). **Fail-open** sin datos:
+  un backend caido no puede dejar al asistente sin navegacion. Si no queda ninguno el
+  grid no se dibuja (decision Kamilo: el Home conserva HappeningNow + HUD + campana;
+  un cartel de "no hay modulos" seria ruido sobre una decision deliberada). Los de rol
+  (`staff_checkin`, `admin`) no son del catalogo y no se filtran. **No se agregaron
+  entradas nuevas** — documentos/paginas/recap siguen llegando por deeplinks, HUD y
+  Ayuda del perfil, coherente con "no inventar entradas de menu que Expo no tiene".
+- **`ENTITY_KEYS` gana `modules`** (`useDataInvalidation.ts`). El backend emitia
+  `modules` (`ModuleObserver` + `ModulosPanel.php:162`) y el Expo lo descartaba en el
+  `return` del listener — era el unico cliente sordo. Una linea reconecta una cadena
+  ya probada en la webapp.
+- **Double-count del comentario propio (`useWall`)**. `addComment` sumaba +1 optimista
+  y el listener `wall:comment` volvia a sumar al rebotar el broadcast. **No se podia
+  arreglar solo en el Expo**: el payload no decia quien comento, y deduplicar por id
+  llegaba tarde porque el backend emite el socket ANTES de responder el POST
+  (`WallController.php:208` vs `:210`). Fix en 3 repos, 4 lineas: el broadcast manda
+  `attendee_id`, el tipo del socket lo refleja, y el Expo hace **skip-self** — el
+  mismo patron que ya usaba `useDataInvalidation.ts:276`.
+- **BUG-LOG a 0 pendientes de 305.** BUG-127 (metricas MC) y BUG-111 (PollSlides)
+  estaban resueltos en codigo desde hacia tiempo y nadie los habia marcado; se
+  cerraron con la evidencia archivo:linea en cada entrada.
+- Hallazgo anotado en PENDIENTES: `ModuleMenuCompact.tsx` esta importado pero nunca
+  renderizado (componente huerfano).
 
 ---
 

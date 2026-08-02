@@ -4,8 +4,9 @@
 > Organizado por AREA tecnica, con prioridad de impacto dentro de cada una.
 > Filtro post-pivote 2026-07-08: "¿esto acerca el demo desplegado y vendible
 > para prospectos oct-nov?" (el deal Eventos Efectivos/Bancolombia se cayo).
-> Actualizado: 2026-07-19 (limpieza: lo cerrado se movio a COMPLETADO.md)
-> Bugs: BUG-001 a BUG-305, 226+ resueltos, 2 pendientes (BUG-111, BUG-127)
+> Actualizado: 2026-08-01 (sueltos cerrados: enforcement Expo + double-count + BUG-LOG a cero)
+> Bugs: BUG-001 a BUG-305, **0 pendientes** (BUG-111 y BUG-127 cerrados 2026-08-01
+> por auditoria de vigencia — ya estaban resueltos en codigo sin marcar)
 
 ---
 
@@ -302,10 +303,14 @@
 > webapp quede solo con lo de webapp (features + QA + deploy). Ninguno bloquea el cierre.
 
 ### Paridad config admin ↔ 3 superficies (diseño con Kamilo; toca backend+Filament+Expo+webapp)
-- [ ] **Enforcement de modulos en el Expo**: el panel /admin/modulos + rail
-      webapp YA obedecen (F10, hecho); el grid del Expo sigue hardcodeado a 4
-      modulos (agenda/speakers/social/sponsors) y documentos/banners/passport/
-      pages/recap quedan huerfanos sin entrada. El HUD desafio si obedece.
+- [x] ~~**Enforcement de modulos en el Expo**~~ **HECHO 2026-08-01**: `ModuleMenu.tsx`
+      filtra contra `useModules()` (el endpoint ya devuelve solo los encendidos),
+      fail-open sin datos, grid entero oculto si no queda ninguno (decision Kamilo:
+      el Home conserva HappeningNow + HUD + campana). NO se agregaron entradas
+      nuevas al grid — documentos/paginas/recap se alcanzan por sus caminos reales
+      (deeplinks, HUD, Ayuda del perfil), coherente con "no inventar entradas de
+      menu que Expo no tiene". Ademas `ENTITY_KEYS` gana `modules`, que era lo que
+      dejaba al Expo sordo al broadcast del panel. Falta QA vivo en device.
 - [ ] **Paginas custom: DEFERIDO POST-DEPLOY** (decision Kamilo 2026-07-20:
       "es para el final, no aporta ni detiene, no es dependencia"). El feature
       (iframes/HTML embebido: YouTube, Slido, mapa) tiene backend+API+detalle
@@ -328,8 +333,8 @@
 
 ### Backlog Expo (sesion Expo futura)
 - [ ] Borrar `banners.tsx` + `BannerCarousel` + `bannersApi` del Expo (feature legacy muerta)
-- [ ] `ENTITY_KEYS` sin `modules` (backend la emite, Expo la pierde)
-- [ ] Double-count comment propio en `useWall` (Expo)
+- [ ] `ModuleMenuCompact.tsx` huerfano: importado en `(tabs)/index.tsx:25` pero nunca
+      renderizado (hallazgo 2026-08-01). Borrar componente + import, o darle uso.
 - [ ] Portar "click sesion → agenda highlight" del webapp W.5 al Expo
 - [ ] Validar si `banners.tsx` Expo es vista dedicada o solo carousel embebido
 - [ ] Decidir recap/[eventId] del Expo (→ Fase 2, no mapeado a webapp)

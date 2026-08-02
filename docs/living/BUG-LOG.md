@@ -1241,10 +1241,14 @@
 
 ## 2026-04-18 — Sesion Mission Control QA Live (28 bugs)
 
-### BUG-127: Mission Control metricas se pierden al refrescar (PENDIENTE)
+### BUG-127: Mission Control metricas se pierden al refrescar (RESUELTO)
 - **Severidad:** MEDIA — msgCount vuelve a 0 al recargar pagina
 - **Causa:** Counter es variable JS client-side. Redis guarda ultimos 20 mensajes pero no el count total.
-- **Fix pendiente:** Redis INCR `chat:count:session:{id}` por mensaje. Leer al cargar MC.
+- **Fix:** exactamente el previsto — Redis INCR `chat:count:session:{id}` por mensaje.
+- **Verificado 2026-08-01** (auditoria de vigencia, la cadena ya estaba completa y sin
+  marcar): `eventos-socket/src/chat.ts:394` incrementa · `:289-291` lo emite al socket
+  que entra · `index.ts:415` lo sirve · `mission-control/app.js:926-928` adopta
+  `d.chatCount` cuando supera al contador local.
 
 ### BUG-126: Toast emoji engana — dice "activado" sin guardar (RESUELTO)
 - **Severidad:** MEDIA — moderador cree que emoji only esta activo pero no se guardo
@@ -1326,10 +1330,16 @@
 - **Fix:** Event delegation con data-aid en bannedList
 - **Archivo:** mission-control/app.js
 
-### BUG-111: PollSlides colores hardcoded no coinciden con tema (PENDIENTE PARCIAL)
+### BUG-111: PollSlides colores hardcoded no coinciden con tema (RESUELTO)
 - **Severidad:** MEDIA — encuesta se ve con accent rojo, fondo blanco inconsistente
 - **Causa:** PollSlides usaba rgba dark hardcoded. Migrado a useTheme() pero el accent del evento estaba en #ff0000.
-- **Fix parcial:** Migrar a useTheme(). Accent cambiado a #1A1A1A. Falta pulido visual.
+- **Fix:** migrado a useTheme(). Accent cambiado a #1A1A1A.
+- **Verificado 2026-08-01** (auditoria de vigencia): `PollSlides.tsx` deriva del tema
+  (`theme.isDark`, `theme.blur.tint`). Los colores literales que quedan NO son deuda,
+  son decisiones posteriores de Kamilo: `#B5A68B` es la dorada unificada
+  ([[project_platinum_gold]]) y el verde/rojo de estado sigue el criterio del
+  SurveyDeck (cierre en verde, NO accent — el accent puede ser rojo y leerse como
+  alarma). El "falta pulido visual" era apreciacion, no defecto.
 - **Archivo:** PollSlides.tsx, PollPanel.tsx, QnAPanel.tsx
 
 ### BUG-110: poll sync — PollSlides mantenia state del poll anterior (RESUELTO)
@@ -1975,13 +1985,15 @@
 |-----------|-------|-----------|------------|
 | CRITICA | 32 | 32 | 0 |
 | ALTA | 83 | 83 | 0 |
-| MEDIA | 104 | 102 | 2 (BUG-111, BUG-127) |
+| MEDIA | 104 | 104 | 0 |
 | BAJA | 24 | 24 | 0 |
-| **Total** | **243+** | **241+** | **2** |
+| **Total** | **243+** | **243+** | **0** |
 
 > Nota: BUG-005 a BUG-015 cuentan como 11 bugs individuales en una sola entrada.
 
-Bugs pendientes: BUG-127 (metricas MC persist), BUG-111 (PollSlides accent parcial).
+Bugs pendientes: **NINGUNO**. Los dos ultimos (BUG-127 metricas MC persist, BUG-111
+PollSlides accent) se cerraron el 2026-08-01 por auditoria de vigencia: ambos ya
+estaban resueltos en codigo y nadie los habia marcado. Detalle en cada entrada.
 
 ---
 
