@@ -13,6 +13,72 @@
 
 ---
 
+## 0. REALIDAD MEDIDA (2026-08-01) — leer ANTES que el resto
+
+> **Este documento se escribio con el producto a medio construir y sus numeros
+> de capacidad nunca se habian ejecutado.** El 2026-08-01 se monto el stack
+> completo en produccion y se midio. Informe:
+> `docs/infra/INFORME-STRESS-2026-08-01.md`.
+>
+> Lo que sigue corrige lo que la medicion desmintio. **Donde este seccion
+> contradiga al resto del documento, manda esta.**
+
+### Lo que se midio en 1 droplet 4 vCPU / 8 GB
+
+| | Medido |
+|---|---|
+| HTTP sostenido | **~70 req/s** (el caudal no sube mas; solo crece la cola) |
+| Latencia sin saturar | 53 ms mediana · 187 ms p95 |
+| Sockets simultaneos | **5.000** con 0 fallos (tras los arreglos de abajo) |
+| Cuello de botella | **CPU** — 0% libre con **6,1 GB de RAM sin usar** y MySQL en 2-8 hilos |
+
+### Afirmaciones de este documento que la medicion DESMINTIO
+
+| Decia | Realidad |
+|---|---|
+| "Cada request servido en ~5ms" (cache Redis) | **46 ms**. Y una ruta que NO EXISTE cuesta casi lo mismo que una con consulta a BD: **~45 ms son costo fijo del framework**, no trabajo de la app |
+| 2 droplets = 10.000 concurrentes ($168/mes) | **Sin validar.** 1 droplet = ~70 req/s. La cuenta no cierra por un factor de ~5-7x *si* la carga fuera proporcional a la gente (ver matiz abajo) |
+| Nada sobre limites de nginx | `worker_connections 768` (default Ubuntu) capaba en **1.536 sockets** sin importar el hardware: cada WebSocket con proxy consume 2 conexiones |
+| Nada sobre el costo de autenticar sockets | Cada conexion disparaba **1 peticion HTTP completa** a `/auth/me` (~50 ms de CPU). 5.000 llegando juntos = ~250 s de CPU solo para abrir la puerta |
+
+### Lo que este documento defiende bien y SIGUE SIENDO CIERTO
+
+La seccion 7.5 (anti-colapso) tiene razon en lo esencial: **con invalidacion
+por socket, un usuario en reposo genera CERO peticiones.** La carga no es
+proporcional a *cuanta gente hay* sino a *cuantas acciones ocurren*. Eso cambia
+toda la aritmetica y es la razon por la que la estimacion original no es
+absurda.
+
+**El agujero real: nunca se midio cuantas peticiones genera una persona real
+por minuto en un evento.** Todo calculo de capacidad se apoya en ese numero y
+ese numero no existe. Es lo primero que deben responder los escenarios de
+`docs/infra/PLAN-EXPERIENCIA-ENTERPRISE.md`.
+
+### Arreglado el 2026-08-01
+
+- **Estampida de autenticacion**: Laravel deja la identidad en Redis al emitir
+  el token (`App\Services\SocketAuthCache`); el socket la lee en ~0,2 ms sin
+  tocar PHP. Resultado medido: 5.000 conexiones = **0 peticiones a Laravel**
+  (antes 5.000), tiempo de conexion de 2.886 ms a **1.232 ms**, 0 fallos.
+- **`worker_connections` 768 → 16384** + `worker_rlimit_nofile 65535`. Solo
+  eso llevo de 1.468 a 2.500 conexiones.
+- OPcache con JIT + `config:cache`/`route:cache`: **+25% de capacidad gratis**
+  (mediana 564 → 363 ms).
+
+### Sobre el objetivo de disponibilidad — correccion de criterio
+
+99,999% son **26 segundos de caida al AÑO**. No se logra con 2 droplets en una
+region; exige multi-region. Pero para una plataforma de eventos **esa es la
+metrica equivocada**: a un organizador no le importa un martes a las 3am entre
+eventos.
+
+**El objetivo correcto es: CERO DEGRADACION DURANTE LA VENTANA DEL EVENTO.**
+Es alcanzable, es verificable, y es lo que un cliente enterprise realmente
+compra. Perseguir cinco nueves anuales gasta en proteger las horas en que no
+hay nadie.
+
+---
+
 ## 1. Principio Fundamental
 
 **Nada corre en un solo lugar.** Cada componente tiene réplica o failover automático.
@@ -473,6 +539,13 @@ Un evento de 8 horas con 2 Droplets de emergencia = ~$1.12 total.
 
 ### Escenario produccion: 10,000 usuarios concurrentes
 
+> **OJO (2026-08-01): esta capacidad NO esta validada.** Es una estimacion
+> previa a cualquier medicion. Lo verificado en 1 droplet identico: ~70 req/s
+> y 5.000 sockets. Si la carga fuera proporcional a la gente, la cuenta no
+> cierra por ~5-7x; el argumento de que NO lo es (usuarios en reposo = cero
+> peticiones) es solido pero depende de un dato que aun no existe: cuantas
+> peticiones genera una persona real por minuto. Ver seccion 0.
+
 | Servicio | Plan | Costo/mes |
 |----------|------|-----------|
 | Droplet-1 DO sao1 | 4 vCPU, 8GB RAM | $48 |
@@ -572,7 +645,7 @@ Cada capa opera independientemente. Si todas fallan, pull-to-refresh manual sigu
 | **Jitter 0-2s** | App (cliente) | 10k requests en 2s, no en 1ms |
 | **Throttle 1s** | Backend (Redis TTL) | Admin edita 5 cosas → 1 evento socket |
 | **React Query dedup** | App (cliente) | 3 eventos seguidos → 1 solo refetch |
-| **Redis cache API** | Backend | Cada request servido en ~5ms |
+| **Redis cache API** | Backend | ~~Cada request servido en ~5ms~~ → **medido 2026-08-01: 46 ms.** El cache evita la consulta, pero ~45 ms son costo fijo del framework: una ruta inexistente cuesta lo mismo. Ver seccion 0 |
 | **Warm cache** | Backend (Observer) | Cache::forget ANTES de broadcast → refetch trae datos frescos |
 | **hasConnectedOnce flag** | App (cliente) | Primera conexion no invalida innecesariamente |
 
