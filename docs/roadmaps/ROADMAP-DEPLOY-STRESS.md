@@ -1,4 +1,27 @@
-# ROADMAP — DEPLOY PRODUCCION + STRESS TEST — 0/24
+# ROADMAP — DEPLOY PRODUCCION + STRESS TEST — 21/24
+
+> ## EJECUTADO 2026-08-01 → **`docs/infra/INFORME-STRESS-2026-08-01.md`**
+>
+> Stack completo montado en `killjoy.pro` (HTTPS real, R2, Resend, webapp Next
+> incluida) sobre 4 vCPU / 8 GB, medido desde un generador aparte con 5.050
+> asistentes reales sembrados.
+>
+> **El numero: ~70 peticiones/segundo y ~1.000 conexiones de socket
+> simultaneas. Cuello de botella = CPU (0% libre con 6,1 GB de RAM sin usar).
+> Traduccion: ~1.000 personas con la app abierta a la vez; un evento de
+> 1.000-2.000 inscritos entra comodo en un droplet de $48/mes.**
+>
+> **3 bugs de producto cazados** (los tres habrian llegado a un cliente):
+> leaderboard rompiendo en MySQL 8 — y solo visible con miles de asistentes —,
+> el backend sin poder instalarse con `--no-dev`, y HTMLPurifier sin su
+> directorio de cache. **+4 defectos del arnes** que estaban dando numeros
+> falsos. **+25% de capacidad gratis** con OPcache/JIT y cachés de Laravel.
+>
+> **Los droplets siguen VIVOS** — destruirlos es decision de Kamilo.
+> `eventos-target` 134.209.116.227 · `eventos-load` 104.248.53.253.
+>
+> Falta: prueba mixta con el admin bajo carga (D.4.4), rotar credenciales R2,
+> y decidir la destruccion.
 
 > **Decision Kamilo 2026-08-01**: se reactiva el stress test (estaba DIFERIDO
 > desde el pivote del 2026-07-08) y se define el alcance sin ambiguedad:

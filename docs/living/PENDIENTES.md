@@ -182,7 +182,39 @@
 
 ---
 
-## 7. Stress test — **REACTIVADO 2026-08-01 (decision Kamilo)**
+## 7. Stress test — **EJECUTADO 2026-08-01** → `docs/infra/INFORME-STRESS-2026-08-01.md`
+
+> **RESULTADO: ~70 req/s · ~1.000 sockets simultaneos · cuello de botella CPU**
+> (0% libre con 6,1 GB de RAM sin tocar). Traduccion comercial: **~1.000
+> personas con la app abierta a la vez; un evento de 1.000-2.000 inscritos
+> entra comodo en un droplet de $48/mes**. Para crecer se suman NUCLEOS, no
+> memoria.
+>
+> Los dos bloqueantes D.0 quedaron resueltos y commiteados. Salieron 3 bugs de
+> producto (leaderboard/MySQL 8, backend sin instalar con `--no-dev`,
+> HTMLPurifier) y 4 defectos del arnes de medicion. +25% de capacidad gratis
+> con OPcache/JIT y cachés de Laravel.
+>
+> **PENDIENTE INMEDIATO**: los droplets siguen ENCENDIDOS y facturando
+> (`eventos-target` 134.209.116.227 · `eventos-load` 104.248.53.253, ~$0.14/h
+> entre los dos). Destruirlos es decision de Kamilo tras leer el informe.
+> Tambien: **rotar las credenciales de R2** (quedaron escritas en el chat de
+> la sesion; alcance acotado a objetos de un bucket, pero R2 no se destruye).
+
+### Quedo sin correr
+
+- [ ] D.4.4 prueba mixta: HTTP + sockets + `stress-admin.js` a la vez (el
+      admin trabajando mientras el evento corre — el escenario mas realista)
+- [ ] Prueba de red degradada 4G Colombia (TEST 5 del plan v2.1): todo se
+      midio dentro del mismo centro de datos a proposito, para saturar el
+      servidor y no medir el cable
+- [ ] Mitigar el hallazgo de arquitectura: **cada conexion de socket cuesta
+      una peticion HTTP** a `/auth/me` (verificado: 1.468 conexiones = 1.468
+      peticiones, pico de 76/s = justo el techo de la maquina). Una
+      reconexion masiva se come sola toda la capacidad HTTP. Mitigacion:
+      que el socket valide el token sin pegarle al backend en cada handshake.
+
+## 7b. Stress test 10K — sigue DIFERIDO
 
 > **Kamilo revierte el diferido del 2026-07-08**: "necesito ya medir esto, lo
 > postergamos mucho tiempo". Y define el alcance: **NO a medias — se monta

@@ -6,6 +6,72 @@
 
 ---
 
+## SESION 2026-08-01 NOCHE (Opus 5) — DEPLOY DE PRODUCCION REAL + STRESS TEST EJECUTADO
+
+**Informe completo: `docs/infra/INFORME-STRESS-2026-08-01.md`.** Todo
+commiteado y pusheado (backend `0e31e32` `5f2f575` `79cfd0b` `fc4cbbb`
+`8b43002` `4f242ba` en feature/magic-link-auth · socket `10aeefa` · docs).
+
+### El numero que faltaba desde el pivote
+
+**~70 peticiones/segundo · ~1.000 conexiones de socket simultaneas.**
+Cuello de botella = **CPU** (0% libre con **6,1 GB de RAM sin usar** y MySQL
+en 2-8 hilos). La cuenta cierra: mediana sin saturar 53 ms, 4 nucleos / 53 ms
+= ~75 req/s teoricos. **La app es eficiente; se acabaron los nucleos.**
+
+Traduccion comercial: **~1.000 personas con la app abierta a la vez. Un
+evento de 1.000-2.000 inscritos entra comodo en un droplet de $48/mes.**
+Para crecer se suman NUCLEOS, no memoria. Subir `pm.max_children` no serviria.
+
+### 3 bugs de producto que habrian llegado a un cliente
+
+1. **Leaderboard 500 en el 86% de las peticiones** — `only_full_group_by`
+   viene ACTIVADO en MySQL 8 y apagado en Laragon. La rama que falla **solo
+   corre si el asistente NO esta en el top 50**: con los 50 del seed, todos
+   estaban dentro y jamas se ejecutaba. Aparece recien con miles de personas.
+2. **El backend no se podia instalar en produccion**: `composer install
+   --no-dev` reventaba por Telescope (require-dev) registrado siempre.
+3. **HTMLPurifier sin su directorio de cache** — guardar contenido con HTML
+   fallaba en cualquier servidor recien montado.
+
++4 defectos del arnes de medicion que daban numeros falsos (tokens mal
+repartidos → medi­a sus propios 429; `/banners` muerto dando 404; `stress-full`
+no cabe en 8 GB por OOM; artillery no manda el token de socket).
+
+**+25% de capacidad gratis** con OPcache/JIT y cachés de Laravel
+(mediana 564→363 ms, p95 1,86→1,35 s).
+
+### Hallazgo de arquitectura (no es bug, nadie lo habia visto)
+
+**Cada conexion de socket cuesta una peticion HTTP** a `/auth/me`. Verificado
+en nginx: 1.468 conexiones = 1.468 peticiones, con pico de 76/s — justo el
+techo de la maquina. Una reconexion masiva (mil personas perdiendo wifi) se
+come sola toda la capacidad HTTP.
+
+### ESTADO AL CIERRE — OJO
+
+- **Los dos droplets siguen ENCENDIDOS y facturando** (~$0.14/h entre ambos):
+  `eventos-target` **134.209.116.227** · `eventos-load` **104.248.53.253**.
+  Destruirlos es decision de Kamilo tras leer el informe.
+- El stack quedo **vivo y sano**: `https://api.killjoy.pro` ·
+  `https://app.killjoy.pro` · `https://socket.killjoy.pro`, los 3 en 200,
+  certificados validos, servicios activos. Credenciales en
+  `/root/CREDENCIALES.txt` del target.
+- **Rotar las credenciales de R2** (quedaron escritas en el chat).
+- Quedo sin correr: prueba mixta con el admin bajo carga · red degradada 4G.
+
+### PROXIMA SESION
+
+Decidir sobre los droplets, y despues **DEPLOY DEMO** — que ahora tiene guia
+probada (la seccion de la guia en el informe: `X-Forwarded-Host` obligatorio
+o Next filtra el puerto interno · `LARAVEL_API_URL` lleva `/api/v1` ·
+`APP_URL` real desde el primer arranque · llave de despliegue para los repos
+privados · el log que sirve es el diario). Detras: seguridad del staff
+(2FA+passkeys, con la raya: la URL no sale a un prospecto sin eso) · reglas
+del Event Pulse · QA device · landing.
+
+---
+
 ## SESION 2026-08-01 (Opus 5) — Sueltos cerrados · BUG-LOG a CERO · deploy+stress reactivado
 
 **TODO COMMITEADO Y PUSHEADO**: backend `8d4f5b9` (feature/magic-link-auth) ·
