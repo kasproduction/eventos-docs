@@ -223,7 +223,9 @@ no solo el numero final.
 | **E2** el anuncio | **VERDE** — mismo patron, mecanismo verificado |
 | **E4** el chat | **VERDE** — perfilado, diagnosticado y arreglado (ver abajo) |
 | **E1** se abren las puertas | **VERDE** — y trae el dato que faltaba |
-| E5-E8 | sin correr |
+| **E7** se cae algo | **VERDE** — 100% recupera solo en ~11 s |
+| **E8** el organizador | **VERDE** — no afecta a los asistentes |
+| E5, E6 | sin correr |
 | Canario | **implementado** (`e3-agenda-storm.js`) |
 | Peticiones por usuario/minuto | **MEDIDO**: 8 por arranque · **0 en reposo** |
 
@@ -335,6 +337,39 @@ suscritos de verdad — los cuatro lo decian en el log pero
 `PUBSUB NUMSUB` reportaba 2. **El log mentia.** Causa: era el unico cliente
 Redis sin manejador de errores, se suscribia antes de registrar el manejador
 de mensajes, y no se re-suscribia al reconectar.
+
+### E7 — resultado (2026-08-02, 1.321 conectados)
+
+Se mataron los CUATRO procesos del socket de golpe, con gente adentro.
+
+| | |
+|---|---|
+| Se cayeron | 1.321 (todos) |
+| **Recuperados** | **1.321 — 100%** |
+| Colgados sin volver | **0** |
+| Tiempo de recuperacion | **~10,7 s** para todos |
+
+La sospecha era que la reconexion masiva fuera peor que la caida. **No paso**,
+y la razon es directa: la cache de auth arreglada hoy hace que reconectar no
+le cueste peticiones al backend. Ese arreglo se pago solo aca.
+
+### E8 — resultado (2026-08-02, 800 dentro + organizador trabajando)
+
+**El trabajo del admin NO toca la experiencia de los asistentes.** El canario
+se mantuvo en **3-4 ms con 0 errores** en las tres corridas. La sospecha —que
+un export pesado le robara CPU a miles— queda descartada. La latencia del
+propio admin tambien esta bien: mediana 40 ms.
+
+**Pregunta de producto que destapo, sin responder:** el limite de 60
+peticiones/minuto **por persona** aplica tambien al organizador. Las tablas de
+Filament paginan, filtran y refrescan; un organizador activo puede pasarse
+solo y recibir 429. Medirlo con una cuenta real antes del demo.
+
+Dos defectos del arnes corregidos en el camino (ambos reportaban como falla
+del servidor lo que era del test): apuntaba a `/admin/events/{id}/attendees`,
+ruta inexistente; y buscaba la cuenta de organizador muestreando 20 tokens —
+lo que dejo de funcionar con mi propio arreglo de E4, porque con UN solo admin
+entre 5.050 la probabilidad de hallarlo en 20 intentos es del 0,4%.
 
 ### Lo que el patron NO cubre (deliberado)
 
