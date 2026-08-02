@@ -15,6 +15,11 @@
 
 ## 0. REALIDAD MEDIDA (2026-08-01) — leer ANTES que el resto
 
+> **DIAGNOSTICO COMPLETO Y GUIA DE CRECIMIENTO:
+> `docs/infra/DIAGNOSTICO-2026-08-02.md`** — que se monto, los 8 escenarios,
+> los 15 errores encontrados, buenas practicas y como se crece a varios
+> droplets con failover.
+>
 > **Este documento se escribio con el producto a medio construir y sus numeros
 > de capacidad nunca se habian ejecutado.** El 2026-08-01 se monto el stack
 > completo en produccion y se midio. Informe:
@@ -22,6 +27,22 @@
 >
 > Lo que sigue corrige lo que la medicion desmintio. **Donde este seccion
 > contradiga al resto del documento, manda esta.**
+
+### CORRECCION DE REGION — el documento nombra una region que NO EXISTE
+
+Este documento (y `PLAN-STRESS-TESTDO.md`) dicen **"DO sao1 consolidado"** y
+justifican la eleccion con *"RTT Bogota ~80ms vs ~150ms"*.
+
+**DigitalOcean NO tiene region en Sao Paulo.** El servidor real quedo en
+**nyc1 (Nueva York)** — verificado en la metadata del droplet.
+
+Consecuencia medida desde Colombia contra nyc1: **~100 ms de ida y vuelta de
+red**. Todas las cifras de latencia de los escenarios se tomaron DENTRO del
+datacenter, asi que **la experiencia real de un asistente en Bogota es esos
+numeros + ~100 ms** (abrir la app: 118 ms medidos → ~220 ms reales).
+
+Efecto colateral bueno: el bucket R2 quedo en ENAM (Norteamerica Este), o sea
+la MISMA region que el servidor. Sin querer, quedo optimo.
 
 ### Lo que se midio en 1 droplet 4 vCPU / 8 GB
 
