@@ -137,8 +137,10 @@ redimensiona el droplet y se corre `evento-en-vivo.js`.)*
 **Sin cambiar una línea de código ni de arquitectura.** Y si además se hizo la
 etapa 1, cada número se duplica.
 
-**Hasta ~5.000 personas navegando, este es el camino.** No hay razón para
-complicar la arquitectura antes.
+**Mientras el numero quepa en una sola maquina, este es el camino.** No hay
+razon para complicar la arquitectura antes — y cada salto se verifica corriendo
+`evento-en-vivo.js` con el canario, que es exactamente como se descubrio que
+1.500 iba bien y 5.000 no.
 
 ---
 
