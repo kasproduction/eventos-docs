@@ -270,6 +270,14 @@ Despues, en el servidor:
   php artisan config:cache && php artisan route:cache && php artisan view:cache
   mkdir -p storage/app/purifier && chown -R www-data:www-data storage bootstrap/cache
 
+  # OBLIGATORIO: el panel Filament necesita sus recursos compilados con Vite.
+  # Sin esto TODO el admin da "Error del servidor" (Vite manifest not found)
+  # y el Data Center, que vive detras del login del admin, tampoco entra.
+  # Se descubrio recien al abrirlo en el navegador (2026-08-02).
+  pnpm install && pnpm run build
+  php artisan filament:optimize
+  chown -R www-data:www-data public/build
+
   cd /var/www/socket && pnpm install && pnpm build
   pm2 start ecosystem.config.js && pm2 save && pm2 startup systemd -u root --hp /root
 
