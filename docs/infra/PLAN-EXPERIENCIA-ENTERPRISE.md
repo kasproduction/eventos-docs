@@ -191,9 +191,48 @@ no solo el numero final.
 
 | Escenario | Estado |
 |---|---|
-| E1-E8 | **0/8** — sin correr |
-| Canario | sin implementar |
+| **E3** la agenda cambia | **VERDE** — corrido, roto, arreglado y re-medido |
+| **E2** el anuncio | **VERDE** — mismo patron, mecanismo verificado |
+| E1, E4-E8 | sin correr |
+| Canario | **implementado** (`e3-agenda-storm.js`) |
 | Peticiones por usuario/minuto | **sin medir** (bloquea la aritmetica de capacidad) |
+
+### E3 — resultado (2026-08-01, 3.000 conectados)
+
+| | Antes | Despues |
+|---|---|---|
+| Peticiones que genera el cambio | **3.000** | **0** |
+| Ultimo en tener la agenda | **52,5 s** | **0,20 s** |
+| Latencia del refresco | p50 27,6 s | *no hay refresco* |
+| **Canario p95** | **29.415 ms** | **74 ms** |
+| Veredicto | **ROJO** | **VERDE** |
+
+El arreglo: el aviso viaja CON el dato (`InvalidationService::sync` +
+`data:sync`). Se reparte **1.272 bytes** por la conexion que ya existe en vez
+de 3.000 peticiones HTTP. **260 veces mas rapido gastando menos.**
+
+Dos decisiones lo hicieron viable: mandar **la sesion** (1,2 KB) y no la
+agenda (34 KB); y descubrir que **la agenda no es igual para todos**
+(`is_favorite` es por persona) — mandar la agenda completa le habria pisado
+los favoritos a 3.000 personas con los del admin.
+
+### E2 — mecanismo verificado
+
+Anuncio para todos → `[sync] announcements bytes=238`.
+Anuncio segmentado a un rol → `[invalidate]`, camino viejo.
+
+**Segunda vez que aparece la misma leccion**: el dato no siempre es igual
+para todos. Repartir un anuncio segmentado a toda la sala no seria lentitud,
+seria una fuga. **Regla para los proximos escenarios: verificar SIEMPRE si el
+dato es identico para todos ANTES de repartirlo.**
+
+### Lo que el patron NO cubre (deliberado)
+
+Crear o borrar sesiones · sesion que cambia de dia · anuncios segmentados.
+Todo eso sigue por invalidar y refrescar. El cliente no puede parchar lo que
+no tiene, y son casos raros a mitad de evento.
+
+Falta: la webapp ya lo implementa (`AgendaView`), pero **sin QA vivo**.
 
 Herramientas ya construidas y reutilizables: `tests/load/runner.js` (un
 escenario a la vez) · `socket-load.js` (cliente real con metricas) ·
