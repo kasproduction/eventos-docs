@@ -334,32 +334,30 @@ Volver: `docs/infra/COMO-VOLVER.md` — **apagar NO detiene el cobro, hay que de
 
 ---
 
-### RENDIMIENTO Y CAPACIDAD — 0/5 (frente ABIERTO 2026-08-02, nace del stress test)
+### RENDIMIENTO Y CAPACIDAD → **MOVIDO 2026-08-02** a `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`
 
-> **Capacidad VERIFICADA: 1.500 navegando OK (CPU 82%) — 5.000 navegando ROTO.**
-> Todo este bloque se trabaja **local**, sin droplets encendidos.
-> Plan de escalado con el porque de cada paso: `docs/infra/COMO-CRECEMOS.md`.
-
-- [ ] **Los 45 ms de costo fijo por peticion** — PRIMERO. Una ruta que NO EXISTE
-      cuesta ~45 ms; el trabajo real de la app son 7 ms. **Bajarlo a la mitad
-      DUPLICA la capacidad sin comprar hardware.** Se diagnostica con profiler en
-      Laragon (el desglose es el mismo, cambian los absolutos). Sospechosos sin
-      confirmar: pila de middleware, ~20 observadores al arranque, sesion
-      levantandose en rutas de API. **Va antes que medir la curva: optimizar
-      invalida la medicion.**
-- [ ] **Instrumentar el ritmo real de navegacion** — cuantas pantallas abre una
-      persona por minuto. **Es el multiplicador de 5x de toda la cuenta comercial
-      y hoy es un supuesto mio** (asumi 1 pantalla cada 20-40 s). No se resuelve
-      adivinando mejor: se mide. Y de paso es una funcionalidad que le sirve al cliente.
-- [ ] **La estampida en frio** — la cache de auth vence y **832 de 1.500 conexiones
-      se pierden** cuando todos llegan con la ficha vencida ("todos se registraron
-      anoche", el caso mas normal). Requiere diseno, no parche: precalentar? TTL
-      mas largo? cola en el handshake?
-- [ ] **Medir la curva 1.500→5.000** — DESPUES de los 45 ms. Solo tenemos dos
-      puntos y uno roto; no se sabe donde se quiebra. Necesita droplets: se
-      remonta con `deploy.sh` y de paso se verifica que la guia funciona limpia.
-- [ ] **El techo propio de la webapp Next** — tiro 503 en el pico de 5.000 pero
-      nunca se midio por separado del backend.
+> Este bloque nacio de una premisa que se midio y resulto **falsa**: los "45 ms
+> de peaje fijo" que iban a duplicar la capacidad eran 33, y el propio documento
+> decia que 15-25 seria sano. **Ese 2x nunca estuvo disponible.**
+>
+> Lo que si aparecio, midiendo de verdad sobre el droplet:
+>
+> | | antes | despues |
+> |---|---|---|
+> | 1.500 personas navegando | **82% de CPU** | **46%** |
+> | 2.500 personas navegando | sin medir | **68%**, 87,4 pantallas/s, 0 errores |
+> | `branding` | 37,8 ms | **27,6 ms** |
+>
+> Dos causas, ninguna sospechada: Sanctum dejaba **una escritura en cada
+> lectura**, y el panel de administracion **arrancaba entero en cada peticion de
+> la API** porque `filament:optimize` nunca se habia corrido.
+>
+> **Y navegando —no midiendo— salio algo peor: los limites por IP contaban para
+> TODA la plataforma** (5 ingresos por minuto entre todos), porque la webapp
+> llama al backend desde el servidor. Un evento real se caia en la puerta.
+>
+> **Todo el frente, con el catalogo de niveles vendibles, vive ahora en
+> `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` (2/26).**
 
 ---
 
