@@ -111,6 +111,16 @@ sed -i 's/^pm = .*/pm = dynamic/;s/^pm.max_children = .*/pm.max_children = 60/;s
 grep -q '^pm.max_requests' $P && sed -i 's/^pm.max_requests = .*/pm.max_requests = 500/' $P || echo 'pm.max_requests = 500' >> $P
 
 # OPcache + JIT: +25% de capacidad medido, gratis
+#
+# TRAMPA DE DESPLIEGUE (verificada el 2026-08-02): `validate_timestamps=0` hace
+# que PHP-FPM NUNCA vuelva a mirar los archivos. Subir codigo nuevo, o correr
+# config:cache / route:cache, NO TIENE NINGUN EFECTO hasta recargar FPM:
+#
+#     systemctl reload php8.3-fpm
+#
+# Pasa en silencio: el servidor sigue respondiendo 200 con la version vieja.
+# Se descubrio regenerando la cache de rutas y viendo 404 en rutas que
+# `route:list` sí mostraba.
 cat > /etc/php/8.3/fpm/conf.d/99-eventos-opcache.ini <<'EOF'
 opcache.enable=1
 opcache.memory_consumption=256
@@ -268,6 +278,16 @@ Despues, en el servidor:
   php artisan migrate --force && php artisan db:seed --force
   php artisan security:check         # DEBE dar verde antes de abrir nada
   php artisan config:cache && php artisan route:cache && php artisan view:cache
+
+  # NO ES OPCIONAL Y NO ES SOLO DEL ADMIN — vale ~8,7 ms en CADA peticion de
+  # la API, la use un asistente que jamas abre el panel.
+  # Medido el 2026-08-02 sobre el droplet: sin esta cache, el proveedor de
+  # Filament arrancaba en 10,47 ms por peticion resolviendo sus iconos de
+  # Blade; con ella, 0,51 ms. El piso del framework paso de 19,8 a 11,4 ms.
+  # La primera vez que se corrio, el 2026-08-01, se salto justamente porque
+  # parecia un paso cosmetico del panel.
+  php artisan filament:optimize
+
   mkdir -p storage/app/purifier && chown -R www-data:www-data storage bootstrap/cache
 
   # OBLIGATORIO: el panel Filament necesita sus recursos compilados con Vite.
@@ -275,8 +295,11 @@ Despues, en el servidor:
   # y el Data Center, que vive detras del login del admin, tampoco entra.
   # Se descubrio recien al abrirlo en el navegador (2026-08-02).
   pnpm install && pnpm run build
-  php artisan filament:optimize
   chown -R www-data:www-data public/build
+
+  # Verificar que la cache quedo escrita — si esta vacia, no se aplico:
+  #   find bootstrap/cache/filament -type f   # debe listar panels/admin.php
+  #   ls bootstrap/cache/blade-icons.php
 
   cd /var/www/socket && pnpm install && pnpm build
   pm2 start ecosystem.config.js && pm2 save && pm2 startup systemd -u root --hp /root
