@@ -8,6 +8,124 @@
 
 ---
 
+## SESION 2026-08-17 (Opus 5 → Fable 5) — LA PERSONA 301 EN CHROME: el stack medido, 4 bugs cazados navegando, esqueletos resueltos
+
+**Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` (20/45) — EL
+CATALOGO esta escrito arriba del todo.** Commits: eventos-web `253107a` +
+`2397cdb` + `430ef94` · backend `cce1a84` (feature/magic-link-auth) · APP
+EVENTOS (este). Todo desplegado en `killjoy.pro` y verificado en vivo.
+
+### Como arranco: "no sirvio de nada, cada vez sale un numero distinto, pienso pasarlo a C#"
+
+Kamilo llego con razon en el fondo: tres mediciones, tres numeros de
+"personas". La respuesta que se sostuvo: **las peticiones/segundo nunca se
+movieron (70 → 87 → 95); lo que cambio fue el divisor "llamadas por persona"
+que yo suponia (1) y era 9.** "Personas" nunca fue una medicion: era una cuenta
+con una constante inventada adentro. Y **C# no arregla nada de lo que
+encontramos hoy**: ninguna de las 4 fallas era PHP.
+
+### Metodo nuevo — el que Kamilo pidio 5 veces
+
+**Claude ES la persona 301 en Chrome (MCP), navegando la app real mientras N
+sinteticos cargan.** Los sinteticos (`entrar-por-la-puerta.js`) no ejecutan
+JS; la persona 301 si. Sirvio para lo que ninguna corrida anterior podia:
+**ver la pantalla rota** aunque el servidor diga 200 y el CPU este al 41%.
+
+### 1. Las 7 llamadas por pantalla, con nombre — y el marco cacheado
+
+`auth/me · by-slug · contact-requests · announcements · documents · modules` +
+**la unica que la persona vino a ver.** 6 de 7 = marco repetido en cada clic.
+Ahora en memoria del servidor de Next (`lib/marco.ts`), clave
+`entidad:evento:attendeeId`, **invalidado a proposito por el backend**
+(`InvalidationService::soltarMarcoWebapp` → `POST /api/internal/invalidate`,
+secreto `WEBAPP_INTERNAL_SECRET`, ANTES del socket). TTL 60 s = red de
+seguridad. 7 → 2 llamadas. **Medido con 300: CPU 61% → 41%, p50 250-600 →
+105-215 ms.** No 3x: las 2 que quedan son las caras.
+
+Gotchas que costaron: `globalThis` para el Map (Next empaqueta ruta y layout
+por separado: `removed: 0`) · catch AFUERA del productor (un fallo no se
+cachea) · clave exacta por persona ("…:13" como prefijo borra "…:1320") ·
+`documents` NUNCA emitia invalidacion (ahora si) · solicitudes avisan por
+persona.
+
+### 2. Los 4 bugs que solo vio la persona 301
+
+1. **`TRUSTED_PROXIES` con la IP del droplet del 2 de agosto** — el snapshot
+   la trae quemada. Laravel no confiaba en Next → toda la webapp = una IP →
+   `by-slug` (300/min por IP) le dio 429 a la persona 301. **Es `41b8040`
+   reaparecido por configuracion.** Corregido en el droplet + `deploy.sh`.
+   **Al restaurar snapshot: revisar TRUSTED_PROXIES SIEMPRE.**
+2. **El placeholder "evento vacio" (id 0) se cacheaba un minuto** tras un
+   fallo pasajero → sin anuncios, sin desafio, `/events/0/...`. Catch afuera.
+3. **`by-slug` NO se personaliza** — el `registered_for_user` que justificaba
+   clave por sesion no existe. Clave = slug: 1 llamada/min para todos.
+4. **CADA CLIC EN EL RAIL BORRABA EL CACHE DE NAVEGACION** (`430ef94`) — **los
+   esqueletos al volver que Kamilo señalo.** `useRouter` de next-intl es un
+   objeto nuevo por ruta (useMemo con usePathname); estaba en las deps del
+   efecto del socket → se rehacia por clic → veia el socket conectado →
+   `router.refresh()` "de reconexion" con jitter. Contado en Chrome: 1 clic =
+   1 refresh a los ~1,8 s. **Local no lo sufria** (sin socket server). Ahora
+   volver a Agenda = **0 peticiones**, primera visita 1 (antes 3-4).
+
+### 3. LA CURVA DE UNA MAQUINA (4 vCPU / 8 GB), persona 301 en Chrome
+
+**300 plano** (TTFB 170-335 ms, CPU 41%) · **400 se siente** (mediana 620 ms,
+picos 2 s, 58%) · **480-500 al limite** (multitud p50 0,4-3,9 s, p95 2,4-5 s,
+69-73%) · **700 ROTO** (9/19/9 s — **Kamilo lo vivio como la persona 701**,
+me interrumpio y tenia razon: no le avise que lanzaba 700). El codo esta entre
+300 y 400 y llega antes del 60% de CPU: rompen las olas, no el promedio.
+
+Reparto medido con 300: Laravel 1,0 nucleo · Next 0,4 · MySQL 0,3 · resto 0,1.
+
+**Corrección honesta:** de la corrida de 480 reporte "mediana ~330 ms" mirando
+solo mis vueltas de canario; la multitud tenia p50 370-1.354 ms. 480-500 es
+"al limite", no comodo. Y con 500 sinteticos encima Kamilo navego: ~3 s por
+pantalla el primer minuto (tormenta de entrada), despues rapido incluso al
+refrescar.
+
+### 4. EL CATALOGO — un combo aislado por cliente (tabla completa en el roadmap)
+
+| Nivel | Activas | Combo | ~USD/mes | Estado |
+|---|---|---|---|---|
+| 1 Basico | hasta 300 | 1 maquina 4 vCPU todo adentro + respaldo R2 + snapshot | ~$70 | **MEDIDO** |
+| 2 Sin punto unico | hasta 1.000 | 2 API + 1 web + 1 sockets/colas + MySQL standby + Redis + LB | ~$350-420 | DERIVADO |
+| 3 Tranquilidad | hasta 2.500 | 4-5 API + 2 web + 2 sockets + MySQL HA+replica + Redis HA | ~$800-1.000 | DERIVADO |
+| 4 Masivo | 5.000-10.000 | 8-10 API + 3-4 web + 3 sockets + MySQL 2 replicas | ~$1.600-2.500 | DERIVADO |
+
+"Activas" al ritmo del script (muy activas). Nada derivado se promete sin
+medirlo. Sinteticos pesan MAS que reales (no tienen el fix del navegador).
+
+### DECISIONES / REGLAS (no re-preguntar)
+
+1. **La medicion que vale es la persona N+1 en un navegador real** encima de la
+   carga. Las corridas del script son complemento.
+2. **El stack se vende por combo aislado por cliente, con nivel medido.** No
+   se afirma "duplica/triplica" antes de medir — hoy el marco dio −33%, no 3x.
+3. **Polling NO** (Kamilo pregunto): 300 personas × 1 pregunta/10 s = 30 req/s
+   sin que nadie haga nada. Push por socket cuesta 0-4% con 5.000.
+4. Avisar SIEMPRE antes de lanzar una corrida cuando Kamilo esta navegando.
+
+### PROXIMA SESION
+
+**Montar y medir el nivel 2** (3-4 droplets + MySQL/Redis administrados),
+`deploy.sh` por roles (`--rol api|web|sockets|todo`), 1.000 personas con
+Kamilo y Claude como las 1.001. Convierte la fila 2 en MEDIDA.
+
+En cola (I.1): `auth/me` cacheado con cuidado (TTL ~10 s + invalidacion en
+logout/ban) · **precarga completa al entrar** (diseño propio: "como HTML
+estatico, se descarga todo en la intro" — hoy la precarga por hover es parcial
+y el clic pide igual) · el socket que refresque solo lo que cambio · el 503 con
+UNA persona (verificar si sigue) · I.1b: 500 entrando → 20 x 429 en la puerta
+(contar fallos) y rutas publicas por IP tambien para el Expo · I.6 (Cloudflare
+naranja, rotar R2, 2FA) antes de exponer la URL.
+
+**Droplets ENCENDIDOS al cierre** (`Eventos-target` 192.241.138.249 4 vCPU/8 GB
+tras resize · `eventos-load` 157.230.55.116). Kamilo decide snapshot+destroy.
+DNS ya apunta a la IP nueva. Local: dev server abajo; `.next` local es build de
+produccion (borrar antes de `pnpm dev`).
+
+---
+
 ## SESION 2026-08-02 TARDE/NOCHE (Opus 5) — LA CAPACIDAD REAL ES 300, NO 2.500
 
 **Ventana operativa nueva: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` (10/33).**

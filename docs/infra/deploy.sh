@@ -321,5 +321,22 @@ VARIABLES QUE NO SE PUEDEN OLVIDAR (cada una costo una hora de depuracion):
   QUEUE_CONNECTION=redis        en desarrollo es 'sync'
   CLOUDFLARE_R2_PUBLIC_URL      sin esto las URLs de archivos salen rotas
 
+  TRUSTED_PROXIES=127.0.0.1,::1,\$(curl -s http://169.254.169.254/metadata/v1/interfaces/public/0/ipv4/address)
+        LA IP PUBLICA DE ESTA MAQUINA, NUNCA QUEMADA A MANO. La webapp le habla
+        al backend por https://api.<dominio>, o sea desde la IP publica del
+        propio droplet; si esa IP no esta en la lista, Laravel ignora el
+        X-Forwarded-For y ve a TODOS los asistentes como una sola IP → los
+        limitadores por IP (login, magic link, by-slug) se agotan entre todos.
+        Cazado el 2026-08-17: al restaurar el snapshot en un droplet nuevo, el
+        .env traia la IP del droplet anterior y la persona 301 recibia 429.
+        **Al restaurar un snapshot, ESTA variable hay que revisarla siempre.**
+
+  WEBAPP_INTERNAL_URLS=http://127.0.0.1:3000   (en el .env de Laravel)
+  WEBAPP_INTERNAL_SECRET=\$(openssl rand -hex 32)  MISMO valor en el .env de
+        Laravel y en /var/www/web/.env.production. Es el aviso con el que el
+        backend le dice a la webapp que suelte su cache del marco (anuncios,
+        modulos, documentos, solicitudes, evento). Sin el, un anuncio nuevo
+        tarda hasta 60 s en la campana.
+
 Credenciales generadas: /root/CREDENCIALES.txt
 EOF

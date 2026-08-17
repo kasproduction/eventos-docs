@@ -1,7 +1,75 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 10/33
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 20/45
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
+
+---
+
+# EL CATALOGO — escrito el 2026-08-17 (leer esto primero)
+
+> **Un combo aislado por cliente.** Adentro, la infraestructura crece con el
+> nivel. Lo MEDIDO se distingue de lo DERIVADO en la ultima columna: **nada
+> derivado se le promete a un cliente sin medirlo antes.**
+
+| Nivel | Personas activas* | Combo | ~USD/mes | Promesa | Estado |
+|---|---|---|---|---|---|
+| **1 · Basico** | hasta **300** | 1 maquina 4 vCPU/8 GB, todo adentro · respaldo horario cifrado a R2 · snapshot diario | ~$70 | Si la maquina cae, **el evento se cae**; se remonta en ~15 min (`deploy.sh`) perdiendo max. 1 hora. Se dice claro. | **MEDIDO 2026-08-17** |
+| **2 · Sin punto unico** | hasta **1.000** | **2 nodos API** Laravel (4 vCPU c/u) tras balanceador · **1 nodo webapp** Next (4 vCPU) · **1 nodo sockets + colas** (2 vCPU) · **MySQL administrado con standby** · **Redis administrado** · respaldo a R2 | ~$350-420 | Se cae un nodo API → nadie lo nota. Se cae la BD → standby en ~1 min. Webapp y sockets siguen siendo un nodo (se remontan en minutos, no es transparente). | DERIVADO — **medir antes de vender** |
+| **3 · Tranquilidad** | hasta **2.500** | **4-5 API** · **2 webapp** · **2 sockets** · MySQL HA + **replica de lectura** · Redis HA · balanceador | ~$800-1.000 | Ningun componente es unico: cualquier nodo cae y el evento sigue. | DERIVADO |
+| **4 · Masivo** | 5.000-10.000 | 8-10 API · 3-4 webapp · 3 sockets · MySQL HA con 2 replicas · Redis HA · balanceador | ~$1.600-2.500 | Idem nivel 3, con margen para olas de miles. | DERIVADO |
+
+*"Activas" = navegando al ritmo del script (una pantalla cada 20-40 s: gente
+MUY activa). Un evento real es mas liviano y admite mas inscritos por cada
+activa — ese multiplicador (I.2) sigue sin medirse. **Estas cifras son el
+piso, no el techo.**
+
+### La curva de UNA maquina (4 vCPU / 8 GB) — medida por la persona 301
+
+Metodo del 2026-08-17: N personas sinteticas por la webapp
+(`entrar-por-la-puerta.js`) y **una persona real en Chrome desde Bogota**
+navegando encima (TTFB por pantalla, `performance` del navegador). Es lo que
+Kamilo pidio desde el principio: *"el usuario 1 y el 301 deben navegar igual"*.
+
+| Activas | Persona 301 (TTFB) | Multitud (p50 / p95 del script) | CPU | Veredicto |
+|---|---|---|---|---|
+| 0 | 260-310 ms | — | 1% | linea base |
+| **300** | **170-335 ms** (igual o mejor que sola) | 105-215 ms / 0,2-1,3 s | 41% | **PLANO** |
+| 400 | mediana ~620 ms, picos 2,1 s | 230-680 ms / 3-3,6 s | 58% | se siente |
+| 480-500 | mediana ~330-620 ms, picos 0,9-2 s | 0,4-3,9 s / 2,4-5 s | 69-73% | **al limite** |
+| **700** | **9 s / 19 s / 9 s** (Kamilo lo vivio como persona 701) | 1,4-20 s | ~85% | **ROTO** |
+
+**El codo esta entre 300 y 400, y llega ANTES de que el CPU toque el 60%:**
+lo que rompe no es el promedio, son las olas (todos entrando, todos cambiando
+de pantalla). Punto de operacion sano: **50% de CPU en regimen.**
+
+**Reparto del CPU medido con 300 activas** (base de los niveles derivados):
+Laravel 1,0 nucleo · Next 0,4 · MySQL 0,3 · sockets+Redis+nginx ~0,1. Por
+cada 100 activas, operando al 50%: ~0,66 nucleos de Laravel, ~0,28 de Next,
+~0,18 de MySQL. RAM nunca es cuello (1,8 de 8 GB). Sockets: 5.000 = 0-4% CPU.
+**Es lineal, y eso es exactamente lo que hay que verificar:** separar roles
+mete latencia de red entre nodos y el balanceador tiene su costo.
+
+**OJO al comparar con el script:** las personas sinteticas no ejecutan
+JavaScript, asi que NO se benefician del arreglo del cache del navegador
+(`430ef94`). Una persona real de hoy pesa MENOS que una sintetica. Con 500
+sinteticos encima (73% CPU), Kamilo navegando en Chrome sintio ~3 s por
+pantalla el primer minuto (tormenta de entrada) y despues rapido, incluso al
+refrescar.
+
+### Lo que ya esta listo para multi-nodo (hecho en agosto sin querer)
+
+WebSocket puro sin afinidad de sesion · adaptador Redis entre procesos de
+socket · cache de auth compartida · archivos en R2 · `deploy.sh` portable · y
+desde hoy la webapp invalida su cache por aviso del backend con **lista de
+URLs** (`WEBAPP_INTERNAL_URLS`), preparada para N nodos web.
+
+### El siguiente paso — convertir el nivel 2 en MEDIDO
+
+Montar el **combo nivel 2 de verdad** (3-4 droplets + MySQL/Redis administrados
+de DO), con `deploy.sh` partido por roles (`--rol api|web|sockets|todo`), y
+correr 1.000 personas con Kamilo y Claude como las 1.001. Un dia de droplets
+(~$5) y una tarde. Al final la fila 2 pasa a MEDIDO y las de arriba se derivan
+de dos puntos en vez de uno.
 
 ---
 
@@ -119,7 +187,67 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
 > seccion `mobileNav` — el build lo reporta como `MISSING_MESSAGE`. Portugues
 > esta incompleto.
 
-## I.1 — Rendimiento — 4/9
+## I.1 — Rendimiento — 9/16
+
+### Lo que se cerro el 2026-08-17 — la persona 301 en Chrome
+
+- [x] **El marco se pedia 7 veces por pantalla** (eventos-web `253107a` +
+      backend `cce1a84`). Una pantalla eran 7 llamadas al backend: `auth/me`,
+      `by-slug`, `contact-requests`, `announcements`, `documents`, `modules` +
+      **la unica que la persona vino a ver**. 6 de 7 eran el marco repetido.
+      Ahora vive en memoria del servidor de Next (`lib/marco.ts`), clave
+      `entidad:evento:attendeeId`, y **el backend lo invalida a proposito**
+      (`InvalidationService::soltarMarcoWebapp` → `POST /api/internal/invalidate`,
+      secreto compartido, ANTES del socket para que el `router.refresh()` de
+      los clientes ya encuentre el cache vacio). El TTL de 60 s es red de
+      seguridad, no el mecanismo. Segunda pantalla: **de 7 llamadas a 2**.
+      **Medido con 300 personas: CPU 61% → 41%, p50 de pantalla 250-600 →
+      105-215 ms.** No el 3x que se esperaba: las 2 llamadas que quedan son
+      las caras (agenda cuesta 2,5x el piso).
+      Gotchas cazados: `globalThis` para el almacen (Next empaqueta ruta y
+      layout por separado: dos Maps, el aviso respondia `removed: 0`) · el
+      catch AFUERA del productor (si no, un fallo se cachea 60 s) · por
+      persona clave EXACTA ("…:13" como prefijo borraria "…:1320") ·
+      `documents` no emitia invalidacion nunca (DocumentObserver ahora si) ·
+      solicitudes de contacto avisan POR PERSONA (NetworkingController).
+- [x] **`by-slug` NO se personaliza** (`2397cdb`): el `registered_for_user` que
+      justificaba una clave por sesion no existe en el backend. Clave = solo
+      slug: **una llamada por minuto para todo el servidor**, y el limitador
+      por IP de by-slug deja de importar para la webapp.
+- [x] **Un fallo pasajero cacheaba "evento vacio" un minuto** (`2397cdb`).
+      Cazado con la persona 301 en Chrome: un 429 en by-slug devolvia el
+      placeholder (id 0), el cache lo guardaba, y esa persona veia el evento
+      sin anuncios ni desafio (`/events/0/...`). Catch afuera del cache.
+- [x] **CADA CLIC EN EL RAIL BORRABA EL CACHE DE NAVEGACION ENTERO** (`430ef94`)
+      — **por eso los esqueletos al volver a una pantalla ya visitada.**
+      `useRouter` de next-intl devuelve un objeto NUEVO por ruta (su useMemo
+      depende de `usePathname`), y `GlobalSocketProvider` lo tenia en las deps
+      del efecto: se rehacia en cada navegacion, veia el socket ya conectado y
+      programaba el `router.refresh()` "de reconexion" con jitter 0-2 s.
+      Contado en produccion con Chrome: **1 clic = 1 refresh a los ~1,8 s.**
+      Local no lo sufria (sin socket server, nunca conecta) — por eso nadie lo
+      vio. Ahora: volver a Agenda = **0 peticiones, instantaneo**; primera
+      visita 1 peticion (antes 3-4). El refresh de reconexion sale SOLO del
+      evento `connect` cuando ya hubo conexion. **Este arreglo no lo mide el
+      script de carga (no ejecuta JS): la ganancia real con navegadores es
+      mayor que la que muestran las corridas.**
+- [ ] **`auth/me` en cada pantalla** — ahora es 1 de las 2 llamadas que quedan
+      (y sostiene ademas la conexion de socket). Cachearla del lado de Next
+      unos segundos es la mayor pieza restante, pero es la SESION: si el
+      backend revoca, tiene que verse rapido (TTL ~10 s + invalidacion en
+      logout/ban). Merece analisis propio.
+- [ ] **Precarga completa al entrar** (diseño propio, pedido de Kamilo:
+      *"como un HTML estatico: se descarga todo en la introduccion"*). Durante
+      el showcase, traer los modulos del rail ENTEROS (`router.prefetch` full),
+      escalonado (uno cada 1-2 s), guardados 30 min → cada clic instantaneo
+      sin esqueleto incluso la primera vez. Hoy la precarga por hover es
+      PARCIAL (hasta `loading.tsx`) y el clic pide el resto igual. Costo: ~10
+      renders por persona una vez al entrar, en el minuto que ya es el peor →
+      escalonar y/o solo los 4-5 modulos principales.
+- [ ] **El socket refresca solo lo que cambio.** Cualquier `data:invalidate`
+      sigue vaciando el cache del navegador ENTERO; con evento vivo eso pasa
+      seguido y la precarga se pierde a cada anuncio. `data:sync` con el dato
+      adentro para anuncios/modulos como ya se hizo con agenda (E3).
 
 - [x] **La escritura de Sanctum en cada lectura** (`7fd3a76`). `last_used_at`
       hacia un UPDATE en cada peticion autenticada; con MySQL en durabilidad
@@ -152,16 +280,17 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
       Cache en memoria del servidor, 30 s, **con la sesion en la clave** — se
       personalizan, y cachear por evento a secas le entregaria a una persona los
       datos de otra. Dos clics: de 51 llamadas a **36**.
-- [ ] **El esqueleto al VOLVER sigue ahi.** Hipotesis a verificar: el cache de
-      navegacion (5 min, ya configurado) lo borra `router.refresh()`, que la app
-      llama ante cada aviso de tiempo real — y en Next eso **invalida todos los
-      modulos, no solo el que cambio**. Con un evento vivo eso pasa seguido.
-      **El arreglo es refrescar solo lo que cambio, y eso toca el tiempo real
-      entero: merece diseño, no parche.**
+- [x] **El esqueleto al VOLVER** — CERRADO 2026-08-17 (`430ef94`, arriba). La
+      hipotesis era parcialmente cierta: si lo borraba `router.refresh()`, pero
+      no el del tiempo real — el de "reconexion" que el socket disparaba EN
+      CADA CLIC. El "refrescar solo lo que cambio" sigue abierto arriba como
+      pieza propia.
 - [ ] **La webapp toca su propio techo con UNA persona.** Aparecieron `503` en
       desafio, speakers, live, social y documentos **con el servidor vacio**,
-      por la rafaga de renders simultaneos. Deberia irse con la rafaga — hay que
-      verificarlo. **Ese techo nunca se midio por separado del backend.**
+      por la rafaga de renders simultaneos. Visto de nuevo el 2026-08-17 en
+      LOCAL con build de produccion: un `503` en una de las 3 peticiones RSC
+      del primer clic a agenda. Con el refresh-por-clic muerto la rafaga es
+      menor; **verificar si sigue apareciendo.**
 
 > **Y lo que esto le hace al catalogo:** el script de carga cuenta **1 peticion
 > por pantalla**; un usuario real de navegador costaba **10 o mas**. Las "2.500
@@ -169,9 +298,26 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
 > real. **Hace falta un escenario que entre por la webapp** — el mismo agujero
 > del arnes que ya escondio el bug de los limites por IP.
 
-## I.1b — La puerta del evento — 1/2
+## I.1b — La puerta del evento — 2/4
 
 > **El bug mas grave del dia, y solo aparecio al entrar por la webapp.**
+
+- [x] **`TRUSTED_PROXIES` con la IP del droplet anterior** (2026-08-17, corregido
+      en el servidor + `deploy.sh`). Al restaurar el snapshot en un droplet
+      nuevo, el `.env` traia la IP publica del droplet del 2 de agosto. La
+      webapp le habla al backend por `https://api.…` (IP publica propia), asi
+      que Laravel NO confiaba en Next como proxy, ignoraba el X-Forwarded-For y
+      veia a TODOS los asistentes como una sola IP: **es el bug de `41b8040`
+      reaparecido por configuracion**. Sintoma: `by-slug` (300/min por IP) le
+      dio 429 a la persona 301 con 300 navegando → evento vacio. **Regla:
+      al restaurar un snapshot, revisar TRUSTED_PROXIES SIEMPRE.**
+- [ ] **500 entrando en 60 s → 20 bloqueados en la puerta (429).** El techo por
+      red de 300/min por IP se agota con 500 personas entrando a 8-10 por
+      segundo desde una IP (= un recinto). Es el mismo item de abajo (contar
+      fallos, no intentos), medido de nuevo hoy. **Y `by-slug`/rutas publicas
+      siguen a 300/min por IP tambien para el Expo** (300 telefonos en el wifi
+      del salon abriendo la app en el mismo minuto): pendiente decidir el
+      limitador de rutas publicas por recinto.
 
 - [x] **El limite de ingreso protegia la red, no la cuenta** (`69dd89c`). En un
       recinto mil personas comparten el wifi, o sea UNA IP publica. Con 5
@@ -206,7 +352,15 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
       eventos de socket. Con eso, *"el 1320 va a 40 peticiones/minuto cuando la
       mediana es 2"* es trivial de detectar, y sirve mas.
 
-## I.3 — El catalogo vendible — 2/6
+## I.3 — El catalogo vendible — 3/6
+
+> **2026-08-17: la tabla del catalogo esta ARRIBA del todo** ("EL CATALOGO").
+> El nivel 1 (una maquina) esta MEDIDO por la persona 301 en Chrome; los
+> niveles 2-4 son DERIVADOS del reparto de CPU medido y hay que montarlos y
+> medirlos antes de venderlos. Lo de abajo es el historico del 2 de agosto.
+
+- [x] **Nivel 1 — una maquina** — MEDIDO 2026-08-17: hasta ~300 activas
+      plano, 500 al limite, 700 roto. Promesa escrita en la tabla.
 
 ### LA CURVA DEL CANARIO — MEDIDA 2026-08-02
 
@@ -322,8 +476,9 @@ complemento, no la medida.**
 - [x] **Correr la curva del canario** buscando **el codo** — donde la linea deja
       de ser plana— y no el punto de rotura. **HECHO: el codo esta entre 2.500 y
       3.000 personas muy activas en una maquina de 4 nucleos.**
-- [ ] **Nivel 1.000** — una maquina. Barato, honesto, **y se dice claro: si esa
-      maquina cae, el evento se cae.**
+- [x] ~~**Nivel 1.000** — una maquina.~~ **SUPERSEDED 2026-08-17: una maquina
+      NO da para 1.000 activas — da para ~300.** Ese es el nivel 1 del
+      catalogo de arriba; 1.000 es el nivel 2 y pide roles separados.
 - [ ] **Niveles 2.500 / 5.000 / 10.000+** — minimo dos nodos, sin punto unico de
       falla. **El salto de nivel no es de capacidad, es de promesa.**
 - [ ] **Revisar la topologia desde cero** (no dar por bueno el dibujo de
