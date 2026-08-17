@@ -10,8 +10,11 @@
 
 ## SESION 2026-08-17 (Opus 5 → Fable 5) — LA PERSONA 301 EN CHROME: el stack medido, 4 bugs cazados navegando, esqueletos resueltos
 
-**Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` (20/45) — EL
-CATALOGO esta escrito arriba del todo.** Commits: eventos-web `253107a` +
+**Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` (21/46) — EL
+CATALOGO esta escrito arriba del todo, y la LISTA DE COMPRA exacta por nivel
+(droplets por rol, tamaños, Cloudflare LB, DO Managed MySQL — NO PlanetScale —,
+Redis administrado HA, sockets en su nodo; **droplet unico = demo, no se
+vende**) en `docs/infra/STACK-PRODUCCION.md`.** Commits: eventos-web `253107a` +
 `2397cdb` + `430ef94` · backend `cce1a84` (feature/magic-link-auth) · APP
 EVENTOS (este). Todo desplegado en `killjoy.pro` y verificado en vivo.
 
@@ -83,17 +86,25 @@ solo mis vueltas de canario; la multitud tenia p50 370-1.354 ms. 480-500 es
 pantalla el primer minuto (tormenta de entrada), despues rapido incluso al
 refrescar.
 
-### 4. EL CATALOGO — un combo aislado por cliente (lista de compra: `docs/infra/STACK-PRODUCCION.md`)
+### 4. EL CATALOGO — la infra real desde el primer nivel vendible (`docs/infra/STACK-PRODUCCION.md`)
+
+**Principio (Kamilo, y estaba en DISPONIBILIDAD-HA §1 desde el primer dia):
+"nada corre en un solo lugar". Un droplet solo es DEMO y no se cotiza.** Mi
+primer borrador puso el droplet unico como "nivel 1 vendible" — Kamilo lo
+rechazo con razon ("si se cae y no arranca, que pasa? eso no es enterprise").
 
 | Nivel | Activas | Combo | ~USD/mes | Estado |
 |---|---|---|---|---|
-| 1 Basico | hasta 300 | 1 maquina 4 vCPU todo adentro + respaldo R2 + snapshot | ~$70 | **MEDIDO** |
-| 2 Sin punto unico | hasta 1.000 | 2 API + 1 web + 1 sockets/colas + MySQL standby + Redis + LB | ~$350-420 | DERIVADO |
-| 3 Tranquilidad | hasta 2.500 | 4-5 API + 2 web + 2 sockets + MySQL HA+replica + Redis HA | ~$800-1.000 | DERIVADO |
-| 4 Masivo | 5.000-10.000 | 8-10 API + 3-4 web + 3 sockets + MySQL 2 replicas | ~$1.600-2.500 | DERIVADO |
+| 0 Demo | ~300 | 1 droplet 4 vCPU | ~$60 | MEDIDO, NO SE VENDE |
+| 1 Basico | hasta 300 | 2 API + 2 web + 2 sockets (2 vCPU) + MySQL standby + Redis HA + Cloudflare LB | ~$240-400 | DERIVADO |
+| 2 | hasta 1.000 | 3 API 4vCPU + 2 web + 2 sockets + admin. | ~$440-600 | DERIVADO |
+| 3 | hasta 2.500 | 5-6 API + 2-3 web + 2 sockets + replica | ~$700-1.050 | DERIVADO |
+| 4 | 5.000-10.000 | 9-12 API + 3-4 web + 3 sockets + 2 replicas | ~$1.300-2.200 | DERIVADO |
 
-"Activas" al ritmo del script (muy activas). Nada derivado se promete sin
-medirlo. Sinteticos pesan MAS que reales (no tienen el fix del navegador).
+Decisiones cerradas: **Cloudflare LB** (no nginx propio, no DO LB) · **DO
+Managed MySQL en VPC, NO PlanetScale** · Redis administrado HA TLS · sockets en
+su nodo (x2 por redundancia) · Next en su nodo · 50% CPU por rol · droplets sin
+estado. Sinteticos pesan MAS que reales (no tienen el fix del navegador).
 
 ### DECISIONES / REGLAS (no re-preguntar)
 
@@ -107,9 +118,10 @@ medirlo. Sinteticos pesan MAS que reales (no tienen el fix del navegador).
 
 ### PROXIMA SESION
 
-**Montar y medir el nivel 2** (3-4 droplets + MySQL/Redis administrados),
-`deploy.sh` por roles (`--rol api|web|sockets|todo`), 1.000 personas con
-Kamilo y Claude como las 1.001. Convierte la fila 2 en MEDIDA.
+**Montar y medir el NIVEL 1 real** (6 droplets chicos por rol + MySQL/Redis
+administrados + Cloudflare LB), `deploy.sh --rol api|web|sockets|todo`, 300
+personas con Kamilo y Claude en Chrome como las 301, y **tirar un nodo de cada
+rol a proposito**: si la 301 no lo nota, el nivel 1 pasa a MEDIDO.
 
 En cola (I.1): `auth/me` cacheado con cuidado (TTL ~10 s + invalidacion en
 logout/ban) · **precarga completa al entrar** (diseño propio: "como HTML

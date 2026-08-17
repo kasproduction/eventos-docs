@@ -7,28 +7,28 @@
 
 # EL CATALOGO — escrito el 2026-08-17 (leer esto primero)
 
-> **Un combo aislado por cliente.** Adentro, la infraestructura crece con el
-> nivel. Lo MEDIDO se distingue de lo DERIVADO en la ultima columna: **nada
-> derivado se le promete a un cliente sin medirlo antes.**
->
-> **La lista de compra exacta por nivel (cuantos droplets, tamaños, quien
-> balancea, que BD, y las decisiones cerradas — Cloudflare LB, DO Managed MySQL y
-> NO PlanetScale, Redis administrado, un nodo de sockets) esta en
-> `docs/infra/STACK-PRODUCCION.md`.** Esta tabla es el resumen.
+> **Principio (`DISPONIBILIDAD-HA.md` §1, desde el primer dia): "nada corre en un
+> solo lugar". Todo lo que se vende NO tiene punto unico de falla. Un droplet
+> solo es DEMO/QA y no se cotiza.** La arquitectura es una sola — Cloudflare LB
+> + N droplets por rol (API / web / sockets+colas) + MySQL administrado con
+> standby + Redis administrado HA + R2 — y lo que cambia con la gente es cuantos
+> nodos y de que tamaño. **Lista de compra exacta, decisiones y por que:
+> `docs/infra/STACK-PRODUCCION.md`.** Nada DERIVADO se promete sin medirlo.
 
-| Nivel | Personas activas* | Combo | ~USD/mes | Promesa | Estado |
+| Nivel | Personas activas* | Combo | ~USD/mes | Que se garantiza | Estado |
 |---|---|---|---|---|---|
-| **1 · Basico** | hasta **300** | 1 maquina 4 vCPU/8 GB, todo adentro · respaldo horario cifrado a R2 · snapshot diario | ~$70 | Si la maquina cae, **el evento se cae**; se remonta en ~15 min (`deploy.sh`) perdiendo max. 1 hora. Se dice claro. | **MEDIDO 2026-08-17** |
-| **2 · Sin punto unico** | hasta **1.000** | **2 nodos API** Laravel (4 vCPU c/u) tras balanceador · **1 nodo webapp** Next (4 vCPU) · **1 nodo sockets + colas** (2 vCPU) · **MySQL administrado con standby** · **Redis administrado** · respaldo a R2 | ~$350-420 | Se cae un nodo API → nadie lo nota. Se cae la BD → standby en ~1 min. Webapp y sockets siguen siendo un nodo (se remontan en minutos, no es transparente). | DERIVADO — **medir antes de vender** |
-| **3 · Tranquilidad** | hasta **2.500** | **4-5 API** · **2 webapp** · **2 sockets** · MySQL HA + **replica de lectura** · Redis HA · balanceador | ~$800-1.000 | Ningun componente es unico: cualquier nodo cae y el evento sigue. | DERIVADO |
-| **4 · Masivo** | 5.000-10.000 | 8-10 API · 3-4 webapp · 3 sockets · MySQL HA con 2 replicas · Redis HA · balanceador | ~$1.600-2.500 | Idem nivel 3, con margen para olas de miles. | DERIVADO |
+| **0 · Demo/QA** | ~300 | 1 droplet 4 vCPU con todo adentro | ~$60 | Nada: si muere, el evento muere. **NO SE VENDE.** | **MEDIDO** (curva abajo) |
+| **1 · Basico** | hasta **300** | **2 API + 2 web + 2 sockets/colas** (2 vCPU c/u) · MySQL admin. con standby · Redis admin. HA · Cloudflare LB · R2 | **~$240-400** | Muere cualquier droplet → LB lo saca en < 30 s, su pareja atiende (queda al 50%). BD → standby < 60 s. Cero datos perdidos, nadie hace nada. Deploy sin corte. | DERIVADO — **montar, tirar un nodo con 300 encima y medir** |
+| **2** | hasta **1.000** | 3 API (4 vCPU) + 2 web (4 vCPU) + 2 sockets · MySQL standby · Redis HA · LB | ~$440-600 | Idem | DERIVADO |
+| **3** | hasta **2.500** | 5-6 API + 2-3 web + 2 sockets · MySQL standby + **replica** · Redis HA · LB | ~$700-1.050 | Idem | DERIVADO |
+| **4** | 5.000-10.000 | 9-12 API + 3-4 web + 3 sockets · MySQL + 2 replicas · Redis HA · LB | ~$1.300-2.200 | Idem; medir antes | DERIVADO |
 
 *"Activas" = navegando al ritmo del script (una pantalla cada 20-40 s: gente
 MUY activa). Un evento real es mas liviano y admite mas inscritos por cada
 activa — ese multiplicador (I.2) sigue sin medirse. **Estas cifras son el
 piso, no el techo.**
 
-### La curva de UNA maquina (4 vCPU / 8 GB) — medida por la persona 301
+### La curva de UNA maquina (4 vCPU / 8 GB, = nivel 0 demo) — medida por la persona 301
 
 Metodo del 2026-08-17: N personas sinteticas por la webapp
 (`entrar-por-la-puerta.js`) y **una persona real en Chrome desde Bogota**
@@ -68,13 +68,14 @@ socket · cache de auth compartida · archivos en R2 · `deploy.sh` portable · 
 desde hoy la webapp invalida su cache por aviso del backend con **lista de
 URLs** (`WEBAPP_INTERNAL_URLS`), preparada para N nodos web.
 
-### El siguiente paso — convertir el nivel 2 en MEDIDO
+### El siguiente paso — convertir el NIVEL 1 en MEDIDO
 
-Montar el **combo nivel 2 de verdad** (3-4 droplets + MySQL/Redis administrados
-de DO), con `deploy.sh` partido por roles (`--rol api|web|sockets|todo`), y
-correr 1.000 personas con Kamilo y Claude como las 1.001. Un dia de droplets
-(~$5) y una tarde. Al final la fila 2 pasa a MEDIDO y las de arriba se derivan
-de dos puntos en vez de uno.
+Montar el **combo nivel 1 de verdad** (6 droplets chicos por rol + MySQL/Redis
+administrados de DO + Cloudflare LB), con `deploy.sh` partido por roles
+(`--rol api|web|sockets|todo`), correr 300 personas con Kamilo y Claude en
+Chrome como las 301, y **tirar un droplet de cada rol a proposito**: si la
+persona 301 no lo nota, el nivel 1 pasa a MEDIDO. Un dia de infra (~$10) y una
+tarde. Los niveles 2-4 se derivan de dos puntos en vez de uno.
 
 ---
 
@@ -364,8 +365,9 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
 > niveles 2-4 son DERIVADOS del reparto de CPU medido y hay que montarlos y
 > medirlos antes de venderlos. Lo de abajo es el historico del 2 de agosto.
 
-- [x] **Nivel 1 — una maquina** — MEDIDO 2026-08-17: hasta ~300 activas
-      plano, 500 al limite, 700 roto. Promesa escrita en la tabla.
+- [x] **Nivel 0 (demo) — una maquina** — MEDIDO 2026-08-17: hasta ~300 activas
+      plano, 500 al limite, 700 roto. **No se vende**: si muere, el evento
+      muere. Es la base de calculo de los niveles con redundancia.
 
 ### LA CURVA DEL CANARIO — MEDIDA 2026-08-02
 
@@ -492,11 +494,11 @@ complemento, no la medida.**
       unico; DO LB descartado por atar a DO sin aportar). BD **DO Managed MySQL**
       en VPC (< 1 ms) con standby y replica; **PlanetScale descartado**
       (remoto 80-150 ms, sin FKs, precio por uso). Redis administrado con TLS.
-      UN nodo de sockets (5.000 conexiones = 0-4% CPU). Nivel 2 = 4 droplets +
-      2 administrados. "Mas nucleos en la misma maquina" NO es nivel vendible
-      (sigue siendo una sola maquina) — solo un tamaño intermedio del nivel 1.
+      UN nodo de sockets (5.000 conexiones = 0-4% CPU). **Todo lo vendible sin punto unico desde el nivel 1** (2 API + 2
+      web + 2 sockets chicos + BD/Redis administrados). "Mas nucleos en la
+      misma maquina" NO es nivel vendible: sigue siendo una sola maquina.
 - [ ] **Escribir `deploy.sh --rol api|web|sockets|todo`** — hoy monta "todo" en
-      una. Es lo que falta para poder MONTAR el nivel 2 y medirlo.
+      una. Es lo que falta para poder MONTAR el nivel 1 y medirlo.
 - [ ] **Escribir la promesa de cada nivel**: RTO/RPO, punto de operacion en
       **50-60% de CPU y no 82%**, y que costo total **y por persona**. Ojo: el
       costo de un combo redundante (~$191/mes) es **por cliente**, no repartido.
