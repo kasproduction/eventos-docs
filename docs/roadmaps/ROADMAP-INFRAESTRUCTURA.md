@@ -1,4 +1,4 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 21/46
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 21/53
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
@@ -519,7 +519,7 @@ complemento, no la medida.**
       en X minutos perdiendo maximo Y"*. Con `deploy.sh` a ~15 min y respaldo
       horario, sale algo vendible y verificable.
 
-## I.5 — Platform Health — 0/4
+## I.5 — Platform Health — 0/11
 
 > **Kamilo lo pidio el 2026-04-19** (memoria `project_event_pulse_idea`), con su
 > propia nota: *"sin esto, un error en produccion lo descubrimos porque un
@@ -528,11 +528,74 @@ complemento, no la medida.**
 > cerrar deal septiembre)"** — una seccion atada a un deal que se cayo en julio.
 > El deploy del 1-2 de agosto fue ese primer evento, y corrio sin esto.
 
-- [ ] **Ya existe y no se esta usando:** `HealthController` con `/health` y
-      `/version`, Sentry, Horizon. **Falta Laravel Pulse** (no instalado).
-- [ ] Salud por modulo en vivo: API, socket, Redis, MySQL, colas.
-- [ ] Peticiones con error (500, 429, timeouts) en tiempo real, por evento.
-- [ ] Alertas: enterarse antes de que alguien se queje.
+> **2026-08-17 — Kamilo, al cierre:** *"¿vamos a tener un panel que nos muestre
+> en tiempo real el rendimiento, no pm2, algo que permita seguimiento real ANTES
+> de que el usuario se de cuenta que fallo?"* Hoy seguimos operando a ciegas:
+> el 1-2 de agosto y hoy, "produccion" se miro con `top` y el log de nginx por
+> ssh. Eso no es operar, es espiar. Este es el BRIEF DE DISEÑO acordado (se
+> diseña bien cuando toque, no se codea de pasada), en el orden en que le sirve
+> al dia del evento.
+
+### Las tres capas — lo minimo antes de exponer la URL
+
+- [ ] **Capa 1 — Alerta externa** ("¿esta arriba y responde a tiempo?"). Un
+      vigilante FUERA de nuestra infra (BetterStack / UptimeRobot, planificado
+      desde SEC-5.3) pega a `/api/v1/health`, `app.` y el socket cada 30 s desde
+      varias regiones; falla o tarda mas de X → **aviso al telefono de Kamilo**.
+      30 min de configurar. **Antes de exponer la URL a nadie.**
+- [ ] **Capa 2 — Panel en vivo del servidor** ("¿por que esta lento?"):
+      **Laravel Pulse** (oficial, gratis, una tarde) + Sentry que ya esta.
+      Peticiones/s, tiempo por endpoint, consultas lentas, colas, excepciones,
+      usuarios que mas piden. Ya existe y no se usa: `HealthController`
+      (`/health`, `/version`), Sentry, Horizon.
+- [ ] **Capa 3 — El canario automatico** ("¿la persona 301 lo esta
+      sintiendo?"): `entrar-por-la-puerta.js` con USERS=1 corriendo cada minuto
+      desde un droplet chico o desde el monitor externo, midiendo tiempo de
+      pantalla por la webapp; sobre el umbral → alerta. Es lo que hoy se hizo a
+      mano en Chrome, automatizado.
+- **Capa 4 (gratis con el stack):** el Cloudflare LB ve el health check de cada
+  nodo cada 10 s y **saca al que falle solo** — actua mientras las otras avisan.
+
+### Lo que Kamilo pidio ademas ("todo muy dinamico, que sepa en tiempo real todo")
+
+- [ ] **La torre de control** — UNA pantalla en el admin (solo super_admin) para
+      el dia del evento: personas conectadas ahora (sockets por nodo),
+      peticiones/s, p95 por endpoint, errores del ultimo minuto, CPU por rol,
+      colas, y **estado de cada nodo en el balanceador** (verde/rojo). En vivo
+      por socket, no refrescando. Pulse da la mitad generica; la otra mitad sale
+      de lo que ya emite el socket server + la API de DO. Distinto del Event
+      Pulse (que es del organizador): esto es de quien opera la maquina.
+- [ ] **Alertas con umbrales que salen de lo medido, no a ojo**, por nivel del
+      stack: CPU por rol > 60% sostenido 2 min · p95 > 800 ms · 5xx > 1% ·
+      colas creciendo · reconexiones masivas de socket · **y CUALQUIER 429 a un
+      usuario legitimo** (hoy aprendimos que es la firma del bug de IP
+      compartida: debe sonar el telefono, no descubrirse navegando).
+- [ ] **Modo "evento en curso"**: interruptor que sube la sensibilidad (canario
+      cada 30 s, alertas mas agresivas), **congela despliegues** y toma snapshot
+      al empezar. El dia del evento no se toca nada.
+- [ ] **Registro por persona** (= I.2, doble pago): pantallas/minuto, rutas,
+      subidas por asistente → multiplicador comercial real + linea base de
+      abuso ("el 1320 va a 40/min cuando la mediana es 2").
+- [ ] **Ensayo de fallas periodico ("game day")**: tirar un nodo con carga y que
+      nadie lo note — antes de cada evento importante, no una vez (E7 y la
+      medicion del nivel 1 son el patron). Con runbook por falla: "si pasa X,
+      haz Y" (`COMO-VOLVER.md` tiene el espiritu).
+- [ ] **Escalar en 5 minutos con un comando**: `escalar.sh --api +1` crea el
+      droplet desde snapshot, corre `deploy.sh --rol api`, lo mete al LB. NO
+      autoescalado (traicionero en olas): escalado humano asistido, desde la
+      torre de control, antes de que duela.
+- [ ] **Logs centralizados con id de peticion** (Grafana Loki o el mismo
+      BetterStack): con 6-11 maquinas, entrar por ssh a cada una (lo de hoy)
+      no es viable. "Que le paso a la persona 1320 a las 10:42" en un solo
+      lugar, nginx + Laravel + socket correlacionados.
+- [ ] **Pagina de estado publica** (`status.<dominio>`, BetterStack la da
+      gratis): a un cliente enterprise, "asi estuvo tu evento minuto a minuto"
+      vale mas que la promesa del contrato.
+
+**Orden honesto:** capas 1-3 + torre de control + alertas por umbral son lo que
+cambia el juego; el resto se agrega cuando un evento real lo pida. **Nada de
+esto sustituye la arquitectura: el monitor avisa, el balanceador y la pareja de
+nodos son los que salvan.**
 
 ## I.6 — Antes de exponerselo a nadie — 0/3
 

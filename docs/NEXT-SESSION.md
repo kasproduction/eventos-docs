@@ -115,6 +115,15 @@ estado. Sinteticos pesan MAS que reales (no tienen el fix del navegador).
 3. **Polling NO** (Kamilo pregunto): 300 personas × 1 pregunta/10 s = 30 req/s
    sin que nadie haga nada. Push por socket cuesta 0-4% con 5.000.
 4. Avisar SIEMPRE antes de lanzar una corrida cuando Kamilo esta navegando.
+5. **La app (Expo) le cuesta MENOS al servidor que la webapp** (solo datos, sin
+   SSR, cache local + socket): los niveles del catalogo se midieron con la
+   webapp = caso caro; con app la capacidad es mayor (medir con escenario API).
+   La app comparte el problema de IP del recinto (I.1b).
+6. **Monitoreo (I.5) — BRIEF acordado al cierre:** 3 capas minimas antes de
+   exponer la URL (alerta externa al telefono · Laravel Pulse · canario
+   automatico) + torre de control en el admin + alertas por umbral medido
+   (incluye CUALQUIER 429 legitimo) + modo evento en curso + game day +
+   `escalar.sh` + logs centralizados + status page. Se diseña bien cuando toque.
 
 ### PROXIMA SESION
 
