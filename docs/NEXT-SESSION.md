@@ -83,7 +83,7 @@ solo mis vueltas de canario; la multitud tenia p50 370-1.354 ms. 480-500 es
 pantalla el primer minuto (tormenta de entrada), despues rapido incluso al
 refrescar.
 
-### 4. EL CATALOGO — un combo aislado por cliente (tabla completa en el roadmap)
+### 4. EL CATALOGO — un combo aislado por cliente (lista de compra: `docs/infra/STACK-PRODUCCION.md`)
 
 | Nivel | Activas | Combo | ~USD/mes | Estado |
 |---|---|---|---|---|

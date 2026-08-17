@@ -1,4 +1,4 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 20/45
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 21/46
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
@@ -10,6 +10,11 @@
 > **Un combo aislado por cliente.** Adentro, la infraestructura crece con el
 > nivel. Lo MEDIDO se distingue de lo DERIVADO en la ultima columna: **nada
 > derivado se le promete a un cliente sin medirlo antes.**
+>
+> **La lista de compra exacta por nivel (cuantos droplets, tamaños, quien
+> balancea, que BD, y las decisiones cerradas — Cloudflare LB, DO Managed MySQL y
+> NO PlanetScale, Redis administrado, un nodo de sockets) esta en
+> `docs/infra/STACK-PRODUCCION.md`.** Esta tabla es el resumen.
 
 | Nivel | Personas activas* | Combo | ~USD/mes | Promesa | Estado |
 |---|---|---|---|---|---|
@@ -352,7 +357,7 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
       eventos de socket. Con eso, *"el 1320 va a 40 peticiones/minuto cuando la
       mediana es 2"* es trivial de detectar, y sirve mas.
 
-## I.3 — El catalogo vendible — 3/6
+## I.3 — El catalogo vendible — 4/7
 
 > **2026-08-17: la tabla del catalogo esta ARRIBA del todo** ("EL CATALOGO").
 > El nivel 1 (una maquina) esta MEDIDO por la persona 301 en Chrome; los
@@ -481,13 +486,17 @@ complemento, no la medida.**
       catalogo de arriba; 1.000 es el nivel 2 y pide roles separados.
 - [ ] **Niveles 2.500 / 5.000 / 10.000+** — minimo dos nodos, sin punto unico de
       falla. **El salto de nivel no es de capacidad, es de promesa.**
-- [ ] **Revisar la topologia desde cero** (no dar por bueno el dibujo de
-      `COMO-CRECEMOS` §5). Decisiones abiertas: quien balancea —nginx propio
-      (portable, pero se vuelve el nuevo punto unico) contra balanceador de
-      Cloudflare (sin punto unico, ~$6/mes, ata a Cloudflare)—; que se separa
-      primero; **y que "mas nucleos en la misma maquina" probablemente no
-      sobrevive como nivel vendible, porque una maquina mas grande sigue siendo
-      una sola maquina.**
+- [x] **Topologia y decisiones CERRADAS 2026-08-17 → `docs/infra/STACK-PRODUCCION.md`.**
+      Balancea **Cloudflare Load Balancer** (sin punto unico, portable entre
+      proveedores, ~$5-10; nginx propio descartado por ser el nuevo punto
+      unico; DO LB descartado por atar a DO sin aportar). BD **DO Managed MySQL**
+      en VPC (< 1 ms) con standby y replica; **PlanetScale descartado**
+      (remoto 80-150 ms, sin FKs, precio por uso). Redis administrado con TLS.
+      UN nodo de sockets (5.000 conexiones = 0-4% CPU). Nivel 2 = 4 droplets +
+      2 administrados. "Mas nucleos en la misma maquina" NO es nivel vendible
+      (sigue siendo una sola maquina) — solo un tamaño intermedio del nivel 1.
+- [ ] **Escribir `deploy.sh --rol api|web|sockets|todo`** — hoy monta "todo" en
+      una. Es lo que falta para poder MONTAR el nivel 2 y medirlo.
 - [ ] **Escribir la promesa de cada nivel**: RTO/RPO, punto de operacion en
       **50-60% de CPU y no 82%**, y que costo total **y por persona**. Ojo: el
       costo de un combo redundante (~$191/mes) es **por cliente**, no repartido.

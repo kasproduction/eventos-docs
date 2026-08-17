@@ -1,6 +1,11 @@
 # EventOS — Alta Disponibilidad e Infraestructura
 
 > Arquitectura para 99.9% uptime (~8.7 horas downtime/año).
+
+> **2026-08-17 — la lista de compra vigente por nivel es `STACK-PRODUCCION.md`.**
+> Este documento conserva las justificaciones (DO Managed MySQL en VPC y NO
+> PlanetScale/Upstash/Hetzner, §2-3) y el blue-green (§4). Sus cifras de
+> capacidad en "personas" NO se citan (ver ROADMAP-INFRAESTRUCTURA "EL CATALOGO").
 > Principio: ningún componente es punto único de falla.
 > Versión: 2.0 | Fecha: 2026-04-25
 >

@@ -1,5 +1,14 @@
 # Cómo crecemos — arquitectura de escalado
 
+> # ⚠ SUPERSEDED 2026-08-17 → `STACK-PRODUCCION.md`
+>
+> La topologia de §5 (API replicada + un nodo de sockets + MySQL y Redis
+> administrados + Cloudflare LB) SE CONFIRMO y las decisiones estan cerradas en
+> `STACK-PRODUCCION.md` (lista de compra por nivel, MEDIDO vs DERIVADO). Las
+> tablas de "personas" y costos de §7-8 estan infladas ~9x y NO se citan: la
+> curva medida esta en `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` ("EL CATALOGO").
+> Se conserva por su explicacion de POR QUE separar por costo.
+
 > # ⚠ CORREGIDO LA MISMA NOCHE DEL 2026-08-02 — LEER ESTO PRIMERO
 >
 > Tres cosas de este documento se midieron después y resultaron falsas:
