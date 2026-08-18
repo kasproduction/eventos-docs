@@ -80,7 +80,18 @@ APIs de 4 vCPU** (~$320-440/mes, corregido en el catalogo).
 - Los tableros del organizador (Pulse, Data Center, exports) entran al game
   day de I.5: hoy cada uno guardaba un bug de meses.
 
-### ESTADO DE LA INFRA AL CIERRE — **TODO ENCENDIDO** (~$10/dia)
+### ESTADO DE LA INFRA AL CIERRE — **DESTRUIDA 2026-08-18 03:50 UTC** (Kamilo: "destruye ahora todo")
+
+Borrados los 7 droplets y las 2 BD administradas; en DO solo queda `terpel`
+(otro proyecto). **Snapshots guardados:** `eventos-n1-api-1/web-1/sock-1-2026-08-18`
+(~15 GB, ~$0,90/mes) + `Eventos-target` y `eventos-load` del 17. Con eso el
+Nivel 1 se levanta en ~10 min (`COMO-VOLVER.md` "Volver al NIVEL 1").
+Cloudflare: pool y monitores de prueba borrados; el complemento Basic Load
+Balancing ($5/mes) sigue activo — Kamilo lo cancela o lo usa. DNS `api/app/
+socket` apuntan a IPs muertas hasta el proximo montaje. **Rotar los 4 secretos
+del chat sigue pendiente de Kamilo.**
+
+(Como estaba antes de destruir, para referencia:)
 
 7 droplets + MySQL + Valkey con etiqueta `eventos-n1` (tabla exacta con IPs
 en STACK-PRODUCCION §3.4). DNS `api/app/socket` → proxy 157.245.81.59.
