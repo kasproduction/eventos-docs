@@ -3,14 +3,14 @@
 > Este archivo es **solo continuidad** (que hicimos la sesion pasada, decisiones cerradas).
 >
 > **Para saber que sigue → abrir `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`**
-> (ventana operativa del frente de infraestructura, 28/58). Lo de webapp sigue
+> (ventana operativa del frente de infraestructura, 28/59). Lo de webapp sigue
 > en `docs/living/PENDIENTES-WEBAPP.md`.
 
 ---
 
 ## SESION 2026-08-17 noche / 2026-08-18 (Fable 5) — EL NIVEL 1 MONTADO Y MEDIDO: 300 personas, tres apagones, 0 errores
 
-**Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` (28/58).
+**Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` (28/59). **Informe final (aguanta / cuanto cuesta / modo registro-evento): STACK-PRODUCCION §10-11.**
 El catalogo con lo medido, la tabla de la corrida, los 3 cuellos TLS, la
 decision nginx vs Cloudflare y el estado exacto de la infra:
 `docs/infra/STACK-PRODUCCION.md` §3.** Commits: backend (feature/magic-link-auth),

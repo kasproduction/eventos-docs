@@ -1,4 +1,4 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 28/58
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 28/59
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
@@ -91,6 +91,10 @@ URLs** (`WEBAPP_INTERNAL_URLS`), preparada para N nodos web.
       escuchaba) — corregidos. Ver "LO QUE DESTAPO EL NIVEL 1" al final.
 - [ ] Repetir la caida de API con nodos de 4 vCPU (confirmar que ademas de no
       fallar no se siente) — y con eso el Nivel 1 queda MEDIDO sin asteriscos.
+- [ ] **Modo registro / modo evento** (STACK-PRODUCCION §11): administrados
+      siempre encendidos + 1 droplet `ROL=todo` mientras la gente se inscribe
+      (~$180-200/mes); el combo de 6 se levanta desde snapshots la vispera
+      (~$6,5/dia). Falta: `escalar.sh --modo evento|registro` y probarlo una vez.
 
 ---
 

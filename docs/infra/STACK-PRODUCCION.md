@@ -354,3 +354,76 @@ las replicas, las escrituras no); el techo de un balanceador de Cloudflare.
 "A la vez" = navegando activamente al ritmo del script (una pantalla cada
 20-40 s). En un evento real la gente mira menos seguido, asi que caben mas
 inscritos por nivel — cuantos mas, se sabra al instrumentar el ritmo real (I.2).
+
+---
+
+## 10. INFORME FINAL DEL NIVEL 1 (2026-08-18) — ¿aguanta o no?
+
+**Aguanta.** 300 personas navegando activamente durante 10 minutos con tres
+apagones a proposito (API, web y sockets, uno a uno, desenchufados): **5.639
+pantallas, 0 fallidas, 300/300 ingresos, y las caidas de web y de sockets
+fueron invisibles para la persona 301** (Kamilo dentro de una sesion en vivo
+con 200 personas en la sala). Sin apagones: p50 300-420 ms, p95 0,7-2 s.
+
+**Con un asterisco, ya resuelto en el catalogo:** la API de 2 vCPU no absorbe
+a su pareja caida (0 errores, pero 8-10 s por pantalla mientras estuvo sola).
+Por eso el Nivel 1 vendible lleva **2 API de 4 vCPU**. Repetir esa caida con
+4 vCPU es lo unico que falta para quitarle el asterisco.
+
+**Lo que NO se midio:** failover de la BD y de Redis administrados (no hay
+"tirar el primario" desde la API de DO; es garantia del proveedor) y el
+Cloudflare LB (se midio con nginx round-robin, que reparte y reintenta igual
+pero es un punto unico — no vale para vender).
+
+### Cuanto cuesta al mes — precios de lista de DigitalOcean, agosto 2026
+
+| Pieza | Como se probo hoy | **Nivel 1 vendible** |
+|---|---|---|
+| 2 API | 2 × s-2vcpu-4gb = $48 | **2 × s-4vcpu-8gb = $96** |
+| 2 web | 2 × $24 = $48 | $48 |
+| 2 sockets+colas | 2 × $24 = $48 | $48 |
+| MySQL administrado 1 vCPU/2 GB × 2 nodos (primario + standby) | $60 | $60 |
+| Valkey administrado 1 vCPU/2 GB × 2 nodos (HA) | $60 | $60 |
+| Balanceador | nginx en un droplet ($24-64) | **Cloudflare LB 6 origenes + chequeo 15 s ≈ $40** |
+| R2 · Resend · Sentry · respaldos | ~$10-30 | ~$10-30 |
+| **Total** | **~$300-360/mes** | **~$360-380/mes** |
+
+Un evento de 3 dias con este stack encendido solo esos dias cuesta **~$35-40
+en droplets** (se cobran por hora) mas lo que este siempre encendido (abajo).
+
+## 11. MODO REGISTRO / MODO EVENTO — no pagar 6 droplets mientras la gente se inscribe
+
+La pregunta de Kamilo: *"mientras el registro, ¿se puede dejar algo sencillo y
+montar la infraestructura fuerte en el evento?"* **Si, y el diseño lo permite
+sin migrar nada:** los droplets no guardan estado; los datos viven en MySQL y
+Redis administrados y los archivos en R2. Cambiar de modo es prender o apagar
+droplets, no mover datos.
+
+| | MODO REGISTRO (semanas antes) | MODO EVENTO (dias del evento) |
+|---|---|---|
+| Datos | MySQL + Valkey administrados **siempre encendidos** (los mismos) | los mismos, sin tocar |
+| Maquinas | **1 droplet 4 vCPU con los tres roles** (`deploy.sh ROL=todo` apuntando a los administrados) o 2 chicos (API+web / sockets) | 2 API 4 vCPU + 2 web + 2 sockets desde **snapshots** |
+| Balanceo | DNS naranja directo al droplet | Cloudflare LB (o nginx para demo) |
+| Que se garantiza | si el droplet muere, el registro se cae 15-30 min hasta restaurar snapshot — **cero datos perdidos** (estan en los administrados) | nada se cae, nadie lo nota |
+| Costo | administrados $120 + droplet $48 + extras $10-30 = **~$180-200/mes** | + $192 en droplets prorrateado por dia (**~$6,5/dia**) + LB $40 el mes del evento |
+
+**Procedimiento de cambio (30-45 min, se hace la vispera):**
+1. Snapshot de un nodo por rol al cerrar cada evento (api/web/sock, ~$2/mes).
+2. Vispera: `doctl compute droplet create` ×6 desde los snapshots (2 min),
+   revisar `.env` (mismos administrados, `WEBAPP_INTERNAL_URLS` con las IPs
+   privadas nuevas, `TRUSTED_PROXIES`), `config:cache`, arrancar servicios.
+3. Cloudflare LB (o nginx): pools con las 6 IPs; DNS `api/app/socket` → LB.
+4. Prueba de humo: `by-slug`, login, una sesion, la 301 en Chrome.
+5. Al terminar: DNS de vuelta al droplet de registro, destruir los 6.
+
+**Lo que hay que respetar para que esto funcione:** los administrados NUNCA
+se apagan (son la verdad); el droplet de registro tambien apunta a ellos (no
+a un MySQL local: si no, habria que migrar datos el dia del evento — que es
+exactamente el error que no se puede cometer); y las colas (Horizon) corren
+donde este el rol sockets, en cualquiera de los dos modos.
+
+**Un paso mas alla, cuando toque:** el paso 2 se vuelve un `escalar.sh
+--modo evento|registro` (esta en el brief de I.5). Y con varios clientes al
+tiempo, el modo registro de todos puede vivir en un droplet compartido — el
+combo aislado por cliente se levanta solo en modo evento.
+
