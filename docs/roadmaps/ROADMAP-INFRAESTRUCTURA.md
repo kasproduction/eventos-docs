@@ -1,4 +1,4 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 28/59
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 28/60
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
@@ -91,6 +91,14 @@ URLs** (`WEBAPP_INTERNAL_URLS`), preparada para N nodos web.
       escuchaba) — corregidos. Ver "LO QUE DESTAPO EL NIVEL 1" al final.
 - [ ] Repetir la caida de API con nodos de 4 vCPU (confirmar que ademas de no
       fallar no se siente) — y con eso el Nivel 1 queda MEDIDO sin asteriscos.
+- [ ] **`ROL=admin` en `deploy.sh`** (pregunta de Kamilo 2026-08-18: "¿los admins
+      consumen recursos o van en droplet aparte?"). Hoy admin/Data Center/Pulse
+      los sirven los nodos API (mismo FPM y MySQL que los asistentes); lo pesado
+      (exports, ZIP, PDF) ya va a Horizon en los sockets. Nivel 1: se queda en
+      la API. Nivel 2: droplet admin aparte = rol `api` con hostname
+      `admin.<dominio>` y sin trafico de asistentes. Nivel 3+: reportes contra
+      la replica. **Medir en el game day (I.5): abrir Pulse + Data Center +
+      un ZIP maestro CON 300 encima** — hoy se abrieron sin carga.
 - [ ] **Modo registro / modo evento** (STACK-PRODUCCION §11): administrados
       siempre encendidos + 1 droplet `ROL=todo` mientras la gente se inscribe
       (~$180-200/mes); el combo de 6 se levanta desde snapshots la vispera
