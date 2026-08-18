@@ -88,8 +88,10 @@ Borrados los 7 droplets y las 2 BD administradas; en DO solo queda `terpel`
 Nivel 1 se levanta en ~10 min (`COMO-VOLVER.md` "Volver al NIVEL 1").
 Cloudflare: pool y monitores de prueba borrados; el complemento Basic Load
 Balancing ($5/mes) sigue activo — Kamilo lo cancela o lo usa. DNS `api/app/
-socket` apuntan a IPs muertas hasta el proximo montaje. **Rotar los 4 secretos
-del chat sigue pendiente de Kamilo.**
+socket` apuntan a IPs muertas hasta el proximo montaje. **Los 4 secretos del
+chat (DO, Cloudflare, R2, Resend) ya fueron rotados por Kamilo al cierre** —
+la proxima sesion pide tokens nuevos si vuelve a montar (el `doctl auth init`
+local quedo con un token revocado).
 
 (Como estaba antes de destruir, para referencia:)
 
