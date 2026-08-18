@@ -7,24 +7,54 @@
 #
 # Uso:
 #   scp deploy.sh root@IP:/root/
-#   ssh root@IP "DOMINIO=midominio.com bash /root/deploy.sh"
+#   ssh root@IP "DOMINIO=midominio.com bash /root/deploy.sh"              # ROL=todo (Nivel 0, demo)
+#   ssh root@IP "DOMINIO=midominio.com ROL=api bash /root/deploy.sh"      # Nivel 1, un rol por maquina
+#   ssh root@IP "DOMINIO=midominio.com ROL=web bash /root/deploy.sh"
+#   ssh root@IP "DOMINIO=midominio.com ROL=sockets bash /root/deploy.sh"
 #
 # Variables (todas opcionales salvo DOMINIO):
 #   DOMINIO           midominio.com          (obligatorio)
-#   EMAIL_SSL         para Let's Encrypt
-#   RAMA_BACKEND      feature/magic-link-auth
+#   ROL               todo | api | web | sockets   (por defecto: todo)
+#   EMAIL_SSL         para Let's Encrypt (solo ROL=todo)
+#
+# ROLES (Nivel 1, `docs/infra/STACK-PRODUCCION.md` §3 — "nada corre en un
+# solo lugar"). Con ROL != todo esta maquina NO lleva MySQL ni Redis: los datos
+# viven en los servicios administrados de la VPC. Antes de correr el script,
+# copiar a /root/:
+#   origin.pem + origin.key   certificado de origen de Cloudflare (*.dominio, 15 anos).
+#                             Reemplaza a certbot: con 2 nodos detras del balanceador
+#                             el reto HTTP de Let's Encrypt cae en el nodo equivocado.
+#   do-ca.crt                 CA de la base de datos administrada (MYSQL_ATTR_SSL_CA).
+# El puerto 443 se abre SOLO a los rangos de Cloudflare y a la red privada:
+# nadie le pega a un nodo directo, y nadie puede falsificar la IP del cliente.
+#
+#   todo     nginx + PHP-FPM + Next + socket + Horizon + MySQL + Redis locales (lo de siempre)
+#   api      nginx + PHP-FPM (Laravel) — lo que se multiplica al crecer
+#   web      nginx + Next (pm2), escucha 3000 en la red privada para la invalidacion del marco
+#   sockets  nginx + socket (pm2) + Horizon + cron del scheduler (PHP-CLI, sin FPM)
 #
 # NO instala el codigo: los repos son privados. Al final imprime que falta.
 
 set -euo pipefail
 
 DOMINIO="${DOMINIO:?Falta DOMINIO=midominio.com}"
+ROL="${ROL:-todo}"
 EMAIL_SSL="${EMAIL_SSL:-admin@$DOMINIO}"
 API="api.$DOMINIO"
 APP="app.$DOMINIO"
 SOCKET="socket.$DOMINIO"
 
-echo "══ EventOS · despliegue en $DOMINIO ══"
+case "$ROL" in todo|api|web|sockets) ;; *) echo "ROL invalido: $ROL (todo|api|web|sockets)"; exit 1;; esac
+# `es api,sockets` → verdadero si ROL es uno de esos
+es() { case ",$1," in *",$ROL,"*) return 0;; *) return 1;; esac; }
+
+if [ "$ROL" != todo ]; then
+  for f in origin.pem origin.key do-ca.crt; do
+    [ -f /root/$f ] || { echo "Falta /root/$f (ver cabecera del script)"; exit 1; }
+  done
+fi
+
+echo "══ EventOS · despliegue en $DOMINIO · rol: $ROL ══"
 echo
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -45,27 +75,46 @@ if [ ! -f /swapfile ]; then
   grep -q swapfile /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
 fi
 
-ufw allow OpenSSH >/dev/null; ufw allow 80/tcp >/dev/null; ufw allow 443/tcp >/dev/null
+ufw allow OpenSSH >/dev/null
+if [ "$ROL" = todo ]; then
+  ufw allow 80/tcp >/dev/null; ufw allow 443/tcp >/dev/null
+else
+  # Nivel 1: 443 solo desde Cloudflare (el balanceador) y desde la VPC.
+  CF_RANGES="$(curl -fsS https://www.cloudflare.com/ips-v4) $(curl -fsS https://www.cloudflare.com/ips-v6)"
+  for r in $CF_RANGES; do ufw allow from "$r" to any port 443 proto tcp >/dev/null; done
+  ufw allow from 10.0.0.0/8 to any port 443 proto tcp >/dev/null
+  # El nodo web recibe la invalidacion del marco desde los nodos API por la red privada.
+  es web && ufw allow from 10.0.0.0/8 to any port 3000 proto tcp >/dev/null
+  # nginx registra la IP real del visitante, no la del borde de Cloudflare.
+  { for r in $CF_RANGES; do echo "set_real_ip_from $r;"; done; echo "real_ip_header CF-Connecting-IP;"; } > /root/cloudflare-realip.conf
+fi
 ufw --force enable >/dev/null
 
 # ─────────────────────────────────────────────────────────────────────────
 # 2. Paquetes
 # ─────────────────────────────────────────────────────────────────────────
-echo "[2/7] nginx, PHP 8.3, MySQL, Redis, Node 20..."
+echo "[2/7] Paquetes del rol $ROL..."
 apt-get update -qq
-apt-get install -y -qq nginx mysql-server redis-server git unzip curl jq \
-  php8.3-fpm php8.3-cli php8.3-mysql php8.3-redis php8.3-mbstring php8.3-xml \
-  php8.3-curl php8.3-zip php8.3-gd php8.3-intl php8.3-bcmath \
-  certbot python3-certbot-nginx >/dev/null
+PAQ="nginx git unzip curl jq"
+PHP_EXT="php8.3-cli php8.3-mysql php8.3-redis php8.3-mbstring php8.3-xml php8.3-curl php8.3-zip php8.3-gd php8.3-intl php8.3-bcmath"
+es todo    && PAQ="$PAQ mysql-server redis-server certbot python3-certbot-nginx php8.3-fpm $PHP_EXT"
+es api     && PAQ="$PAQ php8.3-fpm $PHP_EXT"
+es sockets && PAQ="$PAQ $PHP_EXT"          # Horizon y el scheduler son PHP-CLI, sin FPM
+apt-get install -y -qq $PAQ >/dev/null
 
+# Node en TODOS los roles: web y sockets lo corren; api lo necesita para
+# compilar los recursos de Filament con Vite (sin `public/build` el admin no abre).
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash - >/dev/null 2>&1
 apt-get install -y -qq nodejs >/dev/null
 npm install -g pnpm pm2 --silent >/dev/null 2>&1
-curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer >/dev/null 2>&1
+if es todo,api,sockets; then
+  curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer >/dev/null 2>&1
+fi
 
 # ─────────────────────────────────────────────────────────────────────────
 # 3. Base de datos y Redis
 # ─────────────────────────────────────────────────────────────────────────
+if [ "$ROL" = todo ]; then
 echo "[3/7] MySQL y Redis con credenciales propias..."
 DBPASS=$(openssl rand -base64 24 | tr -d '/+=' | head -c 30)
 REDISPASS=$(openssl rand -base64 24 | tr -d '/+=' | head -c 30)
@@ -84,6 +133,11 @@ systemctl restart redis-server
 
 printf 'MySQL  db=eventos_db  user=eventos_user  pass=%s\nRedis  pass=%s\n' "$DBPASS" "$REDISPASS" > /root/CREDENCIALES.txt
 chmod 600 /root/CREDENCIALES.txt
+else
+echo "[3/7] Sin MySQL ni Redis locales (rol $ROL): datos en los servicios administrados de la VPC."
+mkdir -p /etc/ssl/eventos
+cp /root/do-ca.crt /etc/ssl/eventos/do-ca.crt && chmod 644 /etc/ssl/eventos/do-ca.crt
+fi
 
 # ─────────────────────────────────────────────────────────────────────────
 # 4. Limites del sistema — sin esto se mide un techo falso
@@ -105,10 +159,16 @@ for svc in nginx php8.3-fpm; do
   printf '[Service]\nLimitNOFILE=65535\n' > /etc/systemd/system/$svc.service.d/limits.conf
 done
 
-# PHP-FPM dimensionado a 8 GB
+if es todo,api; then
+# PHP-FPM dimensionado a la RAM de la maquina: ~7 hijos por GB (60 en 8 GB,
+# que fue lo medido; ~28 en los nodos API de 4 GB del Nivel 1).
+RAM_GB=$(awk '/MemTotal/ {printf "%d", $2/1024/1024 + 0.5}' /proc/meminfo)
+FPM_MAX=$(( RAM_GB * 7 )); [ "$FPM_MAX" -gt 60 ] && FPM_MAX=60; [ "$FPM_MAX" -lt 12 ] && FPM_MAX=12
+FPM_START=$(( FPM_MAX / 5 )); FPM_MIN=$(( FPM_MAX / 8 )); FPM_SPARE=$(( FPM_MAX * 2 / 5 ))
 P=/etc/php/8.3/fpm/pool.d/www.conf
-sed -i 's/^pm = .*/pm = dynamic/;s/^pm.max_children = .*/pm.max_children = 60/;s/^pm.start_servers = .*/pm.start_servers = 12/;s/^pm.min_spare_servers = .*/pm.min_spare_servers = 8/;s/^pm.max_spare_servers = .*/pm.max_spare_servers = 24/' $P
+sed -i "s/^pm = .*/pm = dynamic/;s/^pm.max_children = .*/pm.max_children = $FPM_MAX/;s/^pm.start_servers = .*/pm.start_servers = $FPM_START/;s/^pm.min_spare_servers = .*/pm.min_spare_servers = $FPM_MIN/;s/^pm.max_spare_servers = .*/pm.max_spare_servers = $FPM_SPARE/" $P
 grep -q '^pm.max_requests' $P && sed -i 's/^pm.max_requests = .*/pm.max_requests = 500/' $P || echo 'pm.max_requests = 500' >> $P
+fi
 
 # OPcache + JIT: +25% de capacidad medido, gratis
 #
@@ -121,6 +181,7 @@ grep -q '^pm.max_requests' $P && sed -i 's/^pm.max_requests = .*/pm.max_requests
 # Pasa en silencio: el servidor sigue respondiendo 200 con la version vieja.
 # Se descubrio regenerando la cache de rutas y viendo 404 en rutas que
 # `route:list` sí mostraba.
+if es todo,api; then
 cat > /etc/php/8.3/fpm/conf.d/99-eventos-opcache.ini <<'EOF'
 opcache.enable=1
 opcache.memory_consumption=256
@@ -130,8 +191,9 @@ opcache.validate_timestamps=0
 opcache.jit=tracing
 opcache.jit_buffer_size=128M
 EOF
+fi
 
-printf '[mysqld]\nmax_connections = 500\n' > /etc/mysql/mysql.conf.d/99-eventos.cnf
+es todo && printf '[mysqld]\nmax_connections = 500\n' > /etc/mysql/mysql.conf.d/99-eventos.cnf
 
 # CRITICO: el default de Ubuntu (768) capa en ~1.536 WebSockets sin importar
 # el hardware — cada uno con proxy consume DOS conexiones de nginx.
@@ -143,12 +205,24 @@ systemctl daemon-reload
 # ─────────────────────────────────────────────────────────────────────────
 # 5. nginx
 # ─────────────────────────────────────────────────────────────────────────
-echo "[5/7] nginx para $API, $APP y $SOCKET..."
+echo "[5/7] nginx (rol $ROL)..."
 mkdir -p /var/www/backend /var/www/socket /var/www/web
 
-cat > /etc/nginx/sites-available/$API <<EOF
+# Con ROL != todo los sitios escuchan 443 con el certificado de origen de
+# Cloudflare (el borde habla con el nodo por HTTPS; modo Full (strict) en la zona).
+if [ "$ROL" = todo ]; then
+  LISTEN='listen 80;'
+else
+  mkdir -p /etc/ssl/eventos
+  cp /root/origin.pem /etc/ssl/eventos/origin.pem; cp /root/origin.key /etc/ssl/eventos/origin.key
+  chmod 600 /etc/ssl/eventos/origin.key
+  LISTEN='listen 443 ssl http2; ssl_certificate /etc/ssl/eventos/origin.pem; ssl_certificate_key /etc/ssl/eventos/origin.key;'
+  mv /root/cloudflare-realip.conf /etc/nginx/conf.d/cloudflare-realip.conf
+fi
+
+es todo,api && cat > /etc/nginx/sites-available/$API <<EOF
 server {
-    listen 80;
+    $LISTEN
     server_name $API;
     root /var/www/backend/public;
     index index.php index.html;
@@ -179,9 +253,9 @@ server {
 }
 EOF
 
-cat > /etc/nginx/sites-available/$APP <<EOF
+es todo,web && cat > /etc/nginx/sites-available/$APP <<EOF
 server {
-    listen 80;
+    $LISTEN
     server_name $APP;
     client_max_body_size 50M;
     location / {
@@ -202,9 +276,9 @@ server {
 }
 EOF
 
-cat > /etc/nginx/sites-available/$SOCKET <<EOF
+es todo,sockets && cat > /etc/nginx/sites-available/$SOCKET <<EOF
 server {
-    listen 80;
+    $LISTEN
     server_name $SOCKET;
     location / {
         proxy_pass http://127.0.0.1:3001;
@@ -222,28 +296,36 @@ server {
 EOF
 
 rm -f /etc/nginx/sites-enabled/default
-for s in "$API" "$APP" "$SOCKET"; do ln -sf /etc/nginx/sites-available/$s /etc/nginx/sites-enabled/$s; done
+for s in "$API" "$APP" "$SOCKET"; do
+  [ -f /etc/nginx/sites-available/$s ] && ln -sf /etc/nginx/sites-available/$s /etc/nginx/sites-enabled/$s
+done
 nginx -t && systemctl reload nginx
 
 # ─────────────────────────────────────────────────────────────────────────
 # 6. Certificados
 # ─────────────────────────────────────────────────────────────────────────
+if [ "$ROL" = todo ]; then
 echo "[6/7] Certificados SSL..."
 certbot --nginx -d "$API" -d "$APP" -d "$SOCKET" \
   --non-interactive --agree-tos -m "$EMAIL_SSL" --redirect >/dev/null 2>&1 \
   && echo "     HTTPS listo" \
   || echo "     OJO: certbot fallo — ¿el DNS ya apunta aca? Reintentar despues."
+else
+echo "[6/7] Certificado de origen de Cloudflare instalado en /etc/ssl/eventos/."
+fi
 
-systemctl restart php8.3-fpm nginx
+es todo,api && systemctl restart php8.3-fpm
+systemctl restart nginx
 
 # ─────────────────────────────────────────────────────────────────────────
 # 7. Horizon
 # ─────────────────────────────────────────────────────────────────────────
-echo "[7/7] Servicio de colas..."
+if es todo,sockets; then
+echo "[7/7] Servicio de colas y scheduler..."
 cat > /etc/systemd/system/horizon.service <<'EOF'
 [Unit]
 Description=Laravel Horizon
-After=network.target redis-server.service
+After=network.target
 
 [Service]
 Type=simple
@@ -257,8 +339,17 @@ WantedBy=multi-user.target
 EOF
 systemctl daemon-reload && systemctl enable horizon >/dev/null 2>&1
 
+# Scheduler de Laravel. En el Nivel 1 corre en LOS DOS nodos de sockets: cada
+# tarea lleva `onOneServer()` (candado en el Redis compartido), asi que no se
+# duplica y sobrevive a la caida de cualquiera de los dos.
+echo '* * * * * www-data cd /var/www/backend && /usr/bin/php artisan schedule:run >/dev/null 2>&1' > /etc/cron.d/eventos-scheduler
+chmod 644 /etc/cron.d/eventos-scheduler
+else
+echo "[7/7] Sin Horizon en este rol."
+fi
+
 echo
-echo "══ Sistema listo. Falta el codigo ══"
+echo "══ Sistema listo (rol $ROL). Falta el codigo ══"
 echo
 cat <<EOF
 Los repos son privados, asi que el codigo se sube aparte. Desde tu maquina:
@@ -339,4 +430,27 @@ VARIABLES QUE NO SE PUEDEN OLVIDAR (cada una costo una hora de depuracion):
         tarda hasta 60 s en la campana.
 
 Credenciales generadas: /root/CREDENCIALES.txt
+
+NIVEL 1 (ROL != todo) — lo que cambia en el .env respecto al droplet unico:
+
+  DB_HOST / DB_PORT / DB_USERNAME / DB_PASSWORD   del MySQL administrado (host PRIVADO de la VPC)
+  MYSQL_ATTR_SSL_CA=/etc/ssl/eventos/do-ca.crt   la BD administrada exige TLS
+  REDIS_CLIENT=phpredis
+  REDIS_HOST=tls://<host privado del Valkey>      el esquema tls:// es lo que enciende TLS en phpredis
+  REDIS_PORT=25061  REDIS_USERNAME=default  REDIS_PASSWORD=...
+  (socket: REDIS_TLS=true REDIS_USERNAME=default y el mismo host/puerto/clave)
+
+  TRUSTED_PROXIES=<rangos IPv4+IPv6 de Cloudflare>,<IP publica de web-1>,<IP publica de web-2>,10.0.0.0/8
+        Cloudflare porque es quien nos habla; los nodos web porque Next reenvia
+        la IP real del asistente en X-Forwarded-For y Laravel solo la cree si
+        el que la trae es de confianza (bug 41b8040 / 2026-08-17).
+
+  WEBAPP_INTERNAL_URLS=http://<IP privada web-1>:3000,http://<IP privada web-2>:3000
+        La invalidacion del marco tiene que llegar a TODOS los nodos web.
+
+  Solo en sockets ademas: HORIZON corre aqui y el scheduler (cron) tambien; los
+  dos nodos comparten Redis, onOneServer() evita duplicados.
+
+  El codigo del backend va en api Y en sockets (Horizon y el scheduler lo
+  necesitan); el de web solo en web; el del socket solo en sockets.
 EOF

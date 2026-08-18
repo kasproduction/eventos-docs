@@ -1,4 +1,4 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 21/53
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 28/58
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
@@ -18,7 +18,7 @@
 | Nivel | Personas activas* | Combo | ~USD/mes | Que se garantiza | Estado |
 |---|---|---|---|---|---|
 | **0 · Demo/QA** | ~300 | 1 droplet 4 vCPU con todo adentro | ~$60 | Nada: si muere, el evento muere. **NO SE VENDE.** | **MEDIDO** (curva abajo) |
-| **1 · Basico** | hasta **300** | **2 API + 2 web + 2 sockets/colas** (2 vCPU c/u) · MySQL admin. con standby · Redis admin. HA · Cloudflare LB · R2 | **~$240-400** | Muere cualquier droplet → LB lo saca en < 30 s, su pareja atiende (queda al 50%). BD → standby < 60 s. Cero datos perdidos, nadie hace nada. Deploy sin corte. | DERIVADO — **montar, tirar un nodo con 300 encima y medir** |
+| **1 · Basico** | hasta **300** | **2 API (4 vCPU) + 2 web + 2 sockets/colas** (2 vCPU) · MySQL admin. con standby · Redis admin. HA · balanceador · R2 | **~$320-440** | Muere cualquier droplet → su pareja atiende y **nadie lo nota** (web y sockets MEDIDO con la persona 301 en una sesion en vivo; API MEDIDO sin errores, lento con 2 vCPU → por eso 4). BD/Redis → failover del proveedor. Cero datos perdidos, nadie hace nada. | **MONTADO Y MEDIDO 2026-08-17/18** — 300 personas, 3 apagones, 0 errores (`STACK-PRODUCCION.md` §3.1) |
 | **2** | hasta **1.000** | 3 API (4 vCPU) + 2 web (4 vCPU) + 2 sockets · MySQL standby · Redis HA · LB | ~$440-600 | Idem | DERIVADO |
 | **3** | hasta **2.500** | 5-6 API + 2-3 web + 2 sockets · MySQL standby + **replica** · Redis HA · LB | ~$700-1.050 | Idem | DERIVADO |
 | **4** | 5.000-10.000 | 9-12 API + 3-4 web + 3 sockets · MySQL + 2 replicas · Redis HA · LB | ~$1.300-2.200 | Idem; medir antes | DERIVADO |
@@ -68,14 +68,29 @@ socket · cache de auth compartida · archivos en R2 · `deploy.sh` portable · 
 desde hoy la webapp invalida su cache por aviso del backend con **lista de
 URLs** (`WEBAPP_INTERNAL_URLS`), preparada para N nodos web.
 
-### El siguiente paso — convertir el NIVEL 1 en MEDIDO
+### El NIVEL 1 se monto y se midio (2026-08-17/18) — 7/7
 
-Montar el **combo nivel 1 de verdad** (6 droplets chicos por rol + MySQL/Redis
-administrados de DO + Cloudflare LB), con `deploy.sh` partido por roles
-(`--rol api|web|sockets|todo`), correr 300 personas con Kamilo y Claude en
-Chrome como las 301, y **tirar un droplet de cada rol a proposito**: si la
-persona 301 no lo nota, el nivel 1 pasa a MEDIDO. Un dia de infra (~$10) y una
-tarde. Los niveles 2-4 se derivan de dos puntos en vez de uno.
+- [x] `deploy.sh ROL=api|web|sockets` (todo = demo). Certificado de origen de
+      Cloudflare en los nodos, 443 solo a Cloudflare + VPC.
+- [x] MySQL 8.4 (2 nodos) y Valkey 8 (2 nodos) administrados en la VPC nyc1,
+      cortafuegos por etiqueta. Datos importados del snapshot del demo.
+- [x] 6 droplets 2 vCPU/4 GB por rol, codigo por `rsync` desde un nodo semilla.
+- [x] Reparto: **nginx round-robin** en un droplet aparte (`lb-nginx.conf`) —
+      el Cloudflare LB pide comprar origenes ($5/origen/mes) y se decidio no
+      pagarlo para medir. Ver "nginx vs Cloudflare" en STACK-PRODUCCION §3.3.
+- [x] **300 personas, 10 min, apagones a proposito: 5.639 pantallas, 0 fallos.**
+      Web: invisible. Sockets: invisible (Kamilo dentro de una sesion en vivo con
+      200 en la sala y 40 chateando; reenganche < 10 s). API: sin errores pero
+      lenta con 2 vCPU sola → **API pasa a 4 vCPU en el catalogo.**
+- [x] Tres cuellos que NO existian en el droplet unico, corregidos en codigo:
+      phpredis+TLS se cuelga (→ predis), un handshake TLS a Redis por peticion
+      (→ persistentes), una conexion MySQL TLS por peticion (→ PDO persistente).
+      Corrida 1 → 2: p50 660 → 300 ms, carga API 9 → 4.
+- [x] Cinco bugs VIEJOS que el stack real destapo (Pulse x2, asistencia por
+      sesion nunca volcada, colas `exports/pdf/documents` que Horizon no
+      escuchaba) — corregidos. Ver "LO QUE DESTAPO EL NIVEL 1" al final.
+- [ ] Repetir la caida de API con nodos de 4 vCPU (confirmar que ademas de no
+      fallar no se siente) — y con eso el Nivel 1 queda MEDIDO sin asteriscos.
 
 ---
 
@@ -609,7 +624,42 @@ nodos son los que salvan.**
 
 ---
 
-## LO QUE SE ARREGLO HOY Y NO ES DE RENDIMIENTO
+## LO QUE DESTAPO EL NIVEL 1 (2026-08-18) — 5/5 corregidos
+
+> Ninguno lo causo el multi-nodo. Todos existian; el stack real (Pulse, Data
+> Center y exports usados de verdad con `QUEUE=redis`) los hizo visibles. **La
+> pregunta de Kamilo — "¿son bugs que salen por esta implementacion?" — tiene
+> respuesta medida: no. Y uno de escala si se encontro y se resolvio (TLS por
+> peticion, arriba).**
+
+- [x] **Event Pulse "no conectado" (1/2)**: armaba la URL del socket como
+      `hostname:3001` (`public/event-pulse/js/socket.js:35`), nunca abierto por
+      el cortafuegos ni en el droplet unico. Ahora `PulseController::bootstrap`
+      manda `socket_url` (`SOCKET_SERVER_URL`), como display y mission-control.
+- [x] **Event Pulse "no conectado" (2/2)**: carrera — el callback del bootstrap
+      corria antes de que cargara `counters.js` (la API detras de Cloudflare +
+      proxy responde antes de que el navegador baje `sections.js`) →
+      `animateCounter is not defined` → nunca `EP.ready` → nunca socket. Ahora
+      arranca tras `DOMContentLoaded` (`app.js`), `?v=23`.
+- [x] **Asistencia por sesion nunca volcada**: `FlushSessionAttendanceJob` leia
+      `Redis::connection('default')` (BD 0, con prefijo) y el socket escribe
+      `session:{id}:joined|left` en la BD 2 sin prefijo (conexion `socket`).
+      `session_attendances` estaba vacia desde el primer evento. Corregido: 304
+      registros de la sesion 5 al primer volcado; Data Center muestra 406/track.
+- [x] **Exports del Data Center nunca se procesaron en produccion**: van a la
+      cola `exports` (y recaps a `pdf`, ZIP de documentos a `documents`) y
+      Horizon solo escuchaba `default`. En local `QUEUE=sync` los ejecutaba en
+      linea. Nuevo `supervisor-heavy` (`config/horizon.php`): 3 colas, timeout
+      900 s, 3 procesos en produccion. Los 4 exports atascados salieron en 20 s.
+- [x] **Sesion demo en vivo**: las fechas del seeder eran del 1-2 de agosto y
+      la BD guarda hora Bogota (`APP_TIMEZONE`) — para probar se movio la
+      sesion 5 a hoy y se le puso el video de YouTube (url + iframe embebido).
+
+**Leccion:** los tableros del organizador (Pulse, Data Center, exports) NO
+tienen escenario de carga ni QA en produccion. Cada uno guardaba un bug de
+meses. Entra a I.5 como criterio: el game day incluye abrir los tres.
+
+## LO QUE SE ARREGLO EL 2026-08-02 Y NO ES DE RENDIMIENTO
 
 > Salio navegando, no midiendo. **Era mas grave que todo lo de rendimiento: un
 > evento real se caia en la puerta, no adentro.**

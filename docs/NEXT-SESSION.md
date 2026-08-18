@@ -3,8 +3,110 @@
 > Este archivo es **solo continuidad** (que hicimos la sesion pasada, decisiones cerradas).
 >
 > **Para saber que sigue → abrir `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`**
-> (ventana operativa del frente de infraestructura, 10/33). Lo de webapp sigue
+> (ventana operativa del frente de infraestructura, 28/58). Lo de webapp sigue
 > en `docs/living/PENDIENTES-WEBAPP.md`.
+
+---
+
+## SESION 2026-08-17 noche / 2026-08-18 (Fable 5) — EL NIVEL 1 MONTADO Y MEDIDO: 300 personas, tres apagones, 0 errores
+
+**Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` (28/58).
+El catalogo con lo medido, la tabla de la corrida, los 3 cuellos TLS, la
+decision nginx vs Cloudflare y el estado exacto de la infra:
+`docs/infra/STACK-PRODUCCION.md` §3.** Commits: backend (feature/magic-link-auth),
+eventos-socket, APP EVENTOS (este). eventos-web sin cambios.
+
+### Como arranco
+
+Kamilo pregunto "¿me toca montar 6 maquinas mas MySQL en DO?" y luego "¿hay
+forma de que te conectes a DigitalOcean?" — se instalo `doctl` con un token
+de API y desde ahi Claude creo, apago, prendio y va a destruir todo. Kamilo
+dio un token de Cloudflare (DNS + LB + SSL) tambien. **Ambos tokens quedaron
+en el chat: hay que rotarlos.**
+
+### Lo que se monto (Fases 0-4 del plan aprobado)
+
+Semilla desde el snapshot (240 GB, solo para sacar `.env` y volcado) →
+MySQL 8.4 ×2 y Valkey 8 ×2 administrados en la VPC → 6 droplets 2 vCPU/4 GB
+con `deploy.sh ROL=api|web|sockets` (nuevo: cabecera, cortafuegos 443 solo
+Cloudflare+VPC, certificado de origen, FPM por RAM, cron del scheduler) →
+codigo por `rsync` desde la semilla → `.env` por rol → DNS naranja.
+**Cloudflare LB no se compro** (pide $5 por origen extra; Kamilo: "es mucha
+plata... estamos probando apenas") → **nginx round-robin en la semilla**
+(`docs/infra/lb-nginx.conf`). Todo en ~4 horas y ~$3 de DO.
+
+### Lo medido — la corrida definitiva (300 sinteticos, 10 min)
+
+| Minuto | Que pasaba | p50 | p95 | Fallos |
+|---|---|---|---|---|
+| 1-2 | todo arriba | 300-360 ms | 0,7-1,3 s | 0 |
+| 2,5-4,5 | **api-1 apagada** | 8-10 s | 6-12 s | **0** |
+| 5,5-7,5 | **web-1 apagada** | 290-420 ms | 0,5-1,5 s | **0** |
+| 8,5-10 | todo arriba | 340-420 ms | 0,7-2,2 s | 0 |
+
+**5.639 pantallas, 0 fallidas.** Web: invisible. **Sockets: invisible con
+Kamilo dentro de la sesion "IA Generativa" en vivo, 200 en la sala y 40
+chateando (E4): "no paso nada, incluso actualice y ahi sigo".** API: sin
+errores pero lenta con un solo nodo de 2 vCPU → **el Nivel 1 se vende con
+APIs de 4 vCPU** (~$320-440/mes, corregido en el catalogo).
+
+### Los hallazgos que valen la sesion
+
+1. **phpredis + Redis por TLS se cuelga** en ~0,5% de conexiones nuevas
+   (AUTH sin respuesta, sin timeout posible en el handshake) → logins de 120 s.
+   500/500 conexiones crudas responden: es PHP. **→ predis** + persistentes.
+2. **TLS por peticion**: el Valkey de 1 vCPU hace ~25 handshakes/s y PHP
+   abria 2-3 conexiones Redis + 1 MySQL (40-70 ms) POR PETICION.
+   **→ `REDIS_PERSISTENT` + `persistent_id` por conexion + `DB_PERSISTENT`
+   (PDO)** en `config/database.php`. Corrida 1 → 2: p50 660 → 300 ms.
+3. **Cloudflare con 2 registros A naranja NO reparte** (api-1: 0 peticiones).
+4. **El LB de Cloudflare cuesta ~$25-40/mes con 6 origenes**, no $5-10 como
+   decia el doc (error mio, corregido).
+5. **Cinco bugs viejos destapados** (ninguno del multi-nodo): Pulse ×2 (URL
+   `:3001` quemada; carrera `animateCounter`), asistencia por sesion nunca
+   volcada (`FlushSessionAttendanceJob` leia la BD de Redis equivocada), y
+   exports/recaps/ZIP en colas que Horizon no escuchaba (nuevo
+   `supervisor-heavy`). Todos corregidos y desplegados en los nodos.
+6. `onOneServer()` en las 13 tareas del scheduler; socket con `REDIS_TLS`.
+
+### DECISIONES (no re-preguntar)
+
+- **Nivel 1 = 2 API de 4 vCPU** (no 2 vCPU). Web y sockets de 2 vCPU sobran.
+- **Backend en produccion multi-nodo: `REDIS_CLIENT=predis`,
+  `REDIS_PERSISTENT=true`, `DB_PERSISTENT=true`.** phpredis queda para local.
+- **Balanceador:** nginx propio para medir/demo; **Cloudflare LB con chequeo
+  de 15 s (~$40/mes) para vender**, comprado con el primer cliente. Tabla
+  comparativa en STACK-PRODUCCION §3.3.
+- Los tableros del organizador (Pulse, Data Center, exports) entran al game
+  day de I.5: hoy cada uno guardaba un bug de meses.
+
+### ESTADO DE LA INFRA AL CIERRE — **TODO ENCENDIDO** (~$10/dia)
+
+7 droplets + MySQL + Valkey con etiqueta `eventos-n1` (tabla exacta con IPs
+en STACK-PRODUCCION §3.4). DNS `api/app/socket` → proxy 157.245.81.59.
+Complemento LB de Cloudflare activo sin usar ($5/mes). **Kamilo no decidio
+aun destruir/snapshot** — la sesion se cerro documentando. Al arrancar la
+proxima: `doctl compute droplet list --tag-name eventos-n1` y decidir.
+
+**Al cerrar de verdad:** snapshot de api-1/web-1/sock-1 (opcional, ~$2/mes)
+→ `doctl compute droplet delete` los 7 → `doctl databases delete` los 2 →
+cancelar LB de Cloudflare (Facturacion → Suscripciones) → **rotar los 4
+secretos del chat** (DO, Cloudflare `eventos-nivel1`, R2, Resend).
+
+### PROXIMA SESION
+
+1. Decidir infra (arriba). Si se destruye, el Nivel 1 se vuelve a levantar en
+   ~30 min con `deploy.sh ROL=` + STACK-PRODUCCION §8.
+2. **Repetir la caida de API con nodos de 4 vCPU** → Nivel 1 MEDIDO sin
+   asteriscos. Con eso, derivar niveles 2-4 de dos puntos.
+3. Data Center: el Pulse cuenta 84 mensajes y la BD tiene 2.156 en la sesion
+   de hoy — criterio de conteo por revisar (`PulseController`, procedencia:
+   bootstrap `stats.messages`). Check-ins/leads/ratings en 0 son dato (los
+   sinteticos no los generan), no bug.
+4. En cola I.1: `auth/me` cacheado, precarga completa al entrar, el 503 con
+   una persona, I.1b, I.6 antes de exponer la URL, I.5 monitoreo (brief listo).
+
+Local: `.next` local es build de produccion (borrar antes de `pnpm dev`).
 
 ---
 
