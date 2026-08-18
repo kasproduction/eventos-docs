@@ -435,9 +435,16 @@ NIVEL 1 (ROL != todo) — lo que cambia en el .env respecto al droplet unico:
 
   DB_HOST / DB_PORT / DB_USERNAME / DB_PASSWORD   del MySQL administrado (host PRIVADO de la VPC)
   MYSQL_ATTR_SSL_CA=/etc/ssl/eventos/do-ca.crt   la BD administrada exige TLS
-  REDIS_CLIENT=phpredis
-  REDIS_HOST=tls://<host privado del Valkey>      el esquema tls:// es lo que enciende TLS en phpredis
+  REDIS_CLIENT=predis                            NO phpredis: con TLS se cuelga en ~0,5% de las
+                                                 conexiones nuevas esperando el AUTH, sin timeout
+                                                 posible en el handshake (medido 2026-08-18)
+  REDIS_HOST=tls://<host privado del Valkey>      el esquema tls:// enciende TLS
   REDIS_PORT=25061  REDIS_USERNAME=default  REDIS_PASSWORD=...
+  REDIS_PERSISTENT=true  REDIS_TIMEOUT=5  REDIS_READ_TIMEOUT=30
+  DB_PERSISTENT=true
+        Sin persistentes, PHP hacia 2-3 handshakes TLS a Redis + 1 a MySQL
+        (40-70 ms) POR PETICION; el Valkey de 1 vCPU termina ~25 handshakes/s
+        y con 300 personas la cola era de minutos. Persistente = uno por worker.
   (socket: REDIS_TLS=true REDIS_USERNAME=default y el mismo host/puerto/clave)
 
   TRUSTED_PROXIES=<rangos IPv4+IPv6 de Cloudflare>,<IP publica de web-1>,<IP publica de web-2>,10.0.0.0/8

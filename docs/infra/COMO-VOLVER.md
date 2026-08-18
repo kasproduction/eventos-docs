@@ -52,7 +52,38 @@ demo + 5.050 asistentes de prueba) y las credenciales generadas
 
 ---
 
-## Volver desde cero — la secuencia
+## Volver al NIVEL 1 (6 nodos + administrados) — desde 2026-08-18
+
+Lo de abajo levanta el **droplet demo** (una maquina, ROL=todo). Para el combo
+vendible el procedimiento completo esta en `STACK-PRODUCCION.md` §8 (como se
+monto) y §11 (modo registro / modo evento). En corto, todo desde la terminal
+con `doctl` (instalado con `winget install DigitalOcean.Doctl`; token en
+`doctl auth init`):
+
+```
+# 0. Ver que hay encendido
+doctl compute droplet list --tag-name eventos-n1
+# 1. Administrados (si no existen): MySQL 8.4 x2 y Valkey x2 en la VPC nyc1
+doctl databases create eventos-n1-mysql --engine mysql --version 8.4 --size db-amd-1vcpu-2gb --num-nodes 2 --region nyc1 --private-network-uuid <vpc> --tag eventos-n1
+doctl databases create eventos-n1-redis --engine valkey --size db-amd-1vcpu-2gb --num-nodes 2 --region nyc1 --private-network-uuid <vpc> --tag eventos-n1
+doctl databases firewalls append <id> --rule tag:eventos-n1      # los dos
+# 2. Droplets por rol (desde snapshot api/web/sock si existen; si no, ubuntu-24-04-x64 + deploy.sh ROL=)
+doctl compute droplet create api-1 api-2 --image <snapshot|ubuntu-24-04-x64> --size s-4vcpu-8gb --region nyc1 --vpc-uuid <vpc> --ssh-keys <id> --tag-names eventos-n1,rol-api
+#    idem web-1 web-2 (s-2vcpu-4gb) y sock-1 sock-2 (s-2vcpu-4gb)
+# 3. En cada nodo nuevo desde cero: scp deploy.sh origin.pem origin.key do-ca.crt root@IP:/root/
+#    ssh root@IP "DOMINIO=killjoy.pro ROL=api bash /root/deploy.sh"   (web | sockets)
+#    codigo por rsync desde un nodo ya construido, .env por rol (bloque NIVEL 1 al final de deploy.sh)
+# 4. Balanceador: Cloudflare LB (comprar origenes) o nginx round-robin (lb-nginx.conf) en un droplet aparte
+# 5. DNS api/app/socket naranja -> LB. Prueba de humo: /up, login, una sesion, la 301 en Chrome.
+# 6. Apagar un nodo a proposito: doctl compute droplet-action power-off <id>   (y power-on despues)
+# 7. Al cerrar: snapshot de api-1/web-1/sock-1 -> delete los droplets -> databases delete -> rotar tokens
+```
+
+**Regla:** los administrados son la verdad y NUNCA se apagan mientras haya un
+evento en registro; el droplet de registro (ROL=todo) apunta a ellos, no a un
+MySQL local (STACK-PRODUCCION §11).
+
+## Volver desde cero — la secuencia (droplet DEMO, una maquina)
 
 ```bash
 # 1. Crear droplet: 4 vCPU / 8 GB · Ubuntu 24.04 LTS · con llave SSH
