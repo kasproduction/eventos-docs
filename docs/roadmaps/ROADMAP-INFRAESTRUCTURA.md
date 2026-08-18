@@ -1,4 +1,4 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 28/60
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 28/61
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
@@ -99,6 +99,14 @@ URLs** (`WEBAPP_INTERNAL_URLS`), preparada para N nodos web.
       `admin.<dominio>` y sin trafico de asistentes. Nivel 3+: reportes contra
       la replica. **Medir en el game day (I.5): abrir Pulse + Data Center +
       un ZIP maestro CON 300 encima** — hoy se abrieron sin carga.
+- [ ] **Replica de lectura para reportes** (pregunta de Kamilo 2026-08-18: "una
+      base de datos espejo para que un informe del Data Center no afecte al
+      resto"). DO la crea sobre la BD administrada (~$30/mes, 1 vCPU/2 GB);
+      el backend ya tiene split lectura/escritura (`DB_WRITE_HOST`). Falta:
+      conexion `reports` + Data Center/Pulse/jobs de export leyendo de ella
+      (`Model::on('reports')`). Catalogo: Nivel 3; **regla: si el game day
+      muestra que los tableros le pegan a los asistentes, entra al Nivel 1 ese
+      dia.** Va en pareja con `ROL=admin` (replica = datos, nodo = CPU).
 - [ ] **Modo registro / modo evento** (STACK-PRODUCCION §11): administrados
       siempre encendidos + 1 droplet `ROL=todo` mientras la gente se inscribe
       (~$180-200/mes); el combo de 6 se levanta desde snapshots la vispera
