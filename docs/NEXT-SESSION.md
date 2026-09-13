@@ -9,6 +9,50 @@
 
 ---
 
+## SESION 2026-09-13 (Fable 5.1 → Opus 5) — EL EVENTO DE NOVIEMBRE: plan de infraestructura para 5.000 personas + base limpia
+
+**Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` → "PLAN DE TRABAJO — EVENTO DE NOVIEMBRE, 5.000 PERSONAS" (2/29).**
+Commits: backend `0bb28b6` + `67a609a` (feature/magic-link-auth) · APP EVENTOS `4564329` + `285e287` + cierre. Push hecho.
+
+### Decisiones de Kamilo (no re-preguntar)
+
+- **Posible cliente en noviembre: evento con influencers, 5.000 personas.**
+- **Criterio que manda:** *"si mañana hay evento, ¿que monto sin sufrir ni improvisar?"*. W.19 Spatial Player es mejora (lo actual funciona) → segundo plano. Tiendas de ultimo.
+- **Orquestador = pipeline con compuertas, con Terraform + GitHub Actions** (aprobado). Vive fuera de la infra del cliente.
+- W.19 8.6: preview de /live = A en desktop (permanente muted) / B en mobile (tap, 4 s).
+- Cuando pide DOCUMENTAR lo revisado, se documenta; no se vuelve a proponer.
+
+### Hecho
+
+- **Auditoria de todos los pendientes** con verificacion contra codigo → `PENDIENTES-WEBAPP.md` "ESTADO GENERAL POR CATEGORIA" (82% global), contadores viejos corregidos (Recap, deploy demo, 3 de infra, socket en cluster, auth del socket por Redis, indices de juegos).
+- **Plan de infraestructura B1-B6 (29 items)** con dependencias y compuertas; reclasificacion para 5.000 personas (Nivel 3-4, DERIVADOS, nada medido arriba de 300).
+- **B1.1 instalacion limpia** (`php artisan eventos:instalar`, `SistemaSeeder`, candado `EVENTOS_DEMO`, `security:check` bloquea el demo) y **B1.2 primer ingreso al wizard**. 16 tests nuevos; instalacion probada sobre base real.
+- **BUG-339 a BUG-348** en `BUG-LOG.md` (5 resueltos, 5 abiertos).
+- Sesion 2026-09-07 (no quedo registrada aqui): scripts `demo/` + `Demo5DiasSeeder`, y apertura de W.19 viendo la demo.
+
+### Pruebas
+
+| Fecha | Suite | Resultado |
+|---|---|---|
+| 2026-09-13 | backend completa (Pest) | 887 pasan, 1 falla ya existente (BUG-348), 242 s |
+
+**Para correr Pest en Windows sin horas de espera:** `php artisan config:clear` y luego
+`SOCKET_SERVER_URL=http://0.0.0.0:1 WEBAPP_INTERNAL_URLS=http://0.0.0.0:1 php vendor/bin/pest` (BUG-344, BUG-347).
+
+### A medias / abierto
+
+- BUG-345 correo sin control de ritmo frente a Resend (10 req/s) → B3.1.
+- BUG-346 aviso de config de sesion al socket sin timeout (10 s en prod si cae el socket).
+- BUG-347 tests llaman al socket y a la webapp reales · BUG-344 config cacheada manda Pest a MySQL dev · BUG-348 test de cache del Data Center desactualizado.
+- Complemento LB de Cloudflare sigue cobrando $5/mes sin infra: Kamilo cancela o usa.
+- Decisiones pendientes: W.19 8.7 (tarjetas laterales vivas) · I.7.7 carga y caida obligatoria antes de evento real (recomendado, sin confirmar) · si no se alcanza a medir el ritmo real, se cotiza Nivel 4 (regla escrita).
+
+### Sigue
+
+**B1.3 — 2FA del staff** (`docs/roadmaps/ROADMAP-SEGURIDAD-STAFF.md`, 0/26; decisiones cerradas desde 2026-07-20: solo staff, obligatorio para todos, TOTP con `pragmarx/google2fa`). Con eso cierra B1 y se abre B2 (montaje reproducible) con B3 en paralelo (B3.1 correo primero).
+
+---
+
 ## SESION 2026-08-17 noche / 2026-08-18 (Fable 5) — EL NIVEL 1 MONTADO Y MEDIDO: 300 personas, tres apagones, 0 errores
 
 **Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` (28/59). **Informe final (aguanta / cuanto cuesta / modo registro-evento): STACK-PRODUCCION §10-11.**
