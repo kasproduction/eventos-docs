@@ -1,7 +1,134 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 28/61
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 33/71 · PLAN NOVIEMBRE 2/29
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
+
+---
+
+# PLAN DE TRABAJO — EVENTO DE NOVIEMBRE, 5.000 PERSONAS — 2/29
+
+> **Organizado el 2026-09-13 por decision de Kamilo:** *"empieza por
+> infraestructura organizando el trabajo"*. Criterio que manda: *"si mañana hay
+> evento, ¿que monto sin sufrir ni improvisar?"*. **ESTA ES LA VENTANA OPERATIVA
+> DEL FRENTE.** Las fases I.0-I.7 de abajo quedan como detalle y terreno; cada
+> item de aqui dice de donde sale.
+>
+> **Por que este orden:** lo medido llega a 300 activas (Nivel 1). 5.000 cae en
+> Nivel 3 o 4, ambos DERIVADOS. Nada se monta para el cliente sin una base
+> limpia (B1), sin un montaje reproducible (B2), sin los arreglos que 5.000
+> exige (B3) y sin ver lo que pasa (B4). Solo entonces se mide (B5) y se entrega
+> (B6). **B3 no depende de B2: se puede trabajar en paralelo.**
+
+```
+B1 Base limpia ──> B2 Montaje reproducible ──┐
+                                             ├──> B4 Ver lo que pasa ──> B5 Medir 5.000 ──> B6 Entrega
+B3 Arreglos para 5.000 (paralelo) ───────────┘
+```
+
+## B1 — Base limpia y segura — 2/3 (nada se monta sin esto)
+
+- [x] **HECHO (2026-09-13: 16 tests nuevos en verde; suite completa 887 pasan y 1 falla que ya existia, en el Data Center y ajena a este cambio; instalacion probada sobre base real: 1 organizacion, 1 usuario, 8 roles, 24 plantillas de modulos, 30 de correo, 0 eventos; segunda ejecucion se niega; sin commit).** `php artisan eventos:instalar`, `SistemaSeeder`, `DatabaseSeeder` con candado `EVENTOS_DEMO`, 3 chequeos nuevos en `security:check`, `deploy.sh` y `COMO-VOLVER.md` actualizados. Bugs BUG-339, 340, 342 y 343.
+      **B1.1 Instalacion limpia** (= I.7.1). Sembrado separado en sistema y demo;
+      comando de instalacion para produccion (organizacion + roles + plantillas +
+      superadmin con clave generada mostrada una vez; se niega si ya hay
+      usuarios); `deploy.sh` deja de sembrar el demo; `security:check` bloquea si
+      hay rastro del demo; el sembrado demo pide permiso explicito en produccion.
+      Terreno: I.7 "Clasificacion del sembrado".
+- [x] **HECHO (2026-09-13: `Dashboard::mount()` redirige al wizard sin eventos; `PrimerIngresoWizardTest` 2 en verde). BUG-341.**
+      **B1.2 Primer ingreso al wizard** (= I.7.2). Sin eventos, el admin lleva a
+      crear evento. Depende de B1.1.
+- [ ] **B1.3 2FA del staff** (= I.6 + `ROADMAP-SEGURIDAD-STAFF.md` S.0-S.6 y S.8,
+      0/26). S.7 va con B2.
+
+**Compuerta B1:** servidor nuevo con la instalacion → 0 eventos, 1 organizacion,
+1 superadmin con 2FA obligatorio, `security:check` verde, lo primero que abre es
+el wizard. Con tests que lo prueben.
+
+## B2 — Montaje reproducible — 0/5 (depende de B1.1)
+
+- [ ] **B2.1 Paquete por version** (= I.7.3). GitHub Actions construye backend,
+      web y socket; cada nodo descarga su paquete. Muere el rsync desde semilla.
+- [ ] **B2.2 Terraform por nivel** (= I.7.4). Modulos Nivel 0-4 del catalogo sobre
+      DO + Cloudflare, estado remoto, `plan` con costo, `destroy` sin residuos.
+      Incluye ROL=admin y replica de lectura como recursos del nivel.
+- [ ] **B2.3 Pipeline con compuertas, etapas 1-6** (= I.7.5).
+- [ ] **B2.4 Humo funcional automatico** (= I.7.6), incluye correo de acceso recibido.
+- [ ] **B2.5 Remontar de cero y destruir** (= I.4 "verificar deploy.sh" + I.7.10
+      para Nivel 1). Tokens nuevos de DO y Cloudflare (`doctl auth init`).
+
+**Compuerta B2:** el Nivel 1 se monta desde cero SOLO con el pipeline, pasa el
+humo en verde y se destruye sin dejar nada cobrando. Nadie toca una maquina a mano.
+
+## B3 — Arreglos de codigo que 5.000 exige — 0/6 (paralelo a B2)
+
+- [ ] **B3.1 Correo con ritmo controlado** (hallazgo 8). Cola limitada por debajo
+      del techo de Resend (10 peticiones/s por equipo), enlaces de acceso con
+      prioridad sobre invitaciones, reintentos que no pierdan correos, y pedir
+      ampliacion a Resend.
+- [ ] **B3.2 La puerta** (= I.1b, 2 items). El limitador cuenta fallos, no
+      intentos, y las rutas publicas soportan un recinto entero en una sola IP.
+- [ ] **B3.3 Juegos en vivo** (`PENDIENTES.md` §7b). Limitar difusiones de juego y
+      cachear `GameService::getEligiblePool`.
+- [ ] **B3.4 Replica de lectura en codigo.** Conexion `reports` para Data Center,
+      Pulse y exports (detalle en "Replica de lectura para reportes", arriba de I.0).
+- [ ] **B3.5 ROL=admin** en `deploy.sh`: admin en `admin.<dominio>` sin trafico de
+      asistentes.
+- [ ] **B3.6 El 503 de la webapp con una persona** (I.1). Verificar si sigue; si
+      sigue, corregir.
+
+**Compuerta B3:** tests de cada arreglo + prueba local que demuestre el cambio
+(ej: 5.000 correos encolados salen todos sin chocar con el limite).
+
+## B4 — Ver lo que pasa — 0/6 (depende de B2)
+
+- [ ] **B4.1 Alerta externa** (= I.5 capa 1): aviso al telefono si algo no responde.
+- [ ] **B4.2 Respaldo fuera de DigitalOcean** (= I.4): volcado cifrado a R2 por cron
+      y **restauracion probada**, no solo el volcado.
+- [ ] **B4.3 Logs centralizados con id de peticion** (I.5).
+- [ ] **B4.4 Alertas por umbral** salidas de lo medido (I.5), incluido cualquier 429
+      a un usuario legitimo.
+- [ ] **B4.5 Torre de control** (I.5): conectados, peticiones/s, p95, errores, CPU
+      por rol, colas y estado de cada nodo en el balanceador.
+- [ ] **B4.6 Escalar con un comando** (I.5): sumar un nodo desde el pipeline.
+
+**Compuerta B4:** apagar un nodo a proposito hace sonar el telefono, se ve en la
+torre de control y se reemplaza con un comando. Un respaldo se restaura entero.
+
+## B5 — Medir para 5.000 — 0/5 (depende de B2, B3 y B4)
+
+- [ ] **B5.1 Ritmo real** (= I.2): registrar pantallas por persona por minuto.
+      **Regla si no se alcanza a medir con gente real antes del evento: se cotiza
+      Nivel 4 como supuesto conservador.**
+- [ ] **B5.2 Generador de carga para 5.000**: varias maquinas + asistentes
+      sembrados + `entrar-por-la-puerta.js` por la webapp.
+- [ ] **B5.3 Montar Nivel 3 con el pipeline y medir la curva hasta 5.000**: login en
+      ola, 5.000 navegando, red 4G Colombia, admin trabajando con carga (D.4.4),
+      export aislado, juegos en vivo con 5.000 conectados.
+- [ ] **B5.4 Caidas con carga**: un nodo por rol + repetir la caida de API con 4 vCPU.
+- [ ] **B5.5 Decidir Nivel 3 o 4** y escribir la promesa del nivel: que aguanta,
+      cuanto cuesta, RTO/RPO. Es lo que se le cotiza al cliente.
+
+**Compuerta B5:** la persona 5.001 navega en Chrome igual que la primera, 0
+errores con caidas, y el costo mensual cerrado.
+
+## B6 — Entrega y dia del evento — 0/4 (depende de B5)
+
+- [ ] **B6.1 Pipeline completo** (= I.7.7 y I.7.8): carga, caida y entrega con informe.
+- [ ] **B6.2 Modo registro / modo evento** (arriba de I.0): barato mientras la gente
+      se inscribe, el nivel completo la vispera.
+- [ ] **B6.3 Runbook del dia del evento** + modo "evento en curso" (congela
+      despliegues, snapshot al empezar).
+- [ ] **B6.4 Ensayo general** una semana antes con el nivel elegido.
+
+**Compuerta B6:** el ensayo general sale en verde de punta a punta.
+
+## Despues de noviembre (NO se toca antes)
+
+Niveles de 10.000 · montar en otro proveedor y RTO/RPO probado fuera de DO ·
+pagina de estado publica · panel Pulse y canario automatico · que el tiempo real
+refresque solo lo que cambio · precarga completa · cache de sesion en Next ·
+consultas duplicadas y conteos de branding · re-medir el techo por endpoint ·
+registro por persona como producto · I.7.9 pipelines hermanos.
 
 ---
 
@@ -393,7 +520,7 @@ a ese ritmo estaba roto**; hoy hace 87,4 al 68% sin un solo error.
       eventos de socket. Con eso, *"el 1320 va a 40 peticiones/minuto cuando la
       mediana es 2"* es trivial de detectar, y sirve mas.
 
-## I.3 — El catalogo vendible — 4/7
+## I.3 — El catalogo vendible — 5/7
 
 > **2026-08-17: la tabla del catalogo esta ARRIBA del todo** ("EL CATALOGO").
 > El nivel 1 (una maquina) esta MEDIDO por la persona 301 en Chrome; los
@@ -532,7 +659,7 @@ complemento, no la medida.**
       UN nodo de sockets (5.000 conexiones = 0-4% CPU). **Todo lo vendible sin punto unico desde el nivel 1** (2 API + 2
       web + 2 sockets chicos + BD/Redis administrados). "Mas nucleos en la
       misma maquina" NO es nivel vendible: sigue siendo una sola maquina.
-- [ ] **Escribir `deploy.sh --rol api|web|sockets|todo`** — hoy monta "todo" en
+- [x] **HECHO 2026-08-17 (verificado 2026-09-13: `deploy.sh ROL=api|web|sockets|todo`).** **Escribir `deploy.sh --rol api|web|sockets|todo`** — hoy monta "todo" en
       una. Es lo que falta para poder MONTAR el nivel 1 y medirlo.
 - [ ] **Escribir la promesa de cada nivel**: RTO/RPO, punto de operacion en
       **50-60% de CPU y no 82%**, y que costo total **y por persona**. Ojo: el
@@ -632,15 +759,115 @@ cambia el juego; el resto se agrega cuando un evento real lo pida. **Nada de
 esto sustituye la arquitectura: el monitor avisa, el balanceador y la pareja de
 nodos son los que salvan.**
 
-## I.6 — Antes de exponerselo a nadie — 0/3
+## I.6 — Antes de exponerselo a nadie — 2/3
 
-- [ ] **Cloudflare a naranja.** Hoy en gris a proposito (para medir el servidor y
+- [x] **HECHO en el Nivel 1 (2026-08-17: DNS naranja + 443 solo a Cloudflare en `deploy.sh`).** **Cloudflare a naranja.** Hoy en gris a proposito (para medir el servidor y
       no a Cloudflare), y el servidor esta desnudo: 125 intentos de bots
       buscando `/.env` desde 7 IPs.
-- [ ] **Rotar las credenciales de R2** — quedaron escritas en la conversacion del
+- [x] **HECHO 2026-08-18 (Kamilo roto DO, Cloudflare, R2 y Resend).** **Rotar las credenciales de R2** — quedaron escritas en la conversacion del
       2026-08-02. R2 no se destruye con los droplets.
 - [ ] **2FA del staff.** Raya escrita por Kamilo: **la URL del admin no sale a
       ningun prospecto sin esto.** Ver `ROADMAP-SEGURIDAD-STAFF.md`.
+
+---
+
+## I.7 — Orquestador de despliegue: pipeline con compuertas — 2/10 (abierto 2026-09-13)
+
+> **Decision Kamilo 2026-09-13:** "al dar clic se crea automaticamente la
+> infraestructura para X cantidad de personas y lo primero que se abre es el
+> wizard" + "quiero que ese orquestador sea tipo pipeline, que confirme que
+> efectivamente esta correcto y funcional". **Herramienta: Terraform
+> (aprobado)** + GitHub Actions como ejecutor. Modelo de negocio: instancia
+> dedicada administrada por cliente (= "combo aislado por cliente", no SaaS).
+> **Orden:** despues de W.19 (decision Kamilo 2026-09-13).
+
+**Principio:** cada etapa tiene una compuerta de verificacion. Si no pasa en
+verde, el pipeline se detiene, dice que fallo y ofrece reintentar o destruir
+lo creado. **Nada se entrega sin pasar el humo funcional.** El orquestador
+vive FUERA de la infra del cliente (si viviera en el admin, caeria con ella y
+no podria crear la suya).
+
+**Terreno verificado contra codigo (2026-09-13):**
+- `deploy.sh:369` corre `db:seed --force` → `DatabaseSeeder` siembra el DEMO
+  entero (eventos, asistentes, fotos, wall) y `UserSeeder.php:16-17` crea
+  `superadmin@eventos.test` con clave `password`. **Un cliente nuevo recibiria
+  eso.**
+- `SetFilamentEventContext` sin eventos deja el contexto vacio y el Escritorio
+  abre sin evento: **no redirige al wizard** (`CreateEvent`, F11 de
+  ROADMAP-LUMINA-ADMIN, cerrado y probado). No verificado si el Escritorio
+  vacio falla.
+- `deploy.sh` NO instala el codigo (repos privados): hoy se copia por rsync
+  desde una semilla.
+- Hoy el montaje es manual (doctl + rsync + `.env` por rol + DNS): ~4 h la
+  primera vez, ~10 min desde snapshots operado paso a paso.
+- **Clasificacion del sembrado (2026-09-13):** del `DatabaseSeeder` solo son de
+  SISTEMA y globales `RoleSeeder` (roles + permisos), `ModuleTemplateSeeder`
+  (plantillas que usa el wizard en `afterCreate`), `EmailTemplateSeeder`,
+  `MagicLinkEmailTemplateSeeder` y `RecapEmailTemplateSeeder` (`event_id` null).
+  Todo lo demas (`EventSeeder`, `UserSeeder`, `AttendeeSeeder`, `ModuleSeeder`,
+  `ContentSeeder`, `SponsorSeeder`, `NetworkingSeeder`, `PhotoSeeder`,
+  `WallSeeder`, `GamificationSeeder`, `RegistrationFieldSeeder`, `MasterSeeder`,
+  `RecapConfigSeeder`, `OnboardingSeeder`) esta amarrado al evento demo
+  `summit-empresarial-2026`.
+- **El wizard necesita una organizacion:** `CreateEvent.php:304` toma la primera
+  que exista; en una BD vacia no hay ninguna (`OrganizationSeeder` crea
+  "Kasproduction"). El wizard SI siembra campos de registro, recordatorios y
+  modulos (`afterCreate`). `session_types` es por evento, opcional, se crea en
+  el admin (`SessionTypeResource`).
+- **`security:check` no detecta la cuenta de prueba:** revisa APP_DEBUG y claves
+  de BD/Redis (`SecurityCheckCommand.php`), pero deja pasar
+  `superadmin@eventos.test`/`password` y el evento demo.
+- **Un correo no registrado no recibe nada ni ve error**
+  (`AuthController.php:470-474`, anti-enumeracion). Hoy la unica entrada de un
+  asistente nuevo es la importacion del admin (`ListAttendeeAdmins.php:60`) o el
+  registro del Expo.
+- **Las BD administradas del Nivel 1 se borraron al cerrar** (COMO-VOLVER paso 7);
+  quedan los snapshots de api/web/sock con codigo. El complemento LB de
+  Cloudflare ($5/mes) sigue activo: Kamilo cancela o usa.
+
+- [x] **HECHO 2026-09-13 (ver B1.1 del plan).** **I.7.1 Instalacion limpia.** Seeder de produccion separado del demo:
+      roles, plantillas de correo (magic link y recap incluidas), catalogo de
+      modulos, campos de registro base. Administrador del cliente con clave
+      generada, entregada por canal seguro. `deploy.sh` deja de sembrar el
+      demo. **Va primero: las etapas 5 y 9 dependen de esto.**
+- [x] **HECHO 2026-09-13 (ver B1.2 del plan).** **I.7.2 Primer ingreso lleva al wizard.** Sin eventos, el admin redirige
+      a crear evento (wizard F11) en vez de abrir el Escritorio vacio.
+- [ ] **I.7.3 Paquete por version.** GitHub Actions construye un artefacto de
+      release por repo (backend, web, socket); cada nodo lo descarga. Reemplaza
+      el rsync desde la semilla.
+- [ ] **I.7.4 Terraform por nivel.** Modulos que traducen el catalogo (Nivel
+      0-4) a recursos DO + Cloudflare. Estado remoto. `plan` muestra que se
+      crea y cuanto cuesta; `destroy` no deja nada cobrando.
+- [ ] **I.7.5 Pipeline etapas 1-6 con compuertas.**
+      1 Plan (cliente, dominio, nivel, fechas; aprobacion manual) ·
+      2 Prerrequisitos (tokens, dominio, cupo, version publicada) ·
+      3 Datos (MySQL + Valkey en VPC; compuerta: TLS desde adentro + standby) ·
+      4 Maquinas por rol (compuerta: servicios arriba, cortafuegos 443 solo
+      Cloudflare + VPC) ·
+      5 Configuracion (`.env` por rol con TRUSTED_PROXIES,
+      WEBAPP_INTERNAL_URLS con IPs privadas, reload FPM por opcache; instalacion
+      limpia; compuerta: `/health` de cada nodo con la version esperada) ·
+      6 Red (DNS, certificado de origen, LB; compuerta: nodos verdes en el LB y
+      api/app/socket responden por dominio).
+- [ ] **I.7.6 Etapa 7 — Humo funcional.** Script de persona real: by-slug,
+      magic link con correo recibido, login, agenda, socket conecta y recibe un
+      evento, foto a R2, Horizon procesa un job. Base: `entrar-por-la-puerta.js`.
+- [ ] **I.7.7 Etapa 8 — Carga y caida.** N personas del nivel unos minutos +
+      apagar un nodo por rol (= la medicion del Nivel 1, automatizada).
+      Compuerta: 0 errores y p95 dentro de lo medido. **Decision pendiente
+      Kamilo:** recomendado obligatoria antes de evento real, opcional en demos
+      (~15 min y unos dolares por montaje).
+- [ ] **I.7.8 Etapa 9 — Entrega.** Monitoreo externo registrado (capa 1 de
+      I.5), snapshot inicial, enlace al wizard, credenciales por canal seguro,
+      informe de lo verificado + tiempos + costo.
+- [ ] **I.7.9 Pipelines hermanos.** Actualizar cliente (canario: 1 nodo + humo,
+      luego el resto) · modo registro/evento (absorbe `escalar.sh`) · destruir.
+- [ ] **I.7.10 Probarlo de punta a punta.** Montar Nivel 0 y Nivel 1 desde cero
+      solo con el pipeline, sin tocar nada a mano.
+
+**Referencias a estudiar al diseñarlo:** Laravel Forge y Ploi (crean servidores
+Laravel via API de DO), Coolify (lo mismo con Docker). Docker se evalua cuando
+haga falta otro proveedor; se arranca con imagenes por rol sobre DO.
 
 ---
 

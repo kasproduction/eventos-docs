@@ -3,6 +3,64 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-09-13 — Auditoria de infraestructura + plan noviembre B1.1/B1.2 (10 bugs: 5 resueltos, 5 abiertos)
+
+> Contexto: posible cliente en noviembre, evento de 5.000 personas. Plan en
+> `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` "PLAN DE TRABAJO — EVENTO DE NOVIEMBRE".
+> Sin commit al registrar (esperando confirmacion de Kamilo).
+
+### BUG-348: El test "stats are cached for 60s" del Data Center espera un comportamiento que se cambio a proposito en abril (ABIERTO)
+- **Severidad:** BAJA (test desactualizado, el codigo esta bien) — Es el unico fallo de la suite completa del 2026-09-13 (887 pasan, 1 falla). El test pide las estadisticas, crea un asistente y espera que la segunda consulta devuelva el valor viejo en cache (`registered = 0`); recibe 1. Falla siempre, con cache `array` y con `file`. **Causa:** `DataCenterCacheObserver` borra `dc:stats:{eventId}:*` al crear, actualizar o borrar los modelos del Data Center (registrado en `AppServiceProvider.php:95`). Lo agrego el commit `f6111e6` del 2026-04-25, posterior al commit del test (`07796dc`, mismo dia). La cache de 60 s ahora solo aplica mientras los datos no cambian, que es lo correcto para el organizador.
+- **Ajeno a B1.1/B1.2:** ninguno de los archivos de ese cambio toca Data Center, observers, asistentes ni cache.
+- **Fix pendiente:** reescribir el test para que pruebe lo que el codigo promete: dos consultas seguidas sin cambios devuelven el valor en cache, y un asistente nuevo invalida la cache y se ve de inmediato.
+- **Archivos:** `tests/Feature/DataCenter/DataCenterApiTest.php:76`
+### BUG-347: Los tests llaman al servidor de sockets real y la suite completa tarda horas (ABIERTO)
+- **Severidad:** ALTA (confiabilidad de la suite) — Controladores, servicios y observers avisan al socket con `Http::post` a `SOCKET_SERVER_URL` (`InvalidationService`, `CheckinService`, `GameService`, `WallController`, `PollController` y otros). Ningun test usa `Http::fake()` ni `Http::preventStrayRequests()`. En Windows un puerto cerrado de localhost no rechaza la conexion: espera el tiempo completo, medido en 2,00 s. Con el socket apagado, la suite completa (unos 950 tests en 87 archivos) corrio 29 minutos con 37 s de CPU sin terminar y se detuvo a mano. El resultado de la suite depende de si el socket esta prendido en la maquina.
+- **Tambien la webapp:** `InvalidationService` avisa a la webapp local (`WEBAPP_INTERNAL_URLS`, por defecto `http://127.0.0.1:3000`) para soltar su cache del marco, con 1 s de espera por llamada. Con la webapp apagada, los tests unitarios de rate limit tardaban 1-2 s cada uno.
+- **Mitigacion usada el 2026-09-13 para validar B1.1/B1.2:** correr Pest con `SOCKET_SERVER_URL=http://0.0.0.0:1` y `WEBAPP_INTERNAL_URLS=http://0.0.0.0:1`: en Windows esa direccion falla en 1 ms en vez de esperar.
+- **Fix pendiente:** `Http::preventStrayRequests()` + fake de las rutas `/internal/*` del socket y de la webapp en `tests/TestCase.php`, y revisar los tests que hoy asumen la llamada real.
+- **Archivos:** `tests/TestCase.php` (pendiente)
+
+### BUG-346: Avisar al socket la configuracion de una sesion no tiene tiempo de espera propio (ABIERTO)
+- **Severidad:** ALTA — `SessionConfigController::emitConfigUpdate` usa `Http::post(...)` sin `timeout()`. Todas las demas llamadas internas al socket usan `Http::timeout(2)`. Sin tiempo propio aplica el de Laravel (`connect_timeout` 10 s en `PendingRequest`). **En produccion, si el nodo de sockets se cae, cada cambio de configuracion de sesion bloquea un proceso PHP-FPM hasta 10 s**, y con varios moderadores cambiando la configuracion en vivo se come los procesos de la API. En tests, las 17 peticiones que cambian configuracion en `SessionConfigTest` suman minutos.
+- **Fix pendiente:** `Http::timeout(2)` como el resto.
+- **Archivos:** `app/Http/Controllers/Api/V1/Admin/SessionConfigController.php:495`
+### BUG-345: El correo no controla su ritmo frente al limite de Resend (ABIERTO → plan B3.1)
+- **Severidad:** ALTA — Resend permite 10 peticiones por segundo por equipo (docs de Resend, ampliable por solicitud). `SendEmailJob` no limita el ritmo: solo `tries = 3` y `backoff = 60`. Con 5.000 invitaciones, o 5.000 personas pidiendo enlace de acceso al abrir puertas, los envios que choquen con el limite se reintentan tres veces y se pierden.
+- **Fix previsto:** cola limitada por debajo del techo, enlaces de acceso con prioridad sobre invitaciones, reintentos que no pierdan correos y pedir ampliacion a Resend. Item B3.1 del plan de noviembre.
+- **Archivos:** `app/Jobs/SendEmailJob.php`
+
+### BUG-344: Pest con la configuracion cacheada corre contra la base MySQL de desarrollo (ABIERTO, mitigado)
+- **Severidad:** ALTA (riesgo de perdida de datos) — Con `bootstrap/cache/config.php` presente (lo deja `DEMO-BUILD.bat` via `artisan optimize`), Laravel ignora los `<env>` de `phpunit.xml` y los tests usan `eventos_db` en MySQL. El 2026-09-13 fallaron 53 tests con "connection refused" porque MySQL estaba apagado. **Con MySQL encendido, `RefreshDatabase` habria migrado de cero la base de desarrollo.**
+- **Mitigacion aplicada:** `php artisan config:clear` antes de testear + memoria `feedback_tests_config_cache`.
+- **Fix pendiente:** guarda en `tests/TestCase.php` que aborte si la conexion no es `sqlite` o si existe la cache de configuracion.
+- **Archivos:** `tests/TestCase.php` (pendiente)
+
+### BUG-343: El chequeo nuevo de staff lanzaba excepcion sin roles y se saltaba la revision del evento demo (RESUELTO antes de commit)
+- **Severidad:** ALTA — El chequeo de staff con clave "password" usaba `User::role(Roles::PANEL_ACCESS)`, que lanza excepcion si los roles no existen. El `catch` la convertia en advertencia y el chequeo del evento demo, que viene despues, nunca corria: una base sin roles con el evento demo pasaba en verde. Cazado por el test "security:check fails when the demo event exists".
+- **Fix:** `User::whereHas('roles', fn ($q) => $q->whereIn('name', Roles::PANEL_ACCESS))`, que no lanza.
+- **Archivos:** `app/Console/Commands/SecurityCheckCommand.php`
+
+### BUG-342: La base de tests rechazaba las plantillas de correo de acceso y de recap (RESUELTO)
+- **Severidad:** MEDIA (solo entorno de tests) — Los tipos `magic_link` y `recap_ready` se agregan con `ALTER TABLE ... MODIFY ENUM` en las migraciones `2026_04_26_120003` y `2026_05_02_031313`, que solo corren en MySQL. En SQLite la columna quedaba con la lista original y el CHECK rechazaba esas plantillas (`CHECK constraint failed: type`). Ningun test sembraba esas plantillas, por eso nunca aparecio.
+- **Fix:** los dos tipos declarados tambien en la migracion original, en `email_templates.type` y `email_logs.type`. En MySQL los ALTER posteriores reescriben el mismo ENUM.
+- **Archivos:** `database/migrations/2026_04_05_000001_create_email_templates_table.php`
+
+### BUG-341: En una base sin eventos el admin abria un Escritorio vacio en vez del wizard (RESUELTO)
+- **Severidad:** MEDIA — `SetFilamentEventContext` deja el contexto vacio si no hay eventos, y el Escritorio salia sin evento ni tareas. En un servidor nuevo, lo primero que hay que hacer es crear el evento.
+- **Fix:** `Dashboard::mount()` redirige al wizard de crear evento cuando no existe ningun evento. Tests `PrimerIngresoWizardTest` (2).
+- **Archivos:** `app/Filament/Pages/Dashboard.php`, `tests/Feature/Admin/PrimerIngresoWizardTest.php`
+
+### BUG-340: `security:check` dejaba pasar el demo y la cuenta de prueba (RESUELTO)
+- **Severidad:** ALTA — El chequeo revisaba APP_DEBUG y claves de BD, Redis y secretos, pero no la base: un servidor con `superadmin@eventos.test` / `password` y el evento demo salia en verde.
+- **Fix:** tres chequeos criticos nuevos: usuarios `@eventos.test`, staff con acceso al panel con clave "password" (solo staff, para no revisar miles de claves con bcrypt) y el evento demo `summit-empresarial-2026` (advertencia en vez de error si `EVENTOS_DEMO=true`). 4 tests nuevos.
+- **Archivos:** `app/Console/Commands/SecurityCheckCommand.php`, `tests/Feature/Security/SecurityCheckCommandTest.php`
+
+### BUG-339: Un servidor nuevo quedaba con el demo entero y un superadmin con clave "password" (RESUELTO)
+- **Severidad:** CRITICA (seguridad) — `deploy.sh` corria `php artisan db:seed --force`, y `DatabaseSeeder` siembra el evento demo, asistentes, fotos y `UserSeeder` crea `superadmin@eventos.test` con clave `password`. Cualquier cliente montado con el script habria recibido eso.
+- **Fix:** `SistemaSeeder` con solo lo global (roles, plantillas de modulos y de correo); comando `php artisan eventos:instalar` (organizacion + sistema + superadmin con clave generada mostrada una vez, se niega si la base tiene datos); `DatabaseSeeder` se niega en produccion salvo `EVENTOS_DEMO=true`; `deploy.sh` y `COMO-VOLVER.md` usan la instalacion. Verificado sobre una base real: 1 organizacion, 1 usuario, 8 roles, 24 plantillas de modulos, 30 de correo, 0 eventos. 6 tests nuevos.
+- **Archivos:** `app/Console/Commands/InstalarCommand.php`, `database/seeders/SistemaSeeder.php`, `database/seeders/DatabaseSeeder.php`, `config/app.php`, `.env.production.example`, `tests/Feature/Security/InstalarCommandTest.php`, `docs/infra/deploy.sh`, `docs/infra/COMO-VOLVER.md`
+
 ## 2026-06-21 — Sesion DaVinci W.7 Sponsors completo (4 bugs)
 
 ### BUG-338: Polish visuales W.7 — 4 issues agrupados (RESUELTO)

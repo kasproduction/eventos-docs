@@ -5,7 +5,8 @@
 > Filtro post-pivote 2026-07-08: "¿esto acerca el demo desplegado y vendible
 > para prospectos oct-nov?" (el deal Eventos Efectivos/Bancolombia se cayo).
 > Actualizado: 2026-08-01 (sueltos cerrados: enforcement Expo + double-count + BUG-LOG a cero)
-> Bugs: BUG-001 a BUG-305, **0 pendientes** (BUG-111 y BUG-127 cerrados 2026-08-01
+> Bugs: BUG-001 a BUG-348, **5 pendientes** (2026-09-13: BUG-348 test de cache del Data Center desactualizado desde abril; BUG-346 aviso de config de sesion al socket sin timeout; BUG-347 tests llaman al socket real y la suite tarda horas; BUG-344 tests contra MySQL dev con config cacheada, mitigado; BUG-345 correo sin control de ritmo frente a Resend, plan B3.1).
+> Antes: BUG-001 a BUG-305, 0 pendientes (BUG-111 y BUG-127 cerrados 2026-08-01
 > por auditoria de vigencia — ya estaban resueltos en codigo sin marcar)
 
 ---
@@ -43,7 +44,12 @@
 - Los fixes de codigo (ENTITY_KEYS `modules`, double-count comment) estan en
   **"Backlog Expo"** al final de este doc — sin duplicar aca.
 
-### Recap compartible — post-evento (~26h, 3-4 dias) — 0/75
+### Recap compartible — post-evento — IMPLEMENTADO (contador viejo corregido 2026-09-13)
+
+> **Verificado 2026-09-13:** existe en backend (`RecapService.php`, `RecapImageRenderer.php`,
+> `RecapController.php`, `RecapVerifyController.php`) y en la app (`eventos-app/app/(app)/recap`).
+> ROADMAP-RECAP dice "Fases 0-6 cerradas; pendiente E2E con Chromium en VPS y validacion visual en dev build".
+> Las casillas de abajo son el plan original y NO reflejan el estado real.
 
 > Plan completo: `docs/ROADMAP-RECAP.md` (DaVinci mode, con tests + refs).
 > Solo app movil en Fase 1. Webapp consume mismo backend en Fase 2 (post Web App Bancolombia).
@@ -71,7 +77,7 @@
 ## 2. Web App — pendientes (ventana: `PENDIENTES-WEBAPP.md`)
 
 - [ ] QA presencial en device fisico (M.2-M.8 + B5 Fase C, ~2h con Kamilo)
-- [ ] DEPLOY DEMO 0/6 (hosting, backend prod, Next prod, socket PM2, evento
+- [x] DEPLOY DEMO 6/6 — HECHO 2026-08-01/02 y luego destruido (ver ROADMAP-INFRAESTRUCTURA). Texto original: (hosting, backend prod, Next prod, socket PM2, evento
       demo curado, Sentry DSN) — **prioridad estrategica post-pivote**
 
 ---
@@ -208,7 +214,7 @@
 - [ ] Prueba de red degradada 4G Colombia (TEST 5 del plan v2.1): todo se
       midio dentro del mismo centro de datos a proposito, para saturar el
       servidor y no medir el cable
-- [ ] Mitigar el hallazgo de arquitectura: **cada conexion de socket cuesta
+- [x] **RESUELTO (verificado 2026-09-13: ficha compartida en Redis, `eventos-socket/src/auth.ts`; `/auth/me` solo si no hay ficha).** Mitigar el hallazgo de arquitectura: **cada conexion de socket cuesta
       una peticion HTTP** a `/auth/me` (verificado: 1.468 conexiones = 1.468
       peticiones, pico de 76/s = justo el techo de la maquina). Una
       reconexion masiva se come sola toda la capacidad HTTP. Mitigacion:
@@ -233,12 +239,12 @@
 
 ### Bloqueantes cazados 2026-08-01 (arreglar ANTES de medir, o el numero miente)
 
-- [ ] **`eventos-socket/ecosystem.config.js`**: `instances: 1` +
+- [x] **RESUELTO (verificado 2026-09-13: `instances: 'max'`, `cluster`, `max_memory_restart: '2G'`).** **`eventos-socket/ecosystem.config.js`**: `instances: 1` +
       `exec_mode: 'fork'` + `max_memory_restart: '256M'`. Bajo carga el
       servidor se reinicia a mitad del test → se mide una caida, no una
       capacidad. Subir el techo + cluster mode (el adaptador Redis ya esta
       implementado, es seguro).
-- [ ] **`tests/load/tokens.json` tiene ~10 usuarios** y el script reparte
+- [ ] **ANOTADO 2026-09-13: hoy tiene 4 tokens; el recorrido vigente es `entrar-por-la-puerta.js` por la webapp, revisar si este kit sigue en uso.** **`tests/load/tokens.json` tiene ~10 usuarios** y el script reparte
       tokens en rueda: 5000 VUs golpearian las mismas 10 cuentas
       (rate limits + caches por persona = resultado inventado). Sembrar
       miles de asistentes antes de correr.
@@ -256,7 +262,7 @@
 ### Fixes pre-stress (Live Moments)
 
 - [ ] Throttle game broadcasts (ver DISPONIBILIDAD-HA.md seccion 11)
-- [ ] Indices `live_game_participants`
+- [x] **HECHO (verificado 2026-09-13: unique game_id+attendee_id+round e index game_id+round+score).** Indices `live_game_participants`
 - [ ] Cache `getEligiblePool`
 - [ ] HTTP connection pool
 

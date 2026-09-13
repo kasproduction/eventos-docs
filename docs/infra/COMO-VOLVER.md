@@ -102,7 +102,10 @@ Después, en el servidor, los pasos que imprime `deploy.sh` al terminar.
 **Los datos del demo:**
 
 ```bash
-php artisan db:seed --force                                    # base
+# Este es el DROPLET DE DEMO: requiere EVENTOS_DEMO=true en .env. Desde el
+# 2026-09-13 DatabaseSeeder se niega en produccion sin eso. Para un CLIENTE
+# no se siembra: php artisan eventos:instalar (ver deploy.sh).
+php artisan db:seed --force                                    # base DEMO
 php artisan db:seed --class=DemoMediaSeeder --force            # imágenes a R2
 php artisan db:seed --class=DemoCompletoSeeder --force         # slides, FAQ, premios, Q&A
 php artisan db:seed --class=LoadTestAttendeeSeeder --force     # 5.000 asistentes (solo para pruebas)

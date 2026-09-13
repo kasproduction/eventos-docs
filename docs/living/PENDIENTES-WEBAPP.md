@@ -43,16 +43,224 @@
 | **W.17 Soporte** | **13/13** | **CERRADO 100% 2026-07-04** (split layout espejo W.14 + form nueva consulta + subflow FAQ + backend announcement on ticket-resolve. RT respuesta → W.11 via `data:invalidate{announcements}` (OJO: `support:new_response` NO existe como evento — auditoria 2026-07-04) + Web Push → W.12) | **+2** |
 | **W.18 Hub Personal** | **19/19** | **100% — CERRADO 2026-07-04** (split 35/65 espejo W.13/W.14/W.17. Wall: hero+stats+rows+footer. Panel der: 3 sub-views Datos/Intereses/Apariencia. Data form con 3 cards visuales agrupando + 1 solo Guardar. Intereses chips min 1 con empty state. Apariencia Lux/Noir cards con preview aplicando via useTheme. Logout modal confirm. **Foto upload + shuffle beam avatar** (PerfilAvatarMenu popover: subir/cambiar variante/eliminar, seed en localStorage scopeado por email, beam URL espejo Expo). Deep link `eventos://profile[/sub]`. Sidebar refactor + ProfilePopover eliminado. 391/391 vitest + 13/13 E2E) | **+17** |
 | **W.X Welcome Showcase** | **1/1** | **CERRADO 2026-07-14** (eventos-web `9d02140`, pusheado) — pelicula de bienvenida: opening keyvisual → invitacion crossfade → FLIP al canvas + 6 beats que HABITAN el canvas espejando su modulo real (Agenda: popups tip+sesion SINCRONIZADOS a la accion + payoff Mi Agenda / En vivo: player 16:9 poster+controles + About / Social: hub 3col / Desafio: hub+ranking / Sponsors: por tier REAL + detalle / Speakers) + finale nombre completo. Saltar se retira en finale. Copy es-CO tuteo. `/api/showcase` sponsors por tier real. typecheck/lint 0, vitest 7/7. **Falta solo QA final end-to-end.** Ver [[project_wx_showcase_design]] | **+1** |
-| **TOTAL** | **550/576** | **95.5%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05) | **2026-07-14: W.X Welcome Showcase CERRADO 0→1** (pelicula bienvenida, todas las escenas habitan el canvas). **Ya no queda ningun modulo de features abierto.** Lo que resta es QA presencial (Mobile parity M.2-M.8 + B5 Fase C + QA final W.X) + DEPLOY DEMO. **19 modulos cerrados:** W.0, W.1, W.1B, W.2, W.3, W.4, W.5, W.6, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.16, W.17, W.18, W.X |
+| **W.19 Spatial Player** | **0/9** | **ABIERTO 2026-09-07** (BLOQUE 8) — el stream como sistema operativo: player persistente en el shell, `split` con Agenda, `mini` flotante con el resto, /live con preview real en vez de redirigir. Decision Kamilo viendo la demo de 5 dias | **+0 (nuevo)** |
+| **TOTAL** | **550/585** | **94.0%** — Fase 1 desktop (W.15 → Mobile parity 2026-07-05). **2026-09-07: se abre W.19 (0/9), denominador 576→585** | **2026-07-14: W.X Welcome Showcase CERRADO 0→1** (pelicula bienvenida, todas las escenas habitan el canvas). **Ya no queda ningun modulo de features abierto.** Lo que resta es QA presencial (Mobile parity M.2-M.8 + B5 Fase C + QA final W.X) + DEPLOY DEMO. **19 modulos cerrados:** W.0, W.1, W.1B, W.2, W.3, W.4, W.5, W.6, W.7, W.8, W.9, W.10, W.11, W.13, W.14, W.16, W.17, W.18, W.X |
 
 > Conflicto W.10 resuelto 2026-06-20: el codigo creo "W.10 Live Hub" reusando el numero. Doc viejo "W.10 Hub Personal" se renombra a W.18 Hub Personal. Sin refactor de codigo, solo doc.
 
 ---
 
+## ESTADO GENERAL POR CATEGORIA — auditoria 2026-09-13
+
+> Conteo de casillas de TODOS los documentos de pendientes + verificacion contra
+> codigo de los casos que no cuadraban. Contadores viejos corregidos el mismo dia
+> (ver "Contadores corregidos" abajo). Global sobre frentes con contador:
+> **588 de 717 = 82%** (actualizado tras B1.1 y B1.2).
+
+| Categoria | Avance | % | Estado | Donde vive el detalle |
+|---|---|---|---|---|
+| Webapp | 550/585 | 94% | Activa. Falta W.19 y QA presencial | Este archivo (BLOQUE 5, BLOQUE 8, MOBILE PARITY) |
+| App movil Expo | Fase 1 cerrada | 100% implementado | Faltan pruebas en telefono; no publicada en tiendas | `PENDIENTES.md` §1 y §6 |
+| Admin Lumina | 57/57 | 100% | Cerrado. Solo falta decidir las paginas personalizadas | `ROADMAP-LUMINA-ADMIN.md` F10.6 |
+| Modulos del organizador | Cerrados | 100% implementado | Pulse, Data Center, kiosko, Mission Control, juegos en vivo, webhooks, recap | Roadmaps de cada modulo |
+| Infraestructura | 33/71 | 46% | Activa: plan noviembre 2/29 (B1.1 y B1.2 hechos 2026-09-13) | `ROADMAP-INFRAESTRUCTURA.md` |
+| Seguridad del staff | 0/26 | 0% | Sin empezar. No hay nada de 2FA en el codigo (grep 2026-09-13) | `ROADMAP-SEGURIDAD-STAFF.md` |
+| Manual del organizador | 5/35 | 14% | En pausa | `ROADMAP-MANUAL.md` |
+| Registro publico, landing y widget | Sin contador | 0% | Sin empezar. La webapp no tiene pantalla de registro | `PENDIENTES.md` §3 + RUTA etapa 3 |
+
+### Detalle de lo abierto por categoria
+
+**Webapp (35 abiertos)**
+| Bloque | Avance |
+|---|---|
+| W.19 Spatial Player | 0/9 |
+| W.12 pulido: telefono, Edge, Firefox, accesibilidad, Lighthouse | 25/48 |
+| QA presencial mobile M.1 a M.8 | Construido, falta probarlo en telefono |
+| QA final de la pelicula de bienvenida W.X | 0/1 |
+
+**Infraestructura por fase**
+| Fase | Avance |
+|---|---|
+| I.0 Errores que rompen un evento | 3/3 |
+| Nivel 1 montado y medido | 7/7 + 4 seguimientos abiertos (repetir caida API con 4 vCPU, ROL=admin, replica de lectura, modo registro/evento) |
+| I.1 Rendimiento | 9/16 |
+| I.1b Puerta del evento | 2/4 |
+| I.2 Medir el ritmo real | 0/3 |
+| I.3 Catalogo vendible | 5/7 |
+| I.4 Independencia de DigitalOcean | 0/3 |
+| I.5 Monitoreo y torre de control | 0/11 |
+| I.6 Antes de exponer la URL | 2/3 (falta 2FA del staff) |
+| I.7 Orquestador pipeline con Terraform (NUEVO 2026-09-13) | 2/10 |
+
+**App movil y modulos — sueltos reales**
+- App movil: probar el socket en telefono; push de silent disco con build real;
+  barra liquid glass espera soporte de la libreria; EAS build de produccion y
+  publicacion en tiendas (`eas.json` tiene perfiles, no hay rastro de publicacion).
+- Event Pulse: decision "cada interaccion es momento hero"; verificar motor de
+  momentos v2 (`ROADMAP-EVENT-PULSE.md`).
+- Kiosko: medir escaneo < 100 ms en servidor real.
+- Mission Control: pestaña de juegos (Fase 2).
+- Recap: E2E con Chromium en VPS + validacion visual en dev build.
+
+**Backlog sin fecha (no cuenta en el porcentaje):** stress 10K, UI optimista del
+chat, unificar estilos de las SPAs standalone, tests de Mission Control, nice to
+have Fase 2 y 3 (`PENDIENTES.md` §7b, §8, §9).
+
+### Hallazgos de la auditoria 2026-09-13 (verificados contra codigo)
+
+1. **El montaje siembra el demo y una cuenta de prueba.** `deploy.sh:369` corre
+   `db:seed --force`; `UserSeeder.php:16-17` crea `superadmin@eventos.test` con
+   clave `password`. Detalle y clasificacion del sembrado: I.7.1.
+2. **`security:check` no detecta esa cuenta ni el evento demo.** → I.7.1.
+3. **Sin eventos, el admin no lleva al wizard** (`SetFilamentEventContext` deja el
+   contexto vacio). El wizard F11 existe y esta probado; necesita que exista una
+   organizacion. → I.7.2.
+4. **Registro abierto imposible hoy.** Un correo no registrado no recibe enlace
+   ni ve error (`AuthController.php:470-474`); la webapp no tiene registro (solo
+   el Expo usa `POST /auth/register`). Hoy se entra solo por importacion del admin
+   con invitacion. → RUTA etapa 3.
+5. **No hay despliegue automatico.** El montaje es manual (doctl + rsync + `.env`
+   por rol); las BD administradas del Nivel 1 se borraron; `deploy.sh` no instala
+   el codigo. → I.7 (Terraform + GitHub Actions aprobados).
+6. **No hay 2FA** en ninguna parte del backend. → `ROADMAP-SEGURIDAD-STAFF.md`.
+7. **Cloudflare LB sigue cobrando $5/mes** sin infraestructura detras. Kamilo
+   cancela o usa.
+
+### EL EVENTO DE NOVIEMBRE ES DE 5.000 PERSONAS (dato Kamilo 2026-09-13)
+
+> **Lo medido llega a 300 activas** (Nivel 1, agosto). 5.000 personas cae en el
+> **Nivel 3 (hasta 2.500 activas, ~$700-1.050/mes) o Nivel 4 (5.000-10.000
+> activas, ~$1.300-2.200/mes)** del catalogo, y los dos son DERIVADOS, no
+> medidos. Cual de los dos depende de cuantas estan activas a la vez, que es
+> justo I.2 (sin medir). **Montar para 5.000 sin medir = improvisar.**
+
+**Infraestructura abierta, reclasificada para 5.000 personas:**
+
+| Para que sirve | Items |
+|---|---|
+| **Imprescindible para noviembre** | I.7.1 instalacion limpia · I.7.2 wizard · 2FA · I.4 respaldo fuera de DO · I.5 capa 1 alerta externa · I.1b limitador por fallos + rutas publicas por recinto · I.2 medir el ritmo real (decide Nivel 3 o 4 y el costo) · montar Nivel 3/4 y medirlo con carga del tamaño real (login en ola, 5K, red 4G Colombia, caida de nodo con carga, export aislado, admin trabajando con carga D.4.4) · replica de lectura + ROL=admin (Nivel 3 la incluye) · correo masivo con ritmo controlado (hallazgo 8) · juegos en vivo: limitar difusiones + cache del grupo elegible · I.7.3-I.7.8 pipeline con humo, carga y entrega · torre de control + alertas por umbral + logs centralizados + escalar con un comando (con 11+ maquinas, entrar por ssh no es viable) · verificar el 503 de la webapp con una persona |
+| **Mejora, no bloquea** | Panel en vivo del servidor (Pulse) · canario automatico · que el tiempo real refresque solo lo que cambio · precarga completa · cache de la sesion en Next · modo registro/evento · runbook y game day periodico · consultas duplicadas y conteos del branding |
+| **Despues de noviembre** | Niveles de 10.000 · la promesa escrita por nivel · montar en otro proveedor · pagina de estado publica · modo "evento en curso" · re-medir el techo publicado por endpoint · I.7.9-I.7.10 |
+
+**Hallazgo 8 — el correo tiene techo (2026-09-13).** Resend permite **10
+peticiones por segundo por equipo** (docs de Resend; ampliable por solicitud) y
+`SendEmailJob` no limita su ritmo (solo `tries=3`, `backoff=60`). Con 5.000
+invitaciones o una ola de enlaces de acceso al abrir puertas: 600 correos por
+minuto como maximo, y los que choquen con el limite se reintentan 3 veces y se
+pierden. Hace falta limitar el ritmo en la cola y pedir ampliacion a Resend
+antes del evento.
+
+**Pendientes de agosto que ya estaban resueltos (verificado 2026-09-13):** socket
+en cluster (`ecosystem.config.js`: `instances: 'max'`, `cluster`, 2G); el socket
+ya no le pide `/auth/me` al backend en cada conexion (ficha compartida en Redis,
+`eventos-socket/src/auth.ts`); indices de `live_game_participants` creados.
+
+### Contadores corregidos el 2026-09-13
+
+- `PENDIENTES.md` Recap 0/75 → IMPLEMENTADO (backend + app verificados).
+- `PENDIENTES.md` y `EventOS_Roadmap.md` DEPLOY DEMO 0/6 → HECHO 2026-08-01/02.
+- `ROADMAP-INFRAESTRUCTURA.md` 28 → 31: `deploy.sh` por rol, Cloudflare naranja y
+  rotacion de R2 marcados como hechos.
+- **Anotados, sin marcar (no verificado item por item):** casillas de trivia en
+  `ROADMAP-LIVE-MOMENTS.md` (la trivia existe: `LiveGame`, `GameController`, W.16)
+  y criterios de exito de `ROADMAP-WEBHOOKS.md` (roadmap cerrado con 24 tests).
+
+---
+
+## RUTA A NOVIEMBRE — orden de trabajo con dependencias (decision Kamilo 2026-09-13, re-priorizada el mismo dia)
+
+> **Contexto:** posible cliente en noviembre (evento con influencers, **5.000 personas** — ver "EL EVENTO DE NOVIEMBRE ES DE 5.000 PERSONAS" arriba).
+> **Criterio que manda (Kamilo, textual):** *"si en este momento me dijeran
+> tenemos evento mañana, ¿que podria montar sin sufrir ni improvisar?"*.
+> W.19 es mejora (lo actual funciona) → pasa a segundo plano. Tiendas de ultimo.
+>
+> **2026-09-13 — LA INFRAESTRUCTURA SE EJECUTA POR SU PLAN:** `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`
+> "PLAN DE TRABAJO — EVENTO DE NOVIEMBRE, 5.000 PERSONAS" (0/29, bloques B1-B6 con compuertas).
+> Las etapas 1, 2 y 5 de esta ruta son ese plan; los items de infraestructura de abajo quedan como resumen.
+
+### Diagnostico "evento mañana" (verificado contra codigo 2026-09-13)
+
+- **Funciona sin sufrir:** todos los modulos del asistente (agenda, streaming con
+  URL de YouTube/Vimeo, social, desafio, sponsors, speakers), Pulse, kiosko,
+  Mission Control, juegos en vivo. Crear el evento con el wizard F11. Importar la
+  lista de asistentes desde el admin con invitacion por correo
+  (`ListAttendeeAdmins.php:60`, `AttendeesImport`).
+- **Se puede, pero improvisando:** el montaje (manual por consola con `doctl`,
+  tokens nuevos, las BD administradas se borraron al cerrar el Nivel 1, codigo por
+  rsync, `.env` por rol a mano); limpiar el demo y cambiar la clave del
+  superadmin a mano (`deploy.sh:369` + `UserSeeder.php:16-17`); el correo necesita
+  clave nueva de Resend y dominio verificado; vigilar por ssh sin alertas; nunca
+  se recorrio en telefono con gente real.
+- **No se puede:** registro abierto desde un enlace. Un correo que no existe no
+  recibe nada y no ve error (`AuthController.php:470-474`, anti-enumeracion), y la
+  webapp no tiene pantalla de registro. 2FA del staff. App en tiendas.
+
+**Etapa 0 — Guardar lo suelto** (espera confirmacion de Kamilo para commit)
+- [ ] APP EVENTOS: `demo/`, este archivo, ROADMAP-INFRAESTRUCTURA (I.7)
+- [ ] eventos-backend: `Demo5DiasSeeder.php` + cambio en `DemoCompletoSeeder.php`
+- [x] **HECHO 2026-09-13 (ver "Contadores corregidos" arriba).** Sanear contadores viejos: Recap figura 0/75 en PENDIENTES.md y ya existe
+      (`RecapService.php`, `eventos-app/app/(app)/recap`); trivia de LIVE-MOMENTS y
+      criterios de WEBHOOKS sin marcar con el roadmap cerrado; DEPLOY DEMO 0/6 en
+      EventOS_Roadmap y PENDIENTES.md (se hizo en agosto); 3 items de
+      ROADMAP-INFRAESTRUCTURA hechos sin marcar (deploy.sh por rol, rotacion de
+      claves, Cloudflare naranja)
+
+**Etapa 1 — Un admin que se le entrega a un cliente**
+- [x] **HECHO 2026-09-13.** I.7.1 Instalacion limpia sin demo y sin `superadmin@eventos.test`/`password`
+      (ROADMAP-INFRAESTRUCTURA I.7) → **base de todo lo demas**
+- [x] **HECHO 2026-09-13.** I.7.2 Primer ingreso lleva al wizard F11 → depende de I.7.1
+- [ ] 2FA del staff, S.0-S.6 + S.8 (ROADMAP-SEGURIDAD-STAFF, 0/26). S.7 va con el
+      montaje. Regla Kamilo: la URL del admin no sale sin esto
+
+**Etapa 2 — Montar sin improvisar** → depende de I.7.1
+- [ ] I.7.3 Paquete por version (reemplaza el rsync desde una semilla)
+- [ ] I.7.4 Terraform por nivel + I.7.5 pipeline etapas 1-6 con compuertas
+- [ ] I.7.6 Humo funcional automatico (incluye correo de acceso recibido)
+- [ ] Correo transaccional listo por cliente: clave Resend, dominio verificado
+- [ ] Alerta externa (capa 1 de I.5) + respaldo fuera de DigitalOcean (I.4)
+- [ ] I.7.8 Entrega + runbook del dia del evento ("si pasa X, haz Y")
+
+**Etapa 3 — La puerta del publico** (influencers: la gente llega por un enlace)
+- [ ] **Registro publico en la webapp** (NUEVO). Terreno: el backend tiene
+      `POST /auth/register` (`routes/api/auth.php:8`), solo lo usa el Expo
+      (`eventos-app/lib/authApi.ts:105`); `eventos-web` `(auth)` no tiene registro.
+      Espejo del flujo Expo, diseño DaVinci antes de codear
+- [ ] I.1b limitador por IP cuenta FALLOS, no intentos + rutas publicas por recinto
+      (ROADMAP-INFRAESTRUCTURA I.1b, 2/4)
+
+**Etapa 4 — QA presencial con Kamilo** → depende de etapas 1-3
+- [ ] Mobile parity M.1-M.8 en telefono real
+- [ ] W.12 Fase C: device, Edge/Firefox, Lighthouse, WCAG, E2E cross-tab
+- [ ] W.X QA final de la pelicula de corrido
+
+**Etapa 5 — Ensayo general** → depende de etapas 2 y 4
+- [ ] Montar con el pipeline el nivel del evento, I.7.7 carga del tamaño real +
+      caida de un nodo por rol, y desmontar. Con eso "evento mañana" = si
+
+**Etapa 6 — W.19 Spatial Player** (BLOQUE 8 abajo, 0/9) — mejora, segundo plano
+- Propuesta de arquitectura hecha 2026-09-13 (capa fija de reproduccion en el
+  layout + hueco por pantalla; el iframe nunca se mueve porque Safari no soporta
+  `moveBefore()`; modo derivado de la ruta; chat/Q&A/config suben al provider;
+  8.1 y 8.3 juntos; mini con snap a esquina). **Sin aprobar todavia.**
+- 8.6 DECIDIDO A desktop / B mobile · 8.7 decision pendiente
+
+**Etapa 7 — Tiendas (ultimo, decision Kamilo)**
+- [ ] EAS build de produccion Android + iOS, cuentas, envio y revision
+      (`eas.json` ya tiene perfil `production` y `submit`; no hay rastro de
+      publicacion). **Riesgo anotado:** la revision toma dias o semanas; si el
+      cliente pide app en tiendas, dejar margen antes del evento
+- [ ] Pipeline restante: I.7.9 hermanos (actualizar, modo registro/evento,
+      destruir) + I.7.10 prueba de punta a punta
+
 ## QUE SIGUE — features CERRADAS, queda QA presencial (webapp only)
 
 **Ya no hay modulos de features abiertos** (2026-07-14: W.X fue el ultimo). Lo que resta
 de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
+
+> **EXCEPCION 2026-09-07 — se abre W.19 Spatial Player** (BLOQUE 8 abajo, 0/9): en la demo
+> de 5 dias Kamilo vio que el streaming NO se comporta como un sistema operativo
+> (visionOS): al navegar a otro modulo el player desaparece entero, y "En vivo" es un
+> directorio que redirige, sin preview. Es un cambio de arquitectura del shell, no un bug.
 
 - [ ] **Mobile parity M.2-M.8 QA vivo en device** (implementacion 60/60 cerrada 2026-07-11):
   heart particulas, momentos/uploads, shuffle, trivia sponsor, desafio, anuncios detail,
@@ -162,6 +370,65 @@ de webapp es QA CON Kamilo presente (device + tiempo), NO codigo nuevo:
 - [ ] **Fase C** — QA device real 3 viewports + Edge/Firefox + Lighthouse batch + WCAG audit (CON Kamilo)
 - [ ] **Fase C** — E2E cross-tab (streaming Q&A, social conectar)
 - [ ] **Fase C** — DSN prod Sentry + validacion (item de deploy; config completa ya en codigo)
+
+### BLOQUE 8 — W.19 Spatial Player (visionOS): el stream convive con el resto — 0/9 (abierto 2026-09-07)
+
+**Procedencia:** decision Kamilo 2026-09-07, viendo la demo local de 5 dias con stream en vivo.
+**Diagnostico contra codigo (2026-09-07):** el player vive DENTRO de la ruta
+`session-stream/[id]/page.tsx` → `StreamShell.tsx` (grid desktop/tablet/mobile por pagina);
+al cambiar de ruta se desmonta y no queda ni miniatura. No existe ningun mini player ni
+PiP en `eventos-web/src` (grep 2026-09-07). En `/live`, `LiveHubView.tsx:53-58` hace
+`router.push('/session-stream/{id}')` directo y `LiveHero.tsx:39` pinta un poster estatico
+(`livePoster.ts`), no el video. Resultado: "En vivo" es un directorio, no un en vivo.
+
+**Regla de convivencia (la idea de Kamilo, en 3 frases):**
+1. Si estoy viendo un stream y abro **Agenda** → la agenda se abre EN LA MISMA pagina,
+   al lado del player (split literal izq/der, patron W.13/W.14/W.18), sin salir del stream.
+2. Si abro **cualquier otro modulo** (social, sponsors, desafio, speakers, perfil...) →
+   el player pasa a **flotante** (mini, esquina, arrastrable, con volver/cerrar; chat y
+   paneles se ocultan, el audio sigue).
+3. **/live** deja de redirigir a ciegas: muestra **preview** de lo que se esta reproduciendo
+   y ahi decido si entro.
+
+- [ ] **8.1 Player persistente a nivel shell.** Sacar `StreamPlayer` de la ruta y montarlo
+  en un `StreamProvider` del shell W.0 (junto a `GlobalSocketProvider`) con estado
+  `{sessionId, mode: 'full' | 'split' | 'mini' | 'closed'}`. La ruta `session-stream/[id]`
+  pasa a ser solo el layout `full`; navegar NO desmonta el iframe (YouTube/Vimeo/HLS).
+  Ref: `StreamShell.tsx` (grid por pagina), `detectSource.ts`.
+- [ ] **8.2 Modo `split` con Agenda.** Click en Agenda desde el stream → `mode: 'split'`:
+  player izq (16:9 con controles) + agenda der en el mismo canvas. Clic en otra sesion
+  con stream → cambia la fuente sin salir. Sin stream → DetailPanel normal.
+  Ref: `agenda/DetailPanel.tsx`, patron split [[feedback_split_layout_pattern]].
+- [ ] **8.3 Modo `mini` (flotante) para el resto.** Cualquier otra ruta → `mode: 'mini'`:
+  card 320px esquina inferior derecha (fuera del SidebarPill), arrastrable (framer drag),
+  spring al entrar/salir, boton volver (→ `full` con FLIP como W.X) y cerrar.
+  Chat/Q&A/polls se ocultan pero su hook sigue vivo (no re-join de rooms,
+  [[feedback_no_extra_sockets]]). Toasts de trivia/ruleta siguen llegando por
+  `GlobalSocketProvider`.
+- [ ] **8.4 Volver al stream.** Desde `mini` o `split`, clic en el player o en "En vivo" del
+  rail → `full` restaurando paneles y scroll del chat donde iba (no recargar historial).
+- [ ] **8.5 Mobile (espejo YouTube app).** Mismo estado, pero `mini` es una barra sobre la
+  `MobileTabBar` (thumbnail + titulo + play/pause + cerrar); `split` no existe en mobile
+  (la agenda reemplaza y el player queda en barra). Ref: `shell/mobile/MobileTabBar.tsx`.
+- [ ] **8.6 /live con preview real.** `LiveHero` reproduce el stream destacado muted
+  (iframe autoplay+mute, YouTube/Vimeo lo permiten) en vez del poster; clic → `full`.
+  **DECIDIDO Kamilo 2026-09-13:** A en desktop (preview permanente muted en el hero)
+  y B en mobile (tap dispara preview de 4 s y luego entra; el browser bloquea autoplay).
+  Ref: `live/LiveHero.tsx:39`, `LiveHubView.tsx:55`.
+- [ ] **8.7 Tarjetas laterales del hub con vida.** `LiveSideCard` de las otras salas en
+  vivo: miniatura del stream muted o, si son varias, rotacion cada 8 s (1 solo iframe
+  extra maximo; 3 iframes de YouTube a la vez pesan). Decision Kamilo pendiente.
+- [ ] **8.8 Lifecycle.** Si la sesion del player termina (`session:ended` / hora + buffer),
+  el mini muestra "Termino — ver siguiente" con la proxima del mismo salon (ya lo sabe el
+  backend, es lo que devuelve `rooms/ping` al kiosko). Cerrar el evento (`ended`) apaga
+  el player.
+- [ ] **8.9 QA vivo con Kamilo.** Recorrido completo: stream → agenda (split) → social (mini)
+  → volver (full) → /live (preview) → otra sala; desktop + tablet + mobile; y con socket
+  apagado (degradacion sin errores). Medir que el iframe NO se recargue en ningun paso.
+
+**Fuera de scope (por ahora):** PiP nativo del browser (`requestPictureInPicture`) solo
+aplica a `<video>`, no a iframes de YouTube/Vimeo — el flotante tiene que ser DOM propio.
+Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ### MOBILE PARITY — workstream 60/60 **CERRADO 2026-07-11 (implementacion 100%; queda QA vivo Kamilo M.2-M.8)**
 
@@ -366,9 +633,9 @@ Volver: `docs/infra/COMO-VOLVER.md` — **apagar NO detiene el cobro, hay que de
 > **Raya escrita por Kamilo: la URL del admin no sale a NINGUN prospecto ni recibe
 > datos reales sin el 2FA puesto.** Ver [[project_security_audit]].
 - [ ] 2FA / passkeys en el panel admin (el HTTPS que exigen ya lo regala el deploy)
-- [ ] **Rotar credenciales de R2** — quedaron escritas en el chat del 2026-08-02.
+- [x] **HECHO 2026-08-18.** **Rotar credenciales de R2** — quedaron escritas en el chat del 2026-08-02.
       R2 NO se destruyo con los droplets.
-- [ ] Cloudflare a **naranja** antes de exponer nada (en gris se registraron 125
+- [x] **HECHO en el Nivel 1 (2026-08-17).** Cloudflare a **naranja** antes de exponer nada (en gris se registraron 125
       intentos de bots buscando `/.env` desde 7 IPs)
 
 > **Paralelos movidos fuera de este doc (2026-07-14):** Paridad config admin↔superficies,

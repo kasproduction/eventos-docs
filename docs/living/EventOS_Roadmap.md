@@ -33,7 +33,7 @@ El detalle de cada cierre vive en COMPLETADO.md y los roadmaps historicos._
 | **Web Push + PWA** | ✅ Fases A+B (2026-07-05) | Push multi-canal + PWA + CSP. Falta Fase C QA |
 | **LUMINA ADMIN** | ✅ F0-F12 (2026-07-19) | EventContext + scoping 44 resources · tema Noir/Lux White Chrome · arbol features 45→18 · interiores INT.1-13 · Escritorio · Panel Modulos + enforcement webapp RT · Wizard v2 · validacion es · Roles canon · UN DROPLET POR EVENTO. Historico: `ROADMAP-LUMINA-ADMIN.md` |
 | **Knowledge base / Manual** | ⏸ Pausado (5/35) | M0 fundacion cerrada (inventario 27 paginas + sitio Starlight + piloto). Se retoma pre-produccion. Ventana: `ROADMAP-MANUAL.md` |
-| **Deploy / DEPLOY DEMO** | ⏳ **PRIORIDAD** | DEPLOY DEMO 0/6 (hosting, prod x3, evento demo, Sentry). Despues: Docker + CI/CD + HA segun cliente |
+| **Deploy / DEPLOY DEMO** | ⏳ **PRIORIDAD** | DEPLOY DEMO 6/6 HECHO 2026-08-01/02 (destruido) · Nivel 1 montado y medido 2026-08-18 (destruido, snapshots) · estado actual y orden: PENDIENTES-WEBAPP "ESTADO GENERAL" y "RUTA A NOVIEMBRE" (2026-09-13). Despues: Docker + CI/CD + HA segun cliente |
 | **Fase 3** — SaaS | ⏳ | Multi-tenant, monetizacion. Modelo actual: un droplet por evento/cliente |
 
 **Que falta:** ver `docs/living/PENDIENTES.md`

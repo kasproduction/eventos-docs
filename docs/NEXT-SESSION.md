@@ -2,8 +2,9 @@
 
 > Este archivo es **solo continuidad** (que hicimos la sesion pasada, decisiones cerradas).
 >
-> **Para saber que sigue → abrir `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`**
-> (ventana operativa del frente de infraestructura, 28/59). Lo de webapp sigue
+> **Para saber que sigue → abrir `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`, seccion
+> "PLAN DE TRABAJO — EVENTO DE NOVIEMBRE, 5.000 PERSONAS" (0/29, B1-B6)** (actualizado 2026-09-13:
+> posible cliente en noviembre, 5.000 personas; arranca por B1 instalacion limpia). Lo de webapp sigue
 > en `docs/living/PENDIENTES-WEBAPP.md`.
 
 ---

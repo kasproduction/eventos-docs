@@ -366,7 +366,12 @@ Despues, en el servidor:
   COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
   cp .env.production.example .env    # y completar TODO
   php artisan key:generate --force
-  php artisan migrate --force && php artisan db:seed --force
+  php artisan migrate --force
+  # Instalacion limpia (2026-09-13): organizacion + sistema + superadmin con
+  # clave generada que se muestra UNA vez. SIN demo. db:seed ya NO va aqui:
+  # sembraba el demo entero y superadmin@eventos.test con clave "password".
+  php artisan eventos:instalar --organizacion="Nombre del cliente" --nombre="Nombre del admin" --email=admin@cliente.com
+  #   Droplet de DEMO en vez de lo anterior: EVENTOS_DEMO=true en .env + php artisan db:seed --force
   php artisan security:check         # DEBE dar verde antes de abrir nada
   php artisan config:cache && php artisan route:cache && php artisan view:cache
 
