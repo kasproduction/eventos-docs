@@ -1,11 +1,11 @@
-# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 33/71 · PLAN NOVIEMBRE 2/29
+# ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 33/73 · PLAN NOVIEMBRE 2/31
 
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
 
 ---
 
-# PLAN DE TRABAJO — EVENTO DE NOVIEMBRE, 5.000 PERSONAS — 2/29
+# PLAN DE TRABAJO — EVENTO DE NOVIEMBRE, 5.000 PERSONAS — 2/31
 
 > **Organizado el 2026-09-13 por decision de Kamilo:** *"empieza por
 > infraestructura organizando el trabajo"*. Criterio que manda: *"si mañana hay
@@ -59,7 +59,7 @@ el wizard. Con tests que lo prueben.
 **Compuerta B2:** el Nivel 1 se monta desde cero SOLO con el pipeline, pasa el
 humo en verde y se destruye sin dejar nada cobrando. Nadie toca una maquina a mano.
 
-## B3 — Arreglos de codigo que 5.000 exige — 0/6 (paralelo a B2)
+## B3 — Arreglos de codigo que 5.000 exige — 0/8 (paralelo a B2)
 
 - [ ] **B3.1 Correo con ritmo controlado** (hallazgo 8). Cola limitada por debajo
       del techo de Resend (10 peticiones/s por equipo), enlaces de acceso con
@@ -75,6 +75,31 @@ humo en verde y se destruye sin dejar nada cobrando. Nadie toca una maquina a ma
       asistentes.
 - [ ] **B3.6 El 503 de la webapp con una persona** (I.1). Verificar si sigue; si
       sigue, corregir.
+- [ ] **B3.7 Partir la agenda en compartida + personal** (conteo por codigo
+      2026-09-26, disparado por un video de caching en un servidor de $12; su
+      cifra de "5.000 usuarios" NO es comparable: su usuario pide algo cada
+      ~11 s y no hay picos sincronizados). Hoy cada pantalla cuesta `auth/me` +
+      lo que la persona vino a ver (el marco ya se cachea desde `253107a`). La
+      agenda es el 30% de las visitas en `entrar-por-la-puerta.js`, la mas cara
+      (2,5x el piso) y **no tiene cache** (`AgendaController::index`: "No cache
+      — invalidated via socket RT"). Pero solo `is_favorite` es personal: la
+      lista de sesiones con speakers/track/tipo/`favorites_count` es igual para
+      todos. Plan: lista compartida cacheada por evento en el `serverCache` de
+      Next (ya invalidable por aviso del backend, no hace falta nginx) + IDs de
+      favoritos aparte (consulta barata). Despues, mismo patron para las otras
+      mixtas: sponsors (`is_favorite`), muro y fotos (`liked`/`is_mine`),
+      ranking (`my_position`). Compartidas puras (speakers, highlights,
+      branding, happening-now, by-slug) son pocas, baratas y dos ya cacheadas:
+      cachearlas en nginx tal cual daria poco. **Ganancia SIN MEDIR:** partir y
+      correr `entrar-por-la-puerta.js` con 300 contra el 41% de CPU del
+      2026-08-17. Pendiente de verificar: si `attendees` (directorio) filtra
+      por persona.
+- [ ] **B3.8 Social pide 10 llamadas por apertura** (conteo por codigo
+      2026-09-26, `(app)/social/page.tsx`): muro, sugeridos, solicitudes,
+      enviadas, contactos, directorio, bloqueados, historias, fotos, concurso.
+      Es la segunda pantalla mas visitada (20%) y casi todo es personal, asi que
+      el cache no la salva: reducir lo que se pide en el SSR (cargar pestañas al
+      abrirlas) o agrupar en un endpoint. Medir antes y despues igual que B3.7.
 
 **Compuerta B3:** tests de cada arreglo + prueba local que demuestre el cambio
 (ej: 5.000 correos encolados salen todos sin chocar con el limite).

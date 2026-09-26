@@ -11,7 +11,7 @@
 
 ## SESION 2026-09-13 (Fable 5.1 → Opus 5) — EL EVENTO DE NOVIEMBRE: plan de infraestructura para 5.000 personas + base limpia
 
-**Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` → "PLAN DE TRABAJO — EVENTO DE NOVIEMBRE, 5.000 PERSONAS" (2/29).**
+**Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` → "PLAN DE TRABAJO — EVENTO DE NOVIEMBRE, 5.000 PERSONAS" (2/31).**
 Commits: backend `0bb28b6` + `67a609a` (feature/magic-link-auth) · APP EVENTOS `4564329` + `285e287` + cierre. Push hecho.
 
 ### Decisiones de Kamilo (no re-preguntar)

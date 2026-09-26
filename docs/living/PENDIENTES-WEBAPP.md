@@ -55,7 +55,7 @@
 > Conteo de casillas de TODOS los documentos de pendientes + verificacion contra
 > codigo de los casos que no cuadraban. Contadores viejos corregidos el mismo dia
 > (ver "Contadores corregidos" abajo). Global sobre frentes con contador:
-> **588 de 717 = 82%** (actualizado tras B1.1 y B1.2).
+> **588 de 719 = 82%** (actualizado tras B1.1 y B1.2).
 
 | Categoria | Avance | % | Estado | Donde vive el detalle |
 |---|---|---|---|---|
@@ -63,7 +63,7 @@
 | App movil Expo | Fase 1 cerrada | 100% implementado | Faltan pruebas en telefono; no publicada en tiendas | `PENDIENTES.md` §1 y §6 |
 | Admin Lumina | 57/57 | 100% | Cerrado. Solo falta decidir las paginas personalizadas | `ROADMAP-LUMINA-ADMIN.md` F10.6 |
 | Modulos del organizador | Cerrados | 100% implementado | Pulse, Data Center, kiosko, Mission Control, juegos en vivo, webhooks, recap | Roadmaps de cada modulo |
-| Infraestructura | 33/71 | 46% | Activa: plan noviembre 2/29 (B1.1 y B1.2 hechos 2026-09-13) | `ROADMAP-INFRAESTRUCTURA.md` |
+| Infraestructura | 33/73 | 45% | Activa: plan noviembre 2/31 (B1.1 y B1.2 hechos 2026-09-13) | `ROADMAP-INFRAESTRUCTURA.md` |
 | Seguridad del staff | 0/26 | 0% | Sin empezar. No hay nada de 2FA en el codigo (grep 2026-09-13) | `ROADMAP-SEGURIDAD-STAFF.md` |
 | Manual del organizador | 5/35 | 14% | En pausa | `ROADMAP-MANUAL.md` |
 | Registro publico, landing y widget | Sin contador | 0% | Sin empezar. La webapp no tiene pantalla de registro | `PENDIENTES.md` §3 + RUTA etapa 3 |
