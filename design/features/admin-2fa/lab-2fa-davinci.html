@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="es" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 2FA Staff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+/* Tokens literales de eventos-backend/resources/css/filament/admin/theme.css */
+:root {
+  --lum-bg: #F6F8FA; --lum-bg-1: #FAFBFC; --lum-bg-2: #F0F2F5;
+  --lum-card: #FFFFFF; --lum-card-hi: #F6F8FA;
+  --lum-b: rgba(0,0,0,0.08); --lum-b-hi: rgba(0,0,0,0.13); --lum-b-st: rgba(0,0,0,0.18);
+  --lum-t: #131417; --lum-t2: #3A3B40; --lum-t3: #5C5D63; --lum-t4: #85868C; --lum-t5: #AEAFB3;
+  --lum-violet: #7C5FE0; --lum-violet-soft: rgba(124,95,224,0.08);
+  --lum-ink: #1A1B1E; --lum-ink-contrast: #FFFFFF;
+  --lum-danger: #C2413A; --lum-danger-soft: rgba(194,65,58,0.08);
+  --lum-ok: #2F8F6B; --lum-ok-soft: rgba(47,143,107,0.08);
+  --lum-shadow-md: 0 2px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.08);
+  --lum-f: 'Urbanist', ui-sans-serif, system-ui, sans-serif;
+  --lum-fh: 'Plus Jakarta Sans', var(--lum-f);
+  --lum-fm: 'JetBrains Mono', ui-monospace, monospace;
+}
+.dark {
+  --lum-bg: #0A0A0A; --lum-bg-1: #0E0E0E; --lum-bg-2: #141414;
+  --lum-card: rgba(255,255,255,0.03); --lum-card-hi: rgba(255,255,255,0.05);
+  --lum-b: rgba(255,255,255,0.06); --lum-b-hi: rgba(255,255,255,0.10); --lum-b-st: rgba(255,255,255,0.14);
+  --lum-t: #FFFFFF; --lum-t2: rgba(255,255,255,0.6); --lum-t3: rgba(255,255,255,0.45);
+  --lum-t4: rgba(255,255,255,0.35); --lum-t5: rgba(255,255,255,0.15);
+  --lum-violet: #A78BFA; --lum-violet-soft: rgba(167,139,250,0.08);
+  --lum-ink: #FFFFFF; --lum-ink-contrast: #101010;
+  --lum-danger: #F08A80; --lum-danger-soft: rgba(240,138,128,0.08);
+  --lum-ok: #6FD3A8; --lum-ok-soft: rgba(111,211,168,0.08);
+  --lum-shadow-md: none;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--lum-f); background: var(--lum-bg); color: var(--lum-t2);
+  -webkit-font-smoothing: antialiased; min-height: 100vh;
+}
+.dark body::before {
+  content: ''; position: fixed; top: -200px; left: 35%; width: 700px; height: 550px;
+  background: radial-gradient(ellipse, rgba(167,139,250,0.04), transparent 70%); pointer-events: none;
+}
+
+.shell { display: grid; grid-template-columns: 1fr 320px; min-height: 100vh; }
+.stage { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 16px; position: relative; }
+
+/* Pagina simple de Filament (login) */
+.brand { font-family: var(--lum-fh); font-weight: 800; font-size: 20px; letter-spacing: -0.4px; color: var(--lum-t); margin-bottom: 24px; }
+.card {
+  width: 100%; max-width: 440px; background: var(--lum-card); border: 1px solid var(--lum-b-hi);
+  border-radius: 16px; box-shadow: var(--lum-shadow-md); padding: 32px;
+}
+.dark .card { background: var(--lum-bg-1); }
+.card.wide { max-width: 480px; }
+.step-tag { font-size: 12px; font-weight: 600; color: var(--lum-t4); text-align: center; margin-bottom: 8px; letter-spacing: 0.2px; }
+h1 { font-family: var(--lum-fh); font-weight: 800; letter-spacing: -0.5px; color: var(--lum-t); font-size: 24px; line-height: 1.2; text-align: center; margin: 0 0 8px; }
+.sub { font-size: 14px; line-height: 1.5; color: var(--lum-t3); text-align: center; margin: 0 0 24px; }
+
+label.fl { display: block; font-size: 14px; font-weight: 600; color: var(--lum-t); margin-bottom: 6px; }
+.in {
+  width: 100%; height: 40px; border-radius: 8px; border: 1px solid var(--lum-b-st); background: transparent;
+  color: var(--lum-t); font: 500 14px var(--lum-f); padding: 0 12px; outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.in:focus { border-color: var(--lum-t3); box-shadow: 0 0 0 3px var(--lum-violet-soft); }
+.in.code { height: 56px; font: 600 26px var(--lum-fm); letter-spacing: 10px; text-align: center; padding-left: 22px; }
+.in.rec { height: 52px; font: 600 20px var(--lum-fm); letter-spacing: 3px; text-align: center; text-transform: uppercase; }
+.in.bad { border-color: var(--lum-danger); }
+.field { margin-bottom: 16px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px;
+  border-radius: 8px; border: 0; font: 600 14px var(--lum-f); cursor: pointer; transition: opacity .15s, transform .1s;
+}
+.btn:active { transform: scale(0.98); }
+.btn.ink { background: var(--lum-ink); color: var(--lum-ink-contrast); width: 100%; }
+.btn.ink:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn.ghost { background: var(--lum-card-hi); color: var(--lum-t); border: 1px solid var(--lum-b-hi); }
+.btn.ghost:hover { border-color: var(--lum-b-st); }
+.btn svg { width: 16px; height: 16px; }
+.link { background: none; border: 0; padding: 0; color: var(--lum-t2); font: 600 13px var(--lum-f); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--lum-t5); }
+.link:hover { color: var(--lum-t); }
+
+.row { display: flex; align-items: center; gap: 8px; }
+.check { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--lum-t2); cursor: pointer; line-height: 1.4; }
+.check input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--lum-t); }
+
+.msg { font-size: 13px; line-height: 1.45; border-radius: 8px; padding: 10px 12px; margin-bottom: 16px; }
+.msg.err { color: var(--lum-danger); background: var(--lum-danger-soft); }
+.msg.ok { color: var(--lum-ok); background: var(--lum-ok-soft); }
+.msg.info { color: var(--lum-t2); background: var(--lum-card-hi); border: 1px solid var(--lum-b); }
+
+/* Activacion */
+.steps { display: flex; flex-direction: column; gap: 20px; }
+.st { display: grid; grid-template-columns: 24px 1fr; gap: 12px; }
+.st-n { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--lum-b-st); font: 700 12px var(--lum-f); color: var(--lum-t); display: grid; place-items: center; }
+.st-t { font-size: 14px; line-height: 1.5; color: var(--lum-t2); }
+.st-t b { color: var(--lum-t); font-weight: 600; }
+.qr { margin: 12px 0 0; width: 196px; height: 196px; background: #fff; border-radius: 12px; padding: 12px; }
+.qr svg { width: 100%; height: 100%; display: block; }
+.secret { margin-top: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.secret code { font: 600 13px var(--lum-fm); color: var(--lum-t); background: var(--lum-card-hi); border: 1px solid var(--lum-b); border-radius: 8px; padding: 8px 10px; letter-spacing: 1px; word-break: break-all; }
+
+/* Codigos */
+.codes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.codes div { font: 600 15px var(--lum-fm); color: var(--lum-t); text-align: center; padding: 10px 0; border-radius: 8px; background: var(--lum-card-hi); border: 1px solid var(--lum-b); letter-spacing: 1px; }
+.codes div.used { color: var(--lum-t5); text-decoration: line-through; }
+
+/* Escritorio stub */
+.desk { width: 100%; max-width: 560px; }
+.desk .card { max-width: none; }
+.desk-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 1px solid var(--lum-b); font-size: 14px; }
+.desk-row:first-of-type { border-top: 0; }
+.desk-row span:first-child { color: var(--lum-t3); }
+.desk-row span:last-child { color: var(--lum-t); font-weight: 600; }
+
+.foot { margin-top: 20px; text-align: center; font-size: 13px; color: var(--lum-t4); line-height: 1.5; }
+
+/* Panel del laboratorio */
+.lab { border-left: 1px solid var(--lum-b-hi); background: var(--lum-bg-1); padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; }
+.lab h2 { font-family: var(--lum-fh); font-size: 15px; font-weight: 800; color: var(--lum-t); margin: 0; letter-spacing: -0.2px; }
+.lab p { font-size: 12.5px; line-height: 1.5; color: var(--lum-t3); margin: 4px 0 0; }
+.lab-sec { display: flex; flex-direction: column; gap: 8px; }
+.lab-k { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--lum-t4); }
+.kv { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+.kv span:first-child { color: var(--lum-t3); }
+.kv span:last-child { color: var(--lum-t); font-weight: 600; text-align: right; font-family: var(--lum-fm); font-size: 12px; }
+.live-code { display: flex; align-items: center; justify-content: space-between; background: var(--lum-card-hi); border: 1px solid var(--lum-b); border-radius: 10px; padding: 12px; }
+.live-code b { font: 600 22px var(--lum-fm); letter-spacing: 3px; color: var(--lum-t); }
+.ring { width: 28px; height: 28px; }
+.ring circle { fill: none; stroke-width: 3; }
+.ring .bg { stroke: var(--lum-b-hi); }
+.ring .fg { stroke: var(--lum-t2); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 1s linear; }
+.seg { display: flex; border: 1px solid var(--lum-b-hi); border-radius: 8px; overflow: hidden; }
+.seg button { flex: 1; height: 32px; border: 0; background: transparent; color: var(--lum-t3); font: 600 13px var(--lum-f); cursor: pointer; }
+.seg button.on { background: var(--lum-card-hi); color: var(--lum-t); }
+.log { font: 500 11.5px var(--lum-fm); color: var(--lum-t3); display: flex; flex-direction: column; gap: 4px; max-height: 180px; overflow: auto; }
+.log div b { color: var(--lum-t2); font-weight: 600; }
+
+[hidden] { display: none !important; }
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: 1fr; }
+  .lab { border-left: 0; border-top: 1px solid var(--lum-b-hi); }
+  .stage { padding: 32px 16px; }
+  .card { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <main class="stage">
+    <div class="brand">EventOS Admin</div>
+
+    <!-- 1. Login (el que ya existe) -->
+    <section id="v-login" class="card">
+      <h1>Inicia sesión</h1>
+      <p class="sub">Panel de administración del evento</p>
+      <form id="f-login">
+        <div class="field">
+          <label class="fl" for="email">Correo electrónico</label>
+          <input class="in" id="email" type="email" value="staff@tuevento.co" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="fl" for="pass">Contraseña</label>
+          <input class="in" id="pass" type="password" value="••••••••••" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="check"><input type="checkbox"> Recordarme</label>
+        </div>
+        <button class="btn ink" type="submit">Entrar</button>
+      </form>
+    </section>
+
+    <!-- 2. Activacion forzada (S.1.1) -->
+    <section id="v-setup" class="card wide" hidden>
+      <div class="step-tag">Paso 1 de 2</div>
+      <h1>Activa tu segundo factor</h1>
+      <p class="sub">Es obligatorio para todo el equipo del admin. Te toma un minuto y solo se hace una vez.</p>
+      <div class="steps">
+        <div class="st">
+          <div class="st-n">1</div>
+          <div class="st-t">
+            Abre tu app autenticadora (<b>Google Authenticator, Microsoft Authenticator, Authy o 1Password</b>) y escanea este código.
+            <div class="qr" id="qr"></div>
+          </div>
+        </div>
+        <div class="st">
+          <div class="st-n">2</div>
+          <div class="st-t">
+            ¿No puedes escanear? Agrega la cuenta a mano con esta clave:
+            <div class="secret"><code id="secret-txt"></code>
+              <button class="btn ghost" type="button" data-copy="secret">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copiar
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="st">
+          <div class="st-n">3</div>
+          <div class="st-t">
+            Escribe el código de 6 dígitos que aparece en la app.
+            <form id="f-setup" style="margin-top:12px">
+              <div id="setup-msg"></div>
+              <div class="field"><input class="in code" id="setup-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000000"></div>
+              <button class="btn ink" type="submit">Activar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Codigos de recuperacion (S.1.2) -->
+    <section id="v-codes" class="card wide" hidden>
+      <div class="step-tag" id="codes-tag">Paso 2 de 2</div>
+      <h1>Guarda tus códigos de recuperación</h1>
+      <p class="sub">Si pierdes el teléfono, cada código te deja entrar una sola vez. <b style="color:var(--lum-t)">No los vamos a volver a mostrar.</b></p>
+      <div class="codes" id="codes"></div>
+      <div class="row" style="margin-bottom:20px">
+        <button class="btn ghost" type="button" data-copy="codes" style="flex:1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar
+        </button>
+        <button class="btn ghost" type="button" id="dl" style="flex:1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar
+        </button>
+      </div>
+      <div class="field"><label class="check"><input type="checkbox" id="saved"> Los guardé en un lugar seguro (gestor de contraseñas o papel, no en este computador)</label></div>
+      <button class="btn ink" id="codes-go" disabled>Continuar al admin</button>
+    </section>
+
+    <!-- 4. Reto en cada ingreso (S.2.1 / S.2.2) -->
+    <section id="v-challenge" class="card" hidden>
+      <h1>Verificación en dos pasos</h1>
+      <p class="sub" id="ch-sub">Abre tu app autenticadora y escribe el código de EventOS.</p>
+      <form id="f-challenge">
+        <div id="ch-msg"></div>
+        <div class="field" id="ch-totp"><input class="in code" id="ch-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000000"></div>
+        <div class="field" id="ch-rec" hidden><input class="in rec" id="ch-reccode" autocomplete="off" maxlength="11" placeholder="XXXXX-XXXXX"></div>
+        <button class="btn ink" type="submit" id="ch-btn">Verificar</button>
+      </form>
+      <div class="foot">
+        <button class="link" id="ch-toggle" type="button">Usar un código de recuperación</button>
+        <div style="margin-top:12px">¿Perdiste el teléfono y los códigos? Pídele a un super_admin que restablezca tu segundo factor.</div>
+      </div>
+    </section>
+
+    <!-- 5. Adentro -->
+    <section id="v-admin" class="desk" hidden>
+      <div class="card">
+        <h1 style="text-align:left">Escritorio</h1>
+        <p class="sub" style="text-align:left;margin-bottom:16px">Aquí seguiría el admin normal. Esta tarjeta solo existe en el lab.</p>
+        <div id="admin-msg"></div>
+        <div class="desk-row"><span>Segundo factor</span><span>Activo</span></div>
+        <div class="desk-row"><span>Esta sesión</span><span id="admin-via">Verificada con la app</span></div>
+        <div class="desk-row"><span>Códigos de recuperación</span><span id="admin-rem">8 de 8</span></div>
+        <div class="row" style="margin-top:20px; flex-wrap:wrap">
+          <button class="btn ghost" id="regen">Generar códigos nuevos</button>
+          <button class="btn ghost" id="logout">Cerrar sesión</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="lab">
+    <div>
+      <h2>Laboratorio</h2>
+      <p>Funciona de verdad: secreto real, QR real y la misma verificación que <code>TwoFactorService</code> (±30 s, un código sirve una vez, 5 intentos por minuto). Escanéalo con tu app.</p>
+    </div>
+    <div class="lab-sec">
+      <div class="lab-k">Tema</div>
+      <div class="seg"><button data-theme="dark" class="on">Noir</button><button data-theme="light">Lux</button></div>
+    </div>
+    <div class="lab-sec">
+      <div class="lab-k">Estado</div>
+      <div class="kv"><span>Pantalla</span><span id="s-view">login</span></div>
+      <div class="kv"><span>2FA activo</span><span id="s-on">no</span></div>
+      <div class="kv"><span>Último intervalo usado</span><span id="s-last">ninguno</span></div>
+      <div class="kv"><span>Códigos restantes</span><span id="s-rem">—</span></div>
+    </div>
+    <div class="lab-sec" id="lab-code-sec" hidden>
+      <div class="lab-k">Código actual (solo en el lab)</div>
+      <div class="live-code">
+        <b id="lab-code">——————</b>
+        <svg class="ring" viewBox="0 0 28 28"><circle class="bg" cx="14" cy="14" r="11"/><circle class="fg" id="lab-ring" cx="14" cy="14" r="11" stroke-dasharray="69.1" stroke-dashoffset="0"/></svg>
+      </div>
+      <p style="margin:0">Para probar sin teléfono. En producción esto no existe.</p>
+    </div>
+    <div class="lab-sec">
+      <div class="lab-k">Registro</div>
+      <div class="log" id="log"><div>Listo. Entra con el correo de prueba.</div></div>
+    </div>
+    <button class="btn ghost" id="reset">Reiniciar el lab</button>
+  </aside>
+</div>
+
+<script>
+(() => {
+  const ISSUER = 'EventOS';
+  const WINDOW = 1;           // TwoFactorService::WINDOW
+  const MAX_TRIES = 5;        // intentos por minuto en el reto
+  const ALPHA = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+  const st = { secret: null, confirmed: false, last: null, recHashes: [], recPlain: [], used: new Set(), tries: [], via: 'app' };
+  const $ = (id) => document.getElementById(id);
+  const views = ['login', 'setup', 'codes', 'challenge', 'admin'];
+
+  // ── TOTP (RFC 6238, SHA1, 6 digitos, 30 s) ──────────────────
+  const B32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  function b32encode(bytes) {
+    let bits = 0, val = 0, out = '';
+    for (const b of bytes) { val = (val << 8) | b; bits += 8; while (bits >= 5) { out += B32[(val >>> (bits - 5)) & 31]; bits -= 5; } }
+    if (bits > 0) out += B32[(val << (5 - bits)) & 31];
+    return out;
+  }
+  function b32decode(s) {
+    let bits = 0, val = 0; const out = [];
+    for (const c of s.replace(/=+$/, '')) { val = (val << 5) | B32.indexOf(c); bits += 5; if (bits >= 8) { out.push((val >>> (bits - 8)) & 255); bits -= 8; } }
+    return new Uint8Array(out);
+  }
+  async function totpAt(secret, step) {
+    const key = await crypto.subtle.importKey('raw', b32decode(secret), { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
+    const msg = new ArrayBuffer(8); const dv = new DataView(msg);
+    dv.setUint32(0, Math.floor(step / 2 ** 32)); dv.setUint32(4, step >>> 0);
+    const h = new Uint8Array(await crypto.subtle.sign('HMAC', key, msg));
+    const o = h[19] & 15;
+    const n = ((h[o] & 127) << 24) | (h[o + 1] << 16) | (h[o + 2] << 8) | h[o + 3];
+    return String(n % 1e6).padStart(6, '0');
+  }
+  const nowStep = () => Math.floor(Date.now() / 1000 / 30);
+
+  /** Igual que consumeTotp: busca en ±WINDOW y solo intervalos posteriores al ultimo usado. */
+  async function consumeTotp(code) {
+    code = code.replace(/\s+/g, '');
+    if (!/^\d{6}$/.test(code)) return { ok: false, why: 'formato' };
+    const t = nowStep();
+    const from = Math.max(t - WINDOW, (st.last ?? 0) + 1);
+    for (let s = from; s <= t + WINDOW; s++) {
+      if (await totpAt(st.secret, s) === code) { st.last = s; return { ok: true, step: s, drift: s - t }; }
+    }
+    for (let s = t - WINDOW; s <= Math.min(st.last ?? -1, t + WINDOW); s++) {
+      if (await totpAt(st.secret, s) === code) return { ok: false, why: 'reuso' };
+    }
+    return { ok: false, why: 'no-coincide' };
+  }
+
+  async function sha256(s) {
+    const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  const normRec = (c) => c.replace(/[\s-]+/g, '').toUpperCase();
+  function randomRec() {
+    const r = crypto.getRandomValues(new Uint32Array(10));
+    let s = ''; for (const n of r) s += ALPHA[n % ALPHA.length];
+    return s.slice(0, 5) + '-' + s.slice(5);
+  }
+  async function genRecovery() {
+    st.recPlain = Array.from({ length: 8 }, randomRec);
+    st.recHashes = await Promise.all(st.recPlain.map((c) => sha256(normRec(c))));
+    st.used = new Set();
+  }
+
+  // ── Vistas ────────────────────────────────────────────────
+  function show(v) {
+    for (const x of views) $('v-' + x).hidden = x !== v;
+    $('s-view').textContent = v;
+    const first = $('v-' + v).querySelector('input.in');
+    if (first) setTimeout(() => first.focus(), 50);
+    sync();
+  }
+  function sync() {
+    $('s-on').textContent = st.confirmed ? 'sí' : (st.secret ? 'pendiente de confirmar' : 'no');
+    $('s-last').textContent = st.last == null ? 'ninguno' : String(st.last);
+    $('s-rem').textContent = st.confirmed ? `${st.recHashes.length} de 8` : '—';
+    $('lab-code-sec').hidden = !st.secret;
+  }
+  function log(t) {
+    const d = document.createElement('div');
+    const hh = new Date().toLocaleTimeString('es-CO', { hour12: false });
+    d.innerHTML = `<b>${hh}</b> ${t}`;
+    $('log').prepend(d);
+  }
+  function msg(el, kind, text) { $(el).innerHTML = text ? `<div class="msg ${kind}">${text}</div>` : ''; }
+
+  // ── 1. Login ──────────────────────────────────────────────
+  $('f-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!st.confirmed) {
+      st.secret = b32encode(crypto.getRandomValues(new Uint8Array(20)));
+      st.last = null;
+      renderSetup();
+      log('Contraseña correcta. Sin 2FA: activación obligatoria.');
+      show('setup');
+    } else {
+      st.tries = []; setRecMode(false); msg('ch-msg');
+      log('Contraseña correcta. Tiene 2FA: se pide el código.');
+      show('challenge');
+    }
+  });
+
+  // ── 2. Activacion ─────────────────────────────────────────
+  function renderSetup() {
+    const email = $('email').value || 'staff@tuevento.co';
+    const label = encodeURIComponent(ISSUER) + ':' + encodeURIComponent(email);
+    const uri = `otpauth://totp/${label}?secret=${st.secret}&issuer=${encodeURIComponent(ISSUER)}&algorithm=SHA1&digits=6&period=30`;
+    $('secret-txt').textContent = st.secret.match(/.{1,4}/g).join(' ');
+    try {
+      const qr = qrcode(0, 'M'); qr.addData(uri); qr.make();
+      $('qr').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+    } catch {
+      $('qr').innerHTML = '<div style="color:#333;font-size:12px;padding:8px">No cargó la librería del QR. Usa la clave de abajo.</div>';
+    }
+    $('setup-code').value = ''; msg('setup-msg');
+  }
+  $('f-setup').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const r = await consumeTotp($('setup-code').value);
+    if (!r.ok) {
+      $('setup-code').classList.add('bad');
+      msg('setup-msg', 'err', r.why === 'formato'
+        ? 'Son 6 dígitos, sin letras.'
+        : 'Ese código no coincide. Revisa que la hora de tu teléfono esté en automático e intenta con el siguiente.');
+      log(`Activación rechazada (${r.why}).`);
+      return;
+    }
+    $('setup-code').classList.remove('bad');
+    st.confirmed = true;
+    await genRecovery();
+    log(`Activado. Intervalo ${r.step}${r.drift ? ` (reloj desfasado ${r.drift * 30} s, aceptado)` : ''}. 8 códigos generados.`);
+    renderCodes(true);
+    show('codes');
+  });
+
+  // ── 3. Codigos ────────────────────────────────────────────
+  function renderCodes(firstTime) {
+    $('codes-tag').textContent = firstTime ? 'Paso 2 de 2' : 'Códigos nuevos';
+    $('codes').innerHTML = st.recPlain.map((c) => `<div>${c}</div>`).join('');
+    $('saved').checked = false; $('codes-go').disabled = true;
+  }
+  $('saved').addEventListener('change', (e) => { $('codes-go').disabled = !e.target.checked; });
+  $('codes-go').addEventListener('click', () => {
+    st.recPlain = []; // se muestran una sola vez
+    st.via = 'app'; renderAdmin(); show('admin');
+  });
+  $('dl').addEventListener('click', () => {
+    const txt = `Códigos de recuperación de ${ISSUER}\n${$('email').value}\nCada código sirve una sola vez.\n\n${st.recPlain.join('\n')}\n`;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' }));
+    a.download = 'eventos-codigos-recuperacion.txt'; a.click();
+    log('Códigos descargados.');
+  });
+  document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+    const txt = b.dataset.copy === 'secret' ? st.secret : st.recPlain.join('\n');
+    try { await navigator.clipboard.writeText(txt); } catch { /* file:// sin portapapeles */ }
+    const old = b.lastChild.textContent; b.lastChild.textContent = ' Copiado';
+    setTimeout(() => { b.lastChild.textContent = old; }, 1400);
+  }));
+
+  // ── 4. Reto ───────────────────────────────────────────────
+  let recMode = false;
+  function setRecMode(on) {
+    recMode = on;
+    $('ch-totp').hidden = on; $('ch-rec').hidden = !on;
+    $('ch-toggle').textContent = on ? 'Usar el código de la app' : 'Usar un código de recuperación';
+    $('ch-sub').textContent = on
+      ? 'Escribe uno de los códigos que guardaste al activar. Se gasta al usarlo.'
+      : 'Abre tu app autenticadora y escribe el código de EventOS.';
+    $('ch-code').value = ''; $('ch-reccode').value = '';
+    setTimeout(() => (on ? $('ch-reccode') : $('ch-code')).focus(), 50);
+  }
+  $('ch-toggle').addEventListener('click', () => { msg('ch-msg'); setRecMode(!recMode); });
+
+  $('f-challenge').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const now = Date.now();
+    st.tries = st.tries.filter((t) => now - t < 60000);
+    if (st.tries.length >= MAX_TRIES) {
+      const wait = Math.ceil((60000 - (now - st.tries[0])) / 1000);
+      msg('ch-msg', 'err', `Demasiados intentos. Espera ${wait} s y vuelve a intentar.`);
+      log('Reto frenado por el límite de 5 por minuto.');
+      return;
+    }
+    st.tries.push(now);
+
+    if (!recMode) {
+      const r = await consumeTotp($('ch-code').value);
+      if (!r.ok) {
+        $('ch-code').classList.add('bad');
+        const t = r.why === 'reuso' ? 'Ese código ya se usó. Espera el siguiente en tu app.'
+          : r.why === 'formato' ? 'Son 6 dígitos, sin letras.'
+          : 'Ese código no coincide. Revisa que la hora de tu teléfono esté en automático.';
+        msg('ch-msg', 'err', t);
+        log(`Reto rechazado (${r.why}). Intentos en el último minuto: ${st.tries.length}/5.`);
+        return;
+      }
+      $('ch-code').classList.remove('bad');
+      st.via = 'app';
+      log(`Reto aprobado con la app. Intervalo ${r.step}.`);
+    } else {
+      const h = await sha256(normRec($('ch-reccode').value));
+      const i = st.recHashes.indexOf(h);
+      if (i === -1) {
+        $('ch-reccode').classList.add('bad');
+        msg('ch-msg', 'err', 'Ese código no es válido o ya se usó.');
+        log(`Código de recuperación rechazado. Intentos: ${st.tries.length}/5.`);
+        return;
+      }
+      $('ch-reccode').classList.remove('bad');
+      st.recHashes.splice(i, 1);
+      st.via = 'recovery';
+      log(`Entró con código de recuperación. Quedan ${st.recHashes.length}.`);
+    }
+    renderAdmin(); show('admin');
+  });
+
+  // ── 5. Adentro ────────────────────────────────────────────
+  function renderAdmin() {
+    $('admin-via').textContent = st.via === 'app' ? 'Verificada con la app' : 'Verificada con código de recuperación';
+    $('admin-rem').textContent = `${st.recHashes.length} de 8`;
+    const n = st.recHashes.length;
+    msg('admin-msg', n <= 2 && st.via === 'recovery' ? 'err' : 'info',
+      st.via === 'recovery'
+        ? `Entraste con un código de recuperación. Te quedan ${n}. Si perdiste el teléfono, genera códigos nuevos y pide que restablezcan tu segundo factor.`
+        : '');
+  }
+  $('logout').addEventListener('click', () => { log('Sesión cerrada.'); show('login'); });
+  $('regen').addEventListener('click', async () => {
+    await genRecovery();
+    log('Códigos regenerados: los anteriores ya no sirven.');
+    renderCodes(false); show('codes');
+  });
+
+  // ── Laboratorio ───────────────────────────────────────────
+  async function tick() {
+    if (st.secret) {
+      $('lab-code').textContent = await totpAt(st.secret, nowStep());
+      const left = 30 - (Math.floor(Date.now() / 1000) % 30);
+      $('lab-ring').style.strokeDashoffset = String(69.1 * (1 - left / 30));
+    }
+  }
+  setInterval(tick, 1000);
+
+  document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.seg button').forEach((x) => x.classList.toggle('on', x === b));
+    document.documentElement.classList.toggle('dark', b.dataset.theme === 'dark');
+  }));
+  $('reset').addEventListener('click', () => {
+    Object.assign(st, { secret: null, confirmed: false, last: null, recHashes: [], recPlain: [], used: new Set(), tries: [], via: 'app' });
+    $('log').innerHTML = '<div>Lab reiniciado. El usuario vuelve a no tener 2FA.</div>';
+    show('login');
+  });
+
+  // Auto-enviar al completar 6 digitos (como las apps de banco)
+  for (const id of ['setup-code', 'ch-code']) {
+    $(id).addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/[^\d ]/g, '');
+      e.target.classList.remove('bad');
+      if (e.target.value.replace(/\s/g, '').length === 6) e.target.form.requestSubmit();
+    });
+  }
+
+  if (!window.crypto?.subtle) {
+    msg('setup-msg', 'err', 'Este navegador no permite criptografía en esta página. Ábrela desde Chrome o desde http://localhost.');
+  }
+  show('login');
+})();
+</script>
+</body>
+</html>

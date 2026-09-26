@@ -1,4 +1,4 @@
-# ROADMAP — SEGURIDAD DEL STAFF (2FA + sesiones + accesos) — 0/26
+# ROADMAP — SEGURIDAD DEL STAFF (2FA + sesiones + accesos) — 8/26
 
 > **Decision Kamilo 2026-07-20**: "prefiero tener todo lo de seguridad en regla
 > y no esperar a tener cliente encima con presion". Se hace AHORA, con calma,
@@ -44,32 +44,86 @@
 
 ---
 
-## S.0 — Fundacion TOTP — 0/3
+## S.0 — Fundacion TOTP — 3/3 (HECHO 2026-09-26, 14 tests; Auth+Security+Admin 180 en verde)
 
-- [ ] S.0.1 Dependencia `pragmarx/google2fa` instalada
-- [ ] S.0.2 Migracion users: `two_factor_secret` (cifrado),
-      `two_factor_confirmed_at`, `two_factor_recovery_codes` (cifrado, json)
-- [ ] S.0.3 `TwoFactorService`: generar secreto · URI `otpauth://` para el QR ·
+- [x] S.0.1 Dependencia `pragmarx/google2fa` instalada (v9.1; solo agrega
+      `paragonie/constant_time_encoding`)
+- [x] S.0.2 Migracion users: `two_factor_secret` (cifrado),
+      `two_factor_confirmed_at`, `two_factor_recovery_codes` (**hasheados**, no
+      cifrados: se muestran una vez y solo se comparan) + `two_factor_last_timestep`
+      (un codigo sirve UNA vez). Columnas fuera de `$fillable` y en `$hidden`.
+      Corrida en la BD dev el 2026-09-26.
+- [x] S.0.3 `TwoFactorService` (`app/Services/TwoFactorService.php`,
+      test `tests/Feature/Security/TwoFactorServiceTest.php`): generar secreto · URI `otpauth://` para el QR ·
       verificar codigo **con ventana de tolerancia** (los relojes de los
       telefonos se desfasan; sin esto el organizador jura que el codigo esta
       bien y el sistema le dice que no) · generar/consumir codigos de recuperacion
 
-## S.1 — Activacion del segundo factor — 0/3
+## S.1 — Activacion del segundo factor — 2/3 (HECHO 2026-09-26 S.1.1 y S.1.2)
 
-- [ ] S.1.1 Pagina de activacion (lenguaje Lumina, espejo del login ya
+- [x] S.1.1 Pagina de activacion (`app/Filament/Auth/TwoFactorSetup.php`, ruta
+      `/admin/dos-pasos/activar`; conserva el secreto pendiente si la persona recarga) (lenguaje Lumina, espejo del login ya
       tematizado): QR grande + **el secreto tambien en texto** (si la camara
       falla, se escribe a mano) + campo de verificacion para confirmar
-- [ ] S.1.2 **8 codigos de recuperacion** mostrados UNA sola vez al confirmar,
+- [x] S.1.2 **8 codigos de recuperacion** mostrados UNA sola vez al confirmar,
       con opcion de descargar/copiar y advertencia honesta de guardarlos
-- [ ] S.1.3 Regenerar codigos de recuperacion (invalida los anteriores)
+- [ ] S.1.3 Regenerar codigos de recuperacion (invalida los anteriores). El
+      servicio ya lo hace (`regenerateRecoveryCodes`); falta DONDE: va en la
+      pagina "Seguridad de mi cuenta" junto con S.4.3 y S.5.2.
 
-## S.2 — Reto y enforcement — 0/3
+## S.2 — Reto y enforcement — 3/3 (HECHO 2026-09-26, 17 tests en `TwoFactorLoginTest`)
 
-- [ ] S.2.1 Pagina de reto post-contraseña: 6 digitos
-- [ ] S.2.2 El reto acepta tambien un codigo de recuperacion (se consume)
-- [ ] S.2.3 Middleware del panel: sin 2FA confirmado → **setup forzado** (no
+- [x] S.2.1 Pagina de reto post-contraseña: 6 digitos (`TwoFactorChallenge`,
+      `/admin/dos-pasos/verificar`; 5 intentos/min POR PERSONA)
+- [x] S.2.2 El reto acepta tambien un codigo de recuperacion (se consume; aviso
+      persistente con los que quedan)
+- [x] S.2.3 Middleware del panel: sin 2FA confirmado → **setup forzado** (no
       lockout, pantalla que no se salta) · con 2FA pero sesion sin verificar →
-      reto. Cubrir tambien el arranque de todo el staff existente al desplegar
+      reto. Cubrir tambien el arranque de todo el staff existente al desplegar.
+      **Como quedo (cambio de diseño con razon):** revisar ruta por ruta NO
+      bastaba — la sesion web abre el panel, el Data Center, los exportes y
+      TODA la API (`statefulApi()` + Sanctum guard `web`; el Data Center llama
+      con `credentials: 'include'`). Asi que la contraseña deja a la persona
+      PENDIENTE en la sesion, sin login (`App\Support\TwoFactorLogin`, patron
+      Fortify, vence en 10 min), y solo el codigo hace el login real
+      (`App\Filament\Auth\Login`). Red de seguridad `RequireTwoFactor`
+      (persistente en el panel + Data Center + exportes): expulsa sesiones
+      viejas o con el 2FA restablecido. Sin "Recordarme": la cookie reabria la
+      sesion sin codigo por meses (confiar en un equipo = S.4).
+
+**QA en Chrome 2026-09-26 (cuenta desechable, borrada al final) — 3 bugs
+cazados y corregidos, cada uno con test de regresion:**
+- Primer clic en la activacion: `ComponentNotFoundException` (las paginas van
+  como rutas sueltas y Filament no las registra en Livewire) → registradas en
+  `AdminPanelProvider::boot()`.
+- "Continuar al admin" daba 419 "This page has expired" (y luego un 403 al
+  recargar): `session()->regenerate()` tira el token CSRF y la activacion se
+  queda en la misma pagina → `migrate(true)`: cambia el id, conserva el token.
+- Tras un codigo errado el campo quedaba lleno (maxlength 7) y no dejaba
+  escribir el siguiente → se vacia al fallar.
+Verificado de punta a punta: activar, recargar en los codigos, reto con la app,
+codigo errado, codigo de recuperacion en minusculas con espacio (aviso "te
+quedan 7"), sesion con 2FA restablecido expulsada. Suites Admin + Security +
+Auth + DataCenter: 258 en verde, 1 fallo previo (BUG-348).
+
+## Hallazgos 2026-09-26 (al implementar S.2) — para decidir
+
+1. **El login de la API entrega token al staff con solo la contraseña**, y
+   `data-center/*` de la API acepta tokens. La decision de julio fue "2FA solo
+   en el panel": por esa puerta el staff ve datos del Data Center sin codigo.
+   Opciones: no emitir token por API a cuentas con `PANEL_ACCESS`, o limitar
+   esos tokens a lo de asistente. DECIDE KAMILO.
+2. **Al desplegar, cerrar las sesiones web abiertas** (vaciar el almacen de
+   sesiones). `RequireTwoFactor` expulsa las viejas del panel, Data Center y
+   exportes, pero una sesion vieja aun serviria contra la API stateful hasta
+   vencer. Va al runbook de B2.
+3. **Quien active primero se queda con la cuenta**: con 2FA obligatorio y
+   activacion al primer ingreso, alguien que ya tenga la contraseña de una
+   cuenta SIN 2FA puede activarlo con SU telefono. Mitigacion propuesta: correo
+   "se activo el segundo factor en tu cuenta" (mismo patron del aviso de S.3.1).
+4. Mission Control entra por enlace firmado (HMAC), no por sesion: fuera de este
+   candado por diseño. `/data-center/` como HTML es estatico del servidor web;
+   los datos van por la API.
 
 ## S.3 — Recuperacion / rescate (CRITICO por la obligatoriedad) — 0/3
 
@@ -107,7 +161,11 @@
       (exito / contraseña fallida / 2FA fallido)
 - [ ] S.6.2 Visible en el perfil propio y en Staff y permisos
 - [ ] S.6.3 Enlazado con el **lockout que YA existe** (SEC-3.3) — no duplicar
-      el motor, solo darle superficie
+      el motor, solo darle superficie. **OJO (verificado 2026-09-26):** ese
+      lockout (`locked_until`) vive SOLO en el login de la API
+      (`AuthController.php:187`). El login del admin es el `->login()` de
+      Filament por defecto, que solo limita 5 intentos/min. Hay que llevar el
+      lockout al login del admin, no solo mostrarlo.
 
 ## S.7 — Endurecimiento de produccion — 0/2 (va CON el DEPLOY DEMO)
 
