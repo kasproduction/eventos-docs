@@ -1,4 +1,4 @@
-# ROADMAP — SEGURIDAD DEL STAFF (2FA + sesiones + accesos) — 8/26
+# ROADMAP — SEGURIDAD DEL STAFF (2FA + sesiones + accesos) — 11/26
 
 > **Decision Kamilo 2026-07-20**: "prefiero tener todo lo de seguridad en regla
 > y no esperar a tener cliente encima con presion". Se hace AHORA, con calma,
@@ -125,18 +125,41 @@ Auth + DataCenter: 258 en verde, 1 fallo previo (BUG-348).
    candado por diseño. `/data-center/` como HTML es estatico del servidor web;
    los datos van por la API.
 
-## S.3 — Recuperacion / rescate (CRITICO por la obligatoriedad) — 0/3
+## S.3 — Recuperacion / rescate (CRITICO por la obligatoriedad) — 3/3 (HECHO 2026-09-26, 13 tests en `TwoFactorRescueTest`)
 
 > Si el 2FA es obligatorio y alguien pierde el telefono el dia del montaje, NO
 > puede quedarse afuera del admin. Sin estas 3 salidas la obligatoriedad es un
 > riesgo operativo, no una mejora de seguridad.
 
-- [ ] S.3.1 Un **super_admin resetea el 2FA de otra persona** desde Staff y
-      permisos — accion auditada + correo de aviso al afectado
-- [ ] S.3.2 Guarda: el **ultimo super_admin no puede quedar encerrado afuera**
-      (espejo del guard anti auto-borrado que ya existe en Staff)
-- [ ] S.3.3 Columna/estado "segundo factor" visible en Staff y permisos
-      (quien lo tiene activo, quien no)
+- [x] S.3.1 Un **super_admin resetea el 2FA de otra persona** desde Staff y
+      permisos — accion auditada + correo de aviso al afectado. Accion en la
+      fila y en la edicion (`TwoFactorService::resetFor`). Bitacora propia
+      `staff_security_events` (admin_audit_log exige evento; esta tabla es la
+      base de S.6) con actor, via, IP; tambien registra `2fa_enabled`. Correo
+      `staff_2fa_reset`, grupo Sistema, ESENCIAL (no se apaga). Solo super_admin,
+      nunca sobre si mismo; el servidor rechaza la peticion armada a mano.
+- [x] S.3.2 Guarda: el **ultimo super_admin no puede quedar encerrado afuera**
+      (espejo del guard anti auto-borrado que ya existe en Staff). `StaffGuard`
+      frena eliminar, quitar el rol y desactivar al unico super_admin activo
+      (event_admin y org_admin tienen `manage-users`: el riesgo era real).
+      Ultima salida si el unico super_admin pierde el telefono:
+      `php artisan eventos:restablecer-2fa correo` (auditado, via consola).
+- [x] S.3.3 Columna/estado "segundo factor" visible en Staff y permisos
+      (quien lo tiene activo, quien no; tooltip con la fecha).
+
+**Hallazgos al implementar S.3 (2026-09-26):**
+- **BUG corregido — `Roles::STAFF_LISTING`** nombraba `panel_user`, `admin`,
+  `monitor` (no existen en RoleSeeder) y dejaba afuera org_admin, event_admin,
+  moderator y staff_checkin: quien se creaba con esos roles desaparecia de
+  Staff y permisos, y no se le podia rescatar. Test de regresion.
+- **Tests en Windows:** el PHP de consola no tiene la extension `intl`; las
+  tablas de Filament no se renderizan en Pest (las acciones de fila se prueban
+  por su logica). Habilitar `extension=intl` en el php.ini de la consola lo
+  arregla — decision de Kamilo, no se toco.
+- **QA con Chrome:** la pestaña de automatizacion queda oculta y Chrome pausa
+  `requestAnimationFrame`: los modales de Filament no terminan de abrir. No es
+  bug; la ruta del servidor quedo probada (montar, confirmar, restablecer,
+  bitacora, correo). Falta ver el modal con los ojos: Kamilo.
 
 ## S.4 — Confiar en este dispositivo 30 dias — 0/3
 
