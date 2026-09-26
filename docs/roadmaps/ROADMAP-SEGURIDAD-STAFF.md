@@ -132,8 +132,9 @@ Auth + DataCenter: 258 en verde, 1 fallo previo (BUG-348).
 > riesgo operativo, no una mejora de seguridad.
 
 - [x] S.3.1 Un **super_admin resetea el 2FA de otra persona** desde Staff y
-      permisos — accion auditada + correo de aviso al afectado. Accion en la
-      fila y en la edicion (`TwoFactorService::resetFor`). Bitacora propia
+      permisos — accion auditada + correo de aviso al afectado. Boton SOLO
+      dentro de Editar (decision Kamilo: en la fila empujaba "Editar" fuera de
+      columna) (`TwoFactorService::resetFor`). Bitacora propia
       `staff_security_events` (admin_audit_log exige evento; esta tabla es la
       base de S.6) con actor, via, IP; tambien registra `2fa_enabled`. Correo
       `staff_2fa_reset`, grupo Sistema, ESENCIAL (no se apaga). Solo super_admin,
