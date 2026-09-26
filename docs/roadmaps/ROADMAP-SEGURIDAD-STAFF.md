@@ -12,6 +12,29 @@
 > (tabla `otp_codes`, config en `events`, endpoints en la API de asistentes)
 > queda **SUPERSEDED** por este roadmap.
 
+## DECISIONES PENDIENTES DE KAMILO — 0/4 (juntadas aqui 2026-09-26)
+
+> Salieron al implementar S.2 y S.3. Hasta que se decidan, quedan abiertas;
+> ninguna bloquea el uso del 2FA, pero la 1 es una puerta abierta.
+
+- [ ] **D.1 El token del staff por la API** — LA IMPORTANTE. El login de la API
+      (app/webapp) entrega token a una cuenta del staff con solo la contraseña,
+      y `data-center/*` de la API acepta tokens: por esa puerta el staff ve el
+      Data Center sin codigo. La decision de julio fue "2FA solo en el panel".
+      Opciones: (a) no emitir token por API a cuentas con `PANEL_ACCESS`;
+      (b) emitirlo pero limitado a lo de asistente.
+- [ ] **D.2 Correo "se activo el segundo factor en tu cuenta"** (si/no). Con el
+      2FA obligatorio al primer ingreso, quien ya tenga la contraseña de una
+      cuenta que aun no lo activo puede activarlo con SU telefono y quedarse con
+      ella. El aviso le avisa al dueño. Mismo patron que el correo de S.3.1.
+- [ ] **D.3 Cerrar todas las sesiones web al desplegar el 2FA** (sin opciones:
+      solo no olvidarlo). `RequireTwoFactor` expulsa las viejas del panel, Data
+      Center y exportes, pero una sesion vieja aun serviria contra la API
+      stateful hasta vencer. Va al runbook de B2.
+- [ ] **D.4 Habilitar `extension=intl` en el php.ini de la consola** (comodidad,
+      solo tests). Sin ella Pest no renderiza las tablas de Filament; las
+      acciones de tabla se prueban por su logica.
+
 ## Decisiones cerradas (Kamilo 2026-07-20 — no re-preguntar)
 
 1. **Alcance: SOLO staff del admin** (los de `Roles::PANEL_ACCESS`). El
@@ -108,20 +131,10 @@ Auth + DataCenter: 258 en verde, 1 fallo previo (BUG-348).
 
 ## Hallazgos 2026-09-26 (al implementar S.2) — para decidir
 
-1. **El login de la API entrega token al staff con solo la contraseña**, y
-   `data-center/*` de la API acepta tokens. La decision de julio fue "2FA solo
-   en el panel": por esa puerta el staff ve datos del Data Center sin codigo.
-   Opciones: no emitir token por API a cuentas con `PANEL_ACCESS`, o limitar
-   esos tokens a lo de asistente. DECIDE KAMILO.
-2. **Al desplegar, cerrar las sesiones web abiertas** (vaciar el almacen de
-   sesiones). `RequireTwoFactor` expulsa las viejas del panel, Data Center y
-   exportes, pero una sesion vieja aun serviria contra la API stateful hasta
-   vencer. Va al runbook de B2.
-3. **Quien active primero se queda con la cuenta**: con 2FA obligatorio y
-   activacion al primer ingreso, alguien que ya tenga la contraseña de una
-   cuenta SIN 2FA puede activarlo con SU telefono. Mitigacion propuesta: correo
-   "se activo el segundo factor en tu cuenta" (mismo patron del aviso de S.3.1).
-4. Mission Control entra por enlace firmado (HMAC), no por sesion: fuera de este
+Las 3 decisiones que salieron aqui (token por API, correo al activar, cerrar
+sesiones al desplegar) se movieron arriba: **DECISIONES PENDIENTES D.1-D.3**.
+
+- Nota (no decision): Mission Control entra por enlace firmado (HMAC), no por sesion: fuera de este
    candado por diseño. `/data-center/` como HTML es estatico del servidor web;
    los datos van por la API.
 
@@ -153,10 +166,8 @@ Auth + DataCenter: 258 en verde, 1 fallo previo (BUG-348).
   `monitor` (no existen en RoleSeeder) y dejaba afuera org_admin, event_admin,
   moderator y staff_checkin: quien se creaba con esos roles desaparecia de
   Staff y permisos, y no se le podia rescatar. Test de regresion.
-- **Tests en Windows:** el PHP de consola no tiene la extension `intl`; las
-  tablas de Filament no se renderizan en Pest (las acciones de fila se prueban
-  por su logica). Habilitar `extension=intl` en el php.ini de la consola lo
-  arregla — decision de Kamilo, no se toco.
+- **Tests en Windows:** el PHP de consola no tiene la extension `intl` y las
+  tablas de Filament no se renderizan en Pest → decision arriba, **D.4**.
 - **QA con Chrome:** la pestaña de automatizacion queda oculta y Chrome pausa
   `requestAnimationFrame`: los modales de Filament no terminan de abrir. No es
   bug; la ruta del servidor quedo probada (montar, confirmar, restablecer,
