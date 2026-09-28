@@ -45,8 +45,11 @@
       navegador y la linea "si no fuiste tu, avisa al equipo". Se dispara desde
       `TwoFactorService::confirm()` (no desde la pagina: cualquier camino que
       active avisa); la bitacora `2fa_enabled` se movio ahi mismo. Migracion
-      del enum `2026_09_27_100000` (**pendiente de correr en la BD dev: MySQL
-      estaba apagado el 2026-09-27**) + `EmailTemplateSeeder`.
+      del enum `2026_09_27_100000` (corrida en la BD dev) + el tipo en la
+      migracion BASE de `email_templates` (SQLite e instalacion limpia usan ese
+      CHECK; sin eso `eventos:instalar` revienta) + `EmailTemplateSeeder`.
+      **QA vivo 2026-09-27:** activacion en Chrome → bitacora con IP y
+      navegador → correo en Mailpit correcto.
 - [x] **D.3 Cerrar todas las sesiones web al desplegar el 2FA → anotado en el
       runbook** (ROADMAP-INFRAESTRUCTURA, B2 "Al desplegar el 2FA"). Los tokens
       del staff ya no necesitan paso manual: los tumba la red de D.1.

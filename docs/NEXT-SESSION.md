@@ -48,12 +48,22 @@ Kamilo activo su 2FA y verifico el rescate.
   sesiones Redis, tokens sin paso manual, `security:check`).
 - **D.4:** intl (ICU 75.1) con respaldo `php.ini.bak-2026-09-27`.
 
-### Pendiente chico
+### Verificado (Kamilo prendio Laragon y Chrome la misma noche)
 
-- **Correr en la BD dev** (MySQL de Laragon estaba apagado): `php artisan migrate` +
-  `php artisan db:seed --class=EmailTemplateSeeder` + `db:seed --class=UserSeeder`/`AttendeeSeeder`
-  no aplican en BD existente → crear `puerta@eventos.test` a mano o re-correr `Demo5DiasSeeder`
-  tras crearlo. Sin esto el kiosko lobby del demo local no tiene token valido.
+- BD dev: migracion del enum corrida, plantillas es/en sembradas, `puerta@eventos.test` creado a
+  mano (rol de asistente `admin`, sin panel) con token `kiosk-demo`.
+- **QA vivo por API** (Chrome, mismo origen): login de `admin@eventos.test` con contraseña correcta →
+  403 `staff_uses_panel`; contraseña mala → 422 normal; magic link staff → generico y sin enlace
+  creado; asistente presencial → token y `/me` 200; operador de puerta → `/me` 200 y check-in pasa
+  la autorizacion (falla solo por QR falso); token viejo del admin → 401 y borrado de la tabla
+  (el admin tenia 24 tokens viejos acumulados: todos moriran al primer uso).
+- **QA vivo D.2 en el admin**: cuenta desechable `qa2fa` → activacion forzada → codigo real de la
+  clave en texto → bitacora `2fa_enabled` con IP y navegador → correo en Mailpit "Activaste la
+  verificacion en dos pasos" con fecha, IP y navegador. Cuenta borrada al final.
+- **Tests**: suites Auth+Security+Admin+DataCenter 288 en verde + BUG-348 (previo, abierto). El
+  tipo nuevo faltaba en la migracion BASE de `email_templates` (SQLite/instalacion limpia usan ese
+  CHECK): corregido; es el mismo patron que `staff_2fa_reset`. La corrida completa tarda ~34 min
+  (BUG-347): correrla en segundo plano con salida a archivo.
 
 ### Siguiente
 
