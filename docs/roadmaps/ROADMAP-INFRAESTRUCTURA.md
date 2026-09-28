@@ -56,6 +56,23 @@ el wizard. Con tests que lo prueben.
 - [ ] **B2.5 Remontar de cero y destruir** (= I.4 "verificar deploy.sh" + I.7.10
       para Nivel 1). Tokens nuevos de DO y Cloudflare (`doctl auth init`).
 
+**Al desplegar el 2FA del staff (runbook, decision D.3 de ROADMAP-SEGURIDAD-STAFF,
+2026-09-27) — el paquete que lo lleve hace esto, sin excepcion:**
+1. `php artisan migrate --force` (enums `staff_2fa_reset` y `staff_2fa_enabled`,
+   tablas `staff_security_events` y columnas `two_factor_*`) + `db:seed
+   --class=EmailTemplateSeeder` (plantillas es/en de los dos correos).
+2. **Vaciar TODAS las sesiones web**: `SESSION_DRIVER=redis` → `redis-cli -n
+   <REDIS_DB de sesiones> --scan --pattern '<prefijo>*' | xargs redis-cli -n <db>
+   del` (o `FLUSHDB` si la base de sesiones es exclusiva). Motivo:
+   `RequireTwoFactor` expulsa las sesiones viejas del panel, Data Center y
+   exportes, pero una sesion vieja seguiria sirviendo contra la API stateful
+   hasta vencer. Todo el staff vuelve a entrar y cae en la activacion forzada.
+3. Tokens de la API del staff: NO hay paso manual. La red de Sanctum (D.1) los
+   rechaza y borra al primer uso. Verificar con un `curl` con un token viejo del
+   staff → 401.
+4. Correr `php artisan security:check` y confirmar que el unico super_admin
+   tiene forma de entrar (telefono a la mano o `eventos:restablecer-2fa`).
+
 **Compuerta B2:** el Nivel 1 se monta desde cero SOLO con el pipeline, pasa el
 humo en verde y se destruye sin dejar nada cobrando. Nadie toca una maquina a mano.
 

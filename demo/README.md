@@ -42,8 +42,10 @@ Al final imprime las URLs de los kioskos:
 - **Kiosko de salon** (`mode=room`): usa el `auth_token` del totem (tabla `room_totems`).
   Los START abren solos el del Auditorio Principal.
 - **Kiosko lobby** (check-in del evento): `?event_id=1&token=<Sanctum>`. El seeder crea
-  el token `kiosk-demo` de `admin@eventos.test` y lo imprime; cambia en cada corrida.
-  Si lo perdiste: vuelve a correr el seeder (no duplica nada).
+  el token `kiosk-demo` de `puerta@eventos.test` (operador de puerta: rol de asistente
+  `admin`, SIN rol de panel) y lo imprime; cambia en cada corrida. Si lo perdiste: vuelve
+  a correr el seeder (no duplica nada). No sirve un token de `admin@eventos.test` ni de
+  ninguna cuenta del panel: el staff del admin no tiene token por la API (2FA, D.1).
 
 Correrlo el mismo dia de la demo (o la manana anterior): "hoy" es el dia 1.
 

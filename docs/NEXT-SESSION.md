@@ -9,6 +9,64 @@
 
 ---
 
+## SESION 2026-09-26 / 2026-09-27 (Fable 5.1) — 2FA DEL STAFF 11/26 + LAS 4 DECISIONES CERRADAS
+
+**Ventana operativa de este frente: `docs/roadmaps/ROADMAP-SEGURIDAD-STAFF.md` (11/26, D.1-D.4 4/4).**
+Es B1.3 del plan de noviembre. Backend en rama `feature/magic-link-auth`.
+
+### Decisiones de Kamilo (no re-preguntar)
+
+- **D.1 → (a): el staff del admin NO recibe token por la API.** Su unica puerta es el
+  panel con contraseña + app autenticadora. Criterio unico `User::hasPanelAccess()`.
+- **D.2 → si:** correo esencial "activaste la verificacion en dos pasos" (fecha, IP, navegador).
+- **D.3 → runbook:** al desplegar el 2FA se vacian TODAS las sesiones web (ROADMAP-INFRAESTRUCTURA, B2).
+- **D.4 → si:** `extension=intl` habilitada en el php.ini de consola de Windows.
+- Restablecer el 2FA vive SOLO dentro de Editar (2026-09-26). Sin "Recordarme" en el login.
+
+### Hecho 2026-09-26 (S.0-S.3)
+
+TOTP con `TwoFactorService`; login en dos pasos (`TwoFactorLogin`: la contraseña deja PENDIENTE,
+no logueado); activacion con QR + secreto en texto + 8 codigos de recuperacion; reto con app o
+codigo de recuperacion; `RequireTwoFactor` red de seguridad (panel + Data Center + exportes);
+rescate por super_admin auditado (`staff_security_events`) con correo `staff_2fa_reset`;
+`StaffGuard` ultimo super_admin; `eventos:restablecer-2fa`. Bug corregido `Roles::STAFF_LISTING`.
+Kamilo activo su 2FA y verifico el rescate.
+
+### Hecho 2026-09-27 (D.1-D.4)
+
+- **D.1:** login API con contraseña correcta de staff → 403 `staff_uses_panel`; magic link → generico
+  sin enviar, verificar enlace viejo → 403; refresh → 403; **red en Sanctum**
+  (`Sanctum::authenticateAccessTokensUsing` en `AppServiceProvider`) rechaza y BORRA tokens reales
+  del staff (cubre los anteriores al despliegue y saca el token del cache del socket).
+  **Hallazgo:** el kiosko lobby del demo usaba token de `admin@eventos.test` (event_admin) → nuevo
+  `puerta@eventos.test` (rol de asistente `admin`, sin rol de panel) presta `kiosk-demo`.
+  Tests `StaffApiTokenTest` (11).
+- **D.2:** `StaffTwoFactorEnabledMail`, tipo `staff_2fa_enabled` (esencial, Sistema, es/en),
+  disparado desde `TwoFactorService::confirm()`; la bitacora `2fa_enabled` se movio ahi.
+  Migracion enum `2026_09_27_100000` + `EmailTemplateSeeder`.
+- **D.3:** nota "Al desplegar el 2FA" bajo B2 en ROADMAP-INFRAESTRUCTURA (migrar+seed, vaciar
+  sesiones Redis, tokens sin paso manual, `security:check`).
+- **D.4:** intl (ICU 75.1) con respaldo `php.ini.bak-2026-09-27`.
+
+### Pendiente chico
+
+- **Correr en la BD dev** (MySQL de Laragon estaba apagado): `php artisan migrate` +
+  `php artisan db:seed --class=EmailTemplateSeeder` + `db:seed --class=UserSeeder`/`AttendeeSeeder`
+  no aplican en BD existente → crear `puerta@eventos.test` a mano o re-correr `Demo5DiasSeeder`
+  tras crearlo. Sin esto el kiosko lobby del demo local no tiene token valido.
+
+### Siguiente
+
+**S.4 confiar en este equipo 30 dias** (tabla de equipos revocables + casilla en el reto + revocar
+desde el perfil) → S.5 sesiones abiertas → S.6 registro de accesos (llevar el lockout al login del
+admin: hoy solo en la API).
+
+Gotchas de tests: el guard de Sanctum memoriza al usuario dentro de la misma app de test
+(`$this->app['auth']->forgetGuards()` para simular la siguiente peticion). QA con Chrome: la
+pestaña de automatizacion pausa `requestAnimationFrame` y los modales de Filament no abren.
+
+---
+
 ## SESION 2026-09-13 (Fable 5.1 → Opus 5) — EL EVENTO DE NOVIEMBRE: plan de infraestructura para 5.000 personas + base limpia
 
 **Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` → "PLAN DE TRABAJO — EVENTO DE NOVIEMBRE, 5.000 PERSONAS" (2/31).**

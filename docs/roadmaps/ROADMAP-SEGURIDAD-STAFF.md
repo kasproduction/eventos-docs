@@ -12,28 +12,47 @@
 > (tabla `otp_codes`, config en `events`, endpoints en la API de asistentes)
 > queda **SUPERSEDED** por este roadmap.
 
-## DECISIONES PENDIENTES DE KAMILO — 0/4 (juntadas aqui 2026-09-26)
+## DECISIONES DE KAMILO — 4/4 (decididas y hechas 2026-09-27)
 
-> Salieron al implementar S.2 y S.3. Hasta que se decidan, quedan abiertas;
-> ninguna bloquea el uso del 2FA, pero la 1 es una puerta abierta.
+> Salieron al implementar S.2 y S.3 (2026-09-26). Kamilo las decidio el
+> 2026-09-27 y quedaron implementadas ese dia. No re-preguntar.
 
-- [ ] **D.1 El token del staff por la API** — LA IMPORTANTE. El login de la API
-      (app/webapp) entrega token a una cuenta del staff con solo la contraseña,
-      y `data-center/*` de la API acepta tokens: por esa puerta el staff ve el
-      Data Center sin codigo. La decision de julio fue "2FA solo en el panel".
-      Opciones: (a) no emitir token por API a cuentas con `PANEL_ACCESS`;
-      (b) emitirlo pero limitado a lo de asistente.
-- [ ] **D.2 Correo "se activo el segundo factor en tu cuenta"** (si/no). Con el
-      2FA obligatorio al primer ingreso, quien ya tenga la contraseña de una
-      cuenta que aun no lo activo puede activarlo con SU telefono y quedarse con
-      ella. El aviso le avisa al dueño. Mismo patron que el correo de S.3.1.
-- [ ] **D.3 Cerrar todas las sesiones web al desplegar el 2FA** (sin opciones:
-      solo no olvidarlo). `RequireTwoFactor` expulsa las viejas del panel, Data
-      Center y exportes, pero una sesion vieja aun serviria contra la API
-      stateful hasta vencer. Va al runbook de B2.
-- [ ] **D.4 Habilitar `extension=intl` en el php.ini de la consola** (comodidad,
-      solo tests). Sin ella Pest no renderiza las tablas de Filament; las
-      acciones de tabla se prueban por su logica.
+- [x] **D.1 El token del staff por la API → opcion (a): el staff NO recibe
+      token por la API.** Su puerta es el panel, con contraseña + app
+      autenticadora. Un criterio unico, `User::hasPanelAccess()` (los roles de
+      `Roles::PANEL_ACCESS`), aplicado en cuatro puntos:
+      · login por API con contraseña correcta → 403 `staff_uses_panel` ("Esta
+        cuenta es del equipo organizador. Entra por el panel de
+        administracion."); con contraseña errada sigue el 422 de siempre (no
+        delata el rol);
+      · pedir magic link → respuesta generica, no se envia nada; verificar un
+        enlace viejo → 403 `staff_uses_panel`;
+      · refrescar → 403 (y el token queda revocado);
+      · **red en Sanctum** (`Sanctum::authenticateAccessTokensUsing`, en
+        `AppServiceProvider`): cualquier token REAL de una cuenta del staff deja
+        de autenticar y se borra al primer uso — cubre los emitidos antes del
+        despliegue y cualquier puerta de emision futura; al borrarse cae
+        tambien del cache de auth del socket. Las sesiones web del admin y los
+        `actingAs` de los tests no pasan por ahi.
+      **Hallazgo:** el kiosko lobby del demo usaba el token de
+      `admin@eventos.test` (event_admin) → habria muerto. El operador de puerta
+      NO debe ser cuenta del panel: nuevo `puerta@eventos.test` (rol de
+      asistente `admin`, sin rol Spatie del panel) presta el token `kiosk-demo`
+      en `Demo5DiasSeeder`. El kiosko de salon usa token de totem, no se toca.
+      Tests: `tests/Feature/Security/StaffApiTokenTest.php` (11).
+- [x] **D.2 Correo "se activo el segundo factor en tu cuenta" → SI.** Tipo
+      `staff_2fa_enabled`, grupo Sistema, ESENCIAL, es/en, con fecha, IP y
+      navegador y la linea "si no fuiste tu, avisa al equipo". Se dispara desde
+      `TwoFactorService::confirm()` (no desde la pagina: cualquier camino que
+      active avisa); la bitacora `2fa_enabled` se movio ahi mismo. Migracion
+      del enum `2026_09_27_100000` (**pendiente de correr en la BD dev: MySQL
+      estaba apagado el 2026-09-27**) + `EmailTemplateSeeder`.
+- [x] **D.3 Cerrar todas las sesiones web al desplegar el 2FA → anotado en el
+      runbook** (ROADMAP-INFRAESTRUCTURA, B2 "Al desplegar el 2FA"). Los tokens
+      del staff ya no necesitan paso manual: los tumba la red de D.1.
+- [x] **D.4 `extension=intl` en el php.ini de la consola → habilitada** (ICU
+      75.1, respaldo `php.ini.bak-2026-09-27`). Pest ya puede renderizar tablas
+      de Filament en Windows.
 
 ## Decisiones cerradas (Kamilo 2026-07-20 — no re-preguntar)
 
