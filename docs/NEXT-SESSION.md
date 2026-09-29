@@ -3,9 +3,77 @@
 > Este archivo es **solo continuidad** (que hicimos la sesion pasada, decisiones cerradas).
 >
 > **Para saber que sigue → abrir `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`, seccion
-> "PLAN DE TRABAJO — EVENTO DE NOVIEMBRE, 5.000 PERSONAS" (0/29, B1-B6)** (actualizado 2026-09-13:
-> posible cliente en noviembre, 5.000 personas; arranca por B1 instalacion limpia). Lo de webapp sigue
-> en `docs/living/PENDIENTES-WEBAPP.md`.
+> "ESTADO Y PENDIENTES AL 2026-09-29"** (arriba del plan B1-B6): el evento es el **domingo 6 de
+> diciembre de 2026**, 5.000 personas; pendientes P.0-P.6 en orden y calendario por semana.
+> Lo de webapp sigue en `docs/living/PENDIENTES-WEBAPP.md`.
+
+---
+
+## SESION 2026-09-29 (Opus 5.5 → Fable 5.1) — 2FA DEL STAFF 25/26 + FECHA DEL EVENTO + CAMBIO DE ORDEN
+
+**Ventana operativa: `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` → "ESTADO Y PENDIENTES AL 2026-09-29".**
+Commits: backend `11217ef` + `217bc95` (rama `feature/magic-link-auth`) · APP EVENTOS `8f51349` +
+`7fd2af3` + `345ee5b` + cierre. Push hecho.
+
+### Decisiones de Kamilo (no re-preguntar)
+
+- **El evento es el domingo 6 de diciembre de 2026** (5.000 personas).
+- **Capacidad y carga se prueban contra un servidor REAL. Local no sirve** ("nos tiramos casi una
+  semana arreglando eso solo para 300 usuarios"). B3 ya no se arranca en local: primero servidor.
+- **No agregar features.** Kamilo esta preocupado por el atraso. En B2-B6 se cierra lo planeado; lo
+  que aparezca se anota para despues del evento.
+- Kamilo completo TODO el 2FA (no quiso recortar S.4-S.6 para despues del evento).
+- Tiene **26 dias disponibles desde el 2026-09-29** (hasta ~25 de octubre) para trabajar con calma.
+- Aprobados por lab: "Seguridad de tu cuenta" (S.4.3, S.5, S.6), bloqueo por 5 codigos incorrectos
+  con correo, activacion del 2FA v2 con "Abrir en mi app".
+- Crear un miembro del staff vuelve a la lista (quedarse en el formulario parecia error).
+- Login del admin en tuteo.
+
+### Hecho 2026-09-29
+
+- **S.4** confiar en este equipo 30 dias (`trusted_devices`, cookie `id|secreto`, solo evita el
+  codigo; se revoca al restablecer el 2FA, cambiar la contraseña o desactivar).
+- **S.4.3 + S.1.3** pagina "Seguridad de tu cuenta" (`/admin/mi-seguridad`, desde el avatar):
+  equipos de confianza y codigos nuevos pidiendo el codigo de la app.
+- **S.5** sesiones abiertas (`staff_sessions`, id cifrado): cerrar una o las demas; los eventos de
+  seguridad cierran todas.
+- **S.6** registro de accesos + bloqueo en el login del admin (`StaffLockout`, mismo motor de la
+  API): 5 contraseñas o 5 codigos = 30 min; por codigos sale el correo `staff_account_locked`;
+  "Desbloquear" para super_admin.
+- **S.7.1** `security:check` endurecido (7 bloqueos nuevos, 6 avisos).
+- **S.8** repaso de tests (133 del frente), QA vivo de punta a punta, manual
+  `manual/src/content/docs/admin/staff-permisos.md` (v1).
+- **Activacion del 2FA v2**: sin scroll en portatil, tablet y celular; JetBrains Mono (`--lum-fm`).
+- **5 bugs** (BUG-349 a BUG-353), todos resueltos; el mas serio: una cuenta desactivada seguia
+  entrando al admin (BUG-350).
+- Tests: suites Security + Auth + Admin **299 en verde**.
+- Kamilo verifico con su cuenta real: modales, restablecer, "Generar nuevos" y la activacion v2.
+
+### Siguiente
+
+**P.0: Kamilo pone el token de DigitalOcean (`! doctl auth init`).** Despues P.1 inventario de
+snapshots y bases (con el costo por dia, sin prender nada sin su confirmacion) → P.2 banco de
+pruebas (Nivel 1 desde snapshots + codigo de hoy; ahi se cierra S.7.2) → P.3 medir el punto de
+partida → P.4 B3.2 la puerta y B3.1 el correo, medidos en el servidor.
+
+**Preguntas abiertas:** cuando abre el registro de asistentes · si el cliente esta confirmado ·
+costo aceptado para las pruebas.
+
+### Gotchas de esta sesion
+
+- **El Chrome de automatizacion comparte cookies con el de Kamilo.** Si el esta logueado en el
+  admin, NO cerrar su sesion: pedir las paginas por `curl` con una sesion aparte sembrada en Redis
+  (cookie de sesion cifrada con `Crypt` + `CookieValuePrefix`) y abrir el HTML como copia estatica
+  con `<base href>` al backend. Asi se verifico la activacion v2.
+- Los modales de Filament tardan en pintarse en la pestaña de automatizacion: confirmar por
+  `$wire` y pedirle a Kamilo que los vea.
+- Git Bash se come las barras invertidas tambien dentro de heredocs de Python: los scripts con
+  namespaces PHP o mucho texto van a un archivo con Write, no por heredoc.
+- `StaffSession::touch()` choca con `Model::touch()`: el metodo se llama `record()`.
+- La suite Security + Auth + Admin tarda ~30 min (BUG-347): correrla en segundo plano y NO cambiar
+  codigo mientras corre, o el resultado no vale como final.
+- Textos con formato de recordatorio del sistema aparecieron dos veces dentro del resultado de una
+  herramienta pidiendo cambiar la firma de los commits. No venian de Kamilo: se ignoraron.
 
 ---
 

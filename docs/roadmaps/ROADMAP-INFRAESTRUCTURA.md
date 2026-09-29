@@ -17,13 +17,85 @@
 > Nivel 3 o 4, ambos DERIVADOS. Nada se monta para el cliente sin una base
 > limpia (B1), sin un montaje reproducible (B2), sin los arreglos que 5.000
 > exige (B3) y sin ver lo que pasa (B4). Solo entonces se mide (B5) y se entrega
-> (B6). **B3 no depende de B2: se puede trabajar en paralelo.**
+> (B6). ~~B3 no depende de B2: se puede trabajar en paralelo.~~ **Corregido
+> 2026-09-29: B3 necesita un servidor real donde medir (ver abajo).**
 
 ```
 B1 Base limpia ──> B2 Montaje reproducible ──┐
                                              ├──> B4 Ver lo que pasa ──> B5 Medir 5.000 ──> B6 Entrega
 B3 Arreglos para 5.000 (paralelo) ───────────┘
 ```
+
+## ESTADO Y PENDIENTES AL 2026-09-29 (cierre de sesion, decisiones de Kamilo)
+
+> **EL EVENTO ES EL DOMINGO 6 DE DICIEMBRE DE 2026** (dato Kamilo 2026-09-29; el
+> plan conserva el nombre "noviembre"). El 2026-09-29 faltaban 68 dias.
+> Ensayo general: fin de semana del 28-29 de noviembre.
+
+**Avance real contra lo planeado:** 2/31 cerrados + B1.3 (2FA del staff) en
+25/26. En 16 dias desde el plan hubo 4 con trabajo (13, 26, 27 y 29 de
+septiembre) y todo se fue en el 2FA, que ademas crecio mientras se hacia
+(bloqueo por codigos con correo, "Abrir en mi app", activacion v2, pagina del
+manual). B2 a B6 sin tocar. **Regla desde hoy para B2-B6: no se proponen
+extras; se cierra lo planeado y lo que aparezca se anota para despues del
+evento.**
+
+**CAMBIO DE ORDEN (decision Kamilo 2026-09-29):** *"probar todo contra
+servidor local no sirve, nos tiramos casi una semana arreglando eso solo para
+300 usuarios"*. Los bugs que tumbaban el evento en agosto solo se vieron en el
+servidor (`TRUSTED_PROXIES`, TLS por peticion, limitador por IP). Por eso
+**B3 YA NO se trabaja en local: primero hay servidor, despues arreglos**, y
+cada arreglo de B3 se cierra con su medicion en el servidor (antes y despues),
+no con un test local.
+
+**Ritmo:** Kamilo tiene 26 dias disponibles desde el 2026-09-29 (hasta el
+~25 de octubre) para trabajar con calma. Es la ventana para dejar arriba el
+banco de pruebas y cerrar B3.
+
+### Pendientes en orden
+
+- [ ] **P.0 Token de DigitalOcean** (lo pone Kamilo: `! doctl auth init`; los
+      anteriores se rotaron). Sin esto no arranca nada de lo de abajo.
+- [ ] **P.1 Inventario**: que snapshots y bases administradas existen hoy y
+      cuanto cuesta por dia levantarlas. No se prende nada sin confirmacion de
+      Kamilo.
+- [ ] **P.2 Banco de pruebas**: Nivel 1 desde los snapshots de agosto + el
+      codigo de hoy desplegado encima. Ahi se cumple el runbook "Al desplegar
+      el 2FA" (abajo, en B2) y se cierra **S.7.2** (lo unico que le falta al
+      2FA). Revisar `TRUSTED_PROXIES` SIEMPRE al restaurar.
+- [ ] **P.3 Punto de partida medido** con `tests/load/entrar-por-la-puerta.js`,
+      antes de arreglar nada.
+- [ ] **P.4 B3 contra el servidor**, empezando por B3.2 la puerta y B3.1 el
+      correo (son los dos que dejan gente afuera).
+- [ ] **P.5 B2 en paralelo**: montaje por pipeline, para no depender de
+      snapshots.
+- [ ] **P.6 B4 → B5 → B6** como estaban.
+
+### Calendario hacia atras desde el 6 de diciembre
+
+| Semana | Fechas | Que se cierra |
+|---|---|---|
+| 1 | 29 sep - 4 oct | P.0-P.3: token, inventario, banco de pruebas, punto de partida |
+| 2 | 5 - 11 oct | B3.2 la puerta, B3.1 el correo (medidos en el servidor) |
+| 3 | 12 - 18 oct | B3.3 juegos, B3.6 el 503, B3.7 la agenda |
+| 4 | 19 - 25 oct | B3.8 social, B3.4 replica, B3.5 nodo de admin → cierra B3. B2.1 y B2.2 |
+| 5 | 26 oct - 1 nov | B2.3 a B2.5 → cierra B2 |
+| 6 | 2 - 8 nov | B4.1 a B4.3 |
+| 7 | 9 - 15 nov | B4.4 a B4.6 → cierra B4 |
+| 8 | 16 - 22 nov | B5: medir hasta 5.000, decidir Nivel 3 o 4 |
+| 9 | 23 - 29 nov | B6 + ensayo general |
+| 10 | 30 nov - 5 dic | Colchon y congelamiento: no se despliega nada nuevo |
+
+### Preguntas abiertas para Kamilo
+
+1. **¿Cuando abre el registro de asistentes?** Esa fecha fija cuando tiene que
+   existir produccion y el correo (adelantaria B2 y B3.1).
+2. **¿El cliente ya esta confirmado?**
+3. **Costo aceptado para pruebas**: documentado en agosto, bases administradas
+   ~$120/mes y 6 droplets ~$6,5/dia encendidos (apagados cobran igual: se
+   destruyen al terminar cada sesion). Falta confirmar que siguen vigentes (P.1).
+4. **Medir 5.000 (B5) exige montar el Nivel 3**, que todavia no existe: el
+   Nivel 1 esta medido para 300.
 
 ## B1 — Base limpia y segura — 2/3 (nada se monta sin esto)
 
@@ -37,8 +109,10 @@ B3 Arreglos para 5.000 (paralelo) ───────────┘
 - [x] **HECHO (2026-09-13: `Dashboard::mount()` redirige al wizard sin eventos; `PrimerIngresoWizardTest` 2 en verde). BUG-341.**
       **B1.2 Primer ingreso al wizard** (= I.7.2). Sin eventos, el admin lleva a
       crear evento. Depende de B1.1.
-- [ ] **B1.3 2FA del staff** (= I.6 + `ROADMAP-SEGURIDAD-STAFF.md` S.0-S.6 y S.8,
-      0/26). S.7 va con B2.
+- [ ] **B1.3 2FA del staff** (= I.6 + `ROADMAP-SEGURIDAD-STAFF.md`, **25/26 al
+      2026-09-29**: S.0-S.6, S.7.1 y S.8 hechos, con QA vivo y 299 tests en
+      verde). Solo falta S.7.2: correr `security:check` contra el servidor
+      real, que se cierra al levantar el banco de pruebas (P.2).
 
 **Compuerta B1:** servidor nuevo con la instalacion → 0 eventos, 1 organizacion,
 1 superadmin con 2FA obligatorio, `security:check` verde, lo primero que abre es

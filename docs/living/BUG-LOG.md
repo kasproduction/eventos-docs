@@ -3,6 +3,31 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-09-29 — Cierre del 2FA del staff, S.4 a S.8 (5 bugs, todos resueltos)
+
+> Contexto: `ROADMAP-SEGURIDAD-STAFF.md` 25/26. Todos cazados en QA vivo con
+> Chrome o al implementar, y cada uno con test o medicion. Backend `217bc95`.
+
+### BUG-353: "Copiar" no copiaba nada en el entorno local (RESUELTO)
+- **Severidad:** MEDIA — En `http://*.test` no existe `navigator.clipboard` (contexto no seguro): el boton "Copiar" de los codigos de recuperacion y el de la clave del 2FA fallaban en silencio. **Fix:** respaldo con `textarea` + `execCommand("copy")` en la activacion y en "Seguridad de tu cuenta".
+- **Archivos:** `resources/views/filament/auth/two-factor-setup.blade.php`, `resources/views/filament/pages/account-security.blade.php`
+
+### BUG-352: La activacion del 2FA no era responsive y obligaba a hacer scroll (RESUELTO)
+- **Severidad:** MEDIA (QA de Kamilo) — La tarjeta media ~850 px: 245 px de scroll en un portatil 1366x768 y 286 px en celular. Ademas la fuente monoespaciada caia en la del sistema en Windows. **Fix:** activacion v2 (dos columnas en portatil, clave primero en celular, `--lum-fm` JetBrains Mono, una sola escala de espacios). Lab: `design/features/admin-2fa/lab-2fa-activacion-v2.html`. Medido en la pagina real: 0 px de scroll en los tres tamaños.
+- **Archivos:** `resources/css/filament/admin/theme.css`, `resources/views/filament/auth/two-factor-setup.blade.php`, `app/Filament/Auth/TwoFactorSetup.php`
+
+### BUG-351: Restos de otra cuenta en la sesion expulsaban a quien acababa de entrar (RESUELTO)
+- **Severidad:** ALTA — Si una cuenta se eliminaba con el admin abierto, su huella de contraseña quedaba en la sesion del navegador. La siguiente persona que entraba en ese navegador pasaba el 2FA y `AuthenticateSession` la expulsaba en su primer clic (huella vieja contra contraseña nueva). El segundo intento si funcionaba. **Fix:** `TwoFactorLogin::complete()` escribe la huella de quien entra. Test de regresion que falla sin el fix.
+- **Archivos:** `app/Support/TwoFactorLogin.php`, `tests/Feature/Security/TwoFactorLoginTest.php`
+
+### BUG-350: Una cuenta desactivada seguia entrando al admin (RESUELTO)
+- **Severidad:** CRITICA (seguridad, previo a esta sesion) — `User::canAccessPanel()` solo miraba el rol y el login de Filament no revisa `is_active`: apagar "Cuenta activa" no sacaba a nadie. **Fix:** `canAccessPanel` exige `is_active !== false` (Filament lo revisa en el login y en cada peticion) y desactivar cierra sus sesiones y quita la confianza de sus equipos. Verificado en vivo con una sesion real en Redis.
+- **Archivos:** `app/Models/User.php`, `tests/Feature/Security/StaffSessionTest.php`
+
+### BUG-349: El doble envio del codigo tapaba los codigos de recuperacion recien generados (RESUELTO)
+- **Severidad:** ALTA — El campo del codigo se envia solo al completar 6 digitos; si la persona ademas presionaba Enter llegaba un segundo envio con el mismo codigo, que salia "ya se uso", y el error tapaba los codigos nuevos: los viejos ya muertos y los nuevos sin ver. **Fix:** con codigos en pantalla el segundo envio no hace nada; en el reto, el mismo codigo incorrecto repetido cuenta una sola vez para el bloqueo. Tests de regresion.
+- **Archivos:** `app/Filament/Pages/AccountSecurity.php`, `app/Filament/Auth/TwoFactorChallenge.php`
+
 ## 2026-09-13 — Auditoria de infraestructura + plan noviembre B1.1/B1.2 (10 bugs: 5 resueltos, 5 abiertos)
 
 > Contexto: posible cliente en noviembre, evento de 5.000 personas. Plan en

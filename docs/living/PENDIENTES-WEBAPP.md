@@ -63,8 +63,8 @@
 | App movil Expo | Fase 1 cerrada | 100% implementado | Faltan pruebas en telefono; no publicada en tiendas | `PENDIENTES.md` §1 y §6 |
 | Admin Lumina | 57/57 | 100% | Cerrado. Solo falta decidir las paginas personalizadas | `ROADMAP-LUMINA-ADMIN.md` F10.6 |
 | Modulos del organizador | Cerrados | 100% implementado | Pulse, Data Center, kiosko, Mission Control, juegos en vivo, webhooks, recap | Roadmaps de cada modulo |
-| Infraestructura | 33/73 | 45% | Activa: plan noviembre 2/31 (B1.1 y B1.2 hechos 2026-09-13) | `ROADMAP-INFRAESTRUCTURA.md` |
-| Seguridad del staff | 11/26 | 42% | Activa: S.0-S.3 hechos 2026-09-26 (login en dos pasos + rescate); sigue S.4 confiar en el equipo | `ROADMAP-SEGURIDAD-STAFF.md` |
+| Infraestructura | 33/73 | 45% | Activa: plan 2/31. **Evento el 6 de diciembre de 2026.** Sigue: token de DO → banco de pruebas en servidor real → B3 medido ahi (ver "ESTADO Y PENDIENTES AL 2026-09-29") | `ROADMAP-INFRAESTRUCTURA.md` |
+| Seguridad del staff | 25/26 | 96% | Casi cerrado 2026-09-29: 2FA, equipos de confianza, sesiones, registro de accesos y bloqueo, `security:check`. Falta S.7.2 (correr el check en el servidor real) | `ROADMAP-SEGURIDAD-STAFF.md` |
 | Manual del organizador | 5/35 | 14% | En pausa | `ROADMAP-MANUAL.md` |
 | Registro publico, landing y widget | Sin contador | 0% | Sin empezar. La webapp no tiene pantalla de registro | `PENDIENTES.md` §3 + RUTA etapa 3 |
 
@@ -170,6 +170,9 @@ ya no le pide `/auth/me` al backend en cada conexion (ficha compartida en Redis,
 ## RUTA A NOVIEMBRE — orden de trabajo con dependencias (decision Kamilo 2026-09-13, re-priorizada el mismo dia)
 
 > **Contexto:** posible cliente en noviembre (evento con influencers, **5.000 personas** — ver "EL EVENTO DE NOVIEMBRE ES DE 5.000 PERSONAS" arriba).
+> **Actualizado 2026-09-29: el evento es el DOMINGO 6 DE DICIEMBRE DE 2026.** Estado, cambio de orden
+> (servidor real primero, local no sirve para capacidad), pendientes y calendario por semana:
+> `ROADMAP-INFRAESTRUCTURA.md` → "ESTADO Y PENDIENTES AL 2026-09-29".
 > **Criterio que manda (Kamilo, textual):** *"si en este momento me dijeran
 > tenemos evento mañana, ¿que podria montar sin sufrir ni improvisar?"*.
 > W.19 es mejora (lo actual funciona) → pasa a segundo plano. Tiendas de ultimo.
