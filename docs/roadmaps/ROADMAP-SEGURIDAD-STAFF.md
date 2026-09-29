@@ -1,4 +1,4 @@
-# ROADMAP — SEGURIDAD DEL STAFF (2FA + sesiones + accesos) — 15/26
+# ROADMAP — SEGURIDAD DEL STAFF (2FA + sesiones + accesos) — 25/26
 
 > **Decision Kamilo 2026-07-20**: "prefiero tener todo lo de seguridad en regla
 > y no esperar a tener cliente encima con presion". Se hace AHORA, con calma,
@@ -247,44 +247,145 @@ al login + entrar de nuevo cae en la activacion, no en el panel.
       sin ver). Guard en `regenerate()` + test de regresion. Verificado en
       vivo despues del fix.
 
-## S.5 — Sesiones y dispositivos activos — 0/3
+## S.5 — Sesiones y dispositivos activos — 3/3 (HECHO 2026-09-29, 13 tests en `StaffSessionTest`)
 
-- [ ] S.5.1 Tabla de seguimiento de sesiones (**obligatoria**: `SESSION_DRIVER=redis`
-      no enumera por usuario): session_id, dispositivo, IP, ultimo uso
-- [ ] S.5.2 Pantalla en el perfil: lista de sesiones abiertas + "cerrar esta"
-- [ ] S.5.3 "Cerrar todas menos esta" (lo que te salva si perdiste un portatil
-      o dejaste sesion abierta en un computador prestado)
+> Lab aprobado por Kamilo 2026-09-29 (seccion S.5 de `lab-seguridad-cuenta.html`).
 
-## S.6 — Registro de accesos al admin — 0/3
+- [x] S.5.1 Tabla `staff_sessions` + modelo `StaffSession`: id de sesion
+      CIFRADO (con el en claro se secuestra la sesion) + sha256 para buscar la
+      actual. Se anota en `RequireTwoFactor` (unico punto por donde pasan panel,
+      Data Center y exportes con el 2FA pasado), actividad como mucho 1 vez por
+      minuto, las vencidas (> `SESSION_LIFETIME`) se limpian solas. Liga
+      `trusted_device_id` si se entro por un equipo de confianza o se marco.
+      "Salir" borra la fila (listener de `Logout`).
+- [x] S.5.2 Card "Sesiones abiertas" en "Seguridad de tu cuenta", ANTES de
+      Equipos: navegador, ultima actividad ("hace un momento" bajo 1 min), IP.
+      "Esta sesion" sin Cerrar (para eso esta Salir). Cerrar = destruir en el
+      manejador de sesiones (Redis) + borrar fila → ese equipo cae al login en
+      su siguiente clic. Si la sesion es de un equipo de confianza, lo dice y
+      ofrece "Quitar la confianza" (cerrar no la quita, como Google).
+- [x] S.5.3 "Cerrar las demas". NO usa `Auth::logoutOtherDevices()` (pide
+      la contraseña y la re-hashea → quitaria la confianza de todos los
+      equipos). Bitacora `sessions_closed` (reason self/others).
+      **Ademas:** restablecer el 2FA, cambiar la contraseña y desactivar la
+      cuenta cierran TODAS sus sesiones al instante (reason en la bitacora).
+      **Hueco cerrado de paso (hallazgo 2026-09-29):** una cuenta DESACTIVADA
+      seguia entrando al admin — `canAccessPanel` solo miraba el rol y el login
+      de Filament no revisa `is_active`. Ahora `is_active !== false` en
+      `canAccessPanel` (Filament lo revisa en el login y en cada peticion).
 
-- [ ] S.6.1 Tabla de intentos: fecha, IP, dispositivo, resultado
-      (exito / contraseña fallida / 2FA fallido)
-- [ ] S.6.2 Visible en el perfil propio y en Staff y permisos
-- [ ] S.6.3 Enlazado con el **lockout que YA existe** (SEC-3.3) — no duplicar
-      el motor, solo darle superficie. **OJO (verificado 2026-09-26):** ese
-      lockout (`locked_until`) vive SOLO en el login de la API
-      (`AuthController.php:187`). El login del admin es el `->login()` de
-      Filament por defecto, que solo limita 5 intentos/min. Hay que llevar el
-      lockout al login del admin, no solo mostrarlo.
+**QA vivo 2026-09-29 (cuenta desechable, borrada), con una segunda sesion
+REAL en Redis + curl con su cookie:** curl abre el admin (200) → "Cerrar"
+desde la pagina → curl cae al login (302), bitacora `self`. Desactivar la
+cuenta: sus 2 sesiones (Chrome y la de curl) cerradas y la confianza quitada;
+Chrome redirige al login; la contraseña correcta ya no entra (mensaje
+generico, no delata). Detalle de copy corregido: "hace 0 segundos" → "hace un
+momento".
 
-## S.7 — Endurecimiento de produccion — 0/2 (va CON el DEPLOY DEMO)
+## S.6 — Registro de accesos al admin — 3/3 (HECHO 2026-09-29, 14 tests en `StaffLockoutTest`)
 
-- [ ] S.7.1 Auditar que valida hoy `php artisan security:check` (existe, esta
-      citado en `.env.production.example`) y completarlo si falta algo
+> Lab aprobado por Kamilo 2026-09-29 (seccion S.6 de `lab-seguridad-cuenta.html`),
+> incluido el bloqueo por CODIGOS con correo (propuesta nueva).
+
+- [x] S.6.1 Sin tabla nueva: los intentos van a `staff_security_events` (ya
+      tenia IP, navegador, meta). Tipos `login_ok` (meta.via: code, recovery,
+      trusted_device, activation), `login_failed_password`,
+      `login_failed_code`, `account_locked` (reason password|code),
+      `account_unlocked`. "Entro" se anota en UN solo lugar:
+      `TwoFactorLogin::complete()`. Solo cuentas de staff (las de asistentes
+      no se cuentan desde el admin). Los ingresos se borran a los 90 dias
+      (tarea `staff-security:prune-logins`, 2:30am); los cambios de seguridad
+      se quedan como auditoria.
+- [x] S.6.2 "Actividad reciente" al final de "Seguridad de tu cuenta" (en
+      segunda persona, 10 + "Mostrar mas") y "Actividad de acceso" en la ficha
+      de Staff y permisos (tercera persona, 20). Una sola linea de tiempo con
+      entradas y cambios de seguridad (`App\Support\SecurityActivity`); lo
+      fallido en ambar, los bloqueos en rojo.
+- [x] S.6.3 Bloqueo en el login del admin con el MISMO motor de la API
+      (`failed_login_attempts` + `locked_until`, `App\Support\StaffLockout`):
+      5 contraseñas incorrectas seguidas = 30 min; **5 codigos incorrectos
+      seguidos = 30 min + correo esencial `staff_account_locked`** ("alguien
+      tiene tu contraseña"; columna nueva `two_factor_failed_attempts`). El
+      mismo codigo repetido (envio automatico + Enter) cuenta una vez. Antes
+      del bloqueo, el mensaje generico de siempre. Bloqueada: mensaje con los
+      minutos y "pidele a un super_admin". El bloqueo del admin lo ve tambien
+      la API (423). "Desbloquear" en Editar (solo super_admin, solo si esta
+      bloqueada) + aviso rojo arriba con el porque.
+
+**QA vivo 2026-09-29 (dos cuentas desechables, borradas):** 5 codigos
+incorrectos → bloqueada + bitacora + correo en Mailpit "Bloqueamos tu cuenta:
+alguien tiene tu contraseña" + de vuelta al login con el aviso; la contraseña
+correcta ya no entra (mensaje con los minutos); el super_admin ve en la ficha
+el aviso rojo, "Desbloquear" y la actividad en tercera persona; Desbloquear →
+aviso y boton desaparecen, bitacora `account_unlocked`. 0 bugs.
+
+## S.7 — Endurecimiento de produccion — 1/2 (S.7.2 va CON el montaje, B2: hoy no hay produccion)
+
+- [x] S.7.1 **HECHO 2026-09-29** (15 tests en `SecurityCheckCommandTest`, 7
+      nuevos). Auditoria: ya validaba debug, APP_KEY, secretos con
+      placeholder, clave de la base, vencimiento de tokens, clave de Redis
+      remoto y rastros del demo. **Faltaba y se agrego:**
+      · CRITICO (bloquea el despliegue): cookie de sesion no segura (era
+        aviso; con el 2FA la cookie ES la llave del admin) · `SESSION_HTTP_ONLY`
+        apagado · `SESSION_DRIVER` cookie/array (no se podrian cerrar sesiones
+        a distancia, S.5) · `APP_URL` sin https · `APP_ENV=local` (registra
+        Telescope, abierto a cualquiera en local) · `MAIL_MAILER` log/array
+        (no saldrian los correos esenciales) · hay staff pero ningun
+        super_admin activo (nadie podria rescatar ni desbloquear).
+      · AVISO (no bloquea): Sentry sin DSN · LOG_LEVEL=debug ·
+        SESSION_DRIVER=file · APP_ENV distinto de production · staff sin 2FA
+        todavia · base sin staff (falta `eventos:instalar`).
+      Corrido contra el `.env` local: bloquea con 10 criticos, como debe.
 - [ ] S.7.2 Correr el check contra el `.env` real de produccion: debug apagado,
       secretos generados, HTTPS forzado, cookies seguras, Sentry vigilando
 
-## S.8 — Cierre — 0/3
+## S.8 — Cierre — 3/3 (HECHO 2026-09-29)
 
-- [ ] S.8.1 Tests: activacion, reto, codigos de recuperacion (uso unico),
-      reset por super_admin, guarda del ultimo super_admin, dispositivo de
-      confianza, cierre de sesiones
-- [ ] S.8.2 **QA vivo con Chrome** (patron de la sesion del Pulse 2026-07-20):
-      activar con un autenticador real, entrar con codigo, gastar un codigo de
-      recuperacion, resetear a otro usuario, cerrar una sesion remota
-- [ ] S.8.3 Documentar en el manual → `admin/staff-permisos.md`
-      (`ROADMAP-MANUAL.md` M5.6) cuando ese frente se retome
+- [x] S.8.1 Repaso de cobertura: los 7 puntos tienen test (activacion, reto,
+      codigos de un solo uso, reset por super_admin, guarda del ultimo
+      super_admin, equipo de confianza, cierre de sesiones). El repaso
+      encontro 3 casos de S.6 sin cubrir y se agregaron: los codigos de
+      recuperacion incorrectos cuentan para el bloqueo, una cuenta bloqueada
+      con el reto abierto vuelve al login, y el correo de bloqueo es esencial
+      con plantilla es/en. Total del frente: 133 tests en 9 archivos.
+- [x] S.8.2 QA vivo en Chrome de punta a punta (cuentas desechables,
+      borradas): activacion forzada con QR y clave + codigo real + los 8
+      codigos + Copiar (por el respaldo: en `.test` no hay
+      `navigator.clipboard`) + Continuar al admin · generar codigos nuevos ·
+      entrar con un codigo de recuperacion en minusculas y con espacio (aviso
+      "te quedan 7", sin casilla de confianza) · super_admin restablece el 2FA
+      desde la ficha (modal, aviso, bitacora, correo en Mailpit) · cerrar una
+      sesion remota (S.5). **1 bug cazado y corregido:** si el navegador
+      traia restos de otra cuenta (eliminada con la sesion abierta), la
+      huella de contraseña vieja hacia que `AuthenticateSession` expulsara a
+      la persona nueva en su primer clic despues de entrar. Fix en
+      `TwoFactorLogin::complete()` + test de regresion (falla sin el fix).
+      **Pendiente de Kamilo:** ver con los ojos los modales de Filament
+      (la pestaña de automatizacion no los pinta bien) con su cuenta real.
+- [x] S.8.3 Pagina del manual escrita:
+      `manual/src/content/docs/admin/staff-permisos.md` (roles + toda la
+      seguridad del staff, con procedencia). Grupo "Admin" agregado al
+      sidebar; el sitio compila.
 
+
+**QA de Kamilo con su cuenta real (2026-09-29): modales, restablecer y
+"Generar nuevos" verificados con los ojos. Dos ajustes pedidos y hechos:**
+- **Crear un miembro del staff vuelve a la lista** con el aviso (quedarse en
+  el formulario daba sensacion de error). `CreateUser::getRedirectUrl()` +
+  test.
+- **Activacion del 2FA v2** (lab aprobado:
+  `design/features/admin-2fa/lab-2fa-activacion-v2.html`). La v1 no era
+  responsive: 245 px de scroll en portatil 1366x768 y 286 px en celular.
+  Ahora: portatil/tablet en dos columnas (QR + 3 pasos de una linea), la
+  clave solo si se pide ("¿No puedes escanear?", 2 filas de 4 grupos);
+  celular con la clave primero + "Abrir en mi app" (enlace `otpauth://`) y
+  el QR a un toque; los 8 codigos en 2 filas de 4 en portatil; una sola
+  escala de espacios (4-8-12-16-24-32) tambien en el reto; fuente
+  monoespaciada propia (`--lum-fm`, JetBrains Mono: en Windows caia en la
+  del sistema). "Copiar clave" ahora tambien funciona en HTTP. Medido en la
+  pagina real (HTML pedido por curl con sesion aparte, para no tocar la
+  sesion de Kamilo): 0 px de scroll en portatil, tablet y celular, en los
+  dos pasos y en el reto.
 ---
 
 ## Fuera de alcance (decidido)

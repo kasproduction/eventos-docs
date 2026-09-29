@@ -58,9 +58,11 @@ el wizard. Con tests que lo prueben.
 
 **Al desplegar el 2FA del staff (runbook, decision D.3 de ROADMAP-SEGURIDAD-STAFF,
 2026-09-27) — el paquete que lo lleve hace esto, sin excepcion:**
-1. `php artisan migrate --force` (enums `staff_2fa_reset` y `staff_2fa_enabled`,
-   tablas `staff_security_events` y columnas `two_factor_*`) + `db:seed
-   --class=EmailTemplateSeeder` (plantillas es/en de los dos correos).
+1. `php artisan migrate --force` (enums `staff_2fa_reset`, `staff_2fa_enabled`
+   y `staff_account_locked`; tablas `staff_security_events`,
+   `trusted_devices` y `staff_sessions`; columnas `two_factor_*`, incluida
+   `two_factor_failed_attempts`) + `db:seed --class=EmailTemplateSeeder`
+   (plantillas es/en de los tres correos). Actualizado 2026-09-29 (S.4-S.6).
 2. **Vaciar TODAS las sesiones web**: `SESSION_DRIVER=redis` → `redis-cli -n
    <REDIS_DB de sesiones> --scan --pattern '<prefijo>*' | xargs redis-cli -n <db>
    del` (o `FLUSHDB` si la base de sesiones es exclusiva). Motivo:
@@ -72,6 +74,12 @@ el wizard. Con tests que lo prueben.
    staff → 401.
 4. Correr `php artisan security:check` y confirmar que el unico super_admin
    tiene forma de entrar (telefono a la mano o `eventos:restablecer-2fa`).
+   Desde 2026-09-29 (S.7.1) el comando BLOQUEA por: cookie de sesion sin
+   HTTPS, `APP_URL` sin https, `APP_ENV=local`, sesiones en cookie/array,
+   correo en log/array y staff sin ningun super_admin activo. **Esta corrida
+   contra el `.env` real es S.7.2, lo unico que le falta al frente (25/26).**
+5. El programador de tareas (`schedule:run`) tiene que estar activo: borra
+   los ingresos de mas de 90 dias (`staff-security:prune-logins`).
 
 **Compuerta B2:** el Nivel 1 se monta desde cero SOLO con el pipeline, pasa el
 humo en verde y se destruye sin dejar nada cobrando. Nadie toca una maquina a mano.

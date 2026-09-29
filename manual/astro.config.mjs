@@ -13,6 +13,7 @@ export default defineConfig({
       // (autogenerate sobre carpeta vacia rompe el build).
       sidebar: [
         { label: 'Módulos', autogenerate: { directory: 'modulos' } },
+        { label: 'Admin', autogenerate: { directory: 'admin' } },
       ],
       pagination: false,
     }),

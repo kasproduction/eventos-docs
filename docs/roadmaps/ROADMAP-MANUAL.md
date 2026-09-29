@@ -88,6 +88,10 @@
       offline), staff con la app (room check-in, asignar staff)
 - [ ] M5.6 `admin/staff-permisos.md` — Catalogo fijo 8 roles / 13 permisos,
       quien ve que en el admin, super_admin
+      **v1 escrita 2026-09-29** (cierre del 2FA del staff, S.8.3): roles del
+      staff + toda la seguridad (2FA, equipos de confianza, sesiones,
+      bloqueo, rescate). Falta para cerrar M5.6: "quien ve que" menu por menu
+      y el pase de tono.
 
 ## M6 — Operacion y sistema — 0/4
 

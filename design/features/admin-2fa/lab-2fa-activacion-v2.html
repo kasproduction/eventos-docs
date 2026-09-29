@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="es" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Activación 2FA v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* Tokens literales de eventos-backend/resources/css/filament/admin/theme.css */
+:root {
+  --lum-bg: #F6F8FA; --lum-bg-1: #FAFBFC; --lum-bg-2: #F0F2F5;
+  --lum-card: #FFFFFF; --lum-card-hi: #F6F8FA;
+  --lum-b: rgba(0,0,0,0.08); --lum-b-hi: rgba(0,0,0,0.13); --lum-b-st: rgba(0,0,0,0.18);
+  --lum-t: #131417; --lum-t2: #3A3B40; --lum-t3: #5C5D63; --lum-t4: #85868C; --lum-t5: #AEAFB3;
+  --lum-violet: #7C5FE0; --lum-violet-soft: rgba(124,95,224,0.08);
+  --lum-ink: #1A1B1E; --lum-ink-contrast: #FFFFFF;
+  --lum-danger: #C2413A; --lum-ok: #2F8F6B;
+  --lum-shadow-md: 0 2px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.08);
+  --lum-f: 'Urbanist', ui-sans-serif, system-ui, sans-serif;
+  --lum-fh: 'Plus Jakarta Sans', var(--lum-f);
+  --lum-fm: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+.dark {
+  --lum-bg: #0A0A0A; --lum-bg-1: #0E0E0E; --lum-bg-2: #141414;
+  --lum-card: rgba(255,255,255,0.03); --lum-card-hi: rgba(255,255,255,0.05);
+  --lum-b: rgba(255,255,255,0.06); --lum-b-hi: rgba(255,255,255,0.10); --lum-b-st: rgba(255,255,255,0.14);
+  --lum-t: #FFFFFF; --lum-t2: rgba(255,255,255,0.6); --lum-t3: rgba(255,255,255,0.45);
+  --lum-t4: rgba(255,255,255,0.35); --lum-t5: rgba(255,255,255,0.15);
+  --lum-violet: #A78BFA; --lum-violet-soft: rgba(167,139,250,0.08);
+  --lum-ink: #FFFFFF; --lum-ink-contrast: #101010;
+  --lum-danger: #F08A80; --lum-ok: #6FD3A8;
+  --lum-shadow-md: none;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font-family: var(--lum-f); background: #050505; color: var(--lum-t2); -webkit-font-smoothing: antialiased; }
+:root:not(.dark) body { background: #E4E7EB; }
+button { font-family: inherit; }
+[hidden] { display: none !important; }
+svg.i { width: 16px; height: 16px; flex: none; }
+
+.shell { display: grid; grid-template-columns: 1fr 300px; height: 100vh; }
+.stage { min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 12px; overflow: auto; }
+.stage-info { font: 600 12px var(--lum-fm); color: var(--lum-t3); display: flex; gap: 14px; align-items: center; }
+.stage-info b { color: var(--lum-t); }
+.flag { padding: 2px 8px; border-radius: 6px; font-weight: 600; }
+.flag.ok { color: var(--lum-ok); background: rgba(111,211,168,0.1); }
+.flag.bad { color: var(--lum-danger); background: rgba(240,138,128,0.1); }
+
+/* El "navegador": un contenedor con el tamaño real de la pantalla elegida */
+.frame { background: var(--lum-bg); border: 1px solid var(--lum-b-hi); border-radius: 10px; overflow-y: auto; overflow-x: hidden; container-type: inline-size; flex: none; position: relative; }
+.page { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+
+/* ═══════════ ACTUAL (copia de lo que hay hoy) ═══════════ */
+.v1 .card { width: 100%; max-width: 512px; background: var(--lum-card); border: 1px solid var(--lum-b-hi); border-radius: 16px; padding: 48px; }
+.dark .v1 .card { background: var(--lum-bg-1); }
+.v1 .brand { font: 500 11px var(--lum-f); letter-spacing: 0.16em; text-transform: uppercase; color: var(--lum-t3); text-align: center; margin-bottom: 16px; }
+.v1 h1 { font: 800 24px/1.3 var(--lum-fh); letter-spacing: -0.5px; color: var(--lum-t); text-align: center; margin: 0; }
+.v1 .sub { font-size: 14px; line-height: 1.5; color: var(--lum-t3); text-align: center; margin: 8px 0 24px; }
+.v1 .tag { font-size: 12px; font-weight: 600; color: var(--lum-t4); text-align: center; margin-bottom: 8px; }
+.v1 .steps { display: flex; flex-direction: column; gap: 20px; list-style: none; padding: 0; margin: 0; }
+.v1 .steps > li { display: grid; grid-template-columns: 24px 1fr; gap: 12px; font-size: 14px; line-height: 1.5; }
+.v1 .steps b { color: var(--lum-t); font-weight: 600; }
+.v1 .n { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--lum-b-st); display: grid; place-items: center; font: 700 12px var(--lum-f); color: var(--lum-t); }
+.v1 .qr { margin-top: 12px; width: 196px; height: 196px; padding: 12px; border-radius: 12px; background: #fff; }
+.v1 .secret { margin-top: 10px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.v1 .secret code { font: 600 13px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 1px; color: var(--lum-t); background: var(--lum-card-hi); border: 1px solid var(--lum-b); border-radius: 8px; padding: 8px 10px; word-break: break-all; }
+.v1 .form { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.v1 .code { height: 52px; border-radius: 8px; border: 1px solid var(--lum-b-st); background: transparent; color: var(--lum-t); font: 600 24px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 10px; text-align: center; padding-left: 22px; width: 100%; }
+.v1 .foot { margin-top: 20px; text-align: center; }
+.v1 .codes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.v1 .codes div { font: 600 15px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 1px; color: var(--lum-t); text-align: center; padding: 10px 0; border-radius: 8px; background: var(--lum-card-hi); border: 1px solid var(--lum-b); }
+
+/* ═══════════ PROPUESTA ═══════════
+   Escala de espacios unica: 4 · 8 · 12 · 16 · 24 · 32 */
+.v2 .card { width: 100%; max-width: 440px; background: var(--lum-card); border: 1px solid var(--lum-b-hi); border-radius: 16px; box-shadow: var(--lum-shadow-md); padding: 24px 20px; }
+.dark .v2 .card { background: var(--lum-bg-1); }
+.v2 .brand { font: 600 11px var(--lum-f); letter-spacing: 0.16em; text-transform: uppercase; color: var(--lum-t4); text-align: center; margin-bottom: 12px; }
+.v2 h1 { font: 800 22px/1.25 var(--lum-fh); letter-spacing: -0.4px; color: var(--lum-t); text-align: center; margin: 0; }
+.v2 .sub { font-size: 14px; line-height: 1.45; color: var(--lum-t3); text-align: center; margin: 4px 0 24px; }
+.v2 .body { display: grid; gap: 24px; }
+.v2 .steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
+.v2 .steps > li { display: grid; grid-template-columns: 22px 1fr; gap: 12px; align-items: start; }
+.v2 .n { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--lum-b-st); display: grid; place-items: center; font: 700 11.5px var(--lum-f); color: var(--lum-t); margin-top: 1px; }
+.v2 .st { font-size: 14.5px; font-weight: 600; line-height: 1.4; color: var(--lum-t); }
+.v2 .sm { font-size: 13px; line-height: 1.45; color: var(--lum-t4); margin-top: 2px; }
+.v2 .qr-col { display: grid; gap: 12px; justify-items: center; align-content: start; }
+.v2 .qr { width: 176px; height: 176px; padding: 10px; border-radius: 12px; background: #fff; }
+.v2 .qr svg, .v1 .qr svg { width: 100%; height: 100%; display: block; }
+.v2 .key { display: grid; grid-template-columns: repeat(4, auto); gap: 4px 12px; justify-content: center; font: 600 13px/1 var(--lum-fm); color: var(--lum-t); background: var(--lum-card-hi); border: 1px solid var(--lum-b); border-radius: 10px; padding: 12px 16px; }
+.v2 .key-row { display: grid; gap: 8px; justify-items: center; }
+.v2 .form { display: grid; gap: 8px; margin-top: 8px; }
+.v2 .code { height: 48px; border-radius: 8px; border: 1px solid var(--lum-b-st); background: transparent; color: var(--lum-t); font: 600 22px var(--lum-fm); letter-spacing: 8px; text-align: center; padding: 0 0 0 8px; width: 100%; outline: none; }
+.v2 .code:focus { border-color: var(--lum-t3); box-shadow: 0 0 0 3px var(--lum-violet-soft); }
+.v2 .code::placeholder, .v1 .code::placeholder { color: var(--lum-t5); }
+.v2 .foot { margin-top: 24px; text-align: center; }
+.v2 .codes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.v2 .codes div { font: 600 14px/1 var(--lum-fm); color: var(--lum-t); text-align: center; padding: 11px 0; border-radius: 8px; background: var(--lum-card-hi); border: 1px solid var(--lum-b); }
+.v2 .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.v2 .stack { display: grid; gap: 16px; }
+.v2 .only-wide { display: none !important; }
+
+/* Portatil y tablet: dos columnas, todo a la vista */
+@container (min-width: 720px) {
+  .v2 .card.wide { max-width: 720px; padding: 32px; }
+  .v2 .body { grid-template-columns: 200px 1fr; gap: 32px; align-items: start; }
+  .v2 .only-wide { display: grid !important; }
+  .v2 .only-narrow { display: none !important; }
+  .v2 .codes { grid-template-columns: repeat(4, 1fr); }
+  .v2 .acts { grid-template-columns: auto auto; justify-content: start; }
+}
+
+/* Comunes */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 8px; border: 0; font: 600 14px var(--lum-f); cursor: pointer; }
+.btn.ink { background: var(--lum-ink); color: var(--lum-ink-contrast); width: 100%; }
+.btn.ink:disabled { opacity: 0.35; }
+.btn.ghost { background: var(--lum-card-hi); color: var(--lum-t); border: 1px solid var(--lum-b-hi); }
+.btn.sm { height: 32px; padding: 0 12px; font-size: 13px; }
+.link { background: none; border: 0; padding: 0; color: var(--lum-t2); font: 600 13px var(--lum-f); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--lum-t5); }
+.link:hover { color: var(--lum-t); }
+.check { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; line-height: 1.4; color: var(--lum-t2); cursor: pointer; }
+.check input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--lum-t); }
+.trust small { display: block; font-size: 12.5px; color: var(--lum-t4); margin-top: 2px; }
+
+/* Panel del lab */
+.lab { border-left: 1px solid rgba(255,255,255,0.1); background: #0E0E0E; color: rgba(255,255,255,0.6); padding: 20px 18px; display: flex; flex-direction: column; gap: 18px; overflow: auto; }
+.lab h2 { font: 800 15px var(--lum-fh); color: #fff; margin: 0; }
+.lab p { font-size: 12.5px; line-height: 1.5; margin: 4px 0 0; color: rgba(255,255,255,0.45); }
+.lab-k { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 8px; }
+.seg { display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; }
+.seg.h { flex-direction: row; }
+.seg button { text-align: left; min-height: 34px; padding: 6px 10px; border: 0; border-top: 1px solid rgba(255,255,255,0.06); background: transparent; color: rgba(255,255,255,0.45); font: 600 12.5px var(--lum-f); cursor: pointer; }
+.seg.h button { flex: 1; text-align: center; border-top: 0; }
+.seg button:first-child { border-top: 0; }
+.seg button.on { background: rgba(255,255,255,0.06); color: #fff; }
+.notes { font-size: 12.5px; line-height: 1.55; padding-left: 16px; margin: 0; color: rgba(255,255,255,0.45); }
+.notes li { margin-bottom: 6px; }
+.notes b { color: rgba(255,255,255,0.8); }
+
+@media (max-width: 900px) { .shell { grid-template-columns: 1fr; height: auto; } .lab { border-left: 0; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+  <symbol id="qr" viewBox="0 0 29 29" shape-rendering="crispEdges"><path fill="#000" d="M0 0h7v7H0zM1 1v5h5V1zM2 2h3v3H2zM22 0h7v7h-7zM23 1v5h5V1zM24 2h3v3h-3zM0 22h7v7H0zM1 23v5h5v-5zM2 24h3v3H2zM9 0h2v1H9zM12 0h1v3h-1zM14 1h3v1h-3zM18 0h2v2h-2zM9 2h2v2H9zM14 3h2v2h-2zM17 3h3v1h-3zM10 5h3v1h-3zM15 6h4v1h-4zM8 6h1v3H8zM0 9h3v1H0zM4 8h2v2H4zM7 10h3v1H7zM11 8h2v3h-2zM14 9h1v3h-1zM16 8h3v2h-3zM20 9h2v1h-2zM23 8h1v3h-1zM25 9h4v1h-4zM1 11h2v2H1zM4 12h3v1H4zM8 12h2v2H8zM12 12h1v2h-1zM15 13h3v1h-3zM19 11h2v3h-2zM22 12h3v1h-3zM26 11h2v2h-2zM0 14h2v1H0zM3 14h1v3H3zM5 15h3v1H5zM9 15h2v1H9zM12 15h3v2h-3zM16 15h2v2h-2zM20 15h1v2h-1zM22 14h2v3h-2zM25 14h1v2h-1zM27 14h2v3h-2zM0 16h2v2H0zM5 17h2v2H5zM8 17h3v1H8zM14 18h2v2h-2zM17 18h4v1h-4zM24 18h3v1h-3zM1 19h3v2H1zM9 19h2v3H9zM12 20h1v3h-1zM18 20h2v1h-2zM21 20h3v2h-3zM26 20h3v1h-3zM8 23h3v1H8zM14 22h3v1h-3zM17 23h2v3h-2zM20 23h1v2h-1zM23 23h3v1h-3zM27 22h2v3h-2zM9 25h2v2H9zM13 24h2v3h-2zM21 26h3v1h-3zM25 25h2v2h-2zM8 27h1v2H8zM11 28h3v1h-3zM16 27h1v2h-1zM19 27h2v2h-2zM23 28h4v1h-4zM28 27h1v2h-1z"/></symbol>
+</svg>
+
+<div class="shell">
+  <main class="stage">
+    <div class="stage-info"><span id="vp"></span><span class="flag" id="flag"></span></div>
+    <div class="frame" id="frame"><div class="page" id="page"></div></div>
+  </main>
+
+  <aside class="lab">
+    <div>
+      <h2>Lab: activación del 2FA, versión 2</h2>
+      <p>La pantalla de hoy contra la propuesta, en el tamaño real de cada pantalla. Arriba dice si hay que hacer scroll.</p>
+    </div>
+    <div><div class="lab-k">Versión</div><div class="seg h" id="s-ver"><button data-k="v1">Actual</button><button data-k="v2" class="on">Propuesta</button></div></div>
+    <div><div class="lab-k">Pantalla</div><div class="seg" id="s-vp">
+      <button data-w="1366" data-h="650" class="on">Portátil 1366 × 768</button>
+      <button data-w="820" data-h="1060">Tablet 820 × 1180</button>
+      <button data-w="390" data-h="760">Celular 390 × 844</button>
+    </div></div>
+    <div><div class="lab-k">Paso</div><div class="seg" id="s-step">
+      <button data-k="scan" class="on">1. Activar</button>
+      <button data-k="codes">2. Guardar los códigos</button>
+      <button data-k="reto">Reto de cada ingreso</button>
+    </div></div>
+    <div><div class="lab-k">Tema</div><div class="seg h" id="s-theme"><button data-k="dark" class="on">Noir</button><button data-k="light">Lux</button></div></div>
+    <div>
+      <div class="lab-k">Qué cambia</div>
+      <ul class="notes">
+        <li><b>Sin scroll en portátil.</b> El QR va a la izquierda y los 3 pasos a la derecha. Hoy la tarjeta mide unos 850 px de alto.</li>
+        <li><b>Menos texto.</b> Cada paso es una línea. Los nombres de las apps pasan a texto secundario.</li>
+        <li><b>La clave se pide, no se impone.</b> "¿No puedes escanear?" la muestra, en 2 filas de 4 grupos alineados.</li>
+        <li><b>En celular manda la clave.</b> Desde el mismo teléfono no puedes escanear tu propia pantalla: primero "Abrir en mi app" y "Copiar clave"; el QR queda a un toque.</li>
+        <li><b>Una sola escala de espacios</b> (4, 8, 12, 16, 24, 32) en las tres pantallas.</li>
+        <li><b>Monoespaciada de verdad.</b> Hoy en Windows cae en la fuente por defecto del sistema. Propuesta: JetBrains Mono en clave, códigos y campo.</li>
+        <li><b>Los 8 códigos en 2 filas</b> de 4 en portátil.</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const state = { ver: 'v2', w: 1366, h: 650, step: 'scan', showKey: false, showQr: false };
+const KEY = ['IXZ5','KGF7','Z6NP','L6W8','H64B','TOGG','ZI56','25QH'];
+const CODES = ['QK7NH-JUKE9','9P3UC-GY72G','PJJHJ-TC66A','Z53JS-KWMDA','B7RQQ-SPVSC','435JS-BNTJH','FFDF7-JY7NZ','FSDSY-5T2BW'];
+const qr = '<svg><use href="#qr"/></svg>';
+const ico = (n) => `<svg class="i"><use href="#i-${n}"/></svg>`;
+
+const V1 = {
+  scan: () => `
+    <div class="card"><div class="brand">EventOS Admin</div>
+      <h1>Activa tu segundo factor</h1>
+      <p class="sub">Es obligatorio para todo el equipo del admin. Te toma un minuto y solo se hace una vez.</p>
+      <div class="tag">Paso 1 de 2</div>
+      <ol class="steps">
+        <li><span class="n">1</span><div>Abre tu app autenticadora (<b>Google Authenticator, Microsoft Authenticator, Authy o 1Password</b>) y escanea este código.<div class="qr">${qr}</div></div></li>
+        <li><span class="n">2</span><div>¿No puedes escanear? Agrega la cuenta a mano con esta clave:<div class="secret"><code>${KEY.join(' ')}</code><button class="btn ghost sm">${ico('copy')}Copiar</button></div></div></li>
+        <li><span class="n">3</span><div>Escribe el código de 6 dígitos que aparece en la app.<div class="form"><input class="code" placeholder="000000" maxlength="6"><button class="btn ink">Activar</button></div></div></li>
+      </ol>
+      <div class="foot"><button class="link">Volver al inicio de sesión</button></div>
+    </div>`,
+  codes: () => `
+    <div class="card"><div class="brand">EventOS Admin</div>
+      <h1>Guarda tus códigos de recuperación</h1>
+      <p class="sub">Si pierdes el teléfono, cada código te deja entrar una sola vez. No los vamos a volver a mostrar.</p>
+      <div class="tag">Paso 2 de 2</div>
+      <div class="codes">${CODES.map(c => `<div>${c}</div>`).join('')}</div>
+      <div style="display:flex;gap:8px;margin-bottom:20px"><button class="btn ghost" style="flex:1">${ico('copy')}Copiar</button><button class="btn ghost" style="flex:1">${ico('dl')}Descargar</button></div>
+      <label class="check" style="margin-bottom:16px"><input type="checkbox"><span>Los guardé en un lugar seguro (gestor de contraseñas o papel, no en este computador)</span></label>
+      <button class="btn ink" disabled>Continuar al admin</button>
+    </div>`,
+  reto: () => `
+    <div class="card"><div class="brand">EventOS Admin</div>
+      <h1>Verificación en dos pasos</h1>
+      <p class="sub">Abre tu app autenticadora y escribe el código de EventOS.</p>
+      <div class="form">
+        <label class="check trust"><input type="checkbox"><span>Confiar en este equipo por 30 días<small>No te pediremos el código aquí. No la marques en un computador prestado o compartido.</small></span></label>
+        <input class="code" placeholder="000000" maxlength="6"><button class="btn ink">Verificar</button>
+      </div>
+      <div class="foot" style="display:grid;gap:12px;justify-items:center;font-size:13px;color:var(--lum-t4)"><button class="link">Usar un código de recuperación</button><span>¿Perdiste el teléfono y los códigos? Pídele a un super_admin que restablezca tu segundo factor.</span><button class="link">Volver al inicio de sesión</button></div>
+    </div>`,
+};
+
+const keyBlock = () => `<div class="key-row"><div class="key">${KEY.map(k => `<span>${k}</span>`).join('')}</div><button class="btn ghost sm" data-copy>${ico('copy')}<span>Copiar clave</span></button></div>`;
+
+const V2 = {
+  scan: () => `
+    <div class="card wide"><div class="brand">EventOS Admin</div>
+      <h1>Activa tu segundo factor</h1>
+      <p class="sub">Paso 1 de 2. Es obligatorio para todo el equipo y se hace una sola vez.</p>
+      <div class="body">
+        <div class="qr-col only-wide">
+          <div class="qr">${qr}</div>
+          ${state.showKey ? keyBlock() : '<button class="link" data-t="showKey">¿No puedes escanear?</button>'}
+        </div>
+        <ol class="steps">
+          <li><span class="n">1</span><div><div class="st">Abre tu app autenticadora</div><div class="sm">Google Authenticator, Microsoft Authenticator, Authy o 1Password.</div></div></li>
+          <li class="only-wide"><span class="n">2</span><div><div class="st">Escanea el código QR</div></div></li>
+          <li class="only-narrow"><span class="n">2</span><div class="stack" style="gap:12px"><div><div class="st">Agrega la cuenta de EventOS</div><div class="sm">Si la app está en este teléfono, ábrela desde aquí o copia la clave.</div></div>
+            <button class="btn ghost">${ico('open')}Abrir en mi app</button>
+            ${keyBlock()}
+            ${state.showQr ? `<div class="qr" style="justify-self:center">${qr}</div>` : '<button class="link" data-t="showQr" style="justify-self:center">Mostrar el código QR</button>'}
+          </div></li>
+          <li><span class="n">3</span><div><div class="st">Escribe el código de 6 dígitos</div><div class="form"><input class="code" placeholder="000000" maxlength="6" inputmode="numeric"><button class="btn ink">Activar</button></div></div></li>
+        </ol>
+      </div>
+      <div class="foot"><button class="link">Volver al inicio de sesión</button></div>
+    </div>`,
+  codes: () => `
+    <div class="card wide"><div class="brand">EventOS Admin</div>
+      <h1>Guarda tus códigos de recuperación</h1>
+      <p class="sub">Paso 2 de 2. Cada código te deja entrar una sola vez si pierdes el teléfono. No los vamos a volver a mostrar.</p>
+      <div class="stack">
+        <div class="codes">${CODES.map(c => `<div>${c}</div>`).join('')}</div>
+        <div class="acts"><button class="btn ghost" data-copy>${ico('copy')}<span>Copiar</span></button><button class="btn ghost">${ico('dl')}Descargar</button></div>
+        <label class="check"><input type="checkbox" id="saved"><span>Los guardé en un lugar seguro (gestor de contraseñas o papel, no en este computador)</span></label>
+        <button class="btn ink" id="go" disabled>Continuar al admin</button>
+      </div>
+    </div>`,
+  reto: () => `
+    <div class="card"><div class="brand">EventOS Admin</div>
+      <h1>Verificación en dos pasos</h1>
+      <p class="sub">Abre tu app autenticadora y escribe el código de EventOS.</p>
+      <div class="stack">
+        <label class="check trust"><input type="checkbox"><span>Confiar en este equipo por 30 días<small>No te pediremos el código aquí. No la marques en un computador prestado o compartido.</small></span></label>
+        <div class="form" style="margin-top:0"><input class="code" placeholder="000000" maxlength="6" inputmode="numeric"><button class="btn ink">Verificar</button></div>
+      </div>
+      <div class="foot" style="display:grid;gap:12px;justify-items:center;font-size:13px;line-height:1.5;color:var(--lum-t4)"><button class="link">Usar un código de recuperación</button><span>¿Perdiste el teléfono y los códigos? Pídele a un super_admin que restablezca tu segundo factor.</span><button class="link">Volver al inicio de sesión</button></div>
+    </div>`,
+};
+
+function render() {
+  const page = $('#page');
+  page.className = 'page ' + state.ver;
+  page.innerHTML = (state.ver === 'v1' ? V1 : V2)[state.step]();
+
+  const frame = $('#frame');
+  frame.style.width = state.w + 'px';
+  frame.style.height = state.h + 'px';
+  const avail = $('.stage').clientWidth - 40;
+  frame.style.zoom = Math.min(1, avail / state.w);
+  frame.scrollTop = 0;
+
+  requestAnimationFrame(() => {
+    const extra = frame.scrollHeight - frame.clientHeight;
+    $('#vp').innerHTML = `<b>${state.w} px</b> de ancho, <b>${state.h} px</b> visibles`;
+    const f = $('#flag');
+    f.className = 'flag ' + (extra > 2 ? 'bad' : 'ok');
+    f.textContent = extra > 2 ? `Hay que bajar ${extra} px` : 'Todo a la vista, sin scroll';
+  });
+}
+
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-t]');
+  if (t) { state[t.dataset.t] = true; render(); return; }
+  const c = e.target.closest('[data-copy]');
+  if (c) { const s = c.querySelector('span'); const old = s.textContent; s.textContent = 'Copiado'; setTimeout(() => s.textContent = old, 1500); }
+});
+document.addEventListener('change', (e) => { if (e.target.id === 'saved') $('#go').disabled = !e.target.checked; });
+
+function seg(id, fn) {
+  document.querySelectorAll(`#${id} button`).forEach(b => b.onclick = () => {
+    document.querySelectorAll(`#${id} button`).forEach(x => x.classList.toggle('on', x === b));
+    fn(b.dataset); state.showKey = false; state.showQr = false; render();
+  });
+}
+seg('s-ver', d => state.ver = d.k);
+seg('s-vp', d => { state.w = +d.w; state.h = +d.h; });
+seg('s-step', d => state.step = d.k);
+seg('s-theme', d => document.documentElement.classList.toggle('dark', d.k === 'dark'));
+addEventListener('resize', render);
+render();
+</script>
+</body>
+</html>

@@ -101,6 +101,35 @@ h1 { font-family: var(--lum-fh); font-weight: 800; font-size: 26px; letter-spaci
 .lnk { background: none; border: 0; padding: 6px 4px; font: 600 13.5px var(--lum-f); color: var(--lum-t2); cursor: pointer; }
 .lnk:hover { color: var(--lum-t); }
 .lnk.red { color: var(--lum-danger); }
+.lnk.inl { padding: 0; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--lum-t5); }
+.lab-new { outline: 1px dashed var(--lum-violet); outline-offset: 4px; }
+/* S.6 */
+.act .ico svg { width: 15px; height: 15px; }
+.act-ok .ico { color: var(--lum-ok); }
+.act-bad .ico { color: var(--lum-warn); background: var(--lum-warn-soft); }
+.act-bad .rx-t { color: var(--lum-warn); }
+.act-lock .ico { color: var(--lum-danger); background: var(--lum-danger-soft); }
+.act-lock .rx-t { color: var(--lum-danger); }
+.act-w { font-size: 12.5px; color: var(--lum-t4); white-space: nowrap; }
+.act .rowx, .rowx.act { padding-top: 12px; padding-bottom: 12px; }
+.act-more { padding: 4px 20px 14px; border-top: 1px solid var(--lum-b); text-align: center; }
+.edit-h { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.edit-h h1 { margin: 0; }
+.edit-act { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.banner { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 12px; background: var(--lum-danger-soft); border: 1px solid color-mix(in srgb, var(--lum-danger) 30%, transparent); color: var(--lum-t2); font-size: 13.5px; line-height: 1.5; margin-bottom: 16px; }
+.banner svg { color: var(--lum-danger); margin-top: 2px; }
+.banner b { display: block; color: var(--lum-danger); margin-bottom: 2px; }
+.card.stub { opacity: 0.55; }
+.login-card { max-width: 440px; margin: 20px auto 0; background: var(--lum-card); border: 1px solid var(--lum-b-hi); border-radius: 16px; padding: 32px; }
+.dark .login-card { background: var(--lum-bg-1); }
+.login-brand { font: 700 11px var(--lum-f); letter-spacing: 1.4px; text-transform: uppercase; color: var(--lum-t4); text-align: center; margin-bottom: 10px; }
+.login-card h1 { font-size: 24px; margin-bottom: 22px; }
+.login-card .field { margin-bottom: 14px; }
+.login-card label { display: block; font-size: 13.5px; font-weight: 600; color: var(--lum-t); margin-bottom: 6px; }
+.fake-in { height: 38px; border-radius: 8px; border: 1px solid var(--lum-b-st); padding: 0 12px; display: flex; align-items: center; font-size: 14px; color: var(--lum-t2); }
+.fake-in.bad { border-color: var(--lum-danger); }
+.login-err { font-size: 13px; line-height: 1.5; color: var(--lum-danger); margin: -4px 0 16px; }
+.login-note { max-width: 440px; margin: 16px auto 0; font-size: 12.5px; line-height: 1.55; color: var(--lum-t4); text-align: center; }
 .empty { padding: 8px 20px 22px; font-size: 13.5px; line-height: 1.55; color: var(--lum-t4); }
 
 /* Modal (Filament) */
@@ -227,6 +256,16 @@ h1 { font-family: var(--lum-fh); font-weight: 800; font-size: 26px; letter-spaci
             </div>
           </section>
 
+          <!-- S.5 (aprobado 2026-09-29): antes que equipos, porque es lo urgente cuando perdiste el portatil -->
+          <section class="card">
+            <div class="card-h">
+              <h2>Sesiones abiertas</h2>
+              <button class="lnk red" id="s-others">Cerrar las demás</button>
+            </div>
+            <p class="card-sub">Donde tienes el admin abierto ahora. Si no reconoces una, ciérrala y cambia tu contraseña.</p>
+            <div id="sess"></div>
+          </section>
+
           <section class="card">
             <div class="card-h">
               <h2>Equipos de confianza</h2>
@@ -235,6 +274,52 @@ h1 { font-family: var(--lum-fh); font-weight: 800; font-size: 26px; letter-spaci
             <p class="card-sub">En estos equipos no te pedimos el código durante 30 días. Quita los que ya no uses o no reconozcas.</p>
             <div id="devs"></div>
           </section>
+
+          <!-- S.6 (propuesta 2026-09-29): accesos + cambios de seguridad en una sola linea de tiempo -->
+          <section class="card">
+            <div class="card-h"><h2>Actividad reciente</h2></div>
+            <p class="card-sub">Entradas a tu cuenta y cambios de seguridad de los últimos 90 días. Si ves algo que no hiciste, cambia tu contraseña.</p>
+            <div id="act"></div>
+            <div class="act-more"><button class="lnk" id="act-more">Mostrar más</button></div>
+          </section>
+        </div>
+
+        <!-- S.6: la ficha del staff vista por un super_admin -->
+        <div class="page" id="v-staff" hidden>
+          <div class="crumb">Staff y permisos</div>
+          <div class="edit-h">
+            <h1>Beto Perdido</h1>
+            <div class="edit-act">
+              <button class="btn ghost" id="unlock">Desbloquear</button>
+              <button class="btn ghost">Restablecer segundo factor</button>
+              <button class="lnk red">Eliminar</button>
+              <button class="btn ink">Guardar</button>
+            </div>
+          </div>
+          <div class="banner" id="lock-banner">
+            <svg class="i"><use href="#i-lock"/></svg>
+            <div><b>Cuenta bloqueada hasta las 3:42 p. m.</b>5 códigos de verificación incorrectos seguidos: alguien tiene su contraseña. Le avisamos por correo. Desbloquéala solo si hablaste con Beto; lo más seguro es que además cambie su contraseña.</div>
+          </div>
+          <section class="card stub"><div class="card-h"><h2>La persona</h2></div><p class="card-sub">Nombre, correo, contraseña, teléfono… (sin cambios)</p></section>
+          <section class="card stub"><div class="card-h"><h2>Qué puede hacer</h2></div><p class="card-sub">Roles y "Cuenta activa" (sin cambios)</p></section>
+          <section class="card">
+            <div class="card-h"><h2>Actividad de acceso</h2></div>
+            <p class="card-sub">Lo mismo que Beto ve en "Seguridad de tu cuenta".</p>
+            <div id="act-staff"></div>
+          </section>
+        </div>
+
+        <!-- S.6: el login con la cuenta bloqueada -->
+        <div class="page" id="v-login" hidden>
+          <div class="login-card">
+            <div class="login-brand">EventOS Admin</div>
+            <h1 style="text-align:center">Entra a tu cuenta</h1>
+            <div class="field"><label>Correo electrónico</label><div class="fake-in">beto@tuevento.co</div></div>
+            <div class="field"><label>Contraseña</label><div class="fake-in bad">••••••••••</div></div>
+            <p class="login-err">Tu cuenta está bloqueada por intentos fallidos. Intenta de nuevo en 27 minutos o pídele a un super_admin que la desbloquee.</p>
+            <button class="btn ink" style="width:100%" disabled>Entrar</button>
+          </div>
+          <p class="login-note">Antes del bloqueo, cada contraseña incorrecta muestra el mismo mensaje genérico de hoy ("Estas credenciales no coinciden…"): no se cuentan intentos en pantalla, para no ayudar a quien adivina.</p>
         </div>
       </div>
     </div>
@@ -243,17 +328,17 @@ h1 { font-family: var(--lum-fh); font-weight: 800; font-size: 26px; letter-spaci
   <aside class="lab">
     <div>
       <h2>Lab: Seguridad de tu cuenta</h2>
-      <p>S.4.3 + S.1.3. Todo es clicable: el avatar, Quitar, Quitar todos y Generar nuevos. En el modal el código correcto es cualquiera menos 000000.</p>
+      <p>S.4.3 + S.1.3 + S.5 (aprobados e implementados) + S.6 Registro de accesos y bloqueo (aprobado e implementado 2026-09-29). Todo es clicable: el avatar, Cerrar, Cerrar las demás, Quitar y Generar nuevos. En el modal el código correcto es cualquiera menos 000000.</p>
     </div>
     <div class="lab-sec">
       <div class="lab-k">Pantalla</div>
-      <div class="seg h" id="s-view"><button data-v="home">Escritorio</button><button data-v="seg" class="on">La página</button></div>
+      <div class="seg" id="s-view"><button data-v="home">Escritorio</button><button data-v="seg" class="on">Seguridad de tu cuenta</button><button data-v="staff">S.6 Editar staff (super_admin)</button><button data-v="login">S.6 Login bloqueado</button></div>
     </div>
     <div class="lab-sec">
       <div class="lab-k">Estado de la cuenta</div>
       <div class="seg" id="s-state">
-        <button data-s="normal" class="on">Normal: 2 equipos, 6 códigos</button>
-        <button data-s="empty">Sin equipos de confianza</button>
+        <button data-s="normal" class="on">Normal: 3 sesiones, 2 equipos, 6 códigos</button>
+        <button data-s="empty">Solo esta sesión, sin equipos</button>
         <button data-s="low">Le queda 1 código</button>
       </div>
     </div>
@@ -271,7 +356,12 @@ h1 { font-family: var(--lum-fh); font-weight: 800; font-size: 26px; letter-spaci
         <li>Se llega desde el avatar, no desde el sidebar: es de la persona, no del evento.</li>
         <li>Quitar un equipo es instantáneo y sin modal: lo peor que pasa es que te vuelve a pedir el código.</li>
         <li>Generar códigos nuevos pide el código de la app (sudo mode de GitHub): una sesión abierta ajena no puede llevarse tus códigos.</li>
-        <li>Sin secciones vacías ni "próximamente": Sesiones abiertas (S.5) y Actividad (S.6) se suman aquí cuando existan.</li>
+        <li>Sin secciones vacías ni "próximamente": Actividad (S.6) se suma aquí cuando exista.</li>
+        <li><b>S.6 (propuesta):</b> una sola línea de tiempo con entradas (bien, contraseña mala, código malo) y cambios de seguridad, como "Actividad de seguridad reciente" de Google. Lo fallido en ámbar, los bloqueos en rojo. 10 por defecto + "Mostrar más". Se guardan 90 días.</li>
+        <li><b>S.6 bloqueo:</b> 5 contraseñas incorrectas seguidas = cuenta bloqueada 30 min (el mismo motor y las mismas columnas que ya usa la API). Además: 5 CÓDIGOS incorrectos seguidos también bloquean y mandan correo, porque significa que alguien ya tiene tu contraseña.</li>
+        <li><b>S.6 rescate:</b> se desbloquea sola a los 30 min, o un super_admin con "Desbloquear" en Editar (solo aparece si está bloqueada), con el porqué en un aviso rojo arriba.</li>
+        <li><b>S.5:</b> Sesiones va antes que Equipos: es lo urgente si perdiste el portátil. Cerrar es instantáneo (el otro equipo cae al login en su siguiente clic). "Esta sesión" no tiene Cerrar: para eso está Salir.</li>
+        <li><b>S.5:</b> Cerrar una sesión NO quita la confianza del equipo (como Google). Si ese equipo es de confianza, la fila lo dice y ofrece quitarla también.</li>
       </ul>
     </div>
   </aside>
@@ -308,13 +398,18 @@ h1 { font-family: var(--lum-fh); font-weight: 800; font-size: 26px; letter-spaci
 
 <script>
 const $ = (s) => document.querySelector(s);
+const SESS = [
+  { id: 's1', icon: 'monitor', name: 'Chrome en Windows', current: true, meta: 'Activa ahora. IP 190.25.14.8.' },
+  { id: 's2', icon: 'phone', name: 'Safari en iPhone', trustedId: 2, meta: 'Última actividad hace 3 horas. IP 181.52.201.4.' },
+  { id: 's3', icon: 'monitor', name: 'Firefox en Linux', meta: 'Última actividad hace 2 días. IP 201.244.3.19.' },
+];
 const STATES = {
-  normal: { codes: 6, devs: [
+  normal: { codes: 6, sess: SESS, devs: [
     { id: 1, icon: 'monitor', name: 'Chrome en Windows', current: true, meta: 'Confiaste en él el 29 de septiembre. Último uso hace 2 horas, vence el 29 de octubre.' },
     { id: 2, icon: 'phone', name: 'Safari en iPhone', current: false, meta: 'Confiaste en él el 12 de septiembre. Último uso hace 3 días, vence el 12 de octubre.' },
   ]},
-  empty: { codes: 6, devs: [] },
-  low: { codes: 1, devs: [
+  empty: { codes: 6, sess: [SESS[0]], devs: [] },
+  low: { codes: 1, sess: SESS.slice(0, 1), devs: [
     { id: 1, icon: 'monitor', name: 'Chrome en Windows', current: true, meta: 'Confiaste en él el 29 de septiembre. Último uso hace 2 horas, vence el 29 de octubre.' },
   ]},
 };
@@ -355,18 +450,110 @@ function renderDevs() {
       <button class="lnk" data-rm="${d.id}">Quitar</button>
     </div>`).join('');
 }
+function renderSess() {
+  const box = $('#sess');
+  $('#s-others').hidden = st.sess.filter(s => !s.current).length < 1;
+  box.innerHTML = st.sess.map(s => {
+    const trusted = s.trustedId && st.devs.some(d => d.id === s.trustedId);
+    return `
+    <div class="rowx" data-sid="${s.id}">
+      <div class="ico"><svg class="i"><use href="#i-${s.icon}"/></svg></div>
+      <div class="rx-body">
+        <div class="rx-t">${s.name}${s.current ? '<span class="tag">Esta sesión</span>' : ''}</div>
+        <div class="rx-m">${s.meta}</div>
+        ${trusted ? `<div class="rx-m">También es un equipo de confianza: con la contraseña vuelve a entrar sin código. <button class="lnk inl" data-untrust="${s.trustedId}">Quitar la confianza</button></div>` : ''}
+      </div>
+      ${s.current ? '' : `<button class="lnk" data-close-s="${s.id}">Cerrar</button>`}
+    </div>`;
+  }).join('');
+}
 function load(name) {
   st = JSON.parse(JSON.stringify(STATES[name]));
-  renderCodes(); renderDevs();
+  renderCodes(); renderSess(); renderDevs();
 }
+
+$('#sess').addEventListener('click', (e) => {
+  const sid = e.target.dataset.closeS;
+  const un = Number(e.target.dataset.untrust);
+  if (sid) {
+    const s = st.sess.find(x => x.id === sid);
+    e.target.closest('.rowx').classList.add('out');
+    setTimeout(() => {
+      st.sess = st.sess.filter(x => x.id !== sid); renderSess();
+      toast('Sesión cerrada', `En ${s.name} volverá al inicio de sesión en su siguiente clic.`);
+      log('session_closed', `{"label":"${s.name}"}`);
+    }, 230);
+  }
+  if (un) {
+    const d = st.devs.find(x => x.id === un);
+    st.devs = st.devs.filter(x => x.id !== un); renderSess(); renderDevs();
+    toast('Listo', `La próxima vez te pediremos el código en ${d.name}.`);
+    log('trusted_devices_revoked', `{"reason":"self","count":1,"label":"${d.name}"}`);
+  }
+});
+$('#s-others').onclick = () => {
+  const n = st.sess.filter(s => !s.current).length;
+  document.querySelectorAll('#sess .rowx').forEach(r => { if (!r.querySelector('.tag')) r.classList.add('out'); });
+  setTimeout(() => {
+    st.sess = st.sess.filter(s => s.current); renderSess();
+    toast('Listo', `Cerraste ${n} ${n === 1 ? 'sesión' : 'sesiones'}. Solo queda abierta esta.`);
+    log('sessions_closed', `{"reason":"others","count":${n}}`);
+  }, 230);
+};
 
 // Avatar
 $('#avatar').onclick = (e) => { e.stopPropagation(); const m = $('#menu'); m.hidden = !m.hidden; $('#avatar').setAttribute('aria-expanded', String(!m.hidden)); };
 document.addEventListener('click', () => { $('#menu').hidden = true; });
 document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => view(b.dataset.go));
 
+const ACT = [
+  { k: 'ok', t: 'Entraste', m: 'Chrome en Windows, IP 190.25.14.8', w: 'hace un momento' },
+  { k: 'sec', t: 'Quitaste un equipo de confianza', m: 'Safari en iPhone', w: 'hace 20 minutos' },
+  { k: 'bad', t: 'Código de verificación incorrecto', m: 'Firefox en Linux, IP 201.244.3.19', w: 'ayer, 11:04 p. m.' },
+  { k: 'bad', t: 'Contraseña incorrecta', m: 'Firefox en Linux, IP 201.244.3.19', w: 'ayer, 11:02 p. m.' },
+  { k: 'ok', t: 'Entraste sin código', m: 'Safari en iPhone (equipo de confianza), IP 181.52.201.4', w: 'ayer, 8:15 a. m.' },
+  { k: 'sec', t: 'Generaste códigos de recuperación nuevos', m: 'Chrome en Windows', w: '27 sep, 4:30 p. m.' },
+  { k: 'ok', t: 'Entraste', m: 'Chrome en Windows, IP 190.25.14.8', w: '27 sep, 9:12 a. m.' },
+  { k: 'sec', t: 'Activaste la verificación en dos pasos', m: 'Chrome en Windows', w: '26 sep, 6:40 p. m.' },
+];
+const ACT_MORE = [
+  { k: 'ok', t: 'Entraste', m: 'Chrome en Windows, IP 190.25.14.8', w: '25 sep, 10:01 a. m.' },
+  { k: 'lock', t: 'Cuenta bloqueada 30 minutos', m: '5 contraseñas incorrectas seguidas, IP 45.83.12.9', w: '24 sep, 2:13 a. m.' },
+];
+const ACT_STAFF = [
+  { k: 'lock', t: 'Cuenta bloqueada 30 minutos', m: '5 códigos incorrectos seguidos, IP 45.83.12.9. Le avisamos por correo.', w: 'hace 3 minutos' },
+  { k: 'bad', t: 'Código de verificación incorrecto', m: 'Chrome en Linux, IP 45.83.12.9', w: 'hace 3 minutos' },
+  { k: 'bad', t: 'Código de verificación incorrecto', m: 'Chrome en Linux, IP 45.83.12.9', w: 'hace 4 minutos' },
+  { k: 'ok', t: 'Entró', m: 'Safari en iPhone, IP 181.52.201.4', w: 'hoy, 8:02 a. m.' },
+];
+const ICON = { ok: 'check', sec: 'shield', bad: 'key', lock: 'lock' };
+function actRows(list) {
+  return list.map(a => `
+    <div class="rowx act act-${a.k}">
+      <div class="ico"><svg class="i"><use href="#i-${ICON[a.k]}"/></svg></div>
+      <div class="rx-body"><div class="rx-t">${a.t}</div><div class="rx-m">${a.m}</div></div>
+      <span class="act-w">${a.w}</span>
+    </div>`).join('');
+}
+let actOpen = false;
+function renderAct() {
+  $('#act').innerHTML = actRows(actOpen ? ACT.concat(ACT_MORE) : ACT);
+  $('#act-more').parentElement.hidden = actOpen;
+  $('#act-staff').innerHTML = actRows(ACT_STAFF);
+}
+$('#act-more').onclick = () => { actOpen = true; renderAct(); };
+$('#unlock').onclick = () => {
+  $('#lock-banner').hidden = true; $('#unlock').hidden = true;
+  ACT_STAFF.unshift({ k: 'sec', t: 'Desbloqueada por Ana Super', m: 'desde Staff y permisos', w: 'hace un momento' });
+  renderAct();
+  toast('Cuenta desbloqueada', 'Beto ya puede volver a entrar. Si alguien tenía su contraseña, pídele que la cambie.');
+  log('account_unlocked', '{"actor":"Ana Super"}');
+};
+renderAct();
+
 function view(v) {
   $('#v-home').hidden = v !== 'home'; $('#v-seg').hidden = v !== 'seg';
+  $('#v-staff').hidden = v !== 'staff'; $('#v-login').hidden = v !== 'login';
   $('#nav-home').classList.toggle('on', v === 'home');
   document.querySelectorAll('#s-view button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
   $('#menu').hidden = true;
@@ -378,7 +565,7 @@ $('#devs').addEventListener('click', (e) => {
   const d = st.devs.find(x => x.id === id);
   const row = e.target.closest('.rowx'); row.classList.add('out');
   setTimeout(() => {
-    st.devs = st.devs.filter(x => x.id !== id); renderDevs();
+    st.devs = st.devs.filter(x => x.id !== id); renderDevs(); renderSess();
     toast('Listo', `La próxima vez te pediremos el código en ${d.name}.`);
     log('trusted_devices_revoked', `{"reason":"self","count":1,"label":"${d.name}"}${d.current ? ' + cookie borrada' : ''}`);
   }, 230);
@@ -387,7 +574,7 @@ $('#all').onclick = () => {
   const n = st.devs.length;
   document.querySelectorAll('#devs .rowx').forEach(r => r.classList.add('out'));
   setTimeout(() => {
-    st.devs = []; renderDevs();
+    st.devs = []; renderDevs(); renderSess();
     toast('Listo', `Quitaste ${n} equipos. Te pediremos el código en todos, incluido este.`);
     log('trusted_devices_revoked', `{"reason":"self_all","count":${n}} + cookie borrada`);
   }, 230);
