@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="es" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Seguridad Cuenta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* Tokens literales de eventos-backend/resources/css/filament/admin/theme.css (igual que lab-2fa-davinci) */
+:root {
+  --lum-bg: #F6F8FA; --lum-bg-1: #FAFBFC; --lum-bg-2: #F0F2F5;
+  --lum-card: #FFFFFF; --lum-card-hi: #F6F8FA;
+  --lum-b: rgba(0,0,0,0.08); --lum-b-hi: rgba(0,0,0,0.13); --lum-b-st: rgba(0,0,0,0.18);
+  --lum-t: #131417; --lum-t2: #3A3B40; --lum-t3: #5C5D63; --lum-t4: #85868C; --lum-t5: #AEAFB3;
+  --lum-violet: #7C5FE0; --lum-violet-soft: rgba(124,95,224,0.08);
+  --lum-ink: #1A1B1E; --lum-ink-contrast: #FFFFFF;
+  --lum-danger: #C2413A; --lum-danger-soft: rgba(194,65,58,0.08);
+  --lum-warn: #A86A12; --lum-warn-soft: rgba(168,106,18,0.09);
+  --lum-ok: #2F8F6B; --lum-ok-soft: rgba(47,143,107,0.08);
+  --lum-shadow-md: 0 2px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.08);
+  --lum-shadow-lg: 0 8px 32px rgba(0,0,0,0.14);
+  --lum-f: 'Urbanist', ui-sans-serif, system-ui, sans-serif;
+  --lum-fh: 'Plus Jakarta Sans', var(--lum-f);
+  --lum-fm: 'JetBrains Mono', ui-monospace, monospace;
+}
+.dark {
+  --lum-bg: #0A0A0A; --lum-bg-1: #0E0E0E; --lum-bg-2: #141414;
+  --lum-card: rgba(255,255,255,0.03); --lum-card-hi: rgba(255,255,255,0.05);
+  --lum-b: rgba(255,255,255,0.06); --lum-b-hi: rgba(255,255,255,0.10); --lum-b-st: rgba(255,255,255,0.14);
+  --lum-t: #FFFFFF; --lum-t2: rgba(255,255,255,0.6); --lum-t3: rgba(255,255,255,0.45);
+  --lum-t4: rgba(255,255,255,0.35); --lum-t5: rgba(255,255,255,0.15);
+  --lum-violet: #A78BFA; --lum-violet-soft: rgba(167,139,250,0.08);
+  --lum-ink: #FFFFFF; --lum-ink-contrast: #101010;
+  --lum-danger: #F08A80; --lum-danger-soft: rgba(240,138,128,0.08);
+  --lum-warn: #F2C27A; --lum-warn-soft: rgba(242,194,122,0.08);
+  --lum-ok: #6FD3A8; --lum-ok-soft: rgba(111,211,168,0.08);
+  --lum-shadow-md: none;
+  --lum-shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--lum-f); background: var(--lum-bg); color: var(--lum-t2); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+button { font-family: inherit; }
+svg.i { width: 16px; height: 16px; flex: none; }
+[hidden] { display: none !important; }
+
+.shell { display: grid; grid-template-columns: 1fr 300px; min-height: 100vh; }
+
+/* ── Admin (stub fiel al layout real: sidebar + topbar) ── */
+.admin { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; min-width: 0; }
+.side { border-right: 1px solid var(--lum-b); background: var(--lum-bg-1); padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; }
+.side-brand { font: 700 11px var(--lum-f); letter-spacing: 1.4px; text-transform: uppercase; color: var(--lum-t4); padding: 2px 10px 18px; }
+.nav { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; font-size: 13.5px; color: var(--lum-t2); }
+.nav.on { background: var(--lum-ink); color: var(--lum-ink-contrast); font-weight: 600; }
+.nav-k { font-size: 11.5px; font-weight: 600; color: var(--lum-t4); padding: 14px 10px 4px; }
+.main { min-width: 0; display: flex; flex-direction: column; }
+.top { height: 60px; display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 0 24px; border-bottom: 1px solid var(--lum-b); position: relative; }
+.search { width: 220px; height: 34px; border-radius: 8px; border: 1px solid var(--lum-b-hi); color: var(--lum-t4); font-size: 13px; display: flex; align-items: center; gap: 8px; padding: 0 10px; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; border: 0; background: linear-gradient(135deg,#6366F1,#14B8A6); color: #fff; font: 700 12px var(--lum-f); cursor: pointer; }
+.avatar:focus-visible { outline: 2px solid var(--lum-t3); outline-offset: 2px; }
+
+.menu { position: absolute; top: 52px; right: 20px; width: 260px; background: var(--lum-bg-2); border: 1px solid var(--lum-b-hi); border-radius: 12px; box-shadow: var(--lum-shadow-lg); padding: 6px; z-index: 20; }
+.dark .menu { background: #161616; }
+.menu-who { padding: 10px 10px 12px; border-bottom: 1px solid var(--lum-b); margin-bottom: 6px; }
+.menu-who b { display: block; color: var(--lum-t); font-size: 14px; }
+.menu-who span { font-size: 12.5px; color: var(--lum-t4); }
+.mi { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 10px; border: 0; background: none; border-radius: 8px; color: var(--lum-t2); font-size: 13.5px; cursor: pointer; text-align: left; }
+.mi:hover { background: var(--lum-card-hi); color: var(--lum-t); }
+.mi.new { color: var(--lum-t); font-weight: 600; }
+
+.content { padding: 40px 24px 80px; display: flex; justify-content: center; }
+.page { width: 100%; max-width: 720px; }
+.crumb { font-size: 12.5px; color: var(--lum-t4); margin-bottom: 10px; }
+h1 { font-family: var(--lum-fh); font-weight: 800; font-size: 26px; letter-spacing: -0.5px; line-height: 1.2; color: var(--lum-t); margin: 0 0 8px; }
+.lead { display: flex; align-items: center; gap: 8px; font-size: 14.5px; color: var(--lum-t3); margin: 0 0 28px; }
+.lead svg { color: var(--lum-ok); }
+
+.card { background: var(--lum-card); border: 1px solid var(--lum-b-hi); border-radius: 14px; box-shadow: var(--lum-shadow-md); margin-bottom: 16px; }
+.card-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px 4px; }
+.card-h h2 { font-family: var(--lum-fh); font-size: 16px; font-weight: 800; letter-spacing: -0.2px; color: var(--lum-t); margin: 0; }
+.card-sub { font-size: 13px; line-height: 1.5; color: var(--lum-t4); padding: 0 20px 8px; margin: 4px 0 0; }
+.rowx { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-top: 1px solid var(--lum-b); transition: opacity .25s, transform .25s; }
+.rowx:first-of-type { border-top: 0; }
+.card-h + .card-sub + .rowx, .card-h + .rowx { border-top: 0; }
+.rowx.out { opacity: 0; transform: translateX(8px); }
+.ico { width: 36px; height: 36px; border-radius: 10px; background: var(--lum-card-hi); border: 1px solid var(--lum-b); display: grid; place-items: center; color: var(--lum-t2); flex: none; }
+.rx-body { flex: 1; min-width: 0; }
+.rx-t { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: var(--lum-t); font-size: 14.5px; font-weight: 600; }
+.rx-m { font-size: 13px; color: var(--lum-t4); margin-top: 3px; line-height: 1.45; }
+.rx-m.warn { color: var(--lum-warn); }
+.tag { font-size: 11.5px; font-weight: 600; color: var(--lum-t2); background: var(--lum-card-hi); border: 1px solid var(--lum-b-hi); border-radius: 999px; padding: 2px 8px; }
+.okt { font-size: 13px; font-weight: 600; color: var(--lum-ok); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 8px; border: 0; font: 600 13.5px var(--lum-f); cursor: pointer; transition: opacity .15s, transform .1s, border-color .15s; white-space: nowrap; }
+.btn:active { transform: scale(0.98); }
+.btn.ink { background: var(--lum-ink); color: var(--lum-ink-contrast); }
+.btn.ink:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn.ghost { background: var(--lum-card-hi); color: var(--lum-t); border: 1px solid var(--lum-b-hi); }
+.btn.ghost:hover { border-color: var(--lum-b-st); }
+.lnk { background: none; border: 0; padding: 6px 4px; font: 600 13.5px var(--lum-f); color: var(--lum-t2); cursor: pointer; }
+.lnk:hover { color: var(--lum-t); }
+.lnk.red { color: var(--lum-danger); }
+.empty { padding: 8px 20px 22px; font-size: 13.5px; line-height: 1.55; color: var(--lum-t4); }
+
+/* Modal (Filament) */
+.scrim { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: grid; place-items: center; padding: 16px; z-index: 50; }
+.modal { width: 100%; max-width: 460px; background: var(--lum-bg-1); border: 1px solid var(--lum-b-hi); border-radius: 16px; box-shadow: var(--lum-shadow-lg); padding: 26px; }
+.dark .modal { background: #111; }
+.modal h3 { font-family: var(--lum-fh); font-size: 19px; font-weight: 800; color: var(--lum-t); margin: 0 0 8px; letter-spacing: -0.3px; }
+.modal p { font-size: 14px; line-height: 1.55; color: var(--lum-t3); margin: 0 0 18px; }
+.modal p b { color: var(--lum-t); }
+.in.code { width: 100%; height: 56px; border-radius: 8px; border: 1px solid var(--lum-b-st); background: transparent; color: var(--lum-t); font: 600 26px var(--lum-fm); letter-spacing: 10px; text-align: center; padding-left: 22px; outline: none; }
+.in.code:focus { border-color: var(--lum-t3); box-shadow: 0 0 0 3px var(--lum-violet-soft); }
+.in.bad { border-color: var(--lum-danger); }
+.err { font-size: 13px; color: var(--lum-danger); margin: 8px 0 0; }
+.m-act { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.codes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.codes div { font: 600 15px var(--lum-fm); color: var(--lum-t); text-align: center; padding: 10px 0; border-radius: 8px; background: var(--lum-card-hi); border: 1px solid var(--lum-b); letter-spacing: 1px; }
+.check { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: var(--lum-t2); cursor: pointer; line-height: 1.4; margin-top: 14px; }
+.check input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--lum-t); }
+
+.toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-12px); opacity: 0; transition: .25s; background: var(--lum-bg-2); border: 1px solid var(--lum-b-hi); box-shadow: var(--lum-shadow-lg); border-radius: 12px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; max-width: 420px; z-index: 60; font-size: 13.5px; color: var(--lum-t2); line-height: 1.45; }
+.dark .toast { background: #161616; }
+.toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast b { color: var(--lum-t); display: block; }
+.toast svg { color: var(--lum-ok); margin-top: 2px; }
+
+/* ── Panel del laboratorio ── */
+.lab { border-left: 1px solid var(--lum-b-hi); background: var(--lum-bg-1); padding: 22px 18px; display: flex; flex-direction: column; gap: 20px; }
+.lab h2 { font-family: var(--lum-fh); font-size: 15px; font-weight: 800; color: var(--lum-t); margin: 0; }
+.lab p { font-size: 12.5px; line-height: 1.5; color: var(--lum-t3); margin: 4px 0 0; }
+.lab-sec { display: flex; flex-direction: column; gap: 8px; }
+.lab-k { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--lum-t4); }
+.seg { display: flex; flex-direction: column; border: 1px solid var(--lum-b-hi); border-radius: 8px; overflow: hidden; }
+.seg.h { flex-direction: row; }
+.seg button { text-align: left; min-height: 34px; padding: 6px 10px; border: 0; border-top: 1px solid var(--lum-b); background: transparent; color: var(--lum-t3); font: 600 12.5px var(--lum-f); cursor: pointer; }
+.seg.h button { flex: 1; text-align: center; border-top: 0; }
+.seg button:first-child { border-top: 0; }
+.seg button.on { background: var(--lum-card-hi); color: var(--lum-t); }
+.log { font: 500 11.5px var(--lum-fm); color: var(--lum-t3); display: flex; flex-direction: column; gap: 5px; max-height: 220px; overflow: auto; }
+.log div b { color: var(--lum-t2); font-weight: 600; }
+.notes { font-size: 12.5px; line-height: 1.55; color: var(--lum-t3); padding-left: 16px; margin: 0; }
+.notes li { margin-bottom: 6px; }
+
+@media (max-width: 1100px) { .admin { grid-template-columns: 1fr; } .side { display: none; } }
+@media (max-width: 860px) {
+  .shell { grid-template-columns: 1fr; }
+  .lab { border-left: 0; border-top: 1px solid var(--lum-b-hi); }
+  .search { display: none; }
+  .content { padding: 28px 16px 60px; }
+  .rowx { flex-wrap: wrap; }
+  .rowx .lnk, .rowx .btn { margin-left: 50px; }
+  .card-h { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+</svg>
+
+<div class="shell">
+  <div class="admin">
+    <aside class="side">
+      <div class="side-brand">EventOS Admin</div>
+      <div class="nav" id="nav-home"><svg class="i"><use href="#i-home"/></svg>Escritorio</div>
+      <div class="nav-k">Contenido</div>
+      <div class="nav">Agenda</div><div class="nav">Speakers</div><div class="nav">Sponsors</div>
+      <div class="nav-k">Personas</div>
+      <div class="nav">Asistentes</div>
+      <div class="nav-k">Sistema</div>
+      <div class="nav">Staff y permisos</div>
+    </aside>
+
+    <div class="main">
+      <header class="top">
+        <div class="search"><svg class="i"><use href="#i-search"/></svg>Buscar</div>
+        <button class="avatar" id="avatar" aria-haspopup="menu" aria-expanded="false">KA</button>
+        <div class="menu" id="menu" role="menu" hidden>
+          <div class="menu-who"><b>Kamilo Arias</b><span>super_admin</span></div>
+          <button class="mi new" data-go="seg" role="menuitem"><svg class="i"><use href="#i-lock"/></svg>Seguridad de tu cuenta</button>
+          <button class="mi" role="menuitem"><svg class="i"><use href="#i-logout"/></svg>Salir</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- Escritorio (para ver como se llega) -->
+        <div class="page" id="v-home" hidden>
+          <h1>Summit Empresarial 2026</h1>
+          <p class="lead" style="color:var(--lum-t4)">Abre el menú del avatar, arriba a la derecha.</p>
+        </div>
+
+        <!-- La pagina -->
+        <div class="page" id="v-seg">
+          <div class="crumb">Tu cuenta</div>
+          <h1>Seguridad de tu cuenta</h1>
+          <p class="lead"><svg class="i"><use href="#i-shield"/></svg>Verificación en dos pasos activa desde el 26 de septiembre.</p>
+
+          <section class="card">
+            <div class="card-h"><h2>Cómo entras</h2></div>
+            <div class="rowx">
+              <div class="ico"><svg class="i"><use href="#i-phone"/></svg></div>
+              <div class="rx-body">
+                <div class="rx-t">Contraseña y app autenticadora</div>
+                <div class="rx-m">Cada vez que entras desde un equipo nuevo te pedimos el código de 6 dígitos.</div>
+              </div>
+              <span class="okt">Activa</span>
+            </div>
+            <div class="rowx">
+              <div class="ico"><svg class="i"><use href="#i-key"/></svg></div>
+              <div class="rx-body">
+                <div class="rx-t">Códigos de recuperación</div>
+                <div class="rx-m" id="rec-m"></div>
+              </div>
+              <button class="btn ghost" id="gen">Generar nuevos</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-h">
+              <h2>Equipos de confianza</h2>
+              <button class="lnk red" id="all">Quitar todos</button>
+            </div>
+            <p class="card-sub">En estos equipos no te pedimos el código durante 30 días. Quita los que ya no uses o no reconozcas.</p>
+            <div id="devs"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="lab">
+    <div>
+      <h2>Lab: Seguridad de tu cuenta</h2>
+      <p>S.4.3 + S.1.3. Todo es clicable: el avatar, Quitar, Quitar todos y Generar nuevos. En el modal el código correcto es cualquiera menos 000000.</p>
+    </div>
+    <div class="lab-sec">
+      <div class="lab-k">Pantalla</div>
+      <div class="seg h" id="s-view"><button data-v="home">Escritorio</button><button data-v="seg" class="on">La página</button></div>
+    </div>
+    <div class="lab-sec">
+      <div class="lab-k">Estado de la cuenta</div>
+      <div class="seg" id="s-state">
+        <button data-s="normal" class="on">Normal: 2 equipos, 6 códigos</button>
+        <button data-s="empty">Sin equipos de confianza</button>
+        <button data-s="low">Le queda 1 código</button>
+      </div>
+    </div>
+    <div class="lab-sec">
+      <div class="lab-k">Tema</div>
+      <div class="seg h" id="s-theme"><button data-t="dark" class="on">Noir</button><button data-t="light">Lux</button></div>
+    </div>
+    <div class="lab-sec">
+      <div class="lab-k">Lo que queda en la bitácora</div>
+      <div class="log" id="log"><div>(vacío)</div></div>
+    </div>
+    <div class="lab-sec">
+      <div class="lab-k">Decisiones</div>
+      <ul class="notes">
+        <li>Se llega desde el avatar, no desde el sidebar: es de la persona, no del evento.</li>
+        <li>Quitar un equipo es instantáneo y sin modal: lo peor que pasa es que te vuelve a pedir el código.</li>
+        <li>Generar códigos nuevos pide el código de la app (sudo mode de GitHub): una sesión abierta ajena no puede llevarse tus códigos.</li>
+        <li>Sin secciones vacías ni "próximamente": Sesiones abiertas (S.5) y Actividad (S.6) se suman aquí cuando existan.</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+<div class="toast" id="toast"><svg class="i"><use href="#i-check"/></svg><div id="toast-t"></div></div>
+
+<div class="scrim" id="m1" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m1-t">
+    <h3 id="m1-t">Generar códigos nuevos</h3>
+    <p>Los códigos que tienes hoy <b>dejan de servir</b>. Para confirmar que eres tú, escribe el código de tu app autenticadora.</p>
+    <input class="in code" id="m1-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000">
+    <p class="err" id="m1-err" hidden>Ese código no es válido o ya se usó. Espera el siguiente en tu app.</p>
+    <div class="m-act">
+      <button class="btn ghost" data-close>Cancelar</button>
+      <button class="btn ink" id="m1-go">Generar</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="m2" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m2-t">
+    <h3 id="m2-t">Guarda tus códigos nuevos</h3>
+    <p>Cada código te deja entrar una sola vez si pierdes el teléfono. <b>No los vamos a volver a mostrar.</b></p>
+    <div class="codes" id="codes"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn ghost" style="flex:1"><svg class="i"><use href="#i-copy"/></svg>Copiar</button>
+      <button class="btn ghost" style="flex:1"><svg class="i"><use href="#i-dl"/></svg>Descargar</button>
+    </div>
+    <label class="check"><input type="checkbox" id="saved"> Los guardé en un lugar seguro (gestor de contraseñas o papel, no en este computador)</label>
+    <div class="m-act"><button class="btn ink" id="m2-go" disabled>Listo</button></div>
+  </div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const STATES = {
+  normal: { codes: 6, devs: [
+    { id: 1, icon: 'monitor', name: 'Chrome en Windows', current: true, meta: 'Confiaste en él el 29 de septiembre. Último uso hace 2 horas, vence el 29 de octubre.' },
+    { id: 2, icon: 'phone', name: 'Safari en iPhone', current: false, meta: 'Confiaste en él el 12 de septiembre. Último uso hace 3 días, vence el 12 de octubre.' },
+  ]},
+  empty: { codes: 6, devs: [] },
+  low: { codes: 1, devs: [
+    { id: 1, icon: 'monitor', name: 'Chrome en Windows', current: true, meta: 'Confiaste en él el 29 de septiembre. Último uso hace 2 horas, vence el 29 de octubre.' },
+  ]},
+};
+let st;
+
+function log(type, meta) {
+  const box = $('#log');
+  if (box.textContent === '(vacío)') box.innerHTML = '';
+  const d = document.createElement('div');
+  d.innerHTML = `<b>${type}</b> ${meta}`;
+  box.prepend(d);
+}
+function toast(title, body) {
+  $('#toast-t').innerHTML = `<b>${title}</b>${body}`;
+  const t = $('#toast'); t.classList.add('on');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('on'), 3200);
+}
+
+function renderCodes() {
+  const m = $('#rec-m');
+  if (st.codes <= 2) { m.className = 'rx-m warn'; m.textContent = `Te queda${st.codes === 1 ? '' : 'n'} ${st.codes} de 8. Genera nuevos antes de que se acaben.`; }
+  else { m.className = 'rx-m'; m.textContent = `Te quedan ${st.codes} de 8. Cada uno sirve una sola vez si pierdes el teléfono.`; }
+}
+function renderDevs() {
+  const box = $('#devs');
+  $('#all').hidden = st.devs.length < 2;
+  if (!st.devs.length) {
+    box.innerHTML = '<div class="empty">No tienes equipos de confianza. Si marcas «Confiar en este equipo» al entrar, aparecerá aquí.</div>';
+    return;
+  }
+  box.innerHTML = st.devs.map(d => `
+    <div class="rowx" data-id="${d.id}">
+      <div class="ico"><svg class="i"><use href="#i-${d.icon}"/></svg></div>
+      <div class="rx-body">
+        <div class="rx-t">${d.name}${d.current ? '<span class="tag">Este equipo</span>' : ''}</div>
+        <div class="rx-m">${d.meta}</div>
+      </div>
+      <button class="lnk" data-rm="${d.id}">Quitar</button>
+    </div>`).join('');
+}
+function load(name) {
+  st = JSON.parse(JSON.stringify(STATES[name]));
+  renderCodes(); renderDevs();
+}
+
+// Avatar
+$('#avatar').onclick = (e) => { e.stopPropagation(); const m = $('#menu'); m.hidden = !m.hidden; $('#avatar').setAttribute('aria-expanded', String(!m.hidden)); };
+document.addEventListener('click', () => { $('#menu').hidden = true; });
+document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => view(b.dataset.go));
+
+function view(v) {
+  $('#v-home').hidden = v !== 'home'; $('#v-seg').hidden = v !== 'seg';
+  $('#nav-home').classList.toggle('on', v === 'home');
+  document.querySelectorAll('#s-view button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  $('#menu').hidden = true;
+}
+
+// Quitar
+$('#devs').addEventListener('click', (e) => {
+  const id = Number(e.target.dataset.rm); if (!id) return;
+  const d = st.devs.find(x => x.id === id);
+  const row = e.target.closest('.rowx'); row.classList.add('out');
+  setTimeout(() => {
+    st.devs = st.devs.filter(x => x.id !== id); renderDevs();
+    toast('Listo', `La próxima vez te pediremos el código en ${d.name}.`);
+    log('trusted_devices_revoked', `{"reason":"self","count":1,"label":"${d.name}"}${d.current ? ' + cookie borrada' : ''}`);
+  }, 230);
+});
+$('#all').onclick = () => {
+  const n = st.devs.length;
+  document.querySelectorAll('#devs .rowx').forEach(r => r.classList.add('out'));
+  setTimeout(() => {
+    st.devs = []; renderDevs();
+    toast('Listo', `Quitaste ${n} equipos. Te pediremos el código en todos, incluido este.`);
+    log('trusted_devices_revoked', `{"reason":"self_all","count":${n}} + cookie borrada`);
+  }, 230);
+};
+
+// Generar codigos (sudo mode)
+const open = (id) => { $(id).hidden = false; };
+const close = () => { $('#m1').hidden = true; $('#m2').hidden = true; };
+document.querySelectorAll('[data-close]').forEach(b => b.onclick = close);
+$('#gen').onclick = () => { $('#m1-code').value = ''; $('#m1-err').hidden = true; $('#m1-code').classList.remove('bad'); open('#m1'); setTimeout(() => $('#m1-code').focus(), 30); };
+$('#m1-code').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, ''); if (e.target.value.length === 6) $('#m1-go').click(); });
+$('#m1-go').onclick = () => {
+  const v = $('#m1-code').value;
+  if (!/^\d{6}$/.test(v) || v === '000000') { $('#m1-err').hidden = false; $('#m1-code').classList.add('bad'); $('#m1-code').value = ''; return; }
+  const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  const r = () => Array.from({ length: 10 }, () => A[Math.floor(Math.random() * A.length)]).join('');
+  $('#codes').innerHTML = Array.from({ length: 8 }, () => { const c = r(); return `<div>${c.slice(0,5)}-${c.slice(5)}</div>`; }).join('');
+  $('#saved').checked = false; $('#m2-go').disabled = true;
+  $('#m1').hidden = true; open('#m2');
+  st.codes = 8; renderCodes();
+  log('recovery_codes_regenerated', '{"count":8} (los anteriores ya no sirven)');
+};
+$('#saved').onchange = (e) => { $('#m2-go').disabled = !e.target.checked; };
+$('#m2-go').onclick = () => { close(); toast('Códigos nuevos guardados', 'Los anteriores ya no sirven.'); };
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#m2').hidden) close(); });
+
+// Controles del lab
+document.querySelectorAll('#s-view button').forEach(b => b.onclick = () => view(b.dataset.v));
+document.querySelectorAll('#s-state button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#s-state button').forEach(x => x.classList.toggle('on', x === b));
+  load(b.dataset.s); view('seg');
+});
+document.querySelectorAll('#s-theme button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#s-theme button').forEach(x => x.classList.toggle('on', x === b));
+  document.documentElement.classList.toggle('dark', b.dataset.t === 'dark');
+});
+
+load('normal');
+</script>
+</body>
+</html>

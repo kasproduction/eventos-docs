@@ -1,4 +1,4 @@
-# ROADMAP — SEGURIDAD DEL STAFF (2FA + sesiones + accesos) — 11/26
+# ROADMAP — SEGURIDAD DEL STAFF (2FA + sesiones + accesos) — 15/26
 
 > **Decision Kamilo 2026-07-20**: "prefiero tener todo lo de seguridad en regla
 > y no esperar a tener cliente encima con presion". Se hace AHORA, con calma,
@@ -104,7 +104,7 @@
       telefonos se desfasan; sin esto el organizador jura que el codigo esta
       bien y el sistema le dice que no) · generar/consumir codigos de recuperacion
 
-## S.1 — Activacion del segundo factor — 2/3 (HECHO 2026-09-26 S.1.1 y S.1.2)
+## S.1 — Activacion del segundo factor — 3/3 (S.1.3 HECHO 2026-09-29)
 
 - [x] S.1.1 Pagina de activacion (`app/Filament/Auth/TwoFactorSetup.php`, ruta
       `/admin/dos-pasos/activar`; conserva el secreto pendiente si la persona recarga) (lenguaje Lumina, espejo del login ya
@@ -112,9 +112,13 @@
       falla, se escribe a mano) + campo de verificacion para confirmar
 - [x] S.1.2 **8 codigos de recuperacion** mostrados UNA sola vez al confirmar,
       con opcion de descargar/copiar y advertencia honesta de guardarlos
-- [ ] S.1.3 Regenerar codigos de recuperacion (invalida los anteriores). El
-      servicio ya lo hace (`regenerateRecoveryCodes`); falta DONDE: va en la
-      pagina "Seguridad de mi cuenta" junto con S.4.3 y S.5.2.
+- [x] S.1.3 Regenerar codigos de recuperacion (invalida los anteriores).
+      **HECHO 2026-09-29** en "Seguridad de tu cuenta": "Generar nuevos" →
+      modal que pide el codigo de la app (sudo mode de GitHub,
+      `TwoFactorService::regenerateWithCode`, mismo freno de 5/min) → modal
+      con los 8 codigos una sola vez (no se cierra por clic afuera; Copiar con
+      respaldo para HTTP, Descargar, "Los guarde"). Bitacora
+      `recovery_codes_regenerated`. Aviso en ambar con 2 o menos.
 
 ## S.2 — Reto y enforcement — 3/3 (HECHO 2026-09-26, 17 tests en `TwoFactorLoginTest`)
 
@@ -195,14 +199,53 @@ sesiones al desplegar) se movieron arriba: **DECISIONES PENDIENTES D.1-D.3**.
   bug; la ruta del servidor quedo probada (montar, confirmar, restablecer,
   bitacora, correo). Falta ver el modal con los ojos: Kamilo.
 
-## S.4 — Confiar en este dispositivo 30 dias — 0/3
+## S.4 — Confiar en este dispositivo 30 dias — 3/3 (HECHO 2026-09-29, 19 + 13 tests)
 
-- [ ] S.4.1 Tabla de dispositivos de confianza + token **revocable** (cookie
-      firmada sola no basta: hay que poder quitarle la confianza a un equipo)
-- [ ] S.4.2 Casilla "este es mi equipo, no me pidas el codigo por 30 dias" en
-      el reto (reemplaza el "device fingerprinting" del plan viejo con algo
-      mas simple y estandar)
-- [ ] S.4.3 Revocar dispositivos de confianza desde el perfil
+> Referencias (pedido de Kamilo: mirar como lo hacen otros): Google "No volver
+> a preguntar en este equipo", Microsoft "No preguntar durante 30 dias",
+> GitHub. En los tres la confianza SOLO evita el codigo, nunca la contraseña;
+> es revocable y vence.
+
+- [x] S.4.1 Tabla `trusted_devices` + modelo `TrustedDevice`. Cookie cifrada
+      `eventos_trusted_device` = `id|secreto` (HttpOnly, SameSite=Lax, path `/`
+      porque el login corre por `/livewire/update`); en la base solo el sha256
+      del secreto. **30 dias fijos** (usarlo no renueva). El login
+      (`App\Filament\Auth\Login`) con equipo valido de ESA persona pasa por el
+      mismo `TwoFactorLogin::complete()` que el reto. Cookie vencida, revocada
+      o ajena → se borra y va al reto. **Revocacion de todos sus equipos** al
+      restablecer el 2FA (`TwoFactorService::resetFor`), al cambiar la
+      contraseña y al desactivar la cuenta (hook `updated` en `User`: cubre
+      todos los caminos). Bitacora `trusted_device_added` /
+      `trusted_devices_revoked` (meta: motivo y cuantos). Nombre legible
+      "Chrome en Windows" (`labelFor`) para S.4.3. Efecto conocido: si Laravel
+      re-hashea la contraseña al entrar, cuenta como cambio y pide el codigo
+      una vez mas.
+- [x] S.4.2 Casilla "Confiar en este equipo por 30 dias" en el reto, **arriba
+      del campo** (el codigo se envia solo al completar 6 digitos: abajo
+      llegaria tarde), con aviso "no la marques en un computador prestado o
+      compartido". **No se ofrece ni se respeta con codigo de recuperacion**
+      (usarlo = perdi el telefono). Reusa `lum-2fa-check`.
+
+**QA vivo en Chrome 2026-09-29 (cuenta desechable `qa-equipo`, borrada al
+final), 0 bugs:** reto con la casilla → marcada + codigo real → panel; equipo
+"Chrome en Windows" + bitacora `trusted_device_added` · salir y entrar → solo
+contraseña, directo al panel, `last_used_at` anotado · restablecer su 2FA →
+bitacora `trusted_devices_revoked` (2fa_reset, 1) + sesion abierta expulsada
+al login + entrar de nuevo cae en la activacion, no en el panel.
+- [x] S.4.3 **HECHO 2026-09-29.** Pagina "Seguridad de tu cuenta"
+      (`App\Filament\Pages\AccountSecurity`, `/admin/mi-seguridad`), desde el
+      menu del avatar. Lab aprobado por Kamilo:
+      `design/features/admin-2fa/lab-seguridad-cuenta.html` (refs Google Cuenta
+      → Seguridad, GitHub, Stripe/Linear). Cards "Como entras" + "Equipos de
+      confianza" (solo los propios y vigentes, "Este equipo" por la cookie,
+      Quitar instantaneo sin modal, "Quitar todos" con 2+; quitar el actual
+      borra la cookie). Bitacora `trusted_devices_revoked` reason
+      `self`/`self_all`. 13 tests en `AccountSecurityTest`.
+      **QA Chrome 2026-09-29 — 1 bug cazado y corregido:** el campo se envia
+      solo a los 6 digitos + Enter = doble envio; el segundo salia "ya se uso"
+      y el error TAPABA los codigos recien generados (viejos muertos, nuevos
+      sin ver). Guard en `regenerate()` + test de regresion. Verificado en
+      vivo despues del fix.
 
 ## S.5 — Sesiones y dispositivos activos — 0/3
 
