@@ -385,7 +385,8 @@ aviso y boton desaparecen, bitacora `account_unlocked`. 0 bugs.
   del sistema). "Copiar clave" ahora tambien funciona en HTTP. Medido en la
   pagina real (HTML pedido por curl con sesion aparte, para no tocar la
   sesion de Kamilo): 0 px de scroll en portatil, tablet y celular, en los
-  dos pasos y en el reto.
+  dos pasos y en el reto. **Kamilo la reviso en el flujo real el
+  2026-09-29: se ve bien.**
 ---
 
 ## Fuera de alcance (decidido)
