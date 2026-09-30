@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Fondos Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+<style>
+/* =====================================================================
+   LAB — 6 fondos para el hero (three.js). Mismo hero encima en todos.
+   Contenido: evento demo "Summit Empresarial 2026".
+   ===================================================================== */
+:root { --accent: #3D6BFF; --accent-rgb: 61,107,255; --bar: 48px; --ease: cubic-bezier(.2,.8,.2,1); }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: 'Urbanist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #050506; color: #fff; overflow-x: hidden; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+svg.i { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.lab-bar { position: fixed; inset: 0 0 auto 0; height: var(--bar); z-index: 50; display: flex; align-items: center; gap: 14px; padding: 0 16px; background: #0b0b0c; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 13px; }
+.lab-bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; white-space: nowrap; }
+.seg { display: flex; background: rgba(255,255,255,.06); border-radius: 10px; padding: 3px; overflow-x: auto; scrollbar-width: none; }
+.seg button { border: 0; background: transparent; padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; color: rgba(255,255,255,.6); white-space: nowrap; }
+.seg button.on { background: #fff; color: #0b0b0c; }
+.sw { display: flex; gap: 6px; }
+.sw button { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; padding: 0; }
+.sw button.on { border-color: #fff; }
+.lab-bar .sp { flex: 1; }
+.lab-bar .ghost { border: 1px solid rgba(255,255,255,.14); background: transparent; border-radius: 8px; padding: 6px 10px; font-weight: 600; font-size: 12px; color: rgba(255,255,255,.8); white-space: nowrap; }
+@media (max-width: 860px) { .lab-bar b, .lab-bar .lbl, .lab-bar .sw { display: none; } }
+
+#gl { position: fixed; left: 0; top: var(--bar); width: 100vw; height: calc(100svh - var(--bar)); z-index: 0; display: block; }
+.hero { position: relative; z-index: 2; min-height: calc(100svh - var(--bar)); margin-top: var(--bar); display: grid; grid-template-columns: minmax(0,1.3fr) minmax(340px,.62fr); gap: 56px; align-items: end; padding: 110px 48px 56px; pointer-events: none; }
+.hero > * { pointer-events: auto; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(90deg, rgba(5,5,6,.78) 0%, rgba(5,5,6,.25) 48%, rgba(5,5,6,0) 70%), linear-gradient(0deg, rgba(5,5,6,.7) 0%, transparent 32%); }
+.eyebrow { display: inline-flex; align-items: center; gap: 12px; font: 600 12px/1 'JetBrains Mono'; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+.eyebrow::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+h1 { font-family: 'Plus Jakarta Sans'; font-weight: 800; text-transform: uppercase; font-size: clamp(40px, 8.4vw, 150px); line-height: .86; letter-spacing: -.045em; margin: 20px 0 32px; }
+h1 .out { color: transparent; -webkit-text-stroke: 2px var(--accent); }
+.meta { display: flex; gap: 40px; border-top: 1px solid rgba(255,255,255,.12); padding-top: 20px; flex-wrap: wrap; }
+.meta small { display: block; font: 600 11px/1 'JetBrains Mono'; letter-spacing: .14em; color: rgba(255,255,255,.5); margin-bottom: 9px; }
+.meta span { font-weight: 600; font-size: 17px; }
+.meta .aws { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 19px; color: #FF9900; }
+.cd { font: 700 17px/1 'JetBrains Mono'; }
+
+.ticket { position: relative; background: rgba(14,14,16,.92); border: 1px solid rgba(255,255,255,.1); border-radius: 24px; padding: 24px; box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+.t-head { display: flex; justify-content: space-between; font: 600 11px/1 'JetBrains Mono'; letter-spacing: .14em; color: rgba(255,255,255,.45); }
+.t-head b { color: var(--accent); }
+.sent { font-family: 'Plus Jakarta Sans'; font-weight: 600; font-size: 24px; letter-spacing: -.03em; line-height: 1.4; margin: 14px 0 0; }
+.sent .mu { opacity: .5; }
+input.ln { display: block; width: 100%; border: 0; border-bottom: 2px solid rgba(255,255,255,.16); background: transparent; outline: none; font: inherit; font-size: 22px; color: var(--accent); padding: 0 2px; margin: 2px 0 8px; }
+input.ln::placeholder { color: rgba(255,255,255,.28); }
+input.ln:focus { border-bottom-color: var(--accent); }
+input.ln.err { border-bottom-color: #E5484D; }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 1.4; color: rgba(255,255,255,.6); margin: 14px 0; cursor: pointer; }
+.consent input { width: 17px; height: 17px; margin: 1px 0 0; accent-color: var(--accent); }
+.consent.err { color: #E5484D; }
+.cta { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 54px; border: 0; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 700; font-size: 16px; }
+.done { display: none; }
+.ticket.ok .form { display: none; }
+.ticket.ok .done { display: block; }
+.t-name { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 36px; letter-spacing: -.035em; line-height: 1; margin: 16px 0 10px; }
+.t-note { font-size: 13px; color: rgba(255,255,255,.6); margin-top: 10px; }
+
+.cap { position: fixed; left: 16px; bottom: 16px; z-index: 5; max-width: 440px; background: rgba(12,12,13,.9); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 12px 14px; font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.78); transition: opacity .6s; }
+.cap b { color: #fff; }
+.cap.hide { opacity: 0; pointer-events: none; }
+.err-gl { position: fixed; inset: 0; z-index: 60; display: none; place-items: center; background: #050506; color: rgba(255,255,255,.7); font-size: 15px; text-align: center; padding: 24px; }
+
+@media (max-width: 1020px) {
+  .hero { grid-template-columns: 1fr; padding: 90px 16px 36px; gap: 28px; }
+  h1 { font-size: 11.4vw; } .meta { gap: 20px; }
+  .hero::before { background: linear-gradient(0deg, rgba(5,5,6,.85) 0%, rgba(5,5,6,.2) 60%); }
+  .cap { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="lab-bar">
+  <b>Lab Fondos</b>
+  <div class="seg" id="seg">
+    <button data-e="seda" class="on">1 Seda</button>
+    <button data-e="haz">2 Haz de luz</button>
+    <button data-e="metal">3 Metal líquido</button>
+    <button data-e="morfo">4 Partículas</button>
+    <button data-e="topo">5 Curvas de nivel</button>
+    <button data-e="vidrio">6 Vidrio</button>
+  </div>
+  <span class="lbl" style="color:rgba(255,255,255,.45)">Color del cliente</span>
+  <div class="sw" id="sw">
+    <button data-c="#3D6BFF" style="background:#3D6BFF" class="on" title="Azul"></button>
+    <button data-c="#E5192B" style="background:#E5192B" title="Rojo"></button>
+    <button data-c="#FF6A13" style="background:#FF6A13" title="Naranja"></button>
+    <button data-c="#C9A86A" style="background:#C9A86A" title="Dorado"></button>
+  </div>
+  <span class="sp"></span>
+  <button class="ghost" id="reset">Reiniciar</button>
+</div>
+
+<canvas id="gl"></canvas>
+
+<section class="hero">
+  <div>
+    <span class="eyebrow">Bogotá, noviembre de 2026</span>
+    <h1>Summit<br>Empresarial<br><span class="out">2026</span></h1>
+    <div class="meta">
+      <div><small>FECHAS</small><span>4 al 6 de noviembre</span></div>
+      <div><small>LUGAR</small><span>Centro de Convenciones Ágora</span></div>
+      <div><small>EMPIEZA EN</small><span class="cd" id="cd"></span></div>
+      <div><small>PRESENTADO POR</small><span class="aws">AWS</span></div>
+    </div>
+  </div>
+  <div class="ticket" id="ticket">
+    <div class="t-head"><span>PASE GENERAL</span><b id="tn">GRATIS</b></div>
+    <div class="form">
+      <form id="form" novalidate>
+        <p class="sent">Hola, me llamo <input class="ln" name="name" placeholder="tu nombre" autocomplete="name"> <span class="mu">y mi correo es</span> <input class="ln" name="email" type="email" placeholder="tu@empresa.com" autocomplete="email"></p>
+        <label class="consent" id="cn"><input type="checkbox" name="consent"> Acepto el tratamiento de mis datos para gestionar mi participación.</label>
+        <button class="cta" type="submit">Quiero mi lugar <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </form>
+      <div class="t-note">Sin contraseña. Tu acceso llega a tu correo.</div>
+    </div>
+    <div class="done"><div class="t-name" id="nm"></div><div class="t-note">Tu lugar está guardado. Te enviamos el acceso a <b id="ml"></b>.</div></div>
+  </div>
+</section>
+<div class="cap" id="cap"></div>
+<div class="err-gl" id="errgl">Este navegador no pudo iniciar el 3D. En producción se mostraría una imagen fija del fondo.</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const $ = s => document.querySelector(s);
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const CAPS = {
+  seda: '<b>Seda.</b> Una tela satinada que ondula despacio y toma el brillo del color del cliente. El movimiento del mouse cambia dónde cae la luz.',
+  haz: '<b>Haz de luz.</b> Un reflector en la oscuridad. Las partículas de polvo solo brillan cuando cruzan el haz, y el haz sigue a tu cursor.',
+  metal: '<b>Metal líquido.</b> Gotas de cromo que se funden entre sí, con reflejos de estudio y un tinte del color del cliente.',
+  morfo: '<b>Partículas que forman figuras.</b> Catorce mil puntos pasan de esfera a "26" y a anillo. Se apartan de tu cursor.',
+  topo: '<b>Curvas de nivel.</b> Líneas finas de mapa topográfico en movimiento lento. Bajo tu cursor el terreno se levanta.',
+  vidrio: '<b>Vidrio.</b> Una pieza de cristal gira bajo luz de estudio y refracta el nombre del evento que está detrás.'
+};
+
+/* ---------- acento ---------- */
+let ACC = new THREE.Color('#3D6BFF');
+function setAccent(hex) {
+  ACC.set(hex); const c = hex.replace('#', ''), n = parseInt(c, 16);
+  document.documentElement.style.setProperty('--accent', hex);
+  document.documentElement.style.setProperty('--accent-rgb', `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`);
+  document.querySelectorAll('#sw button').forEach(b => b.classList.toggle('on', b.dataset.c === hex));
+  store.set('labf-acc', hex); if (current && current.accent) current.accent();
+}
+
+/* ---------- renderer ---------- */
+const canvas = $('#gl');
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' }); }
+catch (e) { $('#errgl').style.display = 'grid'; throw e; }
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const size = () => ({ w: canvas.clientWidth, h: canvas.clientHeight });
+const mouse = new THREE.Vector2(0, 0), mouseT = new THREE.Vector2(0, 0);
+addEventListener('pointermove', e => { mouseT.set(e.clientX / innerWidth * 2 - 1, -((e.clientY - 48) / (innerHeight - 48)) * 2 + 1); });
+
+/* ---------- ruido simplex 3D (Ashima, dominio publico) ---------- */
+const NOISE = `
+vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
+vec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}
+vec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-.85373472095314*r;}
+float snoise(vec3 v){
+  const vec2 C=vec2(1./6.,1./3.); const vec4 D=vec4(0.,.5,1.,2.);
+  vec3 i=floor(v+dot(v,C.yyy)); vec3 x0=v-i+dot(i,C.xxx);
+  vec3 g=step(x0.yzx,x0.xyz); vec3 l=1.-g; vec3 i1=min(g.xyz,l.zxy); vec3 i2=max(g.xyz,l.zxy);
+  vec3 x1=x0-i1+C.xxx; vec3 x2=x0-i2+C.yyy; vec3 x3=x0-D.yyy;
+  i=mod289(i);
+  vec4 p=permute(permute(permute(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));
+  float n_=.142857142857; vec3 ns=n_*D.wyz-D.xzx;
+  vec4 j=p-49.*floor(p*ns.z*ns.z); vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.*x_);
+  vec4 x=x_*ns.x+ns.yyyy; vec4 y=y_*ns.x+ns.yyyy; vec4 h=1.-abs(x)-abs(y);
+  vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw);
+  vec4 s0=floor(b0)*2.+1.; vec4 s1=floor(b1)*2.+1.; vec4 sh=-step(h,vec4(0.));
+  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+  vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y); vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
+  vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+  p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
+  vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.); m=m*m;
+  return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+}`;
+
+/* fondo de pantalla completa con shader */
+function fullscreen(frag) {
+  const scene = new THREE.Scene(), cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const u = { t: { value: 0 }, res: { value: new THREE.Vector2(1, 1) }, acc: { value: new THREE.Vector3() }, mouse: { value: new THREE.Vector2() } };
+  const mat = new THREE.ShaderMaterial({ uniforms: u, vertexShader: 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position,1.); }', fragmentShader: frag });
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
+  return {
+    scene, cam,
+    resize(w, h) { const pr = renderer.getPixelRatio(); u.res.value.set(w * pr, h * pr); },
+    update(t) { u.t.value = t; u.mouse.value.copy(mouse); u.acc.value.set(ACC.r, ACC.g, ACC.b); },
+    dispose() { mat.dispose(); }
+  };
+}
+
+/* ===================== 1 SEDA ===================== */
+function seda() {
+  return fullscreen(`
+  precision highp float; uniform float t; uniform vec2 res; uniform vec3 acc; uniform vec2 mouse; varying vec2 vUv;
+  ${NOISE}
+  float field(vec2 p){ return snoise(vec3(p*vec2(.9,.55), t*.045))*1.1 + snoise(vec3(p*1.9+4., t*.06))*.35; }
+  float h(vec2 p){ float w=field(p); return sin(p.x*1.7 + p.y*.8 + w*3.2); }
+  void main(){
+    vec2 p=(gl_FragCoord.xy/res - .5)*vec2(res.x/res.y,1.)*2.2;
+    float e=.004; float f=h(p);
+    float fx=(h(p+vec2(e,0.))-f)/e, fy=(h(p+vec2(0.,e))-f)/e;
+    vec3 n=normalize(vec3(-fx*.12,-fy*.12,1.));
+    vec3 l=normalize(vec3(-.35+mouse.x*.5,.55+mouse.y*.35,.75));
+    float dif=max(dot(n,l),0.);
+    float spec=pow(max(dot(reflect(-l,n),vec3(0.,0.,1.)),0.),26.);
+    float sheen=pow(1.-n.z,1.5);
+    vec3 base=mix(vec3(.012,.012,.016), acc*.28, smoothstep(.2,1.,dif));
+    vec3 col=base + acc*sheen*1.4 + mix(vec3(1.),acc,.35)*spec*.85;
+    float v=smoothstep(1.35,.2,length((gl_FragCoord.xy/res-.5)*vec2(1.4,1.)));
+    gl_FragColor=vec4(pow(col*v, vec3(.9)),1.);
+  }`);
+}
+
+/* ===================== 5 CURVAS DE NIVEL ===================== */
+function topo() {
+  return fullscreen(`
+  precision highp float; uniform float t; uniform vec2 res; uniform vec3 acc; uniform vec2 mouse; varying vec2 vUv;
+  ${NOISE}
+  void main(){
+    vec2 uv=gl_FragCoord.xy/res; vec2 p=(uv-.5)*vec2(res.x/res.y,1.)*2.;
+    vec2 m=mouse*vec2(res.x/res.y,1.);
+    float n=snoise(vec3(p*.75, t*.035))*.9 + snoise(vec3(p*1.7+9., t*.05))*.3;
+    n += .75*exp(-dot(p-m,p-m)*2.2);
+    float k=n*9.;
+    float d=abs(fract(k)-.5)/fwidth(k);
+    float line=1.-smoothstep(.0,1.3,d);
+    float major=1.-smoothstep(.0,1.6,abs(fract(k/5.)-.5)/fwidth(k/5.));
+    float hgt=smoothstep(-1.,1.4,n);
+    vec3 col=vec3(.018,.018,.022);
+    col+=line*mix(vec3(.18), acc, hgt)*.55;
+    col+=major*mix(vec3(.5), acc, .7)*.6;
+    float v=smoothstep(1.4,.3,length((uv-.5)*vec2(1.3,1.)));
+    gl_FragColor=vec4(col*v,1.);
+  }`);
+}
+
+/* ===================== 3 METAL LIQUIDO (raymarching) ===================== */
+function metal() {
+  return fullscreen(`
+  precision highp float; uniform float t; uniform vec2 res; uniform vec3 acc; uniform vec2 mouse; varying vec2 vUv;
+  float smin(float a,float b,float k){ float h=clamp(.5+.5*(b-a)/k,0.,1.); return mix(b,a,h)-k*h*(1.-h); }
+  float map(vec3 p){
+    float T=t*.35;
+    vec3 c=vec3(1.05,0.,0.);
+    float d=length(p-c-vec3(sin(T)*.35, cos(T*1.3)*.3, 0.))-.62;
+    d=smin(d, length(p-c-vec3(cos(T*.8)*.55, sin(T*1.1)*.45, sin(T*.7)*.3))-.44, .45);
+    d=smin(d, length(p-c-vec3(sin(T*1.4+2.)*.5, cos(T*.9+1.)*.55, .1))-.36, .45);
+    d=smin(d, length(p-c-vec3(mouse.x*.9, mouse.y*.6, .3))-.28, .5);
+    return d;
+  }
+  vec3 nor(vec3 p){ vec2 e=vec2(.002,0.); return normalize(vec3(map(p+e.xyy)-map(p-e.xyy), map(p+e.yxy)-map(p-e.yxy), map(p+e.yyx)-map(p-e.yyx))); }
+  vec3 env(vec3 r){
+    float y=r.y*.5+.5;
+    vec3 c=mix(vec3(.01), vec3(.09), y);
+    c+=smoothstep(.93,.99, 1.-abs(r.x-.35))*smoothstep(.1,.6,r.y)*2.2;
+    c+=smoothstep(.96,1., 1.-abs(r.x+.6))*smoothstep(-.2,.4,r.y)*1.1;
+    c+=acc*smoothstep(-.1,-.9,r.y)*1.3;
+    c+=acc*.35*smoothstep(.6,1.,-r.z);
+    return c;
+  }
+  void main(){
+    vec2 p=(gl_FragCoord.xy-.5*res)/res.y;
+    vec3 ro=vec3(0.,0.,3.4), rd=normalize(vec3(p,-1.6));
+    float d=0.; bool hit=false; vec3 pos;
+    for(int i=0;i<80;i++){ pos=ro+rd*d; float s=map(pos); if(s<.001){hit=true;break;} d+=s; if(d>8.)break; }
+    vec3 col=vec3(.012,.012,.015)+acc*.05*smoothstep(1.2,0.,length(p-vec2(.55,0.)));
+    if(hit){
+      vec3 n=nor(pos); vec3 r=reflect(rd,n);
+      float fr=pow(1.-max(dot(-rd,n),0.),3.);
+      col=env(r)*mix(.55,1.,fr) + fr*.15;
+      col=mix(col, col*mix(vec3(1.),acc*1.6,.35), .5);
+    }
+    gl_FragColor=vec4(pow(col,vec3(.85)),1.);
+  }`);
+}
+
+/* ===================== 2 HAZ DE LUZ ===================== */
+function haz() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#030304');
+  const cam = new THREE.PerspectiveCamera(45, 1, .1, 100); cam.position.set(0, 0, 9);
+  const N = 5200, pos = new Float32Array(N * 3), seed = new Float32Array(N);
+  for (let i = 0; i < N; i++) { pos[i * 3] = (Math.random() - .5) * 18; pos[i * 3 + 1] = (Math.random() - .5) * 10; pos[i * 3 + 2] = (Math.random() - .5) * 8; seed[i] = Math.random(); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('seed', new THREE.BufferAttribute(seed, 1));
+  const u = { t: { value: 0 }, a: { value: new THREE.Vector3(0, 6, 0) }, b: { value: new THREE.Vector3(2, -4, 0) }, acc: { value: new THREE.Vector3() }, pr: { value: renderer.getPixelRatio() } };
+  const pts = new THREE.Points(g, new THREE.ShaderMaterial({ uniforms: u, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `uniform float t; uniform vec3 a; uniform vec3 b; uniform float pr; attribute float seed; varying float vL; varying float vS;
+      void main(){ vec3 p=position; float s=seed*6.28;
+        p+=vec3(sin(t*.13+s)*.6, sin(t*.09+s*1.7)*.5 + t*.04*(seed-.5), cos(t*.11+s)*.5);
+        p.y=mod(p.y+5.,10.)-5.;
+        vec3 dir=normalize(b-a); vec3 ap=p-a; float along=dot(ap,dir); vec3 closest=a+dir*along;
+        float rad=.25+along*.16; float dist=length(p-closest);
+        vL=smoothstep(rad,rad*.2,dist)*smoothstep(-.5,2.,along); vS=seed;
+        vec4 mv=modelViewMatrix*vec4(p,1.); gl_Position=projectionMatrix*mv;
+        gl_PointSize=(1.2+seed*2.6)*pr*(9./-mv.z)*(1.+vL*1.4); }`,
+    fragmentShader: `uniform vec3 acc; varying float vL; varying float vS;
+      void main(){ vec2 c=gl_PointCoord-.5; float d=length(c); if(d>.5) discard; float a=smoothstep(.5,0.,d);
+        vec3 col=mix(vec3(1.,.96,.88), acc+.25, .35); gl_FragColor=vec4(col, a*(.035+vL*.95)); }` }));
+  scene.add(pts);
+  /* cono del haz */
+  const coneU = { acc: { value: new THREE.Vector3() } };
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(2.1, 12, 64, 1, true), new THREE.ShaderMaterial({ uniforms: coneU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+    vertexShader: 'varying vec3 vN; varying vec3 vV; varying float vY; void main(){ vY=uv.y; vec4 mv=modelViewMatrix*vec4(position,1.); vN=normalize(normalMatrix*normal); vV=normalize(-mv.xyz); gl_Position=projectionMatrix*mv; }',
+    fragmentShader: 'uniform vec3 acc; varying vec3 vN; varying vec3 vV; varying float vY; void main(){ float edge=pow(abs(dot(vN,vV)),2.2); float f=edge*smoothstep(0.,.9,vY)*.16; vec3 col=mix(vec3(1.,.95,.85),acc+.3,.25); gl_FragColor=vec4(col*f, f); }' }));
+  scene.add(cone);
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(3, 64), new THREE.ShaderMaterial({ uniforms: coneU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+    fragmentShader: 'uniform vec3 acc; varying vec2 vUv; void main(){ float d=length(vUv-.5)*2.; float f=smoothstep(1.,0.,d)*.22; gl_FragColor=vec4(mix(vec3(1.,.95,.85),acc+.3,.3)*f,f); }' }));
+  floor.rotation.x = -Math.PI / 2; scene.add(floor);
+  const tip = new THREE.Vector3(0, 6, 0), dir = new THREE.Vector3();
+  return {
+    scene, cam,
+    resize(w, h) { cam.aspect = w / h; cam.updateProjectionMatrix(); },
+    update(t) {
+      u.t.value = t; const target = new THREE.Vector3(1.8 + mouse.x * 4.5, -4, mouse.y * 1.5);
+      u.b.value.lerp(target, .05); u.a.value.copy(tip); u.acc.value.set(ACC.r, ACC.g, ACC.b); coneU.acc.value.copy(u.acc.value);
+      dir.subVectors(u.b.value, tip); const len = dir.length(); dir.normalize();
+      cone.position.copy(tip).addScaledVector(dir, len / 2 + .3); cone.scale.set(1, (len + .6) / 12, 1);
+      cone.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir);
+      floor.position.set(u.b.value.x, -3.95, u.b.value.z);
+    },
+    dispose() { g.dispose(); }
+  };
+}
+
+/* ===================== 4 PARTICULAS QUE FORMAN FIGURAS ===================== */
+function morfo() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#040405');
+  const cam = new THREE.PerspectiveCamera(40, 1, .1, 100); cam.position.set(0, 0, 11);
+  const N = 14000;
+  const sphere = new Float32Array(N * 3), ring = new Float32Array(N * 3), num = new Float32Array(N * 3), rnd = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    const u = Math.random(), v = Math.random(), th = u * Math.PI * 2, ph = Math.acos(2 * v - 1), r = 2.6 + (Math.random() - .5) * .08;
+    sphere.set([r * Math.sin(ph) * Math.cos(th), r * Math.sin(ph) * Math.sin(th), r * Math.cos(ph)], i * 3);
+    const a = Math.random() * Math.PI * 2, rr = 2.9 + (Math.random() - .5) * .5, tt = (Math.random() - .5) * .35;
+    ring.set([Math.cos(a) * rr, Math.sin(a) * rr * .98, tt + Math.sin(a * 3) * .15], i * 3);
+    rnd[i] = Math.random();
+  }
+  /* "26" muestreado de un canvas */
+  const c2 = document.createElement('canvas'); c2.width = 520; c2.height = 320; const x = c2.getContext('2d');
+  x.fillStyle = '#fff'; x.font = '800 290px "Plus Jakarta Sans", sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('26', 260, 170);
+  const data = x.getImageData(0, 0, 520, 320).data, cand = [];
+  for (let yy = 0; yy < 320; yy += 2) for (let xx = 0; xx < 520; xx += 2) if (data[(yy * 520 + xx) * 4 + 3] > 128) cand.push([xx, yy]);
+  for (let i = 0; i < N; i++) { const p = cand[Math.floor(Math.random() * cand.length)] || [260, 160]; num.set([(p[0] - 260) / 52, -(p[1] - 170) / 52, (Math.random() - .5) * .4], i * 3); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(sphere, 3)); g.setAttribute('pB', new THREE.BufferAttribute(num, 3)); g.setAttribute('pC', new THREE.BufferAttribute(ring, 3)); g.setAttribute('rnd', new THREE.BufferAttribute(rnd, 1));
+  const u = { t: { value: 0 }, m: { value: 0 }, mouse: { value: new THREE.Vector3(99, 99, 0) }, acc: { value: new THREE.Vector3() }, pr: { value: renderer.getPixelRatio() } };
+  const mat = new THREE.ShaderMaterial({ uniforms: u, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `uniform float t; uniform float m; uniform vec3 mouse; uniform float pr; attribute vec3 pB; attribute vec3 pC; attribute float rnd; varying float vR; varying float vN;
+      ${NOISE}
+      void main(){
+        float k=fract(m); float st=floor(mod(m,3.));
+        vec3 A= st<.5?position: st<1.5?pB:pC; vec3 B= st<.5?pB: st<1.5?pC:position;
+        float e=smoothstep(0.,1.,clamp((k-rnd*.35)/.65,0.,1.));
+        vec3 p=mix(A,B,e);
+        float scat=sin(3.14159*e); p+=normalize(p+.001)*scat*.9*rnd;
+        p+=vec3(snoise(p*.5+t*.12), snoise(p*.5+t*.12+10.), snoise(p*.5+t*.12+20.))*.07;
+        vec3 d=p-mouse; float dm=length(d.xy); p.xy+=normalize(d.xy+.0001)*smoothstep(1.6,0.,dm)*.9;
+        vR=rnd; vN=scat;
+        vec4 mv=modelViewMatrix*vec4(p,1.); gl_Position=projectionMatrix*mv; gl_PointSize=(1.4+rnd*1.8)*pr*(11./-mv.z); }`,
+    fragmentShader: `uniform vec3 acc; varying float vR; varying float vN;
+      void main(){ vec2 c=gl_PointCoord-.5; float d=length(c); if(d>.5) discard;
+        vec3 col=mix(acc*1.1, vec3(1.), step(.82,vR)*.8); gl_FragColor=vec4(col, smoothstep(.5,.0,d)*(.55+vN*.3)); }` });
+  const pts = new THREE.Points(g, mat); pts.position.x = 2.4; scene.add(pts);
+  const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0), hit = new THREE.Vector3();
+  return {
+    scene, cam,
+    resize(w, h) { cam.aspect = w / h; cam.updateProjectionMatrix(); pts.position.x = w > 1020 ? 2.6 : 0; pts.position.y = w > 1020 ? .2 : 1.4; const s = w > 1020 ? 1 : .8; pts.scale.set(s, s, s); },
+    update(t) {
+      u.t.value = t; u.acc.value.set(ACC.r, ACC.g, ACC.b);
+      const cyc = t / 4.2; u.m.value = Math.floor(cyc) + Math.min(1, (cyc % 1) / .45);
+      pts.rotation.y = Math.sin(t * .15) * .35 + mouse.x * .25; pts.rotation.x = mouse.y * -.15;
+      ray.setFromCamera(mouse, cam); ray.ray.intersectPlane(plane, hit); pts.worldToLocal(hit); u.mouse.value.copy(hit);
+    },
+    dispose() { g.dispose(); mat.dispose(); }
+  };
+}
+
+/* ===================== 6 VIDRIO ===================== */
+function vidrio() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#050506');
+  const cam = new THREE.PerspectiveCamera(35, 1, .1, 100); cam.position.set(0, 0, 10);
+  const pm = new THREE.PMREMGenerator(renderer); const envTex = pm.fromScene(new RoomEnvironment(), .04).texture; scene.environment = envTex;
+  /* texto detras del vidrio */
+  const tc = document.createElement('canvas'); tc.width = 2048; tc.height = 1024; const x = tc.getContext('2d');
+  const drawText = () => {
+    x.clearRect(0, 0, 2048, 1024);
+    const hex = '#' + ACC.getHexString();
+    x.fillStyle = hex; x.font = '800 420px "Plus Jakarta Sans", sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('SUMMIT', 1024, 380);
+    x.fillStyle = '#ffffff'; x.fillText('2026', 1024, 760);
+    tex.needsUpdate = true;
+  };
+  const tex = new THREE.CanvasTexture(tc); tex.colorSpace = THREE.SRGBColorSpace;
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(12, 6), new THREE.MeshBasicMaterial({ map: tex, transparent: true }));
+  back.position.set(2.2, 0, -2.2); scene.add(back);
+  const glass = new THREE.Mesh(new THREE.TorusKnotGeometry(1.15, .36, 320, 64, 2, 3), new THREE.MeshPhysicalMaterial({ color: '#ffffff', metalness: 0, roughness: .04, transmission: 1, thickness: 1.6, ior: 1.52, iridescence: .35, iridescenceIOR: 1.3, envMapIntensity: 1.2, specularIntensity: 1, clearcoat: 1, clearcoatRoughness: .05 }));
+  glass.position.set(2.4, 0, 0); scene.add(glass);
+  const key = new THREE.DirectionalLight('#ffffff', 2.2); key.position.set(-3, 4, 5); scene.add(key);
+  drawText();
+  return {
+    scene, cam,
+    accent() { drawText(); },
+    resize(w, h) { cam.aspect = w / h; cam.updateProjectionMatrix(); const d = w > 1020; glass.position.set(d ? 2.4 : 0, d ? 0 : 1.6, 0); back.position.set(d ? 2.2 : 0, d ? 0 : 1.6, -2.2); },
+    update(t) { glass.rotation.x = t * .12 + mouse.y * .4; glass.rotation.y = t * .18 + mouse.x * .6; },
+    dispose() { envTex.dispose(); pm.dispose(); tex.dispose(); }
+  };
+}
+
+const FX = { seda, haz, metal, morfo, topo, vidrio };
+let current = null, currentKey = '';
+function setFx(k) {
+  if (current && current.dispose) current.dispose();
+  currentKey = k; current = FX[k](); current.resize(size().w, size().h); resize();
+  document.querySelectorAll('#seg button').forEach(b => b.classList.toggle('on', b.dataset.e === k));
+  store.set('labf-fx', k);
+  const cap = $('#cap'); cap.innerHTML = CAPS[k]; cap.classList.remove('hide'); clearTimeout(cap._t); cap._t = setTimeout(() => cap.classList.add('hide'), 7000);
+}
+function resize() { const { w, h } = size(); renderer.setSize(w, h, false); if (current) current.resize(w, h); }
+addEventListener('resize', resize);
+document.querySelectorAll('#seg button').forEach(b => b.addEventListener('click', () => setFx(b.dataset.e)));
+document.querySelectorAll('#sw button').forEach(b => b.addEventListener('click', () => setAccent(b.dataset.c)));
+
+const clock = new THREE.Clock();
+function loop() {
+  mouse.lerp(mouseT, .05);
+  const t = reduced ? 3 : clock.getElapsedTime();
+  if (current) { current.update(t); renderer.render(current.scene, current.cam); }
+  requestAnimationFrame(loop);
+}
+
+/* registro y cuenta regresiva */
+const START = new Date('2026-11-04T08:00:00-05:00'), pad = n => String(n).padStart(2, '0');
+function tick() { const ms = Math.max(0, START - Date.now()); $('#cd').textContent = `${Math.floor(ms / 864e5)}D ${pad(Math.floor(ms / 36e5) % 24)}H ${pad(Math.floor(ms / 6e4) % 60)}M ${pad(Math.floor(ms / 1e3) % 60)}S`; }
+tick(); setInterval(tick, 1000);
+$('#form').addEventListener('submit', e => {
+  e.preventDefault(); const f = e.target; let ok = true;
+  f.name.classList.toggle('err', f.name.value.trim().length < 2); if (f.name.value.trim().length < 2) ok = false;
+  const mailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim()); f.email.classList.toggle('err', !mailOk); if (!mailOk) ok = false;
+  $('#cn').classList.toggle('err', !f.consent.checked); if (!f.consent.checked) ok = false;
+  if (!ok) return;
+  const [u, d] = f.email.value.trim().split('@');
+  $('#nm').textContent = f.name.value.trim(); $('#ml').textContent = u[0] + '***@' + d; $('#tn').textContent = 'N.º 0348'; $('#ticket').classList.add('ok');
+});
+$('#reset').addEventListener('click', () => { $('#ticket').classList.remove('ok'); $('#form').reset(); $('#tn').textContent = 'GRATIS'; });
+
+setAccent(store.get('labf-acc') || '#3D6BFF');
+const q = new URLSearchParams(location.search).get('e');
+setFx(FX[q] ? q : (FX[store.get('labf-fx')] ? store.get('labf-fx') : 'seda'));
+document.fonts && document.fonts.ready.then(() => { if (current && current.accent) current.accent(); if (currentKey === 'morfo') setFx('morfo'); });
+loop();
+window.__lab = { setFx, setAccent, renderer, get cur() { return current; }, renderOnce(t = 4) { current.update(t); renderer.render(current.scene, current.cam); } };
+</script>
+</body>
+</html>

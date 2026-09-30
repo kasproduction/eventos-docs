@@ -94,6 +94,20 @@
 
 ## 3. Landing Web (registro publico)
 
+> **ACTIVO desde 2026-09-30 (decision Kamilo): es la feature que sigue, antes del servidor.**
+> Landing personalizada por cliente + summit demo de EventOS como vitrina + widget embebible
+> (enlace, integrado, boton con ventana, boton flotante). Target: CEOs y ejecutivos, elegante sin
+> cliche. Registro en forma de frase, sin contraseña (enlace magico). Base visual: propuesta A
+> (boleto) + color de marca en patrocinadores. El widget NO espeja el onboarding de Expo.
+> Labs: `design/features/landing/` (v1, v2, direcciones de hero, fondos three.js). Estado del dia y
+> descartes: `docs/NEXT-SESSION.md` sesion 2026-09-30.
+> **Hallazgos backend (antes de abrir al publico):** `POST /auth/register` sin throttle; sin CAPTCHA
+> (propuesto Turnstile); `max_attendees` sin lock (carrera en el ultimo cupo); `SecurityHeaders`
+> pone `X-Frame-Options: DENY` global (bloquea el iframe); `allowed_embed_domains` hoy valida
+> streams salientes, hace falta un campo propio para dominios que embeben; registro exige
+> contraseña (hace falta registro sin contraseña + enlace magico para cuentas nuevas).
+> Campos nuevos que pide el diseño: frase del speaker, "que trae" el patrocinador.
+
 > Ultimo en orden porque el registro puede hacerse por CSV/import hasta tener landing.
 > Ref: `docs/ROADMAP-UIUX-LANDING.md`
 

@@ -28,6 +28,10 @@ B3 Arreglos para 5.000 (paralelo) ───────────┘
 
 ## ESTADO Y PENDIENTES AL 2026-09-29 (cierre de sesion, decisiones de Kamilo)
 
+> **EN PAUSA desde 2026-09-30 (decision Kamilo): "no podemos seguir con digital ocean hasta que
+> esten todas las feature".** Primero landing + widget de registro y W.19; despues P.0 en adelante.
+> El calendario de abajo queda corrido por esa pausa.
+
 > **EL EVENTO ES EL DOMINGO 6 DE DICIEMBRE DE 2026** (dato Kamilo 2026-09-29; el
 > plan conserva el nombre "noviembre"). El 2026-09-29 faltaban 68 dias.
 > Ensayo general: fin de semana del 28-29 de noviembre.

@@ -2,12 +2,77 @@
 
 > Este archivo es **solo continuidad** (que hicimos la sesion pasada, decisiones cerradas).
 >
-> **Para saber que sigue → abrir `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`, seccion
-> "ESTADO Y PENDIENTES AL 2026-09-29"** (arriba del plan B1-B6): el evento es el **domingo 6 de
+> **2026-09-30: el servidor (DigitalOcean) esta EN PAUSA hasta cerrar todas las features. Sigue la
+> landing + widget de registro (`docs/living/PENDIENTES.md` §3, labs en `design/features/landing/`).**
+>
+> Plan de servidor (en pausa): `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`, seccion
+> "ESTADO Y PENDIENTES AL 2026-09-29" (arriba del plan B1-B6): el evento es el **domingo 6 de
 > diciembre de 2026**, 5.000 personas; pendientes P.0-P.6 en orden y calendario por semana.
 > Lo de webapp sigue en `docs/living/PENDIENTES-WEBAPP.md`.
 
 ---
+
+## SESION 2026-09-30 (Fable 5.1 / Opus 5.5) — CAMBIO DE ORDEN + LANDING Y WIDGET DE REGISTRO (LABS)
+
+**Ventana operativa de este frente: `docs/living/PENDIENTES.md` §3 (Landing + widget de registro).**
+Sin codigo en repos de producto. Solo labs en `design/features/landing/`.
+
+### Decisiones de Kamilo (no re-preguntar)
+
+- **DigitalOcean EN PAUSA hasta cerrar TODAS las features** ("no podemos seguir con digital ocean
+  hasta que esten todas las feature"). P.0-P.6 del plan de servidor esperan.
+- Features abiertas: **registro publico = landing personalizada por cliente + widget embebible**
+  (primero) y W.19 Spatial Player (despues).
+- El widget **NO espeja el onboarding de Expo**: vive en la pagina de expectativa. Registro facil:
+  nombre + correo (+ codigo si aplica) + consentimiento, **sin contraseña** (enlace magico).
+- **Nosotros hacemos la landing** por cliente, y EventOS tiene su propio "summit demo" como vitrina.
+  Tiene que ser espectacular: "de nada sirve una plataforma premium enterprise si lo que vende es horrible".
+- **Target: CEOs, ejecutivos mayores, gente fancy.** Animacion tradicional/elegante SIN cliche.
+- Le encanta el **registro en forma de frase** ("Hola, me llamo… y mi correo es…").
+- Le gusta el **boleto** (propuesta A) y el **toque de color de marca en patrocinadores**.
+- Descartado: editorial clara (plana), ondas/lineas de fondo (cliche), texto que cambia de
+  caracteres (es firma de KasProduction), tablero de salidas, papel, campaña con foto.
+  Bambalinas le gusto pero no es el target.
+- Animar con **GSAP**; para 3D explorar three.js.
+
+### Hecho 2026-09-30
+
+- Analisis: backend de registro (`POST /auth/register` sin throttle, sin CAPTCHA, cupo sin lock,
+  SecurityHeaders bloquea iframes, `allowed_embed_domains` hoy sirve para otra cosa), onboarding Expo
+  mapeado (AboutStep y PointsFloat son codigo muerto; salta a foto aunque este apagada).
+- Refs vistas: techsummit26 (Claro), Bintec, Agora, EventFlow, Eventes, ConnectSphere, Stripe Sessions,
+  Vercel Ship; 3D: Cartier W&W, Hubtown, Iventions, IVRESS, Oryzo.
+- Labs: `lab-landing-registro.html` (v1, A boleto + B editorial), `-v2.html` (GSAP, speakers vivos con
+  reseña, patrocinadores vivos), `lab-hero-direcciones.html` (4 direcciones, descartadas),
+  `lab-hero-fondos.html` (6 fondos three.js: seda, haz de luz, metal liquido, particulas que forman
+  figuras, curvas de nivel, vidrio). Vistas de celular: `celular*.html`.
+
+### A medias
+
+- **`lab-hero-fondos.html`**: los 6 fondos compilan y renderizan. Pendiente: las particulas se
+  quedan en esfera y no forman el "26" (depurando: datos y uniform `m` bien, falta ver el shader);
+  seda se ve como "liquido" y debe tener pliegues mas grandes y suaves; el haz de luz casi no se ve;
+  el metal necesita mas brillo de estudio. Kamilo todavia no los vio.
+
+### Siguiente
+
+Corregir los 4 fondos de arriba → Kamilo los ve con la ventana de Chrome AL FRENTE → escoge fondo →
+lab del hero definitivo → resto de la landing (A boleto como base) → roadmap del registro, landing
+y widget.
+
+### Gotchas de esta sesion
+
+- **Con la ventana de Chrome oculta el navegador pausa requestAnimationFrame**: GSAP, CSS y WebGL no
+  avanzan y las capturas salen a medias o en negro. Para revisar: forzar estado final
+  (`progress(1)` de GSAP, render manual de three.js con `__lab.renderOnce()`), o pedir a Kamilo la
+  ventana al frente.
+- El navegador automatizado no abre `file://`: los labs se sirven con
+  `python -m http.server 8765` desde `design/features/landing/`.
+- Transicion CSS sobre `transform` + tween de GSAP en el mismo elemento = animacion trabada.
+- `New folder/` en la raiz tiene un tema comprado de ThemeForest (33 MB): NO se sube a git.
+
+---
+
 
 ## SESION 2026-09-29 (Opus 5.5 → Fable 5.1) — 2FA DEL STAFF 25/26 + FECHA DEL EVENTO + CAMBIO DE ORDEN
 
