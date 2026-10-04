@@ -144,6 +144,7 @@
 - [x] Frase del registro con cargo y empresa (opcionales): "Hola, me llamo ___ trabajo como ___ en ___ y mi correo es ___" (v3)
 - [x] Lab de la pagina de confirmacion (Noir/Lux, celular, movimiento reducido) y paso desde el registro de la v3
 - [ ] Revision de Kamilo en iPad y celular (la franja negra abajo que aparecio una vez al llegar desde el registro)
+- [ ] Cinta de la escarapela creible: curva blanda con holgura (no tiesa) y el giro tuerce la cinta en vez de girar la tarjeta sola (lab primero)
 - [ ] Backend: entregar el QR dinamico (`d.{attendee}.{ventana}.{firma}`, 60 s) a la pagina de confirmacion SIN sesion (hoy `GET /me/qr` exige auth) — decision abierta
 - [ ] Backend: guardar cargo y empresa del registro publico en el asistente
 - [ ] Pasar la confirmacion al stack real de la landing

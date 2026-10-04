@@ -58,7 +58,12 @@
 1. Kamilo revisa la confirmacion en iPad y celular (si ve una franja negra abajo al llegar desde el registro: apareció
    una vez en Playwright y no se pudo repetir). Recargar fuerte: Chrome/Safari guardan la v3 vieja en cache.
 2. Decidir como llega el QR dinamico a la confirmacion SIN sesion (hoy `GET /me/qr` exige auth) y guardar cargo/empresa.
-3. Revision completa de Lux con Kamilo. Luego roadmap del registro, landing y widget (stack real).
+3. **Cinta de la escarapela (Kamilo, al cierre):** "es raro girar la escarapela en su propio eje y que no se enrede,
+   y esta super tiesa la cuerda". Propuesta a llevar a lab ANTES de tocar: (a) la cinta como curva blanda (dos tramos
+   con caida y algo de holgura que siguen el balanceo con retraso, no lineas rectas); (b) el giro hace que el tramo
+   final se tuerza (se angosta con el angulo y se ve el reves de la cinta) y al volver se destuerce, en vez de girar
+   la tarjeta sola. El boton repetido "Volver al evento" ya se quito (queda solo arriba a la derecha).
+4. Revision completa de Lux con Kamilo. Luego roadmap del registro, landing y widget (stack real).
 
 ### Gotchas de hoy
 
