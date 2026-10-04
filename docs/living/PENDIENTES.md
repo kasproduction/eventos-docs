@@ -99,6 +99,8 @@
 > (enlace, integrado, boton con ventana, boton flotante). Target: CEOs y ejecutivos, elegante sin
 > cliche. Registro en forma de frase, sin contraseña (enlace magico). Base visual: propuesta A
 > (boleto) + color de marca en patrocinadores. El widget NO espeja el onboarding de Expo.
+> **Linea visual aprobada 2026-10-01: `design/system/LINEA-VITRINA.md`** (hero oscuro = Paisaje de
+> datos, claro = Fachada cinetica; lab `design/features/landing/lab-hero-elegidos.html`).
 > Labs: `design/features/landing/` (v1, v2, direcciones de hero, fondos three.js). Estado del dia y
 > descartes: `docs/NEXT-SESSION.md` sesion 2026-09-30.
 > **Hallazgos backend (antes de abrir al publico):** `POST /auth/register` sin throttle; sin CAPTCHA
@@ -132,9 +134,19 @@
 - [ ] Tema del widget: hereda branding del evento (accent/logo), Noir/Lux auto
 - [ ] Config en admin: cluster Entrada → tab "Widget" (generar snippet + dominios)
 
-### Post-registro
+### Post-registro (diseño en lab 2026-10-04: `design/features/landing/lab-confirmacion.html`)
 
-- [ ] Confirmacion web + QR descarga app
+> Decisiones Kamilo 2026-10-04: la confirmacion es una **pagina propia** (no el panel del registro), con poco
+> texto y **celebracion** (ola del color del cliente en la escena del hero); **escarapela colgante** con animacion
+> Sutil: un lado nombre grande + cargo + empresa, el otro el **QR real** igual al de Expo/webapp. Noir = escarapela
+> oscura, Lux = crema, cinta oscura en las dos, cinta que pasa por la ranura (sin metal). Apple Wallet = nice to have.
+
+- [x] Frase del registro con cargo y empresa (opcionales): "Hola, me llamo ___ trabajo como ___ en ___ y mi correo es ___" (v3)
+- [x] Lab de la pagina de confirmacion (Noir/Lux, celular, movimiento reducido) y paso desde el registro de la v3
+- [ ] Revision de Kamilo en iPad y celular (la franja negra abajo que aparecio una vez al llegar desde el registro)
+- [ ] Backend: entregar el QR dinamico (`d.{attendee}.{ventana}.{firma}`, 60 s) a la pagina de confirmacion SIN sesion (hoy `GET /me/qr` exige auth) — decision abierta
+- [ ] Backend: guardar cargo y empresa del registro publico en el asistente
+- [ ] Pasar la confirmacion al stack real de la landing
 
 ### Endpoints publicos
 

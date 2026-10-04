@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iPad y el iPhone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Lab: la seccion del iPhone de la landing v3 en iPad vertical y horizontal.
+   Carga la v3 real en dos iframes a tamano de iPad y le inyecta cada opcion encima. La v3 no se toca. */
+:root { --bg: #161617; --fg: #f4f4f5; --mut: rgba(255,255,255,.55); --line: rgba(255,255,255,.1); --card: #202022; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font-family: 'Urbanist', system-ui, sans-serif; overflow: hidden; }
+.bar { height: 56px; display: flex; align-items: center; gap: 14px; padding: 0 20px; border-bottom: 1px solid var(--line); font-size: 13.5px; flex-wrap: nowrap; }
+.bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 15px; white-space: nowrap; margin-right: 6px; }
+.seg { display: flex; padding: 3px; gap: 2px; border-radius: 10px; background: var(--card); }
+.seg button { border: 0; background: none; color: var(--mut); font: 600 13px 'Urbanist'; padding: 7px 12px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+.seg button.on { background: #fff; color: #111; }
+.sw { display: flex; gap: 6px; }
+.sw button { width: 18px; height: 18px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+.sw button.on { border-color: #fff; }
+.go { margin-left: auto; border: 1px solid var(--line); background: none; color: var(--fg); font: 600 13px 'Urbanist'; padding: 8px 14px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
+.go:hover { background: var(--card); }
+.stage { height: calc(100% - 56px); display: flex; justify-content: center; align-items: flex-start; gap: 36px; padding: 18px 20px 0; }
+.dev { display: flex; flex-direction: column; gap: 12px; }
+.ipad { position: relative; border-radius: 30px; background: linear-gradient(145deg, #3a3a3c, #1c1c1e 40%, #2a2a2c); padding: 13px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 30px 60px rgba(0,0,0,.5); }
+.ipad .vp { overflow: hidden; border-radius: 18px; background: #000; position: relative; }
+.ipad iframe { border: 0; display: block; transform-origin: 0 0; position: absolute; left: 0; top: 0; }
+.cap { display: flex; flex-direction: column; gap: 3px; max-width: 100%; }
+.cap strong { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 14px; }
+.cap span { color: var(--mut); font-size: 13.5px; line-height: 1.45; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <b>iPad: la sección del iPhone</b>
+  <div class="seg" id="theme"><button data-t="dark" class="on">Noir</button><button data-t="light">Lux</button></div>
+  <div class="seg" id="opt"></div>
+  <div class="sw" id="sw">
+    <button data-c="#3D6BFF" style="background:#3D6BFF" class="on" title="Azul"></button>
+    <button data-c="#E5192B" style="background:#E5192B" title="Rojo"></button>
+    <button data-c="#FF6A13" style="background:#FF6A13" title="Naranja"></button>
+    <button data-c="#C9A86A" style="background:#C9A86A" title="Dorado"></button>
+  </div>
+  <button class="go" id="back">Volver al inicio de la sección</button>
+</div>
+<div class="stage">
+  <div class="dev"><div class="ipad"><div class="vp"><iframe id="fp" title="iPad vertical"></iframe></div></div><div class="cap"><strong>Vertical, 768 × 1024</strong><span id="capP"></span></div></div>
+  <div class="dev"><div class="ipad"><div class="vp"><iframe id="fl" title="iPad horizontal"></iframe></div></div><div class="cap"><strong>Horizontal, 1024 × 768</strong><span id="capL"></span></div></div>
+</div>
+
+<script>
+const SRC = 'lab-landing-v3.html';
+const $ = s => document.querySelector(s);
+const st = { theme: 'dark', opt: 'n1', acc: '#3D6BFF' };
+
+/* opciones por plantilla. Noir: historia o pestanas. Lux: tablero o pestanas. "Hoy" = la v3 tal cual. */
+const OPTS = {
+  dark: [['hoy', 'Hoy'], ['n1', '1 Historia a dos columnas'], ['t3', '3 Pestañas bajo el iPhone']],
+  light: [['hoy', 'Hoy'], ['l2', '2 Orbe y tablero'], ['t3', '3 Pestañas bajo el iPhone']]
+};
+const CAPS = {
+  hoy: ['La v3 de hoy: iPhone de celular pegado abajo, texto con el ancho de escritorio.', 'La v3 de hoy.'],
+  n1: ['El iPhone se queda a la izquierda, fijo, y cada paso ocupa media pantalla a su lado. Nada lo tapa.', 'La misma pieza girada: el iPhone en el mismo lado, la columna de texto solo se ensancha.'],
+  l2: ['Tablero: el iPhone al centro y las cuatro funciones en dos por dos debajo. Tocar una la enciende.', 'Orbe: las funciones a los lados y el iPhone más grande. Al girar, las tarjetas bajan al piso.'],
+  t3: ['El iPhone al centro y debajo los cuatro títulos. Tocar uno cambia la pantalla y el texto.', 'En horizontal no hay pestañas: se queda la composición de la opción recomendada.']
+};
+
+/* ---------- CSS que se inyecta en la v3 ---------- */
+const PORT = '@media (min-width: 700px) and (max-width: 1100px) and (orientation: portrait)';
+const LAND = '@media (min-width: 900px) and (orientation: landscape)';
+const BASE = `
+.lab-bar { display: none !important; } :root { --bar: 0px !important; }
+${PORT} { .sec { padding-left: 32px; padding-right: 32px; } }
+`;
+const N1 = `
+${PORT} {
+  #experiencia .exp { grid-template-columns: 290px minmax(0, 1fr); gap: 44px; }
+  #experiencia .exp .phone-wrap { order: 0; position: sticky; top: 0; bottom: auto; align-self: start; height: 100svh; padding: 0; background: none; pointer-events: auto; display: grid; place-items: center; }
+  #experiencia .exp .phone-wrap .iphone { --pw: min(290px, calc((100svh - 190px) / 2.06)); }
+  #experiencia .steps { padding: 30svh 0 34svh; }
+  #experiencia .step { min-height: 56svh; padding: 0; opacity: .26; transition: opacity .6s var(--ease); }
+  #experiencia .step.on { opacity: 1; }
+  #experiencia .step h3 { font-size: 34px; margin-bottom: 14px; }
+  #experiencia .step p { font-size: 18px; max-width: 380px; }
+}`;
+const L2 = `
+${PORT} {
+  #lx-exp .orb { grid-template-columns: 1fr 1fr; gap: 14px; }
+  #lx-exp .orb .side { display: contents; }
+  #lx-exp .orb .iphone-slot { grid-column: 1 / -1; order: -1; position: static; background: none; padding: 0 0 22px; display: grid; place-items: center; pointer-events: auto; }
+  #lx-exp .orb .iphone-slot .iphone { --pw: 270px; }
+  #lx-exp .fc { padding: 22px; } #lx-exp .fc h3 { font-size: 22px; } #lx-exp .fc p { font-size: 15px; }
+}
+${LAND} {
+  #lx-exp .orb { gap: 32px; }
+  #lx-exp .orb .iphone { --pw: min(300px, calc((100svh - 180px) / 2.06)); }
+}`;
+const T3 = `
+.tbx { display: none; }
+${PORT} {
+  #experiencia .exp { grid-template-columns: 1fr; }
+  #experiencia .exp .phone-wrap { position: static; height: auto; padding: 0; background: none; pointer-events: auto; display: grid; place-items: center; }
+  #experiencia .steps { display: none; }
+  #lx-exp .orb { grid-template-columns: 1fr; gap: 0; }
+  #lx-exp .orb .side { display: none; }
+  #lx-exp .orb .iphone-slot { position: static; background: none; padding: 0; pointer-events: auto; }
+  #experiencia .exp .iphone, #lx-exp .orb .iphone { --pw: 290px !important; }
+  .tbx { display: block; order: 9; margin: 34px auto 0; width: 100%; max-width: 640px; }
+  .tbx-row { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .tbx-row button { border: 0; background: none; color: var(--mut); text-align: left; padding: 0 12px 16px 0; cursor: pointer; font: inherit; -webkit-tap-highlight-color: transparent; }
+  .tbx-row .n { display: block; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14px; color: var(--mut2); margin-bottom: 6px; transition: color .5s var(--out); }
+  .tbx-row b { display: block; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 17px; letter-spacing: -.02em; line-height: 1.15; transition: color .5s var(--out); }
+  .tbx-row button.on .n { color: var(--accent); } .tbx-row button.on b { color: var(--fg); }
+  .tbx-track { position: relative; height: 2px; background: var(--line); }
+  .tbx-track i { position: absolute; left: 0; top: 0; height: 2px; width: 25%; background: var(--accent); transition: transform .7s var(--io); }
+  .tbx-p { margin: 20px 0 0; font-size: 18px; line-height: 1.55; color: var(--mut); min-height: 3.1em; transition: opacity .35s var(--ease); }
+}`;
+/* en horizontal la opcion 3 se queda con la composicion recomendada de su plantilla */
+const CSS = { hoy: () => '', n1: () => N1, l2: () => L2, t3: () => T3 + (st.theme === 'dark' ? '' : L2.slice(L2.indexOf(LAND))) };
+
+/* ---------- pestanas (opcion 3), construidas dentro de la v3 ---------- */
+function buildTabs(win) {
+  const d = win.document, lux = st.theme === 'light';
+  const cards = lux ? [...d.querySelectorAll('#lx-exp .fc')] : [...d.querySelectorAll('#experiencia .step')];
+  const data = cards.map(c => [c.querySelector('h3').textContent, c.querySelector('p').textContent]);
+  const box = d.createElement('div'); box.className = 'tbx';
+  box.innerHTML = `<div class="tbx-row">${data.map((e, i) => `<button data-i="${i}"><span class="n">0${i + 1}</span><b>${e[0]}</b></button>`).join('')}</div><div class="tbx-track"><i></i></div><p class="tbx-p"></p>`;
+  (lux ? d.querySelector('#lx-exp .orb') : d.querySelector('#experiencia .exp')).appendChild(box);
+  const p = box.querySelector('.tbx-p'); let cur = -1;
+  const paint = i => {
+    if (i === cur) return; const first = cur < 0; cur = i;
+    box.querySelectorAll('.tbx-row button').forEach(b => b.classList.toggle('on', +b.dataset.i === i));
+    box.querySelector('.tbx-track i').style.transform = `translateX(${i * 100}%)`;
+    if (first) { p.textContent = data[i][1]; return; }
+    p.style.opacity = 0; setTimeout(() => { p.textContent = data[i][1]; p.style.opacity = 1; }, 300);
+  };
+  const choose = i => {
+    if (lux) cards[i].dispatchEvent(new win.PointerEvent('pointerenter', { clientX: 0, clientY: 0 })); /* detiene el ciclo y cambia el iPhone */
+    else d.querySelectorAll('#phone .scr').forEach((s, j) => s.classList.toggle('on', j === i + 1));
+    paint(i);
+  };
+  box.querySelectorAll('.tbx-row button').forEach(b => b.addEventListener('click', () => choose(+b.dataset.i)));
+  if (lux) { /* el ciclo de Lux corre hasta el primer toque: las pestanas lo siguen */
+    const sync = () => { const k = cards.findIndex(c => c.classList.contains('lit')); if (k >= 0) paint(k); };
+    new win.MutationObserver(sync).observe(d.querySelector('#lx-exp .orb'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+    sync();
+  } else paint(0);
+}
+
+/* ---------- carga ---------- */
+const frames = [$('#fp'), $('#fl')];
+function secTop(win) { const s = win.document.querySelector(st.theme === 'dark' ? '#experiencia' : '#lx-exp'); return s.getBoundingClientRect().top + win.scrollY; }
+function toSection() { frames.forEach(f => { const w = f.contentWindow; try { w.scrollTo({ top: secTop(w) - 10, behavior: 'instant' }); } catch (e) {} }); }
+function prep(f) {
+  const w = f.contentWindow, d = w.document;
+  const css = d.createElement('style'); css.textContent = BASE + CSS[st.opt](); d.head.appendChild(css);
+  d.body.classList.add('dx-hero'); /* sin hero 3D: solo miramos esta seccion */
+  const lp = d.querySelector('#lx-exp .lx-head p'); if (lp && st.opt !== 'hoy') lp.textContent = 'Toca cada función para verla en la app.';
+  if (st.opt === 't3') buildTabs(w);
+  const wait = () => w.__lab ? (w.__lab.setAccent(st.acc), setTimeout(() => { w.dispatchEvent(new Event('resize')); w.scrollTo({ top: secTop(w) - 10, behavior: 'instant' }); }, 700)) : setTimeout(wait, 100);
+  wait();
+}
+frames.forEach(f => f.addEventListener('load', () => prep(f)));
+function load() { frames.forEach(f => { f.src = `${SRC}?t=${st.theme}&v=${Date.now()}`; }); $('#capP').textContent = CAPS[st.opt][0]; $('#capL').textContent = CAPS[st.opt][1]; }
+
+/* ---------- escala: los dos iPads a la misma escala, que quepan en la ventana ---------- */
+function fit() {
+  const H = innerHeight - 56 - 18 - 72, W = innerWidth - 40 - 36;
+  const s = Math.min(1, H / (1024 + 26), W / (768 + 26 + 1024 + 26));
+  [['#fp', 768, 1024], ['#fl', 1024, 768]].forEach(([id, w, h]) => {
+    const f = $(id); f.style.width = w + 'px'; f.style.height = h + 'px'; f.style.transform = `scale(${s})`;
+    const vp = f.parentElement; vp.style.width = w * s + 'px'; vp.style.height = h * s + 'px';
+    f.closest('.dev').style.width = (w * s + 26) + 'px';
+  });
+}
+addEventListener('resize', fit); fit();
+
+/* ---------- barra ---------- */
+function renderOpts() {
+  $('#opt').innerHTML = OPTS[st.theme].map(([k, l]) => `<button data-o="${k}" class="${k === st.opt ? 'on' : ''}">${l}</button>`).join('');
+  $('#opt').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { st.opt = b.dataset.o; renderOpts(); load(); }));
+}
+$('#theme').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  st.theme = b.dataset.t; $('#theme').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  st.opt = st.theme === 'dark' ? 'n1' : 'l2'; renderOpts(); load();
+}));
+$('#sw').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  st.acc = b.dataset.c; $('#sw').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  frames.forEach(f => { try { f.contentWindow.__lab.setAccent(st.acc); } catch (e) {} });
+}));
+$('#back').addEventListener('click', toSection);
+renderOpts(); load();
+</script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Patrocinadores: tokens y efecto Noir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   MINILAB — patrocinadores con la distribucion de Lux en las dos
+   plantillas (decidido por Kamilo): cuatro tarjetas y las cintas de
+   nombres. Sin niveles escritos. Solo tokens, ningun color de marca.
+   Lux: el efecto aprobado (borde que se dibuja, tinte leve).
+   Noir: tres efectos nuevos para escoger, sin giro, sin resorte.
+   ===================================================================== */
+:root { --accent: #3D6BFF; --on-accent: #fff; --bg: #050506; --fg: #fff; --mut: rgba(255,255,255,.62); --mut2: rgba(255,255,255,.42); --card: #121215; --card2: #18181c; --line: rgba(255,255,255,.1);
+  --out: cubic-bezier(.16,1,.3,1); --io: cubic-bezier(.65,0,.35,1); }
+body.light { --bg: #F2EEE7; --fg: #141414; --mut: rgba(20,20,20,.62); --mut2: rgba(20,20,20,.45); --card: #FBF9F5; --card2: #F4F0E9; --line: rgba(20,20,20,.1); }
+
+/* ---------- TOKENS DE PATROCINADORES ----------
+   La marca no trae su color. Todo sale de seis tokens que ya existen en la plantilla. */
+.spn { --spn-surface: var(--card);                                     /* la tarjeta */
+       --spn-line: var(--line);                                        /* el borde (en Noir, luminoso) */
+       --spn-ink: color-mix(in srgb, var(--fg) 85%, transparent);      /* el nombre */
+       --spn-ink-soft: color-mix(in srgb, var(--fg) 45%, transparent); /* lo secundario y las cintas */
+       --spn-glow: rgba(255, 244, 224, .11);                          /* la luz de la lampara: blanca y calida, nunca el color del cliente */
+       }                                                                /* el color del cliente NO entra en patrocinadores */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: 'Urbanist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: var(--bg); color: var(--fg); transition: background .5s, color .5s; }
+.bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 14px; padding: 10px 20px; background: #0b0b0c; color: #fff; font-size: 13px; flex-wrap: wrap; }
+.bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; }
+.seg { display: flex; background: rgba(255,255,255,.06); border-radius: 10px; padding: 3px; flex-wrap: wrap; }
+.seg button { border: 0; background: transparent; padding: 6px 12px; border-radius: 8px; font: 600 13px 'Urbanist'; color: rgba(255,255,255,.6); cursor: pointer; }
+.seg button.on { background: #fff; color: #0b0b0c; }
+.sw { display: flex; gap: 6px; }
+.sw button { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; padding: 0; cursor: pointer; }
+.sw button.on { border-color: #fff; }
+.why { max-width: 1440px; margin: 0 auto; padding: 22px 48px 0; font-size: 15px; color: var(--mut); }
+.why b { color: var(--fg); font-weight: 700; }
+.why p { display: none; margin: 0; } .why p.on { display: block; }
+body.light .why p.noir { display: none; } body:not(.light) .why p.lux { display: none; } body:not(.light) .why p.noir { display: block; }
+
+.sec { max-width: 1440px; margin: 0 auto; padding: 60px 48px 0; }
+.sec-head { display: flex; justify-content: space-between; align-items: end; gap: 32px; margin-bottom: 44px; }
+.kick { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; font-size: 16px; color: var(--mut); margin-bottom: 18px; }
+.kick::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+h2 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: clamp(36px, 5.4vw, 84px); line-height: .95; letter-spacing: -.04em; margin: 0; }
+h2 em { font-style: normal; } body.light h2 em { color: var(--accent); }
+.sec-head p { font-size: 19px; line-height: 1.5; color: var(--mut); margin: 0; max-width: 420px; }
+
+/* las cuatro tarjetas (la composicion de Lux) */
+.plat { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.plx { position: relative; isolation: isolate; border-radius: 26px; background: var(--spn-surface); padding: 26px; height: 230px; display: flex; flex-direction: column; justify-content: flex-end; cursor: default; outline: none; transition: transform .9s var(--out), box-shadow .9s var(--out), border-color .7s var(--out); }
+.plx b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 40px; letter-spacing: -.04em; color: var(--spn-ink); transition: color .6s var(--out); }
+.plx span { display: block; font-size: 15px; font-weight: 600; color: var(--spn-ink-soft); opacity: 0; transform: translateY(10px); transition: opacity .5s var(--out), transform .7s var(--out); margin-top: 6px; }
+.plx span + span { margin-top: 2px; }
+.plx.on span { opacity: 1; transform: none; }
+.plx svg.bd { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; overflow: visible; }
+.plx svg.bd rect { width: calc(100% - 2px); height: calc(100% - 2px); fill: none; stroke: currentColor; stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1s var(--out); }
+
+/* LUX: sin color del cliente (volviamos a lo mismo). Tres gestos neutros desde el material: yeso crema y luz de tarde. */
+/* 1 — BORDE EN TINTA: el borde que se dibuja, el gesto de Lux, pero en tinta en vez del color del cliente */
+body.light.x1 .plx.on svg.bd rect { stroke-dashoffset: 0; }
+body.light.x1 .plx svg.bd rect { stroke: color-mix(in srgb, var(--fg) 70%, transparent); stroke-width: 1.5; }
+/* 2 — LUZ DE TARDE: la tarjeta se aclara y se entibia, como el sol pegando en el yeso. Nada se mueve. */
+body.light.x2 .plx::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: linear-gradient(160deg, #fffdf8, #fbf6ec 60%, #f6efe2); opacity: 0; transition: opacity .9s var(--out); }
+body.light.x2 .plx.on::before { opacity: 1; }
+body.light.x2 .plx.on { box-shadow: inset 0 1px 0 #fff; }
+/* 3 — RELIEVE: la tarjeta se despega apenas de la pared y aparece su sombra calida. Sin cambio de color. */
+body.light.x3 .plx.on { transform: translateY(-4px); box-shadow: 0 24px 50px rgba(60,45,25,.14), 0 2px 6px rgba(60,45,25,.05); }
+
+/* NOIR: vidrio oscuro con borde luminoso (sin blur) */
+body:not(.light) .plx { border: 1px solid var(--spn-line); box-shadow: inset 0 1px 0 rgba(255,255,255,.07); }
+body:not(.light) .plx svg.bd { display: none; }
+
+/* LA LAMPARA: detras del nombre se enciende una luz suave, blanca y calida, como una lampara tras el vidrio.
+   Sin color: una marca con su propio color (Cloudflare es naranja) no puede verse tenida del color del cliente. */
+body:not(.light) .plx::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: radial-gradient(75% 65% at 28% 100%, var(--spn-glow), transparent 72%); opacity: 0; transition: opacity 1.1s var(--out); }
+body:not(.light) .plx.on::after { opacity: 1; }
+body:not(.light) .plx.on { border-color: rgba(255,255,255,.2); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+body:not(.light) .plx.on b { color: var(--fg); }
+body.nS .spn { --spn-glow: rgba(255, 244, 224, .11); }   /* sutil */
+body.nM .spn { --spn-glow: rgba(255, 244, 224, .06); }   /* muy sutil */
+
+/* las cintas: nombres en tono secundario; al pasar suben a tinta, nunca a un color ajeno */
+.marq { overflow: hidden; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 28px 0; margin-top: 40px; }
+.marq + .marq { border-top: 0; margin-top: 0; }
+.marq .trk { display: flex; gap: 72px; width: max-content; animation: mq 40s linear infinite; }
+.marq:hover .trk { animation-play-state: paused; }
+.marq.rev .trk { animation-direction: reverse; }
+.marq span { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: clamp(28px, 3.2vw, 46px); letter-spacing: -.035em; color: var(--spn-ink-soft); white-space: nowrap; display: inline-block; transition: color .5s var(--out); cursor: default; }
+.marq span:hover { color: var(--spn-ink); }
+@keyframes mq { to { transform: translateX(-50%); } }
+
+@media (max-width: 900px) { .why { padding: 16px 16px 0; } .sec { padding: 40px 16px 0; } .sec-head { flex-direction: column; align-items: start; } .plat { grid-template-columns: 1fr 1fr; gap: 10px; } .plx { height: 170px; padding: 20px; } .plx b { font-size: 28px; } .plx span { font-size: 13.5px; } body.nA .plx::after { left: 20px; right: 20px; } }
+</style>
+</head>
+<body class="nM x1">
+<div class="bar"><b>Patrocinadores con tokens</b>
+  <div class="seg" id="th"><button data-t="noir" class="on">Noir</button><button data-t="lux">Lux</button></div>
+  <div class="seg" id="x"><button data-x="1" class="on">Lux 1 Borde en tinta</button><button data-x="2">Lux 2 Luz de tarde</button><button data-x="3">Lux 3 Relieve</button></div>
+  <div class="sw" id="sw"><button data-c="#3D6BFF" style="background:#3D6BFF" class="on"></button><button data-c="#E5192B" style="background:#E5192B"></button><button data-c="#FF6A13" style="background:#FF6A13"></button><button data-c="#C9A86A" style="background:#C9A86A"></button></div>
+</div>
+<div class="why">
+  <p class="noir"><b>Noir, cerrado.</b> Lámpara muy sutil: luz blanca y cálida detrás del nombre, el borde del vidrio apenas más iluminado. Ningún color.</p>
+  <p data-x="1" class="lux on"><b>Lux 1 Borde en tinta.</b> El borde que se dibuja, el gesto propio de Lux, pero en tinta y más fino. Ningún color ajeno sobre la marca.</p>
+  <p data-x="2" class="lux"><b>Lux 2 Luz de tarde.</b> La tarjeta se aclara y se entibia, como el sol pegando en el yeso. Nada se mueve.</p>
+  <p data-x="3" class="lux"><b>Lux 3 Relieve.</b> La tarjeta se despega apenas de la pared y aparece su sombra cálida. Sin cambio de color.</p>
+</div>
+<section class="sec spn">
+  <div class="sec-head"><div><div class="kick">Patrocinadores</div><h2>Lo hacen<br><em>posible</em></h2></div><p>Pasa el mouse por cada marca para ver qué trae al evento.</p></div>
+  <div class="plat" id="plat"></div>
+</section>
+<div class="spn"><div class="marq"><div class="trk" id="mq1"></div></div><div class="marq rev"><div class="trk" id="mq2"></div></div></div>
+<div style="height:120px"></div>
+<script>
+const MAIN = [['AWS', 'Laboratorio de IA generativa en vivo', 'Pabellón A'], ['Google', 'Zona de demos de Gemini', 'Pabellón B'], ['Microsoft', 'Talleres de Copilot para equipos', 'Salas 3 y 4'], ['Meta', 'Experiencia de realidad mixta', 'Terraza Norte']];
+const REST = ['Stripe', 'Vercel', 'Twilio', 'Shopify', 'Cloudflare', 'Supabase', 'GitHub', 'GitLab', 'Docker', 'Elastic', 'DigitalOcean', 'Segment'];
+const $$ = s => [...document.querySelectorAll(s)];
+const body = document.body;
+document.getElementById('plat').innerHTML = MAIN.map(([n, what, where]) => `<div class="plx" tabindex="0"><svg class="bd" aria-hidden="true"><rect x="1" y="1" rx="25" pathLength="1"/></svg><b>${n}</b><span>${what}</span><span>${where}</span></div>`).join('');
+const half = Math.ceil(REST.length / 2);
+document.getElementById('mq1').innerHTML = REST.slice(0, half).map(n => `<span>${n}</span>`).join('').repeat(2);
+document.getElementById('mq2').innerHTML = REST.slice(half).map(n => `<span>${n}</span>`).join('').repeat(2);
+
+const touch = matchMedia('(hover: none)').matches;
+$$('.plx').forEach(t => {
+  if (!touch) { t.addEventListener('mouseenter', () => t.classList.add('on')); t.addEventListener('mouseleave', () => t.classList.remove('on')); }
+  t.addEventListener('click', () => { if (touch) t.classList.toggle('on'); });
+  t.addEventListener('focus', () => t.classList.add('on')); t.addEventListener('blur', () => t.classList.remove('on'));
+});
+$$('#th button').forEach(b => b.addEventListener('click', () => { $$('#th button').forEach(x => x.classList.toggle('on', x === b)); body.classList.toggle('light', b.dataset.t === 'lux'); }));
+$$('#x button').forEach(b => b.addEventListener('click', () => { $$('#x button').forEach(x => x.classList.toggle('on', x === b)); body.classList.remove('x1', 'x2', 'x3'); body.classList.add('x' + b.dataset.x); $$('.why p[data-x]').forEach(p => p.classList.toggle('on', p.dataset.x === b.dataset.x)); }));
+$$('#sw button').forEach(b => b.addEventListener('click', () => { document.documentElement.style.setProperty('--accent', b.dataset.c); $$('#sw button').forEach(x => x.classList.toggle('on', x === b)); }));
+</script>
+</body>
+</html>

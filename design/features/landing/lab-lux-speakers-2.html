@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Speakers Lux 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   MINILAB — speakers de Lux con la misma sutileza del giro de Noir (v3).
+   Nombre y cargo siempre visibles; la frase es la recompensa (hover o toque).
+   Material Lux: crema, borde que se dibuja, frenada suave, sin rebote.
+   ===================================================================== */
+:root { --accent: #3D6BFF; --bg: #F2EEE7; --card: #FBF9F5; --card2: #EAE4DA; --fg: #141414; --mut: rgba(20,20,20,.6); --line: rgba(20,20,20,.12); --out: cubic-bezier(.16,1,.3,1); --io: cubic-bezier(.65,0,.35,1); }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: 'Urbanist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: var(--bg); color: var(--fg); }
+img { display: block; max-width: 100%; }
+.bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 14px; padding: 10px 20px; background: #0b0b0c; color: #fff; font-size: 13px; flex-wrap: wrap; }
+.bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; }
+.seg { display: flex; background: rgba(255,255,255,.06); border-radius: 10px; padding: 3px; }
+.seg button { border: 0; background: transparent; padding: 6px 12px; border-radius: 8px; font: 600 13px 'Urbanist'; color: rgba(255,255,255,.6); cursor: pointer; }
+.seg button.on { background: #fff; color: #0b0b0c; }
+.sw { display: flex; gap: 6px; }
+.sw button { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; padding: 0; cursor: pointer; }
+.sw button.on { border-color: #fff; }
+
+.sec { max-width: 1440px; margin: 0 auto; padding: 90px 48px 120px; }
+.head { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 52px; }
+.kick { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; font-size: 16px; color: var(--mut); margin-bottom: 18px; }
+.kick::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+h2 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: clamp(36px, 5.4vw, 84px); line-height: .95; letter-spacing: -.04em; margin: 0; }
+h2 em { font-style: normal; color: var(--accent); }
+.hint { margin-top: 16px; font-size: 17px; color: var(--mut); }
+
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.card { cursor: pointer; outline: none; }
+.card .nm { padding: 16px 4px 0; }
+.card .nm b { display: block; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 21px; letter-spacing: -.02em; transition: color .6s var(--out); }
+.card .nm span { display: block; font-size: 15px; color: var(--mut); margin-top: 3px; }
+.card.on .nm b { color: var(--accent); }
+.box { position: relative; aspect-ratio: 4 / 5; border-radius: 26px; }
+.photo { position: absolute; inset: 0; border-radius: 26px; overflow: hidden; background: var(--card2); }
+.photo img { width: 100%; height: 100%; object-fit: cover; }
+.back { position: absolute; inset: 0; border-radius: 26px; background: var(--card); padding: 26px 24px; display: flex; flex-direction: column; isolation: isolate; }
+.back q { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: clamp(19px, 1.6vw, 24px); line-height: 1.22; letter-spacing: -.025em; quotes: "\201C" "\201D"; }
+.back .tk { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
+.back .tk small { display: block; font-size: 13px; color: var(--mut); margin-bottom: 4px; }
+.back .tk b { display: block; font-weight: 700; font-size: 15.5px; line-height: 1.3; color: var(--accent); }
+.back svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 2; }
+.back svg rect { width: calc(100% - 2px); height: calc(100% - 2px); fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.1s var(--out) .15s; }
+.card.on .back svg rect { stroke-dashoffset: 0; }
+
+/* A — GIRO EN MATERIAL LUX (el mismo gesto de Noir) */
+.A .box { perspective: 1400px; }
+.A .in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 1s var(--io); }
+.A .card.on .in { transform: rotateY(180deg); }
+.A .photo, .A .back { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.A .back { transform: rotateY(180deg); box-shadow: 0 24px 60px rgba(60,45,25,.13); }
+
+
+/* C — LA LAMA SUBE: el retrato se levanta como un panel y deja ver la frase */
+.C .box { overflow: hidden; border-radius: 26px; }
+.C .photo { z-index: 1; transition: transform 1s var(--io); box-shadow: 0 10px 30px rgba(60,45,25,.18); }
+.C .card.on .photo { transform: translateY(-74%); }
+.C .back { padding-top: calc(26% + 22px); }
+
+
+/* ---------- senales de que hay algo mas ---------- */
+.cue-btn { display: none; position: absolute; right: 14px; bottom: 14px; z-index: 5; width: 44px; height: 44px; border-radius: 50%; background: rgba(251,249,245,.94); color: var(--accent); place-items: center; box-shadow: 0 8px 20px rgba(0,0,0,.18); transition: transform .7s var(--out), opacity .4s var(--out); }
+.cue-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; }
+body.c1 .cue-btn { display: grid; }
+.card.on .cue-btn { opacity: 0; transform: scale(.7); }
+.cue-lnk { display: none; margin-top: 10px; font-weight: 700; font-size: 15px; color: var(--accent); align-items: center; gap: 6px; }
+.cue-lnk svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .6s var(--out); }
+.card:hover .cue-lnk svg, .card.on .cue-lnk svg { transform: translateX(4px); }
+body.c2 .cue-lnk { display: inline-flex; }
+.demo-note { display: none; margin-top: 16px; font-size: 16px; font-weight: 600; color: var(--accent); }
+body.c3 .demo-note { display: block; }
+body.c3 .hint { display: none; }
+.opt { display: none; } .opt.on { display: block; }
+@media (max-width: 900px) { .sec { padding: 56px 16px 80px; } .grid { grid-template-columns: 1fr 1fr; gap: 12px; } .card .nm b { font-size: 17px; } .card .nm span { font-size: 13.5px; } .back { padding: 16px; } .back q { font-size: 15.5px; } .back .tk b { font-size: 13px; } }
+</style>
+</head>
+<body class="c1">
+<div class="bar"><b>Speakers de Lux</b>
+  <div class="seg" id="seg"><button data-o="A" class="on">A Giro en material Lux</button><button data-o="C">C La lama sube</button></div>
+  <div class="seg" id="cue"><button data-c="1" class="on">1 Botón en la foto</button><button data-c="2">2 Enlace bajo el nombre</button><button data-c="3">3 Se muestra solo al llegar</button></div>
+  <div class="sw" id="sw"><button data-c="#3D6BFF" style="background:#3D6BFF" class="on"></button><button data-c="#E5192B" style="background:#E5192B"></button><button data-c="#FF6A13" style="background:#FF6A13"></button><button data-c="#C9A86A" style="background:#C9A86A"></button></div>
+</div>
+<section class="sec">
+  <div class="head"><div class="kick">Speakers</div><h2>Las voces<br>de este <em>año</em></h2><div class="hint">Pasa el mouse por cada speaker para conocer su idea y su charla.</div><div class="demo-note">Toca cualquier speaker para conocer su idea.</div></div>
+  <div class="opt A on" id="oA"><div class="grid" data-o="A"></div></div>
+  <div class="opt C" id="oC"><div class="grid" data-o="C"></div></div>
+</section>
+<script>
+const SPEAKERS = [
+  ['María García', 'CEO y fundadora', 'Kasproduction', 47, 'Un evento no se mide por cuánta gente llega, sino por cuánta sale distinta.', 'Miércoles 4, 09:00', 'Apertura: el futuro del trabajo corporativo'],
+  ['Sofia Chen', 'VP of Product', 'Google', 25, 'La IA dejó de ser una promesa. Ahora es una decisión de negocio.', 'Miércoles 4, 10:30', 'The State of AI: from hype to production'],
+  ['Carlos Rodríguez', 'CTO', 'TechCorp', 12, 'La nube no es un lugar, es una forma de trabajar.', 'Miércoles 4, 14:00', 'Workshop: Cloud Native en 90 minutos'],
+  ['Laura Díaz', 'Founder y CEO', 'NovaPay', 26, 'En Latam, regular bien es la mayor ventaja competitiva.', 'Miércoles 4, 16:00', 'Fintech en Latam: regulación y oportunidad'],
+  ['Valentina Ríos', 'Design Lead LATAM', 'Figma', 23, 'Un buen sistema de diseño es un acuerdo, no una librería.', 'Jueves 5, 12:00', 'Design systems: de Figma a producción'],
+  ['Emma Thompson', 'VP Engineering', 'Stripe', 5, 'La confiabilidad es la característica que nadie ve hasta que falla.', 'Viernes 6, 09:00', 'Panel: IA en la empresa moderna'],
+  ['Andrés Gil', 'VP Engineering', 'Rappi', 59, 'Escalar es aprender a decir que no.', 'Viernes 6, 10:30', 'Mobile-first: React Native a fondo'],
+  ['Natasha Kozlova', 'ML Engineer', 'OpenAI', 44, 'Los modelos grandes se ganan en los detalles pequeños.', 'Jueves 5, 09:00', 'IA generativa: del hype a la producción']
+];
+const img = n => `https://i.pravatar.cc/800?img=${n}`;
+const $$ = s => [...document.querySelectorAll(s)];
+const N = 7;
+const back = s => `<div class="back"><svg aria-hidden="true"><rect x="1" y="1" rx="25" pathLength="1"/></svg><q>${s[4]}</q><div class="tk"><small>${s[5]}</small><b>${s[6]}</b></div></div>`;
+$$('.grid').forEach(g => {
+  const o = g.dataset.o;
+  g.innerHTML = SPEAKERS.map(s => {
+    let inner;
+    if (o === 'A') inner = `<div class="in"><div class="photo"><img src="${img(s[3])}" alt=""></div>${back(s)}</div>`;
+    else inner = `${back(s)}<div class="photo"><img src="${img(s[3])}" alt=""></div>`;
+    return `<article class="card" tabindex="0"><div class="box">${inner}<span class="cue-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></div><div class="nm"><b>${s[0]}</b><span>${s[1]}, ${s[2]}</span><span class="cue-lnk">Ver su idea <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></article>`;
+  }).join('');
+});
+const touch = matchMedia('(hover: none)').matches;
+$$('.card').forEach(c => {
+  if (!touch) { c.addEventListener('mouseenter', () => c.classList.add('on')); c.addEventListener('mouseleave', () => c.classList.remove('on')); }
+  c.addEventListener('click', () => { if (touch) c.classList.toggle('on'); });
+  c.addEventListener('focus', () => c.classList.add('on')); c.addEventListener('blur', () => c.classList.remove('on'));
+});
+
+/* senal 3: la primera tarjeta se muestra sola una vez al llegar */
+function demo() {
+  if (!document.body.classList.contains('c3')) return;
+  const g = document.querySelector('.opt.on .grid'); const cards = g.querySelectorAll('.card');
+  const run = () => { cards[1].classList.add('on'); setTimeout(() => cards[1].classList.remove('on'), 1900); };
+  const io = new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { ob.disconnect(); setTimeout(run, 500); } }), { threshold: .4 });
+  io.observe(g);
+}
+$$('#cue button').forEach(b => b.addEventListener('click', () => { $$('#cue button').forEach(x => x.classList.toggle('on', x === b)); document.body.className = 'c' + b.dataset.c; demo(); }));
+$$('#seg button').forEach(b => b.addEventListener('click', () => { $$('#seg button').forEach(x => x.classList.toggle('on', x === b)); $$('.opt').forEach(o => o.classList.toggle('on', o.id === 'o' + b.dataset.o)); demo(); }));
+$$('#sw button').forEach(b => b.addEventListener('click', () => { document.documentElement.style.setProperty('--accent', b.dataset.c); $$('#sw button').forEach(x => x.classList.toggle('on', x === b)); }));
+</script>
+</body>
+</html>

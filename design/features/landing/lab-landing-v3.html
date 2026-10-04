@@ -1,0 +1,1245 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Landing v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+<style>
+/* =====================================================================
+   LAB LANDING v3 — Linea Vitrina (design/system/LINEA-VITRINA.md)
+   Oscuro = Paisaje de datos. Claro = Fachada cinetica.
+   Cada seccion usa el lenguaje de piezas que giran y revelan el color del cliente.
+   Cero mono, cero dots, cero mayusculas espaciadas.
+   ===================================================================== */
+:root {
+  --out: cubic-bezier(.16,1,.3,1); --io: cubic-bezier(.65,0,.35,1);
+  --accent: #3D6BFF; --accent-rgb: 61,107,255; --on-accent: #fff; --bar: 44px;
+  --bg: #050506; --bg2: #0c0c0e; --fg: #ffffff; --mut: rgba(255,255,255,.62); --mut2: rgba(255,255,255,.42);
+  --line: rgba(255,255,255,.1); --card: #121215; --card2: #18181c; --shadow: 0 30px 80px rgba(0,0,0,.55);
+  --spring: cubic-bezier(.34,1.36,.5,1); --ease: cubic-bezier(.2,.8,.2,1);
+}
+body.light {
+  --bg: #F2EEE7; --bg2: #EAE4DA; --fg: #141414; --mut: rgba(20,20,20,.62); --mut2: rgba(20,20,20,.45);
+  --line: rgba(20,20,20,.1); --card: #FBF9F5; --card2: #F4F0E9; --shadow: 0 30px 70px rgba(60,45,25,.16), 0 2px 6px rgba(60,45,25,.06);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { margin: 0; }
+body { font-family: 'Urbanist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: var(--bg); color: var(--fg); overflow-x: hidden; transition: background .5s var(--ease), color .5s var(--ease); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+svg.i { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ---------- barra del lab ---------- */
+.lab-bar { position: fixed; inset: 0 0 auto 0; height: var(--bar); z-index: 80; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: #0b0b0c; color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 13px; }
+.lab-bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; white-space: nowrap; }
+.seg { display: flex; background: rgba(255,255,255,.06); border-radius: 10px; padding: 3px; }
+.seg button { border: 0; background: transparent; padding: 5px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; color: rgba(255,255,255,.6); white-space: nowrap; }
+.seg button.on { background: #fff; color: #0b0b0c; }
+.sw { display: flex; gap: 6px; }
+.sw button { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; padding: 0; }
+.sw button.on { border-color: #fff; }
+@media (max-width: 700px) { .lab-bar b, .lab-bar .lbl { display: none; } }
+
+/* ---------- escena 3D ---------- */
+#gl { position: fixed; left: 0; top: var(--bar); width: 100vw; height: calc(100svh - var(--bar)); z-index: 0; display: block; transition: opacity .9s var(--ease); }
+
+/* ---------- navegacion ---------- */
+.nav { position: fixed; top: calc(var(--bar) + 14px); left: 50%; z-index: 60; transform: translate(-50%, -140%); display: flex; align-items: center; gap: 6px; padding: 6px 6px 6px 18px; border-radius: 999px; background: color-mix(in srgb, var(--card) 88%, transparent); border: 1px solid var(--line); backdrop-filter: blur(14px); box-shadow: var(--shadow); transition: transform .6s var(--spring); white-space: nowrap; }
+.nav.on { transform: translate(-50%, 0); }
+.nav .brand { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 15px; letter-spacing: -.02em; margin-right: 10px; }
+.nav a.l { text-decoration: none; font-weight: 600; font-size: 14px; color: var(--mut); padding: 8px 12px; border-radius: 999px; transition: color .2s, background .2s; }
+.nav a.l:hover { color: var(--fg); background: var(--line); }
+.nav .go { height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+@media (max-width: 900px) { .nav a.l { display: none; } }
+
+/* ---------- hero ---------- */
+.hero { position: relative; z-index: 2; min-height: calc(100svh - var(--bar)); margin-top: var(--bar); display: grid; grid-template-columns: minmax(0,1.3fr) minmax(340px,.62fr); gap: 56px; align-items: end; padding: 110px 48px 56px; pointer-events: none; }
+.hero > * { pointer-events: auto; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(90deg, rgba(5,5,6,.82) 0%, rgba(5,5,6,.3) 42%, rgba(5,5,6,0) 62%), linear-gradient(0deg, rgba(5,5,6,.75) 0%, transparent 30%); }
+/* Noir: el oscurecido solo existe sobre los cubos. Sobre el cielo plano del mismo color produce bandas de un punto
+   (redondeo de 8 bits por canal), que Firefox no disimula con tramado y se ven como rayas verticales con tinte. */
+body:not(.light) .hero::before { -webkit-mask-image: linear-gradient(to bottom, transparent 28%, #000 52%); mask-image: linear-gradient(to bottom, transparent 28%, #000 52%); }
+body.light .hero::before { background: linear-gradient(90deg, rgba(242,238,231,.92) 0%, rgba(242,238,231,.5) 40%, rgba(242,238,231,0) 60%), linear-gradient(0deg, rgba(242,238,231,.7) 0%, transparent 28%); }
+.eyebrow { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; font-size: 16px; color: var(--mut); }
+.eyebrow::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+.hero h1 { font-family: 'Plus Jakarta Sans'; font-weight: 800; text-transform: uppercase; font-size: clamp(40px, 8.4vw, 150px); line-height: .86; letter-spacing: -.045em; margin: 20px 0 32px; }
+.hero h1 .out { color: transparent; -webkit-text-stroke: 2px var(--accent); }
+.meta { display: flex; gap: 40px; border-top: 1px solid var(--line); padding-top: 20px; flex-wrap: wrap; }
+.meta small { display: block; font-weight: 500; font-size: 13px; line-height: 1; color: var(--mut2); margin-bottom: 9px; }
+.meta span { font-weight: 600; font-size: 17px; }
+.meta .aws { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 19px; color: #FF9900; }
+body.light .meta .aws { color: #232F3E; }
+.cd { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 17px; font-variant-numeric: tabular-nums; }
+
+/* ---------- boleto ---------- */
+.ticket { position: relative; background: color-mix(in srgb, var(--card) 94%, transparent); border: 1px solid var(--line); border-radius: 24px; padding: 24px; box-shadow: var(--shadow); backdrop-filter: blur(6px); scroll-margin-top: 120px; }
+.ticket.pulse { animation: tpulse 1.1s var(--ease); }
+@keyframes tpulse { 0% { box-shadow: var(--shadow), 0 0 0 0 rgba(var(--accent-rgb),.6); } 100% { box-shadow: var(--shadow), 0 0 0 22px rgba(var(--accent-rgb),0); } }
+.t-head { display: flex; justify-content: space-between; font-weight: 600; font-size: 14px; line-height: 1; color: var(--mut2); }
+.t-head b { color: var(--accent); }
+.sent { font-family: 'Plus Jakarta Sans'; font-weight: 600; font-size: 24px; letter-spacing: -.03em; line-height: 1.4; margin: 14px 0 0; }
+.sent .mu { opacity: .5; }
+input.ln { display: block; width: 100%; border: 0; border-bottom: 2px solid var(--line); background: transparent; outline: none; font: inherit; font-size: 22px; color: var(--accent); padding: 0 2px; margin: 2px 0 8px; }
+input.ln::placeholder { color: var(--mut2); opacity: .7; }
+input.ln:focus { border-bottom-color: var(--accent); }
+input.ln.err { border-bottom-color: #E5484D; }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 1.4; color: var(--mut); margin: 14px 0; cursor: pointer; }
+.consent input { width: 17px; height: 17px; margin: 1px 0 0; accent-color: var(--accent); }
+.consent.err { color: #E5484D; }
+.cta { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 54px; border: 0; border-radius: 14px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 16px; transition: transform .25s var(--spring); }
+.cta:hover { transform: translateY(-2px); }
+body.light .cta { background: #141414; color: #fff; }
+.done { display: none; }
+.ticket.ok .form { display: none; }
+.ticket.ok .done { display: block; }
+.t-name { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 36px; letter-spacing: -.035em; line-height: 1; margin: 16px 0 10px; }
+.t-note { font-size: 13px; color: var(--mut); margin-top: 10px; }
+.rs { border: 1px solid var(--line); background: transparent; border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 600; }
+
+/* ---------- secciones ---------- */
+main { position: relative; z-index: 3; background: var(--bg); transition: background .5s var(--ease); }
+.sec { padding: 140px 48px; max-width: 1440px; margin: 0 auto; }
+.sec-head { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: end; margin-bottom: 56px; }
+.kick { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; font-size: 16px; color: var(--mut); margin-bottom: 18px; }
+.kick::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+h2 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: clamp(36px, 5.4vw, 84px); line-height: .95; letter-spacing: -.04em; margin: 0; }
+.sec-head p { font-size: 19px; line-height: 1.5; color: var(--mut); margin: 0; max-width: 440px; justify-self: end; }
+.rv { opacity: 0; transform: translateY(28px); transition: opacity .9s var(--ease), transform 1s var(--ease); }
+.rv.in { opacity: 1; transform: none; }
+
+/* ---------- lamas (piezas que giran) ---------- */
+.lama { position: relative; perspective: 1400px; }
+.lama .in { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; -webkit-transform-style: preserve-3d; transition: transform 1s var(--io); }
+.lama.flip .in, .lama.intro .in { transform: rotateY(180deg); }
+.lama .fa, .lama .ba { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 20px; overflow: hidden; }
+/* Safari (iPad, iPhone): si las dos caras comparten el plano exacto, pinta la frontal a traves del reverso (se ve translucido
+   y el nombre de la foto queda encima de la charla). Cada cara en su propio plano y backface tambien en los hijos. */
+.lama .fa { transform: rotateY(0deg) translateZ(1px); }
+.lama .ba { transform: rotateY(180deg) translateZ(1px); }
+.lama .fa > *, .lama .ba > * { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+
+/* speakers */
+.spk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.spk { aspect-ratio: 3 / 4; cursor: pointer; outline: none; }
+.spk .in { will-change: transform; }
+.spk .fa { background: var(--card2); }
+.spk .fa img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.85); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+/* sin zoom de la foto: un hijo con transform propio hace que Chrome pinte la cara frontal a traves del reverso */
+.spk .fa::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.78) 0%, rgba(0,0,0,0) 48%); }
+.spk .who { position: absolute; left: 20px; right: 20px; bottom: 18px; z-index: 2; color: #fff; }
+.spk .who b { display: block; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 22px; letter-spacing: -.02em; line-height: 1.1; }
+.spk .who span { display: block; font-size: 14px; color: rgba(255,255,255,.72); margin-top: 4px; }
+/* reverso: vidrio oscuro con borde luminoso (no el color del cliente). La tarjeta se eleva al girar y la idea llega en secuencia. */
+.spk .ba { background: var(--card2); color: var(--fg); padding: 26px 24px; display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 22px 44px rgba(0,0,0,.55); }
+.spk.flip .in { transform: rotateY(180deg) translateZ(22px); }
+.spk .ba { transform: rotateY(180deg) translateZ(1px); }
+.spk .ba q { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: clamp(19px, 1.7vw, 25px); letter-spacing: -.025em; line-height: 1.2; quotes: "\201C" "\201D"; }
+.spk .ba .tk { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); }
+.spk .ba .tk small { display: block; font-size: 13px; color: var(--mut); margin-bottom: 6px; }
+.spk .ba .tk b { display: block; font-weight: 700; font-size: 16px; line-height: 1.3; color: var(--accent); }
+.spk .ba .nm { font-weight: 600; font-size: 14px; color: var(--mut); margin-top: 10px; }
+.spk .ba q, .spk .ba .tk, .spk .ba .nm { opacity: 0; transform: translate(-14px, 14px); transition: opacity .6s var(--out), transform .8s var(--out); }
+.spk.flip .ba q { opacity: 1; transform: none; transition-delay: .4s; }
+.spk.flip .ba .tk { opacity: 1; transform: none; transition-delay: .55s; }
+.spk.flip .ba .nm { opacity: 1; transform: none; transition-delay: .7s; }
+/* llegada: quietas, en cascada */
+.spk { opacity: 0; transform: translateY(22px); transition: opacity .9s var(--out), transform 1s var(--out); transition-delay: calc(var(--i) * 70ms); }
+.spk.seen { opacity: 1; transform: none; }
+
+/* agenda */
+.ag-bar { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 28px; }
+.days { display: flex; gap: 6px; padding: 5px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+.days button { border: 0; background: transparent; border-radius: 12px; padding: 10px 18px; text-align: left; color: var(--mut); transition: background .3s, color .3s; }
+.days button b { display: block; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 17px; color: inherit; }
+.days button span { font-size: 13px; }
+.days button.on { background: var(--fg); color: var(--bg); }
+.tracks { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tracks button { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 9px 16px; font-weight: 600; font-size: 14px; color: var(--mut); transition: all .3s var(--ease); }
+.tracks button.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.rows { border-top: 1px solid var(--line); }
+.row { position: relative; display: grid; grid-template-columns: 110px 1fr 300px 140px; gap: 24px; align-items: center; padding: 26px 8px; border-bottom: 1px solid var(--line); transition: opacity .4s var(--ease), padding .4s var(--ease); }
+.row::before { content: ""; position: absolute; left: 0; top: -1px; height: 2px; width: 0; background: var(--accent); transition: width .7s var(--ease); }
+.row:hover::before { width: 100%; }
+.row:hover { padding-left: 20px; }
+.row .tm { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; }
+.row .tt { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 22px; letter-spacing: -.02em; line-height: 1.25; }
+.row .sp { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--mut); }
+.row .sp img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; margin-right: -14px; border: 2px solid var(--bg); }
+.row .sp .tx { margin-left: 18px; }
+.row .tr { justify-self: end; font-weight: 600; font-size: 14px; color: var(--mut); }
+.row.dim { opacity: .22; }
+.row.hit .tr { color: var(--accent); }
+
+/* experiencia: iPhone real con pantallas de la app Expo (Lumina Noir) */
+.exp { display: grid; grid-template-columns: .9fr 1.1fr; gap: 80px; }
+.phone-wrap { position: sticky; top: 110px; height: calc(100svh - 140px); display: grid; place-items: center; }
+.iphone { --pw: min(340px, 30vw, calc((100svh - 170px) / 2.06)); width: var(--pw); aspect-ratio: 71.5 / 147.6; position: relative; border-radius: calc(var(--pw) * .17); padding: calc(var(--pw) * .032); background: linear-gradient(145deg, #6b6862 0%, #2e2d2b 18%, #4a4844 50%, #232220 82%, #5d5a55 100%); box-shadow: 0 0 0 1px rgba(0,0,0,.6), inset 0 0 0 1.5px rgba(255,255,255,.18), 0 50px 100px rgba(0,0,0,.45), 0 20px 40px rgba(0,0,0,.25); }
+.iphone::before, .iphone::after { content: ""; position: absolute; width: 3px; border-radius: 2px; background: #3c3a37; }
+.iphone::before { left: -3px; top: 22%; height: 9%; box-shadow: 0 calc(var(--pw) * .2) 0 #3c3a37; }
+.iphone::after { right: -3px; top: 30%; height: 14%; }
+.iphone .glass { position: relative; width: 100%; height: 100%; border-radius: calc(var(--pw) * .14); overflow: hidden; background: #0a0a0a; box-shadow: inset 0 0 0 2px #000; }
+.iphone .island { position: absolute; top: 1.6%; left: 50%; transform: translateX(-50%); width: 31%; height: 4.1%; border-radius: 99px; background: #000; z-index: 9; }
+.app { position: absolute; left: 0; top: 0; width: 390px; height: 844px; transform-origin: 0 0; transform: scale(var(--s, .8)); color: #fff; font-family: 'Urbanist', sans-serif; }
+.scr { position: absolute; inset: 0; background: #0a0a0a; opacity: 0; transform: translateY(14px); transition: opacity .6s var(--ease), transform .8s var(--spring); overflow: hidden; }
+.scr.on { opacity: 1; transform: none; }
+.sb { height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 6px 34px 0 46px; font-family: -apple-system, 'SF Pro Text', 'Urbanist', sans-serif; font-weight: 600; font-size: 17px; }
+.sb .ic { display: flex; gap: 6px; align-items: center; }
+.sb svg { height: 13px; fill: #fff; }
+.x .mdi { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.J { font-family: 'Plus Jakarta Sans'; }
+/* home */
+.hh { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px 8px; }
+.hh b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 22px; letter-spacing: -.5px; }
+.bell { position: relative; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; }
+.bell i { position: absolute; top: -2px; right: -2px; min-width: 16px; height: 16px; border-radius: 8px; background: #EF4444; border: 1.5px solid #0a0a0a; font: 800 9px/13px 'Urbanist'; font-style: normal; text-align: center; }
+.hhero { padding: 20px 24px 28px; }
+.hhero .lb { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 2.5px; color: var(--accent); }
+.hhero h4 { margin: 8px 0 0; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 38px; line-height: 1.12; letter-spacing: -1.5px; }
+.hhero h4 em { font-style: normal; color: var(--accent); }
+.hn { margin: 0 24px; border-radius: 18px; border: .5px solid rgba(255,255,255,.12); background: #0a0a0a; padding: 14px; height: 172px; display: flex; flex-direction: column; }
+.hn .top { display: flex; justify-content: space-between; align-items: center; }
+.hn .tag { font-weight: 700; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); }
+.hn .join { background: var(--accent); color: var(--on-accent); border-radius: 99px; padding: 6px 14px; font-weight: 800; font-size: 9px; letter-spacing: .8px; }
+.hn h5 { margin: 12px 0 4px; font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 18px; line-height: 22px; }
+.hn .loc { display: flex; gap: 4px; align-items: center; font-size: 11px; color: rgba(255,255,255,.35); }
+.hn .loc .mdi { width: 12px; height: 12px; }
+.hn .bot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
+.av { display: flex; align-items: center; }
+.av img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 2px solid #0a0a0a; margin-right: -8px; }
+.av .nm { margin-left: 16px; font-weight: 500; font-size: 12px; }
+.av .nm span { display: block; font-size: 8px; text-transform: uppercase; color: var(--accent); }
+.att { display: flex; align-items: center; font-size: 11px; color: rgba(255,255,255,.35); }
+.att img { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #0a0a0a; margin-right: -5px; }
+.att span { margin-left: 9px; }
+.pg { display: flex; gap: 4px; justify-content: center; margin: 12px 0 16px; }
+.pg i { width: 4px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.2); }
+.pg i.on { width: 16px; background: var(--accent); }
+.mods { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 10px; padding: 0 24px; }
+.mod { height: 96px; border-radius: 20px; border: .5px solid rgba(255,255,255,.12); background: rgba(255,255,255,.03); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+.mod .r { display: flex; justify-content: space-between; color: rgba(255,255,255,.5); }
+.mod .r .mdi:last-child { width: 16px; height: 16px; color: rgba(255,255,255,.15); }
+.mod b { font-weight: 500; font-size: 14px; }
+.tabbar { position: absolute; left: 20px; right: 20px; bottom: 49px; height: 64px; border-radius: 99px; background: rgba(10,10,10,.8); border: .5px solid rgba(255,255,255,.08); backdrop-filter: blur(40px); padding: 6px; display: flex; }
+.tabbar div { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-weight: 600; font-size: 9px; letter-spacing: .2px; color: rgba(255,255,255,.35); border-radius: 99px; position: relative; }
+.tabbar div.on { color: var(--accent); background: rgba(255,255,255,.07); box-shadow: inset 0 0 0 1px rgba(255,255,255,.15); }
+.tabbar div i { position: absolute; top: 4px; right: 14px; width: 15px; height: 15px; border-radius: 8px; background: #ef4444; color: #fff; font: 800 9px/15px 'Urbanist'; text-align: center; font-style: normal; }
+.homeind { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.85); }
+/* stream */
+.sh { padding: 16px 20px 0; }
+.sh .row1 { display: flex; gap: 12px; align-items: flex-start; }
+.sh .cl { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.08); display: grid; place-items: center; flex: none; }
+.sh .cl .mdi { width: 18px; height: 18px; }
+.sh h5 { margin: 3px 0 0; font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 20px; line-height: 26px; letter-spacing: -.5px; }
+.sh hr { border: 0; height: 1px; background: rgba(255,255,255,.08); margin: 14px 0; }
+.sh .who { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+.sh .who img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.sh .who b { display: block; font-weight: 500; font-size: 13px; }
+.sh .who span { font-size: 10px; color: #adaaaa; }
+.player { aspect-ratio: 16 / 9; background: #000; position: relative; overflow: hidden; }
+.player img { width: 100%; height: 100%; object-fit: cover; opacity: .9; }
+.player .bar { position: absolute; left: 12px; right: 12px; bottom: 10px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.25); }
+.player .bar i { display: block; width: 64%; height: 100%; background: #fff; border-radius: 2px; }
+.ptabs { display: flex; gap: 6px; padding: 14px 16px 6px; }
+.ptabs span { padding: 7px 12px; border-radius: 20px; background: #141414; font-weight: 600; font-size: 13px; color: rgba(255,255,255,.5); }
+.ptabs span.on { background: var(--accent); color: var(--on-accent); }
+.chat { padding: 8px 16px; display: flex; flex-direction: column; gap: 10px; }
+.chat .st { display: flex; gap: 6px; align-items: center; font-size: 12px; color: rgba(255,255,255,.5); }
+.chat .st i { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; }
+.msg { max-width: 78%; }
+.msg small { display: block; font-size: 11px; color: rgba(255,255,255,.35); margin: 0 0 3px 4px; }
+.msg p { margin: 0; padding: 8px 12px; border-radius: 4px 16px 16px 16px; background: rgba(255,255,255,.06); border: .5px solid rgba(255,255,255,.08); font-size: 14px; line-height: 20px; }
+.msg.me { align-self: flex-end; }
+.msg.me p { border-radius: 16px 4px 16px 16px; background: var(--accent); color: var(--on-accent); border: 0; }
+.emo { display: flex; justify-content: space-between; padding: 4px 16px; font-size: 20px; }
+.inp { position: absolute; left: 16px; right: 16px; bottom: 34px; display: flex; gap: 8px; align-items: center; }
+.inp div { flex: 1; height: 44px; border-radius: 16px; background: #141414; padding: 0 14px; display: flex; align-items: center; font-size: 14px; color: rgba(255,255,255,.3); }
+.inp b { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-size: 18px; }
+/* trivia */
+.tv { padding: 12px 16px 16px; }
+.tv .hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.tv .hd .rd { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 13px; color: rgba(255,255,255,.35); }
+.tv .hd .gt { font-weight: 600; font-size: 12px; color: rgba(255,255,255,.5); margin-left: 8px; }
+.tv .tm { display: flex; gap: 5px; align-items: center; padding: 4px 10px; border-radius: 10px; background: rgba(57,210,192,.1); color: #39d2c0; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14px; }
+.tv .tm .mdi { width: 14px; height: 14px; }
+.tv .sp { font-size: 11px; color: rgba(255,255,255,.35); margin-bottom: 8px; }
+.tv .q { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 17px; line-height: 24px; margin-bottom: 16px; }
+.op { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); margin-bottom: 8px; font-weight: 500; font-size: 14px; }
+.op .lt { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 13px; color: #fff; flex: none; }
+.op.ok { background: rgba(16,185,129,.15); border: 2px solid #10B981; }
+.op.ok .mdi { margin-left: auto; color: #10B981; }
+.op.off { opacity: .4; }
+.pts { margin-top: 12px; text-align: center; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 18px; color: #10B981; }
+/* desafio */
+.lh { display: flex; align-items: center; gap: 12px; padding: 8px 20px 18px; }
+.lh .bk { width: 36px; height: 36px; border-radius: 50%; background: #141414; display: grid; place-items: center; }
+.lh b { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 20px; flex: 1; }
+.lh .mdi:last-child { color: rgba(255,255,255,.5); }
+.hc { margin: 0 20px; padding: 18px; border-radius: 20px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); }
+.hc .r1 { display: flex; justify-content: space-between; align-items: flex-end; }
+.hc small { display: block; font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 2px; }
+.hc .pos { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 40px; letter-spacing: -2px; color: #5eead4; line-height: 1; }
+.hc .pt { text-align: right; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 30px; line-height: 1; }
+.hc .pt span { display: block; font-family: 'Urbanist'; font-weight: 500; font-size: 12px; color: rgba(255,255,255,.5); margin-top: 4px; }
+.seg10 { display: flex; gap: 2px; align-items: center; margin: 16px 0 6px; }
+.seg10 i { flex: 1; height: 6px; border-radius: 2px; background: rgba(255,255,255,.08); }
+.seg10 i.f { background: #39d2c0; }
+.seg10 i.g { background: #5eead4; box-shadow: 0 0 10px #5eead4; }
+.seg10 b { margin-left: 8px; font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 11px; color: #39d2c0; }
+.hc .of { font-size: 12px; color: rgba(255,255,255,.35); }
+.hc hr { border: 0; height: 1px; background: rgba(255,255,255,.06); margin: 14px 0; }
+.top3 { display: flex; justify-content: space-around; }
+.top3 div { text-align: center; font-size: 10px; }
+.top3 .ph { position: relative; width: 32px; height: 32px; margin: 0 auto 5px; }
+.top3 img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid; }
+.top3 em { position: absolute; right: -4px; bottom: -3px; width: 14px; height: 14px; border-radius: 50%; font: 800 8px/14px 'Plus Jakarta Sans'; font-style: normal; color: #0a0a0a; }
+.top3 b { display: block; font-size: 11px; }
+.more { display: flex; justify-content: center; align-items: center; gap: 2px; margin-top: 14px; font-size: 13px; color: #39d2c0; }
+.more .mdi { width: 16px; height: 16px; }
+.port { display: grid; gap: 10px; margin: 12px 20px 0; }
+.port > div { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); }
+.port .mdi { color: rgba(255,255,255,.5); }
+.port b { font-weight: 600; font-size: 12px; text-transform: uppercase; }
+.port span { display: block; font-size: 12px; color: rgba(255,255,255,.35); margin-top: 2px; }
+.port em { margin-left: auto; font-style: normal; font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 13px; color: #5eead4; }
+/* networking */
+.nw { padding: 16px 24px 0; }
+.nw h5 { margin: 0 0 14px; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 28px; letter-spacing: -.5px; }
+.pills { display: flex; gap: 6px; justify-content: center; margin-bottom: 14px; }
+.pills span { padding: 7px 12px; border-radius: 20px; background: #141414; font-weight: 600; font-size: 13px; color: rgba(255,255,255,.5); }
+.pills span.on { background: var(--accent); color: var(--on-accent); }
+.srch { display: flex; gap: 8px; align-items: center; padding: 11px 14px; border-radius: 14px; background: #141414; border: 1px solid rgba(255,255,255,.06); font-size: 14px; color: rgba(255,255,255,.3); }
+.srch .mdi { width: 18px; height: 18px; }
+.cnt { text-align: right; font-size: 12px; color: rgba(255,255,255,.35); margin: 8px 0 12px; }
+.nw h6 { margin: 0 0 12px; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 18px; }
+.sug { display: flex; gap: 10px; margin-right: -24px; }
+.sc { flex: none; width: 160px; height: 260px; border-radius: 20px; border: .5px solid rgba(255,255,255,.12); background: rgba(255,255,255,.03); padding: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.sc .hal { width: 68px; height: 68px; border-radius: 50%; background: rgba(255,255,255,.04); display: grid; place-items: center; margin-bottom: 10px; }
+.sc img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+.sc b { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 13.5px; }
+.sc .cg { font-size: 11px; color: rgba(255,255,255,.5); margin: 2px 0 8px; }
+.sc .ic { padding: 3px 8px; border-radius: 8px; background: rgba(255,255,255,.08); font-weight: 600; font-size: 10.5px; }
+.sc .tg { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin: 8px 0; }
+.sc .tg span { padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,.04); font-size: 9.5px; color: rgba(255,255,255,.6); }
+.sc .cn { margin-top: auto; width: 100%; padding: 8px; border-radius: 12px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 12.5px; }
+.steps { padding: 10vh 0 20vh; }
+.step { min-height: 62vh; display: flex; flex-direction: column; justify-content: center; opacity: .28; transition: opacity .6s var(--ease); }
+.step.on { opacity: 1; }
+.step .n { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 18px; color: var(--accent); margin-bottom: 14px; }
+.step h3 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: clamp(30px, 3.4vw, 52px); letter-spacing: -.035em; line-height: 1; margin: 0 0 18px; }
+.step p { font-size: 19px; line-height: 1.55; color: var(--mut); margin: 0; max-width: 460px; }
+
+/* patrocinadores: misma composicion que Lux (cuatro tarjetas + cintas). Ver bloque "patrocinadores" mas abajo. */
+
+/* lugar */
+.venue { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+.venue h3 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: clamp(30px, 3.4vw, 52px); letter-spacing: -.035em; line-height: 1; margin: 0 0 18px; }
+.venue p { font-size: 19px; line-height: 1.55; color: var(--mut); margin: 0 0 28px; max-width: 520px; }
+.vlist { display: grid; gap: 14px; margin-bottom: 32px; font-size: 17px; }
+.vlist div { display: flex; gap: 12px; align-items: center; }
+.vlist svg { color: var(--accent); }
+.btn { display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 22px; border-radius: 14px; border: 1px solid var(--line); background: transparent; font-weight: 700; font-size: 15px; text-decoration: none; transition: transform .25s var(--spring), border-color .3s; }
+.btn:hover { transform: translateY(-2px); border-color: var(--accent); }
+.hours { border-radius: 24px; background: var(--card); border: 1px solid var(--line); overflow: hidden; }
+.hours .h { display: grid; grid-template-columns: 1fr auto; padding: 26px 28px; border-bottom: 1px solid var(--line); align-items: center; position: relative; }
+.hours .h:last-child { border-bottom: 0; }
+.hours .h b { display: block; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 22px; letter-spacing: -.02em; }
+.hours .h span { font-size: 15px; color: var(--mut); }
+.hours .h .t { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 19px; font-variant-numeric: tabular-nums; }
+.hours .h::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); transform: scaleY(0); transition: transform .5s var(--ease); }
+.hours .h:hover::before { transform: scaleY(1); }
+
+/* preguntas */
+.faq { display: grid; grid-template-columns: .8fr 1.2fr; gap: 64px; }
+.qa { border-bottom: 1px solid var(--line); }
+.qa:first-child { border-top: 1px solid var(--line); }
+.qa button { width: 100%; border: 0; background: transparent; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 26px 4px; text-align: left; font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 21px; letter-spacing: -.02em; }
+.qa button .pl { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; flex: none; transition: transform .5s var(--spring), background .3s, border-color .3s, color .3s; }
+.qa.on button .pl { transform: rotate(45deg); background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.qa .ans { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .5s var(--ease); }
+.qa.on .ans { grid-template-rows: 1fr; }
+.qa .ans > div { overflow: hidden; }
+.qa .ans p { margin: 0; padding: 0 60px 26px 4px; font-size: 17px; line-height: 1.6; color: var(--mut); }
+
+/* cierre */
+.final { position: relative; z-index: 3; min-height: 92svh; display: grid; place-items: center; text-align: center; padding: 120px 24px; background: linear-gradient(180deg, var(--bg) 0%, transparent 26%, transparent 70%, var(--bg) 100%); }
+.final .big { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: clamp(54px, 10vw, 170px); line-height: .9; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+.final .big span { color: var(--accent); }
+.final h2 { font-size: clamp(28px, 3.6vw, 56px); margin: 18px 0 36px; }
+.final .cta { width: auto; display: inline-flex; padding: 0 30px; height: 58px; text-decoration: none; }
+.final-in { position: relative; padding: 48px 56px; border-radius: 32px; background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(10px); }
+footer { position: relative; z-index: 3; background: var(--bg); display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 34px 48px; border-top: 1px solid var(--line); font-size: 14px; color: var(--mut); }
+
+@media (max-width: 1100px) { .spk-grid, .lxs-grid { grid-template-columns: repeat(3, 1fr); } .plat { grid-template-columns: 1fr 1fr; } .plx { height: 190px; } }
+@media (max-width: 1020px) {
+  .hero { grid-template-columns: 1fr; padding: 90px 16px 36px; gap: 28px; }
+  .hero h1 { font-size: 11.4vw; } .meta { gap: 20px; }
+  .hero::before { background: linear-gradient(0deg, rgba(5,5,6,.88) 0%, rgba(5,5,6,.2) 60%); }
+  body.light .hero::before { background: linear-gradient(0deg, rgba(242,238,231,.92) 0%, rgba(242,238,231,.3) 60%); }
+  .sec { padding: 96px 16px; }
+  .sec-head, .exp, .venue, .faq { grid-template-columns: 1fr; gap: 28px; }
+  .sec-head p { justify-self: start; }
+  .spk-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; } /* iPad vertical: tres columnas, a dos se ven inmensas */
+  .spk .who b { font-size: 17px; } .spk .ba { padding: 16px; } .spk .ba q { font-size: 16px; }
+  .row { grid-template-columns: 70px 1fr; gap: 6px 14px; }
+  .row .sp { grid-column: 2; } .row .tr { grid-column: 2; justify-self: start; }
+  .row .tt { font-size: 18px; } .row .tm { font-size: 16px; }
+  .steps { padding: 0; } .step { min-height: auto; padding: 22px 0; opacity: 1; }
+  /* el iPhone se queda pegado al borde inferior, como en la mano, y los pasos pasan por encima y se funden antes de llegarle */
+  .exp { grid-template-columns: 1fr; gap: 0; }
+  .exp .phone-wrap { order: 2; position: sticky; top: auto; bottom: 0; height: auto; padding: 28px 0 10px; z-index: 2; pointer-events: none; background: linear-gradient(180deg, transparent, var(--bg) 30%); }
+  .exp .phone-wrap .iphone { --pw: min(230px, 48vw); pointer-events: auto; }
+  .plat { grid-template-columns: 1fr 1fr; gap: 10px; } .plx { height: 170px; padding: 20px; } .plx b { font-size: 28px; } .plx span { font-size: 13.5px; }
+  .final-in { padding: 32px 20px; }
+  footer { padding: 28px 16px; }
+}
+
+/* =====================================================================
+   LUX — plantilla propia. Firma: el color entra como luz desde el cursor.
+   ===================================================================== */
+#luxMain { display: none; }
+body.light #noirMain { display: none; }
+body.light #luxMain { display: block; }
+.flood { --fl: var(--accent); --fl-ink: var(--accent); position: relative; isolation: isolate; }
+.flood::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: color-mix(in srgb, var(--fl) 9%, var(--card)); opacity: 0; transition: opacity .7s var(--out); }
+.flood:hover::before, .flood.lit::before { opacity: 1; }
+.flood svg.bd { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; overflow: visible; }
+.flood svg.bd rect { width: calc(100% - 2px); height: calc(100% - 2px); fill: none; stroke: var(--fl); stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1s var(--out); }
+.flood:hover svg.bd rect, .flood.lit svg.bd rect { stroke-dashoffset: 0; }
+
+.lx-head { display: flex; justify-content: space-between; align-items: end; gap: 32px; margin-bottom: 48px; }
+.lx-head p { font-size: 19px; line-height: 1.5; color: var(--mut); margin: 0; max-width: 420px; }
+.lx h2 em { font-style: normal; color: var(--accent); }
+
+/* speakers: la lama sube (nombre y cargo siempre visibles; la idea es la recompensa).
+   Invitacion: al llegar, el panel de la primera speaker sube, se queda un instante y se asienta.
+   Ocurre una vez; en cuanto el visitante abre cualquier tarjeta, no vuelve. */
+.lxs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.lxs { cursor: pointer; outline: none; }
+.lxs-nm { padding: 16px 4px 0; }
+.lxs-nm b { display: block; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 21px; letter-spacing: -.02em; transition: color .6s var(--out); }
+.lxs-nm span { display: block; font-size: 15px; color: var(--mut); margin-top: 3px; }
+.lxs.on .lxs-nm b { color: var(--accent); }
+.lxs-box { position: relative; aspect-ratio: 4 / 5; border-radius: 26px; overflow: hidden; background: var(--card); }
+.lxs-back { position: absolute; inset: 0; border-radius: 26px; background: var(--card); padding: calc(26% + 22px) 24px 26px; display: flex; flex-direction: column; isolation: isolate; }
+.lxs-back q { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: clamp(19px, 1.6vw, 24px); line-height: 1.22; letter-spacing: -.025em; quotes: "\201C" "\201D"; }
+.lxs-back .tk { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
+.lxs-back .tk small { display: block; font-size: 13px; color: var(--mut); margin-bottom: 4px; }
+.lxs-back .tk b { display: block; font-weight: 700; font-size: 15.5px; line-height: 1.3; color: var(--accent); }
+.lxs-back svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 2; }
+.lxs-back svg rect { width: calc(100% - 2px); height: calc(100% - 2px); fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.1s var(--out) .15s; }
+.lxs.on .lxs-back svg rect { stroke-dashoffset: 0; }
+.lxs-ph { position: absolute; inset: 0; z-index: 1; border-radius: 26px; overflow: hidden; background: var(--card2); box-shadow: 0 10px 30px rgba(60,45,25,.18); transition: transform 1s var(--io); }
+.lxs-ph img { width: 100%; height: 100%; object-fit: cover; }
+.lxs.on .lxs-ph { transform: translateY(-74%); }
+.lxs.peek .lxs-ph { transition: transform 1.1s var(--out); transform: translateY(-36%); }
+.lxs.settle .lxs-ph { transition: transform 1s var(--io); transform: translateY(0); }
+
+/* agenda: tablero de tres dias */
+.lx-tr { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+.lx-tr button { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 10px 18px; font-weight: 600; font-size: 14px; color: var(--mut); transition: all .3s var(--ease); }
+.lx-tr button.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.col { border-radius: 28px; background: var(--card2); padding: 12px; }
+.col header { padding: 16px 14px 18px; display: flex; justify-content: space-between; align-items: baseline; }
+.col header b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 26px; letter-spacing: -.03em; }
+.col header span { font-weight: 600; font-size: 14px; color: var(--mut); }
+.it { border-radius: 18px; background: var(--card); padding: 16px 16px 14px; margin-bottom: 8px; transition: opacity .4s var(--ease), color .5s; }
+.it .tm { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 14px; color: var(--mut); font-variant-numeric: tabular-nums; transition: color .5s; }
+.it h4 { margin: 6px 0 8px; font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 17px; line-height: 1.3; letter-spacing: -.015em; }
+.it p { margin: 0; font-size: 13.5px; color: var(--mut); transition: color .5s; }
+.it .k { display: inline-block; margin-top: 10px; font-weight: 600; font-size: 12.5px; color: var(--mut2); transition: color .5s; }
+.it h4 { transition: color .6s var(--out); }
+.it:hover h4 { color: var(--accent); }
+.it.hit { box-shadow: inset 3px 0 0 var(--accent); }
+.it.dim { opacity: .3; }
+
+/* experiencia: celular al centro, funciones alrededor */
+.orb { display: grid; grid-template-columns: 1fr auto 1fr; gap: 56px; align-items: center; }
+.orb .side { display: grid; gap: 16px; }
+.fc { border-radius: 24px; background: var(--card); padding: 26px; cursor: pointer; }
+.fc .n { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 15px; color: var(--accent); transition: color .5s; }
+.fc h3 { margin: 10px 0 8px; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 24px; letter-spacing: -.025em; line-height: 1.1; }
+.fc p { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--mut); transition: color .5s; }
+.fc h3 { transition: color .6s var(--out); }
+.fc.lit h3 { color: var(--accent); }
+.orb .iphone { --pw: min(320px, 24vw, calc((100svh - 200px) / 2.06)); }
+
+/* patrocinadores (Noir y Lux): cuatro tarjetas y cintas de nombres. Sin niveles escritos.
+   Tokens, ningun color de marca y ningun color del cliente: una marca nunca toma un color ajeno.
+   Noir responde con luz (lampara muy sutil tras el vidrio); Lux con relieve (se despega apenas y aparece su sombra). */
+.plat { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+/* hasta 1100px (iPad horizontal incluido) dos por dos; va despues de la regla base para que gane */
+@media (max-width: 1100px) { .plat { grid-template-columns: repeat(2, minmax(0, 1fr)); } .plat .plx { height: 190px; } }
+.plx { position: relative; isolation: isolate; border-radius: 26px; background: var(--card); padding: 26px; height: 230px; display: flex; flex-direction: column; justify-content: flex-end; cursor: default; outline: none; transition: transform .9s var(--out), box-shadow .9s var(--out), border-color .7s var(--out); }
+.plx b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 40px; letter-spacing: -.04em; color: color-mix(in srgb, var(--fg) 85%, transparent); }
+.plx span { display: block; font-size: 15px; font-weight: 600; color: var(--mut2); opacity: 0; transform: translateY(10px); transition: opacity .5s var(--out), transform .7s var(--out); margin-top: 6px; }
+.plx span + span { margin-top: 2px; }
+.plx:hover span, .plx.on span { opacity: 1; transform: none; }
+/* Noir: vidrio oscuro con borde luminoso; al pasar, una luz blanca y calida se enciende tras el nombre */
+body:not(.light) .plx { border: 1px solid var(--line); box-shadow: inset 0 1px 0 rgba(255,255,255,.07); }
+body:not(.light) .plx::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: radial-gradient(75% 65% at 28% 100%, rgba(255,244,224,.06), transparent 72%); opacity: 0; transition: opacity 1.1s var(--out); }
+body:not(.light) .plx:hover::after, body:not(.light) .plx.on::after { opacity: 1; }
+body:not(.light) .plx:hover, body:not(.light) .plx.on { border-color: rgba(255,255,255,.2); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+/* Lux: relieve, la tarjeta se despega apenas de la pared y aparece su sombra calida */
+body.light .plx:hover, body.light .plx.on { transform: translateY(-4px); box-shadow: 0 24px 50px rgba(60,45,25,.14), 0 2px 6px rgba(60,45,25,.05); }
+.marq { overflow: hidden; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 28px 0; margin-top: 40px; }
+.marq + .marq { border-top: 0; margin-top: 0; }
+.marq .trk { display: flex; gap: 72px; width: max-content; animation: mq 40s linear infinite; }
+.marq:hover .trk, .marq.off .trk { animation-play-state: paused; }
+.marq.rev .trk { animation-direction: reverse; }
+.marq span { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: clamp(28px, 3.2vw, 46px); letter-spacing: -.035em; color: color-mix(in srgb, var(--fg) 45%, transparent); white-space: nowrap; display: inline-block; transition: color .5s var(--out); cursor: default; }
+.marq span:hover { color: color-mix(in srgb, var(--fg) 85%, transparent); }
+@keyframes mq { to { transform: translateX(-50%); } }
+
+/* lugar: linea de tiempo */
+.vx { display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; align-items: start; }
+.vx h3 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: clamp(30px, 3.4vw, 52px); letter-spacing: -.035em; line-height: 1; margin: 0 0 18px; }
+.vx p { font-size: 19px; line-height: 1.55; color: var(--mut); margin: 0 0 28px; }
+.tl { position: relative; padding-left: 40px; }
+.tl::before { content: ""; position: absolute; left: 11px; top: 14px; bottom: 14px; width: 2px; background: var(--line); }
+.td { position: relative; border-radius: 22px; background: var(--card); padding: 24px 26px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; transition: color .5s; }
+.td::after { content: ""; position: absolute; left: -36px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); }
+.td b { display: block; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 22px; letter-spacing: -.02em; }
+.td span { font-size: 15px; color: var(--mut); transition: color .5s; }
+.td .h { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; }
+.td b { transition: color .6s var(--out); }
+.td:hover b { color: var(--accent); }
+
+/* preguntas: dos columnas */
+.fq { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fq details { border-radius: 22px; background: var(--card); padding: 0 24px; transition: color .5s; }
+.fq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 24px 0; font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 19px; letter-spacing: -.02em; }
+.fq summary::-webkit-details-marker { display: none; }
+.fq summary .pl2 { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; transition: transform .5s var(--spring); }
+.fq details[open] summary .pl2 { transform: rotate(45deg); }
+.fq details p { margin: 0 0 24px; font-size: 16.5px; line-height: 1.6; color: var(--mut); }
+.fq details[open] summary { color: var(--accent); }
+.fq details[open] .pl2 { border-color: var(--accent); }
+
+@media (max-width: 1020px) {
+  .lx-head { flex-direction: column; align-items: start; }
+  .lxs-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } .lxs-nm b { font-size: 17px; } .lxs-nm span { font-size: 13.5px; } .lxs-back { padding: calc(26% + 14px) 16px 16px; } .lxs-back q { font-size: 15.5px; } .lxs-back .tk b { font-size: 13px; }
+  .board, .plat, .fq, .vx { grid-template-columns: 1fr; }
+  .plat { grid-template-columns: 1fr 1fr; gap: 10px; } .plx { height: 170px; padding: 20px; } .plx b { font-size: 28px; } .plx span { font-size: 13.5px; }
+  .orb { grid-template-columns: 1fr; gap: 12px; } .orb .side { gap: 12px; }
+  .orb .iphone-slot { order: 3; display: grid; place-items: center; position: sticky; bottom: 0; z-index: 2; padding: 28px 0 10px; pointer-events: none; background: linear-gradient(180deg, transparent, var(--bg) 30%); }
+  .orb .iphone-slot .iphone { --pw: min(230px, 48vw); pointer-events: auto; }
+}
+
+/* celular: dos columnas */
+@media (max-width: 600px) { .spk-grid, .lxs-grid { grid-template-columns: 1fr 1fr; } }
+
+/* iPad vertical: composicion propia, no la de celular estirada (lab-ipad-iphone.html).
+   Noir = historia a dos columnas: el iPhone fijo a la izquierda, igual que en horizontal; al girar solo cambia el ancho del texto.
+   Lux = tablero: el iPhone al centro y las cuatro funciones en dos por dos debajo, todo en una pantalla. */
+@media (min-width: 700px) and (max-width: 1100px) and (orientation: portrait) {
+  .sec { padding-left: 32px; padding-right: 32px; }
+  /* el iPhone vive en una caja de su tamano, centrada al pegarse: al soltarse no deja media pantalla vacia debajo */
+  #experiencia .exp { --pw: min(290px, calc((100svh - 190px) / 2.06)); grid-template-columns: 290px minmax(0, 1fr); gap: 44px; }
+  #experiencia .exp .phone-wrap { order: 0; position: sticky; top: calc((100svh - var(--pw) * 2.064) / 2); bottom: auto; align-self: start; height: auto; padding: 0; background: none; pointer-events: auto; display: grid; place-items: center; }
+  #experiencia .exp .phone-wrap .iphone { --pw: inherit; }
+  #experiencia .steps { padding: 18svh 0 calc(var(--pw) * 1.032 - 110px); }
+  #experiencia .step { min-height: 0; padding: 48px 0; opacity: .26; transition: opacity .6s var(--ease); }
+  #experiencia .step.on { opacity: 1; }
+  #experiencia .step h3 { font-size: 34px; margin-bottom: 14px; }
+  #experiencia .step p { font-size: 18px; max-width: 380px; }
+  #lx-exp .orb { grid-template-columns: 1fr 1fr; gap: 14px; }
+  #lx-exp .orb .side { display: contents; }
+  #lx-exp .orb .iphone-slot { grid-column: 1 / -1; order: -1; position: static; background: none; padding: 0 0 22px; display: grid; place-items: center; pointer-events: auto; }
+  #lx-exp .orb .iphone-slot .iphone { --pw: 270px; }
+  #lx-exp .fc { padding: 22px; } #lx-exp .fc h3 { font-size: 22px; } #lx-exp .fc p { font-size: 15px; }
+}
+/* iPad horizontal, Noir: pasos mas juntos (el texto es corto y quedaba un bloque negro entre uno y otro).
+   Solo pantallas de hasta 1366 x 1024: el Noir de escritorio grande no cambia. */
+@media (min-width: 900px) and (max-width: 1366px) and (orientation: landscape) and (max-height: 1024px) {
+  #experiencia .exp { --pw: min(340px, 30vw, calc((100svh - 170px) / 2.06)); }
+  #experiencia .exp .phone-wrap { top: calc((100svh - var(--pw) * 2.064) / 2); height: auto; align-self: start; }
+  #experiencia .exp .phone-wrap .iphone { --pw: inherit; }
+  #experiencia .steps { padding: 20svh 0 calc(var(--pw) * 1.032 - 110px); }
+  #experiencia .step { min-height: 0; padding: 48px 0; }
+}
+/* iPad horizontal, Lux: el orbe se queda, con el iPhone mas grande */
+@media (min-width: 900px) and (max-width: 1366px) and (orientation: landscape) {
+  #lx-exp .orb { gap: 32px; }
+  #lx-exp .orb .iphone { --pw: min(300px, calc((100svh - 180px) / 2.06)); }
+}
+
+/* ESPACIADO ENTRE SECCIONES (QA 2026-10-04, ver qa/qa-landing-v3.cjs).
+   Antes: 285px entre secciones en iPad horizontal, hasta 750px de negro despues de la experiencia Noir
+   y un cierre de pantalla entera. Ahora el mismo ritmo en todas: escritorio 140, iPad 88, celular 72. */
+.sec { scroll-margin-top: calc(var(--bar) + 12px); }        /* al saltar desde el menu la pildora no tapa el titulo */
+#preguntas, #lx-faq { padding-bottom: 0; }                  /* el cierre ya trae su propio aire */
+.steps { padding-bottom: 0; }
+@media (min-width: 1021px) { .step:last-child { min-height: 0; padding-top: 24vh; } } /* el ultimo paso conserva su distancia con el anterior, sin vacio debajo */
+.final { min-height: min(92svh, 760px); }
+@media (max-width: 1366px) { .sec { padding-top: 88px; padding-bottom: 88px; } .final { min-height: min(92svh, 640px); } }
+@media (max-width: 600px) { .sec { padding-top: 72px; padding-bottom: 72px; } }
+/* titulo del hero: entre 1021 y 1180 la columna es angosta y EMPRESARIAL se salia */
+@media (min-width: 1021px) and (max-width: 1180px) { .hero h1 { font-size: 7.6vw; } }
+/* speakers de Lux: tres columnas hasta 1100 (la regla base, escrita despues, las devolvia a cuatro) */
+@media (max-width: 1100px) { .lxs-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .lxs-grid { grid-template-columns: 1fr 1fr; } }
+
+/* AGENDA DE LUX en iPad vertical y celular: como la de Noir, un dia a la vez con su selector.
+   Antes eran los tres dias apilados (unas tres pantallas de iPad). En horizontal y escritorio sigue el tablero. */
+.lx-days { display: none; }
+@media (max-width: 600px), (min-width: 601px) and (max-width: 1100px) and (orientation: portrait) {
+  .lx-days { display: flex; width: max-content; max-width: 100%; margin-bottom: 14px; }
+  #lx-agenda .board { grid-template-columns: 1fr; }
+  #lx-agenda .board .col { display: none; }
+  #lx-agenda .board .col.on { display: block; }
+  #lx-agenda .board .col header { display: none; }
+  #lx-agenda .board .col.swap { animation: lxday .6s var(--out) both; }
+}
+@keyframes lxday { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (max-width: 600px) { .lx-days button { padding: 9px 12px; } .lx-days button b { font-size: 15px; } .lx-days button span { font-size: 12px; } }
+@media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; } .lama .in { transition: none; } .lxs.peek .lxs-ph { transform: none; } }
+/* diagnostico de rendimiento (solo barra del lab): apagar sospechosos uno a uno */
+body.dx-hero #gl { display: none !important; }
+body.dx-blur * { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+body.dx-marq .marq .trk { animation: none !important; }
+body.dx-foto img { filter: none !important; }
+body.dx-sombra .spk .ba, body.dx-sombra .lxs-ph, body.dx-sombra .plx, body.dx-sombra .nav, body.dx-sombra .ticket { box-shadow: none !important; }
+body.dx-capas .spk .in { will-change: auto !important; }
+body.dx-rv .rv { opacity: 1 !important; transform: none !important; transition: none !important; }
+.dx { display: flex; gap: 10px; align-items: center; margin-left: 14px; font: 600 12px 'Urbanist'; color: rgba(255,255,255,.55); }
+.dx label { display: inline-flex; gap: 4px; align-items: center; cursor: pointer; } .dx input { margin: 0; }
+/* Firefox: el desenfoque de fondo se recalcula en cada frame de scroll y el filtro de las fotos cae a software.
+   Mismo aspecto con fondos casi opacos. Chrome y Safari no entran aqui. */
+@supports (-moz-appearance: none) {
+  .nav { backdrop-filter: none; background: color-mix(in srgb, var(--card) 96%, transparent); }
+  .ticket { backdrop-filter: none; background: color-mix(in srgb, var(--card) 97%, transparent); }
+  .final-in { backdrop-filter: none; background: color-mix(in srgb, var(--bg) 94%, transparent); }
+  .tabbar { backdrop-filter: none; }
+  .spk .fa img { filter: none; }
+}
+</style>
+</head>
+<body>
+<div class="lab-bar">
+  <b>Landing v3</b>
+  <div class="seg" id="seg">
+    <button data-t="dark" class="on">Noir</button>
+    <button data-t="light">Lux</button>
+  </div>
+  <span class="lbl" style="color:rgba(255,255,255,.45)">Color del cliente</span>
+  <div class="sw" id="sw">
+    <button data-c="#3D6BFF" style="background:#3D6BFF" class="on" title="Azul"></button>
+    <button data-c="#E5192B" style="background:#E5192B" title="Rojo"></button>
+    <button data-c="#FF6A13" style="background:#FF6A13" title="Naranja"></button>
+    <button data-c="#C9A86A" style="background:#C9A86A" title="Dorado"></button>
+  </div>
+  <span class="dx" id="dx">Apagar: <label><input type="checkbox" data-dx="hero">hero 3D</label><label><input type="checkbox" data-dx="blur">desenfoques</label><label><input type="checkbox" data-dx="marq">cintas</label><label><input type="checkbox" data-dx="foto">filtro fotos</label><label><input type="checkbox" data-dx="sombra">sombras</label><label><input type="checkbox" data-dx="capas">capas</label><label><input type="checkbox" data-dx="rv">revelados</label></span>
+  <span id="fpsMeter" style="margin-left:auto;font:600 12px/1 'Urbanist';color:rgba(255,255,255,.55);font-variant-numeric:tabular-nums" title="cuadros por segundo, promedio de medio segundo, y el peor frame">fps</span>
+</div>
+
+<canvas id="gl"></canvas>
+
+<nav class="nav" id="nav">
+  <span class="brand">Summit 2026</span>
+  <a class="l" href="#speakers">Speakers</a><a class="l" href="#agenda">Agenda</a><a class="l" href="#experiencia">Experiencia</a><a class="l" href="#patrocinadores">Patrocinadores</a><a class="l" href="#preguntas">Preguntas</a>
+  <a class="go" href="#ticket" data-goticket>Quiero mi lugar <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</nav>
+
+<section class="hero" id="top">
+  <div>
+    <span class="eyebrow">Bogotá, noviembre de 2026</span>
+    <h1>Summit<br>Empresarial<br><span class="out">2026</span></h1>
+    <div class="meta">
+      <div><small>Fechas</small><span>4 al 6 de noviembre</span></div>
+      <div><small>Lugar</small><span>Centro de Convenciones Ágora</span></div>
+      <div><small>Empieza en</small><span class="cd" id="cd"></span></div>
+      <div><small>Presentado por</small><span class="aws">AWS</span></div>
+    </div>
+  </div>
+  <div class="ticket" id="ticket">
+    <div class="t-head"><span>Pase general</span><b id="tn">Gratis</b></div>
+    <div class="form">
+      <form id="form" novalidate>
+        <p class="sent">Hola, me llamo <input class="ln" name="name" placeholder="tu nombre" autocomplete="name"> <span class="mu">trabajo como</span> <input class="ln" name="role" placeholder="tu cargo" autocomplete="organization-title"> <span class="mu">en</span> <input class="ln" name="company" placeholder="tu empresa" autocomplete="organization"> <span class="mu">y mi correo es</span> <input class="ln" name="email" type="email" placeholder="tu@empresa.com" autocomplete="email"></p>
+        <label class="consent" id="cn"><input type="checkbox" name="consent"> Acepto el tratamiento de mis datos para gestionar mi participación.</label>
+        <button class="cta" type="submit">Quiero mi lugar <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </form>
+      <div class="t-note">Sin contraseña. Tu acceso llega a tu correo.</div>
+    </div>
+    <div class="done"><div class="t-name" id="nm"></div><div class="t-note">Tu lugar está guardado. Te enviamos el acceso a <b id="ml"></b>.</div><div class="t-note" style="margin-top:14px"><button class="rs" id="reset">Reiniciar registro</button></div></div>
+  </div>
+</section>
+
+<main id="noirMain">
+  <section class="sec" id="speakers">
+    <div class="sec-head rv"><div><div class="kick">Speakers</div><h2>Quiénes suben<br>al escenario</h2></div><p>Pasa el mouse por cada speaker para conocer su idea y su charla.</p></div>
+    <div class="spk-grid" id="spkGrid"></div>
+  </section>
+
+  <section class="sec" id="agenda">
+    <div class="sec-head rv"><div><div class="kick">Agenda</div><h2>Tres días,<br>cinco tracks</h2></div><p>Elige el día y marca lo que te interesa. Arma tu agenda personal cuando entres a la plataforma.</p></div>
+    <div class="ag-bar rv"><div class="days" id="days"></div><div class="tracks" id="tracks"></div></div>
+    <div class="rows" id="rows"></div>
+  </section>
+
+  <section class="sec" id="experiencia">
+    <div class="sec-head rv"><div><div class="kick">La experiencia</div><h2>No es solo<br>ver charlas</h2></div><p>El evento vive en tu celular desde que te registras hasta el último aplauso.</p></div>
+    <div class="exp">
+      <div class="phone-wrap"><div class="iphone" id="iphone"><div class="glass"><div class="island"></div><div class="app x" id="phone"></div></div></div></div>
+      <div class="steps" id="steps"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="patrocinadores" style="padding-bottom:0">
+    <div class="sec-head rv"><div><div class="kick">Patrocinadores</div><h2>Lo hacen<br>posible</h2></div><p>Pasa el mouse por cada marca para ver qué trae al evento.</p></div>
+    <div class="plat rv" id="platN"></div>
+  </section>
+  <div class="marq"><div class="trk" id="mqN1"></div></div>
+  <div class="marq rev"><div class="trk" id="mqN2"></div></div>
+
+  <section class="sec" id="lugar">
+    <div class="venue">
+      <div class="rv">
+        <div class="kick">Lugar</div>
+        <h3>Centro de Convenciones Ágora, Bogotá</h3>
+        <p>El recinto de eventos más grande de la ciudad, a minutos del aeropuerto El Dorado.</p>
+        <div class="vlist">
+          <div><svg class="i" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Carrera 40 # 22C-67, Bogotá</div>
+          <div><svg class="i" viewBox="0 0 24 24"><path d="M5 17h14M6 17V9l2-4h8l2 4v8M8 13h.01M16 13h.01"/></svg>Parqueadero en el recinto</div>
+          <div><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg>Entras con tu código QR personal</div>
+        </div>
+        <a class="btn" href="https://www.google.com/maps/search/?api=1&query=Agora+Bogota+Centro+de+Convenciones" target="_blank" rel="noopener">Cómo llegar <svg class="i" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      </div>
+      <div class="hours rv" id="hours"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="preguntas">
+    <div class="faq">
+      <div class="rv"><div class="kick">Preguntas</div><h2>Antes de<br>que preguntes</h2></div>
+      <div id="faq" class="rv"></div>
+    </div>
+  </section>
+</main>
+
+<main id="luxMain" class="lx">
+  <section class="sec" id="lx-speakers">
+    <div class="lx-head rv"><div><div class="kick">Speakers</div><h2>Las voces<br>de este <em>año</em></h2></div><p>Pasa el mouse por cada speaker para conocer su idea y su charla.</p></div>
+    <div class="lxs-grid rv" id="lxsGrid"></div>
+  </section>
+
+  <section class="sec" id="lx-agenda">
+    <div class="lx-head rv"><div><div class="kick">Agenda</div><h2>Tres días<br>de un <em>vistazo</em></h2></div><p>Marca los temas que te interesan y míralos resaltados en los tres días.</p></div>
+    <div class="days lx-days rv" id="lxDays"></div>
+    <div class="lx-tr rv" id="lxTr"></div>
+    <div class="board rv" id="board"></div>
+  </section>
+
+  <section class="sec" id="lx-exp">
+    <div class="lx-head rv"><div><div class="kick">La experiencia</div><h2>El evento vive<br>en tu <em>bolsillo</em></h2></div><p>Pasa el mouse por cada función para verla en la app.</p></div>
+    <div class="orb rv"><div class="side" id="orbL"></div><div class="iphone-slot"><div class="iphone" id="iphone2"><div class="glass"><div class="island"></div><div class="app x" id="phone2"></div></div></div></div><div class="side" id="orbR"></div></div>
+  </section>
+
+  <section class="sec" id="lx-spn" style="padding-bottom:0">
+    <div class="lx-head rv"><div><div class="kick">Patrocinadores</div><h2>Lo hacen<br><em>posible</em></h2></div><p>Pasa el mouse por cada marca para ver qué trae al evento.</p></div>
+    <div class="plat rv" id="plat"></div>
+  </section>
+  <div class="marq"><div class="trk" id="mq1"></div></div>
+  <div class="marq rev"><div class="trk" id="mq2"></div></div>
+
+  <section class="sec" id="lx-lugar">
+    <div class="vx">
+      <div class="rv"><div class="kick">Lugar</div><h3>Centro de Convenciones Ágora, Bogotá</h3><p>El recinto de eventos más grande de la ciudad, a minutos del aeropuerto El Dorado. Parqueadero en el recinto y entrada con tu código QR personal.</p>
+        <a class="btn" href="https://www.google.com/maps/search/?api=1&query=Agora+Bogota+Centro+de+Convenciones" target="_blank" rel="noopener">Cómo llegar <svg class="i" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>
+      <div class="tl rv" id="tl"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="lx-faq">
+    <div class="lx-head rv"><div><div class="kick">Preguntas</div><h2>Lo que suelen<br><em>preguntar</em></h2></div></div>
+    <div class="fq rv" id="fq"></div>
+  </section>
+</main>
+
+<section class="final" id="final">
+  <div class="final-in rv">
+    <div class="big" id="bigCd"></div>
+    <h2>Nos vemos el 4 de noviembre</h2>
+    <a class="cta" href="#ticket" data-goticket>Quiero mi lugar <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+</section>
+<footer><span>Summit Empresarial 2026, Bogotá</span><span>Términos y tratamiento de datos</span></footer>
+
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ===================== DATOS (evento demo, mismos de la v2) ===================== */
+const TRACKS = { tec: 'Tecnología', neg: 'Negocios', inn: 'Innovación', net: 'Networking', lid: 'Liderazgo' };
+const SPEAKERS = [
+  ['María García', 'CEO y fundadora', 'Kasproduction', 47, 'Un evento no se mide por cuánta gente llega, sino por cuánta sale distinta.'],
+  ['Sofia Chen', 'VP of Product', 'Google', 25, 'La IA dejó de ser una promesa. Ahora es una decisión de negocio.'],
+  ['Carlos Rodríguez', 'CTO', 'TechCorp', 12, 'La nube no es un lugar, es una forma de trabajar.'],
+  ['Laura Díaz', 'Founder y CEO', 'NovaPay', 26, 'En Latam, regular bien es la mayor ventaja competitiva.'],
+  ['Valentina Ríos', 'Design Lead LATAM', 'Figma', 23, 'Un buen sistema de diseño es un acuerdo, no una librería.'],
+  ['Emma Thompson', 'VP Engineering', 'Stripe', 5, 'La confiabilidad es la característica que nadie ve hasta que falla.'],
+  ['Andrés Gil', 'VP Engineering', 'Rappi', 59, 'Escalar es aprender a decir que no.'],
+  ['Natasha Kozlova', 'ML Engineer', 'OpenAI', 44, 'Los modelos grandes se ganan en los detalles pequeños.']
+];
+const img = n => `https://i.pravatar.cc/700?img=${n}`;
+const DAYS = [
+  { k: 'Día 1', d: 'Miércoles 4', h: '8:00 a 19:30', items: [
+    ['08:00', 'Registro y café de bienvenida', [], 'net'], ['09:00', 'Apertura: el futuro del trabajo corporativo', [0], 'lid'],
+    ['10:30', 'The State of AI: from hype to production', [1], 'inn'], ['12:30', 'Conexiones que importan: almuerzo curado', [], 'net'],
+    ['14:00', 'Workshop: Cloud Native en 90 minutos', [2], 'tec'], ['16:00', 'Fintech en Latam: regulación y oportunidad', [3], 'neg'],
+    ['18:30', 'Rooftop cocktail: cierre del día 1', [], 'net'] ] },
+  { k: 'Día 2', d: 'Jueves 5', h: '9:00 a 18:00', items: [
+    ['09:00', 'IA generativa: del hype a la producción', [7], 'inn'], ['10:30', 'Arquitecturas serverless a escala', ['David Arango, AWS'], 'tec'],
+    ['12:00', 'Design systems: de Figma a producción', [4], 'inn'], ['14:00', 'DevOps y platform engineering', ['Felipe Torres, Mercado Libre'], 'tec'],
+    ['16:00', 'Growth: métricas que importan', ['Marcus Johnson, Notion'], 'neg'] ] },
+  { k: 'Día 3', d: 'Viernes 6', h: '9:00 a 18:00', items: [
+    ['09:00', 'Panel: IA en la empresa moderna', [1, 5], 'inn'], ['10:30', 'Mobile-first: React Native a fondo', [6], 'tec'],
+    ['12:00', 'Ciberseguridad ofensiva: red team en acción', ['Nikolai Smirnov, Kaspersky'], 'tec'], ['14:00', 'Mentoría 1:1 con líderes de la industria', [], 'lid'],
+    ['16:00', 'Hackathon 48 horas: premiación', [], 'net'] ] }
+];
+const PLAT = [['AWS', 'Laboratorio de IA generativa en vivo', 'Pabellón A'], ['Google', 'Zona de demos de Gemini', 'Pabellón B'], ['Microsoft', 'Talleres de Copilot para equipos', 'Salas 3 y 4'], ['Meta', 'Experiencia de realidad mixta', 'Terraza Norte']];
+const REST = ['Stripe', 'Vercel', 'Twilio', 'Shopify', 'Cloudflare', 'Supabase', 'GitHub', 'GitLab', 'Docker', 'Elastic', 'DigitalOcean', 'Segment'];
+const FAQ = [
+  ['¿Cuánto cuesta?', 'La entrada es gratuita con registro previo. Los cupos son limitados y se asignan por orden de llegada.'],
+  ['¿Tengo que crear una contraseña?', 'No. Con tu nombre y tu correo basta. Te enviamos un enlace de acceso y con ese enlace entras a la plataforma del evento.'],
+  ['¿Qué necesito para entrar el día del evento?', 'Tu código QR personal. Lo encuentras en la plataforma del evento desde el día anterior. Por seguridad, no lo compartas en redes.'],
+  ['¿Puedo verlo en línea?', 'Sí. Las charlas principales se transmiten en vivo en la plataforma, con chat y preguntas al speaker.'],
+  ['¿Puedo invitar a alguien de mi equipo?', 'Claro. Comparte el enlace de esta página. Cada persona se registra con su propio correo.']
+];
+const EXP = [
+  ['En vivo desde donde estés', 'Las charlas principales se transmiten con chat, preguntas al speaker y encuestas en tiempo real.'],
+  ['Juegos en vivo', 'Trivias en la pantalla gigante que respondes desde tu celular, con el auditorio entero jugando a la vez.'],
+  ['El desafío', 'Sumas puntos en cada experiencia del evento y compites por premios con los demás asistentes.'],
+  ['Conexiones que importan', 'Encuentra a quién conocer según tus intereses y agenda reuniones sin salir del evento.']
+];
+
+/* ===================== UTILIDADES ===================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+const pad = n => String(n).padStart(2, '0');
+const lum = hex => { const n = parseInt(hex.slice(1), 16); const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
+const onColor = hex => lum(hex) > .45 ? '#141414' : '#ffffff';
+const spText = arr => arr.map(x => typeof x === 'number' ? `${SPEAKERS[x][0]}, ${SPEAKERS[x][2]}` : x).join(' y ');
+const IC = {
+  pin: '<svg class="i" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  plus: '<svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 5v14M5 12h14"/></svg>',
+  hand: '<svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
+};
+
+/* ===================== TEMA Y ACENTO ===================== */
+let ACC = new THREE.Color('#3D6BFF'), ACCHEX = '#3D6BFF';
+function setAccent(hex) {
+  ACC.set(hex); ACCHEX = hex; const n = parseInt(hex.slice(1), 16);
+  const R = document.documentElement.style;
+  R.setProperty('--accent', hex); R.setProperty('--accent-rgb', `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`); R.setProperty('--on-accent', onColor(hex));
+  $$('#sw button').forEach(b => b.classList.toggle('on', b.dataset.c === hex));
+  store.set('lv3-acc', hex); if (current && current.accent) current.accent();
+}
+
+/* ===================== ESCENA 3D ===================== */
+const canvas = $('#gl');
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }); }
+catch (e) { canvas.style.display = 'none'; }
+const FF = navigator.userAgent.includes('Firefox'); /* Firefox: WebGL mas lento, mismo cuadro con menos trabajo */
+renderer.setPixelRatio(FF ? 1 : Math.min(devicePixelRatio || 1, 1.5));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = FF ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+const desk = () => innerWidth > 1020;
+const mouse = new THREE.Vector2(0, 0), mouseT = new THREE.Vector2(0, 0);
+const mpx = { in: false };
+let SK = 0; /* 0 = hero, 1 = la escena se aleja al bajar */
+addEventListener('pointermove', e => { mouseT.set(e.clientX / innerWidth * 2 - 1, -((e.clientY - 44) / (innerHeight - 44)) * 2 + 1); mpx.in = true; });
+document.addEventListener('pointerleave', () => { mpx.in = false; });
+
+/* =====================================================================
+   2 PAISAJE DE DATOS — three.js, columnas instanciadas
+   ===================================================================== */
+function datos() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#050506'); scene.fog = new THREE.Fog('#050506', 24, 40);
+  const cam = new THREE.PerspectiveCamera(32, 1, .1, 200);
+  const NX = 64, NZ = 40, N = NX * NZ;
+  const geo = new THREE.BoxGeometry(.82, 1, .82); geo.translate(0, .5, 0);
+  const mat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: .5, metalness: .35, dithering: true }); /* tramado: sin franjas de color en la niebla y la luz */
+  const mesh = new THREE.InstancedMesh(geo, mat, N); mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(mesh);
+  const dark = new THREE.Color('#1a1b20'), mid = new THREE.Color('#3a3c44'), tmp = new THREE.Color(), m4 = new THREE.Matrix4();
+  for (let i = 0; i < N; i++) mesh.setColorAt(i, dark);
+  scene.add(new THREE.HemisphereLight('#8a90a0', '#050506', .35));
+  const key = new THREE.DirectionalLight('#ffffff', 2.2); key.position.set(-14, 18, -10); scene.add(key);
+  const fill = new THREE.DirectionalLight('#ffffff', .5); fill.position.set(10, 6, 14); scene.add(fill);
+  const glow = new THREE.PointLight('#ffffff', 60, 30, 2); glow.position.set(0, 4, 0); scene.add(glow);
+  const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hit = new THREE.Vector3(), bump = new THREE.Vector3(999, 0, 999);
+  const target = new THREE.Vector3();
+  return {
+    kind: 'gl', scene, cam,
+    resize(w, h) { cam.aspect = w / h; cam.updateProjectionMatrix(); },
+    update(t) {
+      const d = desk();
+      cam.position.set(1 + mouse.x * 2.5, 17 + mouse.y * 1.5 + SK * 12, 27 - SK * 4); target.set(d ? 5 : 0, -1, -7); cam.lookAt(target);
+      ray.setFromCamera(mouse, cam); if (ray.ray.intersectPlane(plane, hit)) bump.lerp(hit, .12);
+      glow.color.copy(ACC); glow.position.set(bump.x, 3.5, bump.z);
+      let i = 0;
+      for (let ix = 0; ix < NX; ix++) for (let iz = 0; iz < NZ; iz++, i++) {
+        const x = (ix - NX / 2) * 1, z = (iz - NZ / 2) * 1;
+        let h = 1.1 + Math.sin(x * .16 + t * .25) * Math.cos(z * .21 - t * .18) * 1.3 + Math.sin((x + z) * .08 + t * .12) * 1.6 + Math.sin(x * .45 + z * .3 + t * .4) * .25;
+        h = Math.max(.12, h);
+        const dx = x - bump.x, dz = z - bump.z; h += 3.2 * Math.exp(-(dx * dx + dz * dz) / 14);
+        const g = ease((t - .15 - (ix / NX) * 1.4 - (iz / NZ) * .3) / 1.1);
+        const hh = Math.max(.02, h * g);
+        m4.makeScale(1, hh, 1); m4.setPosition(x, 0, z); mesh.setMatrixAt(i, m4);
+        const k = clamp((h - 2.4) / 2.2);
+        const df = clamp((-z - 5) / 11); /* lejania: las cimas del fondo no toman el acento (si no, quedan rayitas de color en el horizonte) */
+        tmp.copy(dark).lerp(mid, clamp(h / 3) * (1 - df * .6)).lerp(ACC, k * k * (1 - df)); mesh.setColorAt(i, tmp);
+      }
+      mesh.instanceMatrix.needsUpdate = true; mesh.instanceColor.needsUpdate = true;
+    },
+    dispose() { geo.dispose(); mat.dispose(); }
+  };
+}
+
+/* =====================================================================
+   FACHADA CINETICA (CLARA) — lamas de yeso calido, reverso del color del cliente
+   ===================================================================== */
+function fachada() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#F2EEE7');
+  const cam = new THREE.PerspectiveCamera(30, 1, .1, 200);
+  const pm = new THREE.PMREMGenerator(renderer); const envTex = pm.fromScene(new RoomEnvironment(), .04).texture; scene.environment = envTex;
+  const COLS = 46, ROWS = 26, N = COLS * ROWS, SX = .5, SY = .5;
+  const geo = new THREE.BoxGeometry(SX * .94, SY * .94, .06);
+  const edge = new THREE.MeshStandardMaterial({ color: '#d6cdbf', roughness: .6, metalness: 0, envMapIntensity: .4, dithering: true });
+  const front = new THREE.MeshStandardMaterial({ color: '#F3EEE6', roughness: .5, metalness: 0, envMapIntensity: .35, dithering: true });
+  const back = new THREE.MeshStandardMaterial({ color: ACC.clone(), roughness: .45, metalness: 0, envMapIntensity: .4, dithering: true, emissive: ACC.clone(), emissiveIntensity: .06 });
+  const mesh = new THREE.InstancedMesh(geo, [edge, edge, edge, edge, front, back], N); mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  mesh.castShadow = true; mesh.receiveShadow = true;
+  const wall = new THREE.Group(); wall.add(mesh); scene.add(wall);
+  scene.add(new THREE.HemisphereLight('#fff6ea', '#cbbfae', 1.1));
+  const sun = new THREE.DirectionalLight('#fff1dc', 2.1); sun.position.set(-9, 7, 8); sun.castShadow = true;
+  sun.shadow.mapSize.set(FF ? 1024 : 2048, FF ? 1024 : 2048); sun.shadow.radius = 5; sun.shadow.bias = -.0004; sun.shadow.normalBias = .02;
+  Object.assign(sun.shadow.camera, { left: -15, right: 15, top: 10, bottom: -10, near: 1, far: 40 });
+  scene.add(sun); scene.add(sun.target);
+  const f = new Float32Array(N).fill(1), v = new Float32Array(N);
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), pos = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), ax = new THREE.Vector3(0, 1, 0);
+  const ray = new THREE.Raycaster(), hit = new THREE.Vector3(), local = new THREE.Vector3(999, 999, 0), plane = new THREE.Plane();
+  let lastT = 0;
+  return {
+    kind: 'gl', scene, cam, light: true,
+    accent() { back.color.copy(ACC); back.emissive.copy(ACC); },
+    resize(w, h) { cam.aspect = w / h; cam.updateProjectionMatrix(); },
+    update(t) {
+      const dt = Math.min(.05, Math.max(0, t - lastT)); lastT = t;
+      const d = desk();
+      cam.position.set(d ? -3.2 : 0, 0, 15.5); cam.lookAt(d ? 1.2 : 0, 0, 0);
+      wall.rotation.set(mouse.y * .05, -.28 + mouse.x * .07, 0); wall.position.set(d ? 2.2 : 0, SK * 3, -SK * 8); wall.updateMatrixWorld();
+      sun.target.position.copy(wall.position);
+      plane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 0, 1).applyQuaternion(wall.quaternion), wall.position);
+      ray.setFromCamera(mouse, cam); if (mpx.in && ray.ray.intersectPlane(plane, hit)) { local.copy(hit); wall.worldToLocal(local); } else local.set(999, 999, 0);
+      const sweep = ((t - 2.5) % 6) / 6 * 28 - 14;
+      let i = 0;
+      for (let c = 0; c < COLS; c++) for (let r = 0; r < ROWS; r++, i++) {
+        const x = (c - COLS / 2 + .5) * SX, y = (r - ROWS / 2 + .5) * SY;
+        const intro = (Math.hypot(c - COLS * .5, r - ROWS * .5) / 30) * 1.6 + .3;
+        let tg = t < intro ? 1 : 0;
+        const dx = x - local.x, dy = y - local.y, dd = dx * dx + dy * dy; if (dd < 2.2) tg = 1;
+        if (t > 3) { const band = (x * .7 + y * .4) - sweep; const ab = Math.abs(band); if (ab < .5) tg = Math.max(tg, 1); else if (ab < 1.4) tg = Math.max(tg, .5 * (1.4 - ab)); }
+        const a = (tg - f[i]) * 38 - v[i] * 7; v[i] += a * dt; f[i] += v[i] * dt;
+        q.setFromAxisAngle(ax, Math.PI * f[i]); pos.set(x, y, 0); m4.compose(pos, q, one); mesh.setMatrixAt(i, m4);
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+    },
+    dispose() { envTex.dispose(); pm.dispose(); geo.dispose(); edge.dispose(); front.dispose(); back.dispose(); }
+  };
+}
+
+
+
+const FX = { dark: datos, light: fachada };
+let current = null, theme = 'dark', t0 = performance.now(), sceneOn = true, finalOn = false;
+function setTheme(k) {
+  theme = k; document.body.classList.toggle('light', k === 'light');
+  $$('#seg button').forEach(b => b.classList.toggle('on', b.dataset.t === k));
+  store.set('lv3-theme', k); requestAnimationFrame(() => typeof fitPhone === 'function' && fitPhone()); $$('#nav a.l').forEach(a => { const id = a.dataset.s || a.getAttribute('href').slice(1); a.dataset.s = id; const lx = { speakers: 'lx-speakers', agenda: 'lx-agenda', experiencia: 'lx-exp', patrocinadores: 'lx-spn', preguntas: 'lx-faq' }; a.setAttribute('href', '#' + (k === 'light' ? lx[id] : id)); });
+  if (!renderer) return;
+  if (current && current.dispose) current.dispose();
+  current = FX[k](); t0 = performance.now(); resize();
+}
+function resize() { if (!renderer) return; const w = innerWidth, h = innerHeight - 44; renderer.setSize(w, h, false); if (current) current.resize(w, h); }
+addEventListener('resize', resize);
+function loop() {
+  mouse.lerp(mouseT, .06);
+  const hero = innerHeight;
+  const k = clamp(scrollY / (hero * .9));
+  SK += ((finalOn ? .15 : k) - SK) * .08;
+  const vis = (finalOn || k < .98) && !document.body.classList.contains('dx-hero');
+  canvas.style.opacity = finalOn ? 1 : String(1 - ease(k));
+  if (renderer && current && vis) { current.update(reduced ? 8 : (performance.now() - t0) / 1000); renderer.render(current.scene, current.cam); }
+  requestAnimationFrame(loop);
+}
+
+/* ===================== NAVEGACION Y REVELADO ===================== */
+addEventListener('scroll', () => { $('#nav').classList.toggle('on', scrollY > innerHeight * .7); }, { passive: true });
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15 });
+new IntersectionObserver(es => es.forEach(e => {
+  const was = finalOn; finalOn = e.isIntersecting;
+  if (finalOn && !was) t0 = performance.now(); /* la escena vuelve a nacer en el cierre */
+}), { threshold: .25 }).observe($('#final'));
+$$('[data-goticket]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => { const t = $('#ticket'); t.classList.remove('pulse'); void t.offsetWidth; t.classList.add('pulse'); t.querySelector('input')?.focus({ preventScroll: true }); }, 700); }));
+
+/* lamas: entran girando en ola desde el centro, como la fachada */
+function waveIn(container, sel) {
+  const items = $$(sel, container);
+  items.forEach(el => el.classList.add('intro'));
+  new IntersectionObserver((es, ob) => es.forEach(e => {
+    if (!e.isIntersecting) return; ob.disconnect();
+    const r0 = container.getBoundingClientRect(), cx = r0.left + r0.width / 2, cy = r0.top + r0.height / 2;
+    items.forEach(el => { const r = el.getBoundingClientRect(); const d = Math.hypot(r.left + r.width / 2 - cx, (r.top + r.height / 2 - cy) * 1.4); setTimeout(() => el.classList.remove('intro'), reduced ? 0 : 150 + d * .9); });
+  }), { threshold: .3 }).observe(container);
+  items.forEach(el => {
+    el.addEventListener('mouseenter', () => el.classList.add('flip'));
+    el.addEventListener('mouseleave', () => el.classList.remove('flip'));
+    el.addEventListener('click', () => { if (matchMedia('(hover: none)').matches) el.classList.toggle('flip'); });
+    el.addEventListener('focus', () => el.classList.add('flip'));
+    el.addEventListener('blur', () => el.classList.remove('flip'));
+  });
+}
+
+/* ===================== SPEAKERS ===================== */
+function talkOf(i) { for (const d of DAYS) for (const it of d.items) if (it[2].includes(i)) return { d, it }; return null; }
+$('#spkGrid').innerHTML = SPEAKERS.map((s, i) => {
+  const t = talkOf(i);
+  return `<div class="lama spk" tabindex="0" style="--i:${i}" aria-label="${s[0]}, ${s[1]} en ${s[2]}"><div class="in">
+    <div class="fa"><img src="${img(s[3])}" alt="" decoding="async"><div class="who"><b>${s[0]}</b><span>${s[1]}, ${s[2]}</span></div></div>
+    <div class="ba"><q>${s[4]}</q><div class="tk">${t ? `<small>${t.d.d} de noviembre, ${t.it[0]}</small><b>${t.it[1]}</b>` : ''}</div><div class="nm">${s[0]}, ${s[2]}</div></div>
+  </div></div>`;
+}).join('');
+new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { ob.disconnect(); $$('#spkGrid .spk').forEach(c => c.classList.add('seen')); } }), { threshold: .2 }).observe($('#spkGrid'));
+const TOUCH = matchMedia('(hover: none)').matches;
+$$('#spkGrid .spk').forEach(el => {
+  if (TOUCH) { el.addEventListener('click', () => el.classList.toggle('flip')); return; }
+  el.addEventListener('mouseenter', () => el.classList.add('flip'));
+  el.addEventListener('mouseleave', () => el.classList.remove('flip'));
+  el.addEventListener('focus', () => el.classList.add('flip'));
+  el.addEventListener('blur', () => el.classList.remove('flip'));
+});
+
+/* ===================== AGENDA ===================== */
+let day = 0; const sel = new Set();
+function renderDays() {
+  $('#days').innerHTML = DAYS.map((d, i) => `<button class="${i === day ? 'on' : ''}" data-i="${i}"><b>${d.k}</b><span>${d.d}</span></button>`).join('');
+  $$('#days button').forEach(b => b.addEventListener('click', () => { day = +b.dataset.i; renderDays(); renderRows(true); }));
+}
+function renderTracks() {
+  $('#tracks').innerHTML = Object.entries(TRACKS).map(([k, v]) => `<button data-k="${k}" class="${sel.has(k) ? 'on' : ''}">${v}</button>`).join('');
+  $$('#tracks button').forEach(b => b.addEventListener('click', () => { const k = b.dataset.k; sel.has(k) ? sel.delete(k) : sel.add(k); renderTracks(); renderRows(false); }));
+}
+function renderRows(anim) {
+  const items = DAYS[day].items;
+  $('#rows').innerHTML = items.map(it => {
+    const sp = it[2]; const faces = sp.filter(x => typeof x === 'number').map(x => `<img src="${img(SPEAKERS[x][3])}" alt="">`).join('');
+    const hit = sel.size === 0 || sel.has(it[3]);
+    return `<div class="row ${hit ? (sel.size ? 'hit' : '') : 'dim'}"><div class="tm">${it[0]}</div><div class="tt">${it[1]}</div><div class="sp">${faces}<span class="tx">${sp.length ? spText(sp) : ''}</span></div><div class="tr">${TRACKS[it[3]]}</div></div>`;
+  }).join('');
+  if (anim && !reduced) $$('#rows .row').forEach((r, i) => { r.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: r.classList.contains('dim') ? .22 : 1, transform: 'none' }], { duration: 600, delay: i * 50, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' }); });
+}
+renderDays(); renderTracks(); renderRows(false);
+
+/* ===================== EXPERIENCIA ===================== */
+const P = {
+  bell: '<path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  close: '<path d="M18 6 6 18M6 6l12 12"/>', pin: '<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+  cal: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>', voice: '<circle cx="9" cy="7" r="4"/><path d="M3 21v-1a6 6 0 0 1 12 0v1M17 7a5 5 0 0 1 0 6M20 4a9 9 0 0 1 0 12"/>',
+  img: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>', dom: '<path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9h.01M9 13h.01M9 17h.01"/>',
+  chev: '<path d="m9 18 6-6-6-6"/>', home: '<path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/>', qr: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM21 14v7h-4M17 21h-3"/>',
+  grp: '<circle cx="9" cy="7" r="4"/><path d="M3 21v-1a6 6 0 0 1 12 0v1M16 3.1a4 4 0 0 1 0 7.8M21 21v-1a6 6 0 0 0-4-5.7"/>', user: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M6.2 18.6a7 7 0 0 1 11.6 0"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>', check: '<circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/>', back: '<path d="M19 12H5M12 19l-7-7 7-7"/>',
+  info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>', gift: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+  target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>', pass: '<rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M8 17h8"/>',
+  mag: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>'
+};
+const ic = (k, st = '') => `<svg class="mdi" viewBox="0 0 24 24" style="${st}">${P[k]}</svg>`;
+const SB = `<div class="sb"><span>9:41</span><span class="ic"><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 16 12"><path d="M8 2.6c2.2 0 4.2.9 5.7 2.3l1.1-1.1A9.6 9.6 0 0 0 8 1C5.4 1 3 2 1.2 3.8l1.1 1.1A8.1 8.1 0 0 1 8 2.6Zm0 3.2c1.3 0 2.5.5 3.4 1.3l1.1-1.1A6.4 6.4 0 0 0 8 4.2c-1.7 0-3.3.7-4.5 1.8l1.1 1.1c.9-.8 2.1-1.3 3.4-1.3Zm0 3.2c-.5 0-1 .2-1.3.6L8 11l1.3-1.4c-.3-.4-.8-.6-1.3-.6Z"/></svg><svg viewBox="0 0 27 12"><rect x=".5" y=".5" width="23" height="11" rx="3.5" fill="none" stroke="#fff" opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="2"/><rect x="24.5" y="4" width="1.5" height="4" rx=".7" opacity=".4"/></svg></span></div>`;
+const TAB = on => `<div class="tabbar">${[['home', 'Inicio'], ['cal', 'Mi Agenda'], ['qr', 'Mi QR'], ['grp', 'Networking'], ['user', 'Perfil']].map(([k, l]) => `<div class="${l === on ? 'on' : ''}">${ic(k)}${l}${k === 'grp' ? '<i>3</i>' : ''}</div>`).join('')}</div><div class="homeind"></div>`;
+const LET = ['#3B82F6', '#EF4444', '#F59E0B', '#10B981'];
+const SCREENS = [
+  /* 0 inicio en vivo */
+  `${SB}<div class="hh"><b>Summit 2026</b><div class="bell">${ic('bell')}<i>2</i></div></div>
+   <div class="hhero"><div class="lb">Tres días que cambian todo</div><h4>El futuro del trabajo <em>corporativo</em></h4></div>
+   <div class="hn"><div class="top"><span class="tag">Happening Now</span><span class="join">UNIRTE AHORA</span></div>
+     <h5>The State of AI: from hype to production</h5><div class="loc">${ic('pin')}Auditorio principal</div>
+     <div class="bot"><div class="av"><img src="${img(25)}" alt=""><div class="nm">Sofia Chen<span>VP of Product</span></div></div><div class="att"><img src="${img(47)}" alt=""><img src="${img(12)}" alt=""><img src="${img(26)}" alt=""><span>+412 asistirán</span></div></div></div>
+   <div class="pg"><i class="on"></i><i></i><i></i></div>
+   <div class="mods">${[['cal', 'Agenda'], ['voice', 'Speakers'], ['img', 'Social'], ['dom', 'Sponsors']].map(([k, l]) => `<div class="mod"><div class="r">${ic(k)}${ic('chev')}</div><b>${l}</b></div>`).join('')}</div>
+   ${TAB('Inicio')}`,
+  /* 1 transmision con chat */
+  `${SB}<div class="sh"><div class="row1"><div class="cl">${ic('close')}</div><h5>The State of AI: from hype to production</h5></div><hr><div class="who"><img src="${img(25)}" alt=""><div><b>Sofia Chen</b><span>VP of Product, Google</span></div></div></div>
+   <div class="player"><img src="${img(25)}" alt=""><div class="bar"><i></i></div></div>
+   <div class="ptabs"><span class="on">Chat</span><span>Preguntas</span><span>Encuestas</span><span>Trivia</span></div>
+   <div class="chat"><div class="st"><i></i>Chat en vivo</div>
+     <div class="msg"><small>Andrea Molina</small><p>Esto es justo lo que necesitaba para el comité del lunes</p></div>
+     <div class="msg"><small>Juan Pablo Rey</small><p>¿Van a compartir las slides?</p></div>
+     <div class="msg me"><p>Increíble el caso de Google Cloud</p></div></div>
+   <div class="emo"><span>❤️</span><span>👏</span><span>🔥</span><span>😮</span><span>🎉</span><span>💯</span></div>
+   <div class="inp"><div>Escribe un mensaje...</div><b>↑</b></div>`,
+  /* 2 trivia */
+  `${SB}<div class="sh"><div class="row1"><div class="cl">${ic('close')}</div><h5>The State of AI: from hype to production</h5></div><hr></div>
+   <div class="player"><img src="${img(25)}" alt=""><div class="bar"><i></i></div></div>
+   <div class="ptabs"><span>Chat</span><span>Preguntas</span><span>Encuestas</span><span class="on">Trivia</span></div>
+   <div class="tv"><div class="hd"><div><span class="rd">2/5</span><span class="gt">IA en la empresa</span></div><div class="tm">${ic('clock')}15s</div></div>
+     <div class="sp">Patrocinado por AWS</div>
+     <div class="q">¿Qué porcentaje de empresas en Latam ya usa IA en producción?</div>
+     ${['12 %', '34 %', '51 %', '78 %'].map((o, i) => `<div class="op ${i === 1 ? 'ok' : 'off'}"><span class="lt" style="background:${LET[i]}">${'ABCD'[i]}</span>${o}${i === 1 ? ic('check') : ''}</div>`).join('')}
+     <div class="pts">+100 pts</div></div>`,
+  /* 3 desafio */
+  `${SB}<div class="lh"><div class="bk">${ic('back')}</div><b>Desafio</b>${ic('info')}</div>
+   <div class="hc"><div class="r1"><div><small>Tu posicion</small><div class="pos">#3</div></div><div class="pt">2.120<span>puntos</span></div></div>
+     <div class="seg10">${Array.from({ length: 10 }, (_, i) => `<i class="${i < 6 ? 'f' : i === 6 ? 'g' : ''}"></i>`).join('')}<b>68%</b></div>
+     <div class="of">de 1.284 participantes</div><hr>
+     <div class="top3">${[['Laura', 26, '#B5A68B', 1, 2480], ['Andrés', 59, '#C0C0C0', 2, 2310], ['Tú', 12, '#CD7F32', 3, 2120]].map(r => `<div><div class="ph"><img src="${img(r[1])}" alt="" style="border-color:${r[2]}"><em style="background:${r[2]}">${r[3]}</em></div><span style="${r[0] === 'Tú' ? 'color:#5eead4' : ''}">${r[0]}</span><b>${r[4].toLocaleString('es-CO')}</b></div>`).join('')}</div>
+     <div class="more">Ver ranking completo${ic('chev')}</div></div>
+   <div class="port"><div>${ic('gift')}<div><b>Premios</b><span>4 disponibles</span></div><em>4</em></div><div>${ic('target')}<div><b>Retos</b><span>Proximo: visita 3 stands (+150 pts)</span></div><em>5/8</em></div><div>${ic('pass')}<div><b>Pasaporte</b><span>Sellos de stands visitados</span></div><em>7/12</em></div></div>
+   ${TAB('Inicio')}`,
+  /* 4 networking */
+  `${SB}<div class="nw"><h5>Networking</h5><div class="pills"><span class="on">Directorio</span><span>Contactos</span><span>Solicitudes</span></div>
+   <div class="srch">${ic('mag')}Buscar por nombre, empresa o cargo...</div><div class="cnt">1.284 asistentes</div>
+   <h6>Sugeridos para ti</h6>
+   <div class="sug">${[['Laura Díaz', 26, 'Founder y CEO, NovaPay', '3 intereses en comun', ['Fintech', 'Liderazgo']], ['Andrés Gil', 59, 'VP Engineering, Rappi', '2 intereses en comun', ['Cloud', 'Mobile']], ['Emma Thompson', 5, 'VP Engineering, Stripe', '1 interes en comun', ['Pagos']]].map(p => `<div class="sc"><div class="hal"><img src="${img(p[1])}" alt=""></div><b>${p[0]}</b><div class="cg">${p[2]}</div><span class="ic">${p[3]}</span><div class="tg">${p[4].map(t => `<span>${t}</span>`).join('')}</div><div class="cn">+ Conectar</div></div>`).join('')}</div></div>
+   ${TAB('Networking')}`
+];
+/* paso de la seccion -> pantalla */
+const STEP_SCR = [1, 2, 3, 4];
+$('#phone').innerHTML = SCREENS.map((s, i) => `<div class="scr ${i === 1 ? 'on' : ''}">${s}</div>`).join('');
+function fitPhone() { $$('.iphone').forEach(ph => { const g = ph.querySelector('.glass'), a = ph.querySelector('.app'); if (g && a && g.clientWidth) a.style.setProperty('--s', g.clientWidth / 390); }); }
+addEventListener('resize', fitPhone); fitPhone(); document.fonts && document.fonts.ready.then(fitPhone);
+$('#steps').innerHTML = EXP.map((e, i) => `<div class="step ${i ? '' : 'on'}" data-i="${i}"><div class="n">0${i + 1}</div><h3>${e[0]}</h3><p>${e[1]}</p></div>`).join('');
+const sio = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return; const i = +e.target.dataset.i;
+  $$('#steps .step').forEach((s, j) => s.classList.toggle('on', i === j));
+  $$('#phone .scr').forEach((s, j) => s.classList.toggle('on', STEP_SCR[i] === j));
+}), { rootMargin: '-45% 0px -45% 0px' });
+$$('#steps .step').forEach(s => sio.observe(s));
+
+/* ===================== PATROCINADORES (Noir y Lux) ===================== */
+function renderSponsors(plat, m1, m2) {
+  $(plat).innerHTML = PLAT.map(([n, what, where]) => `<div class="plx" tabindex="0"><b>${n}</b><span>${what}</span><span>${where}</span></div>`).join('');
+  const half = Math.ceil(REST.length / 2);
+  $(m1).innerHTML = REST.slice(0, half).map(n => `<span>${n}</span>`).join('').repeat(2);
+  $(m2).innerHTML = REST.slice(half).map(n => `<span>${n}</span>`).join('').repeat(2);
+  $$('.plx', $(plat)).forEach(t => t.addEventListener('click', () => { if (matchMedia('(hover: none)').matches) t.classList.toggle('on'); }));
+}
+renderSponsors('#platN', '#mqN1', '#mqN2');
+/* las cintas solo se mueven cuando estan en pantalla */
+const marqIO = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('off', !e.isIntersecting)));
+$$('.marq').forEach(m => { m.classList.add('off'); marqIO.observe(m); });
+
+/* ===================== LUGAR Y PREGUNTAS ===================== */
+$('#hours').innerHTML = DAYS.map(d => `<div class="h"><div><b>${d.d} de noviembre</b><span>${d.k}</span></div><div class="t">${d.h}</div></div>`).join('');
+$('#faq').innerHTML = FAQ.map((q, i) => `<div class="qa ${i ? '' : 'on'}"><button aria-expanded="${!i}">${q[0]}<span class="pl">${IC.plus}</span></button><div class="ans"><div><p>${q[1]}</p></div></div></div>`).join('');
+$$('#faq .qa button').forEach(b => b.addEventListener('click', () => { const q = b.parentElement; const on = !q.classList.contains('on'); $$('#faq .qa').forEach(x => { x.classList.remove('on'); x.querySelector('button').setAttribute('aria-expanded', 'false'); }); if (on) { q.classList.add('on'); b.setAttribute('aria-expanded', 'true'); } }));
+
+/* ===================== LUX ===================== */
+function bindFlood(root) {
+  root.querySelectorAll('.flood').forEach(el => {
+    if (el.querySelector('svg.bd')) return;
+    const host = el.tagName === 'DETAILS' ? el.querySelector('summary') : el;
+    const rx = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+    host.insertAdjacentHTML('beforeend', `<svg class="bd" aria-hidden="true"><rect x="1" y="1" rx="${Math.max(0, rx - 1)}" ry="${Math.max(0, rx - 1)}" pathLength="1"/></svg>`);
+  });
+}
+/* speakers: la lama sube */
+$('#lxsGrid').innerHTML = SPEAKERS.map((s, i) => { const t = talkOf(i); return `<article class="lxs" tabindex="0"><div class="lxs-box"><div class="lxs-back"><svg aria-hidden="true"><rect x="1" y="1" rx="25" pathLength="1"/></svg><q>${s[4]}</q>${t ? `<div class="tk"><small>${t.d.d}, ${t.it[0]}</small><b>${t.it[1]}</b></div>` : ''}</div><div class="lxs-ph"><img src="${img(s[3])}" alt="" loading="lazy"></div></div><div class="lxs-nm"><b>${s[0]}</b><span>${s[1]}, ${s[2]}</span></div></article>`; }).join('');
+(() => {
+  const grid = $('#lxsGrid'), cards = $$('#lxsGrid .lxs'), first = cards[0];
+  const touch = matchMedia('(hover: none)').matches;
+  let learned = false, timers = [];
+  const open = c => { c.classList.add('on'); learned = true; timers.forEach(clearTimeout); first.classList.remove('peek', 'settle'); };
+  cards.forEach(c => {
+    if (touch) { c.addEventListener('click', () => { c.classList.contains('on') ? c.classList.remove('on') : open(c); }); return; }
+    c.addEventListener('mouseenter', () => open(c)); c.addEventListener('mouseleave', () => c.classList.remove('on'));
+    c.addEventListener('focus', () => open(c)); c.addEventListener('blur', () => c.classList.remove('on'));
+  });
+  /* invitacion: sube (1.1s), se queda (0.8s), se asienta (1s); una sola vez */
+  const invite = () => { if (learned || first.classList.contains('on')) return; first.classList.add('peek'); timers.push(setTimeout(() => { first.classList.remove('peek'); first.classList.add('settle'); }, 1900)); };
+  new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { ob.disconnect(); timers.push(setTimeout(invite, 600)); } }), { threshold: .35 }).observe(grid);
+})();
+/* agenda en tablero */
+const lxSel = new Set();
+let lxDay = 0, lxSwap = false;
+function renderBoard() {
+  /* selector de dia: solo se ve en iPad vertical y celular (como la agenda de Noir) */
+  $('#lxDays').innerHTML = DAYS.map((d, i) => `<button class="${i === lxDay ? 'on' : ''}" data-i="${i}"><b>${d.k}</b><span>${d.d}</span></button>`).join('');
+  $$('#lxDays button').forEach(b => b.addEventListener('click', () => { if (lxDay === +b.dataset.i) return; lxDay = +b.dataset.i; lxSwap = true; renderBoard(); }));
+  $('#lxTr').innerHTML = Object.entries(TRACKS).map(([k, v]) => `<button data-k="${k}" class="${lxSel.has(k) ? 'on' : ''}">${v}</button>`).join('');
+  $$('#lxTr button').forEach(b => b.addEventListener('click', () => { const k = b.dataset.k; lxSel.has(k) ? lxSel.delete(k) : lxSel.add(k); renderBoard(); }));
+  $('#board').innerHTML = DAYS.map((d, i) => `<div class="col${i === lxDay ? ' on' : ''}${i === lxDay && lxSwap ? ' swap' : ''}"><header><b>${d.d}</b><span>${d.k}</span></header>${d.items.map(it => { const hit = lxSel.size === 0 || lxSel.has(it[3]); return `<div class="it flood ${lxSel.size ? (hit ? 'hit' : 'dim') : ''}"><div class="tm">${it[0]}</div><h4>${it[1]}</h4>${it[2].length ? `<p>${spText(it[2])}</p>` : ''}<span class="k">${TRACKS[it[3]]}</span></div>`; }).join('')}</div>`).join('');
+  bindFlood($('#board')); lxSwap = false;
+}
+renderBoard();
+/* experiencia alrededor del celular */
+$('#phone2').innerHTML = SCREENS.map((s, i) => `<div class="scr ${i === 1 ? 'on' : ''}">${s}</div>`).join('');
+const fcard = (e, i) => `<div class="fc flood ${i ? '' : 'lit'}" data-i="${i}"><div class="n">0${i + 1}</div><h3>${e[0]}</h3><p>${e[1]}</p></div>`;
+$('#orbL').innerHTML = EXP.slice(0, 2).map((e, i) => fcard(e, i)).join('');
+$('#orbR').innerHTML = EXP.slice(2).map((e, i) => fcard(e, i + 2)).join('');
+let orbI = 0, orbHold = false;
+function orbShow(i) { orbI = i; $$('#lx-exp .fc').forEach(c => c.classList.toggle('lit', +c.dataset.i === i)); $$('#phone2 .scr').forEach((s, j) => s.classList.toggle('on', STEP_SCR[i] === j)); }
+$$('#lx-exp .fc').forEach(c => { c.addEventListener('pointerenter', e => { const r = c.getBoundingClientRect(); c.style.setProperty('--mx', (e.clientX - r.left) + 'px'); c.style.setProperty('--my', (e.clientY - r.top) + 'px'); orbHold = true; orbShow(+c.dataset.i); }); c.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') orbHold = false; }); /* en tactil, el primer toque detiene el recorrido */ c.addEventListener('click', () => orbShow(+c.dataset.i)); });
+setInterval(() => { if (!orbHold && !reduced && theme === 'light') orbShow((orbI + 1) % 4); }, 4200);
+/* sin mouse (iPad, celular) las invitaciones dicen "Toca" */
+if (matchMedia('(hover: none)').matches) $$('.sec-head p, .lx-head p').forEach(p => { p.textContent = p.textContent.replace('Pasa el mouse por', 'Toca'); });
+/* patrocinadores */
+renderSponsors('#plat', '#mq1', '#mq2');
+/* lugar y preguntas */
+$('#tl').innerHTML = DAYS.map(d => `<div class="td flood"><div><b>${d.d} de noviembre</b><span>${d.k}</span></div><div class="h">${d.h}</div></div>`).join('');
+$('#fq').innerHTML = FAQ.map((q, i) => `<details class="flood ${i === 0 ? 'lit' : ''}" ${i === 0 ? 'open' : ''}><summary>${q[0]}<span class="pl2">${IC.plus}</span></summary><p>${q[1]}</p></details>`).join('');
+$$('#fq details').forEach(d => d.addEventListener('toggle', () => d.classList.toggle('lit', d.open)));
+bindFlood($('#luxMain'));
+$$('.rv').forEach(el => io.observe(el));
+
+/* ===================== REGISTRO Y CUENTA ===================== */
+const START = new Date('2026-11-04T08:00:00-05:00');
+function tick() {
+  const ms = Math.max(0, START - Date.now()), d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60;
+  $('#cd').textContent = `${d} días ${pad(h)} h ${pad(m)} min`;
+  $('#bigCd').innerHTML = `Faltan <span>${d}</span> días`;
+}
+tick(); setInterval(tick, 1000);
+$('#form').addEventListener('submit', e => {
+  e.preventDefault(); const f = e.target; let ok = true;
+  f.name.classList.toggle('err', f.name.value.trim().length < 2); if (f.name.value.trim().length < 2) ok = false;
+  const mailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim()); f.email.classList.toggle('err', !mailOk); if (!mailOk) ok = false;
+  $('#cn').classList.toggle('err', !f.consent.checked); if (!f.consent.checked) ok = false;
+  if (!ok) return;
+  /* la confirmacion es su propia pagina (lab-confirmacion.html). Los datos viajan en sessionStorage, nunca en la URL */
+  const reg = { n: f.name.value.trim(), e: f.email.value.trim(), c: f.role.value.trim(), o: f.company.value.trim(), t: document.body.classList.contains('light') ? 'light' : 'dark', a: ACCHEX };
+  try { sessionStorage.setItem('lv3-reg', JSON.stringify(reg)); } catch (err) {}
+  location.href = 'lab-confirmacion.html';
+});
+$('#reset').addEventListener('click', () => { $('#ticket').classList.remove('ok'); $('#form').reset(); $('#tn').textContent = 'Gratis'; });
+
+$$('#seg button').forEach(b => b.addEventListener('click', () => setTheme(b.dataset.t)));
+$$('#sw button').forEach(b => b.addEventListener('click', () => setAccent(b.dataset.c)));
+setAccent(store.get('lv3-acc') || '#3D6BFF');
+const qt = new URLSearchParams(location.search).get('t');
+setTheme(qt === 'light' || qt === 'dark' ? qt : (store.get('lv3-theme') || 'dark'));
+loop();
+/* diagnostico: casillas de la barra del lab */
+$$('#dx input').forEach(c => c.addEventListener('change', () => document.body.classList.toggle('dx-' + c.dataset.dx, c.checked)));
+/* medidor de fps en la barra del lab */
+(() => { const el = $('#fpsMeter'); let n = 0, t0 = performance.now(), last = t0, worst = 0;
+  const tick = t => { n++; worst = Math.max(worst, t - last); last = t; if (t - t0 >= 500) { el.textContent = `${Math.round(n * 1000 / (t - t0))} fps, peor ${Math.round(worst)} ms`; el.style.color = worst > 50 ? '#ff8a8a' : 'rgba(255,255,255,.55)'; n = 0; worst = 0; t0 = t; } requestAnimationFrame(tick); };
+  requestAnimationFrame(tick); })();
+window.__lab = { setTheme, setAccent, get current() { return current; }, renderAt(t = 6) { if (current) { current.update(t); renderer.render(current.scene, current.cam); } } };
+</script>
+</body>
+</html>

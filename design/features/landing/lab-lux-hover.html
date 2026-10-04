@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Hover Lux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   MINILAB — 4 firmas de hover para Lux (reemplazan el circulo que se expande).
+   Todas sin rebote: frenada suave (expo out).
+   ===================================================================== */
+:root { --accent: #3D6BFF; --on-accent: #fff; --bg: #F2EEE7; --card: #FBF9F5; --fg: #141414; --mut: rgba(20,20,20,.6); --mut2: rgba(20,20,20,.42); --line: rgba(20,20,20,.1); --out: cubic-bezier(.16,1,.3,1); }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: 'Urbanist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: var(--bg); color: var(--fg); }
+.bar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 14px; padding: 12px 24px; background: #0b0b0c; color: #fff; font-size: 13px; }
+.bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; }
+.sw { display: flex; gap: 6px; }
+.sw button { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; padding: 0; cursor: pointer; }
+.sw button.on { border-color: #fff; }
+.wrap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 32px 24px 64px; max-width: 1600px; margin: 0 auto; }
+.col h2 { margin: 0 0 6px; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 24px; letter-spacing: -.025em; }
+.col h2 span { color: var(--accent); margin-right: 8px; }
+.col > p { margin: 0 0 22px; font-size: 15px; line-height: 1.45; color: var(--mut); min-height: 66px; }
+.stack { display: grid; gap: 16px; }
+
+/* ---------- tarjetas base ---------- */
+.c { position: relative; border-radius: 24px; background: var(--card); overflow: hidden; isolation: isolate; cursor: default; transition: color .55s var(--out); }
+.c .t1, .c .t2, .c .t3 { transition: color .55s var(--out); position: relative; }
+.spk .ph { aspect-ratio: 16 / 11; overflow: hidden; }
+.spk .ph img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: filter .9s var(--out), transform 1.4s var(--out); display: block; }
+.spk:hover .ph img { filter: grayscale(0); transform: scale(1.03); }
+.spk .tx { padding: 18px 20px 20px; }
+.t1 { display: block; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 21px; letter-spacing: -.02em; }
+.t2 { display: block; font-size: 14px; color: var(--mut); margin-top: 4px; }
+.t3 { display: block; font-size: 13.5px; font-weight: 600; margin-top: 12px; }
+.ag { padding: 18px 20px; }
+.ag .t2 { margin: 0 0 6px; font-family: 'Plus Jakarta Sans'; font-weight: 700; }
+.pl { height: 170px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; }
+.c.pl { --fill: var(--brand); --onf: var(--onb); }
+.pl .t1 { font-size: 34px; letter-spacing: -.04em; }
+.pl .t3 { margin: 0; opacity: 0; transform: translateY(8px); transition: opacity .6s var(--out), transform .7s var(--out), color .55s var(--out); }
+.pl:hover .t3 { opacity: 1; transform: none; }
+.pl small { font-weight: 600; font-size: 13px; color: var(--mut2); position: relative; transition: color .55s var(--out); }
+.c { --fill: var(--accent); --onf: var(--on-accent); }
+
+/* textos que cambian a color sobre relleno (opciones 1 y 2) */
+.fill:hover .t1, .fill:hover .t3 { color: var(--onf); }
+.fill:hover .t2, .fill:hover small { color: color-mix(in srgb, var(--onf) 75%, transparent); }
+
+/* ---------- 1 LAMAS ---------- */
+.lam .sl { position: absolute; inset: 0; z-index: -1; display: flex; perspective: 900px; }
+.lam .sl i { flex: 1; background: var(--fill); transform: rotateY(90deg); transform-origin: center; transition: transform .7s var(--out); transition-delay: calc(var(--k) * 45ms); margin-right: -1px; }
+.lam:hover .sl i { transform: rotateY(0deg); }
+
+/* ---------- 2 BARRIDO DIRECCIONAL ---------- */
+.swp::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--fill); clip-path: var(--from, inset(0 100% 0 0)); transition: clip-path .75s var(--out); }
+.swp.on::before { clip-path: inset(0 0 0 0); }
+
+/* ---------- 3 LUZ QUE SIGUE ---------- */
+.glw::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--fill) 34%, transparent), transparent 62%); opacity: 0; transition: opacity .7s var(--out); }
+.glw:hover::before { opacity: 1; }
+
+/* ---------- 4 BORDE QUE SE DIBUJA + TINTE ---------- */
+.brd::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--fill) 9%, var(--card)); opacity: 0; transition: opacity .7s var(--out); }
+.brd:hover::before { opacity: 1; }
+.brd svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; overflow: visible; }
+.brd svg rect { width: calc(100% - 2px); height: calc(100% - 2px); fill: none; stroke: var(--fill); stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1s var(--out); }
+.brd:hover svg rect { stroke-dashoffset: 0; }
+.brd:hover .t1 { color: var(--fill); }
+.pl.brd:hover .t1 { color: var(--brand-ink); }
+
+@media (max-width: 1100px) { .wrap { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .wrap { grid-template-columns: 1fr; padding: 20px 16px 48px; } }
+</style>
+</head>
+<body>
+<div class="bar"><b>Hover de Lux</b><span style="color:rgba(255,255,255,.5)">Pasa el mouse despacio por cada tarjeta. Color del cliente</span>
+  <div class="sw" id="sw">
+    <button data-c="#3D6BFF" style="background:#3D6BFF" class="on"></button>
+    <button data-c="#E5192B" style="background:#E5192B"></button>
+    <button data-c="#FF6A13" style="background:#FF6A13"></button>
+    <button data-c="#C9A86A" style="background:#C9A86A"></button>
+  </div>
+</div>
+<div class="wrap" id="wrap"></div>
+
+<script>
+const OPTS = [
+  ['lam fill', 'Lamas que se cierran', 'La tarjeta se llena en franjas verticales que giran una tras otra, desde el lado por donde entras. El mismo lenguaje de la fachada del hero.'],
+  ['swp fill', 'Barrido direccional', 'El color entra en línea recta desde el lado por donde entra el cursor y sale por donde se va, como una cortina.'],
+  ['glw', 'Luz que sigue', 'La tarjeta no se llena. Un brillo suave del color sigue al cursor por dentro. Lo más sutil.'],
+  ['brd', 'Borde que se dibuja', 'Una línea del color recorre el borde y el fondo toma un tinte muy leve. Lo más sobrio.']
+];
+const img = n => `https://i.pravatar.cc/600?img=${n}`;
+const lum = hex => { const n = parseInt(hex.slice(1), 16); const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
+const onC = h => lum(h) > .45 ? '#141414' : '#ffffff';
+const SL = '<span class="sl">' + Array.from({ length: 8 }, (_, k) => `<i style="--k:${k}"></i>`).join('') + '</span>';
+const BR = '<svg><rect x="1" y="1" rx="23" pathLength="1"/></svg>';
+const extra = cls => (cls.startsWith('lam') ? SL : '') + (cls === 'brd' ? BR : '');
+document.getElementById('wrap').innerHTML = OPTS.map(([cls, name, desc], i) => `
+  <div class="col"><h2><span>${i + 1}</span>${name}</h2><p>${desc}</p><div class="stack">
+    <div class="c spk ${cls}">${extra(cls)}<div class="ph"><img src="${img(25)}" alt=""></div><div class="tx"><span class="t1">Sofia Chen</span><span class="t2">VP of Product, Google</span><span class="t3">Miércoles 4, 10:30. The State of AI</span></div></div>
+    <div class="c ag ${cls}">${extra(cls)}<span class="t2">09:00</span><span class="t1">IA generativa: del hype a la producción</span><span class="t3">Natasha Kozlova, OpenAI</span></div>
+    <div class="c pl ${cls}" style="--brand:#FF9900;--onb:${onC('#FF9900')};--brand-ink:#B86E00">${extra(cls)}<small>Platino</small><div><span class="t1">AWS</span><span class="t3">Laboratorio de IA generativa en vivo</span></div></div>
+    <div class="c pl ${cls}" style="--brand:#4285F4;--onb:${onC('#4285F4')};--brand-ink:#4285F4">${extra(cls)}<small>Platino</small><div><span class="t1">Google</span><span class="t3">Zona de demos de Gemini</span></div></div>
+  </div></div>`).join('');
+
+/* el lado por donde entra o sale el cursor */
+function side(el, e) {
+  const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+  const d = { left: x, right: 1 - x, top: y, bottom: 1 - y }; return Object.keys(d).reduce((a, b) => d[a] < d[b] ? a : b);
+}
+const CLIP = { left: 'inset(0 100% 0 0)', right: 'inset(0 0 0 100%)', top: 'inset(0 0 100% 0)', bottom: 'inset(100% 0 0 0)' };
+document.querySelectorAll('.swp').forEach(el => {
+  el.addEventListener('pointerenter', e => { el.style.transition = 'none'; el.classList.remove('on'); el.style.setProperty('--from', CLIP[side(el, e)]); void el.offsetWidth; el.style.transition = ''; requestAnimationFrame(() => el.classList.add('on')); });
+  el.addEventListener('pointerleave', e => { el.style.setProperty('--from', CLIP[side(el, e)]); el.classList.remove('on'); });
+});
+document.querySelectorAll('.lam').forEach(el => {
+  const set = e => { const fromRight = side(el, e) === 'right'; el.querySelectorAll('.sl i').forEach((s, k) => s.style.setProperty('--k', fromRight ? 7 - k : k)); };
+  el.addEventListener('pointerenter', set); el.addEventListener('pointerleave', set);
+});
+document.querySelectorAll('.glw').forEach(el => el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(); el.style.setProperty('--mx', (e.clientX - r.left) + 'px'); el.style.setProperty('--my', (e.clientY - r.top) + 'px'); }));
+document.querySelectorAll('#sw button').forEach(b => b.addEventListener('click', () => {
+  document.documentElement.style.setProperty('--accent', b.dataset.c); document.documentElement.style.setProperty('--on-accent', onC(b.dataset.c));
+  document.querySelectorAll('#sw button').forEach(x => x.classList.toggle('on', x === b));
+}));
+</script>
+</body>
+</html>

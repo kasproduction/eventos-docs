@@ -4,11 +4,169 @@
 >
 > **2026-09-30: el servidor (DigitalOcean) esta EN PAUSA hasta cerrar todas las features. Sigue la
 > landing + widget de registro (`docs/living/PENDIENTES.md` §3, labs en `design/features/landing/`).**
+> **2026-10-04: retomar por el PENDIENTE INMEDIATO de la sesion 2026-10-04 (revision de la confirmacion en iPad/celular).**
 >
 > Plan de servidor (en pausa): `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`, seccion
 > "ESTADO Y PENDIENTES AL 2026-09-29" (arriba del plan B1-B6): el evento es el **domingo 6 de
 > diciembre de 2026**, 5.000 personas; pendientes P.0-P.6 en orden y calendario por semana.
 > Lo de webapp sigue en `docs/living/PENDIENTES-WEBAPP.md`.
+
+---
+
+## SESION 2026-10-04 (Fable 5.1 / Opus 5.5) — iPad, ESPACIADO CON QA AUTOMATICO, AGENDA LUX, CONFIRMACION CON ESCARAPELA
+
+**Ventana: `docs/living/PENDIENTES.md` §3. Todo en `design/features/landing/`. Kamilo prueba en iPad por Tailscale:
+`http://100.101.78.118/APP%20EVENTOS/design/features/landing/...` (la IP de la red de la casa da 404).**
+
+### Aprobado / hecho en la v3 (no re-preguntar)
+
+- **iPad = composicion propia, no media query que encoge.** Seccion del iPhone: Noir = historia a dos columnas (iPhone
+  fijo a la izquierda en vertical y horizontal; caja del iPhone del tamano del iPhone, centrada, para que al soltarse no
+  deje media pantalla vacia); Lux = tablero en vertical (iPhone al centro, 4 funciones 2x2) y orbe con iPhone mas grande
+  en horizontal. En tactil Lux deja de recorrer funciones tras el primer toque; invitaciones dicen "Toca" sin mouse.
+  Lab de comparacion: `lab-ipad-iphone.html`.
+- **Espaciado entre secciones** (Kamilo: "exagerado"): escritorio 140, iPad 88, celular 72; preguntas sin relleno abajo;
+  cierre max 760px (640 en iPad); ultimo paso sin vacio; anclas con scroll-margin (la pildora no tapa titulos).
+- **Bugs de orden de reglas CSS** (una regla base escrita despues de la media query la anulaba): patrocinadores en 4 col
+  en iPad horizontal (Microsoft ensanchaba su tarjeta) y speakers Lux en 4 col en iPad. Titulo del hero se salia entre
+  1021 y 1180px.
+- **Agenda Lux en iPad vertical y celular = como la de Noir**: selector de dia + un dia a la vez (antes 3.021px = 3
+  pantallas de iPad; ahora 1.502, igual que Noir).
+- **Frase del registro**: "Hola, me llamo ___ trabajo como ___ en ___ y mi correo es ___" (cargo y empresa opcionales).
+  El submit lleva a `lab-confirmacion.html`; datos por sessionStorage `lv3-reg`, nunca en la URL.
+
+### Confirmacion del registro (decisiones Kamilo, ver memoria project_confirmacion_escarapela)
+
+- Pagina propia, poco texto ("Andrea, ya tienes tu lugar." + 1 linea + 2 botones), **se celebra**: la escena del hero
+  hace una ola del color del cliente que nace bajo la escarapela (Noir: columnas suben; Lux: lamas giran al color y vuelven).
+- **Escarapela colgante, animacion Sutil** (baja, 2-3 oscilaciones, gira una vez y vuelve). Un lado: nombre grande +
+  cargo + empresa + "Pase general" + 0348. Otro lado: **QR real** como Expo (`DoneStep.tsx`/`MiQrScreen.tsx`, webapp
+  `MiQrView.tsx`): placa blanca, borde de gradiente pastel que gira 6 s, ECL M, codigo dinamico 60 s.
+- Noir = escarapela oscura; Lux = crema; **cinta oscura en los dos**; **cinta que pasa por la ranura** (sin metal).
+  Sin brillo. Excepcion a la regla "QR solo en celular" (memoria feedback_qr_only_mobile).
+- Descartado: confirmacion dentro del panel del registro, animaciones Viva/Viento/Del boleto (`lab-escarapela.html`),
+  reverso con agenda (relleno), lista "Lo que sigue", mosqueton (queda como opcion en el lab).
+
+### QA automatico nuevo
+
+- `node "design/features/landing/qa/qa-landing-v3.cjs" [--medir]` (Playwright de eventos-web): 9 tamanos x Noir/Lux,
+  espacio entre secciones, scroll horizontal, tarjetas iguales, columnas, pasos, orbe, agenda Lux, "Toca", textos
+  cortados, iPhone visible, anclas. **275 pasan, 0 fallan** (2026-10-04).
+
+### PENDIENTE INMEDIATO (primero de la proxima sesion)
+
+1. Kamilo revisa la confirmacion en iPad y celular (si ve una franja negra abajo al llegar desde el registro: apareció
+   una vez en Playwright y no se pudo repetir). Recargar fuerte: Chrome/Safari guardan la v3 vieja en cache.
+2. Decidir como llega el QR dinamico a la confirmacion SIN sesion (hoy `GET /me/qr` exige auth) y guardar cargo/empresa.
+3. Revision completa de Lux con Kamilo. Luego roadmap del registro, landing y widget (stack real).
+
+### Gotchas de hoy
+
+- Pestana de Chrome en segundo plano: rAF congelado -> la animacion "no se reproduce". La confirmacion ahora arranca
+  con `visibilitychange`. Para revisar sin la ventana: Playwright headless (6 fps en Lux por software: usar animaciones
+  por tiempo, no por resortes, cuando deben verse iguales a cualquier fps).
+- La landing usa scroll suave: en pruebas usar `scrollTo({ behavior: 'instant' })` o se mide antes de llegar.
+- `New folder/` en la raiz = tema ThemeForest comprado (70 MB): NO va al repo.
+
+---
+
+## SESION 2026-10-02 (Fable 5.1) — LANDING V3: SPEAKERS, PATROCINADORES, RENDIMIENTO, TACTIL
+
+**Ventana operativa: `docs/living/PENDIENTES.md` §3. Todo en `design/features/landing/lab-landing-v3.html`. Sin commit todavia
+(labs de ayer + 4 labs de hoy + Linea Vitrina + v3). Sesion cerrada temprano: a Kamilo le dolia la espalda.**
+
+### Aprobado hoy en la v3 (no re-preguntar)
+
+- **Lux speakers = C "la lama sube"** (grilla 4 col, nombre y cargo visibles, la idea es la recompensa). **Invitacion:** al llegar la
+  seccion, el panel de la primera speaker sube hasta que asoma la primera linea de su idea, se queda y se asienta; UNA sola vez; en
+  cuanto se abre cualquier tarjeta no vuelve. Senal "esquina despegada" (etiqueta) DESCARTADA: truco de papel, ajeno a Lux.
+- **Noir speakers = giro suave** (easing --io, sin resorte) **y la idea llega en secuencia** (frase, charla, nombre entran desde la
+  esquina). **Reverso en vidrio oscuro con borde luminoso y elevacion (translateZ 22px), NO el acento del cliente** ("muy chillon").
+  Acento solo en el nombre de la charla (como Lux). **Llegada: quietas, en cascada** (ya no giran todas desde el centro).
+  Sin zoom de la foto al hover: un hijo con transform hace que Chrome pinte la cara frontal a traves del reverso.
+- **Patrocinadores (Noir y Lux) = composicion de Lux:** 4 tarjetas + 2 cintas de nombres. **Sin niveles** (nada de Platino/Oro/Plata,
+  ni tamanos por nivel). **Tokens, ningun color de marca y ningun color del cliente** (Cloudflare naranja no puede verse azul).
+  Noir: **lampara muy sutil** (luz blanca calida tras el nombre, borde del vidrio apenas mas iluminado). Lux: **relieve** (se despega
+  4px y aparece su sombra calida). "Luz de tarde" descartada (amarilla). Cintas en tinta secundaria, al pasar suben a tinta.
+- **Tactil (iPad/iPhone):** tocar abre, tocar cierra; el foco solo cuenta con hover. Caras del giro en planos distintos
+  (translateZ 1px) + backface en hijos: sin translucido en Safari. Aprobado en iPad y celular.
+- **Columnas:** speakers 4 col escritorio, 3 col de 601 a 1100px (iPad vertical incluido), 2 col <=600. Patrocinadores 2 col <=1100.
+- **iPhone en iPad y celular (opcion 1 elegida):** ya no se oculta; queda **pegado al borde inferior** (sticky bottom) mientras los
+  pasos (Noir) o las funciones (Lux) pasan por encima con fundido. --pw min(230px, 48vw).
+
+### Rendimiento y Firefox (medido)
+
+- Chrome: 180 fps estable, giro 6 ms. Unico tiron: 317 ms al llegar a speakers (capas + decode) -> fotos eager + decoding async,
+  will-change en .spk .in, sombra del reverso 44px. Cintas pausadas fuera de pantalla (IO).
+- **Firefox** caia a 28-46 fps al navegar y en el hero. Solo para Firefox (`@supports (-moz-appearance:none)` + UA):
+  sin backdrop-filter (nav, ticket, final, tabbar), sin filtro en fotos, hero a pixelRatio 1, PCFShadowMap y mapa 1024. Quedo a 60.
+- **Rayas de colores en el hero Noir (Firefox):** causa real = `.hero::before` (degradado #050506 semitransparente sobre fondo
+  #050506: redondeo 8 bits por canal, Firefox no tramea). Fix: mask-image para que sea cero sobre el cielo plano. Ademas: dithering
+  en materiales, niebla 24-40 (medida con readPixels, 5 combinaciones), cimas lejanas sin acento (df por profundidad).
+  OJO: `.final` usa el mismo truco de degradado sobre la escena; si Kamilo ve bandas ahi, misma solucion.
+- Barra del lab: **medidor de fps** y casillas **"Apagar"** (hero 3D, desenfoques, cintas, filtro fotos, sombras, capas, revelados).
+
+### PENDIENTE INMEDIATO (primero de la proxima sesion)
+
+1. **iPad vertical, seccion del iPhone: "no funciona bien y los textos se ven super espaciados a la izquierda".** Revisar bien en
+   768px (Noir `.exp` y Lux `.orb`) y **generar propuesta antes de tocar**. Sospecha: la columna de texto ocupa todo el ancho con
+   `max-width` de escritorio y el iPhone sticky deja hueco.
+2. En celular la pildora de navegacion fija tapa el "01" del primer paso (margen arriba).
+3. Revision completa de Lux con Kamilo (celular y escritorio). Luego roadmap del registro, landing y widget.
+4. Commit de todo (labs + v3 + Linea Vitrina) cuando Kamilo diga "guardar".
+
+### Gotchas de hoy
+
+- Pestana de Chrome oculta: IntersectionObserver NO dispara y rAF se congela. Para medir fps hay que tener la pestana al frente;
+  para leer la escena 3D: `__lab.renderAt(6)` 60 veces (la luz del cursor converge por lerp) y `gl.readPixels`.
+- `__lab.current` expone la escena viva (fog, etc.) para diagnosticar.
+- Para ver viewports moviles sin redimensionar la ventana de Kamilo: iframes de 390 y 768px dentro de la pestana.
+- En Python, `'C'` dentro de una cadena normal se convierte en octal: las comillas CSS salian como un simbolo raro.
+- Labs de hoy: `lab-lux-invitacion.html`, `lab-noir-giro.html`, `lab-patrocinadores.html` (etiqueta: borrado).
+
+---
+
+## SESION 2026-10-01 (Opus 5.5) — LANDING: HERO ELEGIDO, LINEA VITRINA, NOIR APROBADO
+
+**Ventana operativa: `docs/living/PENDIENTES.md` §3. Linea: `design/system/LINEA-VITRINA.md`.**
+Solo labs en `design/features/landing/` (se sirven con Laragon:
+`http://localhost/APP%20EVENTOS/design/features/landing/...`). Sin commit todavia.
+
+### Decisiones de Kamilo (no re-preguntar)
+
+- **Hero elegido:** Noir = Paisaje de datos (columnas 3D, cimas con el color del cliente);
+  Lux = Fachada cinetica clara (lamas color yeso con luz de tarde).
+- **Linea Vitrina** para todo lo ajeno a la app (landing, widget, summit demo): fondo = sistema de
+  piezas con luz real, color del cliente como recompensa. Esencia: invitacion, no vitrina de efectos;
+  CEO en el celular; menos elementos, mas significado.
+- **Noir y Lux son DOS PLANTILLAS** para ofrecer al cliente (no dos temas): misma linea, composicion e
+  interacciones propias.
+- **NOIR de `lab-landing-v3.html` = APROBADO, no tocar** ("me encantaba este Noir"): giro sutil de las
+  lamas en speakers y patrocinadores, iPhone real con pantallas copiadas de Expo.
+- **Lux:** hover = **borde que se dibuja** + tinte leve (no el circulo que se expande). Agenda en
+  tablero, celular al centro con funciones alrededor, patrocinadores platino + cintas de nombres.
+  **Speakers de Lux = opcion A: giro en material Lux** (tarjeta crema con la frase y borde dibujado).
+- Reglas: **cero mono, cero dots, cero mayusculas espaciadas**. **Siempre lab** para opciones visuales
+  ("a escrito no se entiende"). **Persiana de lamas PROHIBIDA en todo.** Todo gesto que esconde
+  informacion debe **avisar que existe**.
+- Descartado: galeria con flechas, retrato que sigue al cursor, celular que cambia solo, color que entra
+  desde el cursor, la v4 "en calma" (plana, generica: `lab-landing-v4.html`).
+
+### Siguiente (en orden)
+
+1. En `lab-landing-v3.html`, Lux: reemplazar la galeria de speakers (`#lx-speakers`, CSS
+   "speakers: galeria que se arrastra", JS "speakers en galeria") por la grilla con el giro A de
+   `lab-lux-speakers-2.html`.
+2. Escoger la **senal de descubrimiento** (en `lab-lux-speakers-2.html`: 1 boton "+" en la foto,
+   2 enlace "Ver su idea", 3 se muestra solo al llegar; combinables) y ponerla en Noir y en Lux.
+3. Revisar Lux completo con Kamilo (celular y escritorio). Luego: roadmap del registro, landing y widget.
+
+### Gotchas
+
+- El Chrome de pruebas en segundo plano congela animaciones y transiciones; cuando Kamilo mira la
+  ventana, su tamaño cambia: parar de mover la pagina.
+- El servidor `python -m http.server` en segundo plano muere a los 30 min: usar Laragon.
+- Clases genericas chocan con las del iPhone (`.sp`, `.pl`): usar nombres propios por seccion.
 
 ---
 

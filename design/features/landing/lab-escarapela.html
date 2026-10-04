@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escarapela de confirmación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Lab: la confirmacion del registro es la escarapela que la persona va a llevar en el evento.
+   Referencia: "Hanging Card" (Code XR), capturas en design/refs/REFS LANDING.
+   Tomamos el objeto, la fisica y el giro. Dejamos los controles de demo, el QR, las mayusculas espaciadas y el mono. */
+:root {
+  --out: cubic-bezier(.16,1,.3,1); --ease: cubic-bezier(.2,.8,.2,1);
+  --accent: #3D6BFF; --on-accent: #fff;
+  --bg: #050506; --fg: #fff; --mut: rgba(255,255,255,.62); --mut2: rgba(255,255,255,.42); --line: rgba(255,255,255,.1);
+  --card: #121215; --shadow: 0 30px 80px rgba(0,0,0,.55);
+  /* escarapela Noir: vidrio oscuro con borde luminoso */
+  --b-bg: linear-gradient(165deg, #1b1b20 0%, #111114 55%, #0b0b0d 100%);
+  --b-border: rgba(255,255,255,.13); --b-hi: inset 0 1px 0 rgba(255,255,255,.12);
+  --b-shadow: rgba(0,0,0,.65); --b-sheen: rgba(255,255,255,.09);
+  --strap: #121214; --strap-ink: rgba(255,255,255,.5); --strap-edge: rgba(255,255,255,.08);
+}
+body.light {
+  --bg: #f2eee7; --fg: #141414; --mut: rgba(20,20,20,.62); --mut2: rgba(20,20,20,.45); --line: rgba(20,20,20,.1);
+  --card: #fbf8f3; --shadow: 0 30px 70px rgba(60,45,25,.14);
+  /* escarapela Lux: tarjeta crema con relieve y sombra calida */
+  --b-bg: linear-gradient(165deg, #fffdf9 0%, #f8f3ea 100%);
+  --b-border: rgba(60,45,25,.11); --b-hi: inset 0 1px 0 rgba(255,255,255,.9);
+  --b-shadow: rgba(60,45,25,.22); --b-sheen: rgba(255,255,255,.55);
+  --strap: #e6dfd2; --strap-ink: rgba(40,30,20,.45); --strap-edge: rgba(60,45,25,.1);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: 'Urbanist', system-ui, sans-serif; transition: background .5s var(--ease), color .5s var(--ease); -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+
+/* ---------- barra del lab ---------- */
+.bar { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 10px 16px; background: #0b0b0c; color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 13px; }
+.bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14px; margin-right: 4px; }
+.bar .lb { color: rgba(255,255,255,.45); }
+.seg { display: flex; padding: 3px; gap: 2px; border-radius: 10px; background: #1c1c1f; }
+.seg button { border: 0; background: none; color: rgba(255,255,255,.6); font-weight: 600; font-size: 12.5px; padding: 6px 10px; border-radius: 7px; cursor: pointer; white-space: nowrap; }
+.seg button.on { background: #fff; color: #111; }
+.sw { display: flex; gap: 6px; }
+.sw button { width: 18px; height: 18px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+.sw button.on { border-color: #fff; }
+.bar .go { margin-left: auto; display: flex; gap: 8px; }
+.bar .go button { border: 1px solid rgba(255,255,255,.14); background: none; color: #fff; font-weight: 600; font-size: 12.5px; padding: 7px 12px; border-radius: 9px; cursor: pointer; }
+.bar .go button.pri { background: #fff; color: #111; border-color: #fff; }
+.desc { padding: 10px 16px; font-size: 13.5px; color: var(--mut); border-bottom: 1px solid var(--line); min-height: 40px; }
+.desc strong { color: var(--fg); font-family: 'Plus Jakarta Sans'; font-weight: 700; }
+
+/* ---------- pagina: hero con el panel del registro ---------- */
+.page { position: relative; max-width: 1240px; margin: 0 auto; padding: 56px 32px 80px; display: grid; grid-template-columns: minmax(0, 1.2fr) 420px; gap: 56px; align-items: end; min-height: calc(100vh - 100px); }
+.page::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(60% 50% at 70% 40%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%); opacity: .7; }
+body.light .page::before { background: radial-gradient(55% 45% at 72% 35%, rgba(255,236,205,.8), transparent 70%); opacity: 1; }
+.hero-t .k { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; font-size: 15px; color: var(--mut); }
+.hero-t .k::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+.hero-t h1 { font-family: 'Plus Jakarta Sans'; font-weight: 800; text-transform: uppercase; font-size: clamp(44px, 6.4vw, 104px); line-height: .88; letter-spacing: -.045em; margin: 18px 0 28px; }
+.hero-t h1 .out { color: transparent; -webkit-text-stroke: 2px var(--accent); }
+.hero-t .meta { display: flex; gap: 36px; border-top: 1px solid var(--line); padding-top: 18px; flex-wrap: wrap; }
+.hero-t .meta small { display: block; font-size: 13px; color: var(--mut2); margin-bottom: 8px; }
+.hero-t .meta span { font-weight: 600; font-size: 16px; }
+
+/* celular: la misma pieza en 390px */
+body.phone .page { max-width: 390px; grid-template-columns: 1fr; padding: 28px 16px 60px; gap: 28px; min-height: 0; }
+body.phone .hero-t h1 { font-size: 44px; }
+body.phone .hero-t .meta { gap: 18px; }
+body.phone .tk { width: 100%; }
+
+/* ---------- panel del registro (el boleto) ---------- */
+.tk { position: relative; width: 420px; justify-self: end; background: color-mix(in srgb, var(--card) 94%, transparent); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); backdrop-filter: blur(6px); overflow: hidden; transition: height .8s var(--out); }
+.tk .form { padding: 24px; transition: opacity .45s var(--ease), transform .6s var(--out); }
+.tk.hang .form { opacity: 0; transform: translateY(-24px); pointer-events: none; position: absolute; inset: 0 0 auto 0; }
+.tk .hd { display: flex; justify-content: space-between; font-size: 13px; color: var(--mut); margin-bottom: 14px; }
+.tk .hd b { color: var(--accent); font-weight: 600; }
+.tk .q { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 22px; letter-spacing: -.02em; margin: 6px 0 2px; }
+.tk input[type=text], .tk input[type=email] { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: none; padding: 8px 2px 10px; font-size: 18px; outline: none; margin-bottom: 14px; }
+.tk input:focus { border-bottom-color: var(--accent); }
+.tk .cn { display: flex; gap: 10px; align-items: center; font-size: 12.5px; color: var(--mut); margin: 4px 0 16px; }
+.tk .cta { width: 100%; height: 48px; border: 0; border-radius: 12px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 15px; cursor: pointer; }
+body.light .tk .cta { background: #141414; color: #fff; }
+.tk .ft { font-size: 12.5px; color: var(--mut2); margin-top: 12px; }
+
+/* riel: la cinta sale por el borde de arriba del panel */
+.rail { position: absolute; left: 50%; top: 0; width: 64px; height: 6px; transform: translateX(-50%); border-radius: 0 0 6px 6px; background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.04)); box-shadow: inset 0 -1px 0 rgba(0,0,0,.4); opacity: 0; transition: opacity .5s; z-index: 4; }
+body.light .rail { background: linear-gradient(180deg, rgba(60,45,25,.16), rgba(60,45,25,.05)); box-shadow: none; }
+.tk.hang .rail { opacity: 1; }
+.note { position: absolute; left: 24px; right: 24px; bottom: 20px; text-align: center; font-size: 13.5px; line-height: 1.45; color: var(--mut); opacity: 0; transform: translateY(8px); transition: opacity .6s var(--ease), transform .8s var(--out); }
+.note b { color: var(--fg); font-weight: 600; }
+.note .acts { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+.note .acts button { border: 1px solid var(--line); background: none; border-radius: 999px; padding: 8px 14px; font-weight: 600; font-size: 13px; cursor: pointer; color: var(--fg); }
+.tk.noted .note { opacity: 1; transform: none; }
+
+/* ---------- el aparejo: cinta, broche y escarapela ---------- */
+.rig { position: absolute; left: 50%; top: 0; width: 0; height: 0; transform-origin: 0 0; z-index: 3; visibility: hidden; }
+.tk.hang .rig { visibility: visible; }
+.strap { position: absolute; left: -13px; top: -12px; width: 26px; height: calc(var(--L) + 12px); transform-origin: 50% 0; border-radius: 0 0 4px 4px; background: var(--strap); box-shadow: inset 1px 0 0 var(--strap-edge), inset -1px 0 0 var(--strap-edge), 0 6px 16px rgba(0,0,0,.25); overflow: hidden; }
+body.light .strap { box-shadow: inset 1px 0 0 var(--strap-edge), inset -1px 0 0 var(--strap-edge), 0 6px 14px rgba(60,45,25,.12); }
+.strap span { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); writing-mode: vertical-rl; white-space: nowrap; font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 10.5px; color: var(--strap-ink); }
+.strap i { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); display: none; }
+.strap i:first-of-type { left: 3px; } .strap i:last-of-type { right: 3px; }
+body.acc-strap .strap i { display: block; }
+.hinge { position: absolute; left: 0; top: var(--L); width: 0; height: 0; transform-origin: 0 0; }
+.clip { position: absolute; left: -11px; top: -6px; width: 22px; height: 40px; }
+.clip .cap { position: absolute; left: 0; top: 0; width: 22px; height: 16px; border-radius: 4px 4px 6px 6px; background: linear-gradient(180deg, #d9d9dc, #8c8c92 60%, #b9b9be); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 2px 4px rgba(0,0,0,.35); }
+body.acc-clip .clip .cap { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 70%, #fff), var(--accent) 55%, color-mix(in srgb, var(--accent) 75%, #000)); }
+.clip .ring { position: absolute; left: 4px; top: 13px; width: 14px; height: 20px; border-radius: 8px; border: 2.5px solid #a9a9ae; border-top-color: #e2e2e5; border-bottom-color: #77777c; }
+.persp { position: absolute; left: calc(var(--W) / -2); top: 26px; width: var(--W); height: var(--H); perspective: 1100px; transform-origin: 50% 0; }
+.badge { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.badge:active { cursor: grabbing; }
+.face { position: absolute; inset: 0; border-radius: 18px; background: var(--b-bg); border: 1px solid var(--b-border); box-shadow: var(--b-hi), 0 var(--shy, 30px) 60px -10px var(--b-shadow); backface-visibility: hidden; -webkit-backface-visibility: hidden; padding: 34px 20px 18px; display: flex; flex-direction: column; overflow: hidden; }
+.face * { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.front { transform: translateZ(1px); }
+.back { transform: rotateY(180deg) translateZ(1px); }
+/* brillo que se mueve con el giro */
+.face::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: linear-gradient(115deg, transparent calc(var(--sh, 50%) - 22%), var(--b-sheen) var(--sh, 50%), transparent calc(var(--sh, 50%) + 22%)); }
+/* ranura por donde pasa el broche */
+.face .slot { position: absolute; left: 50%; top: 12px; width: 38px; height: 8px; transform: translateX(-50%); border-radius: 6px; background: var(--bg); box-shadow: inset 0 1px 2px rgba(0,0,0,.5); }
+body.light .face .slot { box-shadow: inset 0 1px 2px rgba(60,45,25,.25); }
+.front .ev { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.front .ev b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+.front .ev span { font-size: 12px; color: var(--mut2); }
+.front .wh { font-size: 12.5px; color: var(--mut); margin-top: 4px; }
+.front .nm { margin-top: auto; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 30px; line-height: 1.02; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.front .rl { font-size: 14px; color: var(--mut); margin-top: 8px; }
+.front .bt { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--line); margin-top: 18px; padding-top: 12px; }
+.front .bt small { font-size: 12px; color: var(--mut2); line-height: 1.35; }
+.front .bt b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 22px; letter-spacing: -.03em; }
+.back h4 { margin: 0 0 8px; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 19px; letter-spacing: -.02em; }
+.back .r { padding: 8px 0; border-top: 1px solid var(--line); }
+.back .r small { display: block; font-size: 11.5px; color: var(--mut2); margin-bottom: 3px; }
+.back .r span { font-size: 13.5px; font-weight: 600; line-height: 1.3; }
+.back .ml { margin-top: auto; padding-top: 10px; font-size: 12.5px; color: var(--mut); line-height: 1.4; }
+.back .ml b { color: var(--fg); font-weight: 600; }
+
+@media (max-width: 900px) { .page { grid-template-columns: 1fr; } .tk { justify-self: stretch; width: 100%; } }
+</style>
+</head>
+<body class="acc-clip">
+<div class="bar">
+  <b>Escarapela</b>
+  <div class="seg" id="theme"><button data-t="dark" class="on">Noir</button><button data-t="light">Lux</button></div>
+  <span class="lb">Animación</span>
+  <div class="seg" id="anim">
+    <button data-a="sutil" class="on">1 Sutil</button>
+    <button data-a="viva">2 Viva</button>
+    <button data-a="viento">3 Viento</button>
+    <button data-a="boleto">4 Del boleto</button>
+  </div>
+  <span class="lb">Color del cliente en</span>
+  <div class="seg" id="acc"><button data-c="clip" class="on">Broche</button><button data-c="strap">Cinta</button></div>
+  <div class="sw" id="sw">
+    <button data-c="#3D6BFF" style="background:#3D6BFF" class="on" title="Azul"></button>
+    <button data-c="#E5192B" style="background:#E5192B" title="Rojo"></button>
+    <button data-c="#FF6A13" style="background:#FF6A13" title="Naranja"></button>
+    <button data-c="#C9A86A" style="background:#C9A86A" title="Dorado"></button>
+  </div>
+  <span class="lb">Velocidad</span>
+  <div class="seg" id="spd"><button data-s="1" class="on">Normal</button><button data-s=".35">Lenta</button></div>
+  <div class="seg" id="vw"><button data-v="desk" class="on">Escritorio</button><button data-v="phone">Celular</button></div>
+  <div class="seg" id="rm"><button data-r="0" class="on">Con movimiento</button><button data-r="1">Reducido</button></div>
+  <div class="go"><button id="again" class="pri">Repetir</button><button id="back">Volver al formulario</button></div>
+</div>
+<div class="desc" id="desc"></div>
+
+<div class="page">
+  <div class="hero-t">
+    <div class="k">Bogotá, noviembre de 2026</div>
+    <h1>Summit<br>Empresarial<br><span class="out">2026</span></h1>
+    <div class="meta">
+      <div><small>Fechas</small><span>4 al 6 de noviembre</span></div>
+      <div><small>Lugar</small><span>Centro de Convenciones Ágora</span></div>
+    </div>
+  </div>
+
+  <div class="tk" id="tk">
+    <form class="form" id="form" novalidate>
+      <div class="hd"><span>Pase general</span><b>Gratis</b></div>
+      <div class="q">Hola, me llamo</div>
+      <input type="text" name="name" value="Andrea Gómez" placeholder="tu nombre" autocomplete="name">
+      <div class="q">y mi correo es</div>
+      <input type="email" name="email" value="andrea@empresa.com" placeholder="tu@empresa.com" autocomplete="email">
+      <label class="cn"><input type="checkbox" name="consent" checked> Acepto el tratamiento de mis datos para gestionar mi participación.</label>
+      <button class="cta" type="submit">Quiero mi lugar</button>
+      <div class="ft">Sin contraseña. Tu acceso llega a tu correo.</div>
+    </form>
+    <div class="rail"></div>
+    <div class="rig" id="rig">
+      <div class="strap" id="strap"><i></i><span>Summit Empresarial 2026&nbsp;&nbsp;&nbsp;Bogotá&nbsp;&nbsp;&nbsp;Summit Empresarial 2026</span><i></i></div>
+      <div class="hinge" id="hinge">
+        <div class="clip"><i class="cap"></i><i class="ring"></i></div>
+        <div class="persp" id="persp">
+          <div class="badge" id="badge">
+            <div class="face front">
+              <i class="slot"></i>
+              <div class="ev"><b>Summit 2026</b><span>Bogotá</span></div>
+              <div class="wh">4 al 6 de noviembre</div>
+              <div class="nm" id="bName">Andrea Gómez</div>
+              <div class="rl">Pase general</div>
+              <div class="bt"><small>Centro de Convenciones<br>Ágora</small><b>0348</b></div>
+            </div>
+            <div class="face back">
+              <i class="slot"></i>
+              <h4>Tu entrada</h4>
+              <div class="r"><small>Primer día</small><span>Miércoles 4 de noviembre, desde las 8:00 a. m.</span></div>
+              <div class="r"><small>Lugar</small><span>Centro de Convenciones Ágora, Bogotá</span></div>
+              <div class="r"><small>Ingreso</small><span>Puerta principal, registro rápido con tu correo</span></div>
+              <div class="ml">Tu acceso llega a <b id="bMail">a***@empresa.com</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note" id="note">Tu lugar está guardado, <b id="nName">Andrea</b>.<br>Toca la escarapela para ver el reverso.</div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const tk = $('#tk'), rig = $('#rig'), strap = $('#strap'), hinge = $('#hinge'), persp = $('#persp'), badge = $('#badge');
+const L = 150, W = 232, H = 356;
+tk.style.setProperty('--L', L + 'px'); tk.style.setProperty('--W', W + 'px'); tk.style.setProperty('--H', H + 'px');
+
+/* ---------- animaciones: parametros de los resortes ----------
+   y: caida de la cinta. th: pendulo de la cinta. ph: la escarapela sobre el broche (va con retraso). ps: giro sobre su eje (grados). */
+const ANIMS = {
+  sutil:  { d: '<strong>1 Sutil (recomendada).</strong> Baja desde el riel, dos o tres oscilaciones que se apagan, gira una sola vez para mostrar el reverso y vuelve. Después se queda quieta.',
+            ky: 70, dy: 13, th0: .55, kth: 11, dth: 1.9, kph: 60, dph: 7, cpl: .35, kps: 38, dps: 9.5, flipAt: 1.3, flipHold: 2.1, twist: 0, breeze: 0 },
+  viva:   { d: '<strong>2 Viva.</strong> Más cerca de la referencia: cae con más peso, se balancea más tiempo, el giro rebota y queda una brisa leve que la mece.',
+            ky: 55, dy: 7, th0: 1.5, kth: 10, dth: .75, kph: 45, dph: 3.5, cpl: .6, kps: 30, dps: 5, flipAt: 1.1, flipHold: 1.9, twist: 0, breeze: .22 },
+  viento: { d: '<strong>3 Viento.</strong> La cinta llega torcida y la escarapela gira sobre sí misma mientras se destuerce, mostrando las dos caras, hasta quedar de frente.',
+            ky: 70, dy: 12, th0: .3, kth: 11, dth: 1.6, kph: 60, dph: 7, cpl: .3, kps: 6, dps: 1.8, flipAt: null, flipHold: 0, twist: 1150, breeze: 0 },
+  boleto: { d: '<strong>4 Del boleto.</strong> El boleto se vuelve la escarapela: la tarjeta aparece donde estaba el formulario, la cinta baja a buscarla y la sube hasta colgarla.',
+            ky: 70, dy: 13, th0: .45, kth: 11, dth: 1.9, kph: 60, dph: 7, cpl: .35, kps: 38, dps: 9.5, flipAt: 1.5, flipHold: 2.1, twist: 0, breeze: 0, fromTicket: true }
+};
+let A = ANIMS.sutil, speed = 1, reduced = false;
+
+/* ---------- estado fisico ---------- */
+const S = { y: 0, yv: 0, th: 0, thv: 0, ph: 0, phv: 0, ps: 0, psv: 0, psT: 0, sc: 1, scv: 0, oy: 0, oyv: 0, st: 1, stv: 0 };
+let t = 0, landT = null, flipped = 0, running = false, last = 0, drag = null, hanging = false;
+
+function reset() {
+  Object.assign(S, { y: -(L + H + 80), yv: 0, th: 0, thv: 0, ph: 0, phv: 0, ps: 0, psv: 0, psT: 0, sc: 1, scv: 0, oy: 0, oyv: 0, st: 1, stv: 0 });
+  t = 0; landT = null; flipped = 0;
+  if (A.fromTicket) { S.y = 0; S.st = 0; S.oy = 150; S.sc = 1.2; }
+}
+
+function step(dt) {
+  t += dt;
+  /* caida (o, en "Del boleto", la cinta que crece y la tarjeta que sube) */
+  if (A.fromTicket) {
+    if (t > .25) { const a = -90 * (S.st - 1) - 15 * S.stv; S.stv += a * dt; S.st += S.stv * dt; }
+    if (t > .65) {
+      S.oyv += (-70 * S.oy - 12 * S.oyv) * dt; S.oy += S.oyv * dt;
+      S.scv += (-90 * (S.sc - 1) - 14 * S.scv) * dt; S.sc += S.scv * dt;
+      if (landT === null && S.oy < 6) { landT = t; S.thv += A.th0; }
+    }
+  } else {
+    const ya = -A.ky * S.y - A.dy * S.yv; S.yv += ya * dt; S.y += S.yv * dt;
+    if (landT === null && S.y > -4) { landT = t; S.thv += A.th0; S.psv += A.twist; }
+  }
+  /* pendulo de la cinta */
+  let ta = -A.kth * Math.sin(S.th) - A.dth * S.thv;
+  if (A.breeze && landT !== null) ta += A.breeze * Math.sin(t * .9) * Math.min(1, (t - landT) / 3);
+  if (drag) ta = 0;
+  if (!drag) { S.thv += ta * dt; S.th += S.thv * dt; }
+  /* la escarapela sobre el broche, con retraso */
+  const pa = -A.kph * S.ph - A.dph * S.phv - A.cpl * ta * 2; S.phv += pa * dt; S.ph += S.phv * dt;
+  /* giro: una sola vez, a la hora indicada */
+  if (A.flipAt != null && landT !== null) {
+    const since = t - landT;
+    if (flipped === 0 && since > A.flipAt) { flipped = 1; S.psT += 180; }
+    if (flipped === 1 && since > A.flipAt + A.flipHold) { flipped = 2; S.psT += 180; }
+  }
+  const sa = -A.kps * (S.ps - S.psT) - A.dps * S.psv; S.psv += sa * dt; S.ps += S.psv * dt;
+}
+
+function render() {
+  rig.style.transform = `translateY(${S.y.toFixed(2)}px) rotate(${S.th.toFixed(4)}rad)`;
+  strap.style.transform = `scaleY(${Math.max(0, S.st).toFixed(4)})`;
+  const stretch = A.fromTicket ? (L * (1 - Math.max(0, Math.min(1, S.st)))) : 0;
+  hinge.style.transform = `translateY(${(-stretch).toFixed(2)}px) rotate(${S.ph.toFixed(4)}rad)`;
+  hinge.querySelector('.clip').style.opacity = A.fromTicket ? Math.max(0, Math.min(1, S.st * 1.4 - .2)) : 1;
+  /* inclinacion leve con la velocidad: le da peso */
+  persp.style.transform = `translateY(${S.oy.toFixed(2)}px) scale(${S.sc.toFixed(4)})`;
+  badge.style.transform = `rotateY(${S.ps.toFixed(2)}deg) rotateX(${(-S.phv * 2.2).toFixed(2)}deg)`;
+  const n = ((S.ps % 360) + 360) % 360;
+  badge.style.setProperty('--sh', (50 + Math.sin(n * Math.PI / 180) * 60 + S.th * 40).toFixed(1) + '%');
+  badge.style.setProperty('--shy', (30 - Math.abs(S.th) * 20).toFixed(1) + 'px');
+}
+
+function energy() {
+  return Math.abs(S.yv) + Math.abs(S.y) * .1 + Math.abs(S.thv) * 50 + Math.abs(S.th) * 50 + Math.abs(S.phv) * 50 + Math.abs(S.ps - S.psT) + Math.abs(S.psv) * .2 + Math.abs(S.oy) + Math.abs(S.oyv) + Math.abs(S.st - 1) * 50 + Math.abs(S.sc - 1) * 50;
+}
+
+function loop(now) {
+  if (!running) return;
+  let dt = Math.min(1 / 30, (now - last) / 1000 || 1 / 60) * speed; last = now;
+  for (let i = 0; i < 4; i++) step(dt / 4);
+  render();
+  const pending = A.flipAt != null && flipped < 2;
+  if (!drag && !A.breeze && !pending && landT !== null && energy() < .02) {
+    S.ps = ((S.psT % 360) + 360) % 360; S.psT = S.ps; render(); running = false; return;
+  }
+  requestAnimationFrame(loop);
+}
+function wake() { if (!running) { running = true; last = performance.now(); requestAnimationFrame(loop); } }
+
+/* ---------- registro -> escarapela ---------- */
+function hang() {
+  const f = $('#form');
+  const name = f.name.value.trim() || 'Andrea Gómez', mail = f.email.value.trim() || 'andrea@empresa.com';
+  const [u, d] = mail.split('@');
+  $('#bName').textContent = name; $('#nName').textContent = name.split(' ')[0];
+  $('#bMail').textContent = (u ? u[0] : 'a') + '***@' + (d || 'empresa.com');
+  const h0 = tk.offsetHeight; tk.style.height = h0 + 'px';
+  tk.classList.add('hang'); tk.classList.remove('noted');
+  requestAnimationFrame(() => { tk.style.height = (26 + L + 26 + H + 110) + 'px'; });
+  reset(); hanging = true;
+  if (reduced) {
+    Object.assign(S, { y: 0, st: 1, oy: 0, sc: 1 }); render();
+    persp.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, easing: 'ease-out' });
+    strap.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, easing: 'ease-out' });
+    tk.classList.add('noted'); return;
+  }
+  render();
+  setTimeout(wake, 280);
+  setTimeout(() => tk.classList.add('noted'), 2600 / speed);
+}
+function unhang() {
+  hanging = false; running = false;
+  tk.classList.remove('hang', 'noted');
+  const h = tk.offsetHeight; tk.style.height = 'auto'; const target = tk.offsetHeight; tk.style.height = h + 'px';
+  requestAnimationFrame(() => { tk.style.height = target + 'px'; setTimeout(() => { tk.style.height = ''; }, 820); });
+}
+$('#form').addEventListener('submit', e => { e.preventDefault(); hang(); });
+$('#again').addEventListener('click', () => { if (!hanging) return hang(); reset(); render(); tk.classList.remove('noted'); running = false; if (reduced) return hang(); setTimeout(wake, 120); setTimeout(() => tk.classList.add('noted'), 2600 / speed); });
+$('#back').addEventListener('click', unhang);
+
+/* ---------- arrastrar para mecerla, tocar para girarla ---------- */
+function pivot() { const r = tk.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + S.y }; }
+badge.addEventListener('pointerdown', e => {
+  if (!hanging || reduced) { if (hanging && reduced) { S.psT += 180; S.ps = S.psT; render(); } return; }
+  badge.setPointerCapture(e.pointerId);
+  drag = { x0: e.clientX, y0: e.clientY, t0: performance.now(), moved: false, hist: [] }; wake();
+});
+badge.addEventListener('pointermove', e => {
+  if (!drag) return;
+  if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 6) drag.moved = true;
+  if (!drag.moved) return;
+  const p = pivot(); const ang = Math.max(-.9, Math.min(.9, Math.atan2(-(e.clientX - p.x), e.clientY - p.y))); /* rotate() positivo mueve la punta a la izquierda */
+  const now = performance.now(); drag.hist.push([now, ang]); drag.hist = drag.hist.filter(h => now - h[0] < 90);
+  S.th = ang;
+});
+badge.addEventListener('pointerup', e => {
+  if (!drag) return;
+  const d = drag; drag = null;
+  if (!d.moved) { S.psT += 180; wake(); return; }  /* tocar: gira y queda del otro lado */
+  if (d.hist.length > 1) { const a = d.hist[0], b = d.hist[d.hist.length - 1]; S.thv = (b[1] - a[1]) / Math.max(.016, (b[0] - a[0]) / 1000); S.thv = Math.max(-6, Math.min(6, S.thv)); }
+  wake();
+});
+badge.addEventListener('pointercancel', () => { drag = null; wake(); });
+
+/* ---------- barra del lab ---------- */
+function seg(id, fn) { $$(`#${id} button`).forEach(b => b.addEventListener('click', () => { $$(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); fn(b.dataset); })); }
+seg('theme', d => document.body.classList.toggle('light', d.t === 'light'));
+seg('anim', d => { A = ANIMS[d.a]; $('#desc').innerHTML = A.d; if (hanging) $('#again').click(); });
+seg('acc', d => { document.body.classList.toggle('acc-clip', d.c === 'clip'); document.body.classList.toggle('acc-strap', d.c === 'strap'); });
+seg('spd', d => { speed = +d.s; });
+seg('vw', d => document.body.classList.toggle('phone', d.v === 'phone'));
+seg('rm', d => { reduced = d.r === '1'; });
+$$('#sw button').forEach(b => b.addEventListener('click', () => { $$('#sw button').forEach(x => x.classList.toggle('on', x === b)); document.documentElement.style.setProperty('--accent', b.dataset.c); }));
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) { reduced = true; $$('#rm button').forEach(x => x.classList.toggle('on', x.dataset.r === '1')); }
+$('#desc').innerHTML = A.d;
+render();
+</script>
+</body>
+</html>

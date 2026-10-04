@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Confirmación del registro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+<style>
+/* Lab: pagina de confirmacion del registro (despues de "Quiero mi lugar").
+   Kamilo 2026-10-04 (2a vuelta):
+   - registrarse se CELEBRA: el escenario del evento (paisaje Noir / fachada Lux del hero) se enciende con el color del cliente
+     en una ola que nace bajo la escarapela cuando esta llega.
+   - poco texto: dos lineas y los botones. Fuera "lo que sigue" y el reverso con agenda (relleno).
+   - escarapela: de un lado el nombre grande y el cargo; del otro el QR real (como Expo/webapp).
+   - animacion Sutil; arranca solo cuando la pagina esta a la vista (antes corria con la pestana oculta). */
+:root {
+  --out: cubic-bezier(.16,1,.3,1); --ease: cubic-bezier(.2,.8,.2,1);
+  --accent: #3D6BFF; --on-accent: #fff;
+  --bg: #050506; --fg: #fff; --mut: rgba(255,255,255,.66); --mut2: rgba(255,255,255,.45); --line: rgba(255,255,255,.12);
+  --strap: #17171a; --strap-ink: rgba(255,255,255,.42);
+}
+body.light {
+  --bg: #f2eee7; --fg: #141414; --mut: rgba(20,20,20,.66); --mut2: rgba(20,20,20,.45); --line: rgba(20,20,20,.12);
+  --strap: #17171a; --strap-ink: rgba(255,255,255,.42); /* la cinta es oscura en las dos plantillas */
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font-family: 'Urbanist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+button { font: inherit; color: inherit; }
+
+/* ---------- barra del lab ---------- */
+.bar { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 9px 16px; background: #0b0b0c; color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 13px; }
+.bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14px; }
+.bar .lb { color: rgba(255,255,255,.45); }
+.seg { display: flex; padding: 3px; gap: 2px; border-radius: 10px; background: #1c1c1f; }
+.seg button { border: 0; background: none; color: rgba(255,255,255,.6); font-weight: 600; font-size: 12.5px; padding: 6px 10px; border-radius: 7px; cursor: pointer; white-space: nowrap; }
+.seg button.on { background: #fff; color: #111; }
+.sw { display: flex; gap: 6px; }
+.sw button { width: 18px; height: 18px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+.sw button.on { border-color: #fff; }
+.bar .go { margin-left: auto; }
+.bar .go button { border: 0; background: #fff; color: #111; font-weight: 700; font-size: 12.5px; padding: 7px 12px; border-radius: 9px; cursor: pointer; }
+
+/* ---------- escena del evento detras ---------- */
+#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; display: block; }
+.shade { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgba(5,5,6,.9) 0%, rgba(5,5,6,.55) 38%, rgba(5,5,6,0) 62%); -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 55%, transparent 64%); mask-image: linear-gradient(90deg, #000 0%, #000 55%, transparent 64%); }
+body.light .shade { background: linear-gradient(90deg, rgba(242,238,231,.94) 0%, rgba(242,238,231,.62) 38%, rgba(242,238,231,0) 62%); }
+
+/* ---------- pagina ---------- */
+.page { position: relative; z-index: 2; max-width: 1280px; margin: 0 auto; min-height: calc(100vh - 50px); display: grid; grid-template-columns: minmax(0, 1fr) 460px; gap: 40px; padding: 0 40px; }
+.top { grid-column: 1 / -1; grid-row: 1; display: flex; justify-content: space-between; align-items: center; padding: 24px 0 0; height: 64px; }
+.top .brand { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 16px; letter-spacing: -.02em; }
+.top a { color: var(--fg); text-decoration: none; font-weight: 600; font-size: 14px; padding: 8px 14px; border-radius: 999px; background: color-mix(in srgb, var(--bg) 72%, transparent); border: 1px solid var(--line); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.letter { grid-column: 1; grid-row: 2; align-self: center; padding: 0 0 80px; max-width: 560px; }
+.letter .k { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; font-size: 15px; color: var(--mut); }
+.letter .k::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+.letter h1 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: clamp(44px, 5.4vw, 80px); line-height: .96; letter-spacing: -.045em; margin: 18px 0 22px; }
+.letter h1 em { font-style: normal; color: var(--accent); }
+.letter h1 .w { display: inline-block; }
+.letter .lead { font-size: 19px; line-height: 1.5; color: var(--mut); margin: 0; max-width: 470px; }
+.letter .lead b { color: var(--fg); font-weight: 600; }
+.acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.acts button { height: 48px; padding: 0 22px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; border: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 60%, transparent); backdrop-filter: blur(6px); }
+.acts .pri { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+body.light .acts .pri { background: #141414; color: #fff; border-color: #141414; }
+/* entrada de la carta: palabra por palabra el titulo, luego lo demas */
+.letter .k, .letter .lead, .acts { opacity: 0; transform: translateY(12px); }
+.letter h1 .w { opacity: 0; transform: translateY(.45em); }
+body.in .letter .k, body.in .letter .lead, body.in .acts, body.in .letter h1 .w { opacity: 1; transform: none; transition: opacity .8s var(--ease), transform 1s var(--out); }
+body.in .letter .lead { transition-delay: .55s; } body.in .acts { transition-delay: .7s; }
+
+/* escenario de la escarapela */
+.stage { position: sticky; top: 50px; height: calc(100vh - 50px); grid-column: 2; grid-row: 1 / span 2; align-self: start; }
+.rig { position: absolute; left: 50%; top: 0; width: 0; height: 0; transform-origin: 0 0; z-index: 3; }
+.straps { position: absolute; left: -90px; top: -60px; width: 180px; overflow: visible; pointer-events: none; }
+.hinge { position: absolute; left: 0; width: 0; height: 0; transform-origin: 0 0; }
+.hw { position: absolute; left: -40px; top: -24px; width: 80px; height: 100px; overflow: visible; pointer-events: none; z-index: 2; }
+.persp { position: absolute; left: calc(var(--W) / -2); top: var(--cardTop); width: var(--W); perspective: 1200px; z-index: 1; }
+.badge { position: relative; width: 100%; height: var(--H); transform-style: preserve-3d; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+.hint { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 13.5px; font-weight: 600; color: var(--fg); padding: 7px 14px; border-radius: 999px; background: color-mix(in srgb, var(--bg) 72%, transparent); border: 1px solid var(--line); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); opacity: 0; transition: opacity .8s var(--ease); }
+body.landed .hint { opacity: 1; }
+
+/* tarjeta mate con canto, sin brillo. Oscura como la credencial de Expo, o crema */
+.face { position: absolute; inset: 0; border-radius: 20px; background: #0a0a0a; color: #fff; border: 1px solid rgba(255,255,255,.12); backface-visibility: hidden; -webkit-backface-visibility: hidden; padding: 34px 20px 18px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 var(--shy, 26px) 50px -14px rgba(0,0,0,.6); }
+body.light .face { box-shadow: 0 var(--shy, 26px) 46px -14px rgba(15,18,24,.32); }
+.face * { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.fa { transform: translateZ(1.5px); }
+.fb { transform: rotateY(180deg) translateZ(1.5px); }
+.edge { position: absolute; top: 22px; bottom: 22px; width: 3px; background: #1d1d20; transform: rotateY(90deg); }
+.edge.l { left: -1.5px; } .edge.r { right: -1.5px; }
+.slot { position: absolute; left: 50%; top: 9px; width: 40px; height: 9px; transform: translateX(-50%); border-radius: 5px; background: var(--bg); box-shadow: inset 0 1.5px 2px rgba(0,0,0,.55); }
+body.light .slot { box-shadow: inset 0 1.5px 2px rgba(60,45,25,.35); }
+.mut { color: rgba(255,255,255,.5); }
+body.cream .face { background: #fbf8f2; color: #141414; border-color: rgba(60,45,25,.12); }
+body.cream .edge { background: #ddd5c6; }
+body.cream .mut { color: rgba(20,20,20,.5); }
+body.cream .dash { border-color: rgba(20,20,20,.14); }
+body.cream .av { background: rgba(20,20,20,.06); border-color: rgba(20,20,20,.08); }
+body.cream .nb .ft { border-color: rgba(20,20,20,.1); }
+
+/* cara del nombre */
+.nb .ev { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 14.5px; letter-spacing: -.01em; }
+.nb .mt { font-size: 12px; margin-top: 3px; }
+.nb .who { margin-top: auto; }
+.nb .who i { display: block; width: 28px; height: 3px; border-radius: 2px; background: var(--accent); margin-bottom: 14px; }
+.nb .nm { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 40px; line-height: .98; letter-spacing: -.04em; overflow-wrap: anywhere; }
+.nb .cg { font-weight: 600; font-size: 16px; margin-top: 12px; }
+.nb .co { font-size: 14px; margin-top: 2px; }
+.nb .ft { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid rgba(255,255,255,.1); margin-top: 22px; padding-top: 12px; font-size: 13px; }
+.nb .ft b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 20px; letter-spacing: -.03em; }
+/* cara del QR: la credencial de Expo (MiQrScreen / DoneStep) */
+.qb .ev { text-align: center; font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 14.5px; }
+.qb .mt { text-align: center; font-size: 12px; margin-top: 3px; }
+.dash { border-top: 1px dashed rgba(255,255,255,.12); margin: 14px 0; }
+.qrw { position: relative; width: 66%; aspect-ratio: 1; margin: 0 auto; border-radius: 14px; padding: 5px; overflow: hidden; isolation: isolate; }
+.qrw::before { content: ""; position: absolute; left: -21%; top: -21%; width: 142%; height: 142%; z-index: -1; background: linear-gradient(135deg, #a8edea, #fed6e3, #d4a5ff, #a8c0ff, #b8f0c0, #ffd6aa, #a8edea); animation: qspin 6s linear infinite; }
+@keyframes qspin { to { transform: rotate(360deg); } }
+.qrw .pl { width: 100%; height: 100%; background: #fff; border-radius: 11px; padding: 10px; }
+.qrw svg { display: block; width: 100%; height: 100%; }
+.cap2 { display: flex; justify-content: center; align-items: center; gap: 6px; font-size: 11.5px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+.cap2 svg { width: 13px; height: 13px; }
+.idr { display: flex; align-items: center; gap: 12px; margin-top: auto; }
+.av { width: 40px; height: 40px; flex: none; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.08); font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 14px; }
+.idr b { display: block; font-weight: 600; font-size: 15px; }
+.idr span { font-size: 12px; }
+body.rm .qrw::before { animation: none; }
+@media (prefers-reduced-motion: reduce) { .qrw::before { animation: none; } }
+
+/* celular: escarapela arriba, dos lineas abajo */
+@media (max-width: 860px) {
+  .page { display: flex; flex-direction: column; padding: 0 16px; gap: 0; min-height: 0; }
+  .stage { position: relative; top: 0; height: var(--stageH); align-self: stretch; order: 2; overflow: hidden; }
+  .top { order: 1; height: auto; padding-top: 18px; }
+  .letter { order: 3; padding: 4px 0 56px; text-align: left; }
+  .letter h1 { font-size: 42px; margin: 12px 0 14px; } .letter .lead { font-size: 17px; }
+  .shade { background: linear-gradient(0deg, rgba(5,5,6,.92) 0%, rgba(5,5,6,.6) 30%, rgba(5,5,6,0) 52%); -webkit-mask-image: none; mask-image: none; }
+  body.light .shade { background: linear-gradient(0deg, rgba(242,238,231,.95) 0%, rgba(242,238,231,.62) 30%, rgba(242,238,231,0) 52%); }
+}
+</style>
+</head>
+<body>
+<div class="bar">
+  <b>Confirmación</b>
+  <div class="seg" id="theme"><button data-t="dark" class="on">Noir</button><button data-t="light">Lux</button></div>
+  <span class="lb">Escarapela</span>
+  <div class="seg" id="mat"><button data-m="dark" class="on">Oscura, como Expo</button><button data-m="cream">Crema</button></div>
+  <span class="lb">Queda mostrando</span>
+  <div class="seg" id="rest"><button data-r="name" class="on">El nombre</button><button data-r="qr">El QR</button></div>
+  <span class="lb">Herraje</span>
+  <div class="seg" id="hwk"><button data-h="loop" class="on">Cinta por la ranura</button><button data-h="clasp">Mosquetón</button></div>
+  <div class="sw" id="sw">
+    <button data-c="#3D6BFF" style="background:#3D6BFF" class="on" title="Azul"></button>
+    <button data-c="#E5192B" style="background:#E5192B" title="Rojo"></button>
+    <button data-c="#FF6A13" style="background:#FF6A13" title="Naranja"></button>
+    <button data-c="#C9A86A" style="background:#C9A86A" title="Dorado"></button>
+  </div>
+  <div class="seg" id="rmv"><button data-r="0" class="on">Con movimiento</button><button data-r="1">Reducido</button></div>
+  <div class="go"><button id="again">Repetir</button></div>
+</div>
+
+<canvas id="gl"></canvas>
+<div class="shade"></div>
+
+<div class="page" id="page">
+  <div class="top"><span class="brand">Summit 2026</span><a href="lab-landing-v3.html">Volver al evento</a></div>
+
+  <div class="letter">
+    <div class="k">Registro confirmado</div>
+    <h1 id="h1"></h1>
+    <p class="lead">Te esperamos el <b>4 de noviembre</b> en el Centro de Convenciones Ágora. Tu acceso llegó a <b id="mail1">a***@empresa.com</b>.</p>
+    <div class="acts"><button class="pri">Agregar al calendario</button><button>Volver al evento</button></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="rig" id="rig">
+      <svg class="straps" id="straps" viewBox="0 0 180 10" preserveAspectRatio="none"></svg>
+      <div class="hinge" id="hinge">
+        <div class="persp" id="persp">
+          <div class="badge" id="badge">
+            <div class="face fa nb">
+              <i class="slot"></i>
+              <div class="ev">Summit Empresarial 2026</div>
+              <div class="mt mut">4 al 6 de noviembre, Bogotá</div>
+              <div class="who"><i></i><div class="nm" id="bName">Andrea<br>Gómez</div><div class="cg" id="bRole">Directora de Innovación</div><div class="co mut" id="bCo">Empresa S.A.</div></div>
+              <div class="ft"><span class="mut">Pase general</span><b>0348</b></div>
+            </div>
+            <div class="face fb qb">
+              <i class="slot"></i>
+              <div class="ev">Summit Empresarial 2026</div>
+              <div class="mt mut">4 al 6 de noviembre, Bogotá</div>
+              <div class="dash"></div>
+              <div class="qrw"><div class="pl" id="qr"></div></div>
+              <div class="cap2 mut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span id="qrCap">Código dinámico, cambia en 60 s</span></div>
+              <div class="dash"></div>
+              <div class="idr"><div class="av" id="ini">AG</div><div><b id="qName">Andrea Gómez</b><span class="mut">Pase general</span></div></div>
+            </div>
+            <i class="edge l"></i><i class="edge r"></i>
+          </div>
+        </div>
+        <svg class="hw" id="hw" viewBox="-40 -24 80 100"></svg>
+      </div>
+    </div>
+    <div class="hint" id="hint">Toca la escarapela para ver tu código</div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+const page = $('#page'), stage = $('#stage'), rig = $('#rig'), hinge = $('#hinge'), persp = $('#persp'), badge = $('#badge');
+const W = 300, H = 412, cardTop = 46;
+let L = 300, hook = 'loop', rest = 'name', reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+page.style.setProperty('--W', W + 'px'); page.style.setProperty('--H', H + 'px'); page.style.setProperty('--cardTop', cardTop + 'px');
+const phone = () => innerWidth <= 860;
+
+/* ---------- la persona (viene del registro) ---------- */
+/* desde el registro de la v3 (sessionStorage); si se abre suelta, datos de ejemplo */
+let REG = null; try { REG = JSON.parse(sessionStorage.getItem('lv3-reg') || 'null'); } catch (e) {}
+const NAME = REG?.n || 'Andrea Gómez', MAIL = REG?.e || 'andrea@empresa.com';
+const ROLE = REG ? (REG.c || '') : 'Directora de Innovación', CO = REG ? (REG.o || '') : 'Empresa S.A.';
+const parts = NAME.trim().split(/\s+/), first = parts[0];
+$('#h1').innerHTML = `${first}, ya tienes tu <em>lugar</em>.`.split(' ').map((w, i) => `<span class="w" style="transition-delay:${.12 + i * .07}s">${w}</span>`).join(' ');
+$('#bName').innerHTML = parts.length > 1 ? `${first}<br>${parts.slice(1).join(' ')}` : first;
+$('#bRole').textContent = ROLE; $('#bCo').textContent = CO; $('#bRole').hidden = !ROLE; $('#bCo').hidden = !CO; /* son opcionales en el registro */ $('#qName').textContent = NAME;
+$('#ini').textContent = parts.slice(0, 2).map(w => w[0].toUpperCase()).join('');
+const [mu, md] = MAIL.split('@'); $('#mail1').textContent = mu[0] + '***@' + md;
+
+/* ---------- QR dinamico: formato del backend (d.{attendee}.{ventana}.{firma}), cambia cada 60 s ---------- */
+function token() { const win = Math.floor(Date.now() / 60000); let h = ''; for (let i = 0; i < 32; i++) h += '0123456789abcdef'[(win * 7 + i * 13 + i * i) % 16]; return `d.348.${win}.${h}`; }
+function drawQR() {
+  const qr = qrcode(0, 'M'); qr.addData(token()); qr.make();
+  const n = qr.getModuleCount(); let d = '';
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) d += `M${c} ${r}h1v1h-1z`;
+  $('#qr').innerHTML = `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges"><path d="${d}" fill="#0a0a0a"/></svg>`;
+}
+let lastWin = -1;
+setInterval(() => { const s = 60 - Math.floor(Date.now() / 1000) % 60; $('#qrCap').textContent = `Código dinámico, cambia en ${s} s`; const w = Math.floor(Date.now() / 60000); if (w !== lastWin) { lastWin = w; drawQR(); } }, 250);
+drawQR();
+
+/* ---------- herraje de una sola pieza ---------- */
+function drawHW() {
+  const sc = cardTop + 13.5;
+  const defs = `<defs>
+    <linearGradient id="mt" x1="0" x2="1"><stop offset="0" stop-color="#77777d"/><stop offset=".35" stop-color="#e9e9ec"/><stop offset=".6" stop-color="#a6a6ac"/><stop offset="1" stop-color="#6c6c72"/></linearGradient>
+    <linearGradient id="mtv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9d9dd"/><stop offset="1" stop-color="#8b8b91"/></linearGradient>
+    <clipPath id="above"><rect x="-40" y="-24" width="80" height="${sc + 24}"/></clipPath></defs>`;
+  $('#hw').innerHTML = defs + (hook === 'clasp' ? `
+    <rect x="-13" y="-20" width="26" height="18" rx="3.5" fill="url(#mt)"/>
+    <rect x="-13" y="-14" width="26" height="1.2" fill="rgba(0,0,0,.25)"/><rect x="-13" y="-8" width="26" height="1.2" fill="rgba(0,0,0,.25)"/>
+    <rect x="-4.5" y="-2.5" width="9" height="9" rx="2.5" fill="url(#mt)"/>
+    <circle cx="0" cy="11" r="4.2" fill="none" stroke="url(#mtv)" stroke-width="2.2"/>
+    <path d="M-1.5 15 C-8 17 -9.5 27 -7 34 C-5.5 38.5 -1 40 1.5 39.5 C1 36 1 33 2.5 31" fill="none" stroke="url(#mt)" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M-1.5 15 C3 15.5 6.5 19 7 24 L4.2 30.5" fill="none" stroke="url(#mt)" stroke-width="3" stroke-linecap="round"/>
+    <rect x="4.6" y="21" width="3" height="5.5" rx="1" fill="#cfcfd3" stroke="rgba(0,0,0,.35)" stroke-width=".6"/>
+    <g clip-path="url(#above)">
+      <ellipse cx="0" cy="${(38 + sc) / 2}" rx="8" ry="${(sc - 38) / 2 + 1.8}" fill="none" stroke="url(#mtv)" stroke-width="2.1"/>
+      <ellipse cx="1.4" cy="${(38 + sc) / 2 + .6}" rx="8" ry="${(sc - 38) / 2 + 1.8}" fill="none" stroke="url(#mtv)" stroke-width="1.6" opacity=".85"/>
+    </g>` : `
+    <path d="M-11 -24 L11 -24 L11 ${sc - 2} Q11 ${sc + 1} 8 ${sc + 1} L-8 ${sc + 1} Q-11 ${sc + 1} -11 ${sc - 2} Z" fill="var(--strap)"/>
+    <path d="M-9 ${sc - 22} h18" stroke="rgba(128,128,128,.45)" stroke-width="1" stroke-dasharray="2 2"/>
+    <g clip-path="url(#above)"><rect x="-11" y="${sc - 3}" width="22" height="4" fill="rgba(0,0,0,.25)"/></g>`);
+}
+function drawStraps() {
+  const top = -60, y1 = L - (hook === 'clasp' ? 20 : 24), h = y1 - top + 4, bx = hook === 'clasp' ? 6 : 0;
+  const svg = $('#straps'); svg.setAttribute('viewBox', `0 0 180 ${h}`); svg.style.height = h + 'px';
+  const ink = getComputedStyle(document.body).getPropertyValue('--strap-ink').trim();
+  svg.innerHTML = `<line x1="30" y1="0" x2="${85 - bx}" y2="${h}" stroke="var(--strap)" stroke-width="20"/>
+    <line x1="150" y1="0" x2="${95 + bx}" y2="${h}" stroke="var(--strap)" stroke-width="20"/>
+    ${h > 300 ? `<text font-family="Plus Jakarta Sans" font-weight="700" font-size="9.5" fill="${ink}" transform="translate(44 80) rotate(${Math.atan2(h, 85 - bx - 30) * 180 / Math.PI})">Summit Empresarial 2026</text>` : ''}`; /* en celular la cinta es corta: sin texto */
+}
+function layout() {
+  const vh = innerHeight - 50;
+  L = phone() ? 96 : Math.max(110, Math.min(300, vh - H - cardTop - 90));
+  hinge.style.top = L + 'px';
+  page.style.setProperty('--stageH', (L + cardTop + H + 58) + 'px');
+  $('#hint').style.top = (L + cardTop + H + 22) + 'px';
+  drawStraps(); drawHW(); sceneResize();
+}
+
+/* =====================================================================
+   ESCENA DEL EVENTO (la misma del hero). Al llegar la escarapela: una ola
+   con el color del cliente nace bajo ella y recorre el escenario.
+   ===================================================================== */
+const canvas = $('#gl'); let renderer = null;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }); renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5)); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; } catch (e) { canvas.style.display = 'none'; }
+const ACC = new THREE.Color('#3D6BFF');
+const mouse = new THREE.Vector2(), mouseT = new THREE.Vector2(); let mIn = false;
+addEventListener('pointermove', e => { mouseT.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); mIn = true; });
+let tc = null; /* momento de la celebracion, en segundos de escena */
+
+function datos() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#050506'); scene.fog = new THREE.Fog('#050506', 24, 40);
+  const cam = new THREE.PerspectiveCamera(32, 1, .1, 200);
+  const NX = 64, NZ = 40, N = NX * NZ;
+  const geo = new THREE.BoxGeometry(.82, 1, .82); geo.translate(0, .5, 0);
+  const mat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: .5, metalness: .35, dithering: true });
+  const mesh = new THREE.InstancedMesh(geo, mat, N); mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(mesh);
+  const dark = new THREE.Color('#1a1b20'), mid = new THREE.Color('#3a3c44'), tmp = new THREE.Color(), m4 = new THREE.Matrix4();
+  for (let i = 0; i < N; i++) mesh.setColorAt(i, dark);
+  scene.add(new THREE.HemisphereLight('#8a90a0', '#050506', .35));
+  const key = new THREE.DirectionalLight('#ffffff', 2.2); key.position.set(-14, 18, -10); scene.add(key);
+  const fill = new THREE.DirectionalLight('#ffffff', .5); fill.position.set(10, 6, 14); scene.add(fill);
+  const glow = new THREE.PointLight('#ffffff', 60, 30, 2); scene.add(glow);
+  const target = new THREE.Vector3();
+  return {
+    scene, cam,
+    resize(w, h) { cam.aspect = w / h; cam.updateProjectionMatrix(); },
+    update(t) {
+      const ph = phone();
+      cam.position.set(1 + mouse.x * 2, 17 + mouse.y * 1.2, 27); target.set(ph ? 0 : 5, -1, -7); cam.lookAt(target);
+      const ox = ph ? 0 : 9, oz = ph ? -6 : -3;  /* bajo la escarapela */
+      const since = tc === null ? -1 : t - tc, r = since * 12, fade = clamp(1 - since / 5.5);
+      glow.color.copy(ACC); glow.position.set(ox, 4, oz); glow.intensity = 30 + (since >= 0 ? 120 * Math.exp(-since * 1.4) + 30 * clamp(since) : 0);
+      let i = 0;
+      for (let ix = 0; ix < NX; ix++) for (let iz = 0; iz < NZ; iz++, i++) {
+        const x = (ix - NX / 2), z = (iz - NZ / 2);
+        let h = 1.1 + Math.sin(x * .16 + t * .25) * Math.cos(z * .21 - t * .18) * 1.3 + Math.sin((x + z) * .08 + t * .12) * 1.6 + Math.sin(x * .45 + z * .3 + t * .4) * .25;
+        h = Math.max(.12, h);
+        const dist = Math.hypot(x - ox, z - oz);
+        let w = 0;
+        if (since >= 0) { w = Math.exp(-((dist - r) ** 2) / 4) * fade; h += 2.8 * w + 1.4 * Math.exp(-dist * dist / 22) * clamp(since / 1.2); }
+        const g = ease((t - .15 - (ix / NX) * 1.4 - (iz / NZ) * .3) / 1.1);
+        m4.makeScale(1, Math.max(.02, h * g), 1); m4.setPosition(x, 0, z); mesh.setMatrixAt(i, m4);
+        const k = clamp((h - 2.4) / 2.2), df = clamp((-z - 5) / 11);
+        tmp.copy(dark).lerp(mid, clamp(h / 3) * (1 - df * .6)).lerp(ACC, clamp(Math.max(k * k, w * 1.1)) * (1 - df * .7)); mesh.setColorAt(i, tmp);
+      }
+      mesh.instanceMatrix.needsUpdate = true; mesh.instanceColor.needsUpdate = true;
+    },
+    dispose() { geo.dispose(); mat.dispose(); }
+  };
+}
+function fachada() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#F2EEE7');
+  const cam = new THREE.PerspectiveCamera(30, 1, .1, 200);
+  const pm = new THREE.PMREMGenerator(renderer); const envTex = pm.fromScene(new RoomEnvironment(), .04).texture; scene.environment = envTex;
+  const COLS = 46, ROWS = 26, N = COLS * ROWS, SX = .5, SY = .5;
+  const geo = new THREE.BoxGeometry(SX * .94, SY * .94, .06);
+  const edge = new THREE.MeshStandardMaterial({ color: '#d6cdbf', roughness: .6, envMapIntensity: .4, dithering: true });
+  const front = new THREE.MeshStandardMaterial({ color: '#F3EEE6', roughness: .5, envMapIntensity: .35, dithering: true });
+  const back = new THREE.MeshStandardMaterial({ color: ACC.clone(), roughness: .45, envMapIntensity: .4, dithering: true, emissive: ACC.clone(), emissiveIntensity: .06 });
+  const mesh = new THREE.InstancedMesh(geo, [edge, edge, edge, edge, front, back], N); mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); mesh.castShadow = true; mesh.receiveShadow = true;
+  const wall = new THREE.Group(); wall.add(mesh); scene.add(wall);
+  scene.add(new THREE.HemisphereLight('#fff6ea', '#cbbfae', 1.1));
+  const sun = new THREE.DirectionalLight('#fff1dc', 2.1); sun.position.set(-9, 7, 8); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.radius = 5; sun.shadow.bias = -.0004; sun.shadow.normalBias = .02;
+  Object.assign(sun.shadow.camera, { left: -15, right: 15, top: 10, bottom: -10, near: 1, far: 40 }); scene.add(sun); scene.add(sun.target);
+  const f = new Float32Array(N), v = new Float32Array(N);
+  const m4 = new THREE.Matrix4(), qt = new THREE.Quaternion(), pos = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), ax = new THREE.Vector3(0, 1, 0);
+  let lastT = 0;
+  return {
+    scene, cam,
+    accent() { back.color.copy(ACC); back.emissive.copy(ACC); },
+    resize(w, h) { cam.aspect = w / h; cam.updateProjectionMatrix(); },
+    update(t) {
+      const dt = Math.min(.05, Math.max(0, t - lastT)); lastT = t; const ph = phone();
+      cam.position.set(ph ? 0 : -3.2, 0, 15.5); cam.lookAt(ph ? 0 : 1.2, 0, 0);
+      wall.rotation.set(mouse.y * .04, -.28 + mouse.x * .05, 0); wall.position.set(ph ? 0 : 2.2, 0, 0);
+      sun.target.position.copy(wall.position);
+      const ox = ph ? 0 : 5.5, oy = ph ? 2 : 1.5;  /* bajo la escarapela */
+      /* la ola llega a cada lama a su hora: gira al color del cliente, lo sostiene y vuelve (por tiempo, igual a cualquier fps) */
+      const since = tc === null ? -1 : t - tc, SPEED = 5.5, IN = .5, HOLD = .8;
+      let i = 0;
+      for (let c = 0; c < COLS; c++) for (let rr = 0; rr < ROWS; rr++, i++) {
+        const x = (c - COLS / 2 + .5) * SX, y = (rr - ROWS / 2 + .5) * SY;
+        let fl = 0;
+        if (since >= 0) { const at = since - Math.hypot(x - ox, y - oy) / SPEED; fl = ease(at / IN) - ease((at - IN - HOLD) / IN); }
+        qt.setFromAxisAngle(ax, Math.PI * clamp(fl)); pos.set(x, y, 0); m4.compose(pos, qt, one); mesh.setMatrixAt(i, m4);
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+    },
+    dispose() { envTex.dispose(); pm.dispose(); geo.dispose(); edge.dispose(); front.dispose(); back.dispose(); }
+  };
+}
+let scene = null, theme = 'dark', st0 = performance.now();
+const sceneT = () => (performance.now() - st0) / 1000;
+function sceneResize() { if (!renderer) return; renderer.setSize(innerWidth, innerHeight, false); scene && scene.resize(innerWidth, innerHeight); }
+function setScene() { if (!renderer) return; scene && scene.dispose(); scene = (theme === 'light' ? fachada : datos)(); st0 = performance.now(); tc = null; sceneResize(); }
+function frame() {
+  mouse.lerp(mIn ? mouseT : new THREE.Vector2(), .05);
+  if (renderer && scene) { scene.update(reduced ? 8 : sceneT()); renderer.render(scene.scene, scene.cam); }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- fisica de la escarapela: Sutil (aprobada) ---------- */
+const A = { ky: 70, dy: 13, th0: .55, kth: 11, dth: 1.9, kph: 60, dph: 7, cpl: .35, kps: 38, dps: 9.5, flipAt: 1.5, flipHold: 2.2 };
+const S = {}; let t = 0, landT = null, flipped = 0, running = false, last = 0, drag = null;
+const base = () => rest === 'qr' ? 180 : 0;
+function reset() { Object.assign(S, { y: -(L + H + 160), yv: 0, th: 0, thv: 0, ph: 0, phv: 0, ps: base(), psv: 0, psT: base() }); t = 0; landT = null; flipped = 0; document.body.classList.remove('landed'); }
+function land() {
+  landT = t; S.thv += A.th0; document.body.classList.add('landed');
+  tc = reduced ? null : sceneT();   /* la celebracion */
+}
+function step(dt) {
+  t += dt;
+  S.yv += (-A.ky * S.y - A.dy * S.yv) * dt; S.y += S.yv * dt;
+  if (landT === null && S.y > -4) land();
+  const ta = drag ? 0 : -A.kth * Math.sin(S.th) - A.dth * S.thv;
+  if (!drag) { S.thv += ta * dt; S.th += S.thv * dt; }
+  S.phv += (-A.kph * S.ph - A.dph * S.phv - A.cpl * ta * 2) * dt; S.ph += S.phv * dt;
+  if (landT !== null) { const s = t - landT; if (flipped === 0 && s > A.flipAt) { flipped = 1; S.psT += 180; } if (flipped === 1 && s > A.flipAt + A.flipHold) { flipped = 2; S.psT += 180; } }
+  S.psv += (-A.kps * (S.ps - S.psT) - A.dps * S.psv) * dt; S.ps += S.psv * dt;
+}
+function render() {
+  rig.style.transform = `translateY(${S.y.toFixed(2)}px) rotate(${S.th.toFixed(4)}rad)`;
+  hinge.style.transform = `rotate(${S.ph.toFixed(4)}rad)`;
+  badge.style.transform = `rotateY(${S.ps.toFixed(2)}deg) rotateX(${(-S.phv * 2).toFixed(2)}deg)`;
+  badge.style.setProperty('--shy', (26 - Math.abs(S.th) * 18).toFixed(1) + 'px');
+  const showingQR = Math.round((((S.psT % 360) + 360) % 360) / 180) === 1;
+  $('#hint').textContent = showingQR ? 'Toca la escarapela para ver tu nombre' : 'Toca la escarapela para ver tu código';
+}
+const energy = () => Math.abs(S.yv) + Math.abs(S.y) * .1 + (Math.abs(S.thv) + Math.abs(S.th) + Math.abs(S.phv)) * 50 + Math.abs(S.ps - S.psT) + Math.abs(S.psv) * .2;
+function loop(now) {
+  if (!running) return;
+  const dt = Math.min(1 / 30, (now - last) / 1000 || 1 / 60); last = now;
+  for (let i = 0; i < 4; i++) step(dt / 4);
+  render();
+  if (!drag && flipped >= 2 && energy() < .02) { S.ps = ((S.psT % 360) + 360) % 360; S.psT = S.ps; render(); running = false; return; }
+  requestAnimationFrame(loop);
+}
+function wake() { if (!running) { running = true; last = performance.now(); requestAnimationFrame(loop); } }
+
+function arrive() {
+  running = false; document.body.classList.remove('in'); void document.body.offsetWidth;
+  layout(); setScene(); reset();
+  if (reduced) { S.y = 0; flipped = 2; landT = 0; document.body.classList.add('landed'); render(); persp.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500 }); document.body.classList.add('in'); return; }
+  render();
+  setTimeout(() => document.body.classList.add('in'), 200);
+  setTimeout(wake, 650);
+}
+/* arranca solo cuando la pagina esta a la vista */
+function start() {
+  if (document.visibilityState === 'visible') return arrive();
+  const h = () => { if (document.visibilityState === 'visible') { document.removeEventListener('visibilitychange', h); arrive(); } };
+  document.addEventListener('visibilitychange', h);
+}
+
+/* ---------- tocar: gira. Arrastrar: se mece ---------- */
+badge.addEventListener('pointerdown', e => { if (reduced) { S.psT += 180; S.ps = S.psT; render(); return; } badge.setPointerCapture(e.pointerId); drag = { x0: e.clientX, y0: e.clientY, moved: false, hist: [] }; wake(); });
+badge.addEventListener('pointermove', e => {
+  if (!drag) return; if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 6) drag.moved = true; if (!drag.moved) return;
+  const r = stage.getBoundingClientRect(), px = r.left + r.width / 2, py = r.top + S.y;
+  const ang = Math.max(-.8, Math.min(.8, Math.atan2(-(e.clientX - px), e.clientY - py)));
+  const now = performance.now(); drag.hist.push([now, ang]); drag.hist = drag.hist.filter(h => now - h[0] < 90); S.th = ang;
+});
+badge.addEventListener('pointerup', () => {
+  if (!drag) return; const d = drag; drag = null;
+  if (!d.moved) { S.psT += 180; flipped = 2; wake(); return; }
+  if (d.hist.length > 1) { const a = d.hist[0], b = d.hist[d.hist.length - 1]; S.thv = Math.max(-5, Math.min(5, (b[1] - a[1]) / Math.max(.016, (b[0] - a[0]) / 1000))); }
+  wake();
+});
+badge.addEventListener('pointercancel', () => { drag = null; wake(); });
+
+/* ---------- barra del lab ---------- */
+function seg(id, fn) { $$(`#${id} button`).forEach(b => b.addEventListener('click', () => { $$(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); fn(b.dataset); })); }
+function setMat(m) { document.body.classList.toggle('cream', m === 'cream'); $$('#mat button').forEach(x => x.classList.toggle('on', x.dataset.m === m)); }
+seg('theme', d => { theme = d.t; document.body.classList.toggle('light', d.t === 'light'); setMat(d.t === 'light' ? 'cream' : 'dark'); arrive(); }); /* Noir: escarapela oscura. Lux: crema */
+seg('mat', d => document.body.classList.toggle('cream', d.m === 'cream'));
+seg('rest', d => { rest = d.r; arrive(); });
+seg('hwk', d => { hook = d.h; layout(); });
+seg('rmv', d => { reduced = d.r === '1'; document.body.classList.toggle('rm', reduced); arrive(); });
+$$('#sw button').forEach(b => b.addEventListener('click', () => {
+  $$('#sw button').forEach(x => x.classList.toggle('on', x === b));
+  document.documentElement.style.setProperty('--accent', b.dataset.c); ACC.set(b.dataset.c); scene && scene.accent && scene.accent();
+}));
+$('#again').addEventListener('click', arrive);
+addEventListener('resize', () => { layout(); render(); });
+window.__lab = { get S() { return S; }, arrive, get tc() { return tc; }, get scene() { return scene; }, sceneT };
+if (REG?.a) { ACC.set(REG.a); document.documentElement.style.setProperty('--accent', REG.a); $$('#sw button').forEach(x => x.classList.toggle('on', x.dataset.c === REG.a)); }
+if (REG?.t === 'light') { theme = 'light'; document.body.classList.add('light'); setMat('cream'); $$('#theme button').forEach(x => x.classList.toggle('on', x.dataset.t === 'light')); }
+requestAnimationFrame(frame);
+start();
+</script>
+</body>
+</html>

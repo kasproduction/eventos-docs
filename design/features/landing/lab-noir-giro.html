@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Noir: el giro de los speakers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   MINILAB — speakers de Noir. Hoy el giro usa el easing con rebote
+   (resorte) y las ocho tarjetas giran a la vez al llegar. Tres gestos
+   para compararlo, todos con frenada suave y sin rebote.
+   ===================================================================== */
+:root { --accent: #3D6BFF; --on-accent: #fff; --bg: #050506; --fg: #fff; --mut: rgba(255,255,255,.62); --card: #121215; --card2: #18181c; --line: rgba(255,255,255,.1);
+  --spring: cubic-bezier(.34,1.36,.5,1); --out: cubic-bezier(.16,1,.3,1); --io: cubic-bezier(.65,0,.35,1); }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: 'Urbanist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: var(--bg); color: var(--fg); }
+img { display: block; max-width: 100%; }
+.bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 14px; padding: 10px 20px; background: #0b0b0c; color: #fff; font-size: 13px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; }
+.seg { display: flex; background: rgba(255,255,255,.06); border-radius: 10px; padding: 3px; flex-wrap: wrap; }
+.seg button { border: 0; background: transparent; padding: 6px 12px; border-radius: 8px; font: 600 13px 'Urbanist'; color: rgba(255,255,255,.6); cursor: pointer; }
+.seg button.on { background: #fff; color: #0b0b0c; }
+.bar .again { border: 0; border-radius: 8px; padding: 6px 12px; font: 600 13px 'Urbanist'; background: rgba(255,255,255,.12); color: #fff; cursor: pointer; }
+.sw { display: flex; gap: 6px; }
+.sw button { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; padding: 0; cursor: pointer; }
+.sw button.on { border-color: #fff; }
+.why { max-width: 1440px; margin: 0 auto; padding: 22px 48px 0; font-size: 15px; color: var(--mut); }
+.why b { color: var(--fg); font-weight: 700; }
+.why p { display: none; margin: 0; } .why p.on { display: block; }
+
+.sec { max-width: 1440px; margin: 0 auto; padding: 70px 48px 120px; }
+.sec-head { display: flex; justify-content: space-between; align-items: end; gap: 32px; margin-bottom: 48px; }
+.kick { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; font-size: 16px; color: var(--mut); margin-bottom: 18px; }
+.kick::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+h2 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: clamp(36px, 5.4vw, 84px); line-height: .95; letter-spacing: -.04em; margin: 0; }
+.sec-head p { font-size: 19px; line-height: 1.5; color: var(--mut); margin: 0; max-width: 420px; }
+
+/* la lama (tal cual en la v3) */
+.lama { position: relative; perspective: 1400px; }
+.lama .in { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .9s var(--spring); }
+.lama.flip .in, .lama.intro .in { transform: rotateY(180deg); }
+.lama .fa, .lama .ba { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 20px; overflow: hidden; }
+.lama .ba { transform: rotateY(180deg); }
+
+.spk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.spk { aspect-ratio: 3 / 4; cursor: pointer; outline: none; }
+.spk .fa { background: var(--card2); }
+.spk .fa img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.85); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+/* sin zoom de la foto: un hijo con transform propio hace que Chrome pinte la cara frontal a traves del reverso */
+.spk .fa::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.78) 0%, rgba(0,0,0,0) 48%); }
+.spk .who { position: absolute; left: 20px; right: 20px; bottom: 18px; z-index: 2; color: #fff; }
+.spk .who b { display: block; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 22px; letter-spacing: -.02em; line-height: 1.1; }
+.spk .who span { display: block; font-size: 14px; color: rgba(255,255,255,.72); margin-top: 4px; }
+/* reverso: vidrio oscuro con borde luminoso, no el color del cliente (muy chillon). La tarjeta se eleva al girar. */
+.spk .ba { background: var(--card2); color: var(--fg); padding: 26px 24px; display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 34px 70px rgba(0,0,0,.6); }
+.spk .ba q { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: clamp(19px, 1.7vw, 25px); letter-spacing: -.025em; line-height: 1.2; quotes: "\201C" "\201D"; }
+.spk .ba .tk { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); }
+.spk .ba .tk small { display: block; font-size: 13px; color: var(--mut); margin-bottom: 6px; }
+.spk .ba .tk b { display: block; font-weight: 700; font-size: 16px; line-height: 1.3; color: var(--accent); }
+.spk .ba .nm { font-weight: 600; font-size: 14px; color: var(--mut); margin-top: 10px; }
+
+/* 0 — HOY: resorte con rebote (para comparar) */
+
+/* A — GIRO SUAVE: el mismo giro, frenada suave, sin rebote */
+body.gA .lama .in { transition: transform 1s var(--io); }
+
+/* B — GIRO POR LA ESQUINA: la tarjeta gira sobre su diagonal, como quien levanta una hoja por la punta */
+body.gB .lama .in { transition: transform 1.05s var(--io); }
+body.gB .lama.flip .in, body.gB .lama.intro .in { transform: rotate3d(3, 4, 0, 180deg); }
+body.gB .lama .ba { transform: rotate3d(3, 4, 0, 180deg); }
+
+/* C — GIRO SUAVE Y LA IDEA LLEGA EN SECUENCIA: primero la frase, luego la charla, luego el nombre, entrando en diagonal */
+body.gC .lama .in { transition: transform 1s var(--io); }
+body.gC .lama.flip .in { transform: rotateY(180deg) translateZ(22px); }
+body.gC .spk .ba q, body.gC .spk .ba .tk, body.gC .spk .ba .nm { opacity: 0; transform: translate(-14px, 14px); transition: opacity .6s var(--out), transform .8s var(--out); }
+body.gC .spk.flip .ba q { opacity: 1; transform: none; transition-delay: .4s; }
+body.gC .spk.flip .ba .tk { opacity: 1; transform: none; transition-delay: .55s; }
+body.gC .spk.flip .ba .nm { opacity: 1; transform: none; transition-delay: .7s; }
+
+/* llegada */
+body.l2 .spk.intro .in { transform: none; }               /* llegan quietas */
+body.l2 .spk { opacity: 0; transform: translateY(22px); transition: opacity .9s var(--out), transform 1s var(--out); transition-delay: calc(var(--i) * 70ms); }
+body.l2 .spk.seen { opacity: 1; transform: none; }
+
+@media (max-width: 900px) { .why { padding: 16px 16px 0; } .sec { padding: 44px 16px 80px; } .sec-head { flex-direction: column; align-items: start; } .spk-grid { grid-template-columns: 1fr 1fr; gap: 10px; } .spk .who b { font-size: 17px; } .spk .ba { padding: 16px; } .spk .ba q { font-size: 15.5px; } }
+</style>
+</head>
+<body class="gC l2">
+<div class="bar"><b>Noir, el giro de los speakers</b>
+  <div class="seg" id="g"><button data-g="0">Hoy: resorte</button><button data-g="A">A Giro suave</button><button data-g="B">B Giro por la esquina</button><button data-g="C" class="on">C Suave y la idea llega en secuencia</button></div>
+  <div class="seg" id="l"><button data-l="1">Llegada: giran desde el centro</button><button data-l="2" class="on">Llegada: quietas, en cascada</button></div>
+  <button class="again" id="again">Volver a llegar</button>
+  <div class="sw" id="sw"><button data-c="#3D6BFF" style="background:#3D6BFF" class="on"></button><button data-c="#E5192B" style="background:#E5192B"></button><button data-c="#FF6A13" style="background:#FF6A13"></button><button data-c="#C9A86A" style="background:#C9A86A"></button></div>
+</div>
+<div class="why">
+  <p data-g="0"><b>Hoy.</b> El giro usa el resorte de los botones: pasa de largo y vuelve. Es lo que se siente brusco.</p>
+  <p data-g="A"><b>A Giro suave.</b> El mismo giro, con la frenada suave de Lux. Arranca con calma, acelera y se asienta sin pasarse. Lo mínimo que hay que cambiar.</p>
+  <p data-g="B"><b>B Giro por la esquina.</b> La tarjeta gira sobre su diagonal, como quien levanta una hoja por la punta. Un gesto propio de Noir, distinto del panel que sube en Lux.</p>
+  <p data-g="C" class="on"><b>C Suave y la idea llega en secuencia.</b> Giro suave, y cuando la tarjeta ya está de espaldas, la frase, la charla y el nombre entran uno tras otro desde la esquina.</p>
+</div>
+<section class="sec">
+  <div class="sec-head"><div><div class="kick">Speakers</div><h2>Quiénes suben<br>al escenario</h2></div><p>Pasa el mouse por cada speaker para conocer su idea y su charla.</p></div>
+  <div class="spk-grid" id="grid"></div>
+</section>
+<script>
+const SPEAKERS = [
+  ['María García', 'CEO y fundadora', 'Kasproduction', 47, 'Un evento no se mide por cuánta gente llega, sino por cuánta sale distinta.', 'Miércoles 4 de noviembre, 09:00', 'Apertura: el futuro del trabajo corporativo'],
+  ['Sofia Chen', 'VP of Product', 'Google', 25, 'La IA dejó de ser una promesa. Ahora es una decisión de negocio.', 'Miércoles 4 de noviembre, 10:30', 'The State of AI: from hype to production'],
+  ['Carlos Rodríguez', 'CTO', 'TechCorp', 12, 'La nube no es un lugar, es una forma de trabajar.', 'Miércoles 4 de noviembre, 14:00', 'Workshop: Cloud Native en 90 minutos'],
+  ['Laura Díaz', 'Founder y CEO', 'NovaPay', 26, 'En Latam, regular bien es la mayor ventaja competitiva.', 'Miércoles 4 de noviembre, 16:00', 'Fintech en Latam: regulación y oportunidad'],
+  ['Valentina Ríos', 'Design Lead LATAM', 'Figma', 23, 'Un buen sistema de diseño es un acuerdo, no una librería.', 'Jueves 5 de noviembre, 12:00', 'Design systems: de Figma a producción'],
+  ['Emma Thompson', 'VP Engineering', 'Stripe', 5, 'La confiabilidad es la característica que nadie ve hasta que falla.', 'Viernes 6 de noviembre, 09:00', 'Panel: IA en la empresa moderna'],
+  ['Andrés Gil', 'VP Engineering', 'Rappi', 59, 'Escalar es aprender a decir que no.', 'Viernes 6 de noviembre, 10:30', 'Mobile-first: React Native a fondo'],
+  ['Natasha Kozlova', 'ML Engineer', 'OpenAI', 44, 'Los modelos grandes se ganan en los detalles pequeños.', 'Jueves 5 de noviembre, 09:00', 'IA generativa: del hype a la producción']
+];
+const img = n => `https://i.pravatar.cc/800?img=${n}`;
+const $$ = s => [...document.querySelectorAll(s)];
+const grid = document.getElementById('grid');
+grid.innerHTML = SPEAKERS.map((s, i) => `<div class="lama spk" tabindex="0" style="--i:${i}"><div class="in">
+  <div class="fa"><img src="${img(s[3])}" alt=""><div class="who"><b>${s[0]}</b><span>${s[1]}, ${s[2]}</span></div></div>
+  <div class="ba"><q>${s[4]}</q><div class="tk"><small>${s[5]}</small><b>${s[6]}</b></div><div class="nm">${s[0]}, ${s[2]}</div></div>
+</div></div>`).join('');
+const touch = matchMedia('(hover: none)').matches;
+$$('.spk').forEach(c => {
+  if (!touch) { c.addEventListener('mouseenter', () => c.classList.add('flip')); c.addEventListener('mouseleave', () => c.classList.remove('flip')); }
+  c.addEventListener('click', () => { if (touch) c.classList.toggle('flip'); });
+  c.addEventListener('focus', () => c.classList.add('flip')); c.addEventListener('blur', () => c.classList.remove('flip'));
+});
+
+/* llegada 1: tal cual la v3, todas giran desde el centro. llegada 2: quietas, suben en cascada */
+let timers = [];
+function arrive() {
+  timers.forEach(clearTimeout); timers = [];
+  const items = $$('.spk');
+  items.forEach(el => { el.classList.remove('seen'); el.classList.add('intro'); });
+  const run = () => {
+    const r0 = grid.getBoundingClientRect(), cx = r0.left + r0.width / 2, cy = r0.top + r0.height / 2;
+    items.forEach(el => { const r = el.getBoundingClientRect(); const d = Math.hypot(r.left + r.width / 2 - cx, (r.top + r.height / 2 - cy) * 1.4); timers.push(setTimeout(() => { el.classList.remove('intro'); el.classList.add('seen'); }, 150 + d * .9)); });
+  };
+  const io = new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { ob.disconnect(); timers.push(setTimeout(run, 300)); } }), { threshold: .3 });
+  io.observe(grid);
+}
+document.getElementById('again').addEventListener('click', arrive);
+$$('#g button').forEach(b => b.addEventListener('click', () => { $$('#g button').forEach(x => x.classList.toggle('on', x === b)); document.body.classList.remove('g0', 'gA', 'gB', 'gC'); document.body.classList.add('g' + b.dataset.g); $$('.why p').forEach(p => p.classList.toggle('on', p.dataset.g === b.dataset.g)); }));
+$$('#l button').forEach(b => b.addEventListener('click', () => { $$('#l button').forEach(x => x.classList.toggle('on', x === b)); document.body.classList.remove('l1', 'l2'); document.body.classList.add('l' + b.dataset.l); arrive(); }));
+$$('#sw button').forEach(b => b.addEventListener('click', () => { document.documentElement.style.setProperty('--accent', b.dataset.c); $$('#sw button').forEach(x => x.classList.toggle('on', x === b)); }));
+arrive();
+</script>
+</body>
+</html>

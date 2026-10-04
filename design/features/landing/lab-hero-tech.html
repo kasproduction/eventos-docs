@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Hero Tech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+<style>
+/* =====================================================================
+   LAB — 5 heros tecnologicos (version oscura). Mismo boleto encima.
+   Sin particulas, ondas, seda, vidrio ni texto que cambia de caracteres.
+   ===================================================================== */
+:root { --accent: #3D6BFF; --accent-rgb: 61,107,255; --bar: 48px; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: 'Urbanist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #050506; color: #fff; overflow-x: hidden; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+svg.i { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.lab-bar { position: fixed; inset: 0 0 auto 0; height: var(--bar); z-index: 50; display: flex; align-items: center; gap: 14px; padding: 0 16px; background: #0b0b0c; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 13px; }
+.lab-bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; white-space: nowrap; }
+.seg { display: flex; background: rgba(255,255,255,.06); border-radius: 10px; padding: 3px; overflow-x: auto; scrollbar-width: none; }
+.seg button { border: 0; background: transparent; padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; color: rgba(255,255,255,.6); white-space: nowrap; }
+.seg button.on { background: #fff; color: #0b0b0c; }
+.sw { display: flex; gap: 6px; }
+.sw button { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; padding: 0; }
+.sw button.on { border-color: #fff; }
+.lab-bar .sp { flex: 1; }
+.lab-bar .ghost { border: 1px solid rgba(255,255,255,.14); background: transparent; border-radius: 8px; padding: 6px 10px; font-weight: 600; font-size: 12px; color: rgba(255,255,255,.8); white-space: nowrap; text-decoration: none; }
+@media (max-width: 860px) { .lab-bar b, .lab-bar .lbl, .lab-bar .sw { display: none; } }
+
+#gl, #c2 { position: fixed; left: 0; top: var(--bar); width: 100vw; height: calc(100svh - var(--bar)); z-index: 0; display: block; }
+.hero { position: relative; z-index: 2; min-height: calc(100svh - var(--bar)); margin-top: var(--bar); display: grid; grid-template-columns: minmax(0,1.3fr) minmax(340px,.62fr); gap: 56px; align-items: end; padding: 110px 48px 56px; pointer-events: none; }
+.hero > * { pointer-events: auto; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(90deg, rgba(5,5,6,.82) 0%, rgba(5,5,6,.3) 42%, rgba(5,5,6,0) 62%), linear-gradient(0deg, rgba(5,5,6,.75) 0%, transparent 30%); }
+.eyebrow { display: inline-flex; align-items: center; gap: 12px; font: 600 12px/1 'JetBrains Mono'; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+.eyebrow::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+h1 { font-family: 'Plus Jakarta Sans'; font-weight: 800; text-transform: uppercase; font-size: clamp(40px, 8.4vw, 150px); line-height: .86; letter-spacing: -.045em; margin: 20px 0 32px; }
+h1 .out { color: transparent; -webkit-text-stroke: 2px var(--accent); }
+.meta { display: flex; gap: 40px; border-top: 1px solid rgba(255,255,255,.12); padding-top: 20px; flex-wrap: wrap; }
+.meta small { display: block; font: 600 11px/1 'JetBrains Mono'; letter-spacing: .14em; color: rgba(255,255,255,.5); margin-bottom: 9px; }
+.meta span { font-weight: 600; font-size: 17px; }
+.meta .aws { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 19px; color: #FF9900; }
+.cd { font: 700 17px/1 'JetBrains Mono'; }
+
+.ticket { position: relative; background: rgba(14,14,16,.9); border: 1px solid rgba(255,255,255,.1); border-radius: 24px; padding: 24px; box-shadow: 0 30px 80px rgba(0,0,0,.55); backdrop-filter: blur(6px); }
+.t-head { display: flex; justify-content: space-between; font: 600 11px/1 'JetBrains Mono'; letter-spacing: .14em; color: rgba(255,255,255,.45); }
+.t-head b { color: var(--accent); }
+.sent { font-family: 'Plus Jakarta Sans'; font-weight: 600; font-size: 24px; letter-spacing: -.03em; line-height: 1.4; margin: 14px 0 0; }
+.sent .mu { opacity: .5; }
+input.ln { display: block; width: 100%; border: 0; border-bottom: 2px solid rgba(255,255,255,.16); background: transparent; outline: none; font: inherit; font-size: 22px; color: var(--accent); padding: 0 2px; margin: 2px 0 8px; }
+input.ln::placeholder { color: rgba(255,255,255,.28); }
+input.ln:focus { border-bottom-color: var(--accent); }
+input.ln.err { border-bottom-color: #E5484D; }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 1.4; color: rgba(255,255,255,.6); margin: 14px 0; cursor: pointer; }
+.consent input { width: 17px; height: 17px; margin: 1px 0 0; accent-color: var(--accent); }
+.consent.err { color: #E5484D; }
+.cta { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 54px; border: 0; border-radius: 14px; background: var(--accent); color: #fff; font-weight: 700; font-size: 16px; }
+.done { display: none; }
+.ticket.ok .form { display: none; }
+.ticket.ok .done { display: block; }
+.t-name { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 36px; letter-spacing: -.035em; line-height: 1; margin: 16px 0 10px; }
+.t-note { font-size: 13px; color: rgba(255,255,255,.6); margin-top: 10px; }
+
+.cap { position: fixed; left: 16px; bottom: 16px; z-index: 5; max-width: 460px; background: rgba(12,12,13,.92); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 12px 14px; font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.78); transition: opacity .6s; }
+.cap b { color: #fff; }
+.cap.hide { opacity: 0; pointer-events: none; }
+.err-gl { position: fixed; inset: 0; z-index: 60; display: none; place-items: center; background: #050506; color: rgba(255,255,255,.7); font-size: 15px; text-align: center; padding: 24px; }
+
+@media (max-width: 1020px) {
+  .hero { grid-template-columns: 1fr; padding: 90px 16px 36px; gap: 28px; }
+  h1 { font-size: 11.4vw; } .meta { gap: 20px; }
+  .hero::before { background: linear-gradient(0deg, rgba(5,5,6,.88) 0%, rgba(5,5,6,.2) 60%); }
+  .cap { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="lab-bar">
+  <b>Hero tech</b>
+  <div class="seg" id="seg">
+    <button data-e="plano" class="on">1 Plano de la sala</button>
+    <button data-e="datos">2 Paisaje de datos</button>
+    <button data-e="instrumento">3 Instrumento</button>
+    <button data-e="fachada">4 Fachada cinética</button>
+    <button data-e="cinta">5 Cinta de estadio</button>
+  </div>
+  <span class="lbl" style="color:rgba(255,255,255,.45)">Color del cliente</span>
+  <div class="sw" id="sw">
+    <button data-c="#3D6BFF" style="background:#3D6BFF" class="on" title="Azul"></button>
+    <button data-c="#E5192B" style="background:#E5192B" title="Rojo"></button>
+    <button data-c="#FF6A13" style="background:#FF6A13" title="Naranja"></button>
+    <button data-c="#C9A86A" style="background:#C9A86A" title="Dorado"></button>
+  </div>
+  <span class="sp"></span>
+  <button class="ghost" id="replay">Ver la entrada otra vez</button>
+  <a class="ghost" href="lab-hero-claro.html">Versión clara</a>
+</div>
+
+<canvas id="gl"></canvas>
+<canvas id="c2"></canvas>
+
+<section class="hero">
+  <div>
+    <span class="eyebrow">Bogotá, noviembre de 2026</span>
+    <h1>Summit<br>Empresarial<br><span class="out">2026</span></h1>
+    <div class="meta">
+      <div><small>FECHAS</small><span>4 al 6 de noviembre</span></div>
+      <div><small>LUGAR</small><span>Centro de Convenciones Ágora</span></div>
+      <div><small>EMPIEZA EN</small><span class="cd" id="cd"></span></div>
+      <div><small>PRESENTADO POR</small><span class="aws">AWS</span></div>
+    </div>
+  </div>
+  <div class="ticket" id="ticket">
+    <div class="t-head"><span>PASE GENERAL</span><b id="tn">GRATIS</b></div>
+    <div class="form">
+      <form id="form" novalidate>
+        <p class="sent">Hola, me llamo <input class="ln" name="name" placeholder="tu nombre" autocomplete="name"> <span class="mu">y mi correo es</span> <input class="ln" name="email" type="email" placeholder="tu@empresa.com" autocomplete="email"></p>
+        <label class="consent" id="cn"><input type="checkbox" name="consent"> Acepto el tratamiento de mis datos para gestionar mi participación.</label>
+        <button class="cta" type="submit">Quiero mi lugar <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </form>
+      <div class="t-note">Sin contraseña. Tu acceso llega a tu correo.</div>
+    </div>
+    <div class="done"><div class="t-name" id="nm"></div><div class="t-note">Tu lugar está guardado. Te enviamos el acceso a <b id="ml"></b>.</div><div class="t-note" style="margin-top:14px"><button class="ghost" id="reset" style="border:1px solid rgba(255,255,255,.14);background:transparent;border-radius:8px;padding:6px 10px;font-size:12px">Reiniciar registro</button></div></div>
+  </div>
+</section>
+<div class="cap" id="cap"></div>
+<div class="err-gl" id="errgl">Este navegador no pudo iniciar el 3D. En producción se mostraría una imagen fija del fondo.</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const $ = s => document.querySelector(s);
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+const easeIO = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const CAPS = {
+  plano: '<b>Plano de la sala.</b> La sala del evento vista desde arriba: 5.000 lugares que se van tomando en vivo. Pasa el mouse para ver fila y puesto. Al registrarte, uno se enciende como <b>tu lugar</b>.',
+  datos: '<b>Paisaje de datos.</b> Un campo de columnas que crece al abrir, como un gráfico que se vuelve ciudad. Las cimas toman el color del cliente; bajo tu cursor el terreno sube.',
+  instrumento: '<b>Instrumento.</b> Un cronógrafo de precisión que cuenta hacia el evento. Anillos que giran a distinta velocidad y se separan en capas con el mouse.',
+  fachada: '<b>Fachada cinética.</b> Una pared de lamas metálicas, como la fachada de un edificio corporativo. Al pasar el cursor giran y muestran el color del cliente.',
+  cinta: '<b>Cinta de estadio.</b> Dos cintas de LED como las de un estadio giran alrededor del boleto con la información del evento.'
+};
+
+/* ---------- acento ---------- */
+let ACC = new THREE.Color('#3D6BFF'), ACCHEX = '#3D6BFF';
+function setAccent(hex) {
+  ACC.set(hex); ACCHEX = hex; const n = parseInt(hex.slice(1), 16);
+  document.documentElement.style.setProperty('--accent', hex);
+  document.documentElement.style.setProperty('--accent-rgb', `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`);
+  document.querySelectorAll('#sw button').forEach(b => b.classList.toggle('on', b.dataset.c === hex));
+  store.set('labt-acc', hex); if (current && current.accent) current.accent();
+}
+const rgba = (a) => `rgba(${getComputedStyle(document.documentElement).getPropertyValue('--accent-rgb')},${a})`;
+
+/* ---------- superficies ---------- */
+const canvas = $('#gl'), c2 = $('#c2'), ctx = c2.getContext('2d');
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }); }
+catch (e) { $('#errgl').style.display = 'grid'; throw e; }
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const DPR2 = Math.min(devicePixelRatio || 1, 2);
+const size = () => ({ w: canvas.clientWidth || innerWidth, h: canvas.clientHeight || innerHeight - 48 });
+const desk = () => innerWidth > 1020;
+const mouse = new THREE.Vector2(0, 0), mouseT = new THREE.Vector2(0, 0);
+const mpx = { x: -999, y: -999, in: false };
+addEventListener('pointermove', e => {
+  mouseT.set(e.clientX / innerWidth * 2 - 1, -((e.clientY - 48) / (innerHeight - 48)) * 2 + 1);
+  mpx.x = e.clientX; mpx.y = e.clientY - 48; mpx.in = true;
+});
+document.addEventListener('pointerleave', () => { mpx.in = false; });
+
+/* =====================================================================
+   1 PLANO DE LA SALA — 2D con proyeccion propia
+   ===================================================================== */
+function plano() {
+  const seats = []; const TOTAL = 5000;
+  const SZ = 62, R0 = 7, ROWS = 44, GAP = 1.05, TH = 1.0;
+  let spacing = .9;
+  const build = s => { const out = []; for (let r = 0; r < ROWS; r++) { const R = R0 + r * GAP; const n = Math.floor(2 * TH * R / s); for (let i = 0; i < n; i++) { const a = -TH + (i + .5) * (2 * TH / n); const aisle = Math.abs(a) < .035 || Math.abs(Math.abs(a) - .52) < .03; if (aisle) continue; out.push({ r, i, a, R }); } } return out; };
+  for (let k = 0; k < 30; k++) { const n = build(spacing).length; if (Math.abs(n - TOTAL) < 40) break; spacing *= Math.sqrt(n / TOTAL); }
+  build(spacing).slice(0, TOTAL).forEach((s, idx) => {
+    s.x = s.R * Math.sin(s.a); s.z = SZ - s.R * Math.cos(s.a);
+    s.taken = Math.random() < .64; s.tt = 2.6 + Math.random() * 3.2 + (s.r / ROWS) * .6; s.row = s.r + 1; s.num = s.i + 1; s.idx = idx;
+    seats.push(s);
+  });
+  const free = () => seats.filter(s => !s.taken);
+  let liveT = 0, mine = null, mineT = 0, hl = null;
+  let W = 1, H = 1, cx = 0, hy = 0, F = 1, CH = 20;
+  const proj = (x, z) => [cx + x * F / z, hy + CH * F / z, F / z];
+  const onReg = () => { const f = free().filter(s => s.r > 14 && s.r < 26 && Math.abs(s.a) < .4); mine = f[Math.floor(Math.random() * f.length)] || free()[0]; mine.taken = true; mine.tt = -1; mineT = performance.now() / 1000; };
+  addEventListener('lab:registered', onReg);
+  return {
+    kind: '2d',
+    resize(w, h) { W = w; H = h; F = (desk() ? .37 : .3) * h / (CH / 20); cx = desk() ? w * .67 : w * .5; hy = desk() ? h * .06 : h * .02; },
+    draw(t) {
+      const ox = mouse.x * 18, oy = mouse.y * 10; const ccx = cx; cx = ccx + ox;
+      ctx.clearRect(0, 0, W, H);
+      // escenario
+      const pStage = ease((t - .1) / 1.2);
+      const sw = 13, sd = 3.2;
+      const a = proj(-sw, SZ + sd), b = proj(sw, SZ + sd), c = proj(sw, SZ - 1.2), d = proj(-sw, SZ - 1.2);
+      ctx.save(); ctx.translate(0, oy);
+      ctx.strokeStyle = `rgba(255,255,255,${.5 * pStage})`; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(d[0], d[1]); ctx.lineTo(d[0] + (c[0] - d[0]) * pStage, d[1] + (c[1] - d[1]) * pStage); ctx.stroke();
+      ctx.fillStyle = rgba(.12 * pStage); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = rgba(.9 * pStage); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+      ctx.font = `600 ${Math.max(9, F / (SZ + 1) * 1.1)}px "JetBrains Mono"`; ctx.textAlign = 'center'; ctx.fillStyle = `rgba(255,255,255,${.55 * pStage})`;
+      const sc = proj(0, SZ + 1.2); ctx.fillText('E S C E N A R I O', sc[0], sc[1]);
+      // arcos de referencia (lineas de fila cada 5)
+      const pArc = ease((t - .5) / 1.6);
+      ctx.lineWidth = 1;
+      for (let r = 0; r < ROWS; r += 11) { const R = R0 + r * GAP - .5; ctx.strokeStyle = `rgba(255,255,255,${.07 * pArc})`; ctx.beginPath(); const steps = 60; for (let k = 0; k <= steps * pArc; k++) { const an = -TH - .05 + (k / steps) * (2 * TH + .1); const p = proj(R * Math.sin(an), SZ - R * Math.cos(an)); k ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]); } ctx.stroke(); }
+      // puestos
+      if (t > 7 && !reduced) { liveT += 1 / 60; if (liveT > .35) { liveT = 0; const f = free(); if (f.length > 900) { const s = f[Math.floor(Math.random() * f.length)]; s.taken = true; s.tt = t; } } }
+      let best = null, bd = 196; const mx = mpx.x, my = mpx.y - oy;
+      let nTaken = 0;
+      for (const s of seats) {
+        const p = proj(s.x, s.z); s.sx = p[0]; s.sy = p[1];
+        const appear = ease((t - .8 - s.r * .045) / .5); if (appear <= 0) continue;
+        const sz = Math.max(1.3, .52 * p[2]);
+        const on = s.taken && t > s.tt; if (on) nTaken++;
+        const fresh = on && s.tt > 7 ? clamp(1 - (t - s.tt) / 1.2) : 0;
+        let al, col;
+        if (s === mine) continue;
+        if (on) { al = (.82 + fresh * .18) * appear; col = fresh > 0 ? `rgba(255,255,255,${al})` : rgba(al); }
+        else { al = .16 * appear; col = `rgba(255,255,255,${al})`; }
+        if (mpx.in) { const dx = s.sx - mx, dy = s.sy - my, dd = dx * dx + dy * dy; if (dd < 9000) { const k = 1 - dd / 9000; if (!on) col = `rgba(255,255,255,${al + .35 * k})`; } if (dd < bd) { bd = dd; best = s; } }
+        ctx.fillStyle = col; ctx.fillRect(s.sx - sz / 2, s.sy - sz * .35, sz, sz * .7);
+      }
+      // tu lugar
+      if (mine) {
+        const p = proj(mine.x, mine.z); const k = performance.now() / 1000 - mineT; const sz = Math.max(2, .7 * p[2]);
+        for (let i = 0; i < 3; i++) { const ph = ((k * .6 + i / 3) % 1); ctx.strokeStyle = `rgba(255,255,255,${.6 * (1 - ph)})`; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(p[0], p[1], 6 + ph * 40, (6 + ph * 40) * .45, 0, 0, Math.PI * 2); ctx.stroke(); }
+        ctx.fillStyle = '#fff'; ctx.fillRect(p[0] - sz / 2, p[1] - sz * .35, sz, sz * .7);
+        ctx.font = '700 11px "JetBrains Mono"'; ctx.textAlign = 'left'; ctx.fillStyle = '#fff';
+        ctx.fillText(`TU LUGAR  FILA ${mine.row}  PUESTO ${mine.num}`, p[0] + 14, p[1] - 14);
+      }
+      hl = mpx.in && bd < 196 ? best : null;
+      if (hl && hl !== mine) {
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2; const sz = Math.max(5, .9 * F / hl.z); ctx.strokeRect(hl.sx - sz / 2 - 2, hl.sy - sz * .35 - 2, sz + 4, sz * .7 + 4);
+        ctx.font = '600 11px "JetBrains Mono"'; ctx.textAlign = 'left';
+        const lbl = `FILA ${hl.row}  PUESTO ${hl.num}  ${hl.taken && t > hl.tt ? 'TOMADO' : 'LIBRE'}`;
+        const tw = ctx.measureText(lbl).width; ctx.fillStyle = 'rgba(10,10,12,.9)'; ctx.fillRect(hl.sx + 10, hl.sy - 26, tw + 16, 22); ctx.fillStyle = '#fff'; ctx.fillText(lbl, hl.sx + 18, hl.sy - 11);
+      }
+      // contador
+      const pc = ease((t - 2.4) / .8);
+      if (pc > 0) {
+        const nn = nTaken;
+        const y0 = Math.min(H - 70, hy + CH * F / 11) ;
+        const x0 = desk() ? cx + 30 * F / 40 : cx - 120;
+        ctx.textAlign = 'left'; ctx.globalAlpha = pc;
+        ctx.font = '600 10px "JetBrains Mono"'; ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.fillText('LUGARES TOMADOS', x0, y0);
+        ctx.font = '800 30px "Plus Jakarta Sans"'; ctx.fillStyle = '#fff'; const nt = nn.toLocaleString('es-CO'); ctx.fillText(nt, x0, y0 + 32);
+        const tw = ctx.measureText(nt).width; ctx.font = '600 16px "Urbanist"'; ctx.fillStyle = 'rgba(255,255,255,.45)'; ctx.fillText(` de ${TOTAL.toLocaleString('es-CO')}`, x0 + tw, y0 + 32);
+        ctx.globalAlpha = 1;
+      }
+      ctx.restore(); cx = ccx;
+    },
+    dispose() { removeEventListener('lab:registered', onReg); }
+  };
+}
+
+/* =====================================================================
+   2 PAISAJE DE DATOS — three.js, columnas instanciadas
+   ===================================================================== */
+function datos() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#050506'); scene.fog = new THREE.Fog('#050506', 26, 60);
+  const cam = new THREE.PerspectiveCamera(32, 1, .1, 200);
+  const NX = 64, NZ = 40, N = NX * NZ;
+  const geo = new THREE.BoxGeometry(.82, 1, .82); geo.translate(0, .5, 0);
+  const mat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: .5, metalness: .35 });
+  const mesh = new THREE.InstancedMesh(geo, mat, N); mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(mesh);
+  const dark = new THREE.Color('#1a1b20'), mid = new THREE.Color('#3a3c44'), tmp = new THREE.Color(), m4 = new THREE.Matrix4();
+  for (let i = 0; i < N; i++) mesh.setColorAt(i, dark);
+  scene.add(new THREE.HemisphereLight('#8a90a0', '#050506', .35));
+  const key = new THREE.DirectionalLight('#ffffff', 2.2); key.position.set(-14, 18, -10); scene.add(key);
+  const fill = new THREE.DirectionalLight('#ffffff', .5); fill.position.set(10, 6, 14); scene.add(fill);
+  const glow = new THREE.PointLight('#ffffff', 60, 30, 2); glow.position.set(0, 4, 0); scene.add(glow);
+  const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hit = new THREE.Vector3(), bump = new THREE.Vector3(999, 0, 999);
+  const target = new THREE.Vector3();
+  return {
+    kind: 'gl', scene, cam,
+    resize(w, h) { cam.aspect = w / h; cam.updateProjectionMatrix(); },
+    update(t) {
+      const d = desk();
+      cam.position.set(1 + mouse.x * 2.5, 17 + mouse.y * 1.5, 27); target.set(d ? 5 : 0, -1, -7); cam.lookAt(target);
+      ray.setFromCamera(mouse, cam); if (ray.ray.intersectPlane(plane, hit)) bump.lerp(hit, .12);
+      glow.color.copy(ACC); glow.position.set(bump.x, 3.5, bump.z);
+      let i = 0;
+      for (let ix = 0; ix < NX; ix++) for (let iz = 0; iz < NZ; iz++, i++) {
+        const x = (ix - NX / 2) * 1, z = (iz - NZ / 2) * 1;
+        let h = 1.1 + Math.sin(x * .16 + t * .25) * Math.cos(z * .21 - t * .18) * 1.3 + Math.sin((x + z) * .08 + t * .12) * 1.6 + Math.sin(x * .45 + z * .3 + t * .4) * .25;
+        h = Math.max(.12, h);
+        const dx = x - bump.x, dz = z - bump.z; h += 3.2 * Math.exp(-(dx * dx + dz * dz) / 14);
+        const g = ease((t - .15 - (ix / NX) * 1.4 - (iz / NZ) * .3) / 1.1);
+        const hh = Math.max(.02, h * g);
+        m4.makeScale(1, hh, 1); m4.setPosition(x, 0, z); mesh.setMatrixAt(i, m4);
+        const k = clamp((h - 2.4) / 2.2);
+        tmp.copy(dark).lerp(mid, clamp(h / 3)).lerp(ACC, k * k); mesh.setColorAt(i, tmp);
+      }
+      mesh.instanceMatrix.needsUpdate = true; mesh.instanceColor.needsUpdate = true;
+    },
+    dispose() { geo.dispose(); mat.dispose(); }
+  };
+}
+
+/* =====================================================================
+   3 INSTRUMENTO — 2D, cronografo por capas
+   ===================================================================== */
+function instrumento() {
+  let W = 1, H = 1, C = [0, 0], R = 100;
+  const START = new Date('2026-11-04T08:00:00-05:00');
+  const arc = (r, a0, a1) => { ctx.beginPath(); ctx.arc(0, 0, r, a0, a1); ctx.stroke(); };
+  return {
+    kind: '2d',
+    resize(w, h) { W = w; H = h; const d = desk(); C = d ? [w * .7, h * .37] : [w * .5, h * .3]; R = d ? Math.min(h * .43, w * .3) : Math.min(w * .48, h * .3); },
+    draw(t) {
+      ctx.clearRect(0, 0, W, H);
+      const now = Date.now(), ms = Math.max(0, START - now), days = Math.floor(ms / 864e5);
+      const sec = (now / 1000) % 60, minF = ((now / 60000) % 60);
+      const layer = (depth, fn) => { ctx.save(); ctx.translate(C[0] + mouse.x * depth * 26, C[1] - mouse.y * depth * 18); fn(); ctx.restore(); };
+      const p = k => ease((t - k) / 1.4);
+      ctx.lineCap = 'butt';
+      // halo
+      layer(0, () => { const g = ctx.createRadialGradient(0, 0, R * .2, 0, 0, R * 1.3); g.addColorStop(0, rgba(.08 * p(.2))); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(-R * 1.4, -R * 1.4, R * 2.8, R * 2.8); });
+      // anillo exterior: 180 marcas
+      layer(.2, () => {
+        const pr = p(.1); ctx.rotate(t * .012 + mouse.x * .08);
+        for (let i = 0; i < 180 * pr; i++) { const a = i / 180 * Math.PI * 2; const big = i % 15 === 0, mid = i % 5 === 0; const l = big ? R * .06 : mid ? R * .035 : R * .018; ctx.strokeStyle = `rgba(255,255,255,${big ? .7 : mid ? .4 : .2})`; ctx.lineWidth = big ? 1.6 : 1; ctx.beginPath(); ctx.moveTo(Math.cos(a) * R, Math.sin(a) * R); ctx.lineTo(Math.cos(a) * (R - l), Math.sin(a) * (R - l)); ctx.stroke(); }
+        ctx.strokeStyle = `rgba(255,255,255,${.25 * pr})`; ctx.lineWidth = 1; arc(R + 6, 0, Math.PI * 2 * pr);
+      });
+      // anillo de grados (gira al reves)
+      layer(.45, () => {
+        const pr = p(.5); ctx.rotate(-t * .02);
+        ctx.font = `600 ${Math.max(9, R * .028)}px "JetBrains Mono"`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        for (let i = 0; i < 24; i++) { if (i / 24 > pr) break; const a = i / 24 * Math.PI * 2; ctx.save(); ctx.rotate(a); ctx.translate(0, -R * .86); ctx.fillStyle = `rgba(255,255,255,${i % 6 === 0 ? .7 : .32})`; ctx.fillText(String(i * 15).padStart(3, '0'), 0, 0); ctx.restore(); }
+        ctx.strokeStyle = `rgba(255,255,255,${.14 * pr})`; arc(R * .8, 0, Math.PI * 2 * pr);
+      });
+      // anillo de dias que faltan (acento)
+      layer(.7, () => {
+        const pr = p(.9); const frac = clamp(days / 100);
+        ctx.rotate(-Math.PI / 2);
+        ctx.strokeStyle = `rgba(255,255,255,${.08 * pr})`; ctx.lineWidth = R * .03; arc(R * .7, 0, Math.PI * 2 * pr);
+        ctx.strokeStyle = rgba(.95 * pr); ctx.lineWidth = R * .03; arc(R * .7, 0, Math.PI * 2 * frac * pr);
+        for (let i = 0; i < 100; i++) { const a = i / 100 * Math.PI * 2; if (i / 100 > pr) break; ctx.strokeStyle = 'rgba(5,5,6,.9)'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(Math.cos(a) * R * .67, Math.sin(a) * R * .67); ctx.lineTo(Math.cos(a) * R * .73, Math.sin(a) * R * .73); ctx.stroke(); }
+      });
+      // minutero fino + segundero con estela
+      layer(.95, () => {
+        const pr = p(1.4); if (pr <= 0) return;
+        ctx.rotate(-Math.PI / 2);
+        ctx.strokeStyle = `rgba(255,255,255,${.1 * pr})`; ctx.lineWidth = 1; arc(R * .58, 0, Math.PI * 2);
+        const am = minF / 60 * Math.PI * 2; ctx.strokeStyle = `rgba(255,255,255,${.5 * pr})`; ctx.lineWidth = 2; arc(R * .58, 0, am);
+        const as = sec / 60 * Math.PI * 2;
+        for (let k = 0; k < 40; k++) { ctx.strokeStyle = rgba((1 - k / 40) * .5 * pr); ctx.lineWidth = 1.5; ctx.beginPath(); const aa = as - k * .012; ctx.moveTo(Math.cos(aa) * R * .2, Math.sin(aa) * R * .2); ctx.lineTo(Math.cos(aa) * R * .95, Math.sin(aa) * R * .95); ctx.stroke(); }
+        ctx.strokeStyle = `rgba(255,255,255,${pr})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(-Math.cos(as) * R * .08, -Math.sin(as) * R * .08); ctx.lineTo(Math.cos(as) * R * .97, Math.sin(as) * R * .97); ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(0, 0, 3.5, 0, Math.PI * 2); ctx.fill();
+      });
+      // lectura
+      layer(1.1, () => {
+        const pr = p(1.8); if (pr <= 0) return; ctx.globalAlpha = pr;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+        ctx.font = `600 ${Math.max(9, R * .028)}px "JetBrains Mono"`; ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fillText('DÍAS PARA EL SUMMIT', 0, -R * .3);
+        ctx.font = `800 ${R * .3}px "Plus Jakarta Sans"`; ctx.fillStyle = '#fff'; ctx.fillText(String(days).padStart(2, '0'), 0, R * .02);
+        ctx.font = `600 ${Math.max(9, R * .026)}px "JetBrains Mono"`; ctx.fillStyle = 'rgba(255,255,255,.4)'; ctx.fillText('4.6097 N   74.0817 O', 0, R * .16);
+        ctx.globalAlpha = 1;
+      });
+    }
+  };
+}
+
+/* =====================================================================
+   4 FACHADA CINETICA — three.js, lamas que giran
+   ===================================================================== */
+function fachada() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#050506');
+  const cam = new THREE.PerspectiveCamera(30, 1, .1, 200);
+  const pm = new THREE.PMREMGenerator(renderer); const envTex = pm.fromScene(new RoomEnvironment(), .04).texture; scene.environment = envTex;
+  const COLS = 46, ROWS = 26, N = COLS * ROWS, SX = .5, SY = .5;
+  const geo = new THREE.BoxGeometry(SX * .94, SY * .94, .05);
+  const edge = new THREE.MeshStandardMaterial({ color: '#2a2b30', metalness: .9, roughness: .4, envMapIntensity: .5 });
+  const front = new THREE.MeshStandardMaterial({ color: '#4a4c55', metalness: 1, roughness: .28, envMapIntensity: .9 });
+  const back = new THREE.MeshStandardMaterial({ color: ACC.clone(), metalness: .3, roughness: .38, envMapIntensity: .6, emissive: ACC.clone(), emissiveIntensity: .25 });
+  const mesh = new THREE.InstancedMesh(geo, [edge, edge, edge, edge, front, back], N); mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  const wall = new THREE.Group(); wall.add(mesh); scene.add(wall);
+  const key = new THREE.DirectionalLight('#ffffff', 2.4); key.position.set(-8, 6, 5); scene.add(key);
+  const f = new Float32Array(N).fill(1), v = new Float32Array(N);
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), pos = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), ax = new THREE.Vector3(0, 1, 0);
+  const ray = new THREE.Raycaster(), hit = new THREE.Vector3(), local = new THREE.Vector3(999, 999, 0), plane = new THREE.Plane();
+  let lastT = 0;
+  return {
+    kind: 'gl', scene, cam,
+    accent() { back.color.copy(ACC); back.emissive.copy(ACC); },
+    resize(w, h) { cam.aspect = w / h; cam.updateProjectionMatrix(); },
+    update(t) {
+      const dt = Math.min(.05, Math.max(0, t - lastT)); lastT = t;
+      const d = desk();
+      cam.position.set(d ? -3.2 : 0, 0, 15.5); cam.lookAt(d ? 1.2 : 0, 0, 0);
+      wall.rotation.set(mouse.y * .05, -.28 + mouse.x * .07, 0); wall.position.set(d ? 2.2 : 0, 0, 0); wall.updateMatrixWorld();
+      plane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 0, 1).applyQuaternion(wall.quaternion), wall.position);
+      ray.setFromCamera(mouse, cam); if (mpx.in && ray.ray.intersectPlane(plane, hit)) { local.copy(hit); wall.worldToLocal(local); } else local.set(999, 999, 0);
+      const sweep = ((t - 2.5) % 6) / 6 * 28 - 14;
+      let i = 0;
+      for (let c = 0; c < COLS; c++) for (let r = 0; r < ROWS; r++, i++) {
+        const x = (c - COLS / 2 + .5) * SX, y = (r - ROWS / 2 + .5) * SY;
+        const intro = (Math.hypot(c - COLS * .5, r - ROWS * .5) / 30) * 1.6 + .3;
+        let tg = t < intro ? 1 : 0;
+        const dx = x - local.x, dy = y - local.y, dd = dx * dx + dy * dy; if (dd < 2.2) tg = 1;
+        if (t > 3) { const band = (x * .7 + y * .4) - sweep; const ab = Math.abs(band); if (ab < .5) tg = Math.max(tg, 1); else if (ab < 1.4) tg = Math.max(tg, .5 * (1.4 - ab)); }
+        const a = (tg - f[i]) * 38 - v[i] * 7; v[i] += a * dt; f[i] += v[i] * dt;
+        q.setFromAxisAngle(ax, Math.PI * f[i]); pos.set(x, y, 0); m4.compose(pos, q, one); mesh.setMatrixAt(i, m4);
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+    },
+    dispose() { envTex.dispose(); pm.dispose(); geo.dispose(); edge.dispose(); front.dispose(); back.dispose(); }
+  };
+}
+
+/* =====================================================================
+   5 CINTA DE ESTADIO — three.js, LED en anillo
+   ===================================================================== */
+function cinta() {
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#050506');
+  const cam = new THREE.PerspectiveCamera(34, 1, .1, 100); cam.position.set(0, 0, 13);
+  const mk = (lines) => {
+    const c = document.createElement('canvas'); c.width = 4096; c.height = 128; const x = c.getContext('2d');
+    const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.RepeatWrapping; tex.anisotropy = 8;
+    const draw = () => {
+      x.fillStyle = '#000'; x.fillRect(0, 0, 4096, 128);
+      x.font = '800 74px "Plus Jakarta Sans"'; x.textBaseline = 'middle';
+      let px = 40; let k = 0;
+      while (px < 4096) { for (const L of lines) { x.fillStyle = L.a ? ACCHEX : '#ffffff'; x.fillText(L.t, px, 66); px += x.measureText(L.t).width + 50; x.fillStyle = ACCHEX; x.fillRect(px, 58, 70, 10); px += 120; if (px > 4096) break; } if (++k > 20) break; }
+      // mascara de LED
+      x.globalCompositeOperation = 'destination-in';
+      const p = x.createPattern((() => { const m = document.createElement('canvas'); m.width = m.height = 6; const mx = m.getContext('2d'); mx.fillStyle = '#fff'; mx.fillRect(0, 0, 4, 4); return m; })(), 'repeat');
+      x.fillStyle = p; x.fillRect(0, 0, 4096, 128);
+      x.globalCompositeOperation = 'source-over';
+      tex.needsUpdate = true;
+    };
+    draw(); return { tex, draw };
+  };
+  const A = mk([{ t: 'SUMMIT EMPRESARIAL 2026' }, { t: 'BOGOTÁ', a: 1 }, { t: '4 AL 6 DE NOVIEMBRE' }, { t: 'INSCRIPCIONES ABIERTAS', a: 1 }]);
+  const B = mk([{ t: 'PASE GENERAL GRATIS' }, { t: 'CENTRO DE CONVENCIONES ÁGORA', a: 1 }, { t: 'PRESENTADO POR AWS' }]);
+  const ring = (T, r, hgt, rep) => {
+    const g = new THREE.Group(); const geo = new THREE.CylinderGeometry(r, r, hgt, 160, 1, true);
+    T.tex.repeat.set(rep, 1);
+    const fr = new THREE.MeshBasicMaterial({ map: T.tex, side: THREE.FrontSide, transparent: true });
+    const bk = new THREE.MeshBasicMaterial({ map: T.tex, side: THREE.BackSide, transparent: true, opacity: .22 });
+    g.add(new THREE.Mesh(geo, fr), new THREE.Mesh(geo, bk));
+    const rim = new THREE.LineBasicMaterial({ color: '#ffffff', transparent: true, opacity: .18 });
+    for (const yy of [-hgt / 2 - .04, hgt / 2 + .04]) { const pts = []; for (let i = 0; i <= 160; i++) { const a = i / 160 * Math.PI * 2; pts.push(new THREE.Vector3(Math.cos(a) * r, yy, Math.sin(a) * r)); } g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), rim)); }
+    return { g, mats: [fr, bk], geo };
+  };
+  const r1 = ring(A, 4.4, .62, 2), r2 = ring(B, 3.6, .5, 2);
+  const root = new THREE.Group(); root.add(r1.g, r2.g); scene.add(root);
+  const fl = new THREE.Mesh(new THREE.CircleGeometry(9, 64), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .025 })); fl.rotation.x = -Math.PI / 2; fl.position.y = -3.2; root.add(fl);
+  return {
+    kind: 'gl', scene, cam,
+    accent() { A.draw(); B.draw(); },
+    resize(w, h) { cam.aspect = w / h; cam.updateProjectionMatrix(); },
+    update(t) {
+      const d = desk(); root.position.set(d ? 3.3 : 0, d ? 1.2 : 1.6, 0); const s = d ? 1.12 : .62; root.scale.setScalar(s);
+      const spin = ease(t / 2.4); const sp = 1 + (1 - spin) * 14;
+      r1.g.rotation.set(.32 + mouse.y * .12, t * .09 * sp, -.12 + mouse.x * .06);
+      r2.g.rotation.set(-.24 + mouse.y * .1, -t * .12 * sp, .2 + mouse.x * .05);
+      r2.g.position.y = -.35;
+      const o = ease(t / 1.2); r1.mats[0].opacity = o; r1.mats[1].opacity = .22 * o; r2.mats[0].opacity = ease((t - .3) / 1.2); r2.mats[1].opacity = .22 * ease((t - .3) / 1.2);
+      r1.g.scale.setScalar(.6 + .4 * ease(t / 1.6)); r2.g.scale.setScalar(.6 + .4 * ease((t - .3) / 1.6));
+    },
+    dispose() { A.tex.dispose(); B.tex.dispose(); r1.geo.dispose(); r2.geo.dispose(); }
+  };
+}
+
+/* ---------- motor ---------- */
+const FX = { plano, datos, instrumento, fachada, cinta };
+let current = null, currentKey = '', t0 = performance.now();
+function setFx(k) {
+  if (current && current.dispose) current.dispose();
+  currentKey = k; current = FX[k](); t0 = performance.now();
+  canvas.style.visibility = current.kind === 'gl' ? 'visible' : 'hidden';
+  c2.style.visibility = current.kind === '2d' ? 'visible' : 'hidden';
+  if (current.kind === '2d') { renderer.setClearColor('#050506'); renderer.clear(); }
+  resize();
+  document.querySelectorAll('#seg button').forEach(b => b.classList.toggle('on', b.dataset.e === k));
+  store.set('labt-fx', k);
+  const cap = $('#cap'); cap.innerHTML = CAPS[k]; cap.classList.remove('hide'); clearTimeout(cap._t); cap._t = setTimeout(() => cap.classList.add('hide'), 8000);
+}
+function resize() {
+  const { w, h } = size(); renderer.setSize(w, h, false);
+  c2.width = Math.round(w * DPR2); c2.height = Math.round(h * DPR2); ctx.setTransform(DPR2, 0, 0, DPR2, 0, 0);
+  if (current) current.resize(w, h);
+}
+addEventListener('resize', resize);
+document.querySelectorAll('#seg button').forEach(b => b.addEventListener('click', () => setFx(b.dataset.e)));
+document.querySelectorAll('#sw button').forEach(b => b.addEventListener('click', () => setAccent(b.dataset.c)));
+$('#replay').addEventListener('click', () => setFx(currentKey));
+document.body.style.background = '#050506';
+
+function frame(t) {
+  if (!current) return;
+  if (current.kind === 'gl') { current.update(t); renderer.render(current.scene, current.cam); }
+  else current.draw(t);
+}
+function loop() {
+  mouse.lerp(mouseT, .06);
+  frame(reduced ? 8 : (performance.now() - t0) / 1000);
+  requestAnimationFrame(loop);
+}
+
+/* registro y cuenta regresiva */
+const START = new Date('2026-11-04T08:00:00-05:00'), pad = n => String(n).padStart(2, '0');
+function tick() { const ms = Math.max(0, START - Date.now()); $('#cd').textContent = `${Math.floor(ms / 864e5)}D ${pad(Math.floor(ms / 36e5) % 24)}H ${pad(Math.floor(ms / 6e4) % 60)}M ${pad(Math.floor(ms / 1e3) % 60)}S`; }
+tick(); setInterval(tick, 1000);
+$('#form').addEventListener('submit', e => {
+  e.preventDefault(); const f = e.target; let ok = true;
+  f.name.classList.toggle('err', f.name.value.trim().length < 2); if (f.name.value.trim().length < 2) ok = false;
+  const mailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim()); f.email.classList.toggle('err', !mailOk); if (!mailOk) ok = false;
+  $('#cn').classList.toggle('err', !f.consent.checked); if (!f.consent.checked) ok = false;
+  if (!ok) return;
+  const [u, d] = f.email.value.trim().split('@');
+  $('#nm').textContent = f.name.value.trim(); $('#ml').textContent = u[0] + '***@' + d; $('#tn').textContent = 'N.º 0348'; $('#ticket').classList.add('ok');
+  dispatchEvent(new CustomEvent('lab:registered', { detail: { name: f.name.value.trim() } }));
+});
+$('#reset').addEventListener('click', () => { $('#ticket').classList.remove('ok'); $('#form').reset(); $('#tn').textContent = 'GRATIS'; setFx(currentKey); });
+
+setAccent(store.get('labt-acc') || '#3D6BFF');
+const q = new URLSearchParams(location.search).get('e');
+setFx(FX[q] ? q : (FX[store.get('labt-fx')] ? store.get('labt-fx') : 'plano'));
+document.fonts && document.fonts.ready.then(() => { if (current && current.accent) current.accent(); });
+loop();
+window.__lab = { setFx, setAccent, get cur() { return current; }, renderAt(t = 6) { frame(t); } };
+</script>
+</body>
+</html>
