@@ -91,6 +91,11 @@ input.ln { display: block; width: 100%; border: 0; border-bottom: 2px solid var(
 input.ln::placeholder { color: var(--mut2); opacity: .7; }
 input.ln:focus { border-bottom-color: var(--accent); }
 input.ln.err { border-bottom-color: #E5484D; }
+/* "¿Quisiste decir gmail.com?": la mayoria de correos mal escritos son el dominio */
+.sug { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: -2px 0 10px; font-size: 14px; color: var(--mut); }
+.sug[hidden] { display: none; }
+.sug button { border: 1px solid var(--line); background: transparent; color: var(--fg); font: inherit; font-weight: 600; font-size: 13.5px; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+.sug button b { color: var(--accent); font-weight: 700; }
 .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 1.4; color: var(--mut); margin: 14px 0; cursor: pointer; }
 .consent input { width: 17px; height: 17px; margin: 1px 0 0; accent-color: var(--accent); }
 .consent.err { color: #E5484D; }
@@ -665,6 +670,7 @@ body.dx-rv .rv { opacity: 1 !important; transform: none !important; transition: 
     <div class="form">
       <form id="form" novalidate>
         <p class="sent">Hola, me llamo <input class="ln" name="name" placeholder="tu nombre" autocomplete="name"> <span class="mu">trabajo como</span> <input class="ln" name="role" placeholder="tu cargo" autocomplete="organization-title"> <span class="mu">en</span> <input class="ln" name="company" placeholder="tu empresa" autocomplete="organization"> <span class="mu">y mi correo es</span> <input class="ln" name="email" type="email" placeholder="tu@empresa.com" autocomplete="email"></p>
+        <div class="sug" id="sug" hidden aria-live="polite"><span>¿Quisiste decir</span><button type="button" id="sugBtn"></button></div>
         <label class="consent" id="cn"><input type="checkbox" name="consent"> Acepto el tratamiento de mis datos para gestionar mi participación.</label>
         <button class="cta" type="submit">Quiero mi lugar <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </form>
@@ -1214,16 +1220,53 @@ function tick() {
   $('#bigCd').innerHTML = `Faltan <span>${d}</span> días`;
 }
 tick(); setInterval(tick, 1000);
+/* ---------- correo mal escrito: sugerir el dominio comun mas cercano (gmial.com -> gmail.com) ---------- */
+const DOMAINS = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'icloud.com', 'live.com', 'hotmail.es', 'outlook.es', 'yahoo.es', 'msn.com', 'me.com'];
+function lev(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+function suggestMail(v) {
+  const m = v.trim().toLowerCase().match(/^([^\s@]+)@([^\s@]+)$/); if (!m) return null;
+  const dom = m[2]; if (DOMAINS.includes(dom)) return null;
+  let best = null, bd = 3;
+  for (const d of DOMAINS) { const k = lev(dom, d); if (k < bd) { bd = k; best = d; } }
+  return best && bd <= 2 ? `${m[1]}@${best}` : null;
+}
+let sugSeen = '';
+function showSug() {
+  const f = $('#form'), s = suggestMail(f.email.value);
+  $('#sug').hidden = !s; if (s) $('#sugBtn').innerHTML = `${s.split('@')[0]}@<b>${s.split('@')[1]}</b>`;
+  return s;
+}
+$('#form').email.addEventListener('blur', showSug);
+$('#form').email.addEventListener('input', () => { if (!$('#sug').hidden) showSug(); });
+$('#sugBtn').addEventListener('click', () => { const f = $('#form'), s = suggestMail(f.email.value); if (s) f.email.value = s; $('#sug').hidden = true; f.email.classList.remove('err'); });
+
+/* "¿No es tu correo? Corrígelo" desde la confirmacion (cuando no hay sesion): vuelve con lo que escribio */
+try {
+  const fix = sessionStorage.getItem('lv3-fix'), prev = JSON.parse(sessionStorage.getItem('lv3-reg') || 'null');
+  if (fix && prev) {
+    sessionStorage.removeItem('lv3-fix');
+    const f = $('#form'); f.name.value = prev.n || ''; f.role.value = prev.c || ''; f.company.value = prev.o || ''; f.email.value = prev.e || '';
+    requestAnimationFrame(() => { f.email.focus(); f.email.select(); showSug(); });
+  }
+} catch (err) {}
+
 $('#form').addEventListener('submit', e => {
   e.preventDefault(); const f = e.target; let ok = true;
   f.name.classList.toggle('err', f.name.value.trim().length < 2); if (f.name.value.trim().length < 2) ok = false;
   const mailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim()); f.email.classList.toggle('err', !mailOk); if (!mailOk) ok = false;
   $('#cn').classList.toggle('err', !f.consent.checked); if (!f.consent.checked) ok = false;
   if (!ok) return;
-  /* la confirmacion es su propia pagina (lab-confirmacion.html). Los datos viajan en sessionStorage, nunca en la URL */
+  /* si hay sugerencia y aun no la vio, se la mostramos una vez antes de enviar */
+  const sg = showSug(); if (sg && sugSeen !== f.email.value) { sugSeen = f.email.value; return; }
+  /* la confirmacion es su propia pagina (confirmacion.html). Los datos viajan en sessionStorage, nunca en la URL */
   const reg = { n: f.name.value.trim(), e: f.email.value.trim(), c: f.role.value.trim(), o: f.company.value.trim(), t: document.body.classList.contains('light') ? 'light' : 'dark', a: ACCHEX };
   try { sessionStorage.setItem('lv3-reg', JSON.stringify(reg)); } catch (err) {}
-  location.href = 'lab-confirmacion.html';
+  location.href = 'confirmacion.html';
 });
 $('#reset').addEventListener('click', () => { $('#ticket').classList.remove('ok'); $('#form').reset(); $('#tn').textContent = 'Gratis'; });
 

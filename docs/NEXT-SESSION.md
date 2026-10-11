@@ -4,12 +4,46 @@
 >
 > **2026-09-30: el servidor (DigitalOcean) esta EN PAUSA hasta cerrar todas las features. Sigue la
 > landing + widget de registro (`docs/living/PENDIENTES.md` §3, labs en `design/features/landing/`).**
-> **2026-10-04: retomar por el PENDIENTE INMEDIATO de la sesion 2026-10-04 (revision de la confirmacion en iPad/celular).**
+> **2026-10-11: retomar por el PENDIENTE INMEDIATO de la sesion 2026-10-11 (conectar landing y confirmacion al backend real).**
 >
 > Plan de servidor (en pausa): `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`, seccion
 > "ESTADO Y PENDIENTES AL 2026-09-29" (arriba del plan B1-B6): el evento es el **domingo 6 de
 > diciembre de 2026**, 5.000 personas; pendientes P.0-P.6 en orden y calendario por semana.
 > Lo de webapp sigue en `docs/living/PENDIENTES-WEBAPP.md`.
+
+---
+
+## SESION 2026-10-11 (Opus 5.5) — CONFIRMACION CERRADA EN DISEÑO + REGISTRO PUBLICO SIN CONTRASEÑA EN BACKEND
+
+**Ventana: `docs/living/PENDIENTES.md` §3 Post-registro. Pagina real: `design/features/landing/confirmacion.html`.**
+
+### Decisiones Kamilo (no re-preguntar)
+
+- iPad bien. Celular: la escarapela se achica sola para que escarapela + mensaje + boton quepan sin scroll (iPhone SE bajito aun scrollea ~50 px).
+- Version fija sin barra de opciones: Noir oscura / Lux crema, cinta por la ranura, Sutil. `lab-confirmacion.html` queda como historico.
+- **Consistencia con el backend:** fuera "Pase general" y "0348" (no existen: el asistente tiene `role` de permisos y `tags` libres,
+  sin tipo de entrada ni numero). Nombre una sola vez (fuera nombre e iniciales del lado del QR).
+- **Cinta:** blanda, con holgura, puntas quietas; la lengueta gira entera con la tarjeta. Torcida en punta descartada ("se ve rara").
+- **Registro sin contraseña** (backend `feature/magic-link-auth` 87e519e): `POST /api/v1/public/events/{slug}/register` ->
+  `registered` (con sesion; la confirmacion pide `GET /me/qr` como Expo — no hacia falta "QR sin sesion"), `pending` (aprobacion
+  manual, sin sesion), `existing` (ya tenia cuenta: reenvia el enlace; Kamilo acepta que delate que el correo existe).
+- **Correo mal escrito:** correo completo en la confirmacion + "¿No es tu correo? Corrígelo" (`PATCH /api/v1/me/email`, solo
+  cuenta < 24 h sin entrar ni verificar; sin sesion vuelve al registro con lo escrito) + "¿Quisiste decir gmail.com?" en el registro.
+- Rayas del fondo (mismo error del hero 2026-10-04): mask del oscurecido solo sobre los cubos en confirmacion y labs.
+
+### Labs nuevos
+
+- `lab-cinta.html` (Como esta / Blanda), `lab-confirmacion-estados.html` (Registrado / Ya tenia su lugar / En revision; igual a la real + barra).
+
+### Tests
+
+- Backend: PublicRegistrationTest 9 + ChangeEmailTest 5 (16/16 con PublicEvent). Auth + Security/StaffApiToken + RateLimiting 123/123.
+
+### PENDIENTE INMEDIATO
+
+1. Conectar landing + confirmacion al backend real (hoy simulan las respuestas): eso es "pasar al stack real" — decidir donde vive la
+   landing (Next de eventos-web vs Astro, PENDIENTES §3 Stack) y CORS. Desde el iPad por Tailscale no se llega a `eventos-backend.test`.
+2. Despues: revision completa de Lux, widget embebible.
 
 ---
 

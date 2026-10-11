@@ -134,7 +134,7 @@
 - [ ] Tema del widget: hereda branding del evento (accent/logo), Noir/Lux auto
 - [ ] Config en admin: cluster Entrada → tab "Widget" (generar snippet + dominios)
 
-### Post-registro (diseño en lab 2026-10-04: `design/features/landing/lab-confirmacion.html`)
+### Post-registro (pagina: `design/features/landing/confirmacion.html`; labs `lab-confirmacion-estados.html`, `lab-cinta.html`)
 
 > Decisiones Kamilo 2026-10-04: la confirmacion es una **pagina propia** (no el panel del registro), con poco
 > texto y **celebracion** (ola del color del cliente en la escena del hero); **escarapela colgante** con animacion
@@ -143,10 +143,17 @@
 
 - [x] Frase del registro con cargo y empresa (opcionales): "Hola, me llamo ___ trabajo como ___ en ___ y mi correo es ___" (v3)
 - [x] Lab de la pagina de confirmacion (Noir/Lux, celular, movimiento reducido) y paso desde el registro de la v3
-- [ ] Revision de Kamilo en iPad y celular (la franja negra abajo que aparecio una vez al llegar desde el registro)
-- [ ] Cinta de la escarapela creible: curva blanda con holgura (no tiesa) y el giro tuerce la cinta en vez de girar la tarjeta sola (lab primero)
-- [ ] Backend: entregar el QR dinamico (`d.{attendee}.{ventana}.{firma}`, 60 s) a la pagina de confirmacion SIN sesion (hoy `GET /me/qr` exige auth) — decision abierta
-- [ ] Backend: guardar cargo y empresa del registro publico en el asistente
+- [x] Revision de Kamilo en iPad (bien) y celular: escarapela gigante -> se achica sola para caber en una pantalla (2026-10-11)
+- [x] Version fija `confirmacion.html` (Noir oscura / Lux crema, cinta por la ranura, Sutil); el registro de la v3 lleva ahi
+- [x] Sin datos inventados: fuera "Pase general" y "0348" (el backend no tiene tipo de entrada ni numero); el nombre no se repite atras del QR
+- [x] Cinta blanda: puntas quietas, holgura y retraso en el balanceo; la lengueta gira entera con la tarjeta (torcida en punta descartada: "se ve rara")
+- [x] Backend 87e519e: `POST /api/v1/public/events/{slug}/register` sin contraseña -> registered (sesion: la confirmacion pide `/me/qr`) / pending / existing (reenvia el acceso). Cargo y empresa ya se guardaban en el usuario.
+- [x] Confirmacion con los 3 estados (registered / existing "ya tenias tu lugar" / pending "en revision"); sin sesion no hay QR ni giro
+- [x] Correo completo (sin censura) + "¿No es tu correo? Corrígelo": con sesion `PATCH /api/v1/me/email` (cuenta < 24 h, sin entrar, sin verificar); sin sesion vuelve al registro con lo escrito
+- [x] Registro: "¿Quisiste decir gmail.com?" (dominios comunes, distancia <= 2)
+- [x] Rayas del fondo en la confirmacion (mismo error del hero): mask del oscurecido solo sobre los cubos
+- [ ] Credencial con etiqueta visible (VIP, Prensa): en el admin marcar que tags salen en la escarapela (idea Kamilo 2026-10-11, despues)
+- [ ] "Ya tenias tu lugar" con varios eventos: hoy sale tambien si el correo tiene cuenta en OTRO evento y no en este
 - [ ] Pasar la confirmacion al stack real de la landing
 
 ### Endpoints publicos
