@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab registro por pasos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Lab 2026-10-11 — Kamilo: "esa tarjeta se ve super grande, mejor tipo step step y conservar pocos campos; asi pierde la gracia".
+   Tres direcciones con el mismo boleto del v3 (boleto A):
+   A = la frase por pasos (una pregunta a la vez; cargo y empresa opcionales con "Saltar")
+   B = solo nombre y correo; cargo y empresa despues, en la confirmacion ("Completa tu escarapela")
+   C = un solo renglon que cambia; el boleto no crece nunca */
+:root {
+  --accent: #3D6BFF; --on-accent: #fff;
+  --bg: #050506; --fg: #fff; --mut: rgba(255,255,255,.62); --mut2: rgba(255,255,255,.42); --line: rgba(255,255,255,.1);
+  --card: #121215; --shadow: 0 30px 80px rgba(0,0,0,.55);
+  --spring: cubic-bezier(.34,1.36,.5,1); --ease: cubic-bezier(.2,.8,.2,1); --out: cubic-bezier(.16,1,.3,1);
+}
+body.light { --bg: #F2EEE7; --fg: #141414; --mut: rgba(20,20,20,.62); --mut2: rgba(20,20,20,.45); --line: rgba(20,20,20,.1); --card: #FBF9F5; --shadow: 0 30px 70px rgba(60,45,25,.16), 0 2px 6px rgba(60,45,25,.06); }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: 'Urbanist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: var(--bg); color: var(--fg); min-height: 100vh; transition: background .4s var(--ease); }
+body:not(.light) { background: radial-gradient(120% 80% at 70% 100%, #10131f 0%, #050506 60%); }
+body.light { background: radial-gradient(120% 80% at 70% 100%, #eae2d4 0%, #F2EEE7 60%); }
+button, input { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+
+.bar { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 9px 16px; background: #0b0b0c; color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 13px; }
+.bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14px; }
+.seg { display: flex; padding: 3px; gap: 2px; border-radius: 10px; background: #1c1c1f; }
+.seg button { border: 0; background: none; color: rgba(255,255,255,.6); font-weight: 600; font-size: 12.5px; padding: 6px 10px; border-radius: 7px; cursor: pointer; }
+.seg button.on { background: #fff; color: #111; }
+.bar .rep { margin-left: auto; border: 0; background: #fff; color: #111; font-weight: 700; font-size: 12.5px; padding: 7px 12px; border-radius: 9px; cursor: pointer; }
+
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; padding: 40px 32px 64px; max-width: 1380px; margin: 0 auto; align-items: start; }
+.col h2 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 22px; letter-spacing: -.02em; margin: 0 0 6px; }
+.col p.d { margin: 0 0 18px; color: var(--mut); font-size: 15px; line-height: 1.45; min-height: 66px; }
+@media (max-width: 1080px) { .grid { grid-template-columns: 1fr; max-width: 460px; padding: 28px 16px 48px; } .col p.d { min-height: 0; } }
+
+/* el boleto del v3 */
+.ticket { position: relative; background: color-mix(in srgb, var(--card) 94%, transparent); border: 1px solid var(--line); border-radius: 24px; padding: 24px; box-shadow: var(--shadow); overflow: hidden; }
+.t-head { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; line-height: 1; color: var(--mut2); }
+.t-head b { color: var(--accent); }
+.prog { height: 2px; background: var(--line); border-radius: 2px; margin: 16px 0 0; overflow: hidden; }
+.prog i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .6s var(--out); }
+.sent { font-family: 'Plus Jakarta Sans'; font-weight: 600; font-size: 24px; letter-spacing: -.03em; line-height: 1.3; margin: 16px 0 0; }
+.sent .mu { opacity: .5; }
+input.ln { display: block; width: 100%; border: 0; border-bottom: 2px solid var(--line); background: transparent; outline: none; font-size: 22px; letter-spacing: normal; color: var(--accent); padding: 0 2px; margin: 6px 0 4px; border-radius: 0; }
+input.ln::placeholder { color: var(--mut2); opacity: .7; }
+input.ln:focus { border-bottom-color: var(--accent); }
+input.ln.err { border-bottom-color: #E5484D; }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 1.4; color: var(--mut); margin: 14px 0 0; cursor: pointer; }
+.consent input { width: 17px; height: 17px; margin: 1px 0 0; accent-color: var(--accent); flex: none; }
+.consent.err { color: #E5484D; }
+.row { display: flex; gap: 10px; align-items: center; margin-top: 16px; }
+.cta { display: flex; align-items: center; justify-content: center; gap: 10px; flex: 1; height: 52px; border: 0; border-radius: 14px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 16px; cursor: pointer; transition: transform .25s var(--spring); }
+body.light .cta { background: #141414; color: #fff; }
+.cta:hover { transform: translateY(-2px); }
+.cta svg, .back svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.back { width: 52px; height: 52px; flex: none; display: grid; place-items: center; border-radius: 14px; border: 1px solid var(--line); background: transparent; cursor: pointer; }
+.skip { height: 52px; padding: 0 18px; border-radius: 14px; border: 1px solid var(--line); background: transparent; font-weight: 700; font-size: 15px; cursor: pointer; }
+.t-note { font-size: 13px; color: var(--mut); margin-top: 12px; }
+/* A: el boleto NUNCA cambia de tamaño (Kamilo 2026-10-11: "no puede crecer, se ve raro").
+   Cada paso tiene los mismos 4 espacios fijos: pregunta (3 renglones reservados, pegada abajo para que el campo
+   no se mueva), campo, botones y una linea al pie (nota, aceptacion o error). */
+#A .steps { height: 252px; }
+#A .q { height: 94px; margin: 14px 0 0; display: flex; align-items: flex-end; font-size: 22px; line-height: 1.4; overflow: hidden; }
+#A .row { margin-top: 14px; }
+#A .foot { height: 40px; margin-top: 10px; font-size: 13px; color: var(--mut); line-height: 1.4; overflow: hidden; }
+#A .foot .consent { margin: 0; }
+/* pasos: entra de abajo, sale hacia arriba */
+.steps { position: relative; }
+.step { display: none; }
+.step.on { display: block; animation: stepIn .5s var(--out); }
+@keyframes stepIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .step.on { animation: none; } }
+.done .big { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 30px; letter-spacing: -.035em; line-height: 1.05; margin: 16px 0 8px; }
+.done .big em { font-style: normal; color: var(--accent); }
+
+/* B: escarapela que se completa */
+.mini { display: flex; gap: 18px; align-items: flex-start; margin-top: 16px; }
+.badge { width: 132px; flex: none; aspect-ratio: 300 / 412; border-radius: 12px; background: #0a0a0a; color: #fff; border: 1px solid rgba(255,255,255,.12); padding: 16px 11px 10px; display: flex; flex-direction: column; box-shadow: 0 14px 30px -10px rgba(0,0,0,.6); position: relative; }
+body.light .badge { background: #fbf8f2; color: #141414; border-color: rgba(60,45,25,.12); box-shadow: 0 14px 30px -10px rgba(60,45,25,.3); }
+.badge::before { content: ""; position: absolute; left: 50%; top: 5px; width: 22px; height: 5px; transform: translateX(-50%); border-radius: 3px; background: var(--bg); }
+.badge .ev { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 8px; }
+.badge .who { margin-top: auto; }
+.badge .who i { display: block; width: 14px; height: 2px; background: var(--accent); margin-bottom: 7px; }
+.badge .nm { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 19px; line-height: .98; letter-spacing: -.04em; overflow-wrap: anywhere; }
+.badge .cg { font-weight: 600; font-size: 9px; margin-top: 6px; min-height: 11px; transition: opacity .3s; }
+.badge .co { font-size: 8px; opacity: .55; min-height: 10px; }
+.mini .fields { flex: 1; min-width: 0; }
+.mini .fields .lbl { font-size: 13px; color: var(--mut); margin-top: 4px; }
+.mini input.ln { font-size: 18px; }
+
+/* C: un solo renglon */
+.oneline .q { font-family: 'Plus Jakarta Sans'; font-weight: 600; font-size: 22px; letter-spacing: -.03em; margin: 16px 0 0; min-height: 30px; }
+.oneline .q .mu { opacity: .5; }
+.field { display: flex; align-items: center; gap: 10px; border-bottom: 2px solid var(--line); margin-top: 6px; }
+.field:focus-within { border-bottom-color: var(--accent); }
+.field.err { border-bottom-color: #E5484D; }
+.field input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font-size: 22px; color: var(--accent); padding: 4px 2px 6px; }
+.field input::placeholder { color: var(--mut2); opacity: .7; }
+.field .go { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 12px; border: 0; background: var(--accent); color: var(--on-accent); cursor: pointer; margin-bottom: 6px; }
+body.light .field .go { background: #141414; color: #fff; }
+.field .go svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; min-height: 30px; }
+.chips span { font-size: 13px; font-weight: 600; padding: 6px 11px; border-radius: 999px; border: 1px solid var(--line); color: var(--mut); animation: stepIn .4s var(--out); }
+.chips span b { color: var(--fg); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <b>Registro por pasos</b>
+  <div class="seg" id="thm"><button data-t="dark" class="on">Noir</button><button data-t="light">Lux</button></div>
+  <div class="seg" id="code"><button data-c="0" class="on">Sin código</button><button data-c="1">El evento pide código</button></div>
+  <button class="rep" id="again">Reiniciar</button>
+</div>
+
+<div class="grid">
+  <!-- A: la frase por pasos -->
+  <section class="col">
+    <h2>A. La frase por pasos</h2>
+    <p class="d">Una pregunta a la vez, como conversación. Cargo y empresa al final, opcionales: se pueden dejar vacíos.</p>
+    <div class="ticket" id="A">
+      <div class="t-head"><span>Tu registro</span><b>Gratis</b></div>
+      <div class="prog"><i></i></div>
+      <div class="steps">
+        <div class="step" data-s="name">
+          <p class="sent q"><span class="qt">Hola, me llamo</span></p>
+          <input class="ln" data-f="name" placeholder="tu nombre" autocomplete="name">
+          <div class="row"><button class="cta" data-next>Seguir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+          <div class="foot">Sin contraseña. Tu acceso llega a tu correo.</div>
+        </div>
+        <div class="step" data-s="email">
+          <p class="sent q"><span class="qt"><span class="mu">Mucho gusto, <span data-name></span>.</span> ¿A qué correo te enviamos tu acceso?</span></p>
+          <input class="ln" data-f="email" type="email" placeholder="tu@empresa.com" autocomplete="email">
+          <div class="row"><button class="back" data-prev aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button><button class="cta" data-next>Seguir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+          <div class="foot"></div>
+        </div>
+        <div class="step" data-s="code">
+          <p class="sent q"><span class="qt"><span class="mu">Este evento es con invitación.</span> ¿Cuál es tu código?</span></p>
+          <input class="ln" data-f="code" placeholder="tu código" autocomplete="off">
+          <div class="row"><button class="back" data-prev aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button><button class="cta" data-next>Seguir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+          <div class="foot"></div>
+        </div>
+        <div class="step" data-s="role">
+          <p class="sent q"><span class="qt"><span class="mu">Para tu escarapela,</span> trabajo como</span></p>
+          <input class="ln" data-f="role" placeholder="tu cargo" autocomplete="organization-title">
+          <div class="row"><button class="back" data-prev aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button><button class="cta" data-next>Seguir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+          <div class="foot">Opcional. Puedes dejarlo vacío.</div>
+        </div>
+        <div class="step" data-s="company">
+          <p class="sent q"><span class="qt"><span class="mu">Para tu escarapela,</span> trabajo en</span></p>
+          <input class="ln" data-f="company" placeholder="tu empresa" autocomplete="organization">
+          <div class="row"><button class="back" data-prev aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button><button class="cta" data-submit>Quiero mi lugar <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+          <div class="foot"><label class="consent"><input type="checkbox" data-f="consent"> Acepto el tratamiento de mis datos para gestionar mi participación.</label></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B: solo nombre y correo -->
+  <section class="col">
+    <h2>B. Solo dos datos</h2>
+    <p class="d">Nombre y correo, y listo. Cargo y empresa se piden después, en la confirmación, y aparecen en la escarapela mientras escribes.</p>
+    <div class="ticket" id="B">
+      <div class="t-head"><span>Tu registro</span><b>Gratis</b></div>
+      <div class="steps">
+        <div class="step" data-s="form">
+          <p class="sent">Hola, me llamo</p>
+          <input class="ln" data-f="name" placeholder="tu nombre" autocomplete="name">
+          <p class="sent" style="margin-top:8px"><span class="mu">y mi correo es</span></p>
+          <input class="ln" data-f="email" type="email" placeholder="tu@empresa.com" autocomplete="email">
+          <div class="code-only"><p class="sent" style="margin-top:8px"><span class="mu">y mi código es</span></p><input class="ln" data-f="code" placeholder="tu código" autocomplete="off"></div>
+          <label class="consent"><input type="checkbox" data-f="consent"> Acepto el tratamiento de mis datos para gestionar mi participación.</label>
+          <div class="row"><button class="cta" data-submit>Quiero mi lugar <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+        </div>
+        <div class="step" data-s="done">
+          <div class="done"><div class="big"><span data-name></span>, ya tienes tu <em>lugar</em>.</div></div>
+          <div class="t-note" style="margin-top:0">En la confirmación: completa tu escarapela (opcional).</div>
+          <div class="mini">
+            <div class="badge"><div class="ev">Summit Empresarial 2026</div><div class="who"><i></i><div class="nm" data-badge-name></div><div class="cg" data-badge-role></div><div class="co" data-badge-co></div></div></div>
+            <div class="fields">
+              <div class="lbl">Trabajo como</div><input class="ln" data-live="role" placeholder="tu cargo">
+              <div class="lbl">en</div><input class="ln" data-live="company" placeholder="tu empresa">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- C: un solo renglon -->
+  <section class="col">
+    <h2>C. Un solo renglón</h2>
+    <p class="d">Una línea que cambia de pregunta. El boleto siempre tiene el mismo tamaño; lo que ya dijiste queda arriba como etiquetas.</p>
+    <div class="ticket oneline" id="C">
+      <div class="t-head"><span>Tu registro</span><b>Gratis</b></div>
+      <div class="chips" data-chips></div>
+      <p class="q" data-q></p>
+      <div class="field" data-field><input data-in autocomplete="off"><button class="go" data-go aria-label="Seguir"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      <label class="consent" data-consent hidden><input type="checkbox"> Acepto el tratamiento de mis datos para gestionar mi participación.</label>
+      <div class="t-note" data-note>Sin contraseña. Tu acceso llega a tu correo.</div>
+    </div>
+  </section>
+</div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const MAIL = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+let needCode = false;
+const first = v => (v.trim().split(/\s+/)[0] || '');
+
+/* ---------- A ---------- */
+function setupA() {
+  const t = $('#A'); const order = () => ['name', 'email', ...(needCode ? ['code'] : []), 'role', 'company'];
+  let i = 0;
+  const show = () => {
+    const seq = order(), s = seq[i];
+    $$('.step', t).forEach(x => x.classList.toggle('on', x.dataset.s === s));
+    $('.prog i', t).style.width = ((i + 1) / seq.length) * 100 + '%';
+    $$('[data-name]', t).forEach(x => x.textContent = first($('[data-f=name]', t).value));
+    const inp = $(`.step[data-s="${s}"] input.ln`, t); inp && requestAnimationFrame(() => inp.focus({ preventScroll: true }));
+  };
+  const valid = () => {
+    const s = order()[i], inp = $(`.step[data-s="${s}"] input.ln`, t);
+    const ok = s === 'name' ? inp.value.trim().length >= 2 : s === 'email' ? MAIL(inp.value) : s === 'code' ? inp.value.trim().length > 0 : true;
+    if (inp) inp.classList.toggle('err', !ok); return ok;
+  };
+  $$('[data-next]', t).forEach(b => b.onclick = () => { if (valid()) { i++; show(); } });
+  $$('[data-prev]', t).forEach(b => b.onclick = () => { i = Math.max(0, i - 1); show(); });
+  $$('input.ln', t).forEach(x => x.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); const b = $('[data-next],[data-submit]', x.closest('.step')); b && b.click(); } });
+  /* "Quiero mi lugar": no hay paso final en el boleto, va directo a la pagina de confirmacion con la escarapela */
+  $('[data-submit]', t).onclick = () => {
+    const c = $('[data-f=consent]', t); $('.consent', t).classList.toggle('err', !c.checked); if (!c.checked) return;
+    const v = k => $(`[data-f=${k}]`, t).value.trim();
+    const reg = { n: v('name'), e: v('email'), c: v('role'), o: v('company'), t: document.body.classList.contains('light') ? 'light' : 'dark', a: '#3D6BFF' };
+    try { sessionStorage.setItem('lv3-reg', JSON.stringify(reg)); } catch (e) {}
+    location.href = 'confirmacion.html';
+  };
+  t.reset = () => { $$('input', t).forEach(x => { x.value = ''; x.checked = false; x.classList.remove('err'); }); $$('.consent', t).forEach(x => x.classList.remove('err')); i = 0; show(); };
+  t.reset();
+}
+
+/* ---------- B ---------- */
+function setupB() {
+  const t = $('#B');
+  const show = s => $$('.step', t).forEach(x => x.classList.toggle('on', x.dataset.s === s));
+  $('[data-submit]', t).onclick = () => {
+    const n = $('[data-f=name]', t), m = $('[data-f=email]', t), k = $('[data-f=code]', t), c = $('[data-f=consent]', t);
+    const okN = n.value.trim().length >= 2, okM = MAIL(m.value), okK = !needCode || k.value.trim(), okC = c.checked;
+    n.classList.toggle('err', !okN); m.classList.toggle('err', !okM); k.classList.toggle('err', !okK); $('.consent', t).classList.toggle('err', !okC);
+    if (!(okN && okM && okK && okC)) return;
+    const parts = n.value.trim().split(/\s+/);
+    $$('[data-name]', t).forEach(x => x.textContent = parts[0]);
+    $('[data-badge-name]', t).innerHTML = parts.length > 1 ? `${parts[0]}<br>${parts.slice(1).join(' ')}` : parts[0];
+    show('done'); requestAnimationFrame(() => $('[data-live=role]', t).focus({ preventScroll: true }));
+  };
+  $('[data-live=role]', t).oninput = e => $('[data-badge-role]', t).textContent = e.target.value;
+  $('[data-live=company]', t).oninput = e => $('[data-badge-co]', t).textContent = e.target.value;
+  t.reset = () => { $$('input', t).forEach(x => { x.value = ''; x.checked = false; x.classList.remove('err'); }); $('[data-badge-role]', t).textContent = ''; $('[data-badge-co]', t).textContent = ''; $('.code-only', t).hidden = !needCode; show('form'); };
+  t.reset();
+}
+
+/* ---------- C ---------- */
+function setupC() {
+  const t = $('#C'), inp = $('[data-in]', t), field = $('[data-field]', t);
+  const qs = () => [
+    { k: 'name', q: 'Hola, me llamo', ph: 'tu nombre', ok: v => v.trim().length >= 2, chip: v => v.trim() },
+    { k: 'email', q: n => `<span class="mu">Mucho gusto, ${n}.</span> Tu correo`, ph: 'tu@empresa.com', type: 'email', ok: MAIL, chip: v => v.trim() },
+    ...(needCode ? [{ k: 'code', q: '<span class="mu">Es con invitación.</span> Tu código', ph: 'tu código', ok: v => v.trim().length > 0, chip: () => 'Código listo' }] : []),
+    { k: 'role', q: '<span class="mu">Opcional.</span> Trabajo como', ph: 'tu cargo', ok: () => true, chip: v => v.trim(), opt: true },
+    { k: 'company', q: '<span class="mu">Opcional.</span> en', ph: 'tu empresa', ok: () => true, chip: v => v.trim(), opt: true, last: true },
+  ];
+  let i = 0, data = {};
+  const render = () => {
+    const list = qs(), s = list[i];
+    $('[data-chips]', t).innerHTML = Object.entries(data).filter(([, v]) => v).map(([k, v]) => `<span>${k === 'code' ? v : `<b>${v}</b>`}</span>`).join('');
+    if (!s) {
+      $('[data-q]', t).innerHTML = `${first(data.name)}, ya tienes tu <span style="color:var(--accent)">lugar</span>.`; field.hidden = true; $('[data-consent]', t).hidden = true;
+      $('[data-note]', t).textContent = 'Aquí sigue la página de confirmación con la escarapela.'; return;
+    }
+    field.hidden = false; $('[data-q]', t).innerHTML = typeof s.q === 'function' ? s.q(first(data.name)) : s.q;
+    inp.value = ''; inp.placeholder = s.ph; inp.type = s.type || 'text'; field.classList.remove('err');
+    $('[data-consent]', t).hidden = !s.last; $('[data-note]', t).textContent = s.opt ? 'Puedes dejarlo vacío y seguir.' : 'Sin contraseña. Tu acceso llega a tu correo.';
+    requestAnimationFrame(() => inp.focus({ preventScroll: true }));
+  };
+  const next = () => {
+    const s = qs()[i]; if (!s) return;
+    if (!s.ok(inp.value)) { field.classList.add('err'); return; }
+    if (s.last) { const c = $('[data-consent] input', t); $('[data-consent]', t).classList.toggle('err', !c.checked); if (!c.checked) return; }
+    data[s.k] = s.chip(inp.value); i++; render();
+  };
+  $('[data-go]', t).onclick = next; inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); next(); } };
+  t.reset = () => { i = 0; data = {}; $('[data-consent] input', t).checked = false; $('[data-consent]', t).classList.remove('err'); render(); };
+  t.reset();
+}
+
+setupA(); setupB(); setupC();
+const resetAll = () => ['A', 'B', 'C'].forEach(id => $('#' + id).reset());
+$$('#thm button').forEach(b => b.onclick = () => { $$('#thm button').forEach(x => x.classList.toggle('on', x === b)); document.body.classList.toggle('light', b.dataset.t === 'light'); });
+$$('#code button').forEach(b => b.onclick = () => { $$('#code button').forEach(x => x.classList.toggle('on', x === b)); needCode = b.dataset.c === '1'; resetAll(); });
+$('#again').onclick = resetAll;
+</script>
+</body>
+</html>
