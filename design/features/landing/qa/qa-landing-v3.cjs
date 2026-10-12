@@ -142,7 +142,7 @@ async function anchorCovered(page, theme) {
       check(tag, 'patrocinadores: tarjetas iguales', same, JSON.stringify(m.plx));
     }
     /* 4. columnas de speakers */
-    const wantCols = v.w <= 600 ? 2 : v.w <= 1100 ? 3 : 4;
+    const wantCols = v.w <= 600 ? 3 : v.w <= 1100 ? 4 : 6; /* 2026-10-11: 6 columnas elegidas (18 speakers reales) */
     if (m.spkCols) check(tag, 'speakers: columnas', m.spkCols === wantCols, `${m.spkCols} (esperado ${wantCols})`);
     /* 5. Noir: pasos juntos en iPad y celular */
     if (m.stepGaps && v.touch) check(tag, 'experiencia: espacio entre pasos', m.stepGaps.every(g => g <= 130), m.stepGaps.join(', '));

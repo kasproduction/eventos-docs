@@ -662,7 +662,18 @@ body.spk-b .lxs-nm b, body.spk-c .lxs-nm b { font-size: 16px; } body.spk-b .lxs-
 body.spk-a .spk .who b { font-size: 19px; } body.spk-a .spk .ba q { font-size: 18px; }
 body.spk-a .lxs-back { padding: calc(26% + 16px) 18px 18px; } body.spk-a .lxs-back q { font-size: 17px; } body.spk-a .lxs-back .tk b { font-size: 14px; }
 body.spk-b .lxs-back, body.spk-c .lxs-back { padding: calc(26% + 12px) 14px 14px; border-radius: 20px; } body.spk-b .lxs-back q, body.spk-c .lxs-back q { font-size: 14px; } body.spk-b .lxs-back .tk small, body.spk-c .lxs-back .tk small { font-size: 11.5px; } body.spk-b .lxs-back .tk b, body.spk-c .lxs-back .tk b { font-size: 12.5px; }
-@media (max-width: 1100px) { body.spk-a .spk-grid, body.spk-a .lxs-grid { grid-template-columns: repeat(4, 1fr); } body.spk-b .spk-grid, body.spk-b .lxs-grid, body.spk-c .spk-grid, body.spk-c .lxs-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 1100px) { body.spk-a .spk-grid, body.spk-a .lxs-grid, body.spk-b .spk-grid, body.spk-b .lxs-grid, body.spk-c .spk-grid, body.spk-c .lxs-grid { grid-template-columns: repeat(4, 1fr); } } /* iPad vertical: 4 (a 5 o 6 las caras quedan muy chicas) */
+/* celular a 3 columnas: el reverso se resume (idea en 4 lineas, charla en 2) para que no quede cortado al tocar */
+@media (max-width: 600px) {
+  body.spk-b .spk .ba, body.spk-c .spk .ba { padding: 10px 10px 9px; border-radius: 14px; }
+  body.spk-b .spk .ba q, body.spk-c .spk .ba q, body.spk-b .lxs-back q, body.spk-c .lxs-back q { font-size: 12.5px; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  body.spk-b .spk .ba .tk, body.spk-c .spk .ba .tk { padding-top: 8px; }
+  body.spk-b .spk .ba .tk small, body.spk-c .spk .ba .tk small, body.spk-b .spk .ba .nm, body.spk-c .spk .ba .nm, body.spk-b .lxs-back .tk small, body.spk-c .lxs-back .tk small { display: none; }
+  body.spk-b .spk .ba .tk b, body.spk-c .spk .ba .tk b, body.spk-b .lxs-back .tk b, body.spk-c .lxs-back .tk b { font-size: 11.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  body.spk-b .spk .who, body.spk-c .spk .who { left: 9px; right: 9px; bottom: 8px; } body.spk-b .spk .who b, body.spk-c .spk .who b { font-size: 13px; } body.spk-b .spk .who span, body.spk-c .spk .who span { font-size: 10.5px; }
+  body.spk-b .lxs-back, body.spk-c .lxs-back { padding: calc(26% + 8px) 10px 10px; }
+  body.spk-b .lxs-nm b, body.spk-c .lxs-nm b { font-size: 13.5px; } body.spk-b .lxs-nm span, body.spk-c .lxs-nm span { font-size: 11.5px; }
+}
 @media (max-width: 600px) { body.spk-a .spk-grid, body.spk-a .lxs-grid { grid-template-columns: 1fr 1fr; } body.spk-b .spk-grid, body.spk-b .lxs-grid, body.spk-c .spk-grid, body.spk-c .lxs-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
 </style>
 </head>
@@ -837,7 +848,7 @@ const SPEAKERS = [
 const img = n => `https://i.pravatar.cc/700?img=${n}`;
 /* lab-speakers-tamano.html: ?n=18 completa la lista (como el evento real) y ?spk=a|b|c cambia la densidad */
 (() => {
-  const q = new URLSearchParams(location.search), n = +q.get('n') || 0, d = q.get('spk');
+  const q = new URLSearchParams(location.search), n = +q.get('n') || 0, d = q.get('spk') ?? 'b'; /* 2026-10-11 Kamilo: 6 columnas por defecto */
   if (d) document.body.classList.add('spk-' + d);
   const base = SPEAKERS.length, extra = [3, 8, 9, 11, 13, 15, 32, 33, 51, 52, 53, 60, 65, 68];
   for (let i = base; i < n; i++) { const s = SPEAKERS[i % base]; SPEAKERS.push([s[0].split(' ')[0] + ' ' + ['Mejía', 'Rojas', 'Pardo', 'Lozano', 'Vélez', 'Ortiz', 'Cano', 'Duque', 'Salas', 'Mora'][i % 10], s[1], s[2], extra[i % extra.length], s[4]]); }
@@ -1087,7 +1098,7 @@ function revealByRow(grid, sel, mode) {
   const ob = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('seen'); ob.unobserve(e.target); } }), { threshold: .25 });
   cards.forEach(c => ob.observe(c));
 }
-const AP = new URLSearchParams(location.search).get('ap');
+const AP = new URLSearchParams(location.search).get('ap') ?? 'c'; /* 2026-10-11 Kamilo: fila por fila + tono parejo por defecto */
 if (AP) document.body.classList.add('ap-' + AP);
 if (AP) revealByRow($('#spkGrid'), '.spk', AP); else new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { ob.disconnect(); $$('#spkGrid .spk').forEach(c => c.classList.add('seen')); } }), { threshold: .2 }).observe($('#spkGrid'));
 const TOUCH = matchMedia('(hover: none)').matches;
