@@ -51,12 +51,14 @@ function measure(secs) {
   const sticky = [...document.querySelectorAll('*')].filter(e => getComputedStyle(e).position === 'sticky');
   /* y se ubican donde la persona los ve por ultima vez: al soltarse, pegados al final de su contenedor */
   sticky.forEach(e => { e.dataset.qaPos = e.style.position; e.style.position = 'relative'; });
+  /* el inicio de cada seccion se mide con lo fijo en su lugar natural (donde aparece al llegar) */
+  const tops = new Map(secs.map(q => document.querySelector(q)).filter(Boolean).filter(vis).map(sec => [sec, ink(sec).top]));
   sticky.forEach(e => { const pr = e.parentElement.getBoundingClientRect(), pb = parseFloat(getComputedStyle(e.parentElement).paddingBottom) || 0, r = e.getBoundingClientRect(); e.dataset.qaTf = e.style.transform; e.style.transform = `translateY(${pr.bottom - pb - r.bottom}px)`; });
   const list = secs.map(s => document.querySelector(s)).filter(Boolean).filter(vis);
   const gaps = [];
   for (let i = 0; i < list.length - 1; i++) {
-    const a = ink(list[i]), b = ink(list[i + 1]);
-    gaps.push({ from: '#' + list[i].id, to: '#' + list[i + 1].id, gap: Math.round(b.top - a.bot) });
+    const a = ink(list[i]), bTop = tops.get(list[i + 1]) ?? ink(list[i + 1]).top;
+    gaps.push({ from: '#' + list[i].id, to: '#' + list[i + 1].id, gap: Math.round(bTop - a.bot) });
   }
   sticky.forEach(e => { e.style.position = e.dataset.qaPos; e.style.transform = e.dataset.qaTf; delete e.dataset.qaPos; delete e.dataset.qaTf; });
   const o = { gaps, overflowX: document.documentElement.scrollWidth - innerWidth };
@@ -126,8 +128,10 @@ async function anchorCovered(page, theme) {
     const page = await ctx.newPage();
     if (v.touch) await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(`${URL}?t=${theme}`, { waitUntil: 'load' });
-    await page.evaluate(() => { document.body.classList.add('dx-hero'); scrollTo({ top: 0, behavior: 'instant' }); });
-    await page.waitForTimeout(600);
+    /* se mide lo que ve quien llega a cada seccion: todo revelado (sin el desplazamiento de 28 px de antes de aparecer).
+       Sin esto, un titulo fijo (sticky) quedaba medido sin revelar y el espacio salia 26 px mas grande (2026-10-11). */
+    await page.evaluate(() => { document.body.classList.add('dx-hero'); document.querySelectorAll('.rv').forEach(e => e.classList.add('in')); document.querySelectorAll('.spk, .lxs').forEach(e => e.classList.add('seen')); scrollTo({ top: 0, behavior: 'instant' }); });
+    await page.waitForTimeout(1300);
     const tag = `${v.k} ${v.w}x${v.h} ${theme === 'dark' ? 'Noir' : 'Lux'}`;
     const m = await page.evaluate(measure, SECS[theme]);
     table.push({ tag, m });
