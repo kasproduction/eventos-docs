@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab admin widget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* Lab 2026-10-11 — admin Filament: Personas > Entrada > "Landing y widget" (nueva pestaña junto a Registro, Campos y
+   Codigos de acceso). Tokens literales de eventos-backend/resources/css/filament/admin/theme.css (como lab-seguridad-cuenta).
+   A = una columna (canon Lumina 720px). B = configuracion a la izquierda + vista previa en vivo fija a la derecha
+   (como el panel Modulos aprobado). La vista previa es el widget real servido por la webapp (:3000). */
+:root {
+  --lum-bg: #F6F8FA; --lum-bg-1: #FAFBFC; --lum-bg-2: #F0F2F5;
+  --lum-card: #FFFFFF; --lum-card-hi: #F6F8FA;
+  --lum-b: rgba(0,0,0,0.08); --lum-b-hi: rgba(0,0,0,0.13); --lum-b-st: rgba(0,0,0,0.18);
+  --lum-t: #131417; --lum-t2: #3A3B40; --lum-t3: #5C5D63; --lum-t4: #85868C; --lum-t5: #AEAFB3;
+  --lum-ink: #1A1B1E; --lum-ink-contrast: #FFFFFF;
+  --lum-warn: #A86A12; --lum-warn-soft: rgba(168,106,18,0.09);
+  --lum-ok: #2F8F6B; --lum-ok-soft: rgba(47,143,107,0.08);
+  --lum-shadow-md: 0 2px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.08);
+  --lum-f: 'Urbanist', ui-sans-serif, system-ui, sans-serif;
+  --lum-fh: 'Plus Jakarta Sans', var(--lum-f);
+}
+.dark {
+  --lum-bg: #0A0A0A; --lum-bg-1: #0E0E0E; --lum-bg-2: #141414;
+  --lum-card: rgba(255,255,255,0.03); --lum-card-hi: rgba(255,255,255,0.05);
+  --lum-b: rgba(255,255,255,0.06); --lum-b-hi: rgba(255,255,255,0.10); --lum-b-st: rgba(255,255,255,0.14);
+  --lum-t: #FFFFFF; --lum-t2: rgba(255,255,255,0.6); --lum-t3: rgba(255,255,255,0.45); --lum-t4: rgba(255,255,255,0.35); --lum-t5: rgba(255,255,255,0.15);
+  --lum-ink: #FFFFFF; --lum-ink-contrast: #101010;
+  --lum-warn: #F2C27A; --lum-warn-soft: rgba(242,194,122,0.08);
+  --lum-ok: #6FD3A8; --lum-ok-soft: rgba(111,211,168,0.08);
+  --lum-shadow-md: none;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--lum-f); background: var(--lum-bg); color: var(--lum-t2); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+button, input { font-family: inherit; }
+svg.i { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[hidden] { display: none !important; }
+
+/* barra del lab */
+.labbar { position: sticky; top: 0; z-index: 30; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 8px 14px; background: #0b0b0c; color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 13px; }
+.labbar b { font-family: var(--lum-fh); font-weight: 800; font-size: 14px; }
+.seg { display: flex; padding: 3px; gap: 2px; border-radius: 10px; background: #1c1c1f; }
+.seg button { border: 0; background: none; color: rgba(255,255,255,.6); font-weight: 600; font-size: 12.5px; padding: 6px 10px; border-radius: 7px; cursor: pointer; }
+.seg button.on { background: #fff; color: #111; }
+
+/* admin (stub fiel al layout real: sidebar + topbar) */
+.admin { display: grid; grid-template-columns: 232px 1fr; min-height: calc(100vh - 46px); }
+.side { border-right: 1px solid var(--lum-b); background: var(--lum-bg-1); padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; }
+.side-brand { font: 700 14px var(--lum-fh); color: var(--lum-t); padding: 2px 10px 18px; }
+.nav { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; font-size: 13.5px; color: var(--lum-t2); }
+.nav.on { background: var(--lum-ink); color: var(--lum-ink-contrast); font-weight: 600; }
+.nav-k { font-size: 11.5px; font-weight: 600; color: var(--lum-t4); padding: 14px 10px 4px; }
+.main { min-width: 0; display: flex; flex-direction: column; }
+.top { height: 60px; display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 0 24px; border-bottom: 1px solid var(--lum-b); }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#6366F1,#14B8A6); }
+.content { padding: 32px 24px 80px; display: flex; justify-content: center; }
+.page { width: 100%; max-width: 720px; }
+.page.wide { max-width: 1160px; }
+.crumb { font-size: 12.5px; color: var(--lum-t4); margin-bottom: 10px; }
+h1 { font-family: var(--lum-fh); font-weight: 800; font-size: 26px; letter-spacing: -0.5px; line-height: 1.2; color: var(--lum-t); margin: 0 0 18px; }
+/* sub-navegacion del cluster Entrada */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--lum-b); margin-bottom: 24px; overflow-x: auto; }
+.tabs span { padding: 10px 12px; font-size: 13.5px; font-weight: 600; color: var(--lum-t3); border-bottom: 2px solid transparent; white-space: nowrap; }
+.tabs span.on { color: var(--lum-t); border-bottom-color: var(--lum-ink); }
+
+.card { background: var(--lum-card); border: 1px solid var(--lum-b-hi); border-radius: 14px; box-shadow: var(--lum-shadow-md); margin-bottom: 16px; }
+.card-h { padding: 18px 20px 4px; }
+.card-h h2 { font-family: var(--lum-fh); font-weight: 700; font-size: 15.5px; color: var(--lum-t); margin: 0; }
+.card-h p { margin: 4px 0 0; font-size: 13.5px; color: var(--lum-t3); line-height: 1.5; }
+.card-b { padding: 14px 20px 20px; }
+.lbl { font-size: 12.5px; font-weight: 600; color: var(--lum-t3); margin: 16px 0 8px; }
+.lbl:first-child { margin-top: 0; }
+.url { display: flex; gap: 8px; align-items: center; }
+.url .box { flex: 1; min-width: 0; height: 40px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; border: 1px solid var(--lum-b-hi); background: var(--lum-card-hi); color: var(--lum-t); font-size: 13.5px; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.btn { text-decoration: none; height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--lum-b-hi); background: var(--lum-card); color: var(--lum-t); font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.btn.pri { background: var(--lum-ink); color: var(--lum-ink-contrast); border-color: var(--lum-ink); }
+.btn.done { color: var(--lum-ok); border-color: var(--lum-ok); }
+/* dominios como chips */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 40px; padding: 5px 6px; border-radius: 10px; border: 1px solid var(--lum-b-hi); background: var(--lum-card-hi); }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 6px 0 10px; border-radius: 999px; background: var(--lum-card); border: 1px solid var(--lum-b-hi); color: var(--lum-t); font-size: 13px; font-weight: 600; }
+.chip button { width: 20px; height: 20px; border: 0; border-radius: 50%; background: transparent; color: var(--lum-t4); cursor: pointer; display: grid; place-items: center; }
+.chip button:hover { background: var(--lum-b); color: var(--lum-t); }
+.chips input { flex: 1; min-width: 160px; border: 0; outline: none; background: transparent; color: var(--lum-t); font-size: 13.5px; padding: 0 6px; height: 28px; }
+.state { display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; font-size: 13px; line-height: 1.45; padding: 10px 12px; border-radius: 10px; }
+.state.ok { background: var(--lum-ok-soft); color: var(--lum-t2); } .state.ok svg { color: var(--lum-ok); }
+.state.warn { background: var(--lum-warn-soft); color: var(--lum-t2); } .state.warn svg { color: var(--lum-warn); }
+.state b { color: var(--lum-t); }
+.lseg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 10px; background: var(--lum-card-hi); border: 1px solid var(--lum-b); }
+.lseg button { border: 0; background: none; color: var(--lum-t3); font-weight: 600; font-size: 13px; padding: 6px 12px; border-radius: 7px; cursor: pointer; }
+.lseg button.on { background: var(--lum-ink); color: var(--lum-ink-contrast); }
+/* el codigo para copiar (sin monospace: regla de la marca) */
+.code { position: relative; border-radius: 10px; border: 1px solid var(--lum-b-hi); background: var(--lum-card-hi); padding: 12px 12px 12px 14px; display: flex; gap: 12px; align-items: flex-start; }
+.code p { margin: 0; flex: 1; min-width: 0; font-size: 13px; line-height: 1.55; color: var(--lum-t2); overflow-wrap: anywhere; }
+.hint { font-size: 12.5px; color: var(--lum-t4); margin-top: 8px; line-height: 1.5; }
+
+/* vista previa: la pagina del cliente simplificada con el widget real */
+.prev { border-radius: 12px; border: 1px solid var(--lum-b-hi); overflow: hidden; }
+.prev-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--lum-b); font-size: 12px; color: var(--lum-t4); background: var(--lum-card-hi); }
+.prev-bar .dotless { flex: 1; height: 22px; border-radius: 6px; background: var(--lum-card); border: 1px solid var(--lum-b); padding: 0 8px; display: flex; align-items: center; }
+.prev-body { display: grid; place-items: center; padding: 18px 8px; transition: background .3s; }
+.prev-body.light { background: #ffffff; } .prev-body.dark { background: #0f1729; }
+.prev-body iframe { display: block; width: 100%; max-width: 504px; height: 432px; border: 0; background: transparent; color-scheme: normal; }
+.prev-tools { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+
+/* B: dos columnas, la vista previa fija */
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) 460px; gap: 20px; align-items: start; }
+.cols .sticky { position: sticky; top: 64px; }
+@media (max-width: 1180px) { .cols { grid-template-columns: 1fr; } .cols .sticky { position: static; } }
+@media (max-width: 860px) { .admin { grid-template-columns: 1fr; } .side { display: none; } }
+</style>
+</head>
+<body>
+<div class="labbar">
+  <b>Admin: Landing y widget</b>
+  <div class="seg" id="lay"><button data-v="a">A. Una columna</button><button data-v="b" class="on">B. Dos columnas</button></div>
+  <div class="seg" id="mode"><button data-v="light" class="on">Lux (claro)</button><button data-v="dark">Noir (oscuro)</button></div>
+</div>
+
+<div class="admin" id="adm">
+  <aside class="side">
+    <div class="side-brand">EventOS</div>
+    <span class="nav">Inicio</span>
+    <div class="nav-k">Personas</div>
+    <span class="nav">Asistentes</span>
+    <span class="nav on">Entrada</span>
+    <span class="nav">Networking</span>
+    <div class="nav-k">Contenido</div>
+    <span class="nav">Agenda</span><span class="nav">Speakers</span><span class="nav">Sponsors</span>
+  </aside>
+  <div class="main">
+    <div class="top"><span class="avatar"></span></div>
+    <div class="content">
+      <div class="page" id="page">
+        <div class="crumb">Entrada</div>
+        <h1>Landing y widget</h1>
+        <div class="tabs"><span>Registro</span><span>Campos</span><span>Códigos de acceso</span><span class="on">Landing y widget</span></div>
+        <div id="layout"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<template id="tplLanding">
+  <div class="card">
+    <div class="card-h"><h2>Tu página de registro</h2><p>La landing pública del evento, con el registro por pasos. Compártela tal cual.</p></div>
+    <div class="card-b">
+      <div class="url"><span class="box" data-landing-url></span><button class="btn" data-copy="landing"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copiar</span></button><a class="btn" data-open target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg>Abrir</a></div>
+    </div>
+  </div>
+</template>
+<template id="tplWidget">
+  <div class="card">
+    <div class="card-h"><h2>Widget para la página del cliente</h2><p>El mismo registro, para pegar en otra página. Quien se registra termina en la confirmación del evento, con su escarapela.</p></div>
+    <div class="card-b">
+      <div class="lbl">Dónde se puede pegar</div>
+      <div class="chips" data-chips><input data-dom placeholder="Escribe un dominio y presiona Enter, por ejemplo empresa.com"></div>
+      <div data-state></div>
+      <div class="lbl">Tema del widget</div>
+      <div class="lseg" data-tema><button data-v="" class="on">El del evento</button><button data-v="noir">Noir</button><button data-v="lux">Lux</button></div>
+      <div class="lbl">Código para pegar</div>
+      <div class="code"><p data-snippet></p><button class="btn pri" data-copy="code"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copiar código</span></button></div>
+      <div class="hint">Pégalo en la página del cliente, justo donde quiere el registro. Funciona en WordPress, Webflow, Wix y cualquier sitio que permita pegar HTML.</div>
+    </div>
+  </div>
+</template>
+<template id="tplPrev">
+  <div class="card">
+    <div class="card-h"><h2>Vista previa</h2><p>Así se ve el widget en la página del cliente.</p></div>
+    <div class="card-b">
+      <div class="prev-tools"><span class="lbl" style="margin:0">Fondo de la página del cliente</span><div class="lseg" data-fondo><button data-v="light" class="on">Claro</button><button data-v="dark">Oscuro</button></div></div>
+      <div class="prev"><div class="prev-bar"><span class="dotless" data-prev-host>empresa.com</span></div><div class="prev-body light" data-prev-body><iframe data-frame title="Vista previa del widget"></iframe></div></div>
+    </div>
+  </div>
+</template>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const SLUG = 'summit-empresarial-2026';
+const APP = `${location.protocol}//${location.hostname}:3000`;
+let domains = ['empresa.com', 'eventos.empresa.co'], tema = '', layout = 'b', fondo = 'light';
+const ic = { ok: '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>', warn: '<svg class="i" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>' };
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function render() {
+  const host = $('#layout');
+  const L = $('#tplLanding').content.cloneNode(true), W = $('#tplWidget').content.cloneNode(true), P = $('#tplPrev').content.cloneNode(true);
+  host.innerHTML = '';
+  $('#page').classList.toggle('wide', layout === 'b');
+  if (layout === 'a') { host.append(L, W, P); }
+  else {
+    const cols = document.createElement('div'); cols.className = 'cols';
+    const left = document.createElement('div'), right = document.createElement('div'); right.className = 'sticky';
+    left.append(L, W); right.append(P); cols.append(left, right); host.append(cols);
+  }
+  bind(); paint();
+}
+function paint() {
+  const url = `${APP}/es/e/${SLUG}`;
+  $('[data-landing-url]').textContent = url.replace(/^https?:\/\//, '');
+  $('[data-open]').href = url;
+  // chips
+  const box = $('[data-chips]'), inp = $('[data-dom]', box);
+  $$('.chip', box).forEach(c => c.remove());
+  domains.forEach((d, i) => { const c = document.createElement('span'); c.className = 'chip'; c.innerHTML = `${esc(d)}<button aria-label="Quitar ${esc(d)}"><svg class="i" viewBox="0 0 24 24" style="width:12px;height:12px"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`; c.querySelector('button').onclick = () => { domains.splice(i, 1); paint(); }; box.insertBefore(c, inp); });
+  $('[data-state]').innerHTML = domains.length
+    ? `<div class="state ok">${ic.ok}<span>El widget se muestra en <b>${domains.map(esc).join('</b>, <b>')}</b> y sus subdominios. En cualquier otra página el navegador lo bloquea.</span></div>`
+    : `<div class="state warn">${ic.warn}<span><b>Sin dominios, el widget no se muestra en ningún sitio.</b> Agrega el de la página del cliente.</span></div>`;
+  $('[data-snippet]').textContent = `<script src="${APP}/widget.js" data-evento="${SLUG}"${tema ? ` data-tema="${tema}"` : ''} async><\/script>`;
+  $('[data-prev-host]').textContent = domains[0] || 'pagina-del-cliente.com';
+  const f = $('[data-frame]'), src = `${APP}/es/e/${SLUG}/widget${tema ? '?tema=' + tema : ''}`;
+  if (f.getAttribute('src') !== src) f.src = src;
+  $('[data-prev-body]').className = 'prev-body ' + fondo;
+}
+function bind() {
+  $('[data-dom]').onkeydown = e => {
+    if (e.key !== 'Enter' && e.key !== ',') return; e.preventDefault();
+    const v = e.target.value.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+    if (/^[a-z0-9.-]+\.[a-z]{2,}$/.test(v) && !domains.includes(v)) { domains.push(v); e.target.value = ''; paint(); }
+  };
+  $$('[data-tema] button').forEach(b => b.onclick = () => { $$('[data-tema] button').forEach(x => x.classList.toggle('on', x === b)); tema = b.dataset.v; paint(); });
+  $$('[data-fondo] button').forEach(b => b.onclick = () => { $$('[data-fondo] button').forEach(x => x.classList.toggle('on', x === b)); fondo = b.dataset.v; paint(); });
+  $$('[data-copy]').forEach(b => b.onclick = () => {
+    const text = b.dataset.copy === 'code' ? $('[data-snippet]').textContent : $('[data-open]').href;
+    navigator.clipboard?.writeText(text).catch(() => {});
+    const s = $('span', b), old = s.textContent; s.textContent = 'Copiado'; b.classList.add('done'); setTimeout(() => { s.textContent = old; b.classList.remove('done'); }, 1600);
+  });
+}
+$$('#lay button').forEach(b => b.onclick = () => { $$('#lay button').forEach(x => x.classList.toggle('on', x === b)); layout = b.dataset.v; render(); });
+$$('#mode button').forEach(b => b.onclick = () => { $$('#mode button').forEach(x => x.classList.toggle('on', x === b)); document.documentElement.classList.toggle('dark', b.dataset.v === 'dark'); });
+render();
+</script>
+</body>
+</html>
