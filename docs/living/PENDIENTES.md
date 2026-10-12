@@ -154,16 +154,20 @@
 - [x] Rayas del fondo en la confirmacion (mismo error del hero): mask del oscurecido solo sobre los cubos
 - [ ] Credencial con etiqueta visible (VIP, Prensa): en el admin marcar que tags salen en la escarapela (idea Kamilo 2026-10-11, despues)
 - [ ] "Ya tenias tu lugar" con varios eventos: hoy sale tambien si el correo tiene cuenta en OTRO evento y no en este
-- [ ] Pasar la confirmacion al stack real de la landing
+- [x] Pasar la confirmacion y el registro al stack real: webapp `/[locale]/e/[slug]` y `/confirmacion` contra el backend (2026-10-11)
+- [x] Registro por pasos de tamaño fijo (lab-registro-pasos A) y secciones del v3 con datos reales en la webapp
+- [x] Speakers 6 columnas + aparicion fila por fila con tono parejo (lab-speakers-tamano C)
 
 ### Endpoints publicos
 
-- [ ] GET /api/public/event/{slug} (datos, speakers, agenda, sponsors, faqs, registration-count)
-- [ ] POST /api/public/event/{slug}/register (rate limited + CAPTCHA)
+- [x] GET /api/v1/public/events/{slug}/landing (speakers, agenda, tracks, sponsors, faqs) 5711d44
+- [x] POST /api/v1/public/events/{slug}/register (limite por correo y red) 87e519e
+- [ ] CAPTCHA en el registro publico (con el widget)
 
 ### Stack
 
-- [ ] Next.js SSG/ISR o Astro, Tailwind, Framer Motion/GSAP, SEO/OG, Responsive, Dark/Light
+- [x] Stack: dentro de la webapp Next (decision 2026-10-11), Noir/Lux por evento
+- [ ] SEO/OG de la landing publica (metadatos por evento)
 
 ---
 

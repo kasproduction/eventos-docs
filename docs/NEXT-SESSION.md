@@ -39,7 +39,35 @@
 
 - Backend: PublicRegistrationTest 9 + ChangeEmailTest 5 (16/16 con PublicEvent). Auth + Security/StaffApiToken + RateLimiting 123/123.
 
+### Segunda parte del dia (misma sesion): LANDING COMPLETA EN LA WEBAPP CONTRA EL BACKEND REAL
+
+- **Donde vive:** webapp `eventos-web`, ruta publica `/[locale]/e/[slug]` (registro + secciones) y `/[locale]/e/[slug]/confirmacion`.
+  Decision Kamilo: en la webapp (no Astro). `?tema=lux|noir` fuerza plantilla. Componentes en `src/components/landing/`
+  (`confirmacion/` RegistroView, ConfirmacionView, eventScene, badgeRig; `landingSections.ts` + `landing.css` = secciones del v3
+  con el MISMO marcado/CSS/JS del lab, limitado a `.lnd`). Proxies `/api/public/register` y `/api/me/email` (cookie httpOnly).
+- **Backend nuevo (feature/magic-link-auth):** `GET /public/events/{slug}/landing` (speakers, agenda, tracks, patrocinadores,
+  preguntas; cache 60 s) 5711d44; `requires_access_code`, `registration_enabled` y `presenting_sponsor` (primer platinum) en el
+  evento publico. Tests PublicEvent 21/21.
+- **Registro = boleto POR PASOS que nunca cambia de tamaño** (lab-registro-pasos.html, direccion A): nombre, correo, codigo (solo si
+  el evento lo pide), cargo, empresa + aceptar. 348 px fijo. "Quiero mi lugar" va directo a la confirmacion (sin paso final).
+- **Speakers:** 6 columnas (4 iPad vertical, 3 celular), cada fila aparece al entrar y fotos en tono parejo (blanco y negro suave,
+  color al pasar/tocar). lab-speakers-tamano.html opcion C. El v3 queda asi por defecto.
+- **Experiencia:** pasos juntos tambien en escritorio (el arreglo del iPad solo llegaba a 1366x1024; Kamilo lo vio en 1568x744).
+- **Seeders con tildes** (e8314f1) y base local corregida sin re-sembrar.
+- **Errores de QA mios y su arreglo:** (1) probe por localhost y Kamilo entra por Tailscale: Next 16 dev bloqueaba el JS desde otra
+  IP -> `allowedDevOrigins: ["100.101.78.118"]` en next.config.ts; (2) `overflow-x: hidden` en la raiz rompia lo sticky (celular de
+  la experiencia) -> `clip`. Memoria feedback_qa_por_tailscale.
+- **QA nuevo:** `design/features/landing/qa/qa-landing-geo.cjs` compara la geometria del lab contra la webapp por seccion y
+  scroll. Vitest de la landing 16 + publicRegistration 13. QA del v3 275/275 (columnas de speakers ahora 6/4/3).
+- Codigo de acceso de prueba en la base local: `PRUEBALANDING` (borrable).
+
 ### PENDIENTE INMEDIATO
+
+1. Widget de registro embebible (PENDIENTES §3): el mismo boleto por pasos dentro de la pagina del cliente. Proponer antes de codear.
+2. Revisar en iPad con el medidor (qa-landing-geo con 1180x820 y 820x1180 ya pasa; falta que Kamilo lo vea).
+3. Viejo punto 1 (conectar al backend real): HECHO.
+
+#### (historico) PENDIENTE INMEDIATO de la mañana
 
 1. Conectar landing + confirmacion al backend real (hoy simulan las respuestas): eso es "pasar al stack real" — decidir donde vive la
    landing (Next de eventos-web vs Astro, PENDIENTES §3 Stack) y CORS. Desde el iPad por Tailscale no se llega a `eventos-backend.test`.
