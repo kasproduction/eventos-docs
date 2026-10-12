@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab preguntas</title>
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@500;600;700&family=Plus+Jakarta+Sans:wght@800&display=swap" rel="stylesheet">
+<style>
+/* Lab 2026-10-11 — Kamilo: "Antes de que preguntes" con muchas preguntas se ve con scroll exagerado.
+   Carga la landing v3 real con las 13 preguntas del evento (con su tema del admin). */
+html, body { margin: 0; height: 100%; background: #050506; font-family: 'Urbanist', system-ui, sans-serif; }
+.bar { position: fixed; inset: 0 0 auto 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 8px 14px; background: #0b0b0c; color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); }
+.bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14px; }
+.seg { display: flex; padding: 3px; gap: 2px; border-radius: 10px; background: #1c1c1f; }
+.seg button { border: 0; background: none; color: rgba(255,255,255,.6); font: 600 13px 'Urbanist'; padding: 7px 11px; border-radius: 7px; cursor: pointer; }
+.seg button.on { background: #fff; color: #111; }
+.note { font-size: 13px; color: rgba(255,255,255,.55); }
+iframe { position: fixed; left: 0; right: 0; bottom: 0; width: 100%; border: 0; }
+</style>
+</head>
+<body>
+<div class="bar" id="bar">
+  <b>13 preguntas</b>
+  <div class="seg" id="ap"><button data-v="">Hoy (lista)</button><button data-v="a" class="on">A. Por tema</button><button data-v="b">B. 5 y ver todas</button><button data-v="c">C. Dos columnas</button></div>
+  <div class="seg" id="thm"><button data-v="dark" class="on">Noir</button><button data-v="light">Lux</button></div>
+  <span class="note" id="note"></span>
+</div>
+<iframe id="f" title="Landing"></iframe>
+<script>
+const f = document.getElementById('f'), bar = document.getElementById('bar');
+let thm = 'dark', ap = 'a';
+const NOTE = { '': 'Las 13 en lista, como hoy', a: 'Botones por tema: solo se ven 3 o 4', b: 'Se ven 5 y un botón despliega el resto', c: 'Dos columnas con el título arriba (Lux ya es así)' };
+function load() {
+  try { localStorage.setItem('lv3-theme', thm); } catch (e) {}
+  f.style.top = bar.offsetHeight + 'px'; f.style.height = `calc(100% - ${bar.offsetHeight}px)`;
+  f.src = `lab-landing-v3.html?nfaq=13${ap ? '&faq=' + ap : ''}&t=${Date.now()}#${thm === 'light' ? 'lx-faq' : 'preguntas'}`;
+  document.getElementById('note').textContent = NOTE[ap];
+}
+for (const [id, set] of [['ap', v => ap = v], ['thm', v => thm = v]]) document.querySelectorAll(`#${id} button`).forEach(b => b.onclick = () => { document.querySelectorAll(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); set(b.dataset.v); load(); });
+addEventListener('resize', () => { f.style.top = bar.offsetHeight + 'px'; f.style.height = `calc(100% - ${bar.offsetHeight}px)`; });
+load();
+</script>
+</body>
+</html>

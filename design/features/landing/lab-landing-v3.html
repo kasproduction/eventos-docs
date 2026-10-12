@@ -626,6 +626,30 @@ body.dx-rv .rv { opacity: 1 !important; transform: none !important; transition: 
   .tabbar { backdrop-filter: none; }
   .spk .fa img { filter: none; }
 }
+/* ---------- lab-preguntas.html (2026-10-11): 13 preguntas reales ----------
+   ?faq=a  por tema (botones General / Lugar / Mi cuenta / Agenda, como los tracks)
+   ?faq=b  las primeras 5 y "Ver las 13 preguntas"
+   ?faq=c  dos columnas (titulo arriba)
+   En las tres el titulo se queda fijo a la izquierda mientras bajas. */
+body[class*="faq-"] #preguntas .faq > div:first-child { position: sticky; top: 110px; align-self: start; }
+.faq-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.faq-tabs button, .faq-more { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 9px 16px; font-weight: 600; font-size: 14px; color: var(--mut); transition: all .3s var(--ease); }
+.faq-tabs button.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+body.light .faq-tabs button.on { background: #141414; border-color: #141414; color: #fff; }
+.faq-more { margin-top: 22px; color: var(--fg); }
+.faq-more:hover { border-color: var(--accent); }
+.qa.new, .fq details.new { animation: faqIn .6s var(--out) both; }
+@keyframes faqIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+body.faq-c #preguntas .faq { grid-template-columns: 1fr; gap: 40px; }
+body.faq-c #preguntas .faq > div:first-child { position: static; }
+body.faq-c #faq { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; align-items: start; }
+body.faq-c #faq .qa:nth-child(2) { border-top: 1px solid var(--line); }
+@media (max-width: 1100px) {
+  body[class*="faq-"] #preguntas .faq > div:first-child { position: static; }
+  body.faq-c #faq { grid-template-columns: 1fr; } body.faq-c #faq .qa:nth-child(2) { border-top: 0; }
+  .faq-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; }
+  .faq-tabs button { flex: none; }
+}
 /* ---------- aparicion de speakers (lab-speakers-tamano.html, 2026-10-11) ----------
    ?ap=a  fila por fila al entrar: sube 16px y se aclara, de izquierda a derecha (60 ms entre tarjetas)
    ?ap=b  ola de lamas: cada fila entra girando desde el reverso, nace en el centro de la fila
@@ -1221,8 +1245,42 @@ $$('.marq').forEach(m => { m.classList.add('off'); marqIO.observe(m); });
 
 /* ===================== LUGAR Y PREGUNTAS ===================== */
 $('#hours').innerHTML = DAYS.map(d => `<div class="h"><div><b>${d.d} de noviembre</b><span>${d.k}</span></div><div class="t">${d.h}</div></div>`).join('');
+const FAQ13 = [["¿Cuál es el horario del evento?", "Las puertas abren a las 7:30 AM. La primera conferencia inicia a las 9:00 AM y cerramos a las 6:00 PM. El networking cocktail es de 6:30 a 8:00 PM.", "General"], ["¿Hay estacionamiento disponible?", "El venue cuenta con estacionamiento subterráneo. La entrada es por la Calle 72. Las primeras 4 horas son cortesía con tu acreditación.", "General"], ["¿Cómo contacto al organizador?", "Desde tu perfil en la app, toca Soporte. El equipo responde en menos de 15 minutos durante el evento.", "General"], ["¿Se puede reingresar al venue?", "Tu acreditación permite entrada y salida libre durante todo el día. Conserva tu QR activo en la app.", "General"], ["¿Dónde es el registro presencial?", "En el lobby principal, Piso 1. Busca el counter con pantallas LED. Muestra tu QR desde la app y listo.", "Lugar"], ["¿Dónde queda la Sala Principal?", "Piso 2, Ala Norte. Desde el lobby toma el elevador central, gira a la izquierda al salir. Capacidad: 800 personas.", "Lugar"], ["¿Hay zona de carga para dispositivos?", "Estaciones de carga en el Lounge del Piso 1 y junto a la zona de café del Piso 2. Cables USB-C y Lightning disponibles.", "Lugar"], ["¿Cómo descargo mi certificado?", "Tu certificado estará disponible 24 horas después del cierre del evento, en la sección Post-Evento de tu perfil. Se genera en PDF.", "Mi cuenta"], ["¿Puedo cambiar mis datos de perfil?", "Desde tu perfil toca el botón editar. Puedes actualizar foto, cargo, empresa e intereses en cualquier momento.", "Mi cuenta"], ["¿Dónde veo mi código QR?", "En la pestaña Mi QR de la barra inferior. Es tu acreditación digital para registro, sesiones y sorteos.", "Mi cuenta"], ["¿Cómo agrego sesiones a mi agenda?", "En cualquier sesión toca el ícono de corazón. La sesión aparecerá en tu agenda personal con recordatorios automáticos.", "Agenda"], ["¿Puedo ver las charlas en streaming?", "Las sesiones marcadas con el ícono de play tienen streaming en vivo. Toca la sesión y verás el botón para unirte.", "Agenda"], ["¿Las charlas se graban?", "El organizador decide qué sesiones se graban. Las grabaciones disponibles aparecerán en la sección Post-Evento dentro de 48 horas.", "Agenda"]];
+/* lab-preguntas.html: ?nfaq=13 usa las 13 preguntas reales; ?faq=a|b|c cambia como se muestran */
+const FQ = new URLSearchParams(location.search), FAQMODE = FQ.get('faq');
+if (+FQ.get('nfaq')) { FAQ.length = 0; FAQ13.forEach(q => FAQ.push([q[0], q[1], q[2]])); }
+if (FAQMODE) document.body.classList.add('faq-' + FAQMODE);
+const TOPICS = [...new Set(FAQ.map(q => q[2]).filter(Boolean))];
+function faqView(list, mountQa, host, isLux) {
+  /* A: por tema (si hay 2 o mas temas); si no, cae en B */
+  let mode = FAQMODE === 'a' && TOPICS.length < 2 ? 'b' : FAQMODE, topic = TOPICS[0], all = false;
+  const draw = (fresh) => {
+    const items = mode === 'a' ? list.filter(q => q[2] === topic) : mode === 'b' && !all ? list.slice(0, 5) : list;
+    mountQa(items, fresh);
+    host.querySelector('.faq-more')?.remove();
+    if (mode === 'b' && !all && list.length > 5) {
+      const b = document.createElement('button'); b.className = 'faq-more'; b.textContent = `Ver las ${list.length} preguntas`;
+      b.addEventListener('click', () => { all = true; draw(5); }); host.appendChild(b);
+    }
+  };
+  if (mode === 'a') {
+    const tabs = document.createElement('div'); tabs.className = 'faq-tabs';
+    tabs.innerHTML = TOPICS.map(t => `<button class="${t === topic ? 'on' : ''}">${t}</button>`).join('');
+    $$('button', tabs).forEach(b => b.addEventListener('click', () => { topic = b.textContent; $$('button', tabs).forEach(x => x.classList.toggle('on', x === b)); draw(0); }));
+    host.prepend(tabs);
+  }
+  draw(-1);
+}
+const qaHtml = (q, i, fresh) => `<div class="qa ${i ? '' : 'on'}${fresh >= 0 && i >= fresh ? ' new' : ''}"><button aria-expanded="${!i}">${q[0]}<span class="pl">${IC.plus}</span></button><div class="ans"><div><p>${q[1]}</p></div></div></div>`;
+function mountNoirQa(items, fresh) {
+  $('#faq').innerHTML = items.map((q, i) => qaHtml(q, i, fresh)).join('');
+  $$('#faq .qa button').forEach(b => b.addEventListener('click', () => { const q = b.parentElement; const on = !q.classList.contains('on'); $$('#faq .qa').forEach(x => { x.classList.remove('on'); x.querySelector('button').setAttribute('aria-expanded', 'false'); }); if (on) { q.classList.add('on'); b.setAttribute('aria-expanded', 'true'); } }));
+}
+if (FAQMODE) { const box = document.createElement('div'); $('#faq').replaceWith(box); box.className = 'rv'; box.appendChild(Object.assign(document.createElement('div'), { id: 'faq' })); faqView(FAQ, mountNoirQa, box, false); }
+else {
 $('#faq').innerHTML = FAQ.map((q, i) => `<div class="qa ${i ? '' : 'on'}"><button aria-expanded="${!i}">${q[0]}<span class="pl">${IC.plus}</span></button><div class="ans"><div><p>${q[1]}</p></div></div></div>`).join('');
 $$('#faq .qa button').forEach(b => b.addEventListener('click', () => { const q = b.parentElement; const on = !q.classList.contains('on'); $$('#faq .qa').forEach(x => { x.classList.remove('on'); x.querySelector('button').setAttribute('aria-expanded', 'false'); }); if (on) { q.classList.add('on'); b.setAttribute('aria-expanded', 'true'); } }));
+}
 
 /* ===================== LUX ===================== */
 function bindFlood(root) {
@@ -1278,8 +1336,16 @@ if (matchMedia('(hover: none)').matches) $$('.sec-head p, .lx-head p').forEach(p
 renderSponsors('#plat', '#mq1', '#mq2');
 /* lugar y preguntas */
 $('#tl').innerHTML = DAYS.map(d => `<div class="td flood"><div><b>${d.d} de noviembre</b><span>${d.k}</span></div><div class="h">${d.h}</div></div>`).join('');
+function mountLuxQa(items, fresh) {
+  $('#fq').innerHTML = items.map((q, i) => `<details class="flood ${i === 0 ? 'lit' : ''}${fresh >= 0 && i >= fresh ? ' new' : ''}" ${i === 0 ? 'open' : ''}><summary>${q[0]}<span class="pl2">${IC.plus}</span></summary><p>${q[1]}</p></details>`).join('');
+  $$('#fq details').forEach(d => d.addEventListener('toggle', () => d.classList.toggle('lit', d.open)));
+  bindFlood($('#fq'));
+}
+if (FAQMODE && FAQMODE !== 'c') { const host = $('#fq').parentElement, box = document.createElement('div'); $('#fq').before(box); box.appendChild($('#fq')); faqView(FAQ, mountLuxQa, box, true); }
+else {
 $('#fq').innerHTML = FAQ.map((q, i) => `<details class="flood ${i === 0 ? 'lit' : ''}" ${i === 0 ? 'open' : ''}><summary>${q[0]}<span class="pl2">${IC.plus}</span></summary><p>${q[1]}</p></details>`).join('');
 $$('#fq details').forEach(d => d.addEventListener('toggle', () => d.classList.toggle('lit', d.open)));
+}
 bindFlood($('#luxMain'));
 $$('.rv').forEach(el => io.observe(el));
 
