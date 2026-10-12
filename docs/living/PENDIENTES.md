@@ -129,10 +129,11 @@
 > token + tabla dc_embed_tokens) y campo `allowed_embed_domains` que YA existe
 > en el modelo Event — la arquitectura esta semi-prevista.
 
-- [ ] Script/iframe embebible `<script src=".../widget.js" data-event="slug">` con token
-- [ ] Validacion de dominio contra allowed_embed_domains + rate limit + CAPTCHA
-- [ ] Tema del widget: hereda branding del evento (accent/logo), Noir/Lux auto
-- [ ] Config en admin: cluster Entrada → tab "Widget" (generar snippet + dominios)
+- [x] Script/iframe embebible: `widget.js` (data-evento, data-tema) -> iframe `/[locale]/e/[slug]/widget`; al registrarse va a nuestra confirmacion con pase de un solo uso (2026-10-11)
+- [x] Validacion de dominio contra allowed_embed_domains (frame-ancestors en proxy.ts) + rate limit
+- [ ] CAPTCHA (Turnstile): faltan las llaves de Cloudflare
+- [x] Tema del widget: color del evento, Noir/Lux del evento o forzado con data-tema
+- [x] Config en admin: Entrada > Landing y widget (dominios, tema, codigo, vista previa) — falta que Kamilo la revise
 
 ### Post-registro (pagina: `design/features/landing/confirmacion.html`; labs `lab-confirmacion-estados.html`, `lab-cinta.html`)
 

@@ -61,7 +61,43 @@
   scroll. Vitest de la landing 16 + publicRegistration 13. QA del v3 275/275 (columnas de speakers ahora 6/4/3).
 - Codigo de acceso de prueba en la base local: `PRUEBALANDING` (borrable).
 
+### Tercera parte (misma sesion, noche): AJUSTES DE LA LANDING + WIDGET EMBEBIBLE + ADMIN
+
+**Landing (decisiones Kamilo, no re-preguntar):**
+- Speakers: 6 columnas (4 iPad vertical, 3 celular), fila por fila con tono parejo (lab-speakers-tamano C). Celular: reverso
+  resumido (idea 4 lineas, charla 2).
+- Preguntas: por tema (botones con los temas del admin, `section`); sin temas, 5 y "Ver las N". SIN titulo fijo (con temas la
+  lista es del alto del titulo; el QA mostro +26 px). lab-preguntas A.
+- Pasos de la experiencia juntos tambien en escritorio (el arreglo del iPad no llegaba a 1568x744).
+- Evento demo al 4-8 de noviembre de 2026: `php artisan db:seed --class=DemoNoviembreSeeder` (idempotente, no toca status).
+- Seeders con tildes (e8314f1).
+
+**Widget de registro (PENDIENTES §3) — HECHO salvo Turnstile:**
+- Cliente pega `<script src="<webapp>/widget.js" data-evento="slug" [data-tema] async>` -> iframe `/[locale]/e/[slug]/widget`
+  con el mismo boleto por pasos (`RegistroTicket`, separado de la landing). Integracion A: tarjeta con elevacion que se esfuma
+  dentro del marco, sin nombre del evento (lab-widget.html).
+- Al registrarse: SIN mensaje en el widget; la ventana completa va a nuestra confirmacion con un pase de un solo uso
+  (`RegistrationHandoff`, 10 min, hash en cache; `POST /public/handoff`). La confirmacion canjea `?k=`, guarda la sesion en
+  nuestro dominio y lo quita de la direccion. existing/pending: sin sesion.
+- Seguridad: CSP en `src/lib/csp.ts`. Toda la webapp `frame-ancestors 'self'` + X-Frame-Options; solo el widget recibe en
+  `proxy.ts` los dominios del evento (`allowed_embed_domains`, expuestos como `embed_domains`) + el host del admin.
+- Admin: Personas > Entrada > **Landing y widget** (composicion B): URL de la landing, dominios (chips, se guardan al instante,
+  normalizados), tema, codigo para copiar, vista previa en vivo fija. Kamilo aun NO la vio (pide su login + 2FA).
+- Prueba de cliente: `design/features/landing/widget-cliente.html` (otro origen). Base local: dominios `localhost` y la IP de
+  Tailscale en el evento demo.
+
+**QA y pruebas:** QA del v3 ahora mide con todo revelado (275/275). Backend PublicEvent 28 + LandingWidgetPage 5. Webapp
+tests/lib + landing 353. Gotcha: la recarga en caliente mientras edito en dos pasos dejo un error transitorio en el Chrome de
+Kamilo (revealByRow); con el servidor reiniciado, limpio.
+
 ### PENDIENTE INMEDIATO
+
+1. Kamilo revisa Entrada > Landing y widget en el admin con su cuenta.
+2. Turnstile (CAPTCHA) en el registro publico y el widget: Kamilo crea las llaves en Cloudflare.
+3. SEO/OG de la landing publica (titulo, descripcion e imagen al compartir).
+4. Revisar la landing en iPad con Kamilo.
+
+#### (historico) PENDIENTE INMEDIATO de la tarde
 
 1. Widget de registro embebible (PENDIENTES §3): el mismo boleto por pasos dentro de la pagina del cliente. Proponer antes de codear.
 2. Revisar en iPad con el medidor (qa-landing-geo con 1180x820 y 820x1180 ya pasa; falta que Kamilo lo vea).
