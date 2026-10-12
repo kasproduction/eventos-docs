@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Empresa S.A.</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Pagina de un cliente de mentira, en OTRO origen (Laragon :80) que la webapp (:3000),
+   para probar el widget de verdad: widget.js + iframe + permisos por dominio + pase a la confirmacion.
+   ?fondo=claro|oscuro  ?tema=noir|lux */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Manrope', system-ui, sans-serif; }
+body.claro { background: #fff; color: #1d2433; }
+body.oscuro { background: #0f1729; color: #e7ecf5; }
+nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; font-weight: 600; font-size: 14px; }
+nav b { font-size: 18px; }
+main { display: grid; grid-template-columns: minmax(0, 1fr) 496px; gap: 48px; align-items: center; max-width: 1180px; margin: 0 auto; padding: 40px 40px 80px; }
+h1 { font-size: clamp(32px, 4vw, 52px); line-height: 1.08; letter-spacing: -.02em; margin: 14px 0 18px; }
+p { font-size: 17px; line-height: 1.6; opacity: .78; max-width: 520px; }
+@media (max-width: 900px) { main { grid-template-columns: 1fr; padding: 16px 16px 60px; } nav { padding: 18px 16px; } }
+</style>
+</head>
+<body>
+<nav><b>Empresa S.A.</b><span>Eventos</span></nav>
+<main>
+  <div>
+    <div style="font-size:13px;font-weight:600;opacity:.6">Evento anual</div>
+    <h1>Te esperamos en el Summit Empresarial 2026</h1>
+    <p>Tres días de charlas, talleres y conexiones con líderes de la industria. Regístrate aquí mismo: tu acceso llega a tu correo.</p>
+  </div>
+  <div id="slot"></div>
+</main>
+<script>
+  /* el mismo codigo que el organizador copia del admin; aqui la URL de la webapp sale del host (localhost o Tailscale) */
+  const q = new URLSearchParams(location.search);
+  document.body.className = q.get('fondo') === 'oscuro' ? 'oscuro' : 'claro';
+  const s = document.createElement('script');
+  s.src = `${location.protocol}//${location.hostname}:3000/widget.js`;
+  s.dataset.evento = 'summit-empresarial-2026';
+  if (q.get('tema')) s.dataset.tema = q.get('tema');
+  // widget.js usa document.currentScript: se inserta como script normal en el lugar del widget
+  document.getElementById('slot').appendChild(s);
+</script>
+</body>
+</html>
