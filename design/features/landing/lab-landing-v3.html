@@ -626,6 +626,44 @@ body.dx-rv .rv { opacity: 1 !important; transform: none !important; transition: 
   .tabbar { backdrop-filter: none; }
   .spk .fa img { filter: none; }
 }
+/* ---------- aparicion de speakers (lab-speakers-tamano.html, 2026-10-11) ----------
+   ?ap=a  fila por fila al entrar: sube 16px y se aclara, de izquierda a derecha (60 ms entre tarjetas)
+   ?ap=b  ola de lamas: cada fila entra girando desde el reverso, nace en el centro de la fila
+   ?ap=c  como A + tono parejo: las fotos llegan en blanco y negro suave y toman color al pasar o tocar */
+body[class*="ap-"] .spk { opacity: 0; transform: translateY(16px); transition: opacity .7s var(--out), transform .8s var(--out); transition-delay: var(--d, 0ms); }
+body[class*="ap-"] .spk.seen { opacity: 1; transform: none; }
+body[class*="ap-"] .lxs { opacity: 0; transform: translateY(16px); transition: opacity .7s var(--out), transform .8s var(--out); transition-delay: var(--d, 0ms); }
+body[class*="ap-"] .lxs.seen { opacity: 1; transform: none; }
+body[class*="ap-"] #lxsGrid.rv { opacity: 1; transform: none; }
+/* B: la lama llega girada (muestra el reverso) y gira a la foto; sin desplazamiento */
+body.ap-b .spk, body.ap-b .lxs { transform: none; }
+body.ap-b .spk:not(.seen) .in { transform: rotateY(180deg); }
+body.ap-b .spk .in { transition: transform 1s var(--out); transition-delay: var(--d, 0ms); }
+body.ap-b .spk:not(.seen) { opacity: 1; }
+body.ap-b .lxs:not(.seen) .lxs-box { transform: rotateY(90deg); }
+body.ap-b .lxs .lxs-box { transition: transform .9s var(--out); transition-delay: var(--d, 0ms); }
+body.ap-b .lxs:not(.seen) { opacity: 1; }
+/* C: tono parejo */
+body.ap-c .spk .fa img, body.ap-c .lxs-ph img { filter: grayscale(1) contrast(1.06); transition: filter .6s var(--out); }
+body.ap-c .spk:hover .fa img, body.ap-c .spk.flip .fa img, body.ap-c .spk:focus .fa img, body.ap-c .lxs:hover .lxs-ph img, body.ap-c .lxs.on .lxs-ph img { filter: saturate(.9); }
+@media (prefers-reduced-motion: reduce) { body[class*="ap-"] .spk, body[class*="ap-"] .lxs { opacity: 1; transform: none; transition: none; } body.ap-b .spk .in, body.ap-b .lxs .lxs-box { transform: none !important; transition: none; } }
+/* ---------- lab-speakers-tamano.html (2026-10-11): densidad de speakers con 18, como el evento real ----------
+   ?spk=a  5 columnas (tarjetas ~20 % mas chicas)
+   ?spk=b  6 columnas (~33 % mas chicas)
+   ?spk=c  6 columnas y tarjeta mas baja (4/5) */
+body.spk-a .spk-grid, body.spk-a .lxs-grid { grid-template-columns: repeat(5, 1fr); }
+body.spk-b .spk-grid, body.spk-b .lxs-grid, body.spk-c .spk-grid, body.spk-c .lxs-grid { grid-template-columns: repeat(6, 1fr); gap: 12px; }
+body.spk-c .spk { aspect-ratio: 4 / 5; }
+body.spk-c .lxs-box { aspect-ratio: 4 / 5; height: auto; }
+body.spk-b .spk .who b, body.spk-c .spk .who b { font-size: 17px; } body.spk-b .spk .who span, body.spk-c .spk .who span { font-size: 12.5px; }
+body.spk-b .spk .who, body.spk-c .spk .who { left: 14px; right: 14px; bottom: 12px; }
+body.spk-b .spk .ba, body.spk-c .spk .ba { padding: 16px; } body.spk-b .spk .ba q, body.spk-c .spk .ba q { font-size: 15px; }
+body.spk-b .lxs-nm b, body.spk-c .lxs-nm b { font-size: 16px; } body.spk-b .lxs-nm span, body.spk-c .lxs-nm span { font-size: 13px; }
+body.spk-a .spk .who b { font-size: 19px; } body.spk-a .spk .ba q { font-size: 18px; }
+body.spk-a .lxs-back { padding: calc(26% + 16px) 18px 18px; } body.spk-a .lxs-back q { font-size: 17px; } body.spk-a .lxs-back .tk b { font-size: 14px; }
+body.spk-b .lxs-back, body.spk-c .lxs-back { padding: calc(26% + 12px) 14px 14px; border-radius: 20px; } body.spk-b .lxs-back q, body.spk-c .lxs-back q { font-size: 14px; } body.spk-b .lxs-back .tk small, body.spk-c .lxs-back .tk small { font-size: 11.5px; } body.spk-b .lxs-back .tk b, body.spk-c .lxs-back .tk b { font-size: 12.5px; }
+@media (max-width: 1100px) { body.spk-a .spk-grid, body.spk-a .lxs-grid { grid-template-columns: repeat(4, 1fr); } body.spk-b .spk-grid, body.spk-b .lxs-grid, body.spk-c .spk-grid, body.spk-c .lxs-grid { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 600px) { body.spk-a .spk-grid, body.spk-a .lxs-grid { grid-template-columns: 1fr 1fr; } body.spk-b .spk-grid, body.spk-b .lxs-grid, body.spk-c .spk-grid, body.spk-c .lxs-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
 </style>
 </head>
 <body>
@@ -797,6 +835,13 @@ const SPEAKERS = [
   ['Natasha Kozlova', 'ML Engineer', 'OpenAI', 44, 'Los modelos grandes se ganan en los detalles pequeños.']
 ];
 const img = n => `https://i.pravatar.cc/700?img=${n}`;
+/* lab-speakers-tamano.html: ?n=18 completa la lista (como el evento real) y ?spk=a|b|c cambia la densidad */
+(() => {
+  const q = new URLSearchParams(location.search), n = +q.get('n') || 0, d = q.get('spk');
+  if (d) document.body.classList.add('spk-' + d);
+  const base = SPEAKERS.length, extra = [3, 8, 9, 11, 13, 15, 32, 33, 51, 52, 53, 60, 65, 68];
+  for (let i = base; i < n; i++) { const s = SPEAKERS[i % base]; SPEAKERS.push([s[0].split(' ')[0] + ' ' + ['Mejía', 'Rojas', 'Pardo', 'Lozano', 'Vélez', 'Ortiz', 'Cano', 'Duque', 'Salas', 'Mora'][i % 10], s[1], s[2], extra[i % extra.length], s[4]]); }
+})();
 const DAYS = [
   { k: 'Día 1', d: 'Miércoles 4', h: '8:00 a 19:30', items: [
     ['08:00', 'Registro y café de bienvenida', [], 'net'], ['09:00', 'Apertura: el futuro del trabajo corporativo', [0], 'lid'],
@@ -1030,7 +1075,21 @@ $('#spkGrid').innerHTML = SPEAKERS.map((s, i) => {
     <div class="ba"><q>${s[4]}</q><div class="tk">${t ? `<small>${t.d.d} de noviembre, ${t.it[0]}</small><b>${t.it[1]}</b>` : ''}</div><div class="nm">${s[0]}, ${s[2]}</div></div>
   </div></div>`;
 }).join('');
-new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { ob.disconnect(); $$('#spkGrid .spk').forEach(c => c.classList.add('seen')); } }), { threshold: .2 }).observe($('#spkGrid'));
+/* aparicion de speakers por fila (lab-speakers-tamano.html ?ap=a|b|c): cada fila aparece cuando entra en pantalla */
+function revealByRow(grid, sel, mode) {
+  const cards = $$(sel, grid);
+  const setDelays = () => {
+    const rows = new Map();
+    cards.forEach(c => { const k = Math.round(c.offsetTop); if (!rows.has(k)) rows.set(k, []); rows.get(k).push(c); });
+    rows.forEach(row => row.forEach((c, i) => { const mid = (row.length - 1) / 2; c.style.setProperty('--d', (mode === 'b' ? Math.abs(i - mid) * 90 : i * 60) + 'ms'); }));
+  };
+  setDelays(); addEventListener('resize', setDelays);
+  const ob = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('seen'); ob.unobserve(e.target); } }), { threshold: .25 });
+  cards.forEach(c => ob.observe(c));
+}
+const AP = new URLSearchParams(location.search).get('ap');
+if (AP) document.body.classList.add('ap-' + AP);
+if (AP) revealByRow($('#spkGrid'), '.spk', AP); else new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { ob.disconnect(); $$('#spkGrid .spk').forEach(c => c.classList.add('seen')); } }), { threshold: .2 }).observe($('#spkGrid'));
 const TOUCH = matchMedia('(hover: none)').matches;
 $$('#spkGrid .spk').forEach(el => {
   if (TOUCH) { el.addEventListener('click', () => el.classList.toggle('flip')); return; }
@@ -1179,6 +1238,7 @@ $('#lxsGrid').innerHTML = SPEAKERS.map((s, i) => { const t = talkOf(i); return `
   const invite = () => { if (learned || first.classList.contains('on')) return; first.classList.add('peek'); timers.push(setTimeout(() => { first.classList.remove('peek'); first.classList.add('settle'); }, 1900)); };
   new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { ob.disconnect(); timers.push(setTimeout(invite, 600)); } }), { threshold: .35 }).observe(grid);
 })();
+if (AP) revealByRow($('#lxsGrid'), '.lxs', AP);
 /* agenda en tablero */
 const lxSel = new Set();
 let lxDay = 0, lxSwap = false;
