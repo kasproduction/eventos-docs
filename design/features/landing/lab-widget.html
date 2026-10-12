@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab widget de registro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Lab 2026-10-11 — widget de registro embebible (PENDIENTES §3). El mismo boleto por pasos de la landing (A, tamaño fijo)
+   dentro de la pagina de un cliente de mentira. Tres formas de integrarse:
+   A = tarjeta: el boleto tal cual, con su fondo, borde y sombra
+   B = transparente: sin fondo ni borde, toma el fondo del cliente (el tema tiene que coincidir con su fondo)
+   C = tarjeta con el evento: como A, con el nombre y la fecha del evento arriba (fuera de la landing nadie sabe de que evento es)
+   Al registrarse: opcion (a) aprobada, el mensaje sale en el mismo boleto, del mismo tamaño. */
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: 'Urbanist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+
+/* barra del lab */
+.bar { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 9px 16px; background: #0b0b0c; color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 13px; }
+.bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14px; }
+.bar .lb { color: rgba(255,255,255,.45); }
+.seg { display: flex; padding: 3px; gap: 2px; border-radius: 10px; background: #1c1c1f; }
+.seg button { border: 0; background: none; color: rgba(255,255,255,.6); font-weight: 600; font-size: 12.5px; padding: 6px 10px; border-radius: 7px; cursor: pointer; white-space: nowrap; }
+.seg button.on { background: #fff; color: #111; }
+
+/* ---------- la pagina del cliente (de mentira) ---------- */
+.site { min-height: calc(100vh - 50px); font-family: 'Manrope', system-ui, sans-serif; transition: background .4s; /* otra fuente: es la pagina de un cliente, no la nuestra */ }
+.site.light { background: #ffffff; color: #1d2433; }
+.site.dark { background: #0f1729; color: #e7ecf5; }
+.site.photo { background: radial-gradient(80% 90% at 15% 20%, #e9a46a 0%, transparent 55%), radial-gradient(70% 80% at 85% 30%, #6b7fd6 0%, transparent 60%), radial-gradient(90% 90% at 50% 100%, #2b3a67 0%, #141b33 70%); color: #fff; }
+.site nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 40px; font-weight: 600; font-size: 14px; }
+.site nav .lg { font-weight: 700; font-size: 18px; letter-spacing: -.01em; }
+.site nav .lk { display: flex; gap: 26px; opacity: .7; }
+.site main { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 64px; align-items: center; max-width: 1180px; margin: 0 auto; padding: 40px 40px 80px; }
+.site .eyebrow { font-size: 13px; font-weight: 600; opacity: .6; }
+.site h1 { font-size: clamp(32px, 4vw, 52px); line-height: 1.08; letter-spacing: -.02em; margin: 14px 0 18px; font-weight: 700; }
+.site p { font-size: 17px; line-height: 1.6; opacity: .78; max-width: 520px; margin: 0 0 14px; }
+.site .slot-note { font-size: 12px; opacity: .45; margin-top: 10px; text-align: center; }
+@media (max-width: 900px) { .site main { grid-template-columns: 1fr; gap: 32px; padding: 24px 16px 60px; } .site nav { padding: 18px 16px; } .site nav .lk { display: none; } }
+
+/* ---------- el widget (lo que iria dentro del iframe) ---------- */
+.wg { --accent: #3D6BFF; --on-accent: #fff; --bg: #050506; --fg: #fff; --mut: rgba(255,255,255,.62); --mut2: rgba(255,255,255,.42); --line: rgba(255,255,255,.1); --card: #121215; --shadow: 0 30px 80px rgba(0,0,0,.55);
+  --spring: cubic-bezier(.34,1.36,.5,1); --ease: cubic-bezier(.2,.8,.2,1); --out: cubic-bezier(.16,1,.3,1);
+  font-family: 'Urbanist', system-ui, sans-serif; color: var(--fg); }
+.wg.lux { --bg: #F2EEE7; --fg: #141414; --mut: rgba(20,20,20,.62); --mut2: rgba(20,20,20,.45); --line: rgba(20,20,20,.1); --card: #FBF9F5; --shadow: 0 30px 70px rgba(60,45,25,.16), 0 2px 6px rgba(60,45,25,.06); }
+.wg .ticket { position: relative; background: color-mix(in srgb, var(--card) 96%, transparent); border: 1px solid var(--line); border-radius: 24px; padding: 24px; box-shadow: var(--shadow); }
+/* B: transparente */
+.wg.flat .ticket { background: transparent; border-color: transparent; box-shadow: none; padding: 4px 0; }
+.wg .ev { display: none; margin: 0 0 16px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.wg .ev b { display: block; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 19px; letter-spacing: -.02em; }
+.wg .ev span { display: block; font-size: 13.5px; color: var(--mut); margin-top: 3px; }
+.wg.with-ev .ev { display: block; }
+.wg .t-head { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px; line-height: 1; color: var(--mut2); }
+.wg .t-head b { color: var(--accent); }
+.wg .prog { height: 2px; background: var(--line); border-radius: 2px; margin: 16px 0 0; overflow: hidden; }
+.wg .prog i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .6s var(--out); }
+.wg .steps { height: 252px; }
+.wg .step { display: none; }
+.wg .step.on { display: block; animation: wgIn .5s var(--out); }
+@keyframes wgIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.wg .q { height: 94px; margin: 14px 0 0; display: flex; align-items: flex-end; overflow: hidden; font-family: 'Plus Jakarta Sans'; font-weight: 600; font-size: 22px; letter-spacing: -.03em; line-height: 1.4; }
+.wg .q .mu { opacity: .5; }
+.wg input.ln { display: block; width: 100%; border: 0; border-bottom: 2px solid var(--line); background: transparent; outline: none; font-size: 22px; letter-spacing: normal; color: var(--accent); padding: 0 2px; margin: 6px 0 4px; border-radius: 0; }
+.wg input.ln::placeholder { color: var(--mut2); opacity: .7; }
+.wg input.ln:focus { border-bottom-color: var(--accent); }
+.wg input.ln.err { border-bottom-color: #E5484D; }
+.wg .row { display: flex; gap: 10px; align-items: center; margin-top: 14px; }
+.wg .cta { display: flex; align-items: center; justify-content: center; gap: 10px; flex: 1; height: 52px; border: 0; border-radius: 14px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 16px; cursor: pointer; transition: transform .25s var(--spring); }
+.wg.lux .cta { background: #141414; color: #fff; }
+.wg .cta:hover { transform: translateY(-2px); }
+.wg .cta svg, .wg .back svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.wg .back { width: 52px; height: 52px; flex: none; display: grid; place-items: center; border-radius: 14px; border: 1px solid var(--line); background: transparent; cursor: pointer; }
+.wg .foot { height: 40px; margin-top: 10px; font-size: 13px; color: var(--mut); line-height: 1.4; overflow: hidden; }
+.wg .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 1.4; color: var(--mut); cursor: pointer; }
+.wg .consent input { width: 17px; height: 17px; margin: 1px 0 0; accent-color: var(--accent); flex: none; }
+.wg .consent.err { color: #E5484D; }
+/* confirmacion (a): mismo boleto, mismo tamaño */
+.wg .done .big { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 28px; letter-spacing: -.035em; line-height: 1.08; margin: 14px 0 10px; height: 94px; display: flex; align-items: flex-end; }
+.wg .done .big em { font-style: normal; color: var(--accent); }
+.wg .done p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--mut); }
+.wg .done p b { color: var(--fg); font-weight: 600; }
+.wg .done .acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.wg .done .acts button { height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent; font-weight: 700; font-size: 14px; cursor: pointer; }
+.wg .done .acts .pri { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.wg.lux .done .acts .pri { background: #141414; border-color: #141414; color: #fff; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <b>Widget de registro</b>
+  <span class="lb">Integración</span>
+  <div class="seg" id="mode"><button data-v="card" class="on">A. Tarjeta</button><button data-v="flat">B. Transparente</button><button data-v="ev">C. Tarjeta con el evento</button></div>
+  <span class="lb">Página del cliente</span>
+  <div class="seg" id="site"><button data-v="light" class="on">Clara</button><button data-v="dark">Oscura</button><button data-v="photo">Con foto</button></div>
+  <span class="lb">Tema</span>
+  <div class="seg" id="thm"><button data-v="noir">Noir</button><button data-v="lux" class="on">Lux</button></div>
+  <div class="seg" id="state"><button data-v="reg" class="on">Registro</button><button data-v="done">Ya registrado</button></div>
+</div>
+
+<div class="site light" id="siteEl">
+  <nav><span class="lg">Empresa S.A.</span><span class="lk"><span>Nosotros</span><span>Servicios</span><span>Eventos</span><span>Contacto</span></span></nav>
+  <main>
+    <div>
+      <div class="eyebrow">Evento anual</div>
+      <h1>Te esperamos en el Summit Empresarial 2026</h1>
+      <p>Tres días de charlas, talleres y conexiones con líderes de la industria. Cupos limitados para clientes y aliados.</p>
+      <p>Regístrate aquí mismo: tu acceso llega a tu correo.</p>
+    </div>
+    <div>
+      <div class="wg lux" id="wg">
+        <div class="ticket">
+          <div class="ev"><b>Summit Empresarial 2026</b><span>4 al 8 de noviembre, Bogotá</span></div>
+          <div class="t-head"><span>Tu registro</span><b>Gratis</b></div>
+          <div class="prog"><i></i></div>
+          <div class="steps" id="steps">
+            <div class="step" data-s="name"><p class="q"><span>Hola, me llamo</span></p><input class="ln" data-f="name" placeholder="tu nombre"><div class="row"><button class="cta" data-next>Seguir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><div class="foot">Sin contraseña. Tu acceso llega a tu correo.</div></div>
+            <div class="step" data-s="email"><p class="q"><span><span class="mu">Mucho gusto, <span data-name></span>.</span> ¿A qué correo te enviamos tu acceso?</span></p><input class="ln" data-f="email" type="email" placeholder="tu@empresa.com"><div class="row"><button class="back" data-prev aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button><button class="cta" data-next>Seguir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><div class="foot"></div></div>
+            <div class="step" data-s="role"><p class="q"><span><span class="mu">Para tu escarapela,</span> trabajo como</span></p><input class="ln" data-f="role" placeholder="tu cargo"><div class="row"><button class="back" data-prev aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button><button class="cta" data-next>Seguir <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><div class="foot">Opcional. Puedes dejarlo vacío.</div></div>
+            <div class="step" data-s="company"><p class="q"><span><span class="mu">Para tu escarapela,</span> trabajo en</span></p><input class="ln" data-f="company" placeholder="tu empresa"><div class="row"><button class="back" data-prev aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button><button class="cta" data-submit>Quiero mi lugar <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><div class="foot"><label class="consent"><input type="checkbox" data-f="consent"> Acepto el tratamiento de mis datos para gestionar mi participación.</label></div></div>
+            <div class="step done" data-s="done"><div class="big"><span><span data-name></span>, ya tienes tu <em>lugar</em>.</span></div><p>Te enviamos tu acceso a <b data-mail></b>. Con ese enlace entras y ves tu código QR.</p><div class="acts"><button class="pri">Agregar al calendario</button><button data-fix>¿No es tu correo?</button></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="slot-note">Aquí va el widget (marco de tu-app)</div>
+    </div>
+  </main>
+</div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const wg = $('#wg'), order = ['name', 'email', 'role', 'company'];
+let i = 0;
+const MAIL = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+function show() {
+  const s = order[i] ?? 'done';
+  $$('.step', wg).forEach(x => x.classList.toggle('on', x.dataset.s === s));
+  $('.prog i', wg).style.width = (s === 'done' ? 100 : ((i + 1) / order.length) * 100) + '%';
+  $$('[data-name]', wg).forEach(x => x.textContent = ($('[data-f=name]', wg).value.trim().split(/\s+/)[0]) || 'Andrea');
+  $('[data-mail]', wg).textContent = $('[data-f=email]', wg).value.trim() || 'andrea@empresa.com';
+}
+$$('[data-next]', wg).forEach(b => b.onclick = () => {
+  const inp = $(`.step[data-s="${order[i]}"] input.ln`, wg), s = order[i];
+  const ok = s === 'name' ? inp.value.trim().length >= 2 : s === 'email' ? MAIL(inp.value) : true;
+  inp.classList.toggle('err', !ok); if (ok) { i++; show(); }
+});
+$$('[data-prev]', wg).forEach(b => b.onclick = () => { i = Math.max(0, i - 1); show(); });
+$$('input.ln', wg).forEach(x => x.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); $('[data-next],[data-submit]', x.closest('.step')).click(); } });
+$('[data-submit]', wg).onclick = () => { const c = $('[data-f=consent]', wg); $('.consent', wg).classList.toggle('err', !c.checked); if (c.checked) { i = 99; show(); } };
+$('[data-fix]', wg).onclick = () => { i = 1; show(); };
+function seg(id, fn) { $$(`#${id} button`).forEach(b => b.onclick = () => { $$(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); fn(b.dataset.v); }); }
+seg('mode', v => { wg.classList.toggle('flat', v === 'flat'); wg.classList.toggle('with-ev', v === 'ev'); });
+seg('site', v => { $('#siteEl').className = 'site ' + v; });
+seg('thm', v => wg.classList.toggle('lux', v === 'lux'));
+seg('state', v => { i = v === 'done' ? 99 : 0; show(); });
+show();
+</script>
+</body>
+</html>
