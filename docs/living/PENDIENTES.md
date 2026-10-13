@@ -104,7 +104,7 @@
 > Labs: `design/features/landing/` (v1, v2, direcciones de hero, fondos three.js). Estado del dia y
 > descartes: `docs/NEXT-SESSION.md` sesion 2026-09-30.
 > **Hallazgos backend (antes de abrir al publico):** `POST /auth/register` sin throttle; sin CAPTCHA
-> (propuesto Turnstile); `max_attendees` sin lock (carrera en el ultimo cupo); `SecurityHeaders`
+> (propuesto Turnstile); `max_attendees` sin lock (carrera en el ultimo cupo; **RESUELTO 2026-10-12** backend 6959bd0, tambien el ultimo uso de un codigo); `SecurityHeaders`
 > pone `X-Frame-Options: DENY` global (bloquea el iframe); `allowed_embed_domains` hoy valida
 > streams salientes, hace falta un campo propio para dominios que embeben; registro exige
 > contraseña (hace falta registro sin contraseña + enlace magico para cuentas nuevas).

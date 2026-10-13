@@ -164,7 +164,11 @@ humo en verde y se destruye sin dejar nada cobrando. Nadie toca una maquina a ma
 
 ## B3 — Arreglos de codigo que 5.000 exige — 0/8 (paralelo a B2)
 
-- [ ] **B3.1 Correo con ritmo controlado** (hallazgo 8). Cola limitada por debajo
+- [~] **B3.1 Correo con ritmo controlado** (hallazgo 8). **CODIGO HECHO 2026-10-12** (backend d5c3690):
+      limitador compartido `mail` (MAIL_RATE_PER_SECOND=8), cola `mail-priority` para esenciales,
+      reintentos 12 h, `supervisor-mail` en Horizon. **Falta:** plan pagado de Resend + pedir mas
+      envios por segundo (Kamilo: Resend se queda) y medirlo en el servidor con una ola real.
+      Original: Cola limitada por debajo
       del techo de Resend (10 peticiones/s por equipo), enlaces de acceso con
       prioridad sobre invitaciones, reintentos que no pierdan correos, y pedir
       ampliacion a Resend.
