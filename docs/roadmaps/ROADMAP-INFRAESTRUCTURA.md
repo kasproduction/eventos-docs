@@ -172,7 +172,10 @@ humo en verde y se destruye sin dejar nada cobrando. Nadie toca una maquina a ma
       del techo de Resend (10 peticiones/s por equipo), enlaces de acceso con
       prioridad sobre invitaciones, reintentos que no pierdan correos, y pedir
       ampliacion a Resend.
-- [ ] **B3.2 La puerta** (= I.1b, 2 items). El limitador cuenta fallos, no
+- [~] **B3.2 La puerta** — **CODIGO HECHO 2026-10-12** (backend, PuertaDelEventoTest): login cuenta solo
+      fallos por red (60/min), rutas publicas 3000/min por IP, check-email 1500/min por red y 10/min por
+      correo (umbrales en `config/auth.php` puerta). **Falta medirlo en el servidor** con
+      `tests/load/entrar-por-la-puerta.js` (500 en 60 s y 1.000 a 25/s). Original: (= I.1b, 2 items). El limitador cuenta fallos, no
       intentos, y las rutas publicas soportan un recinto entero en una sola IP.
 - [ ] **B3.3 Juegos en vivo** (`PENDIENTES.md` §7b). Limitar difusiones de juego y
       cachear `GameService::getEligiblePool`.
