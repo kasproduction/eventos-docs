@@ -69,7 +69,7 @@ volver a crear con `deploy.sh`.
 | **Webapp (Next)** | Nodo(s) propio(s), **2 desde el primer nivel vendible** | Next es ~25% del CPU navegando; en su maquina no compite con Laravel. Sin estado (su cache del marco se invalida por aviso del backend a la LISTA de nodos: `WEBAPP_INTERNAL_URLS`) | — |
 | **API (Laravel)** | Nodo(s) propio(s), **2 desde el primer nivel vendible**, es lo que se multiplica al crecer | Es el 60% del CPU. Sin estado (sesion y cache en Redis, archivos en R2): cada nodo que se suma es capacidad lineal | — |
 | **Archivos** | **Cloudflare R2** con dominio propio | Ya hecho; sin egress; fuera de las maquinas | — |
-| **Correo** | Resend | Ya hecho | — |
+| **Correo** | Resend (se queda: decision Kamilo 2026-10-12, no sumar otro proveedor) | Ya hecho. Para un evento real: plan pagado y pedir mas envios por segundo (ver costo abajo) | Amazon SES (mas barato a volumen, pero es otro proveedor y otra cuenta) |
 | **Errores / salud / alertas** | Sentry (ya) + Laravel Pulse + monitor externo con alerta (I.5) | Enterarse antes de que alguien se queje | — |
 | **Respaldo fuera del proveedor** | Volcado cifrado a R2 por cron (I.4) + respaldos de la BD administrada + snapshots automaticos de DO | El unico respaldo hoy vive dentro de DO | — |
 | **Deploy** | Blue-green: se saca un nodo del LB, se actualiza, se prueba, se mete; luego el otro | Cero corte en despliegues (`DISPONIBILIDAD-HA.md` §4) | — |
@@ -109,6 +109,12 @@ El combo minimo que **no sufre**: cada rol por duplicado, datos fuera.
 | Cloudflare | DNS + proxy naranja + WAF | Free/Pro | — | $0-20 |
 | R2 · Resend · Sentry · respaldos · monitor | | | | ~$10-30 |
 | **Total: 6 droplets + 2 administrados** | | | | **~$320-440** |
+
+> **Correo en el costo (2026-10-12):** el plan gratis de Resend no sirve para un evento real (tope diario).
+> Un evento de 5.000 personas manda ~15.000-25.000 correos (enlace de acceso, recordatorios, reenvios):
+> plan pagado del orden de USD 20/mes (50.000 correos) mientras dure el evento. **Verificar precio y
+> limite de envios por segundo en el panel de Resend antes de cotizar**, y pedir la ampliacion del limite
+> con semanas de anticipacion. Va dentro de la fila "R2 · Resend · Sentry".
 
 ### 3.1 Lo que se midio (2026-08-17/18: 300 sinteticos por la webapp, 10 min, apagones a proposito)
 
