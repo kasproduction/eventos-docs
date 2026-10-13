@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hero en pantalla vertical</title>
+<style>
+:root{--bg:#0b0b0c;--fg:#f2f2f2;--mut:#8a8a8f;--line:#26262a;--acc:#ff2a2a}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Plus Jakarta Sans",system-ui,sans-serif;padding:32px 24px 64px}
+h1{font-size:28px;margin:0 0 6px;letter-spacing:-.02em}
+p.lead{color:var(--mut);margin:0 0 28px;max-width:760px;line-height:1.5}
+h2{font-size:18px;margin:36px 0 14px;color:var(--mut);font-weight:600}
+.row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
+figure{margin:0}
+figure img{width:100%;display:block;border:1px solid var(--line);border-radius:10px}
+figcaption{margin-top:10px;font-size:14px;line-height:1.45;color:var(--mut)}
+figcaption b{display:block;color:var(--fg);font-size:16px;margin-bottom:2px}
+@media (max-width:900px){.row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style></head><body>
+<h1>Hero en pantalla vertical</h1>
+<p class="lead">Pantalla de 1080 por 1920 (monitor vertical o tótem) y iPad Pro vertical. Hoy el hero ocupa toda la altura y el contenido queda pegado abajo. Solo cambia en pantallas verticales de más de 1020 de ancho; celular, iPad horizontal y escritorio quedan igual.</p>
+
+<h2>1080 × 1920</h2>
+<div class="row">
+<figure><img src="lab-1080-hoy.png" alt=""><figcaption><b>Hoy</b>Casi tres cuartos de la pantalla son fondo vacío.</figcaption></figure>
+<figure><img src="lab-1080-A2.png" alt=""><figcaption><b>A2. Hero corto con los bloques llenándolo (ya aplicada)</b>La escena se dibuja al alto del hero: encuadra como en una pantalla ancha.</figcaption></figure>
+<figure><img src="lab-1080-A.png" alt=""><figcaption><b>A. Hero más corto</b>El hero mide como una pantalla ancha y los speakers suben. Pierde el fondo de bloques: habría que encuadrar la escena al alto del hero.</figcaption></figure>
+<figure><img src="lab-1080-B.png" alt=""><figcaption><b>B. Una columna abajo</b>Título más grande a todo el ancho, datos en una fila y boleto debajo. Sigue anclado abajo, pero llena la mitad inferior.</figcaption></figure>
+<figure><img src="lab-1080-C.png" alt=""><figcaption><b>C. Centrado</b>Todo al centro de la pantalla, boleto centrado. Los bloques quedan arriba y abajo como marco.</figcaption></figure>
+</div>
+
+<h2>iPad Pro vertical, 1024 × 1366</h2>
+<div class="row">
+<figure><img src="lab-1024-hoy.png" alt=""><figcaption><b>Hoy</b></figcaption></figure>
+<figure><img src="lab-1024-A2.png" alt=""><figcaption><b>A2</b></figcaption></figure>
+<figure><img src="lab-1024-A.png" alt=""><figcaption><b>A</b></figcaption></figure>
+<figure><img src="lab-1024-B.png" alt=""><figcaption><b>B</b></figcaption></figure>
+<figure><img src="lab-1024-C.png" alt=""><figcaption><b>C</b></figcaption></figure>
+</div>
+</body></html>

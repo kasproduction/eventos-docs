@@ -131,7 +131,11 @@
 
 - [x] Script/iframe embebible: `widget.js` (data-evento, data-tema) -> iframe `/[locale]/e/[slug]/widget`; al registrarse va a nuestra confirmacion con pase de un solo uso (2026-10-11)
 - [x] Validacion de dominio contra allowed_embed_domains (frame-ancestors en proxy.ts) + rate limit
-- [ ] CAPTCHA (Turnstile): faltan las llaves de Cloudflare
+- [x] CAPTCHA (Turnstile) conectado en registro publico + widget (2026-10-12): invisible, solo aparece si Cloudflare duda;
+  si Cloudflare no responde el registro sigue (queda en el log `turnstile.unreachable`). Probado de punta a punta.
+- [ ] **ANTES DE ABRIR EL REGISTRO: cambiar las llaves de PRUEBA de Turnstile por las reales** (Cloudflare > Turnstile).
+  Hoy van las de prueba, que aprueban a cualquiera. Backend `.env`: `TURNSTILE_SECRET_KEY`; eventos-web `.env.local`
+  (y el del servidor): `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. Agregar el dominio real de la landing en el panel de Turnstile.
 - [x] Tema del widget: color del evento, Noir/Lux del evento o forzado con data-tema
 - [x] Config en admin: Entrada > Landing y widget (dominios, tema, codigo, vista previa) — falta que Kamilo la revise
 
@@ -163,12 +167,16 @@
 
 - [x] GET /api/v1/public/events/{slug}/landing (speakers, agenda, tracks, sponsors, faqs) 5711d44
 - [x] POST /api/v1/public/events/{slug}/register (limite por correo y red) 87e519e
-- [ ] CAPTCHA en el registro publico (con el widget)
+- [x] CAPTCHA en el registro publico (con el widget) — Turnstile 2026-10-12, llaves de prueba (ver arriba)
 
 ### Stack
 
 - [x] Stack: dentro de la webapp Next (decision 2026-10-11), Noir/Lux por evento
-- [ ] SEO/OG de la landing publica (metadatos por evento)
+- [x] SEO/OG de la landing publica (2026-10-12): titulo y descripcion del evento (sin "EventOS"), canonical, tarjeta al
+  compartir con la imagen 16:9 "Card del Home", datos estructurados schema.org/Event; confirmacion y widget fuera de Google
+- [ ] Tarjeta al compartir cuando el evento NO tiene "Card del Home": hoy sale sin imagen. Generarla (nombre, fecha, lugar,
+  color del evento) necesita lab antes
+- [ ] En produccion, probar la tarjeta en WhatsApp, LinkedIn y X con la URL real (en local la imagen no es publica)
 
 ---
 

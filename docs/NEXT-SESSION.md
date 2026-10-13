@@ -13,6 +13,22 @@
 
 ---
 
+## SESION 2026-10-12 (Opus 5.5) — TURNSTILE, SEO DE LA LANDING, HERO VERTICAL
+
+**Decisiones Kamilo:** pestaña del admin Landing y widget aprobada. Turnstile con llaves de PRUEBA y anotar que hay que
+cambiarlas (PENDIENTES §3). Hero en pantallas verticales grandes = **A2** (lab `design/features/landing/lab-hero-vertical/`):
+hero de alto min(100svh, max(780px, 92vw)) y la escena 3D dibujada a ese alto. Descartadas: C centrado (los bloques se
+comen las letras), B una columna, A sin reencuadre.
+
+**Hecho:** backend `68af3f4` (TurnstileVerifier + 4 tests, PublicEvent 32/32); eventos-web `c5f2e63` (useTurnstile,
+SEO/OG/schema.org, noindex en confirmacion y widget, hero A2; vitest landing+lib 52/52). Probado de punta a punta con
+Playwright: registro en landing y widget con token de Cloudflare.
+
+**Pendiente:** llaves reales de Turnstile antes de abrir el registro; tarjeta al compartir cuando no hay Card del Home (lab);
+probar la tarjeta en WhatsApp/LinkedIn en produccion; revisar la landing en iPad con Kamilo (empezada).
+
+---
+
 ## SESION 2026-10-11 (Opus 5.5) — CONFIRMACION CERRADA EN DISEÑO + REGISTRO PUBLICO SIN CONTRASEÑA EN BACKEND
 
 **Ventana: `docs/living/PENDIENTES.md` §3 Post-registro. Pagina real: `design/features/landing/confirmacion.html`.**
