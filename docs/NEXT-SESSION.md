@@ -24,6 +24,18 @@ comen las letras), B una columna, A sin reencuadre.
 SEO/OG/schema.org, noindex en confirmacion y widget, hero A2; vitest landing+lib 52/52). Probado de punta a punta con
 Playwright: registro en landing y widget con token de Cloudflare.
 
+**Tarde/noche (backend, todo con tests):** `6959bd0` cupo y ultimo uso de codigo con bloqueo (RegistrationRaceTest);
+`d5c3690` **B3.1** correo con ritmo: limitador `mail` (MAIL_RATE_PER_SECOND=8), cola `mail-priority` para esenciales,
+reintentos 12 h, `supervisor-mail` en Horizon (SendEmailRateTest); `7d46d5c` **un solo correo** al registrarse en la landing
+(`welcome_access`: bienvenida + enlace de 24 h + .ics; migracion de ENUM + plantilla sembrada en local); `de80348` **B3.2 la
+puerta**: login cuenta solo fallos por red (60/min), rutas publicas `public_read` 3000/min por IP, `check-email` y
+`verify-identity` con `entry_check` (1500/min red, 10/min correo), umbrales en `config/auth.php` puerta (PuertaDelEventoTest).
+Ultima corrida: Auth + Security + PublicEvent 299/299; Emails + PublicEvent 60/60 antes del correo unico.
+**Decisiones Kamilo:** Resend se queda (no sumar proveedores; su plan pagado entra en el costo de cada evento,
+`docs/infra/STACK-PRODUCCION.md`). Registro publico = un solo correo.
+**Sigue (propuesto, sin "dale"):** B3.3 juegos en vivo (limitar difusiones + cachear `GameService::getEligiblePool`).
+B3.1 y B3.2 faltan medirlos en el servidor (`tests/load/entrar-por-la-puerta.js`).
+
 **Pendiente:** llaves reales de Turnstile antes de abrir el registro; tarjeta al compartir cuando no hay Card del Home (lab);
 probar la tarjeta en WhatsApp/LinkedIn en produccion; revisar la landing en iPad con Kamilo (empezada).
 
