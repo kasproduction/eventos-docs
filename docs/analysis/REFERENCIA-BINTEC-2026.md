@@ -67,6 +67,18 @@ conferencia), "Descripcion no disponible", links vacios. No se puede afirmar.
   "Usuario" sin decir si es correo o cedula, solo celular, sin recuperar acceso. La friccion mata la
   gamificacion en la puerta. Regla para nosotros: el QR del stand suma con la sesion que ya existe,
   nunca pide otro login.
+- Dentro (leido del codigo, sin entrar): 4 minijuegos por QR. Trivia (con tiempo), ahorcado
+  (errores permitidos), memoria (parejas) y "ranas" (reflejos por niveles, vidas y tiempo). Cierre
+  con confeti y sonido, "Se acreditaron X Bits a tu campaña", puesto en ranking, segundos, insignia
+  nueva. Saldo, ranking completo y canje no estan en el JS (los pinta el servidor tras el login).
+- Detalles bien pensados: **recupera la partida si se cae la conexion** ("Se recupero tu partida
+  despues de una interrupcion de conexion"), **modo vista previa para el staff** (no guarda
+  intentos, Bits, ranking ni insignias), boton de silenciar, puntos por "campaña" (multi-cliente).
+- **El hueco que nos muestra (Kamilo, 2026-10-14):** EventOS penso la gamificacion EN VIVO
+  (trivia en el streaming, momentos en vivo, lo que dispara el MC). Bintec Play es **a demanda**:
+  la persona juega cuando quiere, en el stand, sin depender de que pase algo en tarima. Nos falta
+  esa capa: juegos cortos por QR, jugables en cualquier momento, que suman al mismo ranking.
+  Ademas carga poco: no necesita socket, solo empezar / responder / terminar.
 - Para tomar: "un QR = un juego corto" con intento unico que suma y repeticiones solo por diversion;
   juegos casuales (memoria, ahorcado) ademas de trivia.
 
