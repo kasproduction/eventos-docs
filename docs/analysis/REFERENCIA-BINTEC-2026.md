@@ -47,6 +47,25 @@ conferencia), "Descripcion no disponible", links vacios. No se puede afirmar.
 - Cada mensaje pasa antes por `POST /api/chat/moderation` (puede responder `ROOM_BANNED`).
 - `/api/chat/history` para historial. Typing, reacciones y avatares con iniciales vienen del kit de Ably.
 
+## 5b. Bintec Play (gamificacion, sitio aparte)
+
+- En el home (`/#bintec-play`): QR + link a `bintecplay.actividad.online/q/GAME-...`, "Disponible
+  solo en version movil". Terminos de Bits en PDF y "Manual del jugador".
+- Mecanica: ganar **Bits** (puntos) en charlas, talleres, stands, retos y trivias; canjear por
+  sorpresas en el evento. Presencial: escanear QR en stands/actividades. Virtual: conectarse a charlas.
+- Tecnologia: otro proveedor, otro servidor. Apache + backend propio (cookie `bintecplay_session`,
+  8 h, HttpOnly/Secure, CSRF en formulario), HTML + JavaScript plano (`/assets/js/app.js`, 47 KB),
+  sin framework y sin socket. Login propio "con las credenciales del evento" (usuario + contraseña,
+  "Tu contraseña no se almacenara": parece validar contra la cuenta Bintec).
+- Cada QR abre UN minijuego: trivia, memoria (parejas), ahorcado y "frog" (juego de reflejos).
+  Endpoints por juego (start / answer / guess / match / finish) via `fetch` POST. Al final muestra
+  puntos, posicion en ranking, insignias nuevas y si puede repetir ("la repeticion fue por diversion
+  y no sumo Bits" / "ya utilizaste tu intento").
+- Lectura: es justo lo que EventOS ya tiene integrado (golden tickets, pasaporte de stands, trivia,
+  ranking, canje) pero ellos lo resolvieron con un tercero en otro dominio y otro login.
+- Para tomar: "un QR = un juego corto" con intento unico que suma y repeticiones solo por diversion;
+  juegos casuales (memoria, ahorcado) ademas de trivia.
+
 ## 5. Seguridad (pasiva)
 
 - Bien: token del chat del lado del servidor, moderacion previa, reCAPTCHA en login, HSTS 2 años.
