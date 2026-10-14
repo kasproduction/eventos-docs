@@ -186,6 +186,30 @@ ya no le pide `/auth/me` al backend en cada conexion (ficha compartida en Redis,
 > para pintar (empezar por la agenda: 1 por dia), cache CDN para lo que casi no cambia, lo vivo por
 > socket, video afuera, chat con respaldo externo si 5.000 no aguanta. Va antes de medir 5.000.
 
+### BINTEC 2026 — lo que sale de la referencia (Kamilo 2026-10-14) — 0/6
+
+> Fuente de todo: `docs/analysis/REFERENCIA-BINTEC-2026.md`. Decision de enfoque (Kamilo):
+> menos features nuevas, mas que lo existente cargue liviano y entre sin friccion.
+> Orden propuesto: B.1 primero (lo que mas pesa para el 6 de diciembre); B.2 siguiente frente,
+> con /davinci (Kamilo dio "dale" a arrancar el analisis, sin codigo).
+
+- [ ] **B.1 Menos peticiones por pantalla.** Medir cuantas hace hoy cada pantalla (~9 medidas en
+  agosto). Empezar por la agenda: 1 peticion por dia ya armada para pintar (sede → sala → sesiones,
+  horas y textos calculados), cache CDN 30-60 s, "en vivo" por socket. Luego el resto de pantallas.
+- [ ] **B.2 Juegos a demanda por QR.** Hueco: nuestra gamificacion es EN VIVO (trivia del streaming,
+  momentos, MC); falta la capa que la persona juega cuando quiere en el stand. Un QR = un juego corto
+  (trivia, memoria, ahorcado, reflejos), un intento que suma al mismo ranking, repeticiones por
+  diversion, recuperar partida si se cae la red, modo vista previa para staff, silenciar sonido.
+  Sin socket, 3-4 peticiones por juego. Base a revisar: golden tickets, pasaporte, trivia. Lab antes de codigo.
+- [ ] **B.3 Cero friccion de entrada.** El QR del stand suma con la sesion que ya existe; nunca otro
+  login (Bintec Play no dejo entrar a Kamilo).
+- [ ] **B.4 Ficha de sesion:** triple estado (me interesa / favorito / asistire presencialmente) y
+  Outlook Calendar ademas de Google. Verificar que tenemos hoy antes de agregar.
+- [ ] **B.5 Cabeceras de seguridad:** revisar CSP, X-Frame-Options, nosniff y Referrer-Policy en
+  eventos-web y la API. Y que ningun registro use un dato conocido (cedula) como contraseña.
+- [ ] **B.6 Respaldo de chat para eventos grandes:** evaluar Ably (o similar) solo si la medicion
+  de 5.000 muestra que nuestro socket no aguanta. Decision por evento, no reescritura.
+
 ### Diagnostico "evento mañana" (verificado contra codigo 2026-09-13)
 
 - **Funciona sin sufrir:** todos los modulos del asistente (agenda, streaming con
