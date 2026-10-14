@@ -63,6 +63,10 @@ conferencia), "Descripcion no disponible", links vacios. No se puede afirmar.
   y no sumo Bits" / "ya utilizaste tu intento").
 - Lectura: es justo lo que EventOS ya tiene integrado (golden tickets, pasaporte de stands, trivia,
   ranking, canje) pero ellos lo resolvieron con un tercero en otro dominio y otro login.
+- Prueba real de Kamilo (2026-10-14): **no pudo entrar**. Tercer login en otro dominio, campo
+  "Usuario" sin decir si es correo o cedula, solo celular, sin recuperar acceso. La friccion mata la
+  gamificacion en la puerta. Regla para nosotros: el QR del stand suma con la sesion que ya existe,
+  nunca pide otro login.
 - Para tomar: "un QR = un juego corto" con intento unico que suma y repeticiones solo por diversion;
   juegos casuales (memoria, ahorcado) ademas de trivia.
 
