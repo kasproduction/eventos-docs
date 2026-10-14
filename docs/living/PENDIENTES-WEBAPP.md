@@ -180,6 +180,11 @@ ya no le pide `/auth/me` al backend en cada conexion (ficha compartida en Redis,
 > **2026-09-13 — LA INFRAESTRUCTURA SE EJECUTA POR SU PLAN:** `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`
 > "PLAN DE TRABAJO — EVENTO DE NOVIEMBRE, 5.000 PERSONAS" (0/29, bloques B1-B6 con compuertas).
 > Las etapas 1, 2 y 5 de esta ruta son ese plan; los items de infraestructura de abajo quedan como resumen.
+>
+> **2026-10-14 — MENOS PETICIONES (por decidir):** referencia real de Bintec 2026 en
+> `docs/analysis/REFERENCIA-BINTEC-2026.md`. Idea central: una peticion por pantalla ya armada
+> para pintar (empezar por la agenda: 1 por dia), cache CDN para lo que casi no cambia, lo vivo por
+> socket, video afuera, chat con respaldo externo si 5.000 no aguanta. Va antes de medir 5.000.
 
 ### Diagnostico "evento mañana" (verificado contra codigo 2026-09-13)
 
