@@ -1,18 +1,10 @@
 # Pendientes — EventOS
 
-> La UNICA fuente de verdad de lo que falta por hacer.
-> Organizado por AREA tecnica, con prioridad de impacto dentro de cada una.
-> Filtro post-pivote 2026-07-08: "¿esto acerca el demo desplegado y vendible
-> para prospectos oct-nov?" (el deal Eventos Efectivos/Bancolombia se cayo).
-> Actualizado: 2026-08-01 (sueltos cerrados: enforcement Expo + double-count + BUG-LOG a cero)
-> Bugs: BUG-001 a BUG-348, **5 pendientes** (2026-09-13: BUG-348 test de cache del Data Center desactualizado desde abril; BUG-346 aviso de config de sesion al socket sin timeout; BUG-347 tests llaman al socket real y la suite tarda horas; BUG-344 tests contra MySQL dev con config cacheada, mitigado; BUG-345 correo sin control de ritmo frente a Resend, plan B3.1).
-> Antes: BUG-001 a BUG-305, 0 pendientes (BUG-111 y BUG-127 cerrados 2026-08-01
-> por auditoria de vigencia — ya estaban resueltos en codigo sin marcar)
-
----
-
-> **Lo hecho NO vive aca**: historial en `COMPLETADO.md`, estado por fase en
-> `EventOS_Roadmap.md` (Estado rapido).
+> SOLO lo abierto, por area tecnica. La ventana del dia a dia es `PENDIENTES-WEBAPP.md` (estado general en %).
+> Lo cerrado se mueve a `COMPLETADO.md` al cerrar (limpieza 2026-10-16).
+> Actualizado: 2026-10-16.
+> Bugs: BUG-001 a BUG-353. Abiertos: los 5 de infraestructura del 2026-09-13 (BUG-344 a 348; BUG-345 con
+> codigo en B3.1, falta medirlo). Detalle: `BUG-LOG.md`.
 
 ---
 
@@ -44,23 +36,13 @@
 - Los fixes de codigo (ENTITY_KEYS `modules`, double-count comment) estan en
   **"Backlog Expo"** al final de este doc — sin duplicar aca.
 
-### Recap compartible — post-evento — IMPLEMENTADO (contador viejo corregido 2026-09-13)
+### Recap compartible — post-evento — IMPLEMENTADO
 
-> **Verificado 2026-09-13:** existe en backend (`RecapService.php`, `RecapImageRenderer.php`,
-> `RecapController.php`, `RecapVerifyController.php`) y en la app (`eventos-app/app/(app)/recap`).
-> ROADMAP-RECAP dice "Fases 0-6 cerradas; pendiente E2E con Chromium en VPS y validacion visual en dev build".
-> Las casillas de abajo son el plan original y NO reflejan el estado real.
+> Existe en backend (`RecapService.php`, `RecapImageRenderer.php`, `RecapController.php`, `RecapVerifyController.php`)
+> y en la app. Plan: `docs/ROADMAP-RECAP.md`.
 
-> Plan completo: `docs/ROADMAP-RECAP.md` (DaVinci mode, con tests + refs).
-> Solo app movil en Fase 1. Webapp consume mismo backend en Fase 2 (post Web App Bancolombia).
-
-- [ ] Fase 0: Investigacion + refs visuales (~2h) — 0/8
-- [ ] Fase 1: Backend datos (RecapService + API + tests) (~4h) — 0/12
-- [ ] Fase 2: Backend imagen Browsershot + R2 (~4h) — 0/10
-- [ ] Fase 3: Backend email + URL firmada + trigger (~4h) — 0/13
-- [ ] Fase 4: App pantalla recap nativa (~7h) — 0/15
-- [ ] Fase 5: App distribucion (push, deeplink, banner, lista) (~2.5h) — 0/8
-- [ ] Fase 6: QA + edge cases + tests E2E (~3h) — 0/9
+- [ ] E2E con Chromium en el servidor + validacion visual en dev build
+- [ ] Commitear el trabajo del recap que sigue en el working tree del Expo (ver arriba, rompe typecheck)
 
 ### Pendientes menores app (Kiosk / Silent disco)
 
@@ -76,9 +58,7 @@
 
 ## 2. Web App — pendientes (ventana: `PENDIENTES-WEBAPP.md`)
 
-- [ ] QA presencial en device fisico (M.2-M.8 + B5 Fase C, ~2h con Kamilo)
-- [x] DEPLOY DEMO 6/6 — HECHO 2026-08-01/02 y luego destruido (ver ROADMAP-INFRAESTRUCTURA). Texto original: (hosting, backend prod, Next prod, socket PM2, evento
-      demo curado, Sentry DSN) — **prioridad estrategica post-pivote**
+- [ ] QA presencial en device fisico (M.2-M.8 + W.12 Fase C, ~2h con Kamilo)
 
 ---
 
@@ -92,142 +72,53 @@
       (natural, humanizado, sin tecnicismos — feedback Kamilo) y producir
       M1-M7 contra el inventario blindado
 
-## 3. Landing Web (registro publico)
+## 3. Landing Web (registro publico) — 26/32
 
-> **ACTIVO desde 2026-09-30 (decision Kamilo): es la feature que sigue, antes del servidor.**
-> Landing personalizada por cliente + summit demo de EventOS como vitrina + widget embebible
-> (enlace, integrado, boton con ventana, boton flotante). Target: CEOs y ejecutivos, elegante sin
-> cliche. Registro en forma de frase, sin contraseña (enlace magico). Base visual: propuesta A
-> (boleto) + color de marca en patrocinadores. El widget NO espeja el onboarding de Expo.
-> **Linea visual aprobada 2026-10-01: `design/system/LINEA-VITRINA.md`** (hero oscuro = Paisaje de
-> datos, claro = Fachada cinetica; lab `design/features/landing/lab-hero-elegidos.html`).
-> Labs: `design/features/landing/` (v1, v2, direcciones de hero, fondos three.js). Estado del dia y
-> descartes: `docs/NEXT-SESSION.md` sesion 2026-09-30.
-> **Hallazgos backend (antes de abrir al publico):** `POST /auth/register` sin throttle; sin CAPTCHA
-> (propuesto Turnstile); `max_attendees` sin lock (carrera en el ultimo cupo; **RESUELTO 2026-10-12** backend 6959bd0, tambien el ultimo uso de un codigo); `SecurityHeaders`
-> pone `X-Frame-Options: DENY` global (bloquea el iframe); `allowed_embed_domains` hoy valida
-> streams salientes, hace falta un campo propio para dominios que embeben; registro exige
-> contraseña (hace falta registro sin contraseña + enlace magico para cuentas nuevas).
-> Campos nuevos que pide el diseño: frase del speaker, "que trae" el patrocinador.
+> Hecho y decidido: `COMPLETADO.md` seccion 2026-10-16 (landing en la webapp `/[locale]/e/[slug]`, registro por
+> pasos sin contraseña, confirmacion con escarapela, widget embebible, Turnstile, SEO/OG, admin Landing y widget).
+> Linea visual: `design/system/LINEA-VITRINA.md`. Labs: `design/features/landing/`.
 
-> Ultimo en orden porque el registro puede hacerse por CSV/import hasta tener landing.
-> Ref: `docs/ROADMAP-UIUX-LANDING.md`
-
-### Secciones
-
-- [ ] Hero, Sobre el evento, Speakers, Agenda, Sponsors, Venue, Testimonios, Galeria, FAQ, Footer
-
-### Registro embebido
-
-- [ ] Form integrado, progressive profiling, social proof, CAPTCHA, rate limiting
-
-### Widget de registro embebible (decision Kamilo 2026-07-18)
-
-> Registro insertable en CUALQUIER sitio de terceros (pagina del organizador,
-> intranet corporativa), no solo en nuestra landing.
-> **Prior art interno**: patron `/dc-embed/{token}` del Data Center (embed con
-> token + tabla dc_embed_tokens) y campo `allowed_embed_domains` que YA existe
-> en el modelo Event — la arquitectura esta semi-prevista.
-
-- [x] Script/iframe embebible: `widget.js` (data-evento, data-tema) -> iframe `/[locale]/e/[slug]/widget`; al registrarse va a nuestra confirmacion con pase de un solo uso (2026-10-11)
-- [x] Validacion de dominio contra allowed_embed_domains (frame-ancestors en proxy.ts) + rate limit
-- [x] CAPTCHA (Turnstile) conectado en registro publico + widget (2026-10-12): invisible, solo aparece si Cloudflare duda;
-  si Cloudflare no responde el registro sigue (queda en el log `turnstile.unreachable`). Probado de punta a punta.
 - [ ] **ANTES DE ABRIR EL REGISTRO: cambiar las llaves de PRUEBA de Turnstile por las reales** (Cloudflare > Turnstile).
   Hoy van las de prueba, que aprueban a cualquiera. Backend `.env`: `TURNSTILE_SECRET_KEY`; eventos-web `.env.local`
   (y el del servidor): `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. Agregar el dominio real de la landing en el panel de Turnstile.
-- [x] Tema del widget: color del evento, Noir/Lux del evento o forzado con data-tema
-- [x] Config en admin: Entrada > Landing y widget (dominios, tema, codigo, vista previa) — falta que Kamilo la revise
+
 - [ ] **Toggle de tema para el demo** (idea Kamilo 2026-10-16): pildora Noir/Lux flotante que cambia `?tema=` en la misma URL,
   visible SOLO con `?demo` (una landing real no deja al asistente cambiar la plantilla del admin); el parametro viaja a la
   confirmacion y al widget. Minilab A (pildora abajo a la derecha) / B (barra fina arriba, con color del cliente como el lab v3)
   antes de codear. Sin backend. Hoy el tema se fuerza con `?tema=lux|noir` (`src/lib/landingEvent.ts:10`).
-
-### Post-registro (pagina: `design/features/landing/confirmacion.html`; labs `lab-confirmacion-estados.html`, `lab-cinta.html`)
-
-> Decisiones Kamilo 2026-10-04: la confirmacion es una **pagina propia** (no el panel del registro), con poco
-> texto y **celebracion** (ola del color del cliente en la escena del hero); **escarapela colgante** con animacion
-> Sutil: un lado nombre grande + cargo + empresa, el otro el **QR real** igual al de Expo/webapp. Noir = escarapela
-> oscura, Lux = crema, cinta oscura en las dos, cinta que pasa por la ranura (sin metal). Apple Wallet = nice to have.
-
-- [x] Frase del registro con cargo y empresa (opcionales): "Hola, me llamo ___ trabajo como ___ en ___ y mi correo es ___" (v3)
-- [x] Lab de la pagina de confirmacion (Noir/Lux, celular, movimiento reducido) y paso desde el registro de la v3
-- [x] Revision de Kamilo en iPad (bien) y celular: escarapela gigante -> se achica sola para caber en una pantalla (2026-10-11)
-- [x] Version fija `confirmacion.html` (Noir oscura / Lux crema, cinta por la ranura, Sutil); el registro de la v3 lleva ahi
-- [x] Sin datos inventados: fuera "Pase general" y "0348" (el backend no tiene tipo de entrada ni numero); el nombre no se repite atras del QR
-- [x] Cinta blanda: puntas quietas, holgura y retraso en el balanceo; la lengueta gira entera con la tarjeta (torcida en punta descartada: "se ve rara")
-- [x] Backend 87e519e: `POST /api/v1/public/events/{slug}/register` sin contraseña -> registered (sesion: la confirmacion pide `/me/qr`) / pending / existing (reenvia el acceso). Cargo y empresa ya se guardaban en el usuario.
-- [x] Confirmacion con los 3 estados (registered / existing "ya tenias tu lugar" / pending "en revision"); sin sesion no hay QR ni giro
-- [x] Correo completo (sin censura) + "¿No es tu correo? Corrígelo": con sesion `PATCH /api/v1/me/email` (cuenta < 24 h, sin entrar, sin verificar); sin sesion vuelve al registro con lo escrito
-- [x] Registro: "¿Quisiste decir gmail.com?" (dominios comunes, distancia <= 2)
-- [x] Rayas del fondo en la confirmacion (mismo error del hero): mask del oscurecido solo sobre los cubos
 - [ ] Credencial con etiqueta visible (VIP, Prensa): en el admin marcar que tags salen en la escarapela (idea Kamilo 2026-10-11, despues)
 - [ ] "Ya tenias tu lugar" con varios eventos: hoy sale tambien si el correo tiene cuenta en OTRO evento y no en este
-- [x] Pasar la confirmacion y el registro al stack real: webapp `/[locale]/e/[slug]` y `/confirmacion` contra el backend (2026-10-11)
-- [x] Registro por pasos de tamaño fijo (lab-registro-pasos A) y secciones del v3 con datos reales en la webapp
-- [x] Speakers 6 columnas + aparicion fila por fila con tono parejo (lab-speakers-tamano C)
-
-### Endpoints publicos
-
-- [x] GET /api/v1/public/events/{slug}/landing (speakers, agenda, tracks, sponsors, faqs) 5711d44
-- [x] POST /api/v1/public/events/{slug}/register (limite por correo y red) 87e519e
-- [x] CAPTCHA en el registro publico (con el widget) — Turnstile 2026-10-12, llaves de prueba (ver arriba)
-
-### Stack
-
-- [x] Stack: dentro de la webapp Next (decision 2026-10-11), Noir/Lux por evento
-- [x] SEO/OG de la landing publica (2026-10-12): titulo y descripcion del evento (sin "EventOS"), canonical, tarjeta al
-  compartir con la imagen 16:9 "Card del Home", datos estructurados schema.org/Event; confirmacion y widget fuera de Google
 - [ ] Tarjeta al compartir cuando el evento NO tiene "Card del Home": hoy sale sin imagen. Generarla (nombre, fecha, lugar,
   color del evento) necesita lab antes
 - [ ] En produccion, probar la tarjeta en WhatsApp, LinkedIn y X con la URL real (en local la imagen no es publica)
+- [ ] Revisar la landing en iPad con Kamilo (empezada 2026-10-12)
 
 ---
 
 ## 4. Admin — residuales (backlog, no urgente)
 
+
 - [ ] Configuracion canales WhatsApp/SMS desde Filament (email/SMTP ya existe;
       WhatsApp/SMS son nice-to-have seccion 9)
-- [ ] Preview landing en tiempo real (depende de que exista la LANDING, secc. 3)
 - [ ] Branded QR codes con logo
 
 ---
 
-## 5. Seguridad del staff — **EN COLA, DESPUES DEL DEPLOY** (decision Kamilo 2026-08-01)
+## 5. Seguridad del staff — 25/26
 
-> "Prefiero tener todo lo de seguridad en regla y no esperar a tener cliente
-> encima con presion" (2026-07-20) — sigue vigente, cambia el ORDEN.
->
-> **Movido a post-deploy el 2026-08-01.** Razones: hoy no hay puerta que proteger
-> (el admin corre local y el staff es Kamilo solo) y las passkeys exigen HTTPS,
-> que el deploy regala — hacerlo antes obligaba a montar SSL en Laragon y cambiar
-> `APP_URL`, rompiendo las imagenes de correos, todo trabajo desechable.
->
-> **RAYA ESCRITA (el riesgo de mover esto es que "despues" se vuelva "nunca"):
-> el admin no se le muestra a ningun prospecto ni recibe datos reales de nadie
-> hasta que el 2FA este puesto.** Deploy → verificar → 2FA → recien ahi sale la URL.
->
-> **Ampliacion de alcance 2026-08-01**: ademas de TOTP entran **passkeys**
-> (huella/Face ID). Verificado: `laravel/passkeys` funciona standalone, NO
-> requiere Fortify. La base sigue siendo `pragmarx/google2fa` a mano — es la
-> misma libreria que usa Laravel Fortify oficialmente (0 advisories, 104M
-> instalaciones). Passkeys entra como bloque S.9 (roadmap 0/26 → ~0/31).
->
-> **Ventana operativa: `docs/roadmaps/ROADMAP-SEGURIDAD-STAFF.md` (0/26)**
-> — 2FA con app autenticadora (TOTP) obligatorio para todo el staff del admin
-> + recuperacion + dispositivos de confianza + sesiones activas + registro de
-> accesos. ~2-3 sesiones.
->
-> **Desbloqueo**: SEC-3.1 llevaba aplazado desde abril por depender de
-> WhatsApp Business API; TOTP elimina esa dependencia. El diseño SEC-3.1/3.2
-> de `infra/FASE-SEGURIDAD.md` queda SUPERSEDED por el roadmap nuevo.
-> Ya hecho y NO se rehace: lockout, socket rate limiting, FormRequests (~90%).
+> 2FA, equipos de confianza, sesiones abiertas, registro de accesos y bloqueo HECHOS (2026-09-29).
+> Ventana: `docs/roadmaps/ROADMAP-SEGURIDAD-STAFF.md`. Raya de Kamilo: la URL del admin no sale sin esto.
+
+- [ ] S.7.2 Correr `security:check` contra el `.env` real de produccion (va con el montaje)
+- [ ] Passkeys (bloque S.9, ampliacion 2026-08-01) — sin fecha
 
 ---
+
 
 ## 6. Deploy + Infra
 
 > Bloquea testing real pero no bloquea desarrollo de features.
+> **2026-10-16:** el plan vigente es B1-B6 de `ROADMAP-INFRAESTRUCTURA.md`; esta lista es la de abril.
 > Stack DO sao1 consolidado. Ref: `docs/DISPONIBILIDAD-HA.md` y `docs/PLAN-STRESS-TESTDO.md` v2.1.
 
 - [ ] SEC-4: Docker Compose, 2 Droplets DO sao1, Cloudflare WAF+LB, DO Managed MySQL+Redis, VPC privada
@@ -239,24 +130,8 @@
 
 ---
 
-## 7. Stress test — **EJECUTADO 2026-08-01** → `docs/infra/INFORME-STRESS-2026-08-01.md`
+## 7. Stress test — EJECUTADO 2026-08-01 (`docs/infra/INFORME-STRESS-2026-08-01.md`)
 
-> **RESULTADO: ~70 req/s · ~1.000 sockets simultaneos · cuello de botella CPU**
-> (0% libre con 6,1 GB de RAM sin tocar). Traduccion comercial: **~1.000
-> personas con la app abierta a la vez; un evento de 1.000-2.000 inscritos
-> entra comodo en un droplet de $48/mes**. Para crecer se suman NUCLEOS, no
-> memoria.
->
-> Los dos bloqueantes D.0 quedaron resueltos y commiteados. Salieron 3 bugs de
-> producto (leaderboard/MySQL 8, backend sin instalar con `--no-dev`,
-> HTMLPurifier) y 4 defectos del arnes de medicion. +25% de capacidad gratis
-> con OPcache/JIT y cachés de Laravel.
->
-> **PENDIENTE INMEDIATO**: los droplets siguen ENCENDIDOS y facturando
-> (`eventos-target` 134.209.116.227 · `eventos-load` 104.248.53.253, ~$0.14/h
-> entre los dos). Destruirlos es decision de Kamilo tras leer el informe.
-> Tambien: **rotar las credenciales de R2** (quedaron escritas en el chat de
-> la sesion; alcance acotado a objetos de un bucket, pero R2 no se destruye).
 
 ### Quedo sin correr
 
@@ -265,11 +140,6 @@
 - [ ] Prueba de red degradada 4G Colombia (TEST 5 del plan v2.1): todo se
       midio dentro del mismo centro de datos a proposito, para saturar el
       servidor y no medir el cable
-- [x] **RESUELTO (verificado 2026-09-13: ficha compartida en Redis, `eventos-socket/src/auth.ts`; `/auth/me` solo si no hay ficha).** Mitigar el hallazgo de arquitectura: **cada conexion de socket cuesta
-      una peticion HTTP** a `/auth/me` (verificado: 1.468 conexiones = 1.468
-      peticiones, pico de 76/s = justo el techo de la maquina). Una
-      reconexion masiva se come sola toda la capacidad HTTP. Mitigacion:
-      que el socket valide el token sin pegarle al backend en cada handshake.
 
 ## 7b. Stress test 10K — sigue DIFERIDO
 
@@ -290,11 +160,6 @@
 
 ### Bloqueantes cazados 2026-08-01 (arreglar ANTES de medir, o el numero miente)
 
-- [x] **RESUELTO (verificado 2026-09-13: `instances: 'max'`, `cluster`, `max_memory_restart: '2G'`).** **`eventos-socket/ecosystem.config.js`**: `instances: 1` +
-      `exec_mode: 'fork'` + `max_memory_restart: '256M'`. Bajo carga el
-      servidor se reinicia a mitad del test → se mide una caida, no una
-      capacidad. Subir el techo + cluster mode (el adaptador Redis ya esta
-      implementado, es seguro).
 - [ ] **ANOTADO 2026-09-13: hoy tiene 4 tokens; el recorrido vigente es `entrar-por-la-puerta.js` por la webapp, revisar si este kit sigue en uso.** **`tests/load/tokens.json` tiene ~10 usuarios** y el script reparte
       tokens en rueda: 5000 VUs golpearian las mismas 10 cuentas
       (rate limits + caches por persona = resultado inventado). Sembrar
@@ -313,7 +178,6 @@
 ### Fixes pre-stress (Live Moments)
 
 - [ ] Throttle game broadcasts (ver DISPONIBILIDAD-HA.md seccion 11)
-- [x] **HECHO (verificado 2026-09-13: unique game_id+attendee_id+round e index game_id+round+score).** Indices `live_game_participants`
 - [ ] Cache `getEligiblePool`
 - [ ] HTTP connection pool
 
@@ -428,14 +292,6 @@
 > webapp quede solo con lo de webapp (features + QA + deploy). Ninguno bloquea el cierre.
 
 ### Paridad config admin ↔ 3 superficies (diseño con Kamilo; toca backend+Filament+Expo+webapp)
-- [x] ~~**Enforcement de modulos en el Expo**~~ **HECHO 2026-08-01**: `ModuleMenu.tsx`
-      filtra contra `useModules()` (el endpoint ya devuelve solo los encendidos),
-      fail-open sin datos, grid entero oculto si no queda ninguno (decision Kamilo:
-      el Home conserva HappeningNow + HUD + campana). NO se agregaron entradas
-      nuevas al grid — documentos/paginas/recap se alcanzan por sus caminos reales
-      (deeplinks, HUD, Ayuda del perfil), coherente con "no inventar entradas de
-      menu que Expo no tiene". Ademas `ENTITY_KEYS` gana `modules`, que era lo que
-      dejaba al Expo sordo al broadcast del panel. Falta QA vivo en device.
 - [ ] **Paginas custom: DEFERIDO POST-DEPLOY** (decision Kamilo 2026-07-20:
       "es para el final, no aporta ni detiene, no es dependencia"). El feature
       (iframes/HTML embebido: YouTube, Slido, mapa) tiene backend+API+detalle
