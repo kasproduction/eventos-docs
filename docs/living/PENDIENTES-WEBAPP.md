@@ -43,6 +43,13 @@ El plan de servidor esta EN PAUSA por decision de Kamilo (2026-09-30) hasta cerr
 - [ ] Correo transaccional listo por cliente: clave Resend, dominio verificado
 - [ ] Alerta externa (capa 1 de I.5) + respaldo fuera de DigitalOcean (I.4)
 - [ ] I.7.8 Entrega + runbook del dia del evento ("si pasa X, haz Y")
+- [ ] **Torre de control** (B4.5 + I.5, pedida por Kamilo 2026-04-19 y 2026-08-17): UNA pantalla en el admin solo
+      super_admin con conectados por nodo, peticiones/s, p95 por endpoint, errores del ultimo minuto, CPU por rol,
+      colas y estado de cada nodo, en vivo por socket. Con ella: alertas al telefono por umbral (B4.4, cualquier 429
+      a un usuario legitimo suena), logs centralizados con id de peticion para seguir a una persona (B4.3), registro
+      por persona (B5.1), Laravel Pulse + canario (capas 2 y 3) y modo "evento en curso". La pantalla, Pulse, los logs
+      y el registro se hacen en local; alertas y umbrales necesitan servidor. Lab antes de codear.
+      Brief completo: `ROADMAP-INFRAESTRUCTURA.md` seccion I.5
 - [ ] Cloudflare LB sigue cobrando $5/mes sin nada detras: cancelar o usar (hallazgo 2026-09-13)
 
 **3. La puerta del publico**
