@@ -138,6 +138,10 @@
   (y el del servidor): `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. Agregar el dominio real de la landing en el panel de Turnstile.
 - [x] Tema del widget: color del evento, Noir/Lux del evento o forzado con data-tema
 - [x] Config en admin: Entrada > Landing y widget (dominios, tema, codigo, vista previa) — falta que Kamilo la revise
+- [ ] **Toggle de tema para el demo** (idea Kamilo 2026-10-16): pildora Noir/Lux flotante que cambia `?tema=` en la misma URL,
+  visible SOLO con `?demo` (una landing real no deja al asistente cambiar la plantilla del admin); el parametro viaja a la
+  confirmacion y al widget. Minilab A (pildora abajo a la derecha) / B (barra fina arriba, con color del cliente como el lab v3)
+  antes de codear. Sin backend. Hoy el tema se fuerza con `?tema=lux|noir` (`src/lib/landingEvent.ts:10`).
 
 ### Post-registro (pagina: `design/features/landing/confirmacion.html`; labs `lab-confirmacion-estados.html`, `lab-cinta.html`)
 
