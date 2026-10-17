@@ -3,6 +3,18 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-16 — Bugs de riesgo para producción (3 resueltos)
+
+### BUG-354: Horas de la webapp corridas 5 h en un servidor en UTC (RESUELTO)
+- **Severidad:** ALTA — ~25 partes formatean fechas con la zona del proceso (`toLocaleTimeString` sin `timeZone`, `getHours`, agrupar la agenda por dia). En un servidor en UTC el HTML sale 5 h corrido frente al celular en Bogota y React reporta error de hidratacion.
+- **Fix (eventos-web 95f52ca):** `instrumentation.ts` fija `TZ=America/Bogota` al arrancar si el despliegue no define otra. Pendiente para eventos en otra zona: formatear con la zona del evento.
+- **Archivos:** `instrumentation.ts`, `tests/lib/zonaHoraria.test.ts`
+
+### BUG-355: Rutas de cuenta sin limite de intentos (RESUELTO)
+- **Severidad:** MEDIA — `/register`, `/forgot-password`, `/activate` y `/reset-password` no tenian throttle propio: se podian usar miles de veces para mandar correos o gastar el cupo de Resend.
+- **Fix (backend):** limitadores `cuenta_correo` (5/h por correo, 600/h por red) y `cuenta_enlace` (10/h por enlace o correo, 300/min por red), umbrales en `config/auth.php` puerta. `LimitesDeCuentaTest` 5/5.
+- **Archivos:** `app/Providers/AppServiceProvider.php`, `routes/api/auth.php`, `config/auth.php`
+
 ## 2026-09-29 — Cierre del 2FA del staff, S.4 a S.8 (5 bugs, todos resueltos)
 
 > Contexto: `ROADMAP-SEGURIDAD-STAFF.md` 25/26. Todos cazados en QA vivo con
@@ -46,9 +58,9 @@
 - **Fix pendiente:** `Http::preventStrayRequests()` + fake de las rutas `/internal/*` del socket y de la webapp en `tests/TestCase.php`, y revisar los tests que hoy asumen la llamada real.
 - **Archivos:** `tests/TestCase.php` (pendiente)
 
-### BUG-346: Avisar al socket la configuracion de una sesion no tiene tiempo de espera propio (ABIERTO)
+### BUG-346: Avisar al socket la configuracion de una sesion no tiene tiempo de espera propio (RESUELTO 2026-10-16)
 - **Severidad:** ALTA — `SessionConfigController::emitConfigUpdate` usa `Http::post(...)` sin `timeout()`. Todas las demas llamadas internas al socket usan `Http::timeout(2)`. Sin tiempo propio aplica el de Laravel (`connect_timeout` 10 s en `PendingRequest`). **En produccion, si el nodo de sockets se cae, cada cambio de configuracion de sesion bloquea un proceso PHP-FPM hasta 10 s**, y con varios moderadores cambiando la configuracion en vivo se come los procesos de la API. En tests, las 17 peticiones que cambian configuracion en `SessionConfigTest` suman minutos.
-- **Fix pendiente:** `Http::timeout(2)` como el resto.
+- **Fix aplicado (backend a20df92):** `Http::timeout(2)` como el resto; los 3 jobs de push a Expo con `timeout(10)`. `tests/Unit/HttpTimeoutTest.php` falla si cualquier `Http::` de `app/` no define timeout.
 - **Archivos:** `app/Http/Controllers/Api/V1/Admin/SessionConfigController.php:495`
 ### BUG-345: El correo no controla su ritmo frente al limite de Resend (ABIERTO → plan B3.1)
 - **Severidad:** ALTA — Resend permite 10 peticiones por segundo por equipo (docs de Resend, ampliable por solicitud). `SendEmailJob` no limita el ritmo: solo `tries = 3` y `backoff = 60`. Con 5.000 invitaciones, o 5.000 personas pidiendo enlace de acceso al abrir puertas, los envios que choquen con el limite se reintentan tres veces y se pierden.
@@ -2074,7 +2086,7 @@
 
 > Nota: BUG-005 a BUG-015 cuentan como 11 bugs individuales en una sola entrada.
 
-> **Corregido 2026-10-16:** la tabla de arriba quedo en agosto. Hoy hay **5 abiertos** (BUG-344 a BUG-348, sesion
+> **Corregido 2026-10-16:** la tabla de arriba quedo en agosto. Hoy hay **4 abiertos** (BUG-344, 345, 347 y 348, sesion
 > 2026-09-13; BUG-345 con codigo en B3.1). Las tareas viven en `PENDIENTES.md` §3.
 
 Historico 2026-08-01: Bugs pendientes: **NINGUNO**. Los dos ultimos (BUG-127 metricas MC persist, BUG-111

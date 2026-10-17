@@ -106,9 +106,11 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 
 ## 2. DECISIONES Y PREGUNTAS ABIERTAS DE KAMILO
 
+> **Decidido por Kamilo 2026-10-16:** no hay cliente para el 6 de diciembre todavía (prioridad: demo vendible; medir
+> 5.000 espera a que haya cliente). El servidor sigue EN PAUSA. El costo de pruebas de agosto hay que bajarlo cuando se
+> retome (menos máquinas, sin bases administradas mientras tanto).
+
 - [ ] ¿Cuando abre el registro de asistentes? Esa fecha fija cuando tiene que existir produccion
-- [ ] ¿El cliente del 6 de diciembre ya esta confirmado?
-- [ ] Costo de pruebas vigente (~$120/mes bases, ~$6,5/dia droplets): confirmar en P.1
 - [ ] ¿Carga y caida de nodo (I.7.7) obligatorias antes de evento real y opcionales en demos? (`project_orquestador_pipeline`)
 - [ ] Umbrales verde/amarillo/rojo del canario: hoy propuesta (`infra/PLAN-EXPERIENCIA-ENTERPRISE.md:37`)
 - [ ] W.19 Spatial Player: aprobar la arquitectura propuesta 2026-09-13 y decidir 8.7
@@ -127,8 +129,6 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 
 ## 3. BUGS ABIERTOS (detalle en `BUG-LOG.md`)
 
-- [ ] BUG-346 El aviso de config de sesion al socket no tiene timeout: si el socket cae, PHP queda bloqueado 10 s
-      (`SessionConfigController.php:495`). Prioridad alta
 - [ ] BUG-347 Los tests llaman al socket y a la webapp reales: falta `preventStrayRequests` y simular `/internal`
       (la suite tarda ~30 min)
 - [ ] BUG-344 Pest con config cacheada corre contra MySQL de dev: TestCase debe abortar si no es sqlite (mitigado)
@@ -136,11 +136,6 @@ y se cierran midiendo en servidor, 13 solo con servidor.
       (`DataCenterApiTest.php:76`). Prioridad baja
 - [ ] BUG-345 Correo sin ritmo: codigo hecho en B3.1, se cierra al medirlo
 - [ ] Pulse cuenta 84 mensajes y la BD tiene 2.156: revisar el criterio de `stats.messages` (sin verificar)
-- [ ] Horas en vistas mobile de la webapp sin `timeZone`: en un servidor UTC el render da 5 h de diferencia y error
-      de hidratacion (`AgendaMobile.tsx:60`, `HappeningNowM.tsx:183`, `SessionDetailM.tsx:50`, `SpeakerDetailM.tsx:28`,
-      `SponsorDetailM.tsx:43`, `AttendeeDetailM.tsx:33`, `VendorHappeningNowM.tsx:185`). **Antes de produccion**
-- [ ] Sin rate limit propio: `/forgot-password`, `/register`, `/activate`, `/reset-password`
-      (`eventos-backend/routes/api/auth.php:8-15`). Va con B.5
 - [ ] `composer audit`: 57 avisos en 19 paquetes sin revisar
 
 ---

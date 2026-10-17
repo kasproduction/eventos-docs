@@ -4,14 +4,33 @@
 
 > Este archivo es **solo continuidad** (que hicimos la sesion pasada, decisiones cerradas).
 >
-> **2026-09-30: el servidor (DigitalOcean) esta EN PAUSA hasta cerrar todas las features. Sigue la
-> landing + widget de registro (`docs/living/PENDIENTES.md` §3, labs en `design/features/landing/`).**
-> **2026-10-11: retomar por el PENDIENTE INMEDIATO de la sesion 2026-10-11 (conectar landing y confirmacion al backend real).**
->
-> Plan de servidor (en pausa): `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md`, seccion
-> "ESTADO Y PENDIENTES AL 2026-09-29" (arriba del plan B1-B6): el evento es el **domingo 6 de
-> diciembre de 2026**, 5.000 personas; pendientes P.0-P.6 en orden y calendario por semana.
-> Lo de webapp sigue en `docs/living/PENDIENTES-WEBAPP.md`.
+> **2026-10-16: NO HAY CLIENTE para el 6 de diciembre (Kamilo). Prioridad: demo vendible. Servidor EN PAUSA.**
+> Tareas: SOLO `docs/living/PENDIENTES.md`. Tablero para priorizar: https://claude.ai/artifact/UwSGdGXbJCHTeXEb7UpBDL
+> (fuente y scripts en `design/features/pendientes/fuente/`).
+
+---
+
+## SESION 2026-10-16 (Fable 5.1 / Opus 5.5) — UNA SOLA FUENTE DE PENDIENTES, TABLERO PARA PRIORIZAR, 3 BUGS DE RIESGO
+
+**Decisiones Kamilo (no re-preguntar):**
+- Fuente unica de tareas = `docs/living/PENDIENTES.md` ("prefiero mil tareas a tener todo suelto"). PENDIENTES-WEBAPP quedo
+  como aviso; 58 docs con aviso HISTORICO o de referencia arriba. Lo cerrado va a COMPLETADO en cada /guardar.
+- Tablero privado en claude.ai (artifact) para priorizar: **C1** (lista lateral de modulos), **Lux** unico, **lenguaje simple**
+  (que es / por que importa / cuando esta lista), dependencias y alertas por modulo, arrastre, orden sugerido por Claude
+  (20 Ya, 96 antes, 96 despues, 3 descartar). Labs: `design/features/pendientes/lab-tablero.html` y `lab-tablero-c.html`.
+- No hay cliente aun; servidor sigue en pausa; bajar el costo de pruebas al retomar.
+- Toggle Noir/Lux para el demo de la landing (solo con `?demo`): anotado, lab antes de codear.
+
+**Hecho:** inventario de 45 docs (~1.700 casillas) con 3 revisores; PENDIENTES unificado (215 tareas con fuente);
+COMPLETADO al dia desde agosto. Backend a20df92 BUG-346 timeout del socket + `HttpTimeoutTest`; limites en rutas de cuenta
+(`cuenta_correo`, `cuenta_enlace`, `LimitesDeCuentaTest` 5/5). eventos-web 95f52ca hora de Bogota en el servidor
+(`instrumentation.ts`, vitest 3/3). BUG-354 y BUG-355 en BUG-LOG.
+
+**Error mio y leccion:** publique la primera version del tablero sin lab y Kamilo la rechazo ("codeaste de una sin lab").
+Siempre lab por letra antes de UI, tambien en herramientas internas.
+
+**Sigue (propuesto, sin "dale"):** medir cuantos pedidos hace cada pantalla y proponer la agenda en un solo pedido (B.1 +
+B3.7); despues lab de la torre de control (B4.5) y el toggle de tema del demo.
 
 ---
 

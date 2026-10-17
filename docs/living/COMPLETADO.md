@@ -8,6 +8,26 @@
 
 ---
 
+## 2026-10-16: tres bugs de riesgo y decisiones de Kamilo
+
+- **BUG-346 el admin ya no se traba** si el tiempo real está caído: `emitConfigUpdate` con `timeout(2)`; los 3 jobs de push a Expo con `timeout(10)`; `tests/Unit/HttpTimeoutTest.php` revisa todo `app/` (backend a20df92). Session + live-config 57/57.
+- **Horas corridas:** la webapp fija `TZ=America/Bogota` al arrancar (`instrumentation.ts`, respeta TZ del despliegue); arregla de una vez las ~25 partes que formatean con la zona del proceso (eventos-web 95f52ca, vitest 3/3).
+- **Límite en rutas de cuenta:** `throttle:cuenta_correo` (registro, olvidé mi contraseña: 5/h por correo, 600/h por red) y `throttle:cuenta_enlace` (activar, restablecer: 10/h por enlace o correo, 300/min por red); umbrales en `config/auth.php` puerta (LimitesDeCuentaTest 5/5).
+- **Decisiones:** no hay cliente aún; servidor sigue en pausa; bajar el costo de pruebas al retomar.
+- Texto original de las tareas cerradas:
+
+- [ ] ¿El cliente del 6 de diciembre ya esta confirmado?
+- [ ] Costo de pruebas vigente (~$120/mes bases, ~$6,5/dia droplets): confirmar en P.1
+- [ ] BUG-346 El aviso de config de sesion al socket no tiene timeout: si el socket cae, PHP queda bloqueado 10 s
+      (`SessionConfigController.php:495`). Prioridad alta
+- [ ] Horas en vistas mobile de la webapp sin `timeZone`: en un servidor UTC el render da 5 h de diferencia y error
+      de hidratacion (`AgendaMobile.tsx:60`, `HappeningNowM.tsx:183`, `SessionDetailM.tsx:50`, `SpeakerDetailM.tsx:28`,
+      `SponsorDetailM.tsx:43`, `AttendeeDetailM.tsx:33`, `VendorHappeningNowM.tsx:185`). **Antes de produccion**
+- [ ] Sin rate limit propio: `/forgot-password`, `/register`, `/activate`, `/reset-password`
+      (`eventos-backend/routes/api/auth.php:8-15`). Va con B.5
+
+---
+
 ## Agosto a octubre 2026 + limpieza de pendientes — 2026-10-16
 
 > Desde el 1 de agosto lo cerrado se quedo en los pendientes. El 2026-10-16 se movio todo aca.
