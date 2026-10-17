@@ -137,3 +137,38 @@ assert h.count(a) == 1
 h = h.replace(a, 'text:"Bloqueada por " + (ob.length === 1 ? "1 tarea" : ob.length + " tareas")')
 io.open(OUT, "w", encoding="utf-8").write(h)
 print("pildora ok")
+
+# ---------- sugerencias de Claude (2026-10-16) ----------
+h = io.open(OUT, encoding="utf-8").read()
+def H(a, b):
+    global h
+    assert h.count(a) == 1, (a[:90], h.count(a))
+    h = h.replace(a, b)
+SUG = json.load(io.open(SP + "sugerencias.json", encoding="utf-8"))
+H('const SIMPLE = D.simples || {}, MODDEP = D.moddep || {};', 'const SIMPLE = D.simples || {}, MODDEP = D.moddep || {}, SUG = D.sug || {};')
+H('const pr = id => (P[id] && P[id].p) || "sin";',
+  'const isSug = id => !P[id] || !!P[id].sug;\nconst pr = id => P[id] ? (P[id].p || (P[id].sug && SUG[id] ? SUG[id].p : "sin")) : (SUG[id] ? SUG[id].p : "sin");')
+H('const ord = id => (P[id] && P[id].o != null) ? P[id].o : 1e6;', 'const ord = id => (P[id] && P[id].o != null) ? P[id].o : (SUG[id] ? SUG[id].o : 1e6);')
+H('function setPrio(id, p){ if (ro()) return; P[id] = Object.assign({}, P[id]||{}, {p}); if (p === "sin") delete P[id].p; touch(id); }',
+  'function setPrio(id, p){ if (ro()) return; P[id] = Object.assign({}, P[id]||{}, {p}); delete P[id].sug; if (p === "sin") delete P[id].p; touch(id); }')
+H('function reorder(listEl, p){ [...listEl.querySelectorAll("[data-id]")].forEach((n,i) => { const id = n.dataset.id; const before = JSON.stringify(P[id]||{}); P[id] = Object.assign({}, P[id]||{}, {o:i}); if (p) { if (p === "sin") delete P[id].p; else P[id].p = p; } if (JSON.stringify(P[id]) !== before) touch(id); }); }',
+  'function reorder(listEl, p, moved){ [...listEl.querySelectorAll("[data-id]")].forEach((n,i) => { const id = n.dataset.id; const before = JSON.stringify(P[id]||{}); const wasSug = isSug(id); const cur = p || pr(id); P[id] = Object.assign({}, P[id]||{}, {o:i}); if (cur === "sin") delete P[id].p; else P[id].p = cur; if (id !== moved && wasSug) P[id].sug = true; else delete P[id].sug; if (JSON.stringify(P[id]) !== before) touch(id); }); }')
+h = h.replace("reorder(e.to, e.to.dataset.p)", "reorder(e.to, e.to.dataset.p, e.item.dataset.id)")
+h = h.replace("reorder(e.from, null)", "reorder(e.from, null, e.item.dataset.id)")
+H('  if (P[t.id] && P[t.id].nota) m.append(el("span",{cls:"pill nota",text:"Con nota"}));',
+  '  if (P[t.id] && P[t.id].nota) m.append(el("span",{cls:"pill nota",text:"Con nota"}));\n  if (isSug(t.id) && SUG[t.id]) m.append(el("span",{cls:"pill sug",text:"Sugerida por Claude"}));')
+H('.pill.nota{', '.pill.sug{background:transparent;color:var(--t3);border:1px dashed var(--line2)}\n.pill.nota{')
+H('el("div",{cls:"kpi"}, el("b",{text:dec+"/"+v.length}), el("span",{text:"priorizadas"})));',
+  'el("div",{cls:"kpi"}, el("b",{text:v.filter(t=>!isSug(t.id)).length+"/"+v.length}), el("span",{text:"decididas por ti"})));')
+H('". Arrastra para priorizar o toca una tarea para ver el detalle."',
+  '". Ya vienen ordenadas con mi sugerencia: muévelas y quedan como tuyas. Toca una tarea para ver el detalle."')
+H('''    el("div",{cls:"dk"}, el("small",{text:"Prioridad"}),''', '''    SUG[t.id] ? el("div",{cls:"lsec"}, el("small",{text: isSug(t.id) ? "Por qué la puse en " + COLN[SUG[t.id].p] : "Yo la había puesto en " + COLN[SUG[t.id].p]}), el("div",{text:SUG[t.id].por})) : null,
+    (isSug(t.id) && SUG[t.id] && !ro()) ? el("button",{cls:"dx",style:"align-self:flex-start",onclick:()=>{ setPrio(t.id, SUG[t.id].p); render(); }},"Confirmar la sugerencia") : null,
+    el("div",{cls:"dk"}, el("small",{text:"Prioridad"}),''')
+H('    el("div",{cls:"dk"}, el("small",{text:"Prioridad"}), (() => { const g = el("div",{cls:"dprio"}); COLS.slice(1).forEach(c => g.append(el("button",{cls:c.v+(p===c.v?" on":""),',
+  '    el("div",{cls:"dk"}, el("small",{text:"Prioridad"}), (() => { const g = el("div",{cls:"dprio"}); COLS.slice(1).forEach(c => g.append(el("button",{cls:c.v+(p===c.v && !isSug(t.id)?" on":""),')
+dd = json.loads(re.search(r'<script id="data" type="application/json">(.*?)</script>', h, re.S).group(1).replace("<\/", "</"))
+dd["sug"] = SUG
+h = re.sub(r'(<script id="data" type="application/json">)(.*?)(</script>)', lambda m: m.group(1) + json.dumps(dd, ensure_ascii=False).replace("</", "<\/") + m.group(3), h, count=1, flags=re.S)
+io.open(OUT, "w", encoding="utf-8").write(h)
+print("sugerencias ok", len(SUG))
