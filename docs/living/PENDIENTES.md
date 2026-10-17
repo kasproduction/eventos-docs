@@ -7,6 +7,9 @@
 > Inventario completo de todos los docs: 2026-10-16 (45 archivos, ~1.700 casillas; las de planes viejos de modulos
 > cerrados NO se copiaron: esos docs llevan el aviso "HISTORICO" arriba).
 > Actualizado: 2026-10-16.
+> **Vista para priorizar (privada, celular):** https://claude.ai/artifact/UwSGdGXbJCHTeXEb7UpBDL. Kamilo marca
+> Ya / Antes del evento / Despues / Descartar y notas; Claude las lee con ArtifactData (coleccion `prioridades`, id = hash
+> de la tarea) y pasa el orden a este archivo. Si este archivo cambia, se regenera la pagina.
 
 ---
 
