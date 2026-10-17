@@ -1,6 +1,6 @@
 # Web App — Master Plan
 
-> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+> **Referencia (2026-10-16):** documento de consulta, no de tareas. Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
 
 > Plan maestro de la web app para asistentes virtuales. Es la **experiencia primaria** del publico remoto, no un complemento de la app movil.
 >

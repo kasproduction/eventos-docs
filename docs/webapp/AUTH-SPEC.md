@@ -1,6 +1,6 @@
 # Web App — Auth Spec
 
-> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+> **Referencia (2026-10-16):** documento de consulta, no de tareas. Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
 
 > Especificacion completa de autenticacion. Bearer token Sanctum + magic link como flujo principal + email/password fallback + refresh + logout multi-device + session timeout.
 >

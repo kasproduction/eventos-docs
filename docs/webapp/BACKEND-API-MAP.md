@@ -1,6 +1,6 @@
 # Backend API Map — EventOS
 
-> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+> **Referencia (2026-10-16):** documento de consulta, no de tareas. Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
 
 > Referencia EXHAUSTIVA de TODOS los endpoints del backend Laravel para la webapp Next.js.
 >
