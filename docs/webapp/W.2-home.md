@@ -1,5 +1,7 @@
 # W.2 — Home
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Pantalla principal post-login. Hero del evento + countdown + happening now + GamificationHud + Recap banner + Highlights carousel + Anuncios mini + Sponsors brand wall preview + Module menu compacto + Post-event survey prompt + EventArchive (eventos pasados) + Atajos a modulos.
 >
 > **Estimacion:** ~9h (expandida de 6h por submodulos faltantes).

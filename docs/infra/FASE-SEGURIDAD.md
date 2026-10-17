@@ -1,5 +1,7 @@
 # Fase de Seguridad — EventOS
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Auditoría completa + plan de remediación para producción.
 > Fecha auditoría: 2026-04-07 | Implementado: 2026-04-07 | Estado: Parcialmente Implementado (SEC-1 ✅, SEC-2 ✅, SEC-3 parcial, SEC-4/5 pendiente deploy)
 > Documento tipo: Sesión técnica (mismo formato que S1.x)

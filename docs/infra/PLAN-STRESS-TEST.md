@@ -1,5 +1,7 @@
 # Plan de Stress Test — EventOS
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Validacion empirica de que 10,000 asistentes simultaneos tienen experiencia indistinguible de una plataforma enterprise.
 > No se trata de probar que Laravel no se cae. Se trata de probar que en el dia del evento, cualquier asistente abre la app y siente instantaneidad.
 > Version: 2.0 | Fecha: 2026-04-24

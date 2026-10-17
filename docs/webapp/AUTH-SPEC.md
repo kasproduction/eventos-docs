@@ -1,5 +1,7 @@
 # Web App — Auth Spec
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Especificacion completa de autenticacion. Bearer token Sanctum + magic link como flujo principal + email/password fallback + refresh + logout multi-device + session timeout.
 >
 > Backend ya tiene Sanctum. Endpoints existentes se reutilizan. Cualquier endpoint nuevo se documenta abajo y entra como bloqueante de W.1.

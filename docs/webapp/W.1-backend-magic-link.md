@@ -1,5 +1,7 @@
 # W.1 Backend — Magic Link + Login Slideshow ✅ CERRADO
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Sesion backend dedicada en `eventos-backend`. Bloqueante de W.1 webapp F4-F9 (ADR-023).
 >
 > **Estimacion:** ~4h. Solo backend Laravel + Pest. Cero frontend.

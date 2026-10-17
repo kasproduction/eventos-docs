@@ -1,5 +1,7 @@
 # STACK DE PRODUCCION — el combo necesario para no sufrir, segun cuanta gente
 
+> **Pendientes (2026-10-16):** las tareas abiertas de este documento viven en `docs/living/PENDIENTES.md` (fuente unica). Aqui queda el diseño, el contexto y la historia; si nace una tarea nueva, se escribe alla.
+
 > **Escrito el 2026-08-17.** Este es EL documento del stack: cuantas maquinas,
 > de que tamaño, quien balancea, que base de datos, donde vive Redis, donde
 > viven los sockets, y por que. Lo que aqui dice MEDIDO se midio con la persona

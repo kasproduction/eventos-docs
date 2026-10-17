@@ -1,5 +1,7 @@
 # W.X — WelcomeShowcase (cinematic onboarding)
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Trailer cinematico post-login que muestra los 6 features principales del evento usando **componentes reales en miniatura** (no placeholders).
 >
 > **Estimacion:** ~3.5h.

@@ -1,5 +1,7 @@
 # Diagnóstico completo — EventOS en producción real
 
+> **Pendientes (2026-10-16):** las tareas abiertas de este documento viven en `docs/living/PENDIENTES.md` (fuente unica). Aqui queda el diseño, el contexto y la historia; si nace una tarea nueva, se escribe alla.
+
 > # ⚠ CORREGIDO LA MISMA NOCHE DEL 2026-08-02 — LEER ESTO PRIMERO
 >
 > Dos cifras centrales de este documento se volvieron a medir y son falsas:

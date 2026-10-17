@@ -1,5 +1,7 @@
 # W.13 — FAQ + Documentos + Pages
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Tres pantallas de contenido configurable por organizador: FAQ del evento, Documentos descargables (PDFs, guias), Pages dinamicas custom (paginas creadas por organizador en Filament).
 >
 > **Estimacion:** ~3h.

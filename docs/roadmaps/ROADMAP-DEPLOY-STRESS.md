@@ -1,5 +1,7 @@
 # ROADMAP — DEPLOY PRODUCCION + STRESS TEST — 21/24
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > ## EJECUTADO 2026-08-01 → **`docs/infra/INFORME-STRESS-2026-08-01.md`**
 >
 > Stack completo montado en `killjoy.pro` (HTTPS real, R2, Resend, webapp Next

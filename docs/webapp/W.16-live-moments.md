@@ -1,5 +1,7 @@
 # W.16 — Live Moments (subset web)
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Experiencias en vivo durante el evento. **Subset web** — solo features que tienen sentido en pantalla grande/desktop. Mobile-first features (slot machine, spin tap-tap) se quedan solo en app movil.
 >
 > **Estimacion:** ~5h (reducida de 6h tras audit backend — eliminacion de mocks).

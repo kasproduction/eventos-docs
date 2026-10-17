@@ -1,5 +1,7 @@
 # Tests pendientes — webapp
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Inventario de cobertura actual + plan exhaustivo de tests faltantes (vitest + Playwright E2E).
 > Documento generado 2026-05-08 al cerrar W.5 Speakers.
 > **Proximo arranque:** ejecutar este plan modulo por modulo en orden de criticidad.

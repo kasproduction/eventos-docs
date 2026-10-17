@@ -1,5 +1,7 @@
 # W.17 — Soporte
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Tickets de soporte simples: el asistente abre una consulta con asunto + mensaje, el staff responde una vez via Filament. Sin chat threading, sin RT, sin attachments — el modelo backend es un solo ticket + una sola respuesta del admin.
 >
 > **Estimacion:** ~2h (reducida de 3h tras audit backend).

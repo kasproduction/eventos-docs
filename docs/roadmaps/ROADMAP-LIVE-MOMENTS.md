@@ -1,5 +1,7 @@
 # Roadmap — Live Moments (Juegos en Vivo)
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Sistema de activaciones en vivo: Ruleta (puntos) y Sorteo (premios fisicos).
 > Pool = presenciales en salon (room check-in) + virtuales conectados (socket RT via /internal/session/viewers).
 > Display usa libreria spin-wheel (angulos, pesos, animacion nativos).

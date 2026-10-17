@@ -1,5 +1,7 @@
 # W.4 — Streaming + Q&A + Chat + Polls + Trivia + Anuncios in-stream + Replay
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Experiencia virtual core. Player polimorfico (YouTube / Vimeo / iframe custom / URL directa) + Q&A + chat + polls + Trivia + anuncios in-stream + replay (`recording_url`). Reusa la logica probada de la app movil (`session-stream/[id].tsx`).
 >
 > **Estimacion:** ~14h.

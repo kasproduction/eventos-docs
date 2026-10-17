@@ -1,5 +1,7 @@
 # W.3 — Agenda
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Lista completa de sesiones + filtros (dia/track) + favoritos + detalle + .ics download + ratings post-sesion + chat session-specific.
 >
 > **Estimacion:** ~11h (real ejecutado).

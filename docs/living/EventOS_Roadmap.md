@@ -1,5 +1,7 @@
 # EventOS — Roadmap
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 _Plan de trabajo: fases, sesiones, dependencias, timeline_
 _Actualizado: 2026-07-19 | v6.0 — Estado rapido re-basado a la realidad post-pivote:
 Webapp Fase 1 COMPLETA (19 modulos, 2026-07-14) · Mobile parity 60/60 ·

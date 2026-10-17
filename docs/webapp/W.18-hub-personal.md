@@ -1,5 +1,7 @@
 # W.10 — Hub Personal (Perfil + Mi QR + Settings)
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Hub personal del usuario. Perfil editable, foto, datos de onboarding, settings (idioma + tema, client-side), Mi QR, log-out, y entry-points hacia los otros modulos (Mi Stand W.15, Soporte W.17, Mis Premios W.9, Mis Contactos W.8).
 >
 > **Estimacion:** ~4h (reducida de 8h tras audit — sin features inventadas).

@@ -1,5 +1,7 @@
 # W.0 — Spatial Shell (DaVinci redesign 2026-05-02 → 2026-05-03)
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > **Cimiento estructural de toda la webapp.** Define como se ven, navegan y conviven los modulos. Filosofia visionOS-inspired adaptada a 2D web, NO drag manual ni paneles arrastrables.
 >
 > **Estimacion:** ~10h (revisada — antes 12h). Bloqueante de W.2-W.17.

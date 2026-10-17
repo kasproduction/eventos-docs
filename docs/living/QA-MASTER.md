@@ -1,5 +1,7 @@
 # QA Master — Barrido Completo de Plataforma
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Auditoria endpoint por endpoint de todos los modulos.
 > Actualizado: 2026-05-02 | Metodo: curl real + tests automatizados
 > Tests app movil/backend: 71 archivos, 753 test methods (Pest), 1947+ assertions

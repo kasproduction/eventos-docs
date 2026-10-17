@@ -1,5 +1,7 @@
 # Brief para Claude Code — Audit de Latencia Percibida + Optimistic UI
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Documento de contexto para que Claude Code analice el codebase completo de EventOS (mobile + Laravel + Node socket server) y produzca un plan de implementacion de optimistic UI ajustado a la arquitectura real.
 > Generado: 2026-04-25
 > Origen: conversacion sobre HA/stress test que revelo gap entre uptime tecnico y experiencia percibida del usuario.

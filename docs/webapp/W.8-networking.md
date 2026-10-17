@@ -1,5 +1,7 @@
 # W.8 — Networking
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Directorio + sugerencias + perfiles + solicitudes de contacto + lista de bloqueados. **Sin chat 1:1 y sin bookmarks** (no existen en backend).
 >
 > **Estimacion:** ~5h (reducida de 7h tras audit — sin chat DM ni bookmarks).

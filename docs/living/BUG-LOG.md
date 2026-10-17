@@ -2074,7 +2074,10 @@
 
 > Nota: BUG-005 a BUG-015 cuentan como 11 bugs individuales en una sola entrada.
 
-Bugs pendientes: **NINGUNO**. Los dos ultimos (BUG-127 metricas MC persist, BUG-111
+> **Corregido 2026-10-16:** la tabla de arriba quedo en agosto. Hoy hay **5 abiertos** (BUG-344 a BUG-348, sesion
+> 2026-09-13; BUG-345 con codigo en B3.1). Las tareas viven en `PENDIENTES.md` §3.
+
+Historico 2026-08-01: Bugs pendientes: **NINGUNO**. Los dos ultimos (BUG-127 metricas MC persist, BUG-111
 PollSlides accent) se cerraron el 2026-08-01 por auditoria de vigencia: ambos ya
 estaban resueltos en codigo y nadie los habia marcado. Detalle en cada entrada.
 

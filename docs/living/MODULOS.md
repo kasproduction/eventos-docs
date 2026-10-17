@@ -1,5 +1,7 @@
 # EventOS — Modulos del Sistema
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > **Version:** 1.0 | **Fecha:** 2026-04-24
 > **Auditado contra:** codigo real de eventos-backend, eventos-app, eventos-socket, eventos-kiosko
 > **Total:** 15 modulos app + 6 sistemas complementarios + admin Filament

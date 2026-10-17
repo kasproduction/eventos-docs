@@ -1,5 +1,7 @@
 # Web App — Decisiones (ADR-style)
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Architectural Decision Records con fecha. Cada entrada explica que se decidio, por que, alternativas consideradas y consecuencias.
 >
 > Formato: `ADR-NNN — Titulo — fecha — estado`. Estados: `propuesto`, `aceptado`, `rechazado`, `superseded by ADR-XXX`.

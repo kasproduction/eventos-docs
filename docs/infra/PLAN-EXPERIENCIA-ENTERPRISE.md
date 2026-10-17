@@ -1,5 +1,7 @@
 # Plan de Experiencia Enterprise — escenarios de evento real
 
+> **Pendientes (2026-10-16):** las tareas abiertas de este documento viven en `docs/living/PENDIENTES.md` (fuente unica). Aqui queda el diseño, el contexto y la historia; si nace una tarea nueva, se escribe alla.
+
 > **Decision Kamilo 2026-08-01**: los tests de carga existentes (TEST 1-9 de
 > `PLAN-STRESS-TESTDO.md`) miden el eje equivocado. Son todos *"muchos
 > usuarios jalando"*: warmup, 1K, 5K, 10K, punto de rotura.

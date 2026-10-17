@@ -1,5 +1,7 @@
 # EventOS — Alta Disponibilidad e Infraestructura
 
+> **Pendientes (2026-10-16):** las tareas abiertas de este documento viven en `docs/living/PENDIENTES.md` (fuente unica). Aqui queda el diseño, el contexto y la historia; si nace una tarea nueva, se escribe alla.
+
 > Arquitectura para 99.9% uptime (~8.7 horas downtime/año).
 
 > **2026-08-17 — la lista de compra vigente por nivel es `STACK-PRODUCCION.md`.**

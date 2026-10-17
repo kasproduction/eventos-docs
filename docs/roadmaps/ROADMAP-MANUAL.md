@@ -1,5 +1,7 @@
 # ROADMAP — KNOWLEDGE BASE / Manual del organizador — 5/35
 
+> **Pendientes (2026-10-16):** las tareas abiertas de este documento viven en `docs/living/PENDIENTES.md` (fuente unica). Aqui queda el diseño, el contexto y la historia; si nace una tarea nueva, se escribe alla.
+
 > Decision Kamilo 2026-07-19 (PENDIENTES.md §2.5): "Falta un gran instructivo
 > de todo". Pegado al frente DEPLOY DEMO: el manual es parte del demo comercial
 > y escribirlo caza huecos (ya destapo Paginas; el barrido M0 cazo 4 mas).

@@ -1,5 +1,7 @@
 # W.14 — Anuncios + Boletines
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Comunicaciones del organizador: anuncios urgentes (push-style) + boletines/highlights (carousel editorial).
 >
 > **Estimacion:** ~3h.

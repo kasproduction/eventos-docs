@@ -1,5 +1,7 @@
 # W.3 Agenda — QA Checklist
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Validacion manual del modulo W.3 implementado 2026-05-06.
 > Ejecutar antes de promote a staging/produccion.
 

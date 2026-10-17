@@ -1,5 +1,7 @@
 # W.6 — Social Wall + Stories + Photo Contest
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Feed social: posts con texto/foto + Stories (efimeros 24h) + Photo Contest display + comentarios + likes. Hashtags, "memorias" y "report user" se documentan como pendientes backend (no existen).
 >
 > **Estimacion:** ~7h (reducida de 10h tras audit — sin hashtags ni memorias ni report).

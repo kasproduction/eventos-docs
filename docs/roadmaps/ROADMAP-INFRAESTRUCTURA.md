@@ -1,5 +1,7 @@
 # ROADMAP — INFRAESTRUCTURA Y CATALOGO VENDIBLE — 33/73 · PLAN NOVIEMBRE 2/31
 
+> **Pendientes (2026-10-16):** las tareas abiertas de este documento viven en `docs/living/PENDIENTES.md` (fuente unica). Aqui queda el diseño, el contexto y la historia; si nace una tarea nueva, se escribe alla.
+
 > **Abierto el 2026-08-02.** Reemplaza la seccion "RENDIMIENTO Y CAPACIDAD 0/5"
 > de `PENDIENTES-WEBAPP.md`, que nacio de una premisa que hoy se demostro falsa.
 

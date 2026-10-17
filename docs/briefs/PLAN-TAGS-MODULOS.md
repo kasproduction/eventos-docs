@@ -1,5 +1,7 @@
 # Plan: Tags + Visibilidad Modulos + Layout Unificado
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Arquitectura nueva para reemplazar roles presencial/virtual por tags + check-in.
 > Fecha: 2026-04-13 | Estado: Pasos 1, 4, 5 COMPLETADOS (2026-04-14). Pendientes: Paso 2 (CSV pre-registro) y Paso 3 (socket checkin trigger).
 

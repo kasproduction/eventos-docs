@@ -1,5 +1,7 @@
 # Web App — Responsive Spec
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Regla de oro: **NO hay responsive automatico**. Cada viewport es una experiencia dedicada y coherente.
 >
 > Critica del usuario que origino este doc: "Event Pulse no era 100% responsive — quedaba mediocre". La webapp NO repite ese error.

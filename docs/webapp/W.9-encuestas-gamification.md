@@ -1,5 +1,7 @@
 # W.9 — Desafio (Engagement Hub)
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Leaderboard + Logros (acciones completadas) + Passport stamps + Rewards/Redemption + Golden Tickets. Engagement core.
 >
 > **Counter:** **30/35 (86%)** — Sprint 2.B sesion 2 entregada (2026-06-29, commit `4238c69` local)

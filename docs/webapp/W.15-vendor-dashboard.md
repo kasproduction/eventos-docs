@@ -1,5 +1,7 @@
 # W.15 — Vendor Dashboard
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Pantalla para vendedores/sponsors operando un stand. Mi Stand info + team, leads capturados (mis scans personales), stats del stand. Solo accesible si user tiene `has_vendor_access=true` en su `AttendeeResource`.
 >
 > **Estimacion:** ~6h.

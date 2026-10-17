@@ -1,5 +1,7 @@
 # PARITY MATRIX — Expo ↔ Webapp ↔ Backend
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > ⚠ **DOC HISTORICO desde 2026-07-04** (decision Kamilo, auditoria `docs/AUDITORIA-ESPEJO-2026-07-04.md`).
 > Los counters y estados de modulos estan CONGELADOS en junio 2026 y contienen
 > contradicciones internas (ej: W.7 aparece 23/23 en §1.1 y 0% en §3).

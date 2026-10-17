@@ -1,5 +1,7 @@
 # W.5 — Speakers
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Directorio de speakers + perfil detallado + ratings 1-5 (UNIQUE, no editable). **Espejo del Expo mobile** — sin tracks, sin chips, sin favorite speakers, sin tabs "Mi Speakers".
 >
 > **Estimacion:** ~5.5h (incluye agenda highlight extension + deep linking).

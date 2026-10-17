@@ -1,5 +1,7 @@
 # Siguiente sesion — continuidad de contexto
 
+> **Pendientes (2026-10-16):** las tareas abiertas de este documento viven en `docs/living/PENDIENTES.md` (fuente unica). Aqui queda el diseño, el contexto y la historia; si nace una tarea nueva, se escribe alla.
+
 > Este archivo es **solo continuidad** (que hicimos la sesion pasada, decisiones cerradas).
 >
 > **2026-09-30: el servidor (DigitalOcean) esta EN PAUSA hasta cerrar todas las features. Sigue la

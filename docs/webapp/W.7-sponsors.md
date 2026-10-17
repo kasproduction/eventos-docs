@@ -1,5 +1,7 @@
 # W.7 — Sponsors
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Brand Wall con grid por tier + Brand Profile (cliente reusa data del index, NO endpoint detail) + Contact (no "leads" scoped) + Favorite + View tracking + Trivia integration con gamification.
 >
 > **Estimacion:** ~5h (reducida de 7h tras audit — sin endpoints inventados).

@@ -1,5 +1,7 @@
 # Roadmap — Kiosko Room Check-in
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Interfaz de los totems (iPads/pantallas) en las puertas de los salones.
 > Backend 100% funcional. Este roadmap es solo la interfaz.
 > Design system: Lumina Noir (Plus Jakarta Sans + Urbanist, NO JetBrains Mono)

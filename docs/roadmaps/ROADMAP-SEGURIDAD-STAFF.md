@@ -1,5 +1,7 @@
 # ROADMAP — SEGURIDAD DEL STAFF (2FA + sesiones + accesos) — 25/26
 
+> **Pendientes (2026-10-16):** las tareas abiertas de este documento viven en `docs/living/PENDIENTES.md` (fuente unica). Aqui queda el diseño, el contexto y la historia; si nace una tarea nueva, se escribe alla.
+
 > **Decision Kamilo 2026-07-20**: "prefiero tener todo lo de seguridad en regla
 > y no esperar a tener cliente encima con presion". Se hace AHORA, con calma,
 > sin deal de por medio. Ventana operativa de este frente.

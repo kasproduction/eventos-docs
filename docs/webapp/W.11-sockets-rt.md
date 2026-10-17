@@ -1,5 +1,7 @@
 # W.11 — Sockets RT
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Socket.IO client integrado en toda la webapp. RT en agenda, Q&A, chat, social wall, encuestas, networking, sesiones live, anuncios, gamification (via invalidacion). Long-polling fallback para proxy corporativo.
 >
 > **Estimacion:** ~6h.

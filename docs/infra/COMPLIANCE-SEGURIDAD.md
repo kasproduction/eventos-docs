@@ -1,5 +1,7 @@
 # EventOS — Documento de Compliance de Seguridad
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Controles técnicos implementados, alineación con OWASP Top 10,
 > estándares de desarrollo seguro y cumplimiento normativo.
 > Versión: 1.0 | Fecha: 2026-04-07

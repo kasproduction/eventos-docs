@@ -1,5 +1,7 @@
 # Roadmap Recap Compartible — Post-Evento
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Reemplazo del PDF de certificado tradicional. Tarjeta editorial pop, **certificable y verificable**, con flip 3D al reverso (detalle de sesiones). Sistema 100% configurable desde Filament reusando arquitectura del onboarding.
 >
 > **Estado:** IMPLEMENTADO. Fases 0-6 cerradas. Pendiente E2E manual con Chromium en VPS y validacion visual en dev build.

@@ -1,5 +1,7 @@
 # W.12 — Polish + E2E final
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Pase final de pulido: responsive validado en device real, transiciones fluidas, loading states completos, empty states diseñados, accesibilidad, SEO, PWA install prompt, E2E suite verde.
 >
 > **Estimacion:** ~8h.

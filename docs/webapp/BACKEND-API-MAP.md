@@ -1,5 +1,7 @@
 # Backend API Map — EventOS
 
+> **HISTORICO (2026-10-16):** las casillas `[ ]` de este documento NO son pendientes (plan original sin marcar, hecho, descartado o ya trasladado). Las tareas abiertas viven SOLO en `docs/living/PENDIENTES.md`.
+
 > Referencia EXHAUSTIVA de TODOS los endpoints del backend Laravel para la webapp Next.js.
 >
 > **Fecha:** 2026-05-06 | **Total endpoints:** ~197 documentados | **Cobertura:** ~92%

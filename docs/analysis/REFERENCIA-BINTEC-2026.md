@@ -1,5 +1,7 @@
 # Referencia Bintec 2026 — que hizo Bancolombia y que nos sirve
 
+> **Pendientes (2026-10-16):** las tareas abiertas de este documento viven en `docs/living/PENDIENTES.md` (fuente unica). Aqui queda el diseño, el contexto y la historia; si nace una tarea nueva, se escribe alla.
+
 > Revision pasiva (sin login, sin pruebas de ataque) del sitio publico
 > `bintec.eventosbancolombia.com` el 2026-10-14, con el evento en curso (13, 14 y 15 de octubre,
 > Bogota y Medellin). Fuente: HTML, bundles `/_astro/*.js`, cabeceras HTTP y `/api/agenda` publica.
