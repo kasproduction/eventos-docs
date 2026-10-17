@@ -1,0 +1,417 @@
+[
+ {
+  "id": "2cc01d6b118e",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "P.1 Inventario de snapshots y bases administradas + costo por día",
+  "descripcion_actual": "No prender nada sin confirmación",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "6b5e2cecf0e1",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "P.3 Punto de partida medido con tests/load/entrar-por-la-puerta.js, antes de arreglar nada",
+  "descripcion_actual": "",
+  "fuentes": [
+   "tests/load/entrar-por-la-puerta.js"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "23294f123ccb",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "P.4 Medir B3.1 y B3.2 en el servidor",
+  "descripcion_actual": "Código hecho 2026-10-12",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "9d4092240b97",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B1.3 2FA del staff 25/26",
+  "descripcion_actual": "Falta S.7.2 security:check contra el .env real",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "0a31a53ec3ad",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B2.1 Paquete por versión con GitHub Actions",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": "local",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "4907d2e3273f",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B2.2 Terraform por nivel 0-4 escribirlo",
+  "descripcion_actual": "Aplicarlo es servidor",
+  "fuentes": [],
+  "donde_se_hace": "local",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "32bd1f743b1c",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B2.3 Pipeline con compuertas, etapas 1-6",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "27f55fb71022",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B2.4 Humo funcional automático, incluye correo de acceso recibido",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "cb28953a35ac",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B2.5 Remontar de cero y destruir",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "94e883d59162",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B3.1 Correo con ritmo controlado",
+  "descripcion_actual": "Código d5c3690, falta medir",
+  "fuentes": [],
+  "donde_se_hace": "local+medir",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "10aa91e9f590",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B3.3 Juegos en vivo",
+  "descripcion_actual": "Limitar difusiones + cachear GameService::getEligiblePool",
+  "fuentes": [],
+  "donde_se_hace": "local+medir",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "1a917ba767ea",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B3.4 Réplica de lectura",
+  "descripcion_actual": "Conexión reports para Data Center, Pulse y exports",
+  "fuentes": [],
+  "donde_se_hace": "local+medir",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "6764ff3fa2c4",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B3.5 ROL=admin en deploy.sh",
+  "descripcion_actual": "Admin en admin.<dominio> sin tráfico de asistentes",
+  "fuentes": [
+   "deploy.sh"
+  ],
+  "donde_se_hace": "local+medir",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "d6e50dbec15c",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B3.8 Social pide 10 llamadas por apertura",
+  "descripcion_actual": "Pestañas diferidas o un endpoint (cruza con B.1)",
+  "fuentes": [],
+  "donde_se_hace": "local+medir",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "62f25856337a",
+  "modulo": "Torre de control",
+  "titulo_actual": "B4.1 Alerta externa al teléfono",
+  "descripcion_actual": "BetterStack/UptimeRobot a health, app y socket (= I.5 capa 1)",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "9bf55ad37b08",
+  "modulo": "Torre de control",
+  "titulo_actual": "B4.2 Respaldo cifrado a R2 por cron CON restauración probada",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "86c3ec9e1983",
+  "modulo": "Torre de control",
+  "titulo_actual": "B4.3 Logs centralizados con id de petición",
+  "descripcion_actual": "\"que le paso a la persona 1320 a las 10:42\"",
+  "fuentes": [],
+  "donde_se_hace": "local",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "18ddedec6e81",
+  "modulo": "Torre de control",
+  "titulo_actual": "B4.4 Alertas por umbral salidas de lo medido",
+  "descripcion_actual": "Cualquier 429 a un usuario legítimo suena",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "e656151fba38",
+  "modulo": "Torre de control",
+  "titulo_actual": "B4.6 Escalar con un comando",
+  "descripcion_actual": "escalar.sh --api +1 desde el pipeline",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "50c468aa9a3f",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B5.2 Generador de carga para 5.000",
+  "descripcion_actual": "Varias maquinas + miles de asistentes sembrados (hoy tokens.json tiene 4)",
+  "fuentes": [
+   "tokens.json"
+  ],
+  "donde_se_hace": "local",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "b5ace2c87eb6",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B5.3 Montar Nivel 3 y medir hasta 5.000",
+  "descripcion_actual": "Ola de login, red 4G Colombia, admin con carga (D.4.4), export, juegos, foto viral E5 (subidas masivas a R2 contra el límite 10/min), canario sin carga E6",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "99ccf6e8fddd",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B5.4 Caídas con carga",
+  "descripcion_actual": "Un nodo por rol + repetir la caída de API con 4 vCPU",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "a4197b0f2668",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B5.5 Decidir Nivel 3 o 4 y escribir la promesa del nivel",
+  "descripcion_actual": "Aguante, costo, RTO/RPO",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "28028c79d6cd",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B6.1 Pipeline completo con carga, caída y entrega con informe",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "d80a263bc238",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B6.2 Modo registro / modo evento (escalar.sh --modo)",
+  "descripcion_actual": "Barato mientras la gente se registra",
+  "fuentes": [],
+  "donde_se_hace": "local",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "0dbb663e0468",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B6.3 Runbook del día del evento",
+  "descripcion_actual": "\"si pasa X, haz Y\", incluye protocolo de DISPONIBILIDAD-HA.md:536-546 + modo \"evento en curso\" (congela despliegues, snapshot al empezar) borrador",
+  "fuentes": [
+   "DISPONIBILIDAD-HA.md:536-546"
+  ],
+  "donde_se_hace": "local",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "d1b37799990b",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "B6.4 Ensayo general una semana antes con el nivel elegido",
+  "descripcion_actual": "Una semana antes del evento (28-29 de noviembre) se monta el nivel elegido con el pipeline, se le mete la carga real y se tumba un nodo con gente adentro. Si nadie lo nota, \"evento mañana\" es si. Después se desmonta.",
+  "fuentes": [],
+  "donde_se_hace": "servidor",
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "59aca7da87d3",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "Correo transaccional por cliente",
+  "descripcion_actual": "Clave Resend, dominio verificado, Mail-Tester > 9/10 (W.1-backend-magic-link.md:121)",
+  "fuentes": [
+   "W.1-backend-magic-link.md:121"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "fd00e546322b",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "Cloudflare LB cobra $5/mes sin nada detras",
+  "descripcion_actual": "Cancelar o usar (hallazgo 2026-09-13)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "bd8cff5113f6",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "Caché de auth fria",
+  "descripcion_actual": "Si los 5.000 llegan tras 15 min sin uso vuelve la estampida (832 de 1.500 perdidos en la prueba); precalentar (SocketAuthCache.php:45, infra/DIAGNOSTICO-2026-08-02.md:267)",
+  "fuentes": [
+   "SocketAuthCache.php:45",
+   "infra/DIAGNOSTICO-2026-08-02.md:267"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "ea3230cdafd8",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "Sentry: DSN de producción y validación",
+  "descripcion_actual": "W.12 Fase C",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "76bd9dd0dd61",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "HTTP connection pool (viejo \"Fixes pre-stress\", DISPONIBILIDAD-HA.md sección 11)",
+  "descripcion_actual": "",
+  "fuentes": [
+   "DISPONIBILIDAD-HA.md"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Plan de salida a producción",
+  "subseccion": null
+ },
+ {
+  "id": "a9d9b9f68bfa",
+  "modulo": "Torre de control",
+  "titulo_actual": "Anomaly detection — alertar admin",
+  "descripcion_actual": "Fase 2+",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Seguridad avanzada"
+ },
+ {
+  "id": "063092ea837b",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "Caché de auth/me en Next, precarga completa, data:sync en vez de data:invalidate",
+  "descripcion_actual": "Refrescar solo lo que cambio",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Después del 6 de diciembre",
+  "subseccion": null
+ },
+ {
+  "id": "e629e52a2ea3",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "Consultas duplicadas de auth, COUNT de branding, re-medir el techo publicado por endpoint",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Después del 6 de diciembre",
+  "subseccion": null
+ },
+ {
+  "id": "ab4994bdc363",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "Laravel Pulse como panel (capa 2) y canario automático",
+  "descripcion_actual": "Capa 3 si no entran con la torre",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Después del 6 de diciembre",
+  "subseccion": null
+ },
+ {
+  "id": "7f806154d6df",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "Página de estado pública, niveles de 10.000, montar en otro proveedor con RTO/RPO",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Después del 6 de diciembre",
+  "subseccion": null
+ },
+ {
+  "id": "612e8ad86846",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "Stress 10K (TEST 6-9 del plan viejo: 10K 2 h, failover, export aislado, break point)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Después del 6 de diciembre",
+  "subseccion": null
+ },
+ {
+  "id": "fee92aebd68f",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "I.7.9 hermanos del pipeline (actualizar, destruir) + I.7.10 prueba de punta a punta",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Después del 6 de diciembre",
+  "subseccion": null
+ },
+ {
+  "id": "a09329e6c982",
+  "modulo": "Servidor y capacidad",
+  "titulo_actual": "Viejo §6 de abril",
+  "descripcion_actual": "Docker Compose, CI/CD blue-green, Data Center en VPS-3 worker headless (reemplazado por B1-B6; revisar si algo sigue aplicando al cerrar B2)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Después del 6 de diciembre",
+  "subseccion": null
+ }
+]

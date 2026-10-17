@@ -1,0 +1,374 @@
+{
+  "c1c7fc8e28cb": {
+    "titulo": "Probar la webapp en un portátil, un iPad y un iPhone de verdad",
+    "que": "Hasta ahora la webapp se ha revisado en el simulador de Chrome, que imita otros tamaños de pantalla pero no es igual a un aparato real. Falta recorrerla en un portátil, un iPad y un iPhone de verdad. Esta parte solo se puede hacer contigo, con los aparatos en la mano.",
+    "porque": "El 6 de diciembre la gente va a entrar desde sus propios aparatos, no desde un simulador. Lo que se vea raro en un iPhone real lo van a ver miles.",
+    "lista": "Cuando recorrimos todos los módulos en los tres aparatos y anotamos y corregimos lo que se veía mal."
+  },
+  "36840671f3f5": {
+    "titulo": "Revisar el aviso que sale en el iPad vertical",
+    "que": "Cuando alguien abre la webapp en un iPad puesto de pie, aparece un aviso. Hay que confirmar que ese aviso se ve bien y que no tapa nada importante de la pantalla.",
+    "porque": "Muchos ejecutivos revisan en iPad. Un aviso mal puesto da la impresión de producto sin terminar.",
+    "lista": "Cuando en un iPad vertical real el aviso se ve completo y no tapa ningún botón ni contenido."
+  },
+  "c6ddc300fb49": {
+    "titulo": "Probar la webapp en el Edge de las empresas",
+    "que": "Las empresas grandes suelen usar el navegador Edge de Microsoft con reglas puestas por su área de sistemas, que a veces bloquean cosas. Hay que abrir la webapp ahí y revisar que entrar, ver el streaming y recibir lo que pasa en vivo funcionen.",
+    "porque": "Los clientes corporativos van a abrir la plataforma desde el computador de la oficina. Si falla ahí, se pierde la venta.",
+    "lista": "Cuando en un Edge con reglas de empresa se puede entrar, ver el streaming y lo en vivo llega sin errores."
+  },
+  "aeedbe3e1047": {
+    "titulo": "Probar la webapp completa en Firefox",
+    "que": "Recorrer toda la webapp en el navegador Firefox, versión 115 o más nueva: entrar, ver la agenda, ver el streaming y usar la parte social.",
+    "porque": "Una parte de los asistentes usa Firefox. Si algo no carga ahí, esas personas se quedan por fuera.",
+    "lista": "Cuando el recorrido completo en Firefox 115 o superior pasa sin errores."
+  },
+  "3915a38885ec": {
+    "titulo": "Que las pantallas vacías se vean igual en todos los módulos",
+    "que": "Cuando un módulo no tiene nada que mostrar (no hay sesiones, no hay fotos, no hay patrocinadores), sale un mensaje de \"aquí todavía no hay nada\". Hoy cada pantalla lo muestra a su manera. La idea es que todas usen el mismo estilo.",
+    "porque": "Al comienzo de un evento muchas pantallas están vacías. Si cada una se ve distinta, el producto se siente armado por partes.",
+    "lista": "Cuando todos los módulos muestran su pantalla vacía con el mismo diseño."
+  },
+  "d07a949b2541": {
+    "titulo": "Que el paso de \"cargando\" al contenido no dé saltos",
+    "que": "Mientras una pantalla carga, se muestra una silueta gris del contenido. Cuando llega lo real, a veces todo brinca de golpe. La idea es que ese cambio sea suave en todos los módulos.",
+    "porque": "Ese salto se nota en cada pantalla que se abre y hace que la plataforma se sienta menos pulida frente a un cliente.",
+    "lista": "Cuando en todos los módulos el contenido aparece en el mismo lugar de la silueta, sin brincos."
+  },
+  "f0f32ee898e3": {
+    "titulo": "Poder usar toda la webapp solo con el teclado",
+    "que": "Algunas personas no usan mouse, por ejemplo por una discapacidad. Deben poder llegar a cada botón y enlace con la tecla Tab y activarlo con Enter.",
+    "porque": "Las empresas grandes exigen accesibilidad a sus proveedores, y esto es parte de lo que revisan.",
+    "lista": "Cuando se puede recorrer y usar cada módulo de principio a fin sin tocar el mouse."
+  },
+  "48c15ce24a93": {
+    "titulo": "Que el teclado recorra la pantalla en el orden en que se ve",
+    "que": "Al presionar Tab, la webapp va pasando de un botón al siguiente. Ese orden debe seguir lo que se ve en pantalla, de arriba abajo y de izquierda a derecha, y no saltar a lugares sin sentido.",
+    "porque": "Si el orden es caótico, quien navega con teclado se pierde. Es parte de la accesibilidad que piden los clientes corporativos.",
+    "lista": "Cuando en cada pantalla el recorrido con Tab sigue el orden visual."
+  },
+  "c75a64421cd0": {
+    "titulo": "Ponerle nombre a los botones que solo tienen un ícono",
+    "que": "Las personas ciegas usan un lector de pantalla que les dice en voz alta qué hay en la página. Un botón que solo tiene un ícono, como un corazón o una X, no dice nada si no tiene un nombre escondido. Hay que ponerle ese nombre a cada uno.",
+    "porque": "Sin eso, esos botones son invisibles para quien no ve. Es de lo primero que revisan en una auditoría de accesibilidad.",
+    "lista": "Cuando el lector de pantalla anuncia un nombre claro en cada botón de ícono."
+  },
+  "045bc2227e2a": {
+    "titulo": "Que la webapp pese menos al abrirla",
+    "que": "Al abrir la webapp, el celular descarga un paquete con todo el código necesario para arrancar. Hay que medir cuánto pesa y bajarlo a menos de 200 KB comprimido.",
+    "porque": "En el recinto la gente entra con datos móviles y la señal suele estar saturada. Mientras menos pese, más rápido abre para las 5.000 personas.",
+    "lista": "Cuando la medición del código inicial da menos de 200 KB comprimido."
+  },
+  "d2dd5e2e0e6c": {
+    "titulo": "Que las imágenes se descarguen del tamaño en que se ven",
+    "que": "Hoy algunas imágenes se descargan en su tamaño original completo, aunque en pantalla se muestren pequeñas. La idea es que cada imagen pida solo el tamaño que de verdad se va a ver.",
+    "porque": "Las imágenes son lo que más pesa. Bajarlas hace que las pantallas abran más rápido con la red del evento.",
+    "lista": "Cuando ninguna imagen se descarga más grande de lo que se muestra."
+  },
+  "8c8002723abf": {
+    "titulo": "Sacar 85 o más en velocidad en computador según Google",
+    "que": "Google tiene una revisión llamada Lighthouse que califica de 0 a 100 qué tan rápido carga una página. La meta es que la webapp saque 85 o más cuando se abre en un computador.",
+    "porque": "Es un número que los clientes corporativos pueden revisar por su cuenta. Una nota alta respalda que el producto es serio.",
+    "lista": "Cuando Lighthouse da 85 o más en velocidad en computador en las pantallas principales."
+  },
+  "704e10059daa": {
+    "titulo": "Sacar 75 o más en velocidad en celular según Google",
+    "que": "La misma revisión de Google (Lighthouse), pero simulando un celular, que es más exigente. La meta es 75 o más.",
+    "porque": "La mayoría de los asistentes del 6 de diciembre va a entrar desde el celular, así que esta nota importa más que la del computador.",
+    "lista": "Cuando Lighthouse da 75 o más en velocidad en celular en las pantallas principales."
+  },
+  "ee1aa3678024": {
+    "titulo": "Que la webapp se pueda usar en menos de 3 segundos con 4G",
+    "que": "Medir cuánto tarda la webapp, desde que se abre, en responder a los toques, con una red 4G como la de Bogotá. La meta es menos de 3 segundos.",
+    "porque": "Si la pantalla se ve pero no responde, la gente toca varias veces y se frustra. Con 5.000 personas en la misma red esto se nota mucho.",
+    "lista": "Cuando la medición con 4G de Bogotá da menos de 3 segundos hasta que se puede usar."
+  },
+  "e893b1cda0b9": {
+    "titulo": "Que las listas largas se carguen por partes y se recuerden",
+    "que": "Hoy algunas listas se arman completas en el servidor cada vez que alguien entra. La idea es que la webapp las vaya pidiendo por partes a medida que la persona baja, y que recuerde lo que ya trajo para no pedirlo de nuevo. Esto estaba previsto para después de terminar lo del tiempo real.",
+    "porque": "Le quita trabajo al servidor y hace que volver a una pantalla sea instantáneo. Es una mejora, no algo que bloquee el evento.",
+    "lista": "Cuando las listas largas cargan por partes al bajar y al volver a ellas no se piden otra vez."
+  },
+  "502301eccf1c": {
+    "titulo": "Prueba automática de que el chat y las preguntas llegan en vivo",
+    "que": "Una prueba automática que abre dos ventanas a la vez, como si fueran dos personas: una escribe un mensaje o una pregunta en el streaming y la otra debe verlo aparecer. Para eso la prueba necesita tener prendido el servidor de tiempo real de verdad.",
+    "porque": "El chat y las preguntas son lo más usado durante el streaming. Esta prueba avisa si un cambio los daña antes de que lo note el público.",
+    "lista": "Cuando la prueba corre sola con el tiempo real prendido y pasa: lo que escribe una ventana aparece en la otra."
+  },
+  "72d936bf5712": {
+    "titulo": "Prueba automática de que las solicitudes de conexión llegan en vivo",
+    "que": "Una prueba automática con dos ventanas abiertas a la vez: una persona le envía a otra una solicitud para conectar, y la otra debe verla llegar en el momento, sin recargar.",
+    "porque": "El networking es de lo que más valoran los eventos corporativos. Si las solicitudes no llegan, la parte social pierde sentido.",
+    "lista": "Cuando la prueba pasa y la solicitud aparece en la segunda ventana sin recargar."
+  },
+  "0d57aa5e9a95": {
+    "titulo": "Conectar el aviso de errores del servidor real",
+    "que": "Sentry es un servicio que nos avisa cada vez que algo falla en la pantalla de un usuario. El código ya está listo para usarlo; falta poner la llave de producción y confirmar que los errores llegan.",
+    "porque": "El 6 de diciembre necesitamos enterarnos de los errores en el momento, no cuando alguien se queje.",
+    "lista": "Cuando provocamos un error a propósito en producción y aparece en Sentry."
+  },
+  "7aa8b07dcd1b": {
+    "titulo": "Ver si la prueba de la webapp incrustada sirve para el próximo cliente",
+    "que": "Esta prueba era para meter la webapp dentro de la página de Bancolombia, y ese cliente se perdió. Queda pendiente revisar si una prueba parecida aplica para el próximo cliente.",
+    "porque": "Por ahora no aplica. Solo vale la pena si un nuevo cliente quiere la plataforma dentro de su propia página.",
+    "lista": "Cuando decidimos si el próximo cliente necesita esta prueba y la hacemos o la cerramos."
+  },
+  "5f9b39d9075e": {
+    "titulo": "Compartir tu puesto en el ranking en redes sociales",
+    "que": "Que el asistente pueda compartir en sus redes el puesto que tiene en el ranking de puntos del evento. Está guardado como idea para más adelante.",
+    "porque": "Ayudaría a que el evento se mueva en redes, pero no es necesario para el 6 de diciembre.",
+    "lista": "Cuando un asistente puede compartir su puesto con un toque y la publicación se ve bien en la red."
+  },
+  "7c90c539145d": {
+    "titulo": "Medir la velocidad de las pantallas que piden haber entrado",
+    "que": "La revisión de Google (Lighthouse) normalmente califica páginas públicas. Hay que correrla también con una sesión iniciada, para medir las pantallas que solo ve quien ya entró al evento. Va junto con el resto de revisiones de velocidad.",
+    "porque": "Las pantallas que más se usan en el evento son las de adentro, así que su velocidad es la que de verdad cuenta.",
+    "lista": "Cuando tenemos la nota de Lighthouse de las pantallas principales con sesión iniciada."
+  },
+  "7c52fa4e7f66": {
+    "titulo": "Que el módulo al que vas a pasar ya esté cargado",
+    "que": "Mientras estás en un módulo, la webapp podría ir cargando en silencio los que están al lado, para que al tocarlos abran al instante. Se planeó, pero nunca quedó en la lista y no existe todavía.",
+    "porque": "Hace que la plataforma se sienta rápida, que es lo primero que nota un cliente al probarla.",
+    "lista": "Cuando al pasar de un módulo a su vecino la pantalla aparece sin espera."
+  },
+  "40fe663c269f": {
+    "titulo": "Que un módulo apagado no le pida nada al servidor",
+    "que": "El organizador puede apagar módulos que no va a usar. Hay que confirmar que un módulo apagado de verdad no hace ningún pedido al servidor, para poder ofrecer un \"paquete mínimo\" liviano.",
+    "porque": "Cada pedido que sobra suma carga con 5.000 personas. Y un paquete mínimo es una forma de vender a clientes que no necesitan todo.",
+    "lista": "Cuando, con un módulo apagado, medimos que no sale ningún pedido relacionado con él."
+  },
+  "75a436144acb": {
+    "titulo": "Probar en un celular real todo lo que se igualó entre app y webapp",
+    "que": "Hace un tiempo se igualaron muchas funciones entre la webapp y la app del celular, pero falta probarlas en un teléfono de verdad: corazones, momentos, juegos y trivia de patrocinadores, desafíos, anuncios, soporte, preguntas frecuentes, encuestas y lo del vendedor (escanear con la cámara, exportar, invitar en vivo y los bloqueos de personas vetadas o pendientes).",
+    "porque": "Todo esto se va a usar el 6 de diciembre, y en un teléfono real aparecen fallas que en el computador no se ven.",
+    "lista": "Cuando cada una de esas funciones se probó en un teléfono real y lo que falló quedó corregido."
+  },
+  "9d87c1cab8dd": {
+    "titulo": "Revisión final de la webapp en aparatos, navegadores y accesibilidad",
+    "que": "Es el paquete de revisiones de cierre de la webapp: probarla en portátil, iPad y iPhone reales; en los navegadores Edge, Firefox y Safari de escritorio; confirmar que todo lo que se toca mide al menos 44 píxeles para el dedo; y pasar la revisión de velocidad de Google (Lighthouse) y el estándar de accesibilidad (WCAG).",
+    "porque": "Es lo que separa una webapp que funciona en nuestro computador de una lista para 5.000 personas y para clientes que la auditan.",
+    "lista": "Cuando cada punto del paquete está probado y lo que falló quedó corregido."
+  },
+  "006f6a23fe56": {
+    "titulo": "Ver la película de bienvenida completa de corrido",
+    "que": "La webapp tiene una película de bienvenida con varias escenas. Hasta ahora se probó escena por escena. Falta verla completa de principio a fin, como la va a ver un asistente.",
+    "porque": "Es lo primero que ve la gente al entrar. Un corte o un salto entre escenas daña la primera impresión.",
+    "lista": "Cuando la vemos de corrido en un aparato real sin cortes ni saltos."
+  },
+  "67c08b192c28": {
+    "titulo": "Revisar las transiciones del ingreso y del inicio",
+    "que": "El ingreso a la webapp tiene 4 pasos y la pantalla de inicio cambia según 5 momentos del evento. Hay que ver en un aparato real que el paso de uno a otro se vea suave y sin errores.",
+    "porque": "Son las pantallas por las que pasa todo el mundo. Si se traban, se nota de inmediato.",
+    "lista": "Cuando recorrimos los 4 pasos y los 5 estados y todos cambian bien."
+  },
+  "5341c40d9ff8": {
+    "titulo": "Probar la webapp en una red de empresa que bloquea el tiempo real",
+    "que": "Algunas empresas bloquean en su red la conexión que usamos para lo que pasa en vivo. En ese caso la webapp debe pasar sola a un plan B: preguntar cada tanto si hay novedades. Hay que probar que ese cambio pasa sin errores.",
+    "porque": "Los clientes corporativos tienen justo ese tipo de redes. Si el plan B falla, sus empleados no ven nada en vivo.",
+    "lista": "Cuando, con la conexión de tiempo real bloqueada, la webapp sigue mostrando lo en vivo y no sale ningún error."
+  },
+  "ce0739e75331": {
+    "titulo": "Que el ingreso con enlace al correo aguante quedarse sin internet",
+    "que": "Para entrar, la persona recibe un enlace en su correo. Si en ese momento se queda sin internet, la webapp debe decirle \"tu link sigue válido\" para que lo intente de nuevo, y no un error. Hay que probarlo.",
+    "porque": "En un recinto lleno la señal va y viene. Nadie debería quedarse afuera por un corte de segundos.",
+    "lista": "Cuando, cortando el internet a mitad del ingreso, sale el mensaje \"tu link sigue válido\" y al volver la red se puede entrar."
+  },
+  "419698b36527": {
+    "titulo": "Confirmar que la agenda de la webapp se actualiza sola",
+    "que": "Cuando el organizador cambia una sesión (la hora, la sala), la agenda abierta en la webapp debería cambiar sola, sin que la persona recargue. Hay que probarlo con gente real.",
+    "porque": "El día del evento siempre hay cambios de último minuto. Si la agenda no se actualiza, la gente llega a la sala equivocada.",
+    "lista": "Cuando un cambio hecho en el admin aparece en la agenda abierta en segundos, sin recargar."
+  },
+  "367530a8f0ad": {
+    "titulo": "Que cada entrada en el kiosko mueva el Event Pulse al instante",
+    "que": "Cuando alguien entra por el kiosko o el control de asistencia, esas pantallas deben quedar conectadas al evento en tiempo real, y el Event Pulse (la pantalla que muestra cómo va el evento) debe moverse en menos de 2 segundos.",
+    "porque": "El organizador mira el Event Pulse para saber cuánta gente ha llegado. Si se demora, toma decisiones con datos viejos.",
+    "lista": "Cuando, al registrar una entrada en el kiosko, el Event Pulse cambia en menos de 2 segundos."
+  },
+  "0be16594fc74": {
+    "titulo": "Confirmar que la app usa una sola conexión en vivo en el celular",
+    "que": "La app del celular debería abrir una sola conexión de tiempo real y usarla para todo: chat, preguntas, votaciones, emojis y mensajes fijados del streaming, el muro y las encuestas. Hay que probarlo en un teléfono real y ver en el registro que solo hay una conexión.",
+    "porque": "Si cada pantalla abre su propia conexión, con 5.000 personas el servidor de tiempo real se multiplica y se cae.",
+    "lista": "Cuando, usando todas esas funciones en un teléfono, el registro muestra una sola conexión."
+  },
+  "3bd89b8617a3": {
+    "titulo": "Terminar de revisar la landing en el iPad contigo",
+    "que": "La landing es la página pública del evento donde la gente se inscribe. El 12 de octubre empezamos a revisarla en el iPad. Falta terminar contigo, con el iPad de pie y acostado.",
+    "porque": "Es la cara del evento hacia los invitados y hacia los clientes. Muchos de ellos la van a abrir en iPad.",
+    "lista": "Cuando la landing se ve bien en el iPad en las dos posiciones y tú la apruebas."
+  },
+  "b3061aa42dd8": {
+    "titulo": "Medir en celulares reales cuánto tardan las pantallas con 4G",
+    "que": "Usar Sentry Performance, un servicio que mide tiempos, para saber cuánto tarda cada pantalla de la app en celulares iPhone y Android reales, con una red 4G de Bogotá.",
+    "porque": "Así sabemos con números reales, y no a ojo, si la app va a ir bien para las 5.000 personas.",
+    "lista": "Cuando tenemos los tiempos de las pantallas principales medidos en iPhone y Android con 4G."
+  },
+  "33c280d4a030": {
+    "titulo": "Probar en el servidor la imagen del resumen del evento",
+    "que": "El resumen del evento genera una imagen usando Chromium, un navegador que corre por dentro del servidor sin pantalla. Hay que probar que funciona en el servidor real y además ver cómo queda el diseño en una versión de prueba de la app instalada en el teléfono.",
+    "porque": "El resumen es lo que la gente comparte después del evento. Si la imagen no se genera en el servidor, no hay nada que compartir.",
+    "lista": "Cuando el servidor genera la imagen y se ve bien en la app de prueba del teléfono."
+  },
+  "db1cdc1bdec3": {
+    "titulo": "Que escanear en el kiosko responda en menos de una décima de segundo",
+    "que": "Cada vez que el kiosko escanea un QR, el servidor tiene que responder. En el computador de desarrollo tarda unos 150 milisegundos; en el servidor real se espera que baje a unos 50. Hay que medirlo allá y confirmar que está por debajo de 100.",
+    "porque": "En la entrada del 6 de diciembre se van a hacer filas. Cada fracción de segundo por persona se suma con 5.000.",
+    "lista": "Cuando la medición en el servidor real da menos de 100 milisegundos por escaneo."
+  },
+  "ca38d23dda16": {
+    "titulo": "Que la app del staff siga escaneando sin internet",
+    "que": "Que la app del staff pueda guardar los escaneos en el teléfono cuando no hay internet y los mande todos juntos apenas vuelva la señal.",
+    "porque": "Solo vale la pena si en el recinto hay zonas sin wifi. Si no las hay, se puede dejar para después.",
+    "lista": "Cuando, escaneando sin internet, al volver la señal todos los escaneos llegan al servidor sin perder ninguno."
+  },
+  "762fd05c7f97": {
+    "titulo": "Probar los avisos de la silent disco en la app instalada",
+    "que": "La silent disco manda avisos al celular. Hay que probarlos en una versión de prueba instalada como app real, porque la app de pruebas rápidas que usamos (Expo Go) no deja recibir esos avisos.",
+    "porque": "Si los avisos no llegan, la gente no se entera de que empezó la silent disco.",
+    "lista": "Cuando, en la app de prueba instalada, el aviso de la silent disco llega al teléfono."
+  },
+  "c670e06bc8a5": {
+    "titulo": "Poner el efecto de vidrio de Apple en la barra de abajo de la app",
+    "que": "Apple tiene un nuevo efecto de vidrio para las barras de navegación. Hay una herramienta para usarlo, pero por ahora solo sirve en iOS 26 y no con la forma en que está hecha nuestra app. Queda en espera hasta que la herramienta lo soporte.",
+    "porque": "Es solo estético. No afecta el evento, es para después.",
+    "lista": "Cuando la herramienta funcione con nuestra app y la barra de abajo use el efecto en iPhone."
+  },
+  "d6d313d202e3": {
+    "titulo": "Publicar la app en las tiendas de Apple y Google",
+    "que": "Empaquetar la versión final de la app para Android y iPhone, tener las cuentas de las tiendas listas, enviarla y pasar la revisión de Apple y Google. Esa revisión puede tardar días o semanas.",
+    "porque": "Si el cliente quiere la app en las tiendas para el 6 de diciembre, hay que empezar con margen. Es un riesgo de tiempo.",
+    "lista": "Cuando la app está aprobada y se puede descargar en las dos tiendas."
+  },
+  "4c6a89e99abd": {
+    "titulo": "Registrar la firma de la app final en Firebase y apuntar el dominio",
+    "que": "Firebase es el servicio de Google que manda notificaciones al celular. Para que acepte la app final hay que registrarle su firma digital (una especie de huella de la app). Además hay que dejar listo el dominio, es decir, que la dirección web apunte al servidor correcto.",
+    "porque": "Sin esto, la app publicada no recibe notificaciones ni abre los enlaces del evento.",
+    "lista": "Cuando la app final recibe una notificación de prueba y el dominio abre el servidor correcto."
+  },
+  "79d483a8472d": {
+    "titulo": "Poner al día la pantalla de documentos de la app",
+    "que": "La pantalla de documentos de la app quedó de una versión vieja, de antes de que existiera el diseño actual. Hay que alinearla con el estilo y la forma de trabajar del resto de la app.",
+    "porque": "Es una pantalla que se ve distinta a las demás y da sensación de producto viejo.",
+    "lista": "Cuando la pantalla de documentos se ve y se comporta como el resto de la app."
+  },
+  "85e1838191f4": {
+    "titulo": "Borrar de la app los banners viejos que ya no se usan",
+    "que": "En la app quedó el código de una función vieja de banners (la pantalla, el carrusel y lo que pedía al servidor) que ya no se usa. Hay que borrarlo.",
+    "porque": "Código muerto confunde y puede romperse al cambiar otras cosas. Es limpieza, no afecta lo que ve la gente.",
+    "lista": "Cuando ese código está borrado y la app compila y funciona igual."
+  },
+  "f67a9997fefa": {
+    "titulo": "Borrar o usar un menú de módulos que quedó escondido en la app",
+    "que": "En la pantalla de inicio de la app se carga un menú compacto de módulos que nunca se muestra. Se descubrió el 1 de agosto. Hay que decidir si se borra o si se le da un uso.",
+    "porque": "Es limpieza. No afecta al evento, pero deja la app más ordenada.",
+    "lista": "Cuando el menú está borrado o se muestra con un propósito claro."
+  },
+  "a9939f9c92b7": {
+    "titulo": "En la app, tocar la sesión de un speaker te lleve a ella en la agenda",
+    "que": "En la webapp, cuando tocas una sesión desde el perfil de un speaker, te lleva a la agenda y la resalta. Falta hacer lo mismo en la app del celular.",
+    "porque": "Así la app y la webapp funcionan igual y la gente encuentra más rápido la charla que busca.",
+    "lista": "Cuando en la app, al tocar una sesión de un speaker, se abre la agenda con esa sesión resaltada."
+  },
+  "d6dae87aa219": {
+    "titulo": "Confirmar si la pantalla de banners de la app se usa antes de borrarla",
+    "que": "Antes de borrar la pantalla de banners de la app hay que revisar si alguien la abre sola o si solo existe como carrusel dentro de otra pantalla.",
+    "porque": "Evita borrar algo que todavía se usa y romper una parte de la app.",
+    "lista": "Cuando sabemos con certeza si se usa sola, y con eso se decide si se borra."
+  },
+  "9c3dbdbc0ce6": {
+    "titulo": "Decidir qué pasa con el resumen por evento de la app",
+    "que": "La app tiene una pantalla de resumen para cada evento que no tiene equivalente en la webapp. Hay que decidir si se queda, se cambia o se quita. Está marcada para una segunda etapa.",
+    "porque": "No es necesario para el 6 de diciembre. Es para ordenar la app más adelante.",
+    "lista": "Cuando hay una decisión tomada sobre esa pantalla."
+  },
+  "0cf6c2f6e524": {
+    "titulo": "QR del asistente con el logo del evento en el centro",
+    "que": "Que el código QR de cada asistente lleve el logo del evento en el medio, en vez de ser un QR genérico.",
+    "porque": "Es un detalle de marca que los clientes corporativos valoran y hace ver el evento más cuidado.",
+    "lista": "Cuando el QR sale con el logo en el centro y el kiosko lo sigue leyendo sin problema."
+  },
+  "590da5fb147a": {
+    "titulo": "Borrar del admin una sección vieja que ya no se usa",
+    "que": "En el admin sigue existiendo una sección de \"bienvenida del evento\" que ya no se usa. Hay que borrarla.",
+    "porque": "Es limpieza. Evita que alguien la encuentre y se confunda.",
+    "lista": "Cuando la sección ya no existe y el admin funciona igual."
+  },
+  "ff6d0b5366db": {
+    "titulo": "Pulir Mission Control en el iPad acostado",
+    "que": "Mission Control es la pantalla desde donde el organizador controla el evento en vivo. Hay que ajustarla para que se vea bien en un iPad acostado, de 1024 píxeles de ancho.",
+    "porque": "Muchos organizadores manejan el evento desde un iPad. Si no se ve bien, pierden control en pleno evento.",
+    "lista": "Cuando Mission Control se ve completo y usable en un iPad horizontal."
+  },
+  "268199bba17b": {
+    "titulo": "Subir una imagen principal distinta para computador y para celular",
+    "que": "La imagen principal del evento (el keyvisual) hoy es una sola. La idea es que el organizador pueda subir una versión para computador y otra para celular desde el admin, y ver cómo queda cada una antes de guardar.",
+    "porque": "Una imagen pensada para pantalla ancha se corta mal en el celular. Así el evento se ve bien en los dos.",
+    "lista": "Cuando el admin tiene los dos espacios para subir con vista previa y cada pantalla muestra su versión."
+  },
+  "bfb63e98cb5d": {
+    "titulo": "Que la portada del evento pueda ser solo texto",
+    "que": "Hoy la parte de arriba del evento usa una imagen. La idea es que el organizador también pueda elegir que sea solo texto, y que esa misma regla funcione igual en las 3 superficies donde se ve el evento.",
+    "porque": "No todos los clientes tienen una imagen lista. Con texto el evento sigue viéndose bien.",
+    "lista": "Cuando el organizador elige texto en vez de imagen y se ve bien en las 3 superficies."
+  },
+  "680910db3ad3": {
+    "titulo": "Pruebas automáticas para Mission Control",
+    "que": "Escribir pruebas automáticas que revisen que Mission Control funciona cada vez que se cambia algo. Para hacerlas hay que simular la llave de acceso especial que usa esa pantalla. Se calcula en hora y media.",
+    "porque": "Mission Control es lo que el organizador usa en vivo. Las pruebas avisan si un cambio lo rompe antes del 6 de diciembre.",
+    "lista": "Cuando las pruebas existen, corren solas y pasan."
+  },
+  "778bfb0fe207": {
+    "titulo": "Colores oscuro y claro comunes para las pantallas del organizador",
+    "que": "Las pantallas sueltas del organizador (kiosko, asistencia, Event Pulse y otras) definen sus colores cada una por su lado. La idea es crear un archivo común con los colores del modo oscuro (Noir) y del claro (Lux) para que todas lo usen.",
+    "porque": "Así se ven como un mismo producto y un cambio de color se hace una vez y no en cada pantalla.",
+    "lista": "Cuando el archivo común existe y las pantallas toman sus colores de ahí."
+  },
+  "64e9992a0ba2": {
+    "titulo": "Botones, ventanas y avisos iguales en las pantallas del organizador",
+    "que": "Crear un archivo común con el diseño de los botones, las ventanas emergentes, los avisos cortos, las pantallas vacías y las tarjetas, para que todas las pantallas del organizador los usen igual.",
+    "porque": "Hoy cada pantalla los dibuja a su manera. Unificarlos hace que el producto se vea terminado frente a un cliente.",
+    "lista": "Cuando el archivo existe y las pantallas usan esos mismos elementos."
+  },
+  "22ba4639bcc7": {
+    "titulo": "Herramientas comunes para las pantallas del organizador",
+    "que": "Crear un archivo común con las funciones que todas las pantallas del organizador repiten: hablar con el servidor, mostrar un aviso corto, abrir una ventana emergente y otras ayudas. Hoy cada pantalla las tiene copiadas.",
+    "porque": "Si hay que corregir algo, se corrige una vez y no en cada pantalla. Menos riesgo de errores el día del evento.",
+    "lista": "Cuando el archivo existe y las pantallas lo usan en vez de sus copias."
+  },
+  "64e0f95565c9": {
+    "titulo": "Que el control de asistencia use los colores del resto",
+    "que": "La pantalla de control de asistencia usa sus propios colores, con un morado (#6366f1) que no es de nuestro diseño. Hay que pasarla a los colores comunes de las demás pantallas.",
+    "porque": "Es una pantalla que el staff usa en la entrada y que los clientes ven. Debe verse como el resto del producto.",
+    "lista": "Cuando la pantalla toma sus colores del archivo común y ya no aparece ese morado."
+  },
+  "b55e1b43d842": {
+    "titulo": "Que la pantalla de sesión en sala se vea bien cuando no hay nada",
+    "que": "Hay una pantalla que se proyecta en cada sala con la sesión en curso. Cuando no hay sesión, su mensaje de \"no hay nada\" se ve distinto al de las demás pantallas. Hay que alinearlo.",
+    "porque": "Esa pantalla la ve todo el público en la sala, así que tiene que verse cuidada.",
+    "lista": "Cuando, sin sesión en curso, la pantalla muestra el mismo estilo de pantalla vacía que las demás."
+  },
+  "ba8e85b74c68": {
+    "titulo": "Que el Event Pulse use los mismos colores que las demás pantallas",
+    "que": "El Event Pulse, la pantalla que muestra cómo va el evento, nombra sus colores distinto a las demás. Hay que alinearlo con los colores del modo oscuro (Noir) y claro (Lux) que usa el resto.",
+    "porque": "Así se ve igual que el resto del producto y un cambio de color llega a todas las pantallas a la vez.",
+    "lista": "Cuando el Event Pulse se ve bien en oscuro y en claro usando los colores comunes."
+  },
+  "63edba13a64e": {
+    "titulo": "Hacer más fluido el orbe de preguntas frecuentes de la app",
+    "que": "En la app, las preguntas frecuentes tienen un orbe animado. Hoy está hecho con una técnica más pesada; la idea es rehacerlo con otra (Skia) que dibuja directo en la pantalla y es más liviana. Es solo de apariencia.",
+    "porque": "No cambia nada para el evento. Es un pulido para después.",
+    "lista": "Cuando el orbe se ve igual o mejor y corre fluido en un teléfono de gama media."
+  },
+  "a0a3a334da76": {
+    "titulo": "Mapa del lugar del evento en la app",
+    "que": "Una sección con el plano del recinto para que la gente encuentre las salas y los stands. Depende de si el evento tiene un plano disponible.",
+    "porque": "Ayuda mucho en eventos grandes, pero solo tiene sentido si el cliente entrega el plano. Es para más adelante.",
+    "lista": "Cuando la app muestra el plano de un evento y se pueden ubicar las salas en él."
+  },
+  "bcac257e8272": {
+    "titulo": "Recortar la foto de perfil en círculo dentro de la app",
+    "que": "Cuando alguien sube su foto de perfil en la app, que pueda recortarla en forma de círculo, con una pantalla de recorte en modo oscuro.",
+    "porque": "Hace que las fotos de perfil se vean mejor. Es un detalle para después del evento.",
+    "lista": "Cuando al subir una foto aparece el recorte circular y la foto queda guardada así."
+  }
+}

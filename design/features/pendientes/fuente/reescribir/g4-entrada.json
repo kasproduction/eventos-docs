@@ -1,0 +1,375 @@
+[
+ {
+  "id": "e469dd74aef4",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "¿Cuándo abre el registro de asistentes? Esa fecha fija cuando tiene que existir producción",
+  "descripcion_actual": "Esa fecha decide cuando tiene que existir producción de verdad, con correo verificado y Turnstile real. Si el registro abre en noviembre, el servidor tiene que estar arriba antes.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "558e471f5327",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "¿El cliente del 6 de diciembre ya está confirmado?",
+  "descripcion_actual": "Si esta confirmado se justifica pagar las pruebas de servidor y medir 5.000. Si no, se puede priorizar el demo vendible.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "83f163d0509d",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "Costo de pruebas vigente (~$120/mes bases, ~$6,5/día droplets)",
+  "descripcion_actual": "Confirmar en P.1",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "a595905b3fb3",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "¿Carga y caída de nodo (I.7.7) obligatorias antes de evento real y opcionales en demos?",
+  "descripcion_actual": "project_orquestador_pipeline",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "a47ab4cadb43",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "Umbrales verde/amarillo/rojo del canario",
+  "descripcion_actual": "Hoy propuesta (infra/PLAN-EXPERIENCIA-ENTERPRISE.md:37)",
+  "fuentes": [
+   "infra/PLAN-EXPERIENCIA-ENTERPRISE.md:37"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "af7afc7b195c",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "W.19 Spatial Player",
+  "descripcion_actual": "Aprobar la arquitectura propuesta 2026-09-13 y decidir 8.7",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "6e2267c3a1eb",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "Bintec: ¿agenda en grilla por auditorio",
+  "descripcion_actual": "Horas en un eje, salas en columnas para eventos de varias salas? (REFERENCIA-BINTEC-2026.md:23, :106)",
+  "fuentes": [
+   "REFERENCIA-BINTEC-2026.md:23"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "83405f31c0ae",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "Admin: renombrar \"Highlights\" a \"Destacados\"",
+  "descripcion_actual": "HighlightResource.php:23; NEXT-SESSION.md:1767",
+  "fuentes": [
+   "HighlightResource.php:23",
+   "NEXT-SESSION.md:1767"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "117769d32b0a",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "Admin: donde vive \"Otorgar puntos manuales\"",
+  "descripcion_actual": "El motor lo soporta, no hay UI (NEXT-SESSION.md:1768)",
+  "fuentes": [
+   "NEXT-SESSION.md:1768"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "713ce8e1f7df",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "Admin: ¿vuelve el toggle de Silent Disco al form de sesión?",
+  "descripcion_actual": "NEXT-SESSION.md:1769",
+  "fuentes": [
+   "NEXT-SESSION.md:1769"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "dc30c89e5aec",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "Agenda: ¿se puede volver a calificar una sesión ya calificada? Hoy queda de solo lectura",
+  "descripcion_actual": "BUG-322",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "265d40089c10",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "Socket: emits que nadie escucha",
+  "descripcion_actual": "session:started/ended/cancelled, agenda:updated, room:occupancy: consumirlos o quitarlos (AUDITORIA-SOCKETS-SUPERFICIES-2026-07-04.md:216)",
+  "fuentes": [
+   "AUDITORIA-SOCKETS-SUPERFICIES-2026-07-04.md:216"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "663d60b419f7",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "Event Pulse: reglas del hero",
+  "descripcion_actual": "Tarjetas que agregan \"los ultimos 10 ingresos\" + lead individual: lab → aprobación → código",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "b5bebf4a16fe",
+  "modulo": "Decisiones tuyas",
+  "titulo_actual": "Páginas custom (iframes del organizador)",
+  "descripcion_actual": "Construir el acceso o demoler (diferido post-deploy 2026-07-20)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Decisiones tuyas",
+  "subseccion": null
+ },
+ {
+  "id": "43902edfc188",
+  "modulo": "Manual y documentación",
+  "titulo_actual": "Al retomar: re-escribir el piloto de Encuestas con el tono aprobado",
+  "descripcion_actual": "Natural, humanizado, sin tecnicismos — feedback Kamilo y producir M1-M7 contra el inventario blindado",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Manual del organizador",
+  "subseccion": null
+ },
+ {
+  "id": "d31c07898b5d",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "StaggerList y gestos de swipe con háptica",
+  "descripcion_actual": "W.1-setup-auth.md:343, :364",
+  "fuentes": [
+   "W.1-setup-auth.md:343"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "810e44b37b16",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Indicador de CapsLock y cuenta regresiva para reenviar el link",
+  "descripcion_actual": "W.1-setup-auth.md:431, :434",
+  "fuentes": [
+   "W.1-setup-auth.md:431"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "5e300d878ef2",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Recap y certificado en pantalla aparte de la webapp",
+  "descripcion_actual": "W.2-home.md:207",
+  "fuentes": [
+   "W.2-home.md:207"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "a8005e15ca61",
+  "modulo": "Manual y documentación",
+  "titulo_actual": "Páginas dinámicas del organizador en la webapp",
+  "descripcion_actual": "W.13-faq-documentos-pages.md:80-83",
+  "fuentes": [
+   "W.13-faq-documentos-pages.md:80-83"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "48319522c3eb",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "OG y sitemap de la webapp autenticada",
+  "descripcion_actual": "W.12-polish.md:137-141",
+  "fuentes": [
+   "W.12-polish.md:137-141"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "ff9b7b0824cc",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Migrar SSR a TanStack Query infinite caché",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "c5277de22b81",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Home terminado con los próximos eventos del organizador",
+  "descripcion_actual": "Ambiente distinto por estado (project_webapp_home_v2)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "a052fda01ab4",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Search server-side params standardizados",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Backend nice-to-have (NO bloqueante — verificados 2026-07-14 como NO construidos)"
+ },
+ {
+  "id": "166177b892ef",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Endpoint cancelar solicitud (DELETE /contacts/request/{id})",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Backend nice-to-have (NO bloqueante — verificados 2026-07-14 como NO construidos)"
+ },
+ {
+  "id": "9bcd64802447",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Score numerico match en suggested-contacts",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Backend nice-to-have (NO bloqueante — verificados 2026-07-14 como NO construidos)"
+ },
+ {
+  "id": "9ba82a26ebf8",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Endpoint paginado leaderboard >50",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Backend nice-to-have (NO bloqueante — verificados 2026-07-14 como NO construidos)"
+ },
+ {
+  "id": "75d018ba686e",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Evento socket points:awarded {amount, action, total} informativo",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Backend nice-to-have (NO bloqueante — verificados 2026-07-14 como NO construidos)"
+ },
+ {
+  "id": "957d30c440f2",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "WhatsApp Business API (ICE360 lo tiene por $850K COP — evaluar si vale la pena)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Comunicacion avanzada"
+ },
+ {
+  "id": "614b4300e84e",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "SMS fallback",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Comunicacion avanzada"
+ },
+ {
+  "id": "89a829c1065f",
+  "modulo": "Manual y documentación",
+  "titulo_actual": "Documentar arquitectura socket",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Documentacion"
+ },
+ {
+  "id": "a3d94c59ccff",
+  "modulo": "Manual y documentación",
+  "titulo_actual": "White-label: migrar app.json → app.config.js + estructura clients/",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Documentacion"
+ },
+ {
+  "id": "7fb5069eccc7",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Digital signage (pantallas venue)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Features opcionales"
+ },
+ {
+  "id": "3fd558f4bd29",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Badge printing físico",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Features opcionales"
+ },
+ {
+  "id": "26c045893c78",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Multi-tenant, Stripe, Data export GDPR, Juegos Unity bridge",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Fase 3 — SaaS + Monetizacion"
+ },
+ {
+  "id": "6fba66d08244",
+  "modulo": "Producto a futuro",
+  "titulo_actual": "Multi-location con tracks (Bancolombia: Colombia + Panama)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Fase 3 — SaaS + Monetizacion"
+ }
+]

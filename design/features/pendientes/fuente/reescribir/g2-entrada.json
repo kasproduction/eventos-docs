@@ -1,0 +1,661 @@
+[
+ {
+  "id": "ec751d37be4f",
+  "modulo": "Bugs",
+  "titulo_actual": "BUG-347 Los tests llaman al socket y a la webapp reales",
+  "descripcion_actual": "Falta preventStrayRequests y simular /internal (la suite tarda ~30 min)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Bugs abiertos",
+  "subseccion": null
+ },
+ {
+  "id": "18b4c8f8467b",
+  "modulo": "Bugs",
+  "titulo_actual": "BUG-344 Pest con config cacheada corre contra MySQL de dev",
+  "descripcion_actual": "TestCase debe abortar si no es sqlite (mitigado)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Bugs abiertos",
+  "subseccion": null
+ },
+ {
+  "id": "997802a6ee0a",
+  "modulo": "Bugs",
+  "titulo_actual": "BUG-348 Test de caché del Data Center falla siempre",
+  "descripcion_actual": "Reescribirlo para la invalidacion por observer (DataCenterApiTest.php:76). Prioridad baja",
+  "fuentes": [
+   "DataCenterApiTest.php:76"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Bugs abiertos",
+  "subseccion": null
+ },
+ {
+  "id": "66500a6fcbbf",
+  "modulo": "Bugs",
+  "titulo_actual": "BUG-345 Correo sin ritmo",
+  "descripcion_actual": "Código hecho en B3.1, se cierra al medirlo",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Bugs abiertos",
+  "subseccion": null
+ },
+ {
+  "id": "0b7965bd95c4",
+  "modulo": "Bugs",
+  "titulo_actual": "Pulse cuenta 84 mensajes y la BD tiene 2.156",
+  "descripcion_actual": "Revisar el criterio de stats.messages (sin verificar)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Bugs abiertos",
+  "subseccion": null
+ },
+ {
+  "id": "273e385a4bee",
+  "modulo": "Bugs",
+  "titulo_actual": "composer audit",
+  "descripcion_actual": "57 avisos en 19 paquetes sin revisar",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Bugs abiertos",
+  "subseccion": null
+ },
+ {
+  "id": "e895ffb454bf",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "Toggle de tema para el demo",
+  "descripcion_actual": "Idea Kamilo 2026-10-16: pildora Noir/Lux flotante que cambia ?tema= en la misma URL, visible SOLO con ?demo (una landing real no deja al asistente cambiar la plantilla del admin); el parametro viaja a la confirmación y al widget. Minilab A (pildora abajo a la derecha) / B (barra fina arriba, con color del cliente como el lab v3) antes de codear. Sin backend. Hoy el tema se fuerza con ?tema=lux|noir (src/lib/landingEvent.ts:10).",
+  "fuentes": [
+   "src/lib/landingEvent.ts:10"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Registro, landing y widget",
+  "subseccion": null
+ },
+ {
+  "id": "edbed4ddff81",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "Credencial con etiqueta visible (VIP, Prensa)",
+  "descripcion_actual": "En el admin marcar que tags salen en la escarapela (idea Kamilo 2026-10-11, después)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Registro, landing y widget",
+  "subseccion": null
+ },
+ {
+  "id": "15b58d2f17c6",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "\"Ya tenias tu lugar\" con varios eventos",
+  "descripcion_actual": "Hoy sale también si el correo tiene cuenta en OTRO evento y no en este",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Registro, landing y widget",
+  "subseccion": null
+ },
+ {
+  "id": "939c6bf03a02",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "Tarjeta al compartir cuando el evento NO tiene \"Card del Home\"",
+  "descripcion_actual": "Hoy sale sin imagen. Generarla (nombre, fecha, lugar, color del evento) necesita lab antes",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Registro, landing y widget",
+  "subseccion": null
+ },
+ {
+  "id": "858173b0ac8e",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "En producción, probar la tarjeta en WhatsApp, LinkedIn y X con la URL real",
+  "descripcion_actual": "En local la imagen no es pública",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Registro, landing y widget",
+  "subseccion": null
+ },
+ {
+  "id": "8b3579d8d3e3",
+  "modulo": "Agenda",
+  "titulo_actual": "B.3 Cero friccion de entrada",
+  "descripcion_actual": "El QR del stand suma con la sesión que ya existe; nunca otro login (Bintec Play no dejo entrar a Kamilo).",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BINTEC 2026 — lo que sale de la referencia (Kamilo 2026-10-14) — 0/6"
+ },
+ {
+  "id": "cc59d379f1dc",
+  "modulo": "Agenda",
+  "titulo_actual": "B.4 Ficha de sesión",
+  "descripcion_actual": "Triple estado (me interesa / favorito / asistire presencialmente) y Outlook Calendar además de Google. Verificar que tenemos hoy antes de agregar.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BINTEC 2026 — lo que sale de la referencia (Kamilo 2026-10-14) — 0/6"
+ },
+ {
+  "id": "76fd3fb46ea2",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "B.5 Cabeceras de seguridad",
+  "descripcion_actual": "Revisar CSP, X-Frame-Options, nosniff y Referrer-Policy en eventos-web y la API. Y que ningún registro use un dato conocido (cedula) como contraseña.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BINTEC 2026 — lo que sale de la referencia (Kamilo 2026-10-14) — 0/6"
+ },
+ {
+  "id": "36d1b94c9b0c",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "B.6 Respaldo de chat para eventos grandes",
+  "descripcion_actual": "Evaluar Ably (o similar) solo si la medición de 5.000 muestra que nuestro socket no aguanta. Decisión por evento, no reescritura.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BINTEC 2026 — lo que sale de la referencia (Kamilo 2026-10-14) — 0/6"
+ },
+ {
+  "id": "86c4e9a3c942",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "8.1 Player persistente a nivel shell",
+  "descripcion_actual": "Sacar StreamPlayer de la ruta y montarlo en un StreamProvider del shell W.0 (junto a GlobalSocketProvider) con estado {sessionId, mode: 'full' | 'split' | 'mini' | 'closed'}. La ruta session-stream/[id] pasa a ser solo el layout full; navegar NO desmonta el iframe (YouTube/Vimeo/HLS). Ref: StreamShell.tsx (grid por página), detectSource.ts.",
+  "fuentes": [
+   "StreamShell.tsx",
+   "detectSource.ts"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BLOQUE 8 — W.19 Spatial Player (visionOS): el stream convive con el resto — 0/9 (abierto 2026-09-07)"
+ },
+ {
+  "id": "04f87f1d2d6c",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "8.2 Modo split con Agenda",
+  "descripcion_actual": "Click en Agenda desde el stream → mode: 'split': player izq (16:9 con controles) + agenda der en el mismo canvas. Clic en otra sesión con stream → cambia la fuente sin salir. Sin stream → DetailPanel normal. Ref: agenda/DetailPanel.tsx, patron split feedback_split_layout_pattern.",
+  "fuentes": [
+   "agenda/DetailPanel.tsx"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BLOQUE 8 — W.19 Spatial Player (visionOS): el stream convive con el resto — 0/9 (abierto 2026-09-07)"
+ },
+ {
+  "id": "61268d1303e7",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "8.3 Modo mini (flotante) para el resto",
+  "descripcion_actual": "Cualquier otra ruta → mode: 'mini': card 320px esquina inferior derecha (fuera del SidebarPill), arrastrable (framer drag), spring al entrar/salir, botón volver (→ full con FLIP como W.X) y cerrar. Chat/Q&A/polls se ocultan pero su hook sigue vivo (no re-join de rooms, feedback_no_extra_sockets). Toasts de trivia/ruleta siguen llegando por GlobalSocketProvider.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BLOQUE 8 — W.19 Spatial Player (visionOS): el stream convive con el resto — 0/9 (abierto 2026-09-07)"
+ },
+ {
+  "id": "c2f75b36739e",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "8.4 Volver al stream",
+  "descripcion_actual": "Desde mini o split, clic en el player o en \"En vivo\" del rail → full restaurando paneles y scroll del chat donde iba (no recargar historial).",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BLOQUE 8 — W.19 Spatial Player (visionOS): el stream convive con el resto — 0/9 (abierto 2026-09-07)"
+ },
+ {
+  "id": "9637d8835b64",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "8.5 Mobile (espejo YouTube app)",
+  "descripcion_actual": "Mismo estado, pero mini es una barra sobre la MobileTabBar (thumbnail + título + play/pause + cerrar); split no existe en mobile (la agenda reemplaza y el player queda en barra). Ref: shell/mobile/MobileTabBar.tsx.",
+  "fuentes": [
+   "shell/mobile/MobileTabBar.tsx"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BLOQUE 8 — W.19 Spatial Player (visionOS): el stream convive con el resto — 0/9 (abierto 2026-09-07)"
+ },
+ {
+  "id": "e9add8725a2e",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "8.6 /live con preview real",
+  "descripcion_actual": "LiveHero reproduce el stream destacado muted (iframe autoplay+mute, YouTube/Vimeo lo permiten) en vez del poster; clic → full. DECIDIDO Kamilo 2026-09-13: A en desktop (preview permanente muted en el hero) y B en mobile (tap dispara preview de 4 s y luego entra; el browser bloquea autoplay). Ref: live/LiveHero.tsx:39, LiveHubView.tsx:55.",
+  "fuentes": [
+   "live/LiveHero.tsx:39",
+   "LiveHubView.tsx:55"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BLOQUE 8 — W.19 Spatial Player (visionOS): el stream convive con el resto — 0/9 (abierto 2026-09-07)"
+ },
+ {
+  "id": "c2d8b1d93305",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "8.7 Tarjetas laterales del hub con vida",
+  "descripcion_actual": "LiveSideCard de las otras salas en vivo: miniatura del stream muted o, si son varias, rotacion cada 8 s (1 solo iframe extra máximo; 3 iframes de YouTube a la vez pesan). Decisión Kamilo pendiente.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BLOQUE 8 — W.19 Spatial Player (visionOS): el stream convive con el resto — 0/9 (abierto 2026-09-07)"
+ },
+ {
+  "id": "3a24c5406fc1",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "8.8 Lifecycle: Si la sesión del player termina",
+  "descripcion_actual": "session:ended / hora + buffer, el mini muestra \"Termino — ver siguiente\" con la próxima del mismo salon (ya lo sabe el backend, es lo que devuelve rooms/ping al kiosko). Cerrar el evento (ended) apaga el player.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BLOQUE 8 — W.19 Spatial Player (visionOS): el stream convive con el resto — 0/9 (abierto 2026-09-07)"
+ },
+ {
+  "id": "d2aff9888d80",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "8.9 QA vivo con Kamilo",
+  "descripcion_actual": "Recorrido completo: stream → agenda (split) → social (mini) → volver (full) → /live (preview) → otra sala; desktop + tablet + mobile; y con socket apagado (degradacion sin errores). Medir que el iframe NO se recargue en ningún paso.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "BLOQUE 8 — W.19 Spatial Player (visionOS): el stream convive con el resto — 0/9 (abierto 2026-09-07)"
+ },
+ {
+  "id": "545aa447ccbe",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "Sugerencia de typo del correo también al editar el email en el paso de contraseña",
+  "descripcion_actual": "W.1-setup-auth.md:437",
+  "fuentes": [
+   "W.1-setup-auth.md:437"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "Sueltos de la webapp (inventario 2026-10-16)"
+ },
+ {
+  "id": "45ffe3f47261",
+  "modulo": "Agenda",
+  "titulo_actual": "UI optimista en rating de agenda, ticket de soporte y forms de perfil",
+  "descripcion_actual": "NEXT-SESSION.md:2808; ojo: el skip formal 2026-07-05 decia que los forms con validación 422 deben esperar, revisar antes",
+  "fuentes": [
+   "NEXT-SESSION.md:2808"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "Sueltos de la webapp (inventario 2026-10-16)"
+ },
+ {
+  "id": "5360120df172",
+  "modulo": "Juegos y gamificación",
+  "titulo_actual": "W.9 Share rank social (backlog)",
+  "descripcion_actual": "Botón para compartir tu posicion del ranking en redes. Quedo para después al cerrar el módulo.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "Sueltos de la webapp (inventario 2026-10-16)"
+ },
+ {
+  "id": "ed1b6b796949",
+  "modulo": "Agenda",
+  "titulo_actual": "Opcional: 3 vitest de TESTS-PENDIENTES.md que no existen",
+  "descripcion_actual": "Fetchers SSR de speakers, SpeakersView, highlight de agenda; el E2E ya cubre el flujo",
+  "fuentes": [
+   "TESTS-PENDIENTES.md"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "Sueltos de la webapp (inventario 2026-10-16)"
+ },
+ {
+  "id": "60ddab0ba115",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "Configuración canales WhatsApp/SMS desde Filament",
+  "descripcion_actual": "email/SMTP ya existe; WhatsApp/SMS son nice-to-have sección 9",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Admin y módulos",
+  "subseccion": null
+ },
+ {
+  "id": "4eab4e2ca999",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "Credencial con etiqueta visible (VIP, Prensa)",
+  "descripcion_actual": "Marcar en el admin que tags salen en la escarapela (§4)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Admin y módulos",
+  "subseccion": null
+ },
+ {
+  "id": "7fa3c7f5ac43",
+  "modulo": "Agenda",
+  "titulo_actual": "Páginas custom: DEFERIDO POST-DEPLOY",
+  "descripcion_actual": "Decisión Kamilo 2026-07-20: \"es para el final, no aporta ni detiene, no es dependencia\". El feature (iframes/HTML embebido: YouTube, Slido, mapa) tiene backend+API+detalle Expo pero NINGUNA superficie lo lista (huérfano ~60% construido); quedo EN PAUSA visible+deshabilitado en el admin (4cd43d4+52f4522). Al retomar: construir el acceso (Filament reactivar + lista Expo + módulo webapp ~1 sesión) o demoler entero. Costo mapeado, git preserva todo.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Admin y módulos",
+  "subseccion": "Paridad config admin ↔ 3 superficies (diseño con Kamilo; toca backend+Filament+Expo+webapp)"
+ },
+ {
+  "id": "3bd795a5a973",
+  "modulo": "Seguridad",
+  "titulo_actual": "S.7.2 Correr security:check contra el .env real de producción",
+  "descripcion_actual": "Va con el montaje",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Seguridad del staff",
+  "subseccion": null
+ },
+ {
+  "id": "ea749e3f2495",
+  "modulo": "Seguridad",
+  "titulo_actual": "Passkeys (bloque S.9, ampliacion 2026-08-01) — sin fecha",
+  "descripcion_actual": "Entrar al admin con huella o Face ID además del código de la app autenticadora. Ampliacion pedida el 1 de agosto, sin fecha.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Seguridad del staff",
+  "subseccion": null
+ },
+ {
+  "id": "3bf54c2451cb",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "Chat tempId + ack + estados progresivos",
+  "descripcion_actual": "2-3h, cambio mobile + socket server",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "Optimistic UI restantes (~3-4h) — pre-stress polish"
+ },
+ {
+  "id": "3eff5c6074c6",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "Emoji skip-self (30min, cambio socket server)",
+  "descripcion_actual": "Cuando mandas un emoji en el streaming, que no se te muestre dos veces (el tuyo y el que rebota del socket). Unos 30 minutos.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "Optimistic UI restantes (~3-4h) — pre-stress polish"
+ },
+ {
+  "id": "2c6612a25418",
+  "modulo": "Social y networking",
+  "titulo_actual": "Dedup wall:comment con socket broadcast",
+  "descripcion_actual": "20min",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "Optimistic UI restantes (~3-4h) — pre-stress polish"
+ },
+ {
+  "id": "50bbf7755f5d",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "Q&A upvote anti-parpadeo (15min)",
+  "descripcion_actual": "Al votar una pregunta el contador parpadea; dejarlo estable. Unos 15 minutos.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "Optimistic UI restantes (~3-4h) — pre-stress polish"
+ },
+ {
+  "id": "8efb80b78d9e",
+  "modulo": "Agenda",
+  "titulo_actual": "Tests E2E flujos criticos",
+  "descripcion_actual": "Aprobar Q&A, lanzar game, cancelar sesión, scheduled export trigger",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "QA Mission Control + Data Center"
+ },
+ {
+  "id": "dced1dd2997c",
+  "modulo": "Seguridad",
+  "titulo_actual": "Revisar la autenticación del admin",
+  "descripcion_actual": "Como funciona + cuando expiran los tokens (nota Kamilo; encaja con el frente Seguridad del Staff)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "QA Mission Control + Data Center"
+ },
+ {
+  "id": "6a38a940c273",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "Migrar Chat Monitor (public/chat-monitor.html) a Material Symbols + tokens unificados",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "Unificacion SPAs (~10-12h)"
+ },
+ {
+  "id": "608e312b43e4",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "Barra de comandos ⌘K (W.0-spatial-ui.md:447)",
+  "descripcion_actual": "",
+  "fuentes": [
+   "W.0-spatial-ui.md:447"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "049f64cc2c86",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "Usuario sin contraseña que intenta entrar con contraseña",
+  "descripcion_actual": "Avisarle (W.1-setup-auth.md:417; pesa mas desde el registro sin contraseña)",
+  "fuentes": [
+   "W.1-setup-auth.md:417"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "993278b1e1b8",
+  "modulo": "Agenda",
+  "titulo_actual": "Filtros en la URL para compartir, agenda y social",
+  "descripcion_actual": "W.3-agenda.md:195, W.6-social-wall.md:179",
+  "fuentes": [
+   "W.3-agenda.md:195",
+   "W.6-social-wall.md:179"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "261e24819f15",
+  "modulo": "Social y networking",
+  "titulo_actual": "Tarjetas grandes de sugeridos en networking",
+  "descripcion_actual": "W.8-networking.md:142",
+  "fuentes": [
+   "W.8-networking.md:142"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "53819e46479a",
+  "modulo": "Agenda",
+  "titulo_actual": "Aviso de choque cuando dos favoritos caen a la misma hora",
+  "descripcion_actual": "project_w3_agenda_react",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "5b15414da0f8",
+  "modulo": "Juegos y gamificación",
+  "titulo_actual": "Juegos: subasta de puntos, \"¿donde esta el sponsor?\", speed-dating",
+  "descripcion_actual": "project_gamification_ideas; agrupar con B.2",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Webapp — diferidos por decision al cerrar cada modulo"
+ },
+ {
+  "id": "e18eeaffe838",
+  "modulo": "Social y networking",
+  "titulo_actual": "AttendeeResource unificado",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Backend nice-to-have (NO bloqueante — verificados 2026-07-14 como NO construidos)"
+ },
+ {
+  "id": "012b8d2ff10f",
+  "modulo": "Social y networking",
+  "titulo_actual": "Sort server-side wall ?sort=likes_count",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Backend nice-to-have (NO bloqueante — verificados 2026-07-14 como NO construidos)"
+ },
+ {
+  "id": "24bc64bd1a7d",
+  "modulo": "Agenda",
+  "titulo_actual": "social.profile_opened, connection_sent, connection_message_added, contact_method_clicked,…",
+  "descripcion_actual": "social.profile_opened, connection_sent, connection_message_added, contact_method_clicked, profile_closed, views por sponsor/speaker/sesión",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Analytics tracking — Fase 2 (= decision W.8; no existe infra de analytics aun)"
+ },
+ {
+  "id": "a68753a9fec8",
+  "modulo": "Juegos y gamificación",
+  "titulo_actual": "Racha de visitas a la app (streak gamification — día consecutivo = bonus puntos)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "App movil — cosmetico/incremental"
+ },
+ {
+  "id": "2974f8c75089",
+  "modulo": "Social y networking",
+  "titulo_actual": "Waitlist (cuando max_attendees se llena)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Registro & Acceso avanzado"
+ },
+ {
+  "id": "f0ec551ce341",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "Referral tracking",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Registro & Acceso avanzado"
+ },
+ {
+  "id": "2929117b9fad",
+  "modulo": "Social y networking",
+  "titulo_actual": "Social login (Google)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Registro & Acceso avanzado"
+ },
+ {
+  "id": "d33158cabf91",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "Email builder visual (Fase 2+)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Comunicacion avanzada"
+ },
+ {
+  "id": "e7494f18a38e",
+  "modulo": "Social y networking",
+  "titulo_actual": "Networking follow-up (\"Conectaste con X personas\")",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Post-evento"
+ },
+ {
+  "id": "2aef5fb49fad",
+  "modulo": "Social y networking",
+  "titulo_actual": "Highlight reel (collage automático fotos)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Post-evento"
+ },
+ {
+  "id": "8d9faddd5e91",
+  "modulo": "Streaming y chat",
+  "titulo_actual": "Event replay (grabaciones post-evento)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Post-evento"
+ },
+ {
+  "id": "31ccd1791b4f",
+  "modulo": "Seguridad",
+  "titulo_actual": "Backup/Restore de evento (snapshot JSON)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Seguridad avanzada"
+ },
+ {
+  "id": "2138a1b608a1",
+  "modulo": "Social y networking",
+  "titulo_actual": "Wallet digital (.pkpass + Google Wallet)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Features opcionales"
+ },
+ {
+  "id": "9489ab6ec577",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "Landing builder Filament (Fase 2+)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Features opcionales"
+ },
+ {
+  "id": "ae8cdad56672",
+  "modulo": "Registro, landing y correo",
+  "titulo_actual": "A/B testing emails (Fase 2+)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Features opcionales"
+ },
+ {
+  "id": "f85747961ec8",
+  "modulo": "Juegos y gamificación",
+  "titulo_actual": "Juegos Unity en stands (requiere dev Unity separado)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Features opcionales"
+ },
+ {
+  "id": "43b4d11956e6",
+  "modulo": "Social y networking",
+  "titulo_actual": "Panels clickeables, responsive 1920x1080, audio, hints, social wall",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "Showcase / Demo inversor"
+ }
+]

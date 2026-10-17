@@ -1,0 +1,212 @@
+{
+  "e469dd74aef4": {
+    "titulo": "¿Cuándo abre el registro de asistentes?",
+    "que": "La fecha en que la gente empieza a inscribirse decide cuándo tiene que estar listo el servidor de verdad, con el correo verificado y la protección anti-robots real. Si el registro abre en noviembre, el servidor tiene que estar arriba antes de esa fecha.",
+    "porque": "Todo el calendario de montaje para el 6 de diciembre se arma hacia atrás desde esta fecha.",
+    "lista": "Cuando decidas la fecha de apertura del registro."
+  },
+  "558e471f5327": {
+    "titulo": "¿El cliente del 6 de diciembre ya está confirmado?",
+    "que": "Hay dos caminos. Si el cliente está confirmado, vale la pena pagar las pruebas de servidor y medir que aguante 5.000 personas. Si no, conviene priorizar un demo que sirva para vender.",
+    "porque": "Define en qué se gasta el tiempo y la plata de aquí a diciembre.",
+    "lista": "Cuando decidas si el evento va con cliente confirmado o si nos enfocamos en el demo."
+  },
+  "83f163d0509d": {
+    "titulo": "¿Te sirve el costo actual de las pruebas de servidor?",
+    "que": "Hoy las pruebas cuestan unos $120 al mes por las bases de datos y unos $6,5 por día por las máquinas prendidas. Hay que confirmar esos números con el inventario de lo que tenemos guardado antes de prender algo.",
+    "porque": "Las pruebas para 5.000 personas cuestan plata; conviene saber cuánto antes de empezar.",
+    "lista": "Cuando confirmes el costo después de revisar el inventario de máquinas y bases."
+  },
+  "a595905b3fb3": {
+    "titulo": "¿Las pruebas de carga y de caída son obligatorias antes de un evento?",
+    "que": "Antes de un evento podemos simular mucha gente entrando a la vez y apagar una máquina a propósito para ver si la plataforma sigue en pie. La propuesta es que eso sea obligatorio antes de un evento real y opcional cuando solo montamos un demo.",
+    "porque": "Esas pruebas son las que nos dan tranquilidad para el 6 de diciembre, pero cuestan tiempo y plata en cada demo.",
+    "lista": "Cuando decidas en qué casos son obligatorias."
+  },
+  "a47ab4cadb43": {
+    "titulo": "¿Cuándo damos la plataforma por sana, en alerta o en problemas?",
+    "que": "El canario es un asistente de mentira que usa la plataforma todo el tiempo y mide qué tan rápido responde. Hay una propuesta de límites: por ejemplo, una pantalla que carga en menos de 300 milisegundos es verde, hasta 800 es amarillo y más es rojo; y cualquier error que vea la gente es rojo. Falta que tú los apruebes o ajustes.",
+    "porque": "Con esos límites sabemos, sin discutir, si la plataforma está lista para 5.000 personas.",
+    "lista": "Cuando apruebes o ajustes la tabla de verde, amarillo y rojo."
+  },
+  "af7afc7b195c": {
+    "titulo": "¿Apruebas el reproductor que te sigue por toda la webapp?",
+    "que": "Hoy el video en vivo se cierra apenas sales de su pantalla. La propuesta es un reproductor que se quede contigo mientras navegas. Falta aprobar cómo se arma y decidir si las tarjetas de las otras salas en vivo muestran una miniatura del video, o rotan cada 8 segundos si son varias, para no cargar de más el equipo.",
+    "porque": "Es una mejora y no bloquea diciembre, pero hace que el en vivo se sienta en vivo y no como un directorio.",
+    "lista": "Cuando apruebes la propuesta y decidas qué muestran las tarjetas de las otras salas."
+  },
+  "6e2267c3a1eb": {
+    "titulo": "¿Mostramos la agenda en cuadrícula por auditorio, como Bintec?",
+    "que": "En eventos con varias salas, Bintec mostraba la agenda como una tabla: las horas en un lado y cada sala en una columna. Así se ve de un vistazo qué pasa en cada sala a la misma hora.",
+    "porque": "En un evento grande con varias salas ayuda a la gente a elegir rápido, y es algo que el mercado ya conoce.",
+    "lista": "Cuando decidas si la agenda tiene esa vista o no."
+  },
+  "83405f31c0ae": {
+    "titulo": "¿Cambiamos \"Highlights\" por \"Destacados\" en el admin?",
+    "que": "En el admin hay una sección que se llama en inglés, \"Highlights\". La propuesta es llamarla \"Destacados\" para que todo quede en español.",
+    "porque": "Es un detalle pequeño, pero un admin en un solo idioma se ve más cuidado al venderlo.",
+    "lista": "Cuando decidas el nombre."
+  },
+  "117769d32b0a": {
+    "titulo": "¿Dónde va en el admin el botón para dar puntos a mano?",
+    "que": "El sistema de puntos ya permite darle puntos a una persona a mano, pero no hay ningún botón en el admin para hacerlo. Hay que decidir en qué pantalla va.",
+    "porque": "En pleno evento puede hacer falta premiar a alguien al momento sin pedirle ayuda a un programador.",
+    "lista": "Cuando decidas en qué parte del admin va."
+  },
+  "713ce8e1f7df": {
+    "titulo": "¿Vuelve la opción de Silent Disco al formulario de sesión?",
+    "que": "Antes, al crear una sesión en el admin, se podía marcar si era Silent Disco (con audífonos). Esa opción ya no está en el formulario. Hay que decidir si vuelve.",
+    "porque": "Si un cliente quiere sesiones con audífonos, el organizador necesita poder marcarlas él mismo.",
+    "lista": "Cuando decidas si la opción vuelve o se queda por fuera."
+  },
+  "dc30c89e5aec": {
+    "titulo": "¿Alguien puede cambiar la calificación que ya le dio a una sesión?",
+    "que": "Hoy, cuando una persona califica una sesión de la agenda, la calificación queda fija y no la puede cambiar. Hay que decidir si se deja así o si puede volver a calificar.",
+    "porque": "Es una duda que va a salir con 5.000 personas calificando; mejor tener la respuesta decidida.",
+    "lista": "Cuando decidas si la calificación se puede cambiar o queda fija."
+  },
+  "265d40089c10": {
+    "titulo": "¿Usamos o quitamos avisos en vivo que nadie está escuchando?",
+    "que": "El servidor manda avisos en tiempo real cuando una sesión empieza, termina o se cancela, cuando cambia la agenda y cuando cambia la ocupación de una sala. Pero ninguna pantalla los usa. Hay dos opciones: conectarlos para que las pantallas se actualicen solas, o quitarlos.",
+    "porque": "Mandar avisos que nadie usa es carga de más con 5.000 personas; usarlos haría la agenda más viva.",
+    "lista": "Cuando decidas cuáles se conectan y cuáles se quitan."
+  },
+  "663d60b419f7": {
+    "titulo": "¿Qué se muestra en grande en la pantalla de ingresos en vivo?",
+    "que": "Event Pulse es la pantalla que muestra en vivo cómo va entrando la gente. Hay que decidir qué va arriba en grande: tarjetas que agrupan, por ejemplo, \"los últimos 10 ingresos\", y una tarjeta para una persona en particular. Primero se ve en lab, tú apruebas y luego se programa.",
+    "porque": "Es una pantalla que se proyecta y todos la ven; si está bien armada, ayuda a vender el producto.",
+    "lista": "Cuando apruebes el lab con las reglas de qué se muestra arriba."
+  },
+  "b5bebf4a16fe": {
+    "titulo": "¿Terminamos o quitamos las páginas propias del organizador?",
+    "que": "Existe la idea de que el organizador meta sus propias páginas web dentro de la webapp. Está a medias: falta el acceso para que la gente llegue a ellas. Hay dos opciones: construir ese acceso o borrar lo que hay. Se dejó para después de montar el servidor.",
+    "porque": "No hace falta para diciembre; dejarlo a medias solo estorba.",
+    "lista": "Cuando decidas si se construye el acceso o se quita."
+  },
+  "43902edfc188": {
+    "titulo": "Reescribir el manual del organizador con el tono aprobado",
+    "que": "El manual del organizador arrancó con una página de prueba sobre Encuestas. Hay que reescribirla en lenguaje natural y sin tecnicismos, como pediste, y luego escribir el resto del manual a partir del inventario de funciones ya revisado.",
+    "porque": "Un cliente necesita poder manejar su evento sin llamarnos; el manual es parte de lo que se vende.",
+    "lista": "Cuando apruebes la página de Encuestas y las demás estén escritas con el mismo tono."
+  },
+  "d31c07898b5d": {
+    "titulo": "Listas que aparecen en cascada y gestos de deslizar con vibración",
+    "que": "Detalles de movimiento para la webapp: que los elementos de una lista aparezcan uno tras otro, y que se pueda deslizar con el dedo sobre una tarjeta y sentir una vibración leve, como en una app nativa.",
+    "porque": "No hace falta para diciembre; es pulido que la hace sentir más premium.",
+    "lista": "Cuando las listas aparecen en cascada y el deslizar vibra en un celular real."
+  },
+  "810e44b37b16": {
+    "titulo": "Avisar las mayúsculas activadas y cuándo se puede reenviar el enlace",
+    "que": "Dos ayudas al entrar a la webapp: avisar cuando la persona tiene las mayúsculas activadas al escribir la contraseña, y mostrar una cuenta regresiva de cuánto falta para poder pedir otra vez el enlace de acceso.",
+    "porque": "No hace falta para diciembre; evita algunas dudas al entrar.",
+    "lista": "Cuando ambos avisos se ven al entrar a la webapp."
+  },
+  "5e300d878ef2": {
+    "titulo": "Resumen del evento y certificado en una pantalla propia",
+    "que": "Hoy el resumen de lo que viviste en el evento y el certificado no tienen una pantalla propia en la webapp. La idea es darles su espacio aparte.",
+    "porque": "No hace falta para diciembre; sirve para el cierre del evento y para que la gente lo comparta.",
+    "lista": "Cuando el resumen y el certificado abren en su propia pantalla."
+  },
+  "a8005e15ca61": {
+    "titulo": "Páginas que el organizador crea y se ven en la webapp",
+    "que": "Que el organizador pueda armar sus propias páginas de información y que aparezcan en la webapp. Quedó para después, al cerrar ese módulo.",
+    "porque": "No hace falta para diciembre; sirve si un cliente quiere publicar información extra.",
+    "lista": "Cuando una página creada en el admin se ve en la webapp."
+  },
+  "48319522c3eb": {
+    "titulo": "Vista previa al compartir enlaces y mapa del sitio para buscadores",
+    "que": "Cuando alguien comparte un enlace de la webapp por WhatsApp o redes, que salga con imagen y título. Y que exista el mapa del sitio que usan buscadores como Google.",
+    "porque": "No hace falta para diciembre; mejora cómo se ven los enlaces al compartirlos.",
+    "lista": "Cuando un enlace compartido muestra imagen y título correctos."
+  },
+  "ff9b7b0824cc": {
+    "titulo": "Que las listas largas carguen por partes y se recuerden",
+    "que": "Cambiar la forma en que la webapp carga las listas largas para que traiga de a pedazos mientras bajas y guarde lo que ya trajo, en vez de pedirlo todo de nuevo cada vez.",
+    "porque": "No hace falta para diciembre; hace la navegación más fluida y le quita algo de carga al servidor.",
+    "lista": "Cuando las listas largas cargan por partes y al volver no se recargan desde cero."
+  },
+  "c5277de22b81": {
+    "titulo": "Terminar el inicio con los próximos eventos del organizador",
+    "que": "Completar la pantalla de inicio para que muestre los próximos eventos del mismo organizador, y que su ambiente cambie según si el evento no ha empezado, está en vivo o ya terminó.",
+    "porque": "No hace falta para diciembre; ayuda a que el organizador lleve a su gente de un evento al siguiente.",
+    "lista": "Cuando el inicio muestra los próximos eventos y cambia según el estado del evento."
+  },
+  "a052fda01ab4": {
+    "titulo": "Que todas las búsquedas funcionen de la misma forma",
+    "que": "Las búsquedas de la plataforma las resuelve el servidor, pero cada una pide los datos de forma distinta. La idea es que todas usen la misma forma.",
+    "porque": "No hace falta para diciembre; hace más fácil y seguro agregar búsquedas nuevas.",
+    "lista": "Cuando todas las búsquedas usan la misma forma y siguen dando los mismos resultados."
+  },
+  "166177b892ef": {
+    "titulo": "Poder cancelar una solicitud de contacto ya enviada",
+    "que": "Hoy, si le mandas a alguien una solicitud para conectar en el evento, no la puedes retirar. La idea es poder cancelarla antes de que la acepten.",
+    "porque": "No hace falta para diciembre; evita solicitudes enviadas por error.",
+    "lista": "Cuando una solicitud enviada se puede cancelar y desaparece para la otra persona."
+  },
+  "9bcd64802447": {
+    "titulo": "Mostrar qué tanto coincides con cada contacto sugerido",
+    "que": "La plataforma ya sugiere personas para conectar. La idea es darle a cada sugerencia un puntaje que diga qué tanto coinciden contigo.",
+    "porque": "No hace falta para diciembre; ayuda a que la gente decida a quién escribirle.",
+    "lista": "Cuando cada contacto sugerido trae su puntaje."
+  },
+  "9ba82a26ebf8": {
+    "titulo": "Ver el ranking completo, más allá de los primeros 50",
+    "que": "Hoy el ranking de puntos muestra máximo 50 personas. La idea es que se pueda seguir bajando para ver el resto, por partes.",
+    "porque": "No hace falta para diciembre, pero con 5.000 personas el que va en el puesto 300 también quiere verse.",
+    "lista": "Cuando el ranking deja ver más allá del puesto 50."
+  },
+  "75d018ba686e": {
+    "titulo": "Avisar al instante cuántos puntos ganaste y por qué",
+    "que": "Cada vez que alguien gana puntos, que le llegue al momento un aviso con cuántos ganó, por qué acción y cuántos lleva en total.",
+    "porque": "No hace falta para diciembre; hace que ganar puntos se sienta en el momento.",
+    "lista": "Cuando al ganar puntos llega el aviso con la cantidad, la acción y el total."
+  },
+  "957d30c440f2": {
+    "titulo": "Mandar mensajes por WhatsApp a los asistentes",
+    "que": "Conectar la plataforma con WhatsApp para mandar avisos a los asistentes por ahí. ICE360 lo tiene por $850K COP. Hay que evaluar si vale la pena.",
+    "porque": "No hace falta para diciembre; puede ser un argumento de venta si los clientes lo piden.",
+    "lista": "Cuando decidamos si vale la pena y, si sí, un aviso de prueba llega por WhatsApp."
+  },
+  "614b4300e84e": {
+    "titulo": "Mensajes de texto como respaldo",
+    "que": "Si un aviso no le llega a alguien por los canales normales, mandárselo por mensaje de texto al celular.",
+    "porque": "No hace falta para diciembre; sirve si un cliente necesita asegurarse de que todos reciban un aviso importante.",
+    "lista": "Cuando un aviso que no llegó por los canales normales llega por mensaje de texto."
+  },
+  "89a829c1065f": {
+    "titulo": "Dejar por escrito cómo funciona el tiempo real",
+    "que": "Escribir un documento que explique cómo funciona la parte que hace que los cambios lleguen al instante a todos, como el chat, los avisos y la agenda en vivo.",
+    "porque": "Si mañana entra otra persona al equipo, o algo falla en pleno evento, se entiende rápido dónde mirar.",
+    "lista": "Cuando el documento existe y explica cada pieza del tiempo real."
+  },
+  "a3d94c59ccff": {
+    "titulo": "Preparar la app para publicarla con la marca de cada cliente",
+    "que": "Ordenar la configuración de la app del celular para que se pueda sacar una versión con el nombre, el logo y los colores de cada cliente, cada uno en su propia carpeta.",
+    "porque": "No hace falta para diciembre; es lo que permite vender la app con la marca del cliente.",
+    "lista": "Cuando se puede generar la app de un cliente cambiando solo su carpeta."
+  },
+  "7fb5069eccc7": {
+    "titulo": "Pantallas en el lugar del evento",
+    "que": "Mostrar en las pantallas del lugar del evento información como la agenda, los avisos o los patrocinadores.",
+    "porque": "No hace falta para diciembre; sirve si un cliente lo pide.",
+    "lista": "Cuando una pantalla del lugar muestra la información del evento en vivo."
+  },
+  "3fd558f4bd29": {
+    "titulo": "Imprimir escarapelas físicas",
+    "que": "Poder imprimir las escarapelas de los asistentes, por ejemplo en la entrada del evento.",
+    "porque": "No hace falta para diciembre; sirve si un cliente lo pide.",
+    "lista": "Cuando se puede imprimir la escarapela de un asistente desde la plataforma."
+  },
+  "26c045893c78": {
+    "titulo": "Vender la plataforma como servicio a muchos organizadores",
+    "que": "Varias piezas para que muchos organizadores usen la plataforma por su cuenta: que cada uno tenga su espacio separado, cobrar con Stripe, que una persona pueda descargar sus datos como exige la ley europea (GDPR) y conectar juegos hechos en Unity.",
+    "porque": "No hace falta para diciembre; es el camino para cobrar por suscripción más adelante.",
+    "lista": "Cuando decidamos arrancar esa fase y cada pieza tenga su propia tarea."
+  },
+  "6fba66d08244": {
+    "titulo": "Un mismo evento en varias sedes, cada una con su agenda",
+    "que": "Que un evento pase en varios lugares a la vez, cada uno con su propia agenda. Bancolombia lo necesitaba para Colombia y Panamá.",
+    "porque": "No hace falta para diciembre; sirve si un cliente grande hace eventos en varias sedes.",
+    "lista": "Cuando un evento puede tener varias sedes con agendas separadas."
+  }
+}

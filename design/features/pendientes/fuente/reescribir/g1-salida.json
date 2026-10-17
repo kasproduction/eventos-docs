@@ -1,0 +1,242 @@
+{
+ "2cc01d6b118e": {
+  "titulo": "Revisar qué copias de servidor tenemos guardadas y cuánto cuestan",
+  "que": "En agosto quedaron guardadas copias (como fotos) de las máquinas y de las bases de datos que DigitalOcean mantiene por nosotros. Hay que listar cuáles siguen existiendo y cuánto cuesta por día prenderlas. No se prende nada sin que tú lo confirmes.",
+  "porque": "Es el primer paso para montar el servidor de prueba sin sorpresas en la factura.",
+  "lista": "Cuando tienes la lista de lo que existe con su costo por día y apruebas qué se prende."
+ },
+ "6b5e2cecf0e1": {
+  "titulo": "Medir cómo está el servidor hoy, antes de arreglar nada",
+  "que": "Ya tenemos una prueba que simula gente entrando al evento: pide su acceso, entra, ve la agenda. La idea es correrla en el servidor de prueba tal como está hoy y anotar los números. Así después sabemos cuánto mejoró cada arreglo.",
+  "porque": "Sin un punto de partida no podemos demostrar que algo mejoró ni decidir qué arreglar primero para el 6 de diciembre.",
+  "lista": "Cuando la prueba corrió en el servidor de prueba y los números quedaron anotados."
+ },
+ "23294f123ccb": {
+  "titulo": "Probar en el servidor los arreglos del correo y de la entrada",
+  "que": "El 12 de octubre quedaron hechos en código dos arreglos: que los correos salgan a un ritmo controlado sin chocar con el límite de Resend, y que la entrada no bloquee a un auditorio conectado al mismo wifi. Funcionan en el computador; falta medirlos en el servidor real.",
+  "porque": "Son los dos problemas que pueden dejar gente afuera del evento.",
+  "lista": "Cuando en el servidor una ola de gente entra y recibe su correo sin bloqueos ni correos perdidos."
+ },
+ "9d4092240b97": {
+  "titulo": "Cerrar la verificación en dos pasos del equipo con la revisión final",
+  "que": "El equipo que entra al admin ya tiene verificación en dos pasos: la contraseña más un código del celular. Van 25 de 26 partes hechas. Falta la última: correr una revisión automática de seguridad con la configuración real del servidor, que confirma, por ejemplo, que todo viaje cifrado y que haya un administrador principal que pueda entrar.",
+  "porque": "Protege el admin, donde están los datos de los 5.000 asistentes. Se hace al montar el servidor.",
+  "lista": "Cuando la revisión corre en el servidor real y no marca ningún problema."
+ },
+ "0a31a53ec3ad": {
+  "titulo": "Que cada versión salga empacada y lista para instalar",
+  "que": "Hoy el código se copia a cada máquina desde una máquina base. La idea es que GitHub, donde está guardado el código, arme solo un paquete por cada versión: uno para el backend, otro para la webapp y otro para el tiempo real. Cada máquina descarga el suyo.",
+  "porque": "Así todas las máquinas tienen exactamente lo mismo y montar el servidor no depende de copiar a mano, que es donde salen los errores.",
+  "lista": "Cuando una versión nueva genera sus paquetes sola y una máquina se instala con ellos."
+ },
+ "4907d2e3273f": {
+  "titulo": "Escribir la receta para montar cada tamaño de servidor",
+  "que": "Tenemos un catálogo de tamaños de servidor, del nivel 0 (una sola máquina, para demos) al nivel 4 (el más grande). Terraform es una herramienta donde se escribe, como una receta, qué máquinas lleva cada tamaño en DigitalOcean y Cloudflare. Con la receta se ve el costo antes de prender y se apaga todo sin dejar nada cobrando. Esta tarea es escribirla; usarla ya se hace en el servidor.",
+  "porque": "Para el 6 de diciembre hay que montar el tamaño grande sin errores, y para vender hay que poder montar uno por cliente.",
+  "lista": "Cuando la receta de los niveles 0 a 4 está escrita y muestra el costo de cada uno antes de prender."
+ },
+ "32bd1f743b1c": {
+  "titulo": "Montar el servidor paso a paso, con una revisión entre cada paso",
+  "que": "Un proceso automático que monta todo en orden: primero el plan (cliente, dominio, tamaño y fechas, que tú apruebas), luego revisar que esté todo lo necesario, después las bases de datos, las máquinas y lo demás, hasta el paso 6. Entre un paso y otro hay una revisión: si algo no está bien, se detiene ahí en vez de seguir con el error.",
+  "porque": "Es lo que permite montar el servidor del evento sin tocar nada a mano, y repetirlo para cada cliente.",
+  "lista": "Cuando el nivel 1 se monta de cero solo con este proceso y cada revisión pasa en verde."
+ },
+ "27f55fb71022": {
+  "titulo": "Prueba automática de que todo funciona después de montar",
+  "que": "Al terminar de montar, un programa actúa como una persona real: abre la página del evento, pide su enlace de acceso y confirma que el correo le llegó, entra, ve la agenda, se conecta al tiempo real y sube una foto. Si algo falla, avisa.",
+  "porque": "Así sabemos que el servidor sirve de verdad antes de que entre el primer asistente.",
+  "lista": "Cuando la prueba corre sola después de cada montaje y sale en verde, incluido el correo recibido."
+ },
+ "cb28953a35ac": {
+  "titulo": "Montar el servidor desde cero y desmontarlo sin dejar nada cobrando",
+  "que": "Comprobar que el servidor de prueba (nivel 1) se puede montar desde cero solo con el proceso automático, sin las copias de agosto ni nada hecho a mano, y después borrarlo completo. Para eso se usan llaves de acceso nuevas de DigitalOcean y Cloudflare.",
+  "porque": "Si solo sabemos montar desde copias viejas, el día que una falle no tenemos cómo reponerla. Y lo que queda prendido sin uso se cobra.",
+  "lista": "Cuando el nivel 1 se monta de cero, pasa la prueba automática y se borra sin que quede nada en la factura."
+ },
+ "94e883d59162": {
+  "titulo": "Comprobar en el servidor que los correos salen todos y a buen ritmo",
+  "que": "Resend, el servicio que manda los correos, solo deja enviar cierta cantidad por segundo. Ya cambiamos el código para que los correos salgan en fila a un ritmo seguro, que los enlaces de acceso pasen primero y que, si uno falla, se reintente hasta por 12 horas. Falta el plan pagado de Resend, pedirles más envíos por segundo y medirlo en el servidor.",
+  "porque": "Si 5.000 personas piden su enlace a la vez y los correos se traban, se quedan afuera del evento.",
+  "lista": "Cuando en el servidor una ola real de pedidos entrega todos los correos sin chocar con el límite."
+ },
+ "10aa91e9f590": {
+  "titulo": "Que los juegos en vivo aguanten con 5.000 personas conectadas",
+  "que": "Cuando el presentador lanza un juego, el sistema avisa a todas las pantallas de cada cambio y, cada vez, vuelve a calcular quiénes pueden participar. La idea es limitar cuántos avisos se mandan y guardar esa lista de participantes para no recalcularla a cada rato (caché: guardar una respuesta para repetirla).",
+  "porque": "Los juegos son el momento en que todos tocan la pantalla al mismo tiempo; si se traban, se nota en pleno evento.",
+  "lista": "Cuando hay pruebas del cambio y en el servidor un juego corre con mucha gente sin que la app se ponga lenta."
+ },
+ "1a917ba767ea": {
+  "titulo": "Que los reportes lean de una copia y no carguen la base principal",
+  "que": "Una réplica es una copia de la base de datos que se mantiene al día sola y sirve para leer sin cargar la principal. La idea es que el Data Center, el panel de rendimiento (Pulse) y las descargas de datos lean de esa copia. Así la base principal queda libre para los asistentes.",
+  "porque": "Si alguien baja un reporte grande en pleno evento, no debería poner lenta la app de 5.000 personas.",
+  "lista": "Cuando esas tres partes leen de la copia y medimos que un reporte grande no frena la app."
+ },
+ "6764ff3fa2c4": {
+  "titulo": "Darle al admin su propia máquina, aparte de los asistentes",
+  "que": "Hoy el admin y la app de los asistentes pueden quedar en las mismas máquinas. La idea es que el montaje ponga el admin en su propia dirección (admin.tudominio) y en una máquina por donde no pasa el tráfico de los asistentes.",
+  "porque": "Así, por mucha gente que haya, tú y tu equipo pueden trabajar en el admin sin que se ponga lento.",
+  "lista": "Cuando el admin abre desde su dirección propia y, con carga de asistentes encima, sigue respondiendo rápido."
+ },
+ "d6e50dbec15c": {
+  "titulo": "Que la pantalla Social pida menos cosas al abrirla",
+  "que": "Al abrir Social, la webapp le hace 10 pedidos al servidor: muro, sugeridos, solicitudes, contactos, directorio, historias, fotos, concurso y más. Casi todo es personal, así que guardar una respuesta para repetirla no ayuda. La idea es cargar cada pestaña solo cuando la abres, o juntar todo en un solo pedido.",
+  "porque": "Es la segunda pantalla más visitada. Bajar esos 10 pedidos alivia mucho al servidor con 5.000 personas.",
+  "lista": "Cuando medimos antes y después y Social pide bastante menos al abrir."
+ },
+ "62f25856337a": {
+  "titulo": "Que te llegue una alerta al teléfono si algo deja de responder",
+  "que": "Un servicio externo, como BetterStack o UptimeRobot, revisa cada poco tiempo y desde afuera que el servidor, la app y el tiempo real respondan. Si algo no contesta, te avisa al teléfono.",
+  "porque": "El día del evento tienes que enterarte de una caída en segundos, no cuando los asistentes se quejen.",
+  "lista": "Cuando apagamos algo a propósito y suena tu teléfono."
+ },
+ "9bf55ad37b08": {
+  "titulo": "Copia de seguridad automática fuera de DigitalOcean, y probada",
+  "que": "Programar que la base de datos se copie sola cada cierto tiempo, con candado (cifrada), en R2, el almacenamiento de Cloudflare, o sea fuera de DigitalOcean. Y lo más importante: probar que de esa copia se puede recuperar todo, no solo que la copia exista.",
+  "porque": "Si algo le pasa a la base o a DigitalOcean, sin una copia que sirva se pierden los datos del evento y de los asistentes.",
+  "lista": "Cuando una copia se restaura entera en una base nueva y los datos están completos."
+ },
+ "86c3ec9e1983": {
+  "titulo": "Poder rastrear qué le pasó a una persona a una hora exacta",
+  "que": "Hoy cada máquina anota por su lado lo que pasa. La idea es juntar todas esas anotaciones en un solo lugar y marcar cada pedido con un número único, para poder responder preguntas como \"qué le pasó a la persona 1320 a las 10:42\".",
+  "porque": "Si un asistente reporta un problema durante el evento, se encuentra la causa en minutos en vez de adivinar.",
+  "lista": "Cuando, con un pedido cualquiera, encontramos todo su recorrido en un solo lugar."
+ },
+ "18ddedec6e81": {
+  "titulo": "Alertas cuando algo se sale de lo normal",
+  "que": "Con lo que ya medimos sabemos qué es normal: qué tan rápido responde la plataforma y cuánta carga aguanta. La idea es que suene una alerta cuando algo pase esos límites. En especial, si a una persona normal la frena el aviso de \"demasiados intentos\", tiene que sonar siempre.",
+  "porque": "Avisa antes de que el problema crezca y nos dice al instante si estamos dejando gente afuera.",
+  "lista": "Cuando forzamos que se pase un límite y llega la alerta."
+ },
+ "e656151fba38": {
+  "titulo": "Sumar una máquina más con un solo comando",
+  "que": "Si en pleno evento una parte se carga, hoy sumar otra máquina sería trabajo a mano. La idea es un comando que agregue una máquina más, por ejemplo a la API (la parte que responde los pedidos de la app), desde el proceso automático de montaje.",
+  "porque": "Si el 6 de diciembre llega más gente de la esperada, se agrega capacidad en minutos.",
+  "lista": "Cuando un comando suma una máquina, esta entra a trabajar sola y nadie nota errores mientras tanto."
+ },
+ "50c468aa9a3f": {
+  "titulo": "Poder simular 5.000 personas a la vez",
+  "que": "Para probar con 5.000 hay que simular 5.000 asistentes. Un solo computador no alcanza, así que la prueba tiene que correr desde varias máquinas a la vez, y hay que crear miles de asistentes de prueba con su propio acceso (hoy hay solo 4).",
+  "porque": "Sin esto no podemos saber si el servidor aguanta el evento del 6 de diciembre.",
+  "lista": "Cuando la prueba lanza miles de asistentes desde varias máquinas y cada uno entra con su propio acceso."
+ },
+ "b5ace2c87eb6": {
+  "titulo": "Montar el servidor grande y medirlo hasta 5.000 personas",
+  "que": "Montar el nivel 3 y someterlo a todo lo que puede pasar ese día: todos entrando a la vez, gente con datos 4G de Colombia, el admin trabajando con carga encima, descargas de reportes, juegos en vivo y una foto viral con muchas subidas al tiempo (hay un límite de 10 por minuto). Además, una persona de prueba aparte sirve de termómetro de cómo se siente la app.",
+  "porque": "Esto es lo que dice si el servidor aguanta el 6 de diciembre o hay que pasar al tamaño siguiente.",
+  "lista": "Cuando la persona número 5.001 navega igual que la primera y no hay errores."
+ },
+ "99ccf6e8fddd": {
+  "titulo": "Apagar máquinas a propósito con mucha gente adentro",
+  "que": "Con la carga encima, apagar a propósito una máquina de cada tipo (la de la app, la del tiempo real y las demás) y ver si los asistentes lo notan. También repetir el apagón de la API, ahora con la máquina más grande, de 4 procesadores.",
+  "porque": "En el evento una máquina se puede caer en cualquier momento; lo que importa es que la gente no se entere.",
+  "lista": "Cuando cada apagón pasa sin errores para los asistentes."
+ },
+ "a4197b0f2668": {
+  "titulo": "Elegir el tamaño de servidor y escribir qué se le promete al cliente",
+  "que": "Con las mediciones, decidir entre el nivel 3 y el nivel 4 y dejar por escrito la promesa: cuánta gente aguanta, cuánto cuesta al mes, cuánto tarda en volver si algo se cae y cuántos datos se podrían perder como máximo (eso es lo que miden el RTO y el RPO).",
+  "porque": "Es lo que se le cotiza al cliente y lo que fija el costo del evento del 6 de diciembre.",
+  "lista": "Cuando está escrita la promesa del nivel elegido con su costo mensual cerrado."
+ },
+ "28028c79d6cd": {
+  "titulo": "Que el montaje automático pruebe la carga y entregue un informe",
+  "que": "Completar el proceso automático con sus últimos pasos: meterle carga de gente unos minutos, apagar una máquina de cada tipo para ver que nada se cae y, al final, entregar: la alerta externa conectada, una copia inicial, el acceso al asistente de configuración del evento, las claves por un canal seguro y un informe con lo verificado, los tiempos y el costo.",
+  "porque": "Así cada montaje, el del 6 de diciembre o el de cualquier cliente, llega probado y con la prueba por escrito.",
+  "lista": "Cuando un montaje completo termina solo y genera su informe con todo en verde."
+ },
+ "d80a263bc238": {
+  "titulo": "Pagar poco mientras la gente se registra y crecer para el evento",
+  "que": "Durante las semanas de registro entra poca gente, así que basta un servidor pequeño. La idea es un comando que cambie entre \"modo registro\" (barato) y \"modo evento\" (el tamaño completo, que se prende la víspera).",
+  "porque": "Ahorra plata en las semanas antes del 6 de diciembre sin arriesgar el día del evento.",
+  "lista": "Cuando el comando pasa de un modo al otro y la plataforma sigue funcionando durante el cambio."
+ },
+ "0dbb663e0468": {
+  "titulo": "Guía del día del evento: si pasa esto, haz esto",
+  "que": "Un documento con la respuesta lista para cada problema posible el día del evento. Incluye el protocolo que ya está escrito para caídas y un \"modo evento en curso\" que congela los cambios a la plataforma y saca una copia de seguridad al empezar. Hoy hay un borrador.",
+  "porque": "En pleno evento no hay tiempo para pensar; tener cada respuesta escrita evita errores bajo presión.",
+  "lista": "Cuando la guía cubre los problemas que probamos en los ensayos y la revisamos juntos."
+ },
+ "d1b37799990b": {
+  "titulo": "Ensayo general una semana antes del evento",
+  "que": "El 28 y 29 de noviembre se monta el servidor elegido con el proceso automático, se le mete la carga real y se apaga una máquina con gente adentro. Si nadie lo nota, estamos listos para el evento. Después se desmonta.",
+  "porque": "Es la prueba final de que el 6 de diciembre va a funcionar.",
+  "lista": "Cuando el ensayo sale en verde de punta a punta y nadie nota el apagón."
+ },
+ "59aca7da87d3": {
+  "titulo": "Que cada cliente mande los correos desde su propio dominio",
+  "que": "Los correos de acceso salen por Resend. Para cada cliente hace falta su llave de Resend, verificar su dominio para que el correo salga a su nombre, y pasar la prueba de Mail-Tester, que califica si un correo cae en spam, con más de 9 sobre 10.",
+  "porque": "Si el correo de acceso cae en spam, la persona no puede entrar al evento.",
+  "lista": "Cuando Mail-Tester da más de 9 sobre 10 con el dominio del cliente."
+ },
+ "fd00e546322b": {
+  "titulo": "Cancelar o usar el repartidor de Cloudflare que cobra sin uso",
+  "que": "En Cloudflare está contratado un balanceador, que es lo que reparte a la gente entre varias máquinas. Cobra 5 dólares al mes y hoy no tiene nada detrás; lo encontramos el 13 de septiembre. Hay que decidir si se cancela o se usa en el montaje.",
+  "porque": "Es plata que se va cada mes sin dar nada a cambio.",
+  "lista": "Cuando está cancelado o conectado a las máquinas reales."
+ },
+ "bd8cff5113f6": {
+  "titulo": "Evitar la estampida cuando 5.000 entran después de un rato quietos",
+  "que": "Para no revisar el acceso de cada persona a cada momento, el servidor recuerda por un rato quién ya entró (caché). Si pasan 15 minutos sin uso, lo olvida, y si los 5.000 llegan de golpe hay que revisarlos a todos al tiempo. En una prueba así se perdieron 832 de 1.500 conexiones. La idea es precalentar: llenar ese recuerdo antes de que llegue la gente.",
+  "porque": "Es justo lo que pasa al abrir las puertas del evento: mucha gente a la vez después de un rato de calma.",
+  "lista": "Cuando repetimos la llegada en ola después de 15 minutos quietos y no se pierde ninguna conexión."
+ },
+ "ea3230cdafd8": {
+  "titulo": "Activar Sentry para ver los errores de la plataforma real",
+  "que": "Sentry es un servicio que recoge los errores que les salen a los usuarios y nos avisa. Hay que conectarlo a la plataforma real con su llave de producción y comprobar que de verdad recibe los errores.",
+  "porque": "Si a un asistente le falla algo el día del evento, lo vemos aunque no lo reporte.",
+  "lista": "Cuando provocamos un error de prueba en la plataforma real y aparece en Sentry."
+ },
+ "76bd9dd0dd61": {
+  "titulo": "Que los avisos en vivo no hagan fila en los momentos pico",
+  "que": "Cuando pasa algo, por ejemplo una pregunta de trivia, el backend avisa al tiempo real por unas pocas líneas abiertas, hoy 6. Con muchos avisos por segundo esas líneas se llenan y los avisos esperan en fila. La idea es abrir más líneas y acortar las esperas.",
+  "porque": "En un pico de trivia con mucha gente, un aviso que llega tarde se nota en todas las pantallas.",
+  "lista": "Cuando una prueba con muchos avisos por segundo los entrega sin que se forme fila."
+ },
+ "a9d9b9f68bfa": {
+  "titulo": "Avisarle al admin cuando pase algo raro",
+  "que": "Que el sistema detecte por sí solo comportamientos fuera de lo normal en la plataforma y le avise al admin, sin que nadie tenga que estar mirando.",
+  "porque": "Es para después del evento: suma seguridad, pero no bloquea el 6 de diciembre.",
+  "lista": "Cuando un comportamiento raro provocado en una prueba genera el aviso en el admin."
+ },
+ "063092ea837b": {
+  "titulo": "Que la webapp recuerde más y refresque solo lo que cambió",
+  "que": "Tres mejoras: que la webapp recuerde quién eres por un rato en vez de preguntarlo en cada pantalla, que cargue por adelantado lo que vas a ver, y que cuando algo cambia en vivo se actualice solo eso y no la pantalla entera.",
+  "porque": "Hace todo más rápido y liviano, pero es para después del 6 de diciembre: no bloquea el evento.",
+  "lista": "Cuando medimos menos pedidos por pantalla y un cambio en vivo actualiza solo lo que cambió."
+ },
+ "e629e52a2ea3": {
+  "titulo": "Quitar consultas repetidas y volver a medir el límite de cada pantalla",
+  "que": "Hay preguntas a la base de datos que se hacen dos veces al revisar quién eres, y un conteo que se repite al cargar la marca del evento (colores, logo). La idea es quitar esas repeticiones y después volver a medir cuánta gente aguanta cada pedido.",
+  "porque": "Es para después del 6 de diciembre: el servidor aguanta sin esto, pero gana margen.",
+  "lista": "Cuando las repeticiones desaparecen y quedan publicadas las nuevas medidas."
+ },
+ "ab4994bdc363": {
+  "titulo": "Panel de rendimiento con Pulse y una persona de prueba automática",
+  "que": "Laravel Pulse es un panel que muestra cómo está trabajando el backend. El \"canario\" es una persona de prueba que navega sola todo el tiempo y avisa si la app se siente lenta. Son la segunda y tercera capa de vigilancia, si no quedan cubiertas por la torre de control.",
+  "porque": "Es para después del 6 de diciembre: la alerta al teléfono y la torre de control cubren lo esencial del evento.",
+  "lista": "Cuando el panel muestra datos reales y la persona de prueba avisa si provocamos lentitud."
+ },
+ "7f806154d6df": {
+  "titulo": "Página pública de estado, tamaños para 10.000 y otro proveedor",
+  "que": "Tres cosas para crecer: una página pública donde los clientes vean si la plataforma está funcionando, tamaños de servidor pensados para 10.000 personas, y poder montar todo en un proveedor distinto de DigitalOcean con tiempos de recuperación prometidos (cuánto tarda en volver y cuántos datos se podrían perder).",
+  "porque": "Es para después del 6 de diciembre: sirve para venderles a clientes más grandes, no para este evento.",
+  "lista": "Cuando la página de estado está publicada y el montaje en otro proveedor se probó al menos una vez."
+ },
+ "612e8ad86846": {
+  "titulo": "Prueba de esfuerzo con 10.000 personas",
+  "que": "Repetir las pruebas grandes con 10.000 personas: dos horas seguidas de carga, apagar máquinas y ver que otras toman el relevo, bajar reportes sin afectar la app, y subir la carga hasta encontrar dónde se rompe.",
+  "porque": "Es para después del 6 de diciembre: dice hasta qué tamaño de evento se puede vender.",
+  "lista": "Cuando las cuatro pruebas corrieron y sabemos el punto exacto donde se rompe."
+ },
+ "fee92aebd68f": {
+  "titulo": "Actualizar y borrar con el proceso automático, y probarlo completo",
+  "que": "Sumarle al proceso automático de montaje sus hermanos: uno para actualizar a un cliente (primero una máquina, se prueba, y luego el resto) y otro para borrar todo. Y probar que los niveles 0 y 1 se montan de cero sin tocar nada a mano.",
+  "porque": "Es para después del 6 de diciembre: es lo que deja atender varios clientes sin trabajo a mano.",
+  "lista": "Cuando actualizar y borrar funcionan con un comando y los niveles 0 y 1 se montan de cero solo con el proceso."
+ },
+ "a09329e6c982": {
+  "titulo": "Revisar si algo del plan de servidor de abril todavía sirve",
+  "que": "En abril se escribió un plan de servidor con otras herramientas: Docker, cambios de versión sin cortes y el Data Center en su propia máquina. Ya lo reemplazó el plan actual. Al terminar el montaje automático hay que revisar si alguna idea de ese plan sigue sirviendo y descartar el resto.",
+  "porque": "Es para después del 6 de diciembre: es limpieza, para no cargar con un plan viejo que confunde.",
+  "lista": "Cuando cada punto del plan de abril está marcado como \"se usa\" o \"se descarta\"."
+ }
+}

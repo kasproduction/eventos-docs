@@ -1,0 +1,652 @@
+[
+ {
+  "id": "c1c7fc8e28cb",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "3 viewports en device real (laptop / iPad / iPhone)",
+  "descripcion_actual": "Recorrer la webapp en un portatil, un iPad y un iPhone de verdad, no en el emulador de Chrome. Es la parte de W.12 Fase C que solo se puede hacer contigo.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "36840671f3f5",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Validar tablet portrait warning overlay",
+  "descripcion_actual": "En iPad vertical la webapp muestra un aviso; confirmar que sale bien y que no tapa nada.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "c6ddc300fb49",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Validar Edge corporativo",
+  "descripcion_actual": "Los clientes enterprise suelen usar Edge con politicas de empresa. Abrir la webapp ahi y revisar que login, streaming y sockets funcionen.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "aeedbe3e1047",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Validar Firefox 115+",
+  "descripcion_actual": "Recorrido completo en Firefox 115 o superior: login, agenda, streaming, social.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "3915a38885ec",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Empty states consistentes",
+  "descripcion_actual": "Que todos los módulos muestren el mismo tipo de estado vacío (sin sesiones, sin fotos, sin sponsors) y no uno distinto en cada pantalla.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "d07a949b2541",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Loading transitions",
+  "descripcion_actual": "Pasar del esqueleto de carga al contenido real sin salto brusco en todos los módulos.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "f0f32ee898e3",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Keyboard nav completa",
+  "descripcion_actual": "Poder usar la webapp solo con teclado: llegar a todo con Tab y activar con Enter.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "48c15ce24a93",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Tab order logico",
+  "descripcion_actual": "El orden en que salta el foco con Tab sigue el orden visual de la pantalla.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "c75a64421cd0",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "ARIA labels iconos sin texto",
+  "descripcion_actual": "Los botones que son solo un icono necesitan nombre para lectores de pantalla.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "045bc2227e2a",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Bundle <200KB gzipped",
+  "descripcion_actual": "Medir el peso del JavaScript inicial y bajarlo de 200 KB comprimido; afecta a quien entra con datos moviles en el recinto.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "d2dd5e2e0e6c",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "next/image sizes correcto",
+  "descripcion_actual": "Que las imágenes pidan el tamaño que de verdad se muestra, no la original completa.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "8c8002723abf",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Lighthouse Performance >=85 desktop",
+  "descripcion_actual": "Fase C",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "704e10059daa",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Lighthouse Performance >=75 mobile",
+  "descripcion_actual": "Fase C",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "ee1aa3678024",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "TTI <3s 4G Bogota (Fase C)",
+  "descripcion_actual": "Que la webapp sea usable en menos de 3 segundos con una red 4G como la de Bogota.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "e893b1cda0b9",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Migrar SSR → TanStack Query infinite caché",
+  "descripcion_actual": "post-W.11",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "502301eccf1c",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Streaming + Q&A cross-tab (requiere socket server real en CI)",
+  "descripcion_actual": "Prueba automática con dos pestañas: una pregunta o un mensaje en una aparece en la otra. Necesita el socket real corriendo en la prueba.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "72d936bf5712",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Social conectar cross-tab",
+  "descripcion_actual": "Prueba automática: una persona envia solicitud de conexión y la otra la ve llegar en vivo.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "0d57aa5e9a95",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "DSN prod: Poner la llave de Sentry de producción y confirmar que los errores llegan",
+  "descripcion_actual": "La configuración ya está en el código.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "7aa8b07dcd1b",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "~~Bancolombia embed test~~ → N/A",
+  "descripcion_actual": "Cliente perdido — validar si algún embed test aplica al próximo cliente",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "5f9b39d9075e",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "W.9: Share rank social",
+  "descripcion_actual": "Backlog futuro",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "7c90c539145d",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "W.9: Lighthouse autenticado",
+  "descripcion_actual": "Va con el batch de W.12 Fase C",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "W.12 — Polish + E2E + PWA (25/48 — Fases A+B Bloque 5 cerradas 2026-07-05, falta Fase C QA)"
+ },
+ {
+  "id": "7c52fa4e7f66",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Precarga de módulos vecinos (RouteWarmer)",
+  "descripcion_actual": "Se paso a W.12 y nunca quedo listada; no existe (W.12-polish.md:103)",
+  "fuentes": [
+   "W.12-polish.md:103"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "Sueltos de la webapp (inventario 2026-10-16)"
+ },
+ {
+  "id": "40fe663c269f",
+  "modulo": "Calidad de la webapp",
+  "titulo_actual": "Verificar que un módulo apagado no haga peticiones",
+  "descripcion_actual": "\"paquete mínimo\"; entra en B.1 (REFERENCIA-BINTEC-2026.md:104)",
+  "fuentes": [
+   "REFERENCIA-BINTEC-2026.md:104"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Webapp",
+  "subseccion": "Sueltos de la webapp (inventario 2026-10-16)"
+ },
+ {
+  "id": "75a436144acb",
+  "modulo": "QA presencial",
+  "titulo_actual": "Mobile parity M.2-M.8 en teléfono real",
+  "descripcion_actual": "Heart, momentos, shuffle, trivia sponsor, desafio, anuncios, soporte, orb FAQ, encuestas, vendor (scanner con cámara por HTTPS, export, invitación en vivo, gates ban/pending)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "QA presencial",
+  "subseccion": null
+ },
+ {
+  "id": "9d87c1cab8dd",
+  "modulo": "QA presencial",
+  "titulo_actual": "W.12 Fase C: 3 viewports en device, Edge, Firefox, Safari de escritorio, toques de 44 px, Lighthouse, WCAG",
+  "descripcion_actual": "RESPONSIVE-SPEC.md:134, :276",
+  "fuentes": [
+   "RESPONSIVE-SPEC.md:134"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "QA presencial",
+  "subseccion": null
+ },
+ {
+  "id": "006f6a23fe56",
+  "modulo": "QA presencial",
+  "titulo_actual": "W.X pelicula de bienvenida de corrido",
+  "descripcion_actual": "Ver la pelicula de bienvenida completa de principio a fin; hasta ahora se probo escena por escena.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "QA presencial",
+  "subseccion": null
+ },
+ {
+  "id": "67c08b192c28",
+  "modulo": "QA presencial",
+  "titulo_actual": "Transiciones de los 4 pasos del login y los 5 estados del home",
+  "descripcion_actual": "QA-MASTER.md:1229",
+  "fuentes": [
+   "QA-MASTER.md:1229"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "QA presencial",
+  "subseccion": null
+ },
+ {
+  "id": "5341c40d9ff8",
+  "modulo": "QA presencial",
+  "titulo_actual": "Red corporativa con WebSocket bloqueado",
+  "descripcion_actual": "Cae a polling sin errores (W.11-sockets-rt.md:295)",
+  "fuentes": [
+   "W.11-sockets-rt.md:295"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "QA presencial",
+  "subseccion": null
+ },
+ {
+  "id": "ce0739e75331",
+  "modulo": "QA presencial",
+  "titulo_actual": "Login sin red durante el magic link",
+  "descripcion_actual": "Sale \"tu link sigue valido\" (W.1-setup-auth.md:416)",
+  "fuentes": [
+   "W.1-setup-auth.md:416"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "QA presencial",
+  "subseccion": null
+ },
+ {
+  "id": "419698b36527",
+  "modulo": "QA presencial",
+  "titulo_actual": "Agenda de la webapp se actualiza sola por socket",
+  "descripcion_actual": "infra/PLAN-EXPERIENCIA-ENTERPRISE.md:380",
+  "fuentes": [
+   "infra/PLAN-EXPERIENCIA-ENTERPRISE.md:380"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "QA presencial",
+  "subseccion": null
+ },
+ {
+  "id": "367530a8f0ad",
+  "modulo": "QA presencial",
+  "titulo_actual": "Kiosko y attendance-check muestran joined event:X y el Pulse se mueve en < 2 s",
+  "descripcion_actual": "AUDITORIA-SOCKETS-SUPERFICIES:221",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "QA presencial",
+  "subseccion": null
+ },
+ {
+  "id": "0be16594fc74",
+  "modulo": "QA presencial",
+  "titulo_actual": "Expo: socket singleton en device",
+  "descripcion_actual": "Streaming chat/Q&A/polls/emojis/pinned + wall + encuestas, log conns=1",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "QA presencial",
+  "subseccion": null
+ },
+ {
+  "id": "3bd89b8617a3",
+  "modulo": "QA presencial",
+  "titulo_actual": "Landing en iPad con Kamilo (empezada 2026-10-12)",
+  "descripcion_actual": "Revisar contigo la landing en iPad vertical y horizontal (empezada el 12 de octubre).",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "QA presencial",
+  "subseccion": null
+ },
+ {
+  "id": "b3061aa42dd8",
+  "modulo": "QA presencial",
+  "titulo_actual": "iOS + Android con Sentry Performance en 4G Bogota",
+  "descripcion_actual": "Medir en telefonos reales con red 4G de Bogota cuanto tardan las pantallas, usando Sentry Performance.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "QA presencial",
+  "subseccion": null
+ },
+ {
+  "id": "33c280d4a030",
+  "modulo": "App Expo",
+  "titulo_actual": "E2E con Chromium en el servidor + validación visual en dev build",
+  "descripcion_actual": "El recap genera la imagen con Chromium; probarlo en el servidor y ver el diseño en una build de desarrollo del teléfono.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Recap compartible — post-evento — IMPLEMENTADO"
+ },
+ {
+  "id": "db1cdc1bdec3",
+  "modulo": "App Expo",
+  "titulo_actual": "Kiosko: verificar scan endpoint < 100ms en VPS real",
+  "descripcion_actual": "En local Windows ~150ms, Linux producción estimado ~50ms",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Pendientes menores app (Kiosk / Silent disco)"
+ },
+ {
+  "id": "ca38d23dda16",
+  "modulo": "App Expo",
+  "titulo_actual": "Staff app: cola offline MMKV + batch sync",
+  "descripcion_actual": "Nice-to-have, solo si zonas sin WiFi son problema real",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Pendientes menores app (Kiosk / Silent disco)"
+ },
+ {
+  "id": "762fd05c7f97",
+  "modulo": "App Expo",
+  "titulo_actual": "Silent disco push notification — verificar con dev build real",
+  "descripcion_actual": "No Expo Go",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Pendientes menores app (Kiosk / Silent disco)"
+ },
+ {
+  "id": "c670e06bc8a5",
+  "modulo": "App Expo",
+  "titulo_actual": "Tab Bar polish con @callstack/liquid-glass cuando la libreria soporte Expo",
+  "descripcion_actual": "Actualmente solo iOS 26 nativo",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Lux V2 — futuro (bloqueante externo)"
+ },
+ {
+  "id": "d6d313d202e3",
+  "modulo": "App Expo",
+  "titulo_actual": "EAS build de producción Android + iOS, cuentas, envío y revisión. Riesgo",
+  "descripcion_actual": "La revisión toma días o semanas; si el cliente pide app en tiendas, dejar margen",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Tiendas y build"
+ },
+ {
+  "id": "4c6a89e99abd",
+  "modulo": "App Expo",
+  "titulo_actual": "SHA-1 del keystore de producción en Firebase + dominio/DNS",
+  "descripcion_actual": "EventOS_Roadmap.md:568",
+  "fuentes": [
+   "EventOS_Roadmap.md:568"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Tiendas y build"
+ },
+ {
+  "id": "79d483a8472d",
+  "modulo": "App Expo",
+  "titulo_actual": "Alinear documentos.tsx (legacy huérfano previo al tema)",
+  "descripcion_actual": "NEXT-SESSION.md:2344",
+  "fuentes": [
+   "documentos.tsx",
+   "NEXT-SESSION.md:2344"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Tiendas y build"
+ },
+ {
+  "id": "85e1838191f4",
+  "modulo": "App Expo",
+  "titulo_actual": "Borrar banners.tsx + BannerCarousel + bannersApi del Expo",
+  "descripcion_actual": "Feature legacy muerta",
+  "fuentes": [
+   "banners.tsx"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Backlog Expo (sesion Expo futura)"
+ },
+ {
+  "id": "f67a9997fefa",
+  "modulo": "App Expo",
+  "titulo_actual": "ModuleMenuCompact.tsx huérfano",
+  "descripcion_actual": "Importado en (tabs)/index.tsx:25 pero nunca renderizado (hallazgo 2026-08-01). Borrar componente + import, o darle uso.",
+  "fuentes": [
+   "ModuleMenuCompact.tsx",
+   "(tabs)/index.tsx:25"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Backlog Expo (sesion Expo futura)"
+ },
+ {
+  "id": "a9939f9c92b7",
+  "modulo": "App Expo",
+  "titulo_actual": "Portar \"click sesión → agenda highlight\" del webapp W.5 al Expo",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Backlog Expo (sesion Expo futura)"
+ },
+ {
+  "id": "d6dae87aa219",
+  "modulo": "App Expo",
+  "titulo_actual": "Validar si banners.tsx Expo es vista dedicada o solo carousel embebido",
+  "descripcion_actual": "Revisar si la pantalla de banners del Expo se usa sola o solo dentro del carrusel, antes de borrarla.",
+  "fuentes": [
+   "banners.tsx"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Backlog Expo (sesion Expo futura)"
+ },
+ {
+  "id": "9c3dbdbc0ce6",
+  "modulo": "App Expo",
+  "titulo_actual": "Decidir recap/[eventId] del Expo",
+  "descripcion_actual": "→ Fase 2, no mapeado a webapp",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "App móvil Expo",
+  "subseccion": "Backlog Expo (sesion Expo futura)"
+ },
+ {
+  "id": "0cf6c2f6e524",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Branded QR codes con logo",
+  "descripcion_actual": "QR del asistente con el logo del evento en el centro.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Admin y módulos",
+  "subseccion": null
+ },
+ {
+  "id": "590da5fb147a",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Borrar EventOnboardingResource",
+  "descripcion_actual": "Muerto, sigue existiendo (NEXT-SESSION.md:1898)",
+  "fuentes": [
+   "NEXT-SESSION.md:1898"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Admin y módulos",
+  "subseccion": null
+ },
+ {
+  "id": "ff6d0b5366db",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Mission Control",
+  "descripcion_actual": "Pulir iPad horizontal a 1024 px (project_mission_control_notes)",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Admin y módulos",
+  "subseccion": null
+ },
+ {
+  "id": "268199bba17b",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Keyvisual por superficie",
+  "descripcion_actual": "keyvisual_desktop + keyvisual_mobile en branding + 2 uploads Filament con preview.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Admin y módulos",
+  "subseccion": "Paridad config admin ↔ 3 superficies (diseño con Kamilo; toca backend+Filament+Expo+webapp)"
+ },
+ {
+  "id": "bfb63e98cb5d",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Hero modo texto",
+  "descripcion_actual": "Contrato único de branding (type image|text) a escala en las 3 superficies.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Admin y módulos",
+  "subseccion": "Paridad config admin ↔ 3 superficies (diseño con Kamilo; toca backend+Filament+Expo+webapp)"
+ },
+ {
+  "id": "680910db3ad3",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Tests funcionales para Mission Control",
+  "descripcion_actual": "~1.5h — depende de mock de token HMAC /monitor/{id}?token=...",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "QA Mission Control + Data Center"
+ },
+ {
+  "id": "778bfb0fe207",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Crear public/shared/tokens.css",
+  "descripcion_actual": "Variables Noir + Lux unificadas",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "Unificacion SPAs (~10-12h)"
+ },
+ {
+  "id": "64e9992a0ba2",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Crear public/shared/components.css con .btn, .modal, .toast, .empty, .card consistentes",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "Unificacion SPAs (~10-12h)"
+ },
+ {
+  "id": "22ba4639bcc7",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Crear public/shared/lib.js con apiFetch",
+  "descripcion_actual": ", toast(type), openModal(), helpers DOM",
+  "fuentes": [
+   "public/shared/lib.js"
+  ],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "Unificacion SPAs (~10-12h)"
+ },
+ {
+  "id": "64e0f95565c9",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Migrar Attendance Check (public/attendance-check.html) — actualmente usa colores propios",
+  "descripcion_actual": "#6366f1",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "Unificacion SPAs (~10-12h)"
+ },
+ {
+  "id": "b55e1b43d842",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Migrar Display Session (public/display/session.html) — alinear empty states",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "Unificacion SPAs (~10-12h)"
+ },
+ {
+  "id": "ba8e85b74c68",
+  "modulo": "Admin y organizador",
+  "titulo_actual": "Migrar Event Pulse (public/event-pulse/) — --ink → --t consistente con Noir/Lux",
+  "descripcion_actual": "Alinear los colores del Event Pulse con los tokens de Noir y Lux de las demas pantallas.",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Deuda técnica",
+  "subseccion": "Unificacion SPAs (~10-12h)"
+ },
+ {
+  "id": "63edba13a64e",
+  "modulo": "App Expo",
+  "titulo_actual": "Orbe FAQ a Skia shader (reemplazar Reanimated+BlurView, solo cosmetic)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "App movil — cosmetico/incremental"
+ },
+ {
+  "id": "a0a3a334da76",
+  "modulo": "App Expo",
+  "titulo_actual": "Venue + Mapa (depende de si el evento tiene plano)",
+  "descripcion_actual": "",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "App movil — cosmetico/incremental"
+ },
+ {
+  "id": "bcac257e8272",
+  "modulo": "App Expo",
+  "titulo_actual": "react-native-image-crop-picker",
+  "descripcion_actual": "Crop circular dark",
+  "fuentes": [],
+  "donde_se_hace": null,
+  "seccion_original": "Fase 2 y nice to have",
+  "subseccion": "App movil — cosmetico/incremental"
+ }
+]

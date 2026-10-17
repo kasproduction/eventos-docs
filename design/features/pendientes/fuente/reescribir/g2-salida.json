@@ -1,0 +1,380 @@
+{
+  "ec751d37be4f": {
+    "titulo": "Que las pruebas automáticas no dependan de servicios prendidos",
+    "que": "El proyecto tiene unas 950 pruebas automáticas que revisan que nada se rompa. Hoy, al correr, intentan hablar con el tiempo real y con la webapp de verdad, y si están apagados se quedan esperando. Por eso la revisión completa tarda unos 30 minutos o no termina. Hay que hacer que las pruebas simulen esas llamadas en vez de hacerlas.",
+    "porque": "Si las pruebas tardan media hora, no se corren seguido, y los errores se escapan justo en las semanas antes del 6 de diciembre.",
+    "lista": "Cuando la revisión completa corre en minutos con el tiempo real y la webapp apagados, y da el mismo resultado que con todo prendido."
+  },
+  "18b4c8f8467b": {
+    "titulo": "Evitar que las pruebas borren la base de datos de trabajo",
+    "que": "En ciertas condiciones, las pruebas automáticas pueden terminar usando la base de datos de trabajo en vez de una de mentiras, y al arrancar la borran y la arman de cero. Hoy se evita con un paso manual antes de probar. Falta que las pruebas se nieguen solas a correr si no están en la base de mentiras.",
+    "porque": "Un descuido aquí puede borrar todos los datos de prueba del evento. Depender de acordarse del paso manual es arriesgado.",
+    "lista": "Cuando las pruebas se detienen con un aviso claro si detectan que van contra la base de datos de trabajo."
+  },
+  "997802a6ee0a": {
+    "titulo": "Arreglar una prueba de las estadísticas que siempre falla",
+    "que": "Hay una prueba automática del Data Center (las estadísticas del organizador) que falla siempre. El código está bien: en abril se cambió para que los números se actualicen al instante, y la prueba sigue esperando el comportamiento viejo. Hay que reescribirla para que pruebe lo que hace hoy.",
+    "porque": "Una prueba que siempre falla acostumbra a ignorar las fallas. Es de prioridad baja, pero estorba.",
+    "lista": "Cuando la prueba pasa y comprueba que un asistente nuevo aparece de inmediato en las estadísticas."
+  },
+  "66500a6fcbbf": {
+    "titulo": "Comprobar que los correos salen a buen ritmo sin perderse",
+    "que": "Resend, el servicio que manda los correos, solo acepta unos 10 envíos por segundo. Antes, si se pasaba de ese límite, los correos se reintentaban tres veces y se perdían. Ya está el código que los manda a un ritmo seguro y le da prioridad a los enlaces de acceso. Falta medirlo para cerrarlo.",
+    "porque": "El 6 de diciembre pueden ser 5.000 personas pidiendo su enlace de entrada al mismo tiempo. Si los correos se pierden, la gente no entra.",
+    "lista": "Cuando una prueba con miles de correos muestra que todos llegan y ninguno se pierde."
+  },
+  "0b7965bd95c4": {
+    "titulo": "El contador de mensajes de Event Pulse no cuadra",
+    "que": "Event Pulse, la pantalla que muestra en vivo cómo va el evento, dice que hay 84 mensajes, pero en la base de datos hay 2.156. Puede que esté contando solo una parte a propósito o que sea un error. Hay que revisar qué está contando.",
+    "porque": "Si un número del tablero no cuadra, el cliente deja de confiar en todos los demás.",
+    "lista": "Cuando sabemos qué cuenta ese número y coincide con la base de datos, o su nombre explica bien qué mide."
+  },
+  "273e385a4bee": {
+    "titulo": "Revisar los 57 avisos de seguridad de las piezas del backend",
+    "que": "El backend está armado con piezas hechas por otros (librerías). Una revisión automática encontró 57 avisos en 19 de esas piezas, y nadie los ha mirado. Hay que ver cuáles son graves y actualizar esas piezas.",
+    "porque": "Una pieza con un hueco conocido es una puerta abierta. Mejor cerrarlo antes de abrir el evento al público.",
+    "lista": "Cuando cada aviso está revisado y los graves quedaron resueltos con la pieza actualizada."
+  },
+  "e895ffb454bf": {
+    "titulo": "Un botón para cambiar entre tema oscuro y claro en el demo",
+    "que": "Hoy, para ver la landing en oscuro o en claro, hay que cambiar algo a mano en la dirección de la página. La idea es un botón flotante que lo cambie, visible solo en modo demo, porque en una landing real el asistente no debe cambiar el diseño que eligió el organizador. El cambio se mantiene en la confirmación y el widget. Antes de hacerlo, ver en lab dos opciones: una píldora abajo a la derecha o una barra fina arriba.",
+    "porque": "Al mostrarle el producto a un cliente, cambiar de tema con un clic se ve mucho mejor que tocar la dirección.",
+    "lista": "Cuando eliges una de las dos opciones en lab y el botón funciona en landing, confirmación y widget, solo en modo demo."
+  },
+  "edbed4ddff81": {
+    "titulo": "Que la escarapela muestre si eres VIP, Prensa u otra etiqueta",
+    "que": "En el admin, cada asistente puede tener etiquetas como VIP o Prensa. La idea es poder marcar cuáles de esas etiquetas salen en la escarapela digital. Es una idea tuya para más adelante.",
+    "porque": "Ayuda al personal del evento a reconocer de un vistazo quién es quién. No es urgente para el 6 de diciembre.",
+    "lista": "Cuando marcas una etiqueta en el admin y aparece en la escarapela del asistente."
+  },
+  "15b58d2f17c6": {
+    "titulo": "No decir \"ya tenías tu lugar\" a quien se registró en otro evento",
+    "que": "Cuando alguien se registra con un correo que ya existe, le sale \"ya tenías tu lugar\". El problema es que también sale si ese correo está en otro evento y no en este. Hay que revisar solo el evento actual.",
+    "porque": "Si alguien fue a un evento anterior y se inscribe a este, creería que ya estaba inscrito y podría quedarse sin cupo.",
+    "lista": "Cuando un correo registrado solo en otro evento se inscribe normal en este, sin ese mensaje."
+  },
+  "939c6bf03a02": {
+    "titulo": "Imagen al compartir el enlace cuando el evento no tiene una propia",
+    "que": "Cuando alguien comparte el enlace del evento por WhatsApp o redes, aparece una tarjeta con imagen. Si el organizador no subió esa imagen, la tarjeta sale sin foto. La idea es armarla sola con el nombre, la fecha, el lugar y el color del evento. Necesita lab antes.",
+    "porque": "Un enlace compartido sin imagen se ve descuidado y menos gente le da clic.",
+    "lista": "Cuando apruebas el diseño en lab y un evento sin imagen se comparte con su tarjeta generada."
+  },
+  "858173b0ac8e": {
+    "titulo": "Probar la tarjeta del enlace en WhatsApp, LinkedIn y X ya publicada",
+    "que": "La tarjeta con imagen que sale al compartir el enlace solo se puede probar de verdad cuando la página está publicada en internet, porque desde el computador las redes no ven la imagen. Hay que compartir el enlace real en cada red y mirar cómo se ve.",
+    "porque": "Es lo primero que ven los invitados cuando les pasan el enlace del evento.",
+    "lista": "Cuando la tarjeta sale bien en WhatsApp, LinkedIn y X con la dirección real."
+  },
+  "8b3579d8d3e3": {
+    "titulo": "Escanear un QR en un stand sin tener que volver a entrar",
+    "que": "Cuando alguien escanea el QR de un stand, los puntos deben sumarse a la cuenta con la que ya entró, sin pedirle iniciar sesión otra vez. En Bintec Play pasó lo contrario: no te dejó entrar.",
+    "porque": "Cada paso de más hace que la gente abandone. Si escanear es inmediato, los stands de los patrocinadores reciben más visitas.",
+    "lista": "Cuando una persona con sesión abierta escanea un QR y los puntos se suman sin ninguna pantalla de ingreso."
+  },
+  "cc59d379f1dc": {
+    "titulo": "Más opciones en cada sesión de la agenda, y Outlook además de Google",
+    "que": "En la ficha de cada sesión, la idea es que la persona pueda marcar tres cosas distintas: me interesa, favorito o voy a ir en persona. Y además de Google Calendar, poder agregarla a Outlook. Antes hay que revisar qué tenemos hoy para no repetir.",
+    "porque": "En las empresas grandes casi todos usan Outlook. Y saber quién va en persona ayuda al organizador a preparar las salas.",
+    "lista": "Cuando la ficha tiene las tres opciones y la sesión se agrega bien a Outlook y a Google."
+  },
+  "76fd3fb46ea2": {
+    "titulo": "Revisar las protecciones básicas de seguridad de la webapp",
+    "que": "Las páginas web le pueden mandar al navegador unas instrucciones que lo protegen, por ejemplo que otra página no pueda meter la nuestra adentro para engañar a la gente. Hay que revisar que la webapp y el backend las tengan. Y también que ningún registro use un dato fácil de conocer, como la cédula, como contraseña.",
+    "porque": "Los clientes corporativos revisan esto antes de firmar, y protege a los asistentes de engaños.",
+    "lista": "Cuando una revisión de la página muestra todas esas protecciones activas y ningún registro usa la cédula como contraseña."
+  },
+  "36d1b94c9b0c": {
+    "titulo": "Tener un plan B para el chat si somos demasiados",
+    "que": "El chat funciona con nuestro propio sistema de tiempo real. Si la medición con 5.000 personas muestra que no aguanta, la idea es usar un servicio externo como Ably, que se dedica a eso, solo para ese evento. No es rehacer todo, es tener la opción.",
+    "porque": "El chat del streaming es de lo que más se usa en un evento grande. Si se cae el 6 de diciembre, se nota de inmediato.",
+    "lista": "Cuando la medición de 5.000 diga si hace falta y, si hace falta, el chat funcione con el servicio externo en ese evento."
+  },
+  "86c4e9a3c942": {
+    "titulo": "Que el video en vivo siga corriendo aunque cambies de pantalla",
+    "que": "Hoy, si estás viendo el streaming y te vas a otra parte de la webapp, el video se cierra. La idea es que el reproductor viva en la estructura general de la webapp y no en esa página, para que siga corriendo mientras navegas, como en YouTube.",
+    "porque": "Es la base de todo lo demás del reproductor: sin esto, nadie puede mirar la agenda sin perderse la charla.",
+    "lista": "Cuando el video sigue sin cortarse ni recargar al pasar a otras pantallas."
+  },
+  "04f87f1d2d6c": {
+    "titulo": "Ver el video y la agenda lado a lado",
+    "que": "Si estás en el streaming y abres la agenda, la pantalla se parte en dos: el video a la izquierda y la agenda a la derecha. Si das clic en otra sesión que también se transmite, cambia el video sin salir. Si la sesión no se transmite, se abre su ficha normal.",
+    "porque": "La gente quiere ver qué sigue sin perderse la charla actual.",
+    "lista": "Cuando, desde el streaming, abres la agenda, el video queda a la izquierda sin cortarse y puedes cambiar de sesión."
+  },
+  "61268d1303e7": {
+    "titulo": "Video en una ventanita flotante mientras usas el resto de la webapp",
+    "que": "Si vas a cualquier otra pantalla, el video se encoge a una ventanita en la esquina de abajo a la derecha, que puedes arrastrar, con botones para volver o cerrar. El chat y las preguntas se esconden pero siguen conectados por debajo. Los avisos de trivia o ruleta siguen llegando.",
+    "porque": "Así la persona puede ir al networking o a los juegos sin dejar de ver la charla, y se queda más tiempo en el evento.",
+    "lista": "Cuando, en cualquier pantalla, el video sigue en la ventanita, se puede arrastrar y los avisos de juegos siguen llegando."
+  },
+  "c2f75b36739e": {
+    "titulo": "Volver al video en grande justo donde ibas",
+    "que": "Desde la ventanita o desde la pantalla partida, un clic en el video o en \"En vivo\" lo devuelve a pantalla completa. El chat debe quedar donde ibas, sin volver a cargar todo.",
+    "porque": "Si al volver todo se recarga, la persona pierde el hilo y la experiencia se siente rota.",
+    "lista": "Cuando vuelves al video en grande y el chat está en el mismo punto, sin recargar."
+  },
+  "9637d8835b64": {
+    "titulo": "El video flotante en el celular, como en la app de YouTube",
+    "que": "En el celular no cabe la pantalla partida. Ahí, al salir del streaming, el video queda como una barra encima del menú de abajo, con miniatura, título, pausa y cerrar. Si abres la agenda, la agenda ocupa la pantalla y el video sigue en la barra.",
+    "porque": "La mayoría de asistentes van a usar el celular el día del evento.",
+    "lista": "Cuando en un celular el video sigue en la barra al navegar y se puede pausar o cerrar."
+  },
+  "e9add8725a2e": {
+    "titulo": "Que la portada de En vivo muestre el video de verdad",
+    "que": "Hoy la página de En vivo muestra una imagen fija de la transmisión destacada. La idea es que muestre el video corriendo sin sonido. Ya decidiste: en computador el video corre siempre sin sonido; en celular, al tocar, se ven 4 segundos de video y luego entra, porque el celular no deja arrancar video solo.",
+    "porque": "Un video en movimiento invita a entrar mucho más que una foto, y se ve vivo para el cliente.",
+    "lista": "Cuando en computador el video corre sin sonido en la portada y en celular el toque muestra 4 segundos y entra."
+  },
+  "c2d8b1d93305": {
+    "titulo": "Que las tarjetas de las otras salas en vivo se muevan",
+    "que": "Al lado de la transmisión principal hay tarjetas de las otras salas en vivo. La idea es mostrar en cada una una miniatura del video sin sonido o, si son varias, ir rotando cada 8 segundos con un solo video extra, porque tres videos de YouTube al tiempo ponen lenta la página. Falta tu decisión.",
+    "porque": "Ayuda a que la gente descubra otras salas, pero no es urgente.",
+    "lista": "Cuando decides la opción y las tarjetas se mueven sin que la página se ponga lenta."
+  },
+  "3a24c5406fc1": {
+    "titulo": "Qué pasa con el video cuando la sesión termina",
+    "que": "Cuando la sesión que estás viendo termina, la ventanita debe decir \"Terminó, ver siguiente\" y ofrecer la próxima sesión de la misma sala, que el sistema ya conoce. Si el evento completo termina, el reproductor se apaga solo.",
+    "porque": "Sin esto, la persona queda mirando una pantalla quieta y no sabe qué sigue.",
+    "lista": "Cuando, al terminar una sesión, aparece la siguiente de la misma sala, y al cerrar el evento el video se apaga."
+  },
+  "d2aff9888d80": {
+    "titulo": "Probar contigo todo el recorrido del video en vivo",
+    "que": "Hacer juntos el recorrido completo: del streaming a la agenda partida, de ahí a la ventanita, volver a grande, la portada de En vivo y otra sala. En computador, tablet y celular. También con el tiempo real apagado, para ver que no salgan errores. Y comprobar que el video no se recarga en ningún paso.",
+    "porque": "Es la prueba final del reproductor antes de darlo por listo para el evento.",
+    "lista": "Cuando haces el recorrido en los tres tamaños y el video nunca se recarga ni aparecen errores."
+  },
+  "545aa447ccbe": {
+    "titulo": "Sugerir la corrección del correo también al editarlo",
+    "que": "Cuando alguien escribe mal su correo, por ejemplo gmial en vez de gmail, la webapp le sugiere la corrección. Pero si cambia el correo en el paso de la contraseña, esa sugerencia no aparece. Hay que ponerla también ahí.",
+    "porque": "Un correo mal escrito significa que el enlace de acceso nunca le llega a esa persona.",
+    "lista": "Cuando escribir mal el correo en el paso de la contraseña muestra la sugerencia."
+  },
+  "45ffe3f47261": {
+    "titulo": "Que calificar, pedir soporte y editar el perfil respondan al instante",
+    "que": "Al calificar una sesión, mandar una solicitud de soporte o guardar el perfil, hoy hay que esperar a que el servidor confirme. La idea es que la pantalla muestre el cambio de una vez y confirme por detrás. Ojo: antes se decidió que los formularios que pueden rechazar datos deben esperar, así que hay que revisarlo primero.",
+    "porque": "La webapp se siente más rápida, sobre todo con el wifi lento de un evento.",
+    "lista": "Cuando calificar se ve al instante y queda claro, caso por caso, qué formularios sí deben esperar."
+  },
+  "5360120df172": {
+    "titulo": "Compartir tu puesto del ranking en redes",
+    "que": "Un botón para que cada persona comparta en redes su posición en el ranking de puntos del evento. Quedó para después cuando se cerró el módulo de juegos.",
+    "porque": "Cada vez que alguien lo comparte, el evento y la plataforma se ven afuera. Es para después del 6 de diciembre.",
+    "lista": "Cuando el botón deja compartir tu posición en las redes principales."
+  },
+  "ed1b6b796949": {
+    "titulo": "Tres pruebas automáticas que faltan en speakers y agenda (opcional)",
+    "que": "Hay tres pruebas pequeñas que estaban en la lista y no se escribieron: la carga de speakers, su pantalla y el resaltado de una sesión en la agenda. Una prueba más grande ya revisa ese recorrido completo, por eso es opcional.",
+    "porque": "Daría más tranquilidad al cambiar esas pantallas, pero no frena nada del evento.",
+    "lista": "Cuando las tres pruebas existen y pasan."
+  },
+  "60ddab0ba115": {
+    "titulo": "Configurar WhatsApp y SMS desde el admin",
+    "que": "Hoy desde el admin se configura el envío de correos. La idea es poder configurar también mensajes por WhatsApp y SMS. Es algo deseable, no necesario.",
+    "porque": "A algunos clientes les sirve llegar por WhatsApp, que se lee más que el correo. Es para después del evento.",
+    "lista": "Cuando un organizador conecta WhatsApp o SMS desde el admin y un mensaje de prueba llega."
+  },
+  "4eab4e2ca999": {
+    "titulo": "Elegir en el admin qué etiquetas salen en la escarapela",
+    "que": "Cada asistente puede tener etiquetas como VIP o Prensa. La idea es que en el admin se marque cuáles se muestran en su escarapela. Es la misma idea de la escarapela con etiqueta, vista desde el admin.",
+    "porque": "Ayuda al personal del evento a reconocer quién es quién. No es urgente para el 6 de diciembre.",
+    "lista": "Cuando marcas una etiqueta en el admin y aparece en la escarapela."
+  },
+  "7fa3c7f5ac43": {
+    "titulo": "Decidir qué hacer con las páginas personalizadas, después del montaje",
+    "que": "Hay una función para que el organizador meta páginas propias, como un video de YouTube, un Slido o un mapa. Está construida en un 60 %, pero ninguna pantalla la muestra, así que nadie llega a ella. Decidiste dejarla en pausa, visible como deshabilitada en el admin. Al retomarla hay dos caminos: terminar el acceso (más o menos una sesión de trabajo) o borrarla entera.",
+    "porque": "No ayuda ni estorba para el evento, por eso queda para el final. Lo hecho no se pierde.",
+    "lista": "Cuando decides terminarla o borrarla y queda hecho lo que decidiste."
+  },
+  "3bd795a5a973": {
+    "titulo": "Correr la revisión de seguridad con la configuración real del servidor",
+    "que": "Ya existe una revisión automática que mira si la configuración tiene errores peligrosos, como contraseñas de prueba o el evento demo. Hay que correrla con la configuración real del servidor, cuando se monte.",
+    "porque": "Una sola configuración de prueba olvidada en el servidor real puede dejar entrar a quien no debe.",
+    "lista": "Cuando la revisión corre en el servidor real y sale sin problemas."
+  },
+  "ea749e3f2495": {
+    "titulo": "Entrar al admin con huella o Face ID",
+    "que": "Hoy el personal entra al admin con contraseña y un código de una app en el celular. La idea es que también pueda entrar con la huella o la cara, como en el banco. La pediste el 1 de agosto, sin fecha.",
+    "porque": "Es más cómodo y más seguro, pero no hace falta para el 6 de diciembre.",
+    "lista": "Cuando una persona del equipo entra al admin con su huella o Face ID."
+  },
+  "3bf54c2451cb": {
+    "titulo": "Que cada mensaje del chat muestre si se envió",
+    "que": "Hoy, al mandar un mensaje en el chat, no queda claro si llegó. La idea es que aparezca de una vez como enviando y cambie a enviado cuando el servidor lo confirme, como en WhatsApp. Son 2 o 3 horas de trabajo en la app y en el tiempo real.",
+    "porque": "Con el wifi lento de un evento, la gente reenvía mensajes que creyó perdidos y el chat se llena de repetidos.",
+    "lista": "Cuando cada mensaje muestra enviando y luego enviado, y no aparece duplicado."
+  },
+  "3eff5c6074c6": {
+    "titulo": "Que tu emoji en el streaming no salga dos veces",
+    "que": "Cuando mandas un emoji en el streaming, se te muestra dos veces: el tuyo y el que te devuelve el tiempo real. Hay que hacer que el que rebota no se te muestre a ti. Unos 30 minutos.",
+    "porque": "Es un detalle pequeño, pero se nota y hace ver la plataforma descuidada.",
+    "lista": "Cuando mandas un emoji y lo ves una sola vez."
+  },
+  "2c6612a25418": {
+    "titulo": "Que un comentario en el muro social no salga repetido",
+    "que": "Al comentar en el muro social, el comentario puede aparecer dos veces: el que pusiste y el que llega por el tiempo real. Hay que quitar el repetido. Unos 20 minutos.",
+    "porque": "Un comentario duplicado se ve como un error y confunde.",
+    "lista": "Cuando comentas en el muro y el comentario aparece una sola vez."
+  },
+  "50bbf7755f5d": {
+    "titulo": "Que el contador de votos de las preguntas no parpadee",
+    "que": "En las preguntas al speaker, al votar una pregunta el número parpadea. Hay que dejarlo estable. Unos 15 minutos.",
+    "porque": "Es un detalle pequeño, pero en una pantalla proyectada se nota.",
+    "lista": "Cuando votas una pregunta y el número sube una vez, sin parpadear."
+  },
+  "8efb80b78d9e": {
+    "titulo": "Pruebas automáticas de las acciones que no pueden fallar",
+    "que": "Pruebas que hacen solas, como si fueran una persona, las acciones clave: aprobar una pregunta, lanzar un juego, cancelar una sesión y disparar una exportación programada.",
+    "porque": "Si un cambio rompe algo de esto, nos enteramos antes del evento y no en pleno 6 de diciembre.",
+    "lista": "Cuando las cuatro pruebas existen y pasan."
+  },
+  "dced1dd2997c": {
+    "titulo": "Revisar cómo entra el personal al admin y cuándo vence su sesión",
+    "que": "Entender y revisar cómo funciona la entrada al admin y cuánto dura una sesión abierta antes de pedir entrar otra vez. Lo anotaste tú y encaja con el trabajo de seguridad del personal.",
+    "porque": "Una sesión que no vence nunca es un riesgo si alguien deja el computador abierto en el evento.",
+    "lista": "Cuando está escrito cómo funciona y cuánto dura la sesión, y lo que haya que ajustar quedó ajustado."
+  },
+  "6a38a940c273": {
+    "titulo": "Poner el monitor del chat con el mismo estilo del resto",
+    "que": "El monitor del chat es una pantalla aparte para seguir los mensajes. Usa íconos y colores viejos. Hay que pasarlo a los mismos íconos y colores del resto de la plataforma.",
+    "porque": "Es un detalle visual: se ve mejor cuando un cliente lo mira, pero no cambia cómo funciona.",
+    "lista": "Cuando el monitor se ve con los mismos íconos y colores que el resto, en oscuro y en claro."
+  },
+  "608e312b43e4": {
+    "titulo": "Un buscador rápido para saltar a cualquier parte de la webapp",
+    "que": "Una cajita de búsqueda que se abre encima de todo y te deja escribir para ir directo a una sesión, un speaker o una sección, sin navegar por los menús.",
+    "porque": "Es una comodidad para usuarios frecuentes. Queda para después del evento.",
+    "lista": "Cuando la cajita se abre, encuentra sesiones, speakers y secciones, y te lleva a ellas."
+  },
+  "049f64cc2c86": {
+    "titulo": "Avisar a quien no tiene contraseña e intenta entrar con una",
+    "que": "Ahora la gente se puede registrar sin crear contraseña y entra con un enlace al correo. Si luego intenta entrar con una contraseña, no entiende por qué no puede. La idea es avisarle que su cuenta no tiene contraseña y ofrecerle el enlace.",
+    "porque": "Desde que existe el registro sin contraseña, esto le puede pasar a mucha gente el día del evento.",
+    "lista": "Cuando alguien sin contraseña intenta usar una y la pantalla le explica qué hacer y le ofrece el enlace."
+  },
+  "993278b1e1b8": {
+    "titulo": "Compartir la agenda o el muro ya filtrados con un enlace",
+    "que": "Si filtras la agenda o el muro social, por ejemplo por un tema, ese filtro no queda guardado en el enlace. La idea es que sí quede, para que al compartirlo la otra persona vea lo mismo que tú.",
+    "porque": "Sirve, por ejemplo, para que el organizador mande el enlace con solo las sesiones de un tema. Es para después.",
+    "lista": "Cuando abres un enlace copiado con filtros y la agenda o el muro aparecen ya filtrados."
+  },
+  "261e24819f15": {
+    "titulo": "Tarjetas más grandes para las personas sugeridas en networking",
+    "que": "En networking, la plataforma te sugiere personas para conocer. La idea es mostrarlas en tarjetas más grandes, para que den más ganas de conectar.",
+    "porque": "Las conexiones entre asistentes son de lo que más valoran los organizadores. Es para después del evento.",
+    "lista": "Cuando las sugerencias se ven en tarjetas grandes con un diseño aprobado en lab."
+  },
+  "53819e46479a": {
+    "titulo": "Avisar cuando dos de tus favoritas caen a la misma hora",
+    "que": "Si marcas como favoritas dos sesiones que se cruzan en horario, la agenda debería avisarte para que elijas una.",
+    "porque": "Evita que alguien descubra el cruce ya en el evento, corriendo entre salas.",
+    "lista": "Cuando marcas dos sesiones que se cruzan y la agenda muestra el aviso."
+  },
+  "5b15414da0f8": {
+    "titulo": "Nuevos juegos: subasta de puntos, buscar al patrocinador, citas rápidas",
+    "que": "Ideas de juegos para más adelante: subastar algo con los puntos ganados, un juego de \"¿dónde está el sponsor?\" y un speed-dating, que son conversaciones cortas entre asistentes. Van junto con los juegos cortos por QR.",
+    "porque": "Más juegos dan más vida al evento y más visibilidad a los patrocinadores. No es para el 6 de diciembre.",
+    "lista": "Cuando cada juego tiene diseño aprobado en lab y funciona de punta a punta."
+  },
+  "e18eeaffe838": {
+    "titulo": "Que los datos de un asistente salgan siempre con la misma forma",
+    "que": "Hoy distintas partes del backend arman los datos de un asistente a su manera. La idea es tener una sola forma común para todas las pantallas. Es orden interno que no se ve.",
+    "porque": "Evita errores raros cuando una pantalla espera un dato que otra parte no manda. No es urgente para el evento.",
+    "lista": "Cuando todas las pantallas reciben al asistente con la misma forma y las pruebas pasan."
+  },
+  "012b8d2ff10f": {
+    "titulo": "Ordenar el muro social por más likes desde el servidor",
+    "que": "La idea es que, al pedir el muro ordenado por los más populares, el servidor lo entregue ya ordenado por likes. Así el orden incluye todas las publicaciones del evento y no solo las que el celular alcanzó a cargar.",
+    "porque": "Con muchas publicaciones el orden podría salir incompleto. Es para después del evento.",
+    "lista": "Cuando el muro ordenado por likes muestra primero las más populares de todo el evento."
+  },
+  "24bc64bd1a7d": {
+    "titulo": "Medir qué hace la gente en networking y qué perfiles visita",
+    "que": "Registrar más acciones de los asistentes: cuando abren o cierran un perfil, mandan una solicitud de conexión, le agregan un mensaje o tocan un dato de contacto. Y cuántas visitas tiene cada patrocinador, speaker y sesión.",
+    "porque": "Esos números son lo que el organizador le muestra a sus patrocinadores para justificar lo que pagaron.",
+    "lista": "Cuando esas acciones se cuentan y se ven en las estadísticas del organizador."
+  },
+  "a68753a9fec8": {
+    "titulo": "Puntos extra por entrar a la app varios días seguidos",
+    "que": "Una racha: si la persona entra a la app días seguidos, gana puntos de bonificación.",
+    "porque": "Sirve en eventos de varios días o en la previa, para que la gente vuelva. No es para el 6 de diciembre.",
+    "lista": "Cuando entrar dos días seguidos suma el bonus y se ve en los puntos de la persona."
+  },
+  "2974f8c75089": {
+    "titulo": "Lista de espera cuando se llena el cupo",
+    "que": "Cuando el evento llega a su cupo máximo, hoy no se puede inscribir más gente. La idea es que la persona quede en lista de espera y le llegue un aviso si se libera un lugar.",
+    "porque": "En eventos con mucha demanda, el organizador no pierde a esos interesados. Es para después.",
+    "lista": "Cuando, con el cupo lleno, alguien queda en lista de espera y recibe el aviso al liberarse un lugar."
+  },
+  "f0ec551ce341": {
+    "titulo": "Saber quién trajo a quién al evento",
+    "que": "Darle a cada persona su propio enlace para invitar a otros y contar cuántos se registraron gracias a ella.",
+    "porque": "Al organizador le sirve para premiar a quien más invita y saber qué canales funcionan. Es para después.",
+    "lista": "Cuando alguien se registra con un enlace de invitación y queda claro a quién se le cuenta."
+  },
+  "2929117b9fad": {
+    "titulo": "Entrar con la cuenta de Google",
+    "que": "Un botón de \"Entrar con Google\" para que la persona no tenga que escribir su correo ni esperar el enlace.",
+    "porque": "Hace más rápido entrar, pero no es necesario para el evento. Queda para después.",
+    "lista": "Cuando alguien entra con Google y queda dentro del evento correcto."
+  },
+  "d33158cabf91": {
+    "titulo": "Que el organizador diseñe sus correos arrastrando bloques",
+    "que": "Un editor visual en el admin para armar los correos del evento sin saber de diseño: arrastrar un título, una imagen, un botón.",
+    "porque": "Le da independencia al organizador. Es de una fase futura, no para diciembre.",
+    "lista": "Cuando un organizador arma un correo con el editor y llega bien a una bandeja de prueba."
+  },
+  "e7494f18a38e": {
+    "titulo": "Resumen después del evento: \"conectaste con X personas\"",
+    "que": "Al terminar el evento, mandarle a cada persona un resumen con cuánta gente conoció, para que retome el contacto.",
+    "porque": "Hace que el valor del evento dure después de que termina. Es para después.",
+    "lista": "Cuando, al cerrar un evento de prueba, cada asistente recibe su resumen con sus conexiones."
+  },
+  "2aef5fb49fad": {
+    "titulo": "Un collage automático con las fotos del evento",
+    "que": "Armar solo, al final del evento, un collage con las fotos que subió la gente.",
+    "porque": "Es un recuerdo fácil de compartir que hace ver bien al evento. Es para después.",
+    "lista": "Cuando al cerrar un evento de prueba se genera el collage con sus fotos."
+  },
+  "8d9faddd5e91": {
+    "titulo": "Ver las grabaciones de las charlas después del evento",
+    "que": "Que las transmisiones queden guardadas y los asistentes puedan verlas cuando el evento ya pasó.",
+    "porque": "Alarga la vida del evento y es algo que muchos clientes piden. Es para después del 6 de diciembre.",
+    "lista": "Cuando, terminado un evento de prueba, un asistente puede ver la grabación de una charla."
+  },
+  "31ccd1791b4f": {
+    "titulo": "Guardar una copia completa de un evento y poder recuperarla",
+    "que": "Un botón que guarde todo un evento (sesiones, speakers, configuración) en un archivo, para recuperarlo si algo se borra o para usarlo de base en otro evento.",
+    "porque": "Protege contra un error humano en el admin. Es para después.",
+    "lista": "Cuando guardas un evento, lo borras en una prueba y lo recuperas igual desde el archivo."
+  },
+  "2138a1b608a1": {
+    "titulo": "La entrada del evento en la billetera del celular",
+    "que": "Que la persona pueda guardar su entrada en la billetera del iPhone o en Google Wallet, como un pasabordo.",
+    "porque": "Es cómodo y se ve muy profesional, pero no es necesario para diciembre.",
+    "lista": "Cuando la entrada se agrega a la billetera en un iPhone y en un Android."
+  },
+  "9489ab6ec577": {
+    "titulo": "Que el organizador arme su landing desde el admin",
+    "que": "Un editor en el admin para que el organizador arme la página de su evento con bloques, sin que tengamos que hacerla nosotros.",
+    "porque": "Permite atender a más clientes sin trabajo a la medida. Es de una fase futura.",
+    "lista": "Cuando un organizador arma una landing desde el admin y se ve publicada."
+  },
+  "ae8cdad56672": {
+    "titulo": "Probar dos versiones de un correo para ver cuál funciona mejor",
+    "que": "Mandar dos versiones de un mismo correo a grupos distintos y medir cuál abren o cliquean más.",
+    "porque": "Ayuda al organizador a que más gente se inscriba. Es de una fase futura.",
+    "lista": "Cuando se envían dos versiones y el admin muestra cuál funcionó mejor."
+  },
+  "f85747961ec8": {
+    "titulo": "Juegos hechos en Unity para los stands",
+    "que": "Juegos más elaborados, hechos con Unity (una herramienta para crear videojuegos), para pantallas en los stands. Necesita un desarrollador de Unity aparte.",
+    "porque": "Da un efecto muy vistoso en los stands, pero depende de otra persona. No es para diciembre.",
+    "lista": "Cuando hay un juego de Unity funcionando en un stand y conectado a la plataforma."
+  },
+  "43b4d11956e6": {
+    "titulo": "Pulir el demo para mostrárselo a inversionistas",
+    "que": "Mejorar la presentación del producto para inversionistas: que los paneles se puedan tocar, que se vea bien en pantalla grande (1920x1080), con sonido, pistas que guíen a quien lo mira y el muro social.",
+    "porque": "Sirve para vender el producto o buscar inversión, no para el evento.",
+    "lista": "Cuando el demo se recorre completo en pantalla grande, con sonido y pistas, sin tener que explicarlo en voz alta."
+  }
+}

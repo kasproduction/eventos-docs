@@ -1,0 +1,92 @@
+{
+  "c1e8c66d35fc": {
+    "titulo": "Que cada pantalla le pida menos cosas al servidor",
+    "que": "Cada vez que alguien abre la agenda, su celular le hace unos 9 pedidos distintos al servidor: las sesiones, sus favoritas, los speakers, el evento. La idea es que la agenda llegue en un solo pedido, ya armada, y que el servidor no tenga que responder lo mismo mil veces: si 100 personas piden la agenda en el mismo minuto, responde una vez y repite. Lo que cambia en vivo llega solo, sin que nadie lo pida. Después se hace lo mismo con las demás pantallas.",
+    "porque": "Con 5.000 personas abriendo la agenda al tiempo son 45.000 pedidos de golpe. Bajarlo a 1 por persona es lo que más alivia el servidor el 6 de diciembre.",
+    "lista": "Cuando la agenda carga con un solo pedido y medimos que las demás pantallas bajaron de 9 a 3 o menos."
+  },
+  "2d375ca3809c": {
+    "titulo": "Darme acceso a DigitalOcean para montar el servidor",
+    "que": "DigitalOcean es donde se alquilan los servidores. Para crear o prender máquinas necesito una llave de acceso, y la que había se anuló por seguridad. Tú la generas en su página y la escribes en la terminal con un comando; yo nunca la veo.",
+    "porque": "Sin esa llave no se puede montar nada: es el primer paso de todo lo de servidor.",
+    "lista": "Cuando el comando confirma que la cuenta quedó conectada."
+  },
+  "34cb8b604f21": {
+    "titulo": "Montar un servidor de prueba igual al de agosto",
+    "que": "En agosto montamos un servidor que aguantó 300 personas y guardamos una copia (como una foto) de cada máquina. La idea es prenderlas otra vez desde esas fotos y subirles el código de hoy, para probar con algo real y no en el computador.",
+    "porque": "En agosto aprendimos que lo que funciona en el computador falla en el servidor. Todo lo que se mida para diciembre se mide aquí.",
+    "lista": "Cuando la webapp abre desde ese servidor y una persona puede entrar, ver la agenda y el streaming."
+  },
+  "cfd7a98e6b91": {
+    "titulo": "Que un auditorio entero pueda entrar a la vez desde el mismo wifi",
+    "que": "En un evento, cientos de personas se conectan desde el mismo wifi, y para el servidor todas parecen ser una sola. Antes las bloqueaba por \"demasiados intentos\". Ya cambiamos el código para que solo cuente los intentos fallidos y deje pasar a la gente normal. Falta probarlo en el servidor real.",
+    "porque": "Si esto falla, la gente se queda afuera justo al entrar al evento, que es el peor momento.",
+    "lista": "Cuando simulamos 1.000 personas entrando desde la misma red y ninguna queda bloqueada."
+  },
+  "70040ab22c2b": {
+    "titulo": "Revisar un error de \"servicio no disponible\" que salió con una sola persona",
+    "que": "En agosto, navegando solo, la webapp devolvió una vez un error de \"servicio no disponible\". Con una persona no debería pasar nunca. Hay que ver si sigue pasando y por qué.",
+    "porque": "Si falla con una persona, con 5.000 va a fallar mucho más.",
+    "lista": "Cuando sabemos la causa y lo corregimos, o comprobamos que ya no ocurre."
+  },
+  "3582eb97a57a": {
+    "titulo": "Torre de control: ver en vivo cómo va el evento por dentro",
+    "que": "Una pantalla en el admin, solo para ti, que muestra en tiempo real cuánta gente está conectada, qué tan rápido responde la plataforma, si hay errores y qué máquina está cargada. Hoy eso solo se ve entrando a los servidores por consola.",
+    "porque": "La idea es enterarnos de un problema antes de que un asistente se queje, y poder actuar a tiempo.",
+    "lista": "Cuando la pantalla muestra datos reales del servidor de prueba y una falla provocada aparece en ella en segundos."
+  },
+  "dd2750343a29": {
+    "titulo": "El admin se puede quedar trabado 10 segundos si el tiempo real se cae",
+    "que": "Cuando cambias algo de una sesión en el admin, el sistema avisa al tiempo real para que les llegue a todos. Si el tiempo real está caído, el admin se queda esperando hasta 10 segundos sin responder. Hay que ponerle un límite corto a esa espera.",
+    "porque": "En pleno evento, un admin congelado es justo lo que no puede pasar.",
+    "lista": "Cuando, con el tiempo real apagado, el admin guarda al instante y no se traba."
+  },
+  "fb36bfffac12": {
+    "titulo": "Las horas pueden salir corridas 5 horas en el celular",
+    "que": "Algunas pantallas de la webapp en celular calculan la hora sin decir que es hora de Colombia. En el computador sale bien, pero los servidores usan otra zona horaria y la hora podría salir corrida 5 horas, o la pantalla parpadear al cargar.",
+    "porque": "Una agenda con la hora equivocada confunde a todo el evento.",
+    "lista": "Cuando las 7 pantallas fijan la hora de Bogotá y se ven bien en el servidor."
+  },
+  "5f766119b572": {
+    "titulo": "Cambiar la protección anti-robots de prueba por la real antes de abrir el registro",
+    "que": "El registro tiene una protección de Cloudflare que frena robots. Hoy usa llaves de prueba que dejan pasar a cualquiera. Antes de abrir el registro al público hay que poner las llaves reales.",
+    "porque": "Sin esto, un robot podría llenar el registro con miles de inscripciones falsas.",
+    "lista": "Cuando las llaves reales están puestas y una inscripción normal pasa sin problema."
+  },
+  "00c34bd2cd38": {
+    "titulo": "Limitar los intentos en olvidé mi contraseña y registro",
+    "que": "Algunas puertas de la cuenta (olvidé mi contraseña, registro, activación) no tienen límite de intentos. Alguien podría usarlas miles de veces para mandar correos basura o adivinar datos.",
+    "porque": "Además del riesgo, cada correo cuesta y podría gastar el cupo de envíos el día del evento.",
+    "lista": "Cuando cada una de esas puertas tiene un límite razonable y hay una prueba que lo confirma."
+  },
+  "2a70c0fdd387": {
+    "titulo": "Que todo el texto se lea bien, también para quien ve menos",
+    "que": "Revisar que los textos y botones tengan suficiente contraste con el fondo, en oscuro y en claro, según el estándar que usan las empresas grandes.",
+    "porque": "Los clientes corporativos lo piden, y además se lee mejor en una pantalla con sol o con poco brillo.",
+    "lista": "Cuando la revisión automática no marca ningún texto con contraste bajo."
+  },
+  "617dda9f4828": {
+    "titulo": "Guardar el trabajo del resumen del evento que quedó a medias en la app",
+    "que": "En la app quedó trabajo del resumen del evento (el estilo \"Wrapped\") sin guardar en el historial, porque tiene 4 errores que no dejan compilar. Hay que corregirlos y guardarlo.",
+    "porque": "Mientras esté ahí suelto, cualquier cambio en la app corre el riesgo de pisarlo o perderlo.",
+    "lista": "Cuando la app compila sin errores y ese trabajo queda guardado."
+  },
+  "5be11b553602": {
+    "titulo": "Medir cuánto usa la app una persona real",
+    "que": "Contar, por persona y por minuto, cuántas pantallas abre y qué hace. Con eso sabemos cuánta carga genera de verdad un asistente, y no un cálculo a ojo.",
+    "porque": "Ese número decide qué tamaño de servidor contratar para 5.000 personas y cuánto cuesta.",
+    "lista": "Cuando tenemos el promedio real de un evento o una prueba con gente."
+  },
+  "8e65866b0a56": {
+    "titulo": "Juegos cortos que la gente juega cuando quiera escaneando un QR",
+    "que": "Hoy los juegos son en vivo: los lanza el presentador. La idea es sumar juegos que la persona juega cuando quiere, escaneando un QR en un stand: una trivia, memoria, ahorcado. Suma al mismo ranking. Si se cae el internet, retoma donde iba.",
+    "porque": "Es lo que Bintec tuvo con Bintec Play y a nosotros nos falta. Llena los tiempos muertos y le da vida a los stands de los patrocinadores.",
+    "lista": "Cuando hay un diseño aprobado en lab y al menos un juego funciona de punta a punta desde un QR."
+  },
+  "9d833236b25a": {
+    "titulo": "Separar la agenda de todos de la tuya",
+    "que": "Hoy la agenda se arma persona por persona, aunque el 95 % es igual para todos. La idea es que la parte común (sesiones, salas, horas) se arme una vez y se reparta a todos, y que solo tus favoritas se pidan aparte.",
+    "porque": "Es una de las pantallas más abiertas del evento. Si se arma una vez en vez de 5.000, el servidor respira.",
+    "lista": "Cuando medimos en el servidor que la agenda aguanta la carga de 5.000 sin subir el tiempo de respuesta."
+  }
+}
