@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab gramatica iOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070708; --void: #0a0a0b; --card: #111113; --elev: #18181b; --low: #1f1f23;
+    --border: rgba(255,255,255,0.07); --strong: rgba(255,255,255,0.12);
+    --text: #f4f4f5; --muted: #8b8b93; --faint: #5c5c63; --accent: #ff2d3d; --heart: #ff5d6c;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--text); font-family: Urbanist, system-ui, sans-serif; min-height: 100vh; padding: 28px 24px 48px; }
+  h1, h2, h3, h4 { font-family: "Plus Jakarta Sans", system-ui, sans-serif; letter-spacing: -0.4px; }
+
+  .top { max-width: 1240px; margin: 0 auto 20px; }
+  .top h1 { font-size: 26px; font-weight: 800; }
+  .top p { color: var(--muted); font-size: 15px; margin-top: 6px; max-width: 760px; line-height: 1.45; }
+
+  /* Controles para ajustar sin sesgo */
+  .ajustes { max-width: 1240px; margin: 0 auto 26px; display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 16px 20px; }
+  .ajuste { display: grid; gap: 6px; min-width: 220px; flex: 1; }
+  .ajuste label { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; }
+  .ajuste label span { color: var(--muted); font-weight: 500; }
+  .ajuste small { color: var(--faint); font-size: 12px; }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .presets { display: flex; gap: 8px; flex-wrap: wrap; }
+  .presets button { font: 600 13px Urbanist, sans-serif; color: var(--text); background: var(--elev); border: 1px solid var(--strong); border-radius: 999px; padding: 8px 14px; cursor: pointer; transition: transform .16s cubic-bezier(.2,.8,.2,1); }
+  .presets button:active { transform: scale(0.96); }
+
+  .row { max-width: 1240px; margin: 0 auto; display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+  .cap h2 { font-size: 17px; font-weight: 700; }
+  .cap p { color: var(--muted); font-size: 14px; margin: 6px 0 14px; line-height: 1.4; max-width: 600px; }
+
+  /* Escritorio */
+  .desk { display: flex; gap: 12px; width: min(780px, calc(100vw - 48px)); height: 500px; }
+  .rail { width: 50px; flex: none; align-self: center; display: flex; flex-direction: column; gap: 4px; padding: 8px 0; background: rgba(24,24,27,0.85); border: 1px solid var(--strong); border-radius: 26px; position: relative; z-index: 3; }
+  .rail button { position: relative; z-index: 1; height: 42px; display: grid; place-items: center; border: 0; background: transparent; color: var(--faint); cursor: pointer; transition: color .2s; }
+  .rail button[aria-current="page"] { color: var(--text); }
+  .rail .chip { position: absolute; left: 7px; top: 0; width: 36px; height: 36px; border-radius: 12px; background: var(--low); }
+
+  /* Celular */
+  .phone { width: 360px; height: 720px; border-radius: 46px; border: 1px solid var(--strong); background: #000; padding: 10px; position: relative; flex: none; }
+  .phone .card { position: absolute; inset: 10px; border-radius: 37px; border: 0; }
+  .tabbar { position: absolute; left: 28px; right: 28px; bottom: 28px; height: 62px; border-radius: 31px; background: rgba(24,24,27,0.9); backdrop-filter: blur(18px); border: 1px solid var(--strong); display: flex; padding: 6px; z-index: 8; }
+  .tabbar button { position: relative; z-index: 1; flex: 1; border: 0; background: transparent; color: var(--faint); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font: 600 11px Urbanist, sans-serif; cursor: pointer; transition: color .2s; }
+  .tabbar button[aria-current="page"] { color: var(--text); }
+  .tabbar .chip { position: absolute; top: 6px; bottom: 6px; left: 6px; border-radius: 25px; background: var(--low); }
+
+  .card { flex: 1; position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 22px; overflow: hidden; }
+  .screen { position: absolute; inset: 0; padding: 20px 18px; background: var(--card); transform-origin: 50% 45%; }
+  .phone .screen { padding: 54px 18px 100px; overflow: hidden; }
+  .screen h3 { font-size: 21px; font-weight: 800; margin-bottom: 4px; }
+  .screen .sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+
+  .ses { display: grid; grid-template-columns: 50px 1fr; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 14px; margin-bottom: 9px; background: var(--elev); }
+  .ses .h { color: var(--muted); font-size: 13px; font-weight: 600; }
+  .ses .t { font-weight: 600; font-size: 14px; line-height: 1.3; }
+  .ses .s { color: var(--faint); font-size: 12px; margin-top: 4px; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-bottom: 6px; }
+  .post { padding: 13px; border: 1px solid var(--border); border-radius: 14px; margin-bottom: 9px; background: var(--elev); }
+  .who { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .av { width: 32px; height: 32px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff; }
+  .who b { font-size: 14px; }
+  .post p { font-size: 14px; line-height: 1.4; color: #d4d4d8; }
+  .likes { margin-top: 8px; color: var(--heart); font-size: 13px; font-weight: 600; display: flex; gap: 6px; align-items: center; }
+  .spk { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .phone .spk { grid-template-columns: repeat(2, 1fr); }
+  .spk > button { font: inherit; color: inherit; background: var(--elev); border: 1px solid var(--border); border-radius: 16px; padding: 14px 8px; text-align: center; cursor: pointer; transition: border-color .2s, transform .18s cubic-bezier(.2,.8,.2,1); }
+  .spk > button:hover { border-color: var(--strong); }
+  .spk > button:active { transform: scale(0.96); }
+  .spk .av { width: 54px; height: 54px; margin: 0 auto 8px; font-size: 16px; }
+  .spk b { font-size: 13px; display: block; } .spk span { color: var(--faint); font-size: 11px; }
+  .hint { color: var(--faint); font-size: 12px; margin-top: 12px; }
+
+  /* Detalle que se abre con zoom desde la tarjeta */
+  .detalle { position: absolute; inset: 0; background: var(--card); padding: 18px; z-index: 5; transform-origin: 0 0; overflow: hidden; }
+  .phone .detalle { padding: 54px 18px 100px; }
+  .volver { display: inline-flex; gap: 6px; align-items: center; font: 600 13px Urbanist, sans-serif; color: var(--text); background: var(--elev); border: 1px solid var(--strong); border-radius: 999px; padding: 8px 14px 8px 10px; cursor: pointer; margin-bottom: 18px; transition: transform .16s cubic-bezier(.2,.8,.2,1); }
+  .volver:active { transform: scale(0.95); }
+  .det-cab { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
+  .det-cab .av { width: 76px; height: 76px; font-size: 22px; }
+  .det-cab h4 { font-size: 22px; font-weight: 800; }
+  .det-cab span { color: var(--muted); font-size: 14px; }
+  .bio { color: #d4d4d8; font-size: 14px; line-height: 1.5; margin-bottom: 16px; }
+  .det-tit { color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .ses.abre { cursor: pointer; transition: border-color .2s, transform .18s cubic-bezier(.2,.8,.2,1); }
+  .ses.abre:hover { border-color: var(--strong); }
+  .ses.abre:active { transform: scale(0.98); }
+
+  /* Push estilo iOS (entrar a una sesion desde el detalle) */
+  .push { position: absolute; inset: 0; background: var(--card); padding: 54px 18px 100px; z-index: 7; box-shadow: -18px 0 40px rgba(0,0,0,0.45); }
+  .desk .push { padding: 18px; }
+  .push h4 { font-size: 22px; font-weight: 800; margin-bottom: 6px; line-height: 1.2; }
+  .push p { color: #d4d4d8; font-size: 14px; line-height: 1.5; margin-top: 12px; }
+  .chipinfo { display: inline-flex; gap: 8px; color: var(--muted); font-size: 13px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+  <div class="top">
+    <h1>Gramatica de movimiento estilo iOS</h1>
+    <p>Tres momentos, cada uno con su movimiento: cambiar de modulo (fundido con zoom), abrir algo (zoom desde la tarjeta, como iOS 18) y entrar mas profundo o volver (desplazamiento con la pantalla de atras oscureciendose, como el push de iOS). Todo con resorte. Ajusta los controles hasta que se sienta bien; los botones de abajo son puntos de partida.</p>
+  </div>
+
+  <div class="ajustes">
+    <div class="ajuste">
+      <label for="intensidad">Intensidad del zoom <span id="v-int"></span></label>
+      <input type="range" id="intensidad" min="0" max="10" step="0.5" value="5">
+      <small>Cuanto crece lo nuevo al cambiar de modulo</small>
+    </div>
+    <div class="ajuste">
+      <label for="respuesta">Velocidad <span id="v-res"></span></label>
+      <input type="range" id="respuesta" min="0.25" max="0.8" step="0.01" value="0.45">
+      <small>Respuesta del resorte: menos es mas rapido</small>
+    </div>
+    <div class="ajuste">
+      <label for="rebote">Rebote <span id="v-reb"></span></label>
+      <input type="range" id="rebote" min="0.65" max="1" step="0.01" value="0.86">
+      <small>1 es sin rebote; menos, mas elastico</small>
+    </div>
+    <div class="presets">
+      <button type="button" data-p="0,0.3,1">Casi nada</button>
+      <button type="button" data-p="4,0.42,0.9">Sutil</button>
+      <button type="button" data-p="6,0.5,0.82">Notorio</button>
+      <button type="button" data-p="9,0.62,0.74">Expresivo</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <section class="cap">
+      <h2>Escritorio</h2>
+      <p>Cambia de modulo con el menu. En Speakers toca una persona para abrirla y toca una de sus sesiones para entrar mas profundo.</p>
+      <div class="desk" id="desk"></div>
+    </section>
+    <section class="cap">
+      <h2>Celular</h2>
+      <p>La misma gramatica con la barra de abajo.</p>
+      <div class="phone" id="phone"></div>
+    </section>
+  </div>
+
+<script>
+/* ---------- Resorte al estilo de SwiftUI: spring(response, dampingFraction) ---------- */
+function resorte(respuesta, amortiguacion) {
+  const w = (2 * Math.PI) / respuesta;
+  const z = Math.min(amortiguacion, 0.999);
+  const wd = w * Math.sqrt(1 - z * z);
+  const x = (t) => 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + ((z * w) / wd) * Math.sin(wd * t));
+  // Duracion: hasta que queda a menos de 0,1% del final y ya no se mueve.
+  let fin = 0.05;
+  for (let t = 0.05; t < 4; t += 0.005) { if (Math.abs(1 - x(t)) > 0.001) fin = t; }
+  fin += 0.02;
+  const pasos = 48;
+  const puntos = Array.from({ length: pasos + 1 }, (_, i) => +x((fin * i) / pasos).toFixed(4));
+  puntos[pasos] = 1;
+  return { easing: `linear(${puntos.join(", ")})`, duration: Math.round(fin * 1000) };
+}
+
+const ajustes = { intensidad: 5, respuesta: 0.45, rebote: 0.86 };
+const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const SALE = "cubic-bezier(0.4, 0, 1, 1)";
+const mov = () => resorte(ajustes.respuesta, ajustes.rebote);
+
+function pintarValores() {
+  document.getElementById("v-int").textContent = `${ajustes.intensidad}%`;
+  document.getElementById("v-res").textContent = `${mov().duration} ms`;
+  document.getElementById("v-reb").textContent = ajustes.rebote >= 0.99 ? "sin rebote" : ajustes.rebote.toFixed(2);
+}
+["intensidad", "respuesta", "rebote"].forEach((k) => {
+  const el = document.getElementById(k);
+  el.addEventListener("input", () => { ajustes[k] = Number(el.value); pintarValores(); });
+});
+document.querySelectorAll(".presets button").forEach((b) => b.addEventListener("click", () => {
+  const [i, r, d] = b.dataset.p.split(",").map(Number);
+  Object.assign(ajustes, { intensidad: i, respuesta: r, rebote: d });
+  document.getElementById("intensidad").value = i;
+  document.getElementById("respuesta").value = r;
+  document.getElementById("rebote").value = d;
+  pintarValores();
+}));
+pintarValores();
+
+/* ---------- Contenido ---------- */
+const MODULOS = ["inicio", "agenda", "social", "speakers"];
+const ICONOS = {
+  inicio: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg>',
+  agenda: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4M3 9.5h18"/></svg>',
+  social: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5.5 6.5-5.5s5.7 2.1 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.8 3 2.6 3.5 5.2"/></svg>',
+  speakers: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg>',
+};
+const CABEZA = { inicio: ["Inicio", "Tech Summit 2026"], agenda: ["Agenda", "Miercoles 4 de noviembre"], social: ["Social", "Lo que esta pasando"], speakers: ["Speakers", "24 personas en el escenario"] };
+const COLORES = ["#6366f1", "#14b8a6", "#f59e0b", "#ec4899", "#0ea5e9", "#a855f7"];
+const av = (ini, i) => `<span class="av" style="background:${COLORES[i % COLORES.length]}">${ini}</span>`;
+const CORAZON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.4 4.5 7 4.5c2 0 3.6 1.1 5 2.8 1.4-1.7 3-2.8 5-2.8 3.6 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>';
+const SESIONES = [["8:00", "Apertura: el futuro del trabajo corporativo", "Auditorio principal", "Negocios", "#10b981"],
+  ["9:30", "Workshop: Cloud Native en 90 minutos", "Sala A", "Tecnologia", "#6366f1"],
+  ["9:30", "IA en produccion: lo que nadie te cuenta", "Sala B", "Innovacion", "#f59e0b"],
+  ["11:00", "Liderazgo en equipos hibridos", "Sala C", "Liderazgo", "#ec4899"]];
+const ses = ([h, t, s, tag, c], extra = "") => `<div class="ses ${extra}"><div class="h">${h}</div><div><span class="tag" style="background:${c}22;color:${c}">${tag}</span><div class="t">${t}</div><div class="s">${s}</div></div></div>`;
+const SPEAKERS = [["SV", "Sofia Vega", "CEO Fintech"], ["DR", "Diego Ramirez", "Director creativo"], ["VC", "Valentina Cruz", "Product manager"],
+  ["RC", "Ryan Cooper", "Socio Accel"], ["AH", "Ahmed Hassan", "Engineering lead"], ["AR", "Alejandra Ruiz", "VP operaciones"]];
+const CUERPO = {
+  inicio: () => `<div class="post" style="height:140px;background:radial-gradient(120% 120% at 20% 10%, #3a0b10 0%, #160607 45%, #0c0c0d 100%);display:flex;flex-direction:column;justify-content:flex-end"><span style="color:#fca5a5;font-size:13px;font-weight:600">En vivo ahora</span><b style="font:800 22px 'Plus Jakarta Sans',sans-serif">IA en produccion</b></div>${ses(SESIONES[1])}${ses(SESIONES[3])}`,
+  agenda: () => SESIONES.map((s) => ses(s)).join(""),
+  social: () => [["MC", "Mateo Castro", "Networking de otro nivel, me llevo grandes contactos", 12], ["MR", "Mia Roberts", "Increible el nivel de los speakers hoy", 8], ["ET", "Emma Torres", "Que gran evento, aprendiendo un monton", 23]]
+    .map(([i, n, p, l], k) => `<div class="post"><div class="who">${av(i, k)}<b>${n}</b></div><p>${p}</p><div class="likes">${CORAZON}${l}</div></div>`).join(""),
+  speakers: () => `<div class="spk">${SPEAKERS.map(([i, n, r], k) => `<button type="button" data-spk="${k}">${av(i, k)}<b>${n}</b><span>${r}</span></button>`).join("")}</div><p class="hint">Toca una persona</p>`,
+};
+
+const FLECHA = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>';
+
+class Demo {
+  constructor(raiz, celular) {
+    this.celular = celular;
+    if (celular) {
+      raiz.innerHTML = `<div class="card"></div><nav class="tabbar"><span class="chip"></span>${MODULOS.map((m) => `<button type="button" data-m="${m}">${ICONOS[m]}${CABEZA[m][0]}</button>`).join("")}</nav>`;
+      this.menu = raiz.querySelector(".tabbar");
+    } else {
+      raiz.innerHTML = `<nav class="rail"><span class="chip"></span>${MODULOS.map((m) => `<button type="button" data-m="${m}" aria-label="${CABEZA[m][0]}">${ICONOS[m]}</button>`).join("")}</nav><div class="card"></div>`;
+      this.menu = raiz.querySelector(".rail");
+    }
+    this.chip = this.menu.querySelector(".chip");
+    this.card = raiz.querySelector(".card");
+    this.m = "speakers";
+    this.actual = this.pantalla(this.m);
+    this.card.appendChild(this.actual);
+    this.marcar(this.m, false);
+    this.menu.addEventListener("click", (e) => { const b = e.target.closest("button[data-m]"); if (b) this.cambiarModulo(b.dataset.m); });
+    this.card.addEventListener("click", (e) => {
+      const spk = e.target.closest("[data-spk]");
+      if (spk) return this.abrir(spk);
+      if (e.target.closest(".detalle .volver")) return this.cerrar();
+      const s = e.target.closest(".ses.abre");
+      if (s) return this.entrar(Number(s.dataset.i));
+      if (e.target.closest(".push .volver")) return this.salir();
+    });
+  }
+
+  pantalla(m) {
+    const el = document.createElement("div");
+    el.className = "screen";
+    el.innerHTML = `<h3>${CABEZA[m][0]}</h3><div class="sub">${CABEZA[m][1]}</div>${CUERPO[m]()}`;
+    return el;
+  }
+
+  // El indicador del menu tambien va con el mismo resorte.
+  marcar(m, animar = true) {
+    const i = MODULOS.indexOf(m);
+    this.menu.querySelectorAll("button[data-m]").forEach((b) => (b.dataset.m === m ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current")));
+    let destino;
+    if (this.celular) {
+      const ancho = (this.menu.clientWidth - 12) / MODULOS.length;
+      this.chip.style.width = `${ancho}px`;
+      destino = `translateX(${i * ancho}px)`;
+    } else destino = `translateY(${11 + i * 46}px)`;
+    if (animar && !reducido) {
+      const desde = getComputedStyle(this.chip).transform;
+      this.chip.animate([{ transform: desde }, { transform: destino }], mov());
+    }
+    this.chip.style.transform = destino;
+  }
+
+  /* 1. Cambiar de modulo: lo viejo se apaga rapido y lo nuevo llega con zoom y resorte. */
+  cambiarModulo(m) {
+    if (m === this.m) return;
+    this.m = m;
+    this.marcar(m);
+    const vieja = this.actual;
+    const nueva = this.pantalla(m);
+    this.card.appendChild(nueva);
+    this.actual = nueva;
+    if (reducido) { vieja.remove(); return; }
+    const k = ajustes.intensidad / 100;
+    vieja.animate([{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: `scale(${1 - k / 2})` }], { duration: 120, easing: SALE, fill: "forwards" })
+      .finished.then(() => vieja.remove());
+    const { easing, duration } = mov();
+    nueva.animate([{ transform: `scale(${1 - k})` }, { transform: "scale(1)" }], { duration, easing });
+    nueva.animate([{ opacity: 0 }, { opacity: 1 }], { duration: Math.min(260, duration), easing: "cubic-bezier(0.2, 0, 0, 1)" });
+  }
+
+  /* 2. Abrir algo: el detalle crece desde la tarjeta tocada (zoom de iOS 18). */
+  abrir(card) {
+    if (this.actual.querySelector(".detalle")) return;
+    const k = Number(card.dataset.spk);
+    const [ini, nombre, rol] = SPEAKERS[k];
+    const det = document.createElement("div");
+    det.className = "detalle";
+    det.innerHTML = `<button type="button" class="volver">${FLECHA}Speakers</button><div class="det-cab">${av(ini, k)}<div><h4>${nombre}</h4><span>${rol}</span></div></div>
+      <p class="bio">${nombre.split(" ")[0]} lidera equipos que llevan productos de la idea al mercado. Habla de como decidir rapido sin romper lo que ya funciona.</p>
+      <div class="det-tit">Sus sesiones</div>${[k % 4, (k + 1) % 4].map((i) => ses(SESIONES[i], "abre").replace('class="ses abre"', `class="ses abre" data-i="${i}"`)).join("")}`;
+    this.actual.appendChild(det);
+    this.origen = card;
+    if (reducido) return;
+    const { easing, duration } = mov();
+    det.animate(this.desdeTarjeta(card), { duration, easing });
+    // Lo de atras retrocede y se oscurece, como en iOS.
+    this.fondo(true);
+  }
+
+  cerrar() {
+    const det = this.actual.querySelector(".detalle");
+    if (!det) return;
+    if (reducido || !this.origen?.isConnected) { det.remove(); return; }
+    const { easing, duration } = resorte(ajustes.respuesta * 0.85, Math.max(ajustes.rebote, 0.92));
+    det.animate([...this.desdeTarjeta(this.origen)].reverse(), { duration, easing, fill: "forwards" }).finished.then(() => det.remove());
+    this.fondo(false);
+  }
+
+  // Fotogramas: del rectangulo de la tarjeta (escala uniforme + recorte) a pantalla completa.
+  desdeTarjeta(card) {
+    const c = this.actual.getBoundingClientRect(), r = card.getBoundingClientRect();
+    const s = r.width / c.width;
+    const x = r.left - c.left, y = r.top - c.top;
+    const altoVisible = r.height / s;
+    return [
+      { transform: `translate(${x}px, ${y}px) scale(${s})`, clipPath: `inset(0 0 ${c.height - altoVisible}px 0 round ${16 / s}px)`, opacity: 0.85 },
+      { transform: "translate(0, 0) scale(1)", clipPath: `inset(0 0 0 0 round ${this.celular ? 37 : 22}px)`, opacity: 1 },
+    ];
+  }
+
+  fondo(atras) {
+    const grid = this.actual.querySelector(".spk");
+    if (!grid || reducido) return;
+    const { easing, duration } = mov();
+    const a = { transform: "scale(1)", filter: "brightness(1)" }, b = { transform: "scale(0.94)", filter: "brightness(0.45)" };
+    grid.animate(atras ? [a, b] : [b, a], { duration, easing, fill: "forwards" });
+  }
+
+  /* 3. Entrar mas profundo: push con la pantalla de atras desplazandose y oscureciendose. */
+  entrar(i) {
+    const det = this.actual.querySelector(".detalle");
+    if (!det || this.actual.querySelector(".push")) return;
+    const [h, t, s, tag, c] = SESIONES[i];
+    const push = document.createElement("div");
+    push.className = "push";
+    push.innerHTML = `<button type="button" class="volver">${FLECHA}Atras</button><span class="tag" style="background:${c}22;color:${c}">${tag}</span><h4>${t}</h4>
+      <div class="chipinfo">${h} ${s}</div><p>Una conversacion practica sobre lo que funciona y lo que no cuando el equipo crece. Con preguntas del publico al final.</p>`;
+    this.actual.appendChild(push);
+    if (reducido) return;
+    const { easing, duration } = resorte(ajustes.respuesta, 1);
+    push.animate([{ transform: "translateX(100%)" }, { transform: "translateX(0)" }], { duration, easing });
+    det.animate([{ transform: "translateX(0)", filter: "brightness(1)" }, { transform: "translateX(-28%)", filter: "brightness(0.6)" }], { duration, easing, fill: "forwards" });
+  }
+
+  salir() {
+    const push = this.actual.querySelector(".push");
+    const det = this.actual.querySelector(".detalle");
+    if (!push) return;
+    if (reducido) { push.remove(); return; }
+    const { easing, duration } = resorte(ajustes.respuesta * 0.9, 1);
+    push.animate([{ transform: "translateX(0)" }, { transform: "translateX(100%)" }], { duration, easing, fill: "forwards" }).finished.then(() => push.remove());
+    det?.animate([{ transform: "translateX(-28%)", filter: "brightness(0.6)" }, { transform: "translateX(0)", filter: "brightness(1)" }], { duration, easing, fill: "forwards" });
+  }
+}
+
+new Demo(document.getElementById("desk"), false);
+new Demo(document.getElementById("phone"), true);
+</script>
+</body>
+</html>
