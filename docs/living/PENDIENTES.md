@@ -25,7 +25,7 @@
 | Seguridad del staff (2FA) | 25/26 = **96%** | S.7.2: correr `security:check` en el servidor real |
 | App Expo | Implementada | Recap sin commit (rompe typecheck), QA en telefono, tiendas sin empezar |
 | QA presencial con Kamilo | **0%** | §6 |
-| Bintec 2026 (B.1-B.6) | 0/6 = **0%** | Menos peticiones primero |
+| Bintec 2026 (B.1-B.6) | 0/6 = **0%** (B.1 avanzado) | Agenda y Social ya livianas (2026-10-18); siguen speakers, en vivo, home |
 | **Salida a produccion** (plan B1-B6) | ~4/31 = **13%** | §1 |
 
 **Lectura:** el producto esta casi completo; lo que no esta es correrlo en un servidor. Lo medido llega a 300
@@ -67,7 +67,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 - [ ] B3.5 ROL=admin en `deploy.sh`: admin en `admin.<dominio>` sin trafico de asistentes **[local+medir]**
 - [ ] B3.6 El 503 de la webapp con una persona: verificar si sigue y corregir **[local+medir]**
 - [~] B3.7 Agenda partida en compartida cacheada + personal. Codigo backend 5b923a7 + webapp 2928657 (2026-10-18): la agenda pasa de 3 pedidos (uno pesado) a 2 livianos. Falta medir con 300 en servidor; luego sponsors, muro y ranking (cruza con B.1) **[local+medir]**
-- [~] B3.8 Social pide 10 llamadas por apertura. Codigo webapp (2026-10-18): cada pestaña pide lo suyo al abrirse; celular de 10 a 3, escritorio 4 + uno por pestaña. Falta verlo en navegador y medir con 300 en servidor (cruza con B.1) **[local+medir]**
+- [~] B3.8 Social pide 10 llamadas por apertura. Codigo webapp 3e23f65 (2026-10-18): cada pestaña pide lo suyo al abrirse; celular de 10 a 3, escritorio 4 + uno por pestaña. Visto en Chrome escritorio y 390 px con la sesion de Kamilo. Falta medir con 300 en servidor (cruza con B.1) **[local+medir]**
 
 **B4 Ver lo que pasa — 0/6**
 - [ ] B4.1 Alerta externa al telefono (BetterStack/UptimeRobot a health, app y socket) (= I.5 capa 1) **[servidor]**
@@ -129,6 +129,11 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 
 ## 3. BUGS ABIERTOS (detalle en `BUG-LOG.md`)
 
+- [ ] BUG-357 La transicion de cambio de modulo mueve toda la tarjeta y encima los titulos (ver §5 Navegacion, lo primero
+      de la proxima sesion por pedido de Kamilo 2026-10-18)
+- [ ] BUG-358 Error de hidratacion React #418 en produccion (texto distinto servidor/navegador; sospecha horas o fechas)
+- [ ] BUG-359 Falta `mobileNav` en `messages/pt.json` (barra movil en portugues sin textos)
+
 - [ ] BUG-347 Los tests llaman al socket y a la webapp reales: falta `preventStrayRequests` y simular `/internal`
       (la suite tarda ~30 min)
 - [ ] BUG-344 Pest con config cacheada corre contra MySQL de dev: TestCase debe abortar si no es sqlite (mitigado)
@@ -171,9 +176,28 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 > Orden propuesto: B.1 primero (lo que mas pesa para el 6 de diciembre); B.2 siguiente frente,
 > con /davinci (Kamilo dio "dale" a arrancar el analisis, sin codigo).
 
-- [ ] **B.1 Menos peticiones por pantalla.** Medir cuantas hace hoy cada pantalla (~9 medidas en
+- [~] **B.1 Menos peticiones por pantalla.** Medir cuantas hace hoy cada pantalla (~9 medidas en
   agosto). Empezar por la agenda: 1 peticion por dia ya armada para pintar (sede → sala → sesiones,
   horas y textos calculados), cache CDN 30-60 s, "en vivo" por socket. Luego el resto de pantallas.
+  **2026-10-18:** conteo por codigo (promedio 4,2 pedidos por pantalla); agenda partida (B3.7) y Social por pestañas
+  (B3.8) hechas: estimado 2,3. Sigue el "grupo 1", lo que es igual para todos y solo hay que guardar en memoria:
+  speakers, en vivo/lo que sigue (home y live), destacados, branding. Despues patrocinadores, muro y ranking partidos.
+
+### Navegacion inmediata (Kamilo 2026-10-18) — 4/6
+- [x] Sin skeleton al cambiar de modulo; el menu marca el destino en el toque; sesion 30 s en memoria; precarga al
+      pasar el mouse, al apoyar el dedo y en reposo (agenda, social, speakers). eventos-web `368fe81`. Medido local:
+      precargados 49-106 ms, el resto 324-454 ms sin skeleton (antes 275-654 ms con skeleton)
+- [x] Labs de transicion (`design/features/navigation/`): v1, v2, C2 camara (descartada: marea), v3 sutiles, **ios**
+      (aprobado). Cambio de modulo con View Transitions en `TransicionModulo` (eventos-web `bb2cf2a`)
+- [ ] **LO PRIMERO de la proxima sesion (Kamilo):** corregir la transicion (BUG-357). Debe cambiar SOLO el contenido de
+      adentro: marco de la tarjeta quieto y sin titulos encimados (salida y entrada en secuencia). Kamilo pidio "mas
+      softy" en tres rondas: hoy zoom 2%, sin rebote, 395 ms. Lab antes de dar por cerrado
+- [ ] Abrir con zoom desde la tarjeta (speakers, sesiones, patrocinadores) y push al entrar mas profundo en celular,
+      como en `lab-transiciones-ios.html`. Modulo por modulo
+- [ ] Skeleton solo si la espera pasa de ~300 ms (hoy no hay ninguno en modulos; con servidor lento el clic parece
+      no hacer nada mas alla del menu)
+- [ ] Revisar en celular/iPad que la transicion no choque con el deslizamiento propio de las pantallas de detalle
+- [ ] Revocar el token de prueba `qa-claude-2026-10-18` creado en la base local (asistente sembrado del evento demo)
 - [ ] **B.2 Juegos a demanda por QR.** Hueco: nuestra gamificacion es EN VIVO (trivia del streaming,
   momentos, MC); falta la capa que la persona juega cuando quiere en el stand. Un QR = un juego corto
   (trivia, memoria, ahorcado, reflejos), un intento que suma al mismo ranking, repeticiones por

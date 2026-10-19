@@ -10,6 +10,37 @@
 
 ---
 
+## SESION 2026-10-18 (Opus 5.5) — AGENDA Y SOCIAL LIVIANAS, NAVEGACION SIN SKELETON, TRANSICION ESTILO iOS
+
+**Decisiones Kamilo (no re-preguntar):**
+- La webapp debe sentirse como plataforma: clic inmediato y sin tanto skeleton ("si todo esta en cache, por que tanto
+  skeleton"). Skeleton solo cuando la espera es real; optimistic UI intacto.
+- Movimiento: NO mover la tarjeta ni el espacio (la camara C2 mareaba: revertida). La tarjeta es el ancla y cambia solo el
+  contenido. Gramatica iOS aprobada en `design/features/navigation/lab-transiciones-ios.html`: cambiar de modulo = fundido
+  con zoom minimo; abrir algo = zoom desde la tarjeta; entrar mas profundo = push. Kamilo bajo la intensidad en tres rondas
+  (Notorio, Sutil, mas suave); queda zoom 2%, sin rebote, 395 ms.
+- Corte seco tipo Apple-tabs NO le gusta; quiere sensacion "softy" y premium, pero que no canse.
+- Revisar referencias antes de proponer (lo pidio otra vez) y labs con varias propuestas para no sesgar.
+
+**Hecho:** backend `5b923a7` agenda partida (`/agenda/shared` + `/agenda/mine`, aviso a la webapp por agenda, sessions y
+speakers; 7 tests). eventos-web: `2928657` agenda de todos en memoria y calificaciones desde el servidor; `3e23f65` Social
+por pestañas (`/api/social/{id}/parte`); `368fe81` sin skeleton entre modulos + menu optimista + sesion 30 s en memoria
+(huella SHA-256, BUG-356) + precarga completa; `0a5a119`/`9444aaf`/`bb2cf2a` transicion de modulo con View Transitions.
+vitest 646, Pest agenda/contenido 34. Medido local en produccion: modulos precargados 49-106 ms, el resto 324-454 ms.
+
+**A medias (lo primero de la proxima, pedido por Kamilo):** BUG-357. La transicion fotografia la tarjeta entera (el marco
+hace zoom) y lo viejo y lo nuevo se cruzan (titulos encimados). Corregir: nombre de transicion solo en un contenedor
+interno del contenido, grupo de la tarjeta sin animacion, salida y entrada en secuencia. Lab antes de cerrar.
+
+**Gotchas:** con la ventana de Chrome tapada casi no hay cuadros (2 en 500 ms): las animaciones solo avanzan con capturas;
+medir animaciones leyendo `getAnimations()` en `startViewTransition().ready`. Las paginas abren con `display: contents`
+(bifurcacion escritorio/celular): ni View Transitions ni copias del DOM pueden fotografiar eso sin una caja real.
+
+**Sigue:** BUG-357; despues grupo 1 de B.1 (speakers, en vivo, destacados, branding en memoria); abrir con zoom desde la
+tarjeta (speakers primero). Revocar el token de prueba `qa-claude-2026-10-18`.
+
+---
+
 ## SESION 2026-10-16 (Fable 5.1 / Opus 5.5) — UNA SOLA FUENTE DE PENDIENTES, TABLERO PARA PRIORIZAR, 3 BUGS DE RIESGO
 
 **Decisiones Kamilo (no re-preguntar):**

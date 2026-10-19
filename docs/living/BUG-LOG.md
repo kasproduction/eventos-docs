@@ -3,6 +3,33 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-18 — Navegacion inmediata y agenda/social livianas (4 bugs: 1 resuelto, 3 abiertos)
+
+### BUG-357: La transicion de cambio de modulo mueve toda la tarjeta y encima los titulos (ABIERTO)
+- **Severidad:** MEDIA (visual, lo vio Kamilo) — `TransicionModulo` (View Transitions) fotografia el wrapper completo:
+  marco y fondo de la tarjeta hacen zoom, y lo viejo (150 ms) se apaga mientras lo nuevo (300 ms) ya aparece, asi que los
+  titulos se cruzan. **Fix revisado sin escribir:** `view-transition-name` solo en un contenedor interno del contenido
+  (`CanvasCard` envuelve sus hijos en un div 100%x100%; en celular las pantallas son `.m-screen` con `display: contents`,
+  hay que darles caja), grupo `modulo` sin animacion para que el marco quede quieto, y fade through en secuencia (salida
+  ~100 ms, entrada despues). Alternativa si no convence: quitar la transicion (corte).
+- **Archivos:** `eventos-web/src/components/shell/TransicionModulo.tsx`, `src/app/globals.css`, `src/components/shell/CanvasCard.tsx`
+
+### BUG-358: Error de hidratacion de React #418 en la webapp de produccion (ABIERTO)
+- **Severidad:** BAJA por ahora — dos `Minified React error #418` (texto distinto entre servidor y navegador) en la consola
+  de `localhost:3000` (build de produccion) mientras se median pantallas. Sin causa ubicada; sospecha: horas o fechas
+  calculadas distinto en servidor y navegador. Reproducir con `next dev` para ver el componente.
+
+### BUG-359: Falta `mobileNav` en `messages/pt.json` (ABIERTO)
+- **Severidad:** BAJA — `pnpm build` imprime `MISSING_MESSAGE: mobileNav (pt)`: la barra movil en portugues sale sin textos.
+  Ya venia de antes. **Fix:** copiar la seccion de `es.json` y traducir.
+
+### BUG-356: La huella del token era un hash de 32 bits y ahora guarda la sesion (RESUELTO)
+- **Severidad:** ALTA en cuanto la sesion (`/auth/me`) paso a memoria del servidor — con 32 bits y 5.000 asistentes la
+  probabilidad de que dos tokens compartan huella era ~0,3% por evento, y una persona habria visto la sesion de otra.
+- **Fix (webapp `368fe81`):** `huellaDeSesion` con SHA-256 (128 bits); la sesion se suelta en cualquier escritura con el
+  token (`apiFetch`). Test del marco ajustado.
+- **Archivos:** `eventos-web/src/lib/serverCache.ts`, `src/lib/auth.ts`, `src/lib/api.ts`
+
 ## 2026-10-16 — Bugs de riesgo para producción (3 resueltos)
 
 ### BUG-354: Horas de la webapp corridas 5 h en un servidor en UTC (RESUELTO)
