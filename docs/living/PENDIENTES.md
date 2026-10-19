@@ -66,8 +66,8 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 - [ ] B3.4 Replica de lectura: conexion `reports` para Data Center, Pulse y exports **[local+medir]**
 - [ ] B3.5 ROL=admin en `deploy.sh`: admin en `admin.<dominio>` sin trafico de asistentes **[local+medir]**
 - [ ] B3.6 El 503 de la webapp con una persona: verificar si sigue y corregir **[local+medir]**
-- [ ] B3.7 Agenda partida en compartida cacheada + personal; luego sponsors, muro y ranking (cruza con B.1) **[local+medir]**
-- [ ] B3.8 Social pide 10 llamadas por apertura: pestañas diferidas o un endpoint (cruza con B.1) **[local+medir]**
+- [~] B3.7 Agenda partida en compartida cacheada + personal. Codigo backend 5b923a7 + webapp 2928657 (2026-10-18): la agenda pasa de 3 pedidos (uno pesado) a 2 livianos. Falta medir con 300 en servidor; luego sponsors, muro y ranking (cruza con B.1) **[local+medir]**
+- [~] B3.8 Social pide 10 llamadas por apertura. Codigo webapp (2026-10-18): cada pestaña pide lo suyo al abrirse; celular de 10 a 3, escritorio 4 + uno por pestaña. Falta verlo en navegador y medir con 300 en servidor (cruza con B.1) **[local+medir]**
 
 **B4 Ver lo que pasa — 0/6**
 - [ ] B4.1 Alerta externa al telefono (BetterStack/UptimeRobot a health, app y socket) (= I.5 capa 1) **[servidor]**

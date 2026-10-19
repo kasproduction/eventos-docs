@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab transiciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070708;
+    --card: #111113;
+    --elev: #18181b;
+    --low: #1f1f23;
+    --border: rgba(255,255,255,0.07);
+    --strong: rgba(255,255,255,0.12);
+    --text: #f4f4f5;
+    --muted: #8b8b93;
+    --faint: #5c5c63;
+    --accent: #ff2d3d;
+    --heart: #ff5d6c;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Urbanist, system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 28px 24px 40px;
+  }
+  h1, h2, h3 { font-family: "Plus Jakarta Sans", system-ui, sans-serif; letter-spacing: -0.4px; }
+
+  /* Cabecera del lab */
+  .top { max-width: 1320px; margin: 0 auto 22px; display: flex; flex-wrap: wrap; gap: 18px 32px; align-items: flex-end; justify-content: space-between; }
+  .top h1 { font-size: 26px; font-weight: 800; }
+  .top p { color: var(--muted); font-size: 15px; margin-top: 6px; max-width: 620px; line-height: 1.45; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .seg { display: inline-flex; background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 4px; }
+  .seg button {
+    font: 600 14px Urbanist, sans-serif; color: var(--muted); background: transparent; border: 0;
+    padding: 9px 16px; border-radius: 999px; cursor: pointer; transition: color .2s, background .2s;
+  }
+  .seg button[aria-pressed="true"] { background: var(--text); color: #0b0b0c; }
+  .play {
+    font: 700 14px Urbanist, sans-serif; background: var(--accent); color: #fff; border: 0; border-radius: 999px;
+    padding: 12px 20px; cursor: pointer; transition: transform .16s cubic-bezier(.2,.8,.2,1);
+  }
+  .play:active { transform: scale(0.97); }
+  .hint { color: var(--faint); font-size: 13px; }
+
+  /* Columnas */
+  .grid { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; max-width: 560px; } }
+  .col h2 { font-size: 17px; font-weight: 700; display: flex; gap: 10px; align-items: baseline; }
+  .col h2 .letra { color: var(--accent); }
+  .col .desc { color: var(--muted); font-size: 14px; margin: 6px 0 12px; line-height: 1.4; min-height: 40px; }
+  .stat { color: var(--faint); font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+  /* Mini app */
+  .app { display: flex; gap: 10px; height: 470px; }
+  .rail {
+    width: 50px; flex: none; align-self: center; display: flex; flex-direction: column; gap: 4px; padding: 8px 0;
+    background: rgba(24,24,27,0.85); border: 1px solid var(--strong); border-radius: 26px; position: relative;
+  }
+  .rail button {
+    position: relative; z-index: 1; height: 42px; display: grid; place-items: center; border: 0; background: transparent;
+    color: var(--faint); cursor: pointer; transition: color .2s;
+  }
+  .rail button[aria-current="page"] { color: var(--text); }
+  .rail .chip {
+    position: absolute; left: 7px; width: 36px; height: 36px; border-radius: 12px; background: var(--low);
+    transition: transform .32s cubic-bezier(.32,.72,0,1);
+  }
+  .stage { flex: 1; position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 22px; overflow: hidden; }
+  .screen { position: absolute; inset: 0; padding: 20px 18px; will-change: opacity, transform; }
+  .screen h3 { font-size: 21px; font-weight: 800; margin-bottom: 4px; }
+  .screen .sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+
+  /* Contenido de cada modulo */
+  .ses { display: grid; grid-template-columns: 52px 1fr; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 14px; margin-bottom: 9px; background: var(--elev); }
+  .ses .h { color: var(--muted); font-size: 13px; font-weight: 600; }
+  .ses .t { font-weight: 600; font-size: 14px; line-height: 1.3; }
+  .ses .s { color: var(--faint); font-size: 12px; margin-top: 4px; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-bottom: 6px; }
+  .post { padding: 13px; border: 1px solid var(--border); border-radius: 14px; margin-bottom: 9px; background: var(--elev); }
+  .who { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .av { width: 32px; height: 32px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff; }
+  .who b { font-size: 14px; } .who span { color: var(--faint); font-size: 12px; display: block; }
+  .post p { font-size: 14px; line-height: 1.4; color: #d4d4d8; }
+  .likes { margin-top: 8px; color: var(--heart); font-size: 13px; font-weight: 600; display: flex; gap: 6px; align-items: center; }
+  .spk { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .spk div { background: var(--elev); border: 1px solid var(--border); border-radius: 14px; padding: 12px 8px; text-align: center; }
+  .spk .av { width: 54px; height: 54px; margin: 0 auto 8px; font-size: 16px; }
+  .spk b { font-size: 13px; display: block; } .spk span { color: var(--faint); font-size: 11px; }
+
+  /* Skeleton (solo si la espera pasa de 300 ms) */
+  .sk { background: var(--low); border-radius: 8px; position: relative; overflow: hidden; }
+  .sk::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.045), transparent);
+    transform: translateX(-100%); animation: brillo 1.4s ease-in-out infinite;
+  }
+  @keyframes brillo { to { transform: translateX(100%); } }
+
+  /* Indicador de "sigue pendiente" sobre la pantalla actual */
+  .pend {
+    position: absolute; left: 0; top: 0; height: 2px; width: 100%; transform-origin: left; transform: scaleX(0);
+    background: linear-gradient(90deg, transparent, var(--accent)); opacity: 0; z-index: 5;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rail .chip { transition: none; }
+    .sk::after { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div>
+      <h1>Transicion entre modulos</h1>
+      <p>Toca los iconos de cada columna o usa Comparar. En rapido la pantalla llega precargada; en lento tarda 1,2 s y el skeleton aparece solo despues de 300 ms. El menu se mueve en el toque en las tres.</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Velocidad del servidor">
+        <button type="button" data-vel="rapido" aria-pressed="true">Rapido 80 ms</button>
+        <button type="button" data-vel="lento" aria-pressed="false">Lento 1,2 s</button>
+      </div>
+      <button type="button" class="play" id="comparar">Comparar los tres</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <section class="col" data-modo="fundido">
+      <h2><span class="letra">A</span> Fundido</h2>
+      <p class="desc">La pantalla nueva aparece encima de la anterior en 180 ms. Lo mas quieto.</p>
+      <div class="app"></div>
+      <div class="stat"></div>
+    </section>
+    <section class="col" data-modo="desliza">
+      <h2><span class="letra">B</span> Deslizamiento corto</h2>
+      <p class="desc">Sube 10 px mientras aparece, 220 ms. Se siente que llega algo nuevo.</p>
+      <div class="app"></div>
+      <div class="stat"></div>
+    </section>
+    <section class="col" data-modo="escala">
+      <h2><span class="letra">C</span> Escala sutil</h2>
+      <p class="desc">Crece de 98,5% a 100% mientras aparece, 220 ms. Se siente como profundidad.</p>
+      <div class="app"></div>
+      <div class="stat"></div>
+    </section>
+  </div>
+
+<script>
+const ICONOS = {
+  agenda: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4M3 9.5h18"/></svg>',
+  social: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5.5 6.5-5.5s5.7 2.1 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.8 3 2.6 3.5 5.2"/></svg>',
+  speakers: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg>',
+};
+const ORDEN = ["agenda", "social", "speakers"];
+const COLORES = ["#6366f1", "#14b8a6", "#f59e0b", "#ec4899", "#0ea5e9", "#a855f7"];
+
+const av = (ini, i) => `<span class="av" style="background:${COLORES[i % COLORES.length]}">${ini}</span>`;
+
+const PANTALLAS = {
+  agenda: () => `
+    <h3>Agenda</h3><div class="sub">Miercoles 4 de noviembre</div>
+    ${[["8:00", "Apertura: el futuro del trabajo corporativo", "Auditorio principal", "Negocios", "#10b981"],
+       ["9:30", "Workshop: Cloud Native en 90 minutos", "Sala A", "Tecnologia", "#6366f1"],
+       ["9:30", "IA en produccion: lo que nadie te cuenta", "Sala B", "Innovacion", "#f59e0b"],
+       ["11:00", "Liderazgo en equipos hibridos", "Sala C", "Liderazgo", "#ec4899"]]
+      .map(([h, t, s, tag, c]) => `<div class="ses"><div class="h">${h}</div><div><span class="tag" style="background:${c}22;color:${c}">${tag}</span><div class="t">${t}</div><div class="s">${s}</div></div></div>`).join("")}`,
+  social: () => `
+    <h3>Social</h3><div class="sub">Lo que esta pasando en el evento</div>
+    ${[["MC", "Mateo Castro", "Networking de otro nivel, me llevo grandes contactos", 12],
+       ["MR", "Mia Roberts", "Increible el nivel de los speakers hoy", 8],
+       ["ET", "Emma Torres", "Que gran evento, aprendiendo un monton", 23]]
+      .map(([i, n, p, l], k) => `<div class="post"><div class="who">${av(i, k)}<div><b>${n}</b><span>hace ${k * 7 + 3} min</span></div></div><p>${p}</p><div class="likes"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.4 4.5 7 4.5c2 0 3.6 1.1 5 2.8 1.4-1.7 3-2.8 5-2.8 3.6 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>${l}</div></div>`).join("")}`,
+  speakers: () => `
+    <h3>Speakers</h3><div class="sub">24 personas en el escenario</div>
+    <div class="spk">${[["SV", "Sofia Vega", "CEO Fintech"], ["DR", "Diego Ramirez", "Director creativo"], ["VC", "Valentina Cruz", "Product manager"],
+       ["RC", "Ryan Cooper", "Socio Accel"], ["AH", "Ahmed Hassan", "Engineering lead"], ["AR", "Alejandra Ruiz", "VP operaciones"]]
+      .map(([i, n, r], k) => `<div>${av(i, k)}<b>${n}</b><span>${r}</span></div>`).join("")}</div>`,
+};
+
+const SKELETON = {
+  agenda: () => `<div class="sk" style="width:120px;height:24px;margin-bottom:8px"></div><div class="sk" style="width:180px;height:12px;margin-bottom:18px"></div>${'<div class="sk" style="height:74px;border-radius:14px;margin-bottom:9px"></div>'.repeat(4)}`,
+  social: () => `<div class="sk" style="width:100px;height:24px;margin-bottom:8px"></div><div class="sk" style="width:200px;height:12px;margin-bottom:18px"></div>${'<div class="sk" style="height:104px;border-radius:14px;margin-bottom:9px"></div>'.repeat(3)}`,
+  speakers: () => `<div class="sk" style="width:130px;height:24px;margin-bottom:8px"></div><div class="sk" style="width:160px;height:12px;margin-bottom:18px"></div><div class="spk">${'<div class="sk" style="height:118px;border-radius:14px"></div>'.repeat(6)}</div>`,
+};
+
+const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const EASE = "cubic-bezier(0.2, 0.8, 0.2, 1)";
+const ENTRADA = {
+  fundido: { kf: [{ opacity: 0 }, { opacity: 1 }], ms: 180 },
+  desliza: { kf: [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], ms: 220 },
+  escala: { kf: [{ opacity: 0, transform: "scale(0.985)" }, { opacity: 1, transform: "none" }], ms: 220 },
+};
+let velocidad = "rapido";
+
+class MiniApp {
+  constructor(col) {
+    this.modo = col.dataset.modo;
+    this.stat = col.querySelector(".stat");
+    const app = col.querySelector(".app");
+    app.innerHTML = `<nav class="rail" aria-label="Menu"><span class="chip"></span>${ORDEN.map((m) => `<button type="button" data-m="${m}" aria-label="${m}">${ICONOS[m]}</button>`).join("")}</nav><div class="stage"><div class="pend"></div></div>`;
+    this.rail = app.querySelector(".rail");
+    this.chip = app.querySelector(".chip");
+    this.stage = app.querySelector(".stage");
+    this.pend = app.querySelector(".pend");
+    this.actual = null;
+    this.pedido = 0;
+    this.rail.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (b) this.ir(b.dataset.m);
+    });
+    this.pintar("agenda", PANTALLAS.agenda(), false);
+    this.marcar("agenda");
+  }
+
+  // El menu se mueve en el toque, antes de que llegue nada (optimista).
+  marcar(m) {
+    this.rail.querySelectorAll("button").forEach((b) => b.toggleAttribute("aria-current", b.dataset.m === m));
+    this.rail.querySelectorAll("button").forEach((b) => b.dataset.m === m && b.setAttribute("aria-current", "page"));
+    const i = ORDEN.indexOf(m);
+    this.chip.style.transform = `translateY(${8 + i * 46 + 3}px)`;
+  }
+
+  pintar(m, html, animar) {
+    const nueva = document.createElement("div");
+    nueva.className = "screen";
+    nueva.innerHTML = html;
+    const vieja = this.actual;
+    this.stage.appendChild(nueva);
+    this.actual = nueva;
+    if (!animar || reducido) { vieja?.remove(); return; }
+    const { kf, ms } = ENTRADA[this.modo];
+    // La vieja se va mas rapido de lo que entra la nueva: la salida no debe competir.
+    vieja?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms * 0.6, easing: "ease-out", fill: "forwards" })
+      .finished.then(() => vieja.remove());
+    nueva.animate(kf, { duration: ms, easing: EASE });
+  }
+
+  ir(m) {
+    if (this.destino === m || (!this.destino && this.m === m)) return;
+    this.destino = m;
+    this.marcar(m);
+    const id = ++this.pedido;
+    const t0 = performance.now();
+    const espera = velocidad === "rapido" ? 80 : 1200;
+    let conSkeleton = false;
+
+    // Pasados 300 ms sin pantalla: skeleton del modulo destino.
+    const temporizador = setTimeout(() => {
+      if (id !== this.pedido) return;
+      conSkeleton = true;
+      this.pintar(m, SKELETON[m](), true);
+    }, 300);
+
+    // Mientras tanto, una linea muy fina dice que algo viene (solo si tarda).
+    const linea = setTimeout(() => {
+      if (id !== this.pedido || reducido) return;
+      this.pend.getAnimations().forEach((a) => a.cancel());
+      this.pend.animate([{ opacity: 1, transform: "scaleX(0)" }, { opacity: 1, transform: "scaleX(0.8)" }], { duration: 1600, easing: "cubic-bezier(.1,.6,.2,1)", fill: "forwards" });
+    }, 120);
+
+    setTimeout(() => {
+      if (id !== this.pedido) return;
+      clearTimeout(temporizador);
+      clearTimeout(linea);
+      this.pend.getAnimations().forEach((a) => a.cancel());
+      this.pend.animate([{ opacity: 1, transform: "scaleX(1)" }, { opacity: 0, transform: "scaleX(1)" }], { duration: 220, easing: "ease-out" });
+      this.pintar(m, PANTALLAS[m](), true);
+      this.m = m;
+      this.destino = null;
+      const ms = Math.round(performance.now() - t0);
+      this.stat.textContent = conSkeleton ? `Llego en ${ms} ms, con skeleton desde los 300 ms` : `Llego en ${ms} ms, sin skeleton`;
+    }, espera);
+  }
+}
+
+const apps = [...document.querySelectorAll(".col")].map((c) => new MiniApp(c));
+apps.forEach((a) => (a.m = "agenda"));
+
+document.querySelectorAll(".seg button").forEach((b) =>
+  b.addEventListener("click", () => {
+    velocidad = b.dataset.vel;
+    document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  }),
+);
+
+let paso = 0;
+document.getElementById("comparar").addEventListener("click", () => {
+  paso = (paso + 1) % ORDEN.length;
+  apps.forEach((a) => a.ir(ORDEN[paso]));
+});
+</script>
+</body>
+</html>
