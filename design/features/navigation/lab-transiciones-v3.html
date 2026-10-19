@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab transiciones v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070708; --card: #111113; --elev: #18181b; --low: #1f1f23;
+    --border: rgba(255,255,255,0.07); --strong: rgba(255,255,255,0.12);
+    --text: #f4f4f5; --muted: #8b8b93; --faint: #5c5c63; --accent: #ff2d3d; --heart: #ff5d6c;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--text); font-family: Urbanist, system-ui, sans-serif; min-height: 100vh; padding: 28px 24px 48px; }
+  h1, h2, h3 { font-family: "Plus Jakarta Sans", system-ui, sans-serif; letter-spacing: -0.4px; }
+
+  .top { max-width: 1400px; margin: 0 auto 24px; display: flex; flex-wrap: wrap; gap: 18px 32px; align-items: flex-end; justify-content: space-between; }
+  .top h1 { font-size: 26px; font-weight: 800; }
+  .top p { color: var(--muted); font-size: 15px; margin-top: 6px; max-width: 700px; line-height: 1.45; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .seg { display: inline-flex; background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 4px; }
+  .seg button { font: 600 14px Urbanist, sans-serif; color: var(--muted); background: transparent; border: 0; padding: 9px 16px; border-radius: 999px; cursor: pointer; transition: color .2s, background .2s; }
+  .seg button[aria-pressed="true"] { background: var(--text); color: #0b0b0c; }
+  .play { font: 700 14px Urbanist, sans-serif; background: var(--accent); color: #fff; border: 0; border-radius: 999px; padding: 12px 20px; cursor: pointer; transition: transform .16s cubic-bezier(.2,.8,.2,1); }
+  .play:active, .ghost:active { transform: scale(0.97); }
+  .ghost { font: 600 14px Urbanist, sans-serif; color: var(--text); background: var(--card); border: 1px solid var(--strong); border-radius: 999px; padding: 11px 18px; cursor: pointer; transition: transform .16s cubic-bezier(.2,.8,.2,1); }
+
+  .grid { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 30px 20px; }
+  @media (max-width: 1200px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  .col h2 { font-size: 16px; font-weight: 700; display: flex; gap: 8px; align-items: baseline; }
+  .col h2 .letra { color: var(--accent); }
+  .col[data-modo="corte"] h2 .letra { color: var(--muted); }
+  .col .desc { color: var(--muted); font-size: 13px; margin: 5px 0 10px; line-height: 1.4; min-height: 54px; }
+  .col .ref { color: var(--faint); font-size: 12px; margin-top: 8px; }
+
+  .app { display: flex; gap: 8px; height: 330px; }
+  .rail { width: 42px; flex: none; align-self: center; display: flex; flex-direction: column; gap: 2px; padding: 6px 0; background: rgba(24,24,27,0.85); border: 1px solid var(--strong); border-radius: 22px; position: relative; }
+  .rail button { position: relative; z-index: 1; height: 36px; display: grid; place-items: center; border: 0; background: transparent; color: var(--faint); cursor: pointer; transition: color .2s; }
+  .rail button[aria-current="page"] { color: var(--text); }
+  .rail .chip { position: absolute; left: 5px; top: 0; width: 30px; height: 30px; border-radius: 10px; background: var(--low); transition: transform .3s cubic-bezier(.32,.72,0,1); }
+  .card { flex: 1; position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+  .screen { position: absolute; inset: 0; padding: 16px 14px; will-change: opacity, transform, filter; }
+  .screen h3 { font-size: 18px; font-weight: 800; margin-bottom: 2px; }
+  .screen .sub { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+
+  .ses { display: grid; grid-template-columns: 40px 1fr; gap: 8px; padding: 9px; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 7px; background: var(--elev); }
+  .ses .h { color: var(--muted); font-size: 12px; font-weight: 600; }
+  .ses .t { font-weight: 600; font-size: 13px; line-height: 1.25; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 999px; margin-bottom: 4px; }
+  .post { padding: 10px; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 7px; background: var(--elev); }
+  .who { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .av { width: 26px; height: 26px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: #fff; }
+  .who b { font-size: 13px; }
+  .post p { font-size: 13px; line-height: 1.35; color: #d4d4d8; }
+  .likes { margin-top: 6px; color: var(--heart); font-size: 12px; font-weight: 600; display: flex; gap: 5px; align-items: center; }
+  .spk { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .spk > div { background: var(--elev); border: 1px solid var(--border); border-radius: 12px; padding: 10px 4px; text-align: center; }
+  .spk .av { width: 40px; height: 40px; margin: 0 auto 6px; font-size: 13px; }
+  .spk b { font-size: 11px; display: block; }
+
+  .sk { background: var(--low); border-radius: 12px; position: relative; overflow: hidden; }
+  .sk::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.045), transparent); transform: translateX(-100%); animation: brillo 1.4s ease-in-out infinite; }
+  @keyframes brillo { to { transform: translateX(100%); } }
+  @media (prefers-reduced-motion: reduce) { .rail .chip { transition: none; } .sk::after { animation: none; } }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div>
+      <h1>Transicion entre modulos, v3</h1>
+      <p>La tarjeta queda fija y solo cambia lo de adentro. Siete formas, desde no animar nada hasta lo mas expresivo dentro de lo sutil. Prueba Comparar y luego Diez seguidas: cambiar de modulo es lo que mas se repite, asi que importa como se siente a la decima vez, no a la primera.</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Velocidad del servidor">
+        <button type="button" data-vel="rapido" aria-pressed="true">Rapido 80 ms</button>
+        <button type="button" data-vel="lento" aria-pressed="false">Lento 1,2 s</button>
+      </div>
+      <button type="button" class="ghost" id="diez">Diez seguidas</button>
+      <button type="button" class="play" id="comparar">Comparar todas</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <section class="col" data-modo="corte">
+      <h2><span class="letra">Hoy</span> Corte</h2>
+      <p class="desc">Sin animacion: la pantalla nueva reemplaza a la anterior en el mismo instante.</p>
+      <div class="app"></div>
+      <p class="ref">Referencia: Apple, en sus apps cambiar de pestana es instantaneo</p>
+    </section>
+    <section class="col" data-modo="cruzado">
+      <h2><span class="letra">1</span> Fundido cruzado 150 ms</h2>
+      <p class="desc">Lo viejo y lo nuevo se cruzan a la vez. Lo minimo que se nota.</p>
+      <div class="app"></div>
+      <p class="ref">Variante propia</p>
+    </section>
+    <section class="col" data-modo="through">
+      <h2><span class="letra">2</span> Fade through 250 ms</h2>
+      <p class="desc">Lo viejo se apaga rapido y despues aparece lo nuevo con una escala casi imperceptible (99% a 100%).</p>
+      <div class="app"></div>
+      <p class="ref">Referencia: Material Design, para la navegacion principal</p>
+    </section>
+    <section class="col" data-modo="sube">
+      <h2><span class="letra">3</span> Fundido con subida de 6 px</h2>
+      <p class="desc">Como el 1, pero lo nuevo sube 6 px al aparecer. Da sensacion de llegada sin direccion de viaje.</p>
+      <div class="app"></div>
+      <p class="ref">Variante propia</p>
+    </section>
+    <section class="col" data-modo="cascada">
+      <h2><span class="letra">4</span> Titulo al instante, contenido en cascada</h2>
+      <p class="desc">El titulo cambia sin animar. Los bloques aparecen uno tras otro, 25 ms de diferencia.</p>
+      <div class="app"></div>
+      <p class="ref">Variante propia</p>
+    </section>
+    <section class="col" data-modo="enfoque">
+      <h2><span class="letra">5</span> Enfoque</h2>
+      <p class="desc">Lo viejo se desenfoca al salir y lo nuevo entra desenfocado y se aclara, como un cambio de foco de camara.</p>
+      <div class="app"></div>
+      <p class="ref">Variante propia</p>
+    </section>
+    <section class="col" data-modo="velo">
+      <h2><span class="letra">6</span> Velo</h2>
+      <p class="desc">La tarjeta se oscurece apenas un instante y aclara con lo nuevo. Nada se mueve; cambia la luz.</p>
+      <div class="app"></div>
+      <p class="ref">Variante propia</p>
+    </section>
+  </div>
+
+<script>
+const ORDEN = ["agenda", "social", "speakers"];
+const ICONOS = {
+  agenda: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4M3 9.5h18"/></svg>',
+  social: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5.5 6.5-5.5s5.7 2.1 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.8 3 2.6 3.5 5.2"/></svg>',
+  speakers: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg>',
+};
+const CABEZA = { agenda: ["Agenda", "Miercoles 4 de noviembre"], social: ["Social", "Lo que esta pasando"], speakers: ["Speakers", "24 personas en el escenario"] };
+const COLORES = ["#6366f1", "#14b8a6", "#f59e0b", "#ec4899", "#0ea5e9", "#a855f7"];
+const av = (ini, i) => `<span class="av" style="background:${COLORES[i % COLORES.length]}">${ini}</span>`;
+const CORAZON = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.4 4.5 7 4.5c2 0 3.6 1.1 5 2.8 1.4-1.7 3-2.8 5-2.8 3.6 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>';
+const CUERPO = {
+  agenda: () => [["8:00", "Apertura: el futuro del trabajo", "Negocios", "#10b981"], ["9:30", "Cloud Native en 90 minutos", "Tecnologia", "#6366f1"],
+    ["9:30", "IA en produccion", "Innovacion", "#f59e0b"], ["11:00", "Liderazgo en equipos hibridos", "Liderazgo", "#ec4899"]]
+    .map(([h, t, tag, c]) => `<div class="ses"><div class="h">${h}</div><div><span class="tag" style="background:${c}22;color:${c}">${tag}</span><div class="t">${t}</div></div></div>`).join(""),
+  social: () => [["MC", "Mateo Castro", "Networking de otro nivel", 12], ["MR", "Mia Roberts", "Increible el nivel de los speakers", 8], ["ET", "Emma Torres", "Aprendiendo un monton", 23]]
+    .map(([i, n, p, l], k) => `<div class="post"><div class="who">${av(i, k)}<b>${n}</b></div><p>${p}</p><div class="likes">${CORAZON}${l}</div></div>`).join(""),
+  speakers: () => `<div class="spk">${[["SV", "Sofia Vega"], ["DR", "Diego Ramirez"], ["VC", "Valentina Cruz"], ["RC", "Ryan Cooper"], ["AH", "Ahmed Hassan"], ["AR", "Alejandra Ruiz"]]
+    .map(([i, n], k) => `<div>${av(i, k)}<b>${n}</b></div>`).join("")}</div>`,
+};
+const ESQUELETO = {
+  agenda: () => '<div class="sk" style="height:56px;margin-bottom:7px"></div>'.repeat(4),
+  social: () => '<div class="sk" style="height:76px;margin-bottom:7px"></div>'.repeat(3),
+  speakers: () => `<div class="spk">${'<div class="sk" style="height:86px"></div>'.repeat(6)}</div>`,
+};
+
+const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const SUAVE = "cubic-bezier(0.2, 0, 0, 1)";      // entrada: arranca y se asienta sin rebote
+const SALE = "cubic-bezier(0.4, 0, 1, 1)";       // salida: acelera hacia afuera
+let velocidad = "rapido";
+
+function pantalla(m, cuerpo) {
+  const el = document.createElement("div");
+  el.className = "screen";
+  el.innerHTML = `<h3>${CABEZA[m][0]}</h3><div class="sub">${CABEZA[m][1]}</div><div class="body">${cuerpo}</div>`;
+  return el;
+}
+const bloques = (el) => {
+  const b = el.querySelector(".body");
+  return b.querySelector(".spk") ? [...b.querySelectorAll(".spk > *")] : [...b.children];
+};
+
+/* Cada modo recibe la pantalla vieja y la nueva ya montada encima. */
+const MODOS = {
+  corte(vieja) { vieja?.remove(); },
+  cruzado(vieja, nueva) {
+    nueva.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 150, easing: "linear" });
+    vieja?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: "linear", fill: "forwards" }).finished.then(() => vieja.remove());
+  },
+  through(vieja, nueva) {
+    // Material: salida 35% del tiempo, entrada el resto, sin solaparse.
+    vieja?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 90, easing: SALE, fill: "forwards" }).finished.then(() => vieja.remove());
+    nueva.animate([{ opacity: 0, transform: "scale(0.99)" }, { opacity: 1, transform: "scale(1)" }], { duration: 210, delay: 70, easing: SUAVE, fill: "backwards" });
+  },
+  sube(vieja, nueva) {
+    vieja?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: SALE, fill: "forwards" }).finished.then(() => vieja.remove());
+    nueva.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 220, delay: 40, easing: SUAVE, fill: "backwards" });
+  },
+  cascada(vieja, nueva) {
+    vieja?.remove();
+    bloques(nueva).forEach((b, i) => b.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, delay: i * 25, easing: SUAVE, fill: "backwards" }));
+  },
+  enfoque(vieja, nueva) {
+    vieja?.animate([{ opacity: 1, filter: "blur(0)" }, { opacity: 0, filter: "blur(6px)" }], { duration: 140, easing: SALE, fill: "forwards" }).finished.then(() => vieja.remove());
+    nueva.animate([{ opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0)" }], { duration: 240, delay: 50, easing: SUAVE, fill: "backwards" });
+  },
+  velo(vieja, nueva) {
+    vieja?.animate([{ filter: "brightness(1)" }, { filter: "brightness(0.35)" }], { duration: 110, easing: SALE, fill: "forwards" }).finished.then(() => vieja.remove());
+    nueva.animate([{ opacity: 0, filter: "brightness(0.35)" }, { opacity: 1, filter: "brightness(0.35)", offset: 0.01 }, { opacity: 1, filter: "brightness(1)" }],
+      { duration: 260, delay: 100, easing: SUAVE, fill: "backwards" });
+  },
+};
+
+class MiniApp {
+  constructor(col) {
+    this.modo = col.dataset.modo;
+    const app = col.querySelector(".app");
+    app.innerHTML = `<nav class="rail" aria-label="Menu"><span class="chip"></span>${ORDEN.map((m) => `<button type="button" data-m="${m}" aria-label="${CABEZA[m][0]}">${ICONOS[m]}</button>`).join("")}</nav><div class="card"></div>`;
+    this.rail = app.querySelector(".rail");
+    this.chip = app.querySelector(".chip");
+    this.card = app.querySelector(".card");
+    this.m = "agenda";
+    this.pedido = 0;
+    this.actual = pantalla("agenda", CUERPO.agenda());
+    this.card.appendChild(this.actual);
+    this.marcar("agenda");
+    this.rail.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) this.ir(b.dataset.m); });
+  }
+  marcar(m) {
+    this.rail.querySelectorAll("button").forEach((b) => (b.dataset.m === m ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current")));
+    this.chip.style.transform = `translateY(${9 + ORDEN.indexOf(m) * 38}px)`;
+  }
+  // Monta la pantalla nueva sobre la vieja y deja que el modo haga la transicion.
+  cambiar(nueva) {
+    const vieja = this.actual;
+    this.card.appendChild(nueva);
+    this.actual = nueva;
+    if (reducido || this.modo === "corte") { vieja?.remove(); return; }
+    MODOS[this.modo](vieja, nueva);
+  }
+  ir(m) {
+    if (m === (this.destino ?? this.m)) return;
+    this.destino = m;
+    this.marcar(m);
+    const id = ++this.pedido;
+    let enEsqueleto = false;
+    const tSk = setTimeout(() => {
+      if (id !== this.pedido) return;
+      enEsqueleto = true;
+      this.cambiar(pantalla(m, ESQUELETO[m]()));
+    }, 300);
+    setTimeout(() => {
+      if (id !== this.pedido) return;
+      clearTimeout(tSk);
+      if (enEsqueleto) {
+        // Del skeleton al contenido: mismo titulo, solo cambia el cuerpo con un fundido corto.
+        const body = this.actual.querySelector(".body");
+        body.innerHTML = CUERPO[m]();
+        if (!reducido && this.modo !== "corte") body.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: SUAVE });
+      } else {
+        this.cambiar(pantalla(m, CUERPO[m]()));
+      }
+      this.m = m;
+      this.destino = null;
+    }, velocidad === "rapido" ? 80 : 1200);
+  }
+}
+
+const apps = [...document.querySelectorAll(".col")].map((c) => new MiniApp(c));
+document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+  velocidad = b.dataset.vel;
+  document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+}));
+let paso = 0;
+const siguiente = () => { paso = (paso + 1) % ORDEN.length; apps.forEach((a) => a.ir(ORDEN[paso])); };
+document.getElementById("comparar").addEventListener("click", siguiente);
+
+// Diez cambios seguidos, uno cada 700 ms: como alguien que recorre la webapp buscando algo.
+let corriendo = false;
+document.getElementById("diez").addEventListener("click", async () => {
+  if (corriendo) return;
+  corriendo = true;
+  for (let i = 0; i < 10; i++) { siguiente(); await new Promise((r) => setTimeout(r, velocidad === "rapido" ? 700 : 1600)); }
+  corriendo = false;
+});
+</script>
+</body>
+</html>
