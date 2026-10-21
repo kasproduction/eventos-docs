@@ -188,7 +188,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   invitaciones, puntos, premios, pasaporte, ranking, recompensas) = grupo 2: patrocinadores, muro y ranking partidos,
   y `my-speaker-ratings` que se pide dos veces en Speakers.
 
-### Navegacion inmediata (Kamilo 2026-10-18) — 5/7
+### Navegacion inmediata (Kamilo 2026-10-18) — 6/7
 - [x] Sin skeleton al cambiar de modulo; el menu marca el destino en el toque; sesion 30 s en memoria; precarga al
       pasar el mouse, al apoyar el dedo y en reposo (agenda, social, speakers). eventos-web `368fe81`. Medido local:
       precargados 49-106 ms, el resto 324-454 ms sin skeleton (antes 275-654 ms con skeleton)
@@ -196,8 +196,9 @@ y se cierran midiendo en servidor, 13 solo con servidor.
       (aprobado). Cambio de modulo con View Transitions en `TransicionModulo` (eventos-web `bb2cf2a`)
 - [x] BUG-357 corregido 2026-10-21: solo cambia el contenido de adentro, marco quieto, salida (120 ms) y entrada (zoom 2%,
       395 ms) en secuencia. Lab `lab-transicion-contenido.html` (A Relevo escogida); eventos-web `f9e6bfc`
-- [ ] Abrir con zoom desde la tarjeta (speakers, sesiones, patrocinadores) y push al entrar mas profundo en celular,
-      como en `lab-transiciones-ios.html`. Modulo por modulo
+- [x] Abrir con zoom desde la tarjeta: **decision Kamilo 2026-10-21, speakers en escritorio se queda como esta** (el
+      panel ya entra deslizando con fundido). Lab `lab-abrir-desde-tarjeta.html` (A crece hasta su sitio, B nace y se
+      asienta, celular como el lab iOS) queda de referencia por si se retoma para celular, sesiones o patrocinadores
 - [ ] Skeleton solo si la espera pasa de ~300 ms (hoy no hay ninguno en modulos; con servidor lento el clic parece
       no hacer nada mas alla del menu)
 - [ ] Revisar en celular/iPad que la transicion no choque con el deslizamiento propio de las pantallas de detalle
