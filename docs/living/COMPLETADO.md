@@ -41,6 +41,9 @@
 - [x] B.1 grupo 2: patrocinadores, ranking y muro partidos en lo de todos (memoria del servidor) y lo mio; segundo pedido
       de calificaciones en Speakers quitado (eventos-web 69828f4, f1ef98e, 1b2e2cc, 43f49b9; backend 136849e, e7ed96d,
       14dfb59). Pest 21 tests nuevos, vitest 679.
+- [x] B3.9 lo mio en un solo pedido: `GET /events/{id}/mine?piezas=` con estado por pieza (backend 85fd4c0, 535161a) y
+      `lib/loMio.ts` que agrupa por evento y token (eventos-web 4d3d92a, 39c7d39). Medido: home 15 → 10, speakers 7 → 5,
+      desafio 11 → 9. LoMioTest 9, vitest 684.
 
 ## Agosto a octubre 2026 + limpieza de pendientes — 2026-10-16
 

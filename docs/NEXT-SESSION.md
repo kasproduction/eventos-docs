@@ -52,8 +52,16 @@ en home, social y desafio los pedidos pesados (muro, ranking) pasan a livianos (
 medicion de "tibio" entre rutas no alcanza a verlo: medir en servidor con 300 personas.
 **Decision Kamilo:** speakers en escritorio conserva su animacion de abrir. Tokens de prueba del usuario 3 borrados con su
 permiso (277, 278, 279 y el de esta tarde).
-**Sigue:** B3.9 (propuesta): un solo pedido de "lo mio" por pantalla (agenda, muro, patrocinadores, ranking, calificaciones)
-y medir en servidor. Skeleton solo si la espera pasa de 300 ms. BUG-358 (hidratacion #418) sigue abierto.
+**Tercera parte — B3.9 hecho:** `GET /events/{id}/mine?piezas=` (backend `85fd4c0`, `535161a`: LoMioService, cada pieza
+`{ok, data | error}`, 422 si una pieza no existe, repetidas una vez; LoMioTest 9) y `lib/loMio.ts` en la webapp
+(`4d3d92a`, `39c7d39`: lote por evento y token abierto una vuelta del reloj, agenda/speakers/patrocinadores/muro/ranking/
+puntos piden su pieza, paginas sin cambios; vitest 684). Revision de Kamilo (pegada en el chat) atendida: falla parcial,
+piezas repetidas, permisos (mismas reglas que los endpoints viejos: ser asistente), agrupador y medir antes.
+Medido local tibio: home 15 → 10, speakers 7 → 5, live 8 → 6, detalle 8 → 5, social 7 → 6, desafio 11 → 9. TTFB local
+home ~590 ms, speakers ~170 ms, agenda ~260 ms (ruido alto, una sola corrida).
+**Sigue:** medir en servidor con 300 personas (B3.7-B3.9). Skeleton solo si la espera pasa de 300 ms. BUG-358 (hidratacion
+#418) sigue abierto y sale en cada carga en produccion. Las piezas que faltan de "lo mio" (premios, pasaporte, recompensas,
+invitaciones, historias) solo si pesan en la medida real.
 
 ---
 

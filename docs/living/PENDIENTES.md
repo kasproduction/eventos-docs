@@ -194,7 +194,14 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   calificaciones en Speakers quitado. Medido local tibio: speakers 7 → 5; en home, social y desafio los pedidos pesados
   (muro, ranking) pasan a ser livianos (solo lo mio). Lo que queda por pantalla es todo por persona: lo mio de agenda,
   muro, patrocinadores, ranking, calificaciones, historias, invitaciones, puntos, premios, pasaporte, recompensas.
-  **Siguiente en B.1:** juntar "lo mio" de varias piezas en un solo pedido por pantalla (B3.9, propuesta) y medir en servidor.
+  **2026-10-21 B3.9 HECHO** (backend 85fd4c0 + 535161a; eventos-web 4d3d92a + 39c7d39): `GET /events/{id}/mine?piezas=`
+  junta lo mio de una pantalla (agenda, speakers, patrocinadores, muro, ranking, puntos) en UN pedido; cada pieza con su
+  estado (una rota no tumba las demas); pieza desconocida 422; `lib/loMio.ts` agrupa por evento y token en una vuelta del
+  reloj sin cambiar las paginas. Medido local tibio (cada pantalla + su precarga en reposo): home 15 → 10, speakers 7 → 5,
+  live 8 → 6, detalle de speaker 8 → 5, social 7 → 6, desafio 11 → 9. Por render queda UN pedido de lo mio; lo que se ve
+  repetido (`/mine` x3) son las precargas de agenda, social y speakers, una cada una.
+  **Siguiente en B.1:** medir en servidor con 300 (B3.7/B3.8/B3.9), y las piezas que faltan del desafio (premios, pasaporte,
+  recompensas) e invitaciones/historias de social si pesan en la medida real.
 
 ### Navegacion inmediata (Kamilo 2026-10-18) — 8/9
 - [x] Sin skeleton al cambiar de modulo; el menu marca el destino en el toque; sesion 30 s en memoria; precarga al
