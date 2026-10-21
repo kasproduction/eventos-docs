@@ -25,7 +25,7 @@
 | Seguridad del staff (2FA) | 25/26 = **96%** | S.7.2: correr `security:check` en el servidor real |
 | App Expo | Implementada | Recap sin commit (rompe typecheck), QA en telefono, tiendas sin empezar |
 | QA presencial con Kamilo | **0%** | §6 |
-| Bintec 2026 (B.1-B.6) | 0/6 = **0%** (B.1 avanzado) | Agenda y Social ya livianas (2026-10-18); siguen speakers, en vivo, home |
+| Bintec 2026 (B.1-B.6) | 0/6 = **0%** (B.1 avanzado) | Agenda, Social, speakers, en vivo, destacados y branding ya livianos (2026-10-21); sigue grupo 2 (patrocinadores, muro, ranking) |
 | **Salida a produccion** (plan B1-B6) | ~4/31 = **13%** | §1 |
 
 **Lectura:** el producto esta casi completo; lo que no esta es correrlo en un servidor. Lo medido llega a 300
@@ -129,8 +129,6 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 
 ## 3. BUGS ABIERTOS (detalle en `BUG-LOG.md`)
 
-- [ ] BUG-357 La transicion de cambio de modulo mueve toda la tarjeta y encima los titulos (ver §5 Navegacion, lo primero
-      de la proxima sesion por pedido de Kamilo 2026-10-18)
 - [ ] BUG-358 Error de hidratacion React #418 en produccion (texto distinto servidor/navegador; sospecha horas o fechas)
 - [ ] BUG-359 Falta `mobileNav` en `messages/pt.json` (barra movil en portugues sin textos)
 
@@ -182,22 +180,30 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   **2026-10-18:** conteo por codigo (promedio 4,2 pedidos por pantalla); agenda partida (B3.7) y Social por pestañas
   (B3.8) hechas: estimado 2,3. Sigue el "grupo 1", lo que es igual para todos y solo hay que guardar en memoria:
   speakers, en vivo/lo que sigue (home y live), destacados, branding. Despues patrocinadores, muro y ranking partidos.
+  **2026-10-21 grupo 1 HECHO** (eventos-web `8759e9e`, backend `6f148ad`): speakers, destacados, branding y en vivo una
+  vez por evento en memoria del servidor (frescos por aviso; en vivo hasta el proximo cambio de sala o 15 s, con los
+  segundos restantes corregidos); Live arma "lo que sigue" desde la agenda partida. Medido local cargando cada pantalla
+  completa con la precarga en reposo incluida (pedidos al backend, tibio): home 15 → 12, speakers 7 → 6, live 8 → 6,
+  agenda 6 → 5, detalle de speaker 8 → 6. Lo que queda es por persona (lo mio, calificaciones, muro, historias,
+  invitaciones, puntos, premios, pasaporte, ranking, recompensas) = grupo 2: patrocinadores, muro y ranking partidos,
+  y `my-speaker-ratings` que se pide dos veces en Speakers.
 
-### Navegacion inmediata (Kamilo 2026-10-18) — 4/6
+### Navegacion inmediata (Kamilo 2026-10-18) — 5/7
 - [x] Sin skeleton al cambiar de modulo; el menu marca el destino en el toque; sesion 30 s en memoria; precarga al
       pasar el mouse, al apoyar el dedo y en reposo (agenda, social, speakers). eventos-web `368fe81`. Medido local:
       precargados 49-106 ms, el resto 324-454 ms sin skeleton (antes 275-654 ms con skeleton)
 - [x] Labs de transicion (`design/features/navigation/`): v1, v2, C2 camara (descartada: marea), v3 sutiles, **ios**
       (aprobado). Cambio de modulo con View Transitions en `TransicionModulo` (eventos-web `bb2cf2a`)
-- [ ] **LO PRIMERO de la proxima sesion (Kamilo):** corregir la transicion (BUG-357). Debe cambiar SOLO el contenido de
-      adentro: marco de la tarjeta quieto y sin titulos encimados (salida y entrada en secuencia). Kamilo pidio "mas
-      softy" en tres rondas: hoy zoom 2%, sin rebote, 395 ms. Lab antes de dar por cerrado
+- [x] BUG-357 corregido 2026-10-21: solo cambia el contenido de adentro, marco quieto, salida (120 ms) y entrada (zoom 2%,
+      395 ms) en secuencia. Lab `lab-transicion-contenido.html` (A Relevo escogida); eventos-web `f9e6bfc`
 - [ ] Abrir con zoom desde la tarjeta (speakers, sesiones, patrocinadores) y push al entrar mas profundo en celular,
       como en `lab-transiciones-ios.html`. Modulo por modulo
 - [ ] Skeleton solo si la espera pasa de ~300 ms (hoy no hay ninguno en modulos; con servidor lento el clic parece
       no hacer nada mas alla del menu)
 - [ ] Revisar en celular/iPad que la transicion no choque con el deslizamiento propio de las pantallas de detalle
-- [ ] Revocar el token de prueba `qa-claude-2026-10-18` creado en la base local (asistente sembrado del evento demo)
+- [ ] Revocar los tokens de prueba del asistente sembrado (usuario 3, `presencial@eventos.test`) en la base local:
+      `personal_access_tokens` 277 y 278 (`mobile`, 2026-10-18) y 279 (`qa-claude-2026-10-21`). Lo hace Kamilo: el modo
+      automatico de Claude no puede borrar en la base
 - [ ] **B.2 Juegos a demanda por QR.** Hueco: nuestra gamificacion es EN VIVO (trivia del streaming,
   momentos, MC); falta la capa que la persona juega cuando quiere en el stand. Un QR = un juego corto
   (trivia, memoria, ahorcado, reflejos), un intento que suma al mismo ranking, repeticiones por

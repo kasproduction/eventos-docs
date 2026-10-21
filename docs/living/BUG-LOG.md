@@ -3,9 +3,16 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
-## 2026-10-18 — Navegacion inmediata y agenda/social livianas (4 bugs: 1 resuelto, 3 abiertos)
+## 2026-10-18 — Navegacion inmediata y agenda/social livianas (4 bugs: 2 resueltos, 2 abiertos)
 
-### BUG-357: La transicion de cambio de modulo mueve toda la tarjeta y encima los titulos (ABIERTO)
+### BUG-357: La transicion de cambio de modulo mueve toda la tarjeta y encima los titulos (RESUELTO 2026-10-21)
+- **Fix (eventos-web `f9e6bfc`, letra A "Relevo" de `design/features/navigation/lab-transicion-contenido.html`):**
+  `CanvasCard` envuelve lo de adentro en `.canvas-card-contenido` (`view-transition-name: contenido`); la foto del
+  wrapper `modulo` (marco incluido) no se anima; lo viejo se apaga en 120 ms y recien ahi entra lo nuevo (zoom 2%,
+  395 ms). En celular, sin tarjeta, la misma secuencia sobre la caja `modulo`. Verificado con Playwright en produccion
+  local leyendo `getAnimations()` en `startViewTransition().ready`: escritorio solo anima `contenido`, celular solo
+  `modulo`, siempre en secuencia.
+- **Texto original (2026-10-18):**
 - **Severidad:** MEDIA (visual, lo vio Kamilo) — `TransicionModulo` (View Transitions) fotografia el wrapper completo:
   marco y fondo de la tarjeta hacen zoom, y lo viejo (150 ms) se apaga mientras lo nuevo (300 ms) ya aparece, asi que los
   titulos se cruzan. **Fix revisado sin escribir:** `view-transition-name` solo en un contenedor interno del contenido
