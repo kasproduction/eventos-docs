@@ -28,6 +28,17 @@
 
 ---
 
+## 2026-10-21 — BUG-357, grupo 1 de B.1 y detalles sin doble transicion
+
+- [x] BUG-357: cambio de modulo mueve solo el contenido, marco quieto, salida y entrada en secuencia (eventos-web
+      `f9e6bfc`; lab `lab-transicion-contenido.html`, letra A Relevo escogida por Kamilo).
+- [x] B.1 grupo 1: speakers, destacados, branding y en vivo una vez por evento en memoria del servidor; Live arma "lo que
+      sigue" desde la agenda partida (eventos-web `8759e9e`, backend `6f148ad`). Medido: home 15 → 12, speakers 7 → 6,
+      live 8 → 6, agenda 6 → 5, detalle de speaker 8 → 6 pedidos por pantalla.
+- [x] Entrar o volver de un detalle no dispara la transicion de modulo encima del push del celular (eventos-web `43a4fd8`).
+- [x] Abrir con zoom desde la tarjeta: decision Kamilo, speakers en escritorio se queda como esta; lab
+      `lab-abrir-desde-tarjeta.html` de referencia.
+
 ## Agosto a octubre 2026 + limpieza de pendientes — 2026-10-16
 
 > Desde el 1 de agosto lo cerrado se quedo en los pendientes. El 2026-10-16 se movio todo aca.

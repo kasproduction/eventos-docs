@@ -10,6 +10,45 @@
 
 ---
 
+## SESION 2026-10-21 (Fable 5.1) — BUG-357 CERRADO, GRUPO 1 DE B.1, DETALLES SIN DOBLE TRANSICION
+
+**Decisiones Kamilo (no re-preguntar):**
+- Cambio de modulo = letra **A Relevo** de `design/features/navigation/lab-transicion-contenido.html`: marco quieto, lo viejo
+  se apaga en 120 ms y recien ahi entra lo nuevo (zoom 2%, 395 ms, sin rebote). Nunca dos contenidos a la vez.
+- **Speakers en escritorio conserva su animacion de abrir** (el panel entra deslizando con fundido). El lab
+  `lab-abrir-desde-tarjeta.html` (A crece hasta su sitio, B nace y se asienta, celular como el lab iOS) queda de
+  referencia; no se implementa salvo que Kamilo lo retome para celular, sesiones o patrocinadores.
+
+**Hecho:**
+- eventos-web `f9e6bfc` BUG-357: `CanvasCard` envuelve el contenido en `.canvas-card-contenido` (`view-transition-name:
+  contenido`); la foto del marco (`modulo`) no anima; salida y entrada en secuencia; en celular la misma secuencia sobre
+  `modulo`. Verificado con Playwright leyendo `getAnimations()` en `startViewTransition().ready`.
+- eventos-web `8759e9e` + backend `6f148ad` **B.1 grupo 1**: speakers, destacados, branding y en vivo una vez por evento en
+  memoria del servidor (`enCompartido`, clave `:todos`, frescos por aviso; `PREFIJO_POR_ENTIDAD` ahora es lista de
+  prefijos; `highlights` entra en `ENTIDADES_MARCO_WEBAPP`). En vivo vive hasta el proximo cambio de sala o 15 s con los
+  segundos restantes corregidos (`acortarVencimiento` en serverCache). Live arma "lo que sigue" desde la agenda partida.
+  Medido local (pedidos al backend por pantalla completa, tibio): home 15 → 12, speakers 7 → 6, live 8 → 6, agenda 6 → 5,
+  detalle de speaker 8 → 6. Lo que queda es por persona (grupo 2).
+- eventos-web `43a4fd8`: entrar o volver de un detalle (speaker, session, sponsor, attendee, session-stream, join-team,
+  leads/[id]) ya no dispara la transicion de modulo encima del push del celular (`lib/transicionModulo.ts`, clave estable).
+- Tests: vitest 664 (compartido.test.ts y transicionModulo.test.ts nuevos, live.test.ts adaptado), Pest
+  MarcoWebappInvalidationTest 10/10. tsc y eslint limpios.
+
+**Gotchas:**
+- `TaskStop` de un `pnpm start` en segundo plano NO mata el `node` que escucha en :3000: cerrarlo por PID
+  (`Get-NetTCPConnection -LocalPort 3000`). Si no, la medida "despues" sale igual que la "antes".
+- El modo automatico de Claude no puede borrar filas en la base local (ni tokens de prueba): queda para Kamilo.
+- Para QA con sesion en produccion local: cookie `eventos_auth` con un token Sanctum del asistente sembrado (usuario 3) y
+  `localStorage eventos:showcase-seen:1` para saltar la pelicula de bienvenida. Pedidos al backend se cuentan en
+  `C:/laragon/bin/apache/httpd-2.4.62-240904-win64-VS17/logs/access.log`.
+- La extension de Chrome no estaba conectada: todo el QA fue con Playwright (`@playwright/test` en eventos-web).
+
+**Sigue:** grupo 2 de B.1 (patrocinadores, muro y ranking partidos; `my-speaker-ratings` se pide dos veces en Speakers).
+Skeleton solo si la espera pasa de 300 ms. BUG-358 (hidratacion #418) sigue abierto y sale en cada carga en produccion.
+Kamilo revoca los tokens 277, 278 y 279 del usuario 3 en `personal_access_tokens`.
+
+---
+
 ## SESION 2026-10-18 (Opus 5.5) — AGENDA Y SOCIAL LIVIANAS, NAVEGACION SIN SKELETON, TRANSICION ESTILO iOS
 
 **Decisiones Kamilo (no re-preguntar):**

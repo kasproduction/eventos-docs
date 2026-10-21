@@ -188,7 +188,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   invitaciones, puntos, premios, pasaporte, ranking, recompensas) = grupo 2: patrocinadores, muro y ranking partidos,
   y `my-speaker-ratings` que se pide dos veces en Speakers.
 
-### Navegacion inmediata (Kamilo 2026-10-18) — 6/7
+### Navegacion inmediata (Kamilo 2026-10-18) — 7/8
 - [x] Sin skeleton al cambiar de modulo; el menu marca el destino en el toque; sesion 30 s en memoria; precarga al
       pasar el mouse, al apoyar el dedo y en reposo (agenda, social, speakers). eventos-web `368fe81`. Medido local:
       precargados 49-106 ms, el resto 324-454 ms sin skeleton (antes 275-654 ms con skeleton)
@@ -201,7 +201,9 @@ y se cierran midiendo en servidor, 13 solo con servidor.
       asienta, celular como el lab iOS) queda de referencia por si se retoma para celular, sesiones o patrocinadores
 - [ ] Skeleton solo si la espera pasa de ~300 ms (hoy no hay ninguno en modulos; con servidor lento el clic parece
       no hacer nada mas alla del menu)
-- [ ] Revisar en celular/iPad que la transicion no choque con el deslizamiento propio de las pantallas de detalle
+- [x] Choque en celular entre el push del detalle y la transicion de modulo: corregido 2026-10-21 (eventos-web
+      `lib/transicionModulo.ts`): dentro de un detalle se conserva la clave del modulo de origen, entrar y volver no
+      disparan la transicion. Verificado con Playwright (0 transiciones al abrir y volver, push y pop intactos)
 - [ ] Revocar los tokens de prueba del asistente sembrado (usuario 3, `presencial@eventos.test`) en la base local:
       `personal_access_tokens` 277 y 278 (`mobile`, 2026-10-18) y 279 (`qa-claude-2026-10-21`). Lo hace Kamilo: el modo
       automatico de Claude no puede borrar en la base
