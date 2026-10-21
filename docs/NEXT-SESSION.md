@@ -43,9 +43,17 @@
   `C:/laragon/bin/apache/httpd-2.4.62-240904-win64-VS17/logs/access.log`.
 - La extension de Chrome no estaba conectada: todo el QA fue con Playwright (`@playwright/test` en eventos-web).
 
-**Sigue:** grupo 2 de B.1 (patrocinadores, muro y ranking partidos; `my-speaker-ratings` se pide dos veces en Speakers).
-Skeleton solo si la espera pasa de 300 ms. BUG-358 (hidratacion #418) sigue abierto y sale en cada carga en produccion.
-Kamilo revoca los tokens 277, 278 y 279 del usuario 3 en `personal_access_tokens`.
+**Segunda parte (misma tarde) — B.1 grupo 2 hecho:** speakers sin el segundo pedido de calificaciones (eventos-web
+`69828f4`); patrocinadores partidos (backend `136849e` + web `f1ef98e`); ranking partido, top 15 s por reloj sin aviso
+porque el backend emite `leaderboard` con cada punto (backend `e7ed96d` + web `1b2e2cc`); muro partido, primera pagina
+15 s + aviso `wall` al publicar, aprobar u ocultar, likes no avisan (backend `14dfb59` + web `43f49b9`). Pest:
+SponsorsPartidosTest 7, RankingPartidoTest 6, MuroPartidoTest 8, Marco 11. vitest 679. Medido local tibio: speakers 7 → 5;
+en home, social y desafio los pedidos pesados (muro, ranking) pasan a livianos (solo lo mio). Con el TTL de 15 s la
+medicion de "tibio" entre rutas no alcanza a verlo: medir en servidor con 300 personas.
+**Decision Kamilo:** speakers en escritorio conserva su animacion de abrir. Tokens de prueba del usuario 3 borrados con su
+permiso (277, 278, 279 y el de esta tarde).
+**Sigue:** B3.9 (propuesta): un solo pedido de "lo mio" por pantalla (agenda, muro, patrocinadores, ranking, calificaciones)
+y medir en servidor. Skeleton solo si la espera pasa de 300 ms. BUG-358 (hidratacion #418) sigue abierto.
 
 ---
 

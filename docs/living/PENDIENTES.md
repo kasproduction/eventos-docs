@@ -25,7 +25,7 @@
 | Seguridad del staff (2FA) | 25/26 = **96%** | S.7.2: correr `security:check` en el servidor real |
 | App Expo | Implementada | Recap sin commit (rompe typecheck), QA en telefono, tiendas sin empezar |
 | QA presencial con Kamilo | **0%** | §6 |
-| Bintec 2026 (B.1-B.6) | 0/6 = **0%** (B.1 avanzado) | Agenda, Social, speakers, en vivo, destacados y branding ya livianos (2026-10-21); sigue grupo 2 (patrocinadores, muro, ranking) |
+| Bintec 2026 (B.1-B.6) | 0/6 = **0%** (B.1 casi) | Todo lo compartido ya vive en memoria del servidor (2026-10-21); queda juntar "lo mio" por pantalla y medir en servidor |
 | **Salida a produccion** (plan B1-B6) | ~4/31 = **13%** | §1 |
 
 **Lectura:** el producto esta casi completo; lo que no esta es correrlo en un servidor. Lo medido llega a 300
@@ -187,8 +187,16 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   agenda 6 → 5, detalle de speaker 8 → 6. Lo que queda es por persona (lo mio, calificaciones, muro, historias,
   invitaciones, puntos, premios, pasaporte, ranking, recompensas) = grupo 2: patrocinadores, muro y ranking partidos,
   y `my-speaker-ratings` que se pide dos veces en Speakers.
+  **2026-10-21 grupo 2 HECHO** (eventos-web 69828f4, f1ef98e, 1b2e2cc, 43f49b9; backend 136849e, e7ed96d, 14dfb59):
+  patrocinadores partidos (`/sponsors/shared` + `/mine`, aviso `sponsors`), ranking partido (`/leaderboard/shared` en
+  memoria 15 s por reloj, el aviso por cada punto NO va a la webapp; `/mine` fresco), muro partido (`/wall/shared` primera
+  pagina 15 s + aviso `wall` al publicar, aprobar u ocultar; `/mine?ids=` con mis likes), y el segundo pedido de
+  calificaciones en Speakers quitado. Medido local tibio: speakers 7 → 5; en home, social y desafio los pedidos pesados
+  (muro, ranking) pasan a ser livianos (solo lo mio). Lo que queda por pantalla es todo por persona: lo mio de agenda,
+  muro, patrocinadores, ranking, calificaciones, historias, invitaciones, puntos, premios, pasaporte, recompensas.
+  **Siguiente en B.1:** juntar "lo mio" de varias piezas en un solo pedido por pantalla (B3.9, propuesta) y medir en servidor.
 
-### Navegacion inmediata (Kamilo 2026-10-18) — 7/8
+### Navegacion inmediata (Kamilo 2026-10-18) — 8/9
 - [x] Sin skeleton al cambiar de modulo; el menu marca el destino en el toque; sesion 30 s en memoria; precarga al
       pasar el mouse, al apoyar el dedo y en reposo (agenda, social, speakers). eventos-web `368fe81`. Medido local:
       precargados 49-106 ms, el resto 324-454 ms sin skeleton (antes 275-654 ms con skeleton)
@@ -204,9 +212,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 - [x] Choque en celular entre el push del detalle y la transicion de modulo: corregido 2026-10-21 (eventos-web
       `lib/transicionModulo.ts`): dentro de un detalle se conserva la clave del modulo de origen, entrar y volver no
       disparan la transicion. Verificado con Playwright (0 transiciones al abrir y volver, push y pop intactos)
-- [ ] Revocar los tokens de prueba del asistente sembrado (usuario 3, `presencial@eventos.test`) en la base local:
-      `personal_access_tokens` 277 y 278 (`mobile`, 2026-10-18) y 279 (`qa-claude-2026-10-21`). Lo hace Kamilo: el modo
-      automatico de Claude no puede borrar en la base
+- [x] Tokens de prueba del asistente sembrado (277, 278, 279) borrados 2026-10-21 con permiso de Kamilo
 - [ ] **B.2 Juegos a demanda por QR.** Hueco: nuestra gamificacion es EN VIVO (trivia del streaming,
   momentos, MC); falta la capa que la persona juega cuando quiere en el stand. Un QR = un juego corto
   (trivia, memoria, ahorcado, reflejos), un intento que suma al mismo ranking, repeticiones por

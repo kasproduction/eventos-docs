@@ -38,6 +38,9 @@
 - [x] Entrar o volver de un detalle no dispara la transicion de modulo encima del push del celular (eventos-web `43a4fd8`).
 - [x] Abrir con zoom desde la tarjeta: decision Kamilo, speakers en escritorio se queda como esta; lab
       `lab-abrir-desde-tarjeta.html` de referencia.
+- [x] B.1 grupo 2: patrocinadores, ranking y muro partidos en lo de todos (memoria del servidor) y lo mio; segundo pedido
+      de calificaciones en Speakers quitado (eventos-web 69828f4, f1ef98e, 1b2e2cc, 43f49b9; backend 136849e, e7ed96d,
+      14dfb59). Pest 21 tests nuevos, vitest 679.
 
 ## Agosto a octubre 2026 + limpieza de pendientes — 2026-10-16
 
