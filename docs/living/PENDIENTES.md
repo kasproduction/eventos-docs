@@ -31,7 +31,7 @@
 | Registro publico, landing y widget | 26/32 = **81%** | Llaves reales de Turnstile, toggle de tema para el demo, 4 menores (§4) |
 | Admin y modulos del organizador | **100%** | Nada bloqueante (decisiones menores en §2) |
 | Seguridad del staff (2FA) | 25/26 = **96%** | S.7.2: correr `security:check` en el servidor real |
-| App Expo | Implementada | Recap sin commit (rompe typecheck), QA en telefono, tiendas sin empezar |
+| App Expo | Implementada | Recap archivado para rediseño (rama local), BUG-392/393 visuales, QA en telefono, tiendas sin empezar |
 | QA presencial con Kamilo | **0%** | §6 |
 | Bintec 2026 (B.1-B.6) | 0/6 = **0%** (B.1 casi) | Todo lo compartido ya vive en memoria del servidor (2026-10-21); queda juntar "lo mio" por pantalla y medir en servidor |
 | **Salida a produccion** (plan B1-B6) | ~4/31 = **13%** | §1 |
@@ -395,32 +395,24 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 7. APP MOVIL (EXPO)
 
-- [ ] **Recap de la app: rediseño y reparacion** (decision Kamilo 2026-10-22). Que es: la tarjeta-resumen del evento
-  de cada asistente (portada, nivel, reverso). Por que: el intento de julio no funcionaba bien y se veia mal. Esta
-  archivado, no borrado: rama local `archivo/2026-07-recap-haptics-reintentos` de eventos-app (`8176acd`), con
-  `app/(app)/recap`, `components/recap`, `hooks/useRecap.ts`, `lib/recapColors.ts`. Lista cuando: lab de diseño
-  aprobado y funciona contra el backend real. El backend del recap (generar imagen, `/r/{code}`) ya existe.
-- [ ] Revisar aparte lo que quedo en la misma rama de archivo: vibracion al tocar en agenda, networking, fotos y
-  sponsors (4 hooks) y reintentos automaticos de red en `lib/api.ts` (2 reintentos con espera ante caida o 502/503/504).
+### Recap de la app: archivado, pendiente de rediseño y reparacion (antes "WIP sin commitear", 2026-07-04)
 
-### ⚠ WIP SIN COMMITEAR en el working tree de eventos-app (estado 2026-07-04)
+> **2026-10-22, decision Kamilo:** el recap de la app no se commitea como estaba: no funcionaba bien y se veia mal (es
+> sobre todo diseño). El working tree se archivo, no se borro: rama LOCAL `archivo/2026-07-recap-haptics-reintentos`
+> de eventos-app (`8176acd`, sin push), y `main` de eventos-app quedo limpio.
+> En esa rama: `app/(app)/recap/`, `components/recap/`, `hooks/useRecap.ts`, `lib/recapColors.ts` (el recap), mas
+> los cambios de julio en `hooks/useAgenda.ts`, `useNetworking.ts`, `usePhotos.ts`, `useSponsors.ts` (vibracion al
+> tocar) y `lib/api.ts` (2 reintentos con espera ante caida de red o 502/503/504).
+>
+> Historia: el 2026-07-20 Kamilo lo puso DE ULTIMO en la cola ("es un estres"). Los 5 errores de typecheck anotados
+> aqui en julio quedaron asi el 2026-10-22: `RecapCard.tsx:59` se fue con el recap a la rama de archivo;
+> `AttendanceCheckModal.tsx:24` arreglado (BUG-394, eventos-app `3b845dc`); `leaderboard.tsx:1387-1388` (BUG-392) y
+> `ContestBanner.tsx:25` (BUG-393) siguen abiertos, son visuales y van con lab de diseño (M0.6.1).
 
-> **Decision Kamilo 2026-07-20: DE ULTIMO en la cola** (es un estres; no
-> bloquear el resto del saneamiento con esto). Sigue siendo obligatorio
-> resolverlo ANTES de cualquier sesion que toque el Expo a fondo.
-> Trabajo del recap a medio hacer, quedo en el working tree (NO commiteado
-> porque rompe typecheck):
->
-> - **Untracked:** `app/(app)/recap/`, `components/recap/`, `hooks/useRecap.ts`, `lib/recapColors.ts`
-> - **Modificados:** `hooks/useAgenda.ts`, `useNetworking.ts`, `usePhotos.ts`, `useSponsors.ts`, `lib/api.ts`
-> - **5 errores typecheck a resolver antes de commit:**
->   1. `app/(app)/leaderboard.tsx:1387-1388` — object literal con propiedades duplicadas (x2)
->   2. `components/recap/RecapCard.tsx:59` — `image_url` no existe en type `RecapData`
->   3. `components/social/ContestBanner.tsx:25` — `border` no existe en `ThemeTokens`
->   4. `components/ui/AttendanceCheckModal.tsx:24` — `useRef` espera 1 argumento
->
-> El commit `0d9a754` (singleton socket, 2026-07-04) NO incluyo nada de esto —
-> verificado con git stash que los errores son previos.
+- [ ] Rediseño y reparacion del recap de la app: lab de diseño aprobado y funcionando contra el backend real (que ya
+  existe). Partir de la rama de archivo y de `docs/ROADMAP-RECAP.md`.
+- [ ] Revisar aparte, de la misma rama: la vibracion al tocar (4 hooks) y los reintentos de red de `lib/api.ts`.
+- [ ] BUG-392 y BUG-393 con lab de diseño (M0.6.1).
 
 ### Recap compartible — post-evento — IMPLEMENTADO
 
@@ -428,7 +420,7 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 > y en la app. Plan: `docs/ROADMAP-RECAP.md`.
 
 - [ ] E2E con Chromium en el servidor + validacion visual en dev build
-- [ ] Commitear el trabajo del recap que sigue en el working tree del Expo (ver arriba, rompe typecheck)
+- [ ] ~~Commitear el trabajo del recap del working tree~~ -> archivado 2026-10-22 (ver arriba): rediseño y reparacion
 
 ### Pendientes menores app (Kiosk / Silent disco)
 
@@ -516,6 +508,16 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 ---
 
 ## 11. DEUDA TECNICA
+
+### TODO escritos en el codigo que no estaban en ninguna lista (revisados 2026-10-22)
+
+- [ ] `eventos-backend` `HappeningNowController.php:45` y `:97`: "lo que pasa ahora" elige la sesion destacada sin
+  mirar la favorita del asistente; espera un `FavoriteRoom` o `session.is_keynote` que no existen
+- [ ] `eventos-app` `ProfileScreen.tsx:769` y `:894`: color morado fijo donde va el accent del evento (deuda de la Fase 3)
+- [ ] `eventos-app` `hooks/useTracker.ts:18`: el tracker no manda a ningun proveedor de analitica
+- Ramas del backend: se trabaja en `feature/magic-link-auth`, 166 commits delante de `main` (quieto desde 2026-05-02).
+  Desplegar desde `main` perderia cinco meses, seguridad incluida. Pendiente: decidir cuando se une a `main`.
+  Las ramas viejas de abril (backend, app, socket) no tienen nada que no este en la rama principal.
 
 ### Optimistic UI restantes (~3-4h) — pre-stress polish **[los que tocan el socket, congelados hasta decidir SignalR]**
 

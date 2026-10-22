@@ -7,6 +7,8 @@
 
 > Salieron al archivar el trabajo de julio (recap, haptics, reintentos) en la rama local
 > `archivo/2026-07-recap-haptics-reintentos` de eventos-app (`8176acd`): con `main` limpio `tsc` da 4 errores en 3 archivos.
+> **Ya estaban anotados por Kamilo** en `PENDIENTES.md` §7 desde el 2026-07-04 (lista de 5 errores del WIP del recap);
+> aqui solo reciben numero.
 
 ### BUG-394: `AttendanceCheckModal` no compila en TypeScript (`useRef` sin valor inicial) (ABIERTO 2026-10-22)
 - **Severidad:** BAJA (solo tipos; en la app no cambia nada) — `useRef<ReturnType<typeof setInterval>>()` sin argumento,
