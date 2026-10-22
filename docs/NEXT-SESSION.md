@@ -10,6 +10,38 @@
 
 ---
 
+## SESION 2026-10-22 (Opus 5.5) — BLOQUE 0.3 CASI CERRADO: 247 RUTAS CONGELADAS, REGLAS DE LA MIGRACION FIJADAS
+
+**Decisiones Kamilo (no re-preguntar; todas en `docs/decisiones.md`, que es el UNICO lugar de decisiones desde hoy):**
+- **M0.3.7 sacado** (pasar respuestas a Resources en PHP): el contrato ya lo fijan los snapshots.
+- **Cuenta importada sin activar: el codigo de activacion viaja solo por correo** (BUG-363).
+- **Reglas de la migracion** en `docs/BUENAS-PRACTICAS-MIGRACION.md` (25 + 3 anexos), con correcciones aprobadas:
+  unicidad Hangfire con filtro propio en `Worker`; fechas con el offset de la zona de la APP (zona por evento: despues de
+  la fase 5); lista cerrada de 15 excepciones JSON (nada entra sin decision); reinicio solo para pruebas por variable de
+  entorno; un bloque por sesion, un commit por tarea; bug que aparece se registra y se arregla solo si bloquea o si
+  Kamilo decide. Plantilla para el repo C#: `docs/plantillas/CLAUDE-dotnet.md` (una pantalla: 6 pasos + prohibiciones).
+- Roadmap: decisiones movidas a `decisiones.md`, fases 1 a 5 plegadas en `<details>`, 16 tareas nuevas (CI contra C#,
+  analizador async, vulnerables, zona del MySQL, descruzar, panel por ruta, medir en MSI, retros, mediciones por hito).
+
+**Hecho (backend `feature/magic-link-auth`):**
+- **M0.3.3/4/5:** las 247 rutas congeladas: 300 pruebas, 330 respuestas, 10 archivos en `tests/Contratos/` (`90e61f8`).
+- **BUG-362:** el correo de acceso del registro publico nunca llegaba (`private` en `WelcomeMail` + cola). **BUG-363:**
+  `check-email` entregaba el codigo de activacion (`80aef0b`). Cast del ZIP (`generated_at` siempre null).
+- `Carbon::serializeUsing`: fechas armadas a mano tambien con offset. **M0.3.8:** una sola carpeta de Resources (`c65edf1`).
+- **M0.3.9:** modo contratos (`CONTRATOS_SERVIDOR`, `POST /__contratos/reiniciar`, `App\Support\Azar` con semilla,
+  `scripts/servidor-contratos.ps1`); externo contra el propio PHP: 289 + 11 solo-php (`66c9892`).
+- **M0.3.10:** orden explicito en 15 rutas, detectado con `CONTRATO_ORDEN_INVERSO=1` (`a3bd325`).
+- Docs APP EVENTOS: `38751f9` a `3dae240`.
+
+**A medias / pendiente inmediato:** M0.3.11 (escenario `en-sala` para congelar el sorteo con ganador; hoy el jackpot da 403
+porque nadie esta en sala, no es bug). Hallazgo por verificar en M1.2.5: 22 columnas `useCurrent()` toman la hora de la
+base. La respuesta de `data-center/exports` filtra datos internos de Filament (no se copian).
+
+**Sigue:** M0.3.11 y despues el bloque 0.4 (M0.4.1 catalogo de eventos del socket; confirma las excepciones JSON del
+socket). Trampa: `--update-snapshots` con `--filter` borra TODOS los snapshots.
+
+---
+
 ## SESION 2026-10-21 (Fable 5.1, segunda parte) — MIGRACION A .NET: ANALISIS, ROADMAP Y FASE 0 ARRANCADA
 
 **Decisiones Kamilo (no re-preguntar):**

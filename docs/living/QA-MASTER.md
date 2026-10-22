@@ -14,11 +14,14 @@
 
 `tests/Contratos/` congela la respuesta de cada ruta (estado, tipo y cuerpo normalizado) como snapshot sobre un mundo
 determinista (`ContratoSeeder`, reloj en 2026-12-06 10:00 Bogota, bearer conocido por persona). 103/247 rutas al
-2026-10-21: publico 12, contenido 51, perfil/networking/stand/leads 27, formas de error 13. `./vendor/bin/pest tests/Contratos`
-(25 s); con `CONTRATO_BASE_URL` pega por HTTP a otro backend. OpenAPI: `docs/api.json` (Scramble, 247 operaciones).
+2026-10-21: publico 12, contenido 51, perfil/networking/stand/leads 27, formas de error 13. **2026-10-22: 247/247 rutas,
+300 pruebas, 330 respuestas** (sumados Mutaciones, Auth, Operacion, Stand, Juegos, Admin). `./vendor/bin/pest tests/Contratos`
+(~90 s). Por HTTP: `scripts/servidor-contratos.ps1` + `CONTRATO_BASE_URL=http://127.0.0.1:8123` (~5 min). Orden:
+`CONTRATO_ORDEN_INVERSO=1`. Comandos y trampas: `BUENAS-PRACTICAS-MIGRACION.md` Anexo C. OpenAPI: `docs/api.json`.
 
 | Fecha | Suite completa | Contratos | Nota |
 |---|---|---|---|
+| 2026-10-22 | 1.125 pasan, 144-236 s | 300/300 interno y orden inverso; 289 + 11 solo-php por HTTP | BUG-362/363 con regresion |
 | 2026-10-21 | 1.122 pasan, 153-205 s, sin socket ni webapp | 103 estables | Laravel 12.70, formato unico de fecha |
 
 ## Resumen ejecutivo

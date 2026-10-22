@@ -13,17 +13,17 @@
 
 ---
 
-## 0. ESTADO GENERAL AL 2026-10-21
+## 0. ESTADO GENERAL AL 2026-10-22
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
 > .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (11/171). Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> (17/187). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
 | Area | Avance | Que falta |
 |---|---|---|
-| **Migracion a .NET, fase 0 (preparar en PHP)** | 11/31 | 0.3 contratos (103/247 rutas), 0.4 catalogo del socket y capa `realtime`, 0.5 logica a la vista, 0.6 cierres |
+| **Migracion a .NET, fase 0 (preparar en PHP)** | 17/34 | 0.3 M0.3.11 (sorteo con ganador), 0.4 catalogo del socket y capa `realtime`, 0.5 logica a la vista, 0.6 cierres, 0.7 retro |
 
 | Area | Avance | Que falta |
 |---|---|---|

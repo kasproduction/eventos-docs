@@ -8,6 +8,16 @@
 
 ---
 
+## 2026-10-22: contratos de las 247 rutas, reglas de la migracion, dos bugs criticos cerrados
+
+- **Contratos completos** (M0.3.3 a M0.3.10): 300 pruebas, 330 respuestas, 247/247 rutas; corren tambien por HTTP contra
+  otro backend (probado contra el propio PHP: 289 + 11 solo-php) y con orden inverso para cazar listas sin orden.
+  Backend `90e61f8`, `c65edf1`, `66c9892`, `a3bd325`. M0.3.7 sacado por decision de Kamilo.
+- **BUG-362** (correo de acceso del registro publico perdido en la cola) y **BUG-363** (codigo de activacion expuesto en
+  `check-email`) cerrados con pruebas de regresion (`90e61f8`, `80aef0b`). Cast del ZIP de documentos.
+- **Docs:** `BUENAS-PRACTICAS-MIGRACION.md`, `decisiones.md` (unico lugar), `plantillas/CLAUDE-dotnet.md`, roadmap 17/187.
+- Texto original de lo cerrado: M0.3.3 a M0.3.10 del roadmap de migracion (ver el roadmap para el detalle).
+
 ## 2026-10-21 (segunda parte): migracion a .NET decidida en evaluacion, fase 0 arrancada
 
 - **Laravel 12.70.1** y `composer audit` en cero (eran 63 avisos, 3 criticos): backend `dac3429`. Guardia BUG-344 en
