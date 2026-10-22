@@ -3,6 +3,30 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-22 — App movil: errores de TypeScript en `main` (3 abiertos)
+
+> Salieron al archivar el trabajo de julio (recap, haptics, reintentos) en la rama local
+> `archivo/2026-07-recap-haptics-reintentos` de eventos-app (`8176acd`): con `main` limpio `tsc` da 4 errores en 3 archivos.
+
+### BUG-394: `AttendanceCheckModal` no compila en TypeScript (`useRef` sin valor inicial) (ABIERTO 2026-10-22)
+- **Severidad:** BAJA (solo tipos; en la app no cambia nada) — `useRef<ReturnType<typeof setInterval>>()` sin argumento,
+  que los tipos de React 19 ya no aceptan. Ensucia `tsc` y tapa errores nuevos.
+- **Arreglo:** `useRef<...>(undefined)`. **Cuando:** M0.6.1.
+- **Archivos:** `eventos-app/components/ui/AttendanceCheckModal.tsx:24`
+
+### BUG-393: El banner del concurso de fotos sale sin borde en la app (ABIERTO 2026-10-22)
+- **Severidad:** BAJA (visual) — `ContestBanner` lee `border` de `useTheme()`, que no existe en `ThemeTokens`: cae a
+  `transparent`. Es diseño: se decide con lab que borde lleva.
+- **Cuando:** M0.6.1 con decision de diseño de Kamilo.
+- **Archivos:** `eventos-app/components/social/ContestBanner.tsx:25`
+
+### BUG-392: La insignia "reclamado" de la lista de Golden Tickets sale con el estilo del modal (ABIERTO 2026-10-22)
+- **Severidad:** BAJA (visual) — en `leaderboard.tsx` los estilos `goldenClaimedBadge` y `goldenClaimedText` estan
+  definidos dos veces (lista y modal); el segundo pisa al primero, asi que la lista usa el del modal (padding, borde,
+  radio). Arreglarlo cambia como se ve: es diseño, con lab.
+- **Cuando:** M0.6.1 con decision de diseño de Kamilo.
+- **Archivos:** `eventos-app/app/(app)/leaderboard.tsx:1373-1374, 1387-1388`
+
 ## 2026-10-22 — Hallazgos del inventario del admin y de la fase 0 (17 abiertos)
 
 > Orden de arreglo (decision Kamilo 2026-10-22, `decisiones.md`): seguridad en el bloque 0.8 al cierre de la fase 0;

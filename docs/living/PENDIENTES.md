@@ -150,6 +150,10 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   - [ ] BUG-382 Activar o cerrar encuestas desde el admin no avisa por socket
   - [ ] BUG-383 Abrir dos paginas del admin ya cambia datos
   - [ ] BUG-388 El correo de prueba de plantillas no usa el SMTP de la organizacion
+- App movil (M0.6.1):
+  - [ ] BUG-392 Insignia "reclamado" de Golden Tickets con el estilo del modal (diseño)
+  - [ ] BUG-393 Banner del concurso de fotos sin borde (diseño)
+  - [ ] BUG-394 `AttendanceCheckModal` no compila en TypeScript (solo tipos)
 - Solo local:
   - [ ] BUG-371 Con la suite corriendo, un pedido real leyo la config de pruebas (no correr la suite durante QA en vivo)
 - [ ] Pulse cuenta 84 mensajes y la BD tiene 2.156: revisar el criterio de `stats.messages` (sin verificar)
@@ -390,6 +394,14 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 ---
 
 ## 7. APP MOVIL (EXPO)
+
+- [ ] **Recap de la app: rediseño y reparacion** (decision Kamilo 2026-10-22). Que es: la tarjeta-resumen del evento
+  de cada asistente (portada, nivel, reverso). Por que: el intento de julio no funcionaba bien y se veia mal. Esta
+  archivado, no borrado: rama local `archivo/2026-07-recap-haptics-reintentos` de eventos-app (`8176acd`), con
+  `app/(app)/recap`, `components/recap`, `hooks/useRecap.ts`, `lib/recapColors.ts`. Lista cuando: lab de diseño
+  aprobado y funciona contra el backend real. El backend del recap (generar imagen, `/r/{code}`) ya existe.
+- [ ] Revisar aparte lo que quedo en la misma rama de archivo: vibracion al tocar en agenda, networking, fotos y
+  sponsors (4 hooks) y reintentos automaticos de red en `lib/api.ts` (2 reintentos con espera ante caida o 502/503/504).
 
 ### ⚠ WIP SIN COMMITEAR en el working tree de eventos-app (estado 2026-07-04)
 

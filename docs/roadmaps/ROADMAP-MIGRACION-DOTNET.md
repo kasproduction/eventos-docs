@@ -149,7 +149,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
   **Hecho 2026-10-22 (backend):** middleware global `MarcaBackend`; API, errores, admin y paginas del operador la llevan (comprobado en vivo). Los estaticos de Apache no (no pasan por Laravel). 4 pruebas.
 
 ### 0.6 Cerrar lo que quedo a medias en PHP (1 a 2 dias + medir) — 0/4
-- [ ] M0.6.1 Expo: commitear el recap del working tree arreglando los 5 errores de `tsc` (`leaderboard.tsx`, `RecapCard.tsx`, `ContestBanner.tsx`, `AttendanceCheckModal.tsx`) **[local]**
+- [ ] M0.6.1 Expo: `tsc` limpio en `main` (BUG-392, BUG-393 con decision de diseño; BUG-394). El recap NO se commitea: archivado en la rama local `archivo/2026-07-recap-haptics-reintentos` (`8176acd`) por decision de Kamilo 2026-10-22 (no funcionaba bien y se veia mal); queda como funcion pendiente de rediseño y reparacion en PENDIENTES §7 **[local]**
 - [ ] M0.6.2 BUG-359 `mobileNav` en `messages/pt.json`; BUG-358 hidratacion #418 (se espera que caiga con M0.3.2) **[local]**
 - [ ] M0.6.3 Medir en servidor B3.7, B3.8 y B3.9 con 300 personas (lo hecho el 2026-10-18 y 2026-10-21). Si el servidor sigue en pausa, queda como primera medicion de la fase 1 **[servidor]**
 - [ ] M0.6.4 Registrar este roadmap en `docs/living/PENDIENTES.md` como bloque con contadores y marcar lo congelado del admin con "congelado hasta admin .NET" (lista en `pendientes-2026-10.md` §7) **[local]**
