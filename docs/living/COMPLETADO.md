@@ -4,9 +4,27 @@
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
 > **NOTA:** Los numeros BUG-XXX en este archivo son historicos. La numeracion fue reorganizada el 2026-04-23.
 > Fuente de verdad para bugs: `docs/BUG-LOG.md` (numeracion secuencial BUG-001 a BUG-232).
-> Actualizado: 2026-10-16
+> Actualizado: 2026-10-21
 
 ---
+
+## 2026-10-21 (segunda parte): migracion a .NET decidida en evaluacion, fase 0 arrancada
+
+- **Laravel 12.70.1** y `composer audit` en cero (eran 63 avisos, 3 criticos): backend `dac3429`. Guardia BUG-344 en
+  `tests/TestCase.php`. Regresiones cazadas y cerradas: BUG-360 (CSRF del 2FA con Laravel 12) y BUG-361 (ruta de lo mio
+  tapaba `support/mine`).
+- **Suite sin dependencias externas** (BUG-347, BUG-348): 1.122 pruebas en 153 s sin socket ni webapp (backend `4cedb3e`).
+- **Contratos de la API:** `ContratoSeeder` + `tests/Contratos/` con 103 snapshots + `docs/api.json` OpenAPI (backend
+  `6c4087c`). **Un solo formato de fecha** (offset del evento) en toda la API (backend `ebaef93`).
+- **Docs:** `docs/migracion-dotnet.md`, `docs/pendientes-2026-10.md`, `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`.
+- Texto original de las tareas cerradas:
+
+- [ ] BUG-347 Los tests llaman al socket y a la webapp reales: falta `preventStrayRequests` y simular `/internal`
+      (la suite tarda ~30 min)
+- [ ] BUG-344 Pest con config cacheada corre contra MySQL de dev: TestCase debe abortar si no es sqlite (mitigado)
+- [ ] BUG-348 Test de cache del Data Center falla siempre: reescribirlo para la invalidacion por observer
+      (`DataCenterApiTest.php:76`). Prioridad baja
+- [ ] `composer audit`: 57 avisos en 19 paquetes sin revisar
 
 ## 2026-10-16: tres bugs de riesgo y decisiones de Kamilo
 

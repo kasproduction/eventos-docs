@@ -6,16 +6,24 @@
 > cada `/guardar`.
 > Inventario completo de todos los docs: 2026-10-16 (45 archivos, ~1.700 casillas; las de planes viejos de modulos
 > cerrados NO se copiaron: esos docs llevan el aviso "HISTORICO" arriba).
-> Actualizado: 2026-10-16.
+> Actualizado: 2026-10-21 (noche).
 > **Vista para priorizar (privada, celular):** https://claude.ai/artifact/UwSGdGXbJCHTeXEb7UpBDL. Kamilo marca
 > Ya / Antes del evento / Despues / Descartar y notas; Claude las lee con ArtifactData (coleccion `prioridades`, id = hash
 > de la tarea) y pasa el orden a este archivo. Si este archivo cambia, se regenera la pagina.
 
 ---
 
-## 0. ESTADO GENERAL AL 2026-10-16
+## 0. ESTADO GENERAL AL 2026-10-21
 
-> Evento: **domingo 6 de diciembre de 2026, 5.000 personas.** Faltan 51 dias. Ensayo general 28-29 de noviembre.
+> **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
+> .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
+> (11/171). Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
+> es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
+
+| Area | Avance | Que falta |
+|---|---|---|
+| **Migracion a .NET, fase 0 (preparar en PHP)** | 11/31 | 0.3 contratos (103/247 rutas), 0.4 catalogo del socket y capa `realtime`, 0.5 logica a la vista, 0.6 cierres |
 
 | Area | Avance | Que falta |
 |---|---|---|
@@ -129,17 +137,13 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 
 ## 3. BUGS ABIERTOS (detalle en `BUG-LOG.md`)
 
+> Cerrados 2026-10-21: BUG-344, BUG-347, BUG-348, y los nuevos BUG-360 y BUG-361 (ver COMPLETADO).
+
 - [ ] BUG-358 Error de hidratacion React #418 en produccion (texto distinto servidor/navegador; sospecha horas o fechas)
 - [ ] BUG-359 Falta `mobileNav` en `messages/pt.json` (barra movil en portugues sin textos)
 
-- [ ] BUG-347 Los tests llaman al socket y a la webapp reales: falta `preventStrayRequests` y simular `/internal`
-      (la suite tarda ~30 min)
-- [ ] BUG-344 Pest con config cacheada corre contra MySQL de dev: TestCase debe abortar si no es sqlite (mitigado)
-- [ ] BUG-348 Test de cache del Data Center falla siempre: reescribirlo para la invalidacion por observer
-      (`DataCenterApiTest.php:76`). Prioridad baja
 - [ ] BUG-345 Correo sin ritmo: codigo hecho en B3.1, se cierra al medirlo
 - [ ] Pulse cuenta 84 mensajes y la BD tiene 2.156: revisar el criterio de `stats.messages` (sin verificar)
-- [ ] `composer audit`: 57 avisos en 19 paquetes sin revisar
 
 ---
 
@@ -229,8 +233,9 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   login (Bintec Play no dejo entrar a Kamilo).
 - [ ] **B.4 Ficha de sesion:** triple estado (me interesa / favorito / asistire presencialmente) y
   Outlook Calendar ademas de Google. Verificar que tenemos hoy antes de agregar.
-- [ ] **B.5 Cabeceras de seguridad:** revisar CSP, X-Frame-Options, nosniff y Referrer-Policy en
-  eventos-web y la API. Y que ningun registro use un dato conocido (cedula) como contraseña.
+- [~] **B.5 Cabeceras de seguridad:** revisadas 2026-10-21 (M0.1.5): la webapp tiene CSP, X-Frame-Options, nosniff,
+  Referrer-Policy y HSTS; la API ademas `Permissions-Policy`. Falta `Permissions-Policy` en la webapp (`camera=(self)` por el
+  escaner QR, QA en telefono). Cedula como contraseña no aplica: el registro es sin contraseña.
 - [ ] **B.6 Respaldo de chat para eventos grandes:** evaluar Ably (o similar) solo si la medicion
   de 5.000 muestra que nuestro socket no aguanta. Decision por evento, no reescritura.
 
@@ -431,7 +436,9 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ---
 
-## 8. ADMIN Y MODULOS DEL ORGANIZADOR
+## 8. ADMIN Y MODULOS DEL ORGANIZADOR **[congelado hasta admin .NET, salvo Mission Control iPad]**
+
+> Justificacion por item en `docs/pendientes-2026-10.md` seccion 7. Nacen en el admin nuevo (fase 2 del roadmap de migracion).
 
 - [ ] Configuracion canales WhatsApp/SMS desde Filament (email/SMTP ya existe;
       WhatsApp/SMS son nice-to-have seccion 9)
@@ -455,7 +462,7 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ---
 
-## 9. MANUAL DEL ORGANIZADOR — EN PAUSA (decision Kamilo 2026-07-19)
+## 9. MANUAL DEL ORGANIZADOR — EN PAUSA (decision Kamilo 2026-07-19) **[congelado hasta admin .NET: documenta pantallas que se van]**
 
 > Se retoma al final, pre-produccion (primero bugs/funcionalidad/deploy).
 > Ventana operativa: `docs/roadmaps/ROADMAP-MANUAL.md` (5/35 — quedan M1-M7:
@@ -479,7 +486,7 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 11. DEUDA TECNICA
 
-### Optimistic UI restantes (~3-4h) — pre-stress polish
+### Optimistic UI restantes (~3-4h) — pre-stress polish **[los que tocan el socket, congelados hasta decidir SignalR]**
 
 > Plan completo en `docs/OPTIMISTIC-UI-PLAN.md`. Audit en `docs/OPTIMISTIC-UI-AUDIT.md`.
 > Implementar DESPUES de cerrar features de negocio (app + webapp), ANTES del stress test.
@@ -495,7 +502,7 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] Tests E2E flujos criticos: aprobar Q&A, lanzar game, cancelar sesion, scheduled export trigger
 - [ ] Revisar la autenticacion del admin: como funciona + cuando expiran los tokens (nota Kamilo; encaja con el frente Seguridad del Staff)
 
-### Unificacion SPAs (~10-12h)
+### Unificacion SPAs (~10-12h) **[congelado hasta admin .NET: se absorben en el admin nuevo]**
 
 > Cada SPA usa toasts/modales/colores/fetch wrappers diferentes. Crear biblioteca compartida.
 

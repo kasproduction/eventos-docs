@@ -10,6 +10,55 @@
 
 ---
 
+## SESION 2026-10-21 (Fable 5.1, segunda parte) — MIGRACION A .NET: ANALISIS, ROADMAP Y FASE 0 ARRANCADA
+
+**Decisiones Kamilo (no re-preguntar):**
+- **El evento del 6 de diciembre SE CAYO. No entran mas pendientes.** Se evalua migrar el backend a .NET con un solo
+  sistema entendible de punta a punta para la linea enterprise. Motivo medido (no supuesto): PHP era el 60% del CPU, techo
+  70 req/s en 4 vCPU, peaje de 11,4 ms por peticion x 9 por pantalla (`docs/infra/INFORME-STRESS-2026-08-01.md`); mas: un
+  solo runtime (hoy PHP-FPM + Node + PM2 + Horizon + cron con 17 endpoints internos) y un admin enterprise (Filament es la
+  mitad de los commits y hubo que rediseñarlo entero).
+- **D.1 dale a la fase 0** del `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md` (3 semanas en PHP: seguridad, suite, contratos,
+  catalogo del socket, logica a la vista). Faltan D.2 a D.6 (orden admin primero, alcance del admin, torre de control, app
+  en tiendas, nombre del repo C#).
+- **Un solo formato de fecha en la API: ISO 8601 con el offset del evento, sin fracciones** (`2026-12-06T13:30:00-05:00`).
+  Se habia propuesto UTC con Z y se corrigio: la app y la webapp agrupan la agenda cortando la fecha como texto.
+- **Regla del cliente:** si aparece un cliente que paga antes de la semana 12, se le entrega con PHP y la migracion se pausa.
+- El MSI (`servidor@100.94.231.75`, Ubuntu 24.04, Ryzen 3 5300G, 5,7 GB visibles) es el banco de pruebas de la fase 1.
+  Revisado por Tailscale; no se instalo nada todavia (falta Docker, Redis, .NET SDK).
+
+**Hecho:**
+- `docs/migracion-dotnet.md` (analisis: 247 endpoints, 72 jobs, 14 observers, socket, riesgos, equivalentes, fases),
+  `docs/pendientes-2026-10.md` (los 210 pendientes clasificados: seguridad, evento, admin, congelado, fase 2),
+  `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md` (6 fases, 171 tareas, reglas de convivencia, hitos vendibles).
+- **Bloque 0.1** (backend `dac3429`): Laravel 11.51 a **12.70.1**, Filament 3.3.57, `composer audit` **0 avisos** (eran 63,
+  3 criticos), guardia BUG-344 en `tests/TestCase.php`. Dos regresiones cazadas por la suite: BUG-360 (Laravel 12 tira el
+  CSRF en login; `TwoFactorLogin::complete` lo conserva) y BUG-361 (`{eventId}/mine` tapaba `GET /events/support/mine`).
+- **Bloque 0.2** (backend `4cedb3e`): `Http::preventStrayRequests()` + fake solo de POST a socket/webapp/exp.host en
+  TestCase (BUG-347); BUG-348 reescrito. **Suite completa sin socket ni webapp: 1.122 pasan en 153 s** (antes 30 min).
+- **Bloque 0.3 en curso** (backend `6c4087c`, `ebaef93`): `ContratoSeeder` determinista (reloj congelado 2026-12-06
+  10:00 Bogota, bearer conocido por persona), `tests/Contratos/` con **103 snapshots** estables en 25 s, `docs/api.json`
+  OpenAPI 3.1 con Scramble (247 operaciones), formato unico de fecha aplicado (trait `FechasConOffset` en 84 modelos,
+  73 `toISOString` reemplazados). Runbook "al abrir el registro publico" en ROADMAP-INFRAESTRUCTURA.
+
+**Comandos que cuestan redescubrir:**
+- Suite completa: `./vendor/bin/pest` (ya no necesita variables de entorno). Contratos: `./vendor/bin/pest tests/Contratos`;
+  regenerar a proposito: `--update-snapshots`. OpenAPI: `php -d memory_limit=1024M artisan scramble:export --path=docs/api.json`.
+- En Windows composer necesita `--ignore-platform-req=ext-pcntl --ignore-platform-req=ext-posix` (Horizon). En Linux no.
+
+**Gotchas:**
+- Una corrida larga de Pest lanzada con `&` dentro de un Bash que luego se manda a segundo plano se muere: lanzar en
+  segundo plano desde el principio o por archivos.
+- `attendee_stories` y `lead_edits` no tienen timestamps de Eloquent: la base pone la hora REAL aunque el reloj este
+  congelado. El seeder las fija a mano.
+- Las respuestas en streaming (CSV, ZIP) se capturan con `streamedContent()`, no con `getContent()`.
+
+**Sigue (bloque 0.3):** 144 rutas sin snapshot (mutaciones, auth, admin, salas, juegos, stand, Data Center, Pulse),
+formas de error 403 aprobacion / 429 / paginacion, ZIP, M0.3.7 Resources en los 5 controladores grandes, M0.3.8
+`AttendeeResource` unico. Luego 0.4 (catalogo del socket, capa `realtime`), 0.5, 0.6.
+
+---
+
 ## SESION 2026-10-21 (Fable 5.1) — BUG-357 CERRADO, GRUPO 1 DE B.1, DETALLES SIN DOBLE TRANSICION
 
 **Decisiones Kamilo (no re-preguntar):**
