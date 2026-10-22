@@ -10,7 +10,7 @@
   `getEloquentQuery`: cualquier usuario con acceso al panel ve todos los eventos y "Trabajar en este" lo deja operar en
   cualquiera, de cualquier organizacion. Los demas recursos filtran por el evento activo, asi que el cruce entra por aqui.
 - **Visto:** inventario de acciones del admin (M0.5.3), verificado a mano.
-- **Arreglo:** filtrar por `organization_id` del usuario (super_admin ve todo). Decision de Kamilo; va con la auditoria.
+- **Arreglo:** filtrar por `organization_id` del usuario (super_admin ve todo). Agendado: M0.8.3 (bloque de seguridad).
 - **Archivos:** `app/Filament/Resources/EventResource.php`
 
 ### BUG-373: Banear desde el admin no saca a la persona del socket en el momento (ABIERTO 2026-10-22)
@@ -18,17 +18,17 @@
   API si llama (`Admin/BanController.php:180`). El `AttendeeBan::created` del AppServiceProvider solo borra la ficha de
   auth del socket: la conexion abierta sigue (chat incluido) hasta que se reconecte.
 - **Visto:** inventario M0.5.3, verificado a mano.
-- **Arreglo:** que las dos puertas usen el mismo servicio de ban. Decision de Kamilo.
+- **Arreglo:** que las dos puertas usen el mismo servicio de ban. Agendado: M0.8.2 (bloque de seguridad).
 - **Archivos:** `app/Filament/Resources/AttendeeAdminResource.php`, `Admin/BanController.php`
 
-### BUG-372: "Enviar push" de un anuncio privado se lo manda a todo el evento, con el codigo del premio (ABIERTO 2026-10-22)
+### BUG-372: "Enviar push" de un anuncio privado se lo manda a todo el evento, con el codigo del premio (RESUELTO 2026-10-22)
 - **Severidad:** CRITICA (fuga de codigos canjeables) — `AnnouncementResource::sendPush` arma la audiencia por evento y
   roles e ignora `target_attendee_id`. Los anuncios privados (premio del Golden Ticket "Tienes un premio sin reclamar.
   Codigo: XXXXXX", respuestas de soporte) salen en la misma tabla ya publicados, con el boton "Enviar push" visible.
   Un clic del staff y el codigo llega a todos los telefonos del evento; cualquiera puede reclamar el premio.
 - **Visto:** inventario M0.5.3, verificado a mano (`AnnouncementResource.php:273-292`, `GoldenTicketResource.php:143`).
-- **Arreglo propuesto:** si el anuncio tiene destinatario, la push va solo a esa persona (o el boton no aparece).
-  Decision de Kamilo.
+- **Fix (backend a23884a, decision Kamilo):** `sendPush` manda solo al destinatario cuando el anuncio es privado; cubre
+  los tres botones. `PushAnuncioPrivadoTest` (falla con el codigo anterior). Suite 1.141.
 - **Archivos:** `app/Filament/Resources/AnnouncementResource.php`
 
 ### BUG-371: Con la suite corriendo, un pedido real del servidor local leyo la config de pruebas (ABIERTO 2026-10-22)

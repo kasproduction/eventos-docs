@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 29/188
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 29/195
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 29/34
+## Fase 0: Preparar en PHP (3 semanas) — 29/40
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -154,6 +154,18 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M0.6.3 Medir en servidor B3.7, B3.8 y B3.9 con 300 personas (lo hecho el 2026-10-18 y 2026-10-21). Si el servidor sigue en pausa, queda como primera medicion de la fase 1 **[servidor]**
 - [ ] M0.6.4 Registrar este roadmap en `docs/living/PENDIENTES.md` como bloque con contadores y marcar lo congelado del admin con "congelado hasta admin .NET" (lista en `pendientes-2026-10.md` §7) **[local]**
 
+### 0.8 Seguridad (al cierre de la fase 0, antes de la retro; decision Kamilo 2026-10-22) — 0/6
+
+> Va antes de M0.7.1: C# arranca sobre un contrato limpio y no copia fallas. Lo que es solo de Filament y no es de
+> seguridad va a la lista "no repetir" de la fase 2 (M2.8.5), salvo que aparezca un cliente antes de la semana 12.
+
+- [ ] M0.8.1 Auditoria de seguridad del backend y del socket (tamaño a elegir: rapida, estandar o profunda; recomendada estandar). Informe con hallazgos verificados, cada uno en BUG-LOG con severidad **[local]**
+- [ ] M0.8.2 BUG-373: banear desde el admin expulsa del socket en el momento (mismo servicio que la API) **[local]**
+- [ ] M0.8.3 BUG-374: el admin solo muestra los eventos de la organizacion del usuario (super_admin ve todo) **[local]**
+- [ ] M0.8.4 Verificar los 13 hallazgos del inventario del admin (`contratos/acciones-admin.md`) y los de M0.5.2 (`/display/polls` publica, `X-Frame-Options: ALLOWALL`); arreglar los de seguridad confirmados **[local]**
+- [ ] M0.8.5 `.env.example` completo: las 12 variables propias que faltan, secretos sin valor por defecto inseguro, y `security:check` que falle si un secreto quedo en `change_this_secret_in_production` (`contratos/variables.md`) **[local]**
+- [ ] M0.8.6 Arreglar lo que M0.8.1 confirme como real, en orden de severidad **[local]**
+
 ### 0.7 Cierre de la fase — 0/1
 - [ ] M0.7.1 Retro de la fase 0 (regla 25 de BUENAS-PRACTICAS): estimado contra real, regla que falto, que se corrige del roadmap **[local]**
 
@@ -211,9 +223,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 ---
 
 <details>
-<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/44</b></summary>
+<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/45</b></summary>
 
-## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/44
+## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/45
 
 > Next sirve la interfaz; C# sirve la API admin y reproduce los efectos secundarios que hoy hacen los observers de
 > Laravel. Filament se apaga modulo por modulo. La API publica, Node y los correos siguen en PHP y no se enteran.
@@ -268,11 +280,12 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M2.7.3 Mission Control, Event Pulse, display, chat-monitor y attendance-check se enlazan desde el admin nuevo con el mismo token; su unificacion (PENDIENTES §11) se hace aqui o se absorben como paginas del admin **[local]**
 - [ ] M2.7.4 Cuando el ultimo modulo del hito 1 este cubierto: Filament solo queda para lo de M2b, con un aviso en el panel **[local]**
 
-### 2.8 Lo congelado que nace aqui (dentro de los bloques de arriba) — 0/4
+### 2.8 Lo congelado que nace aqui (dentro de los bloques de arriba) — 0/5
 - [ ] M2.8.1 "Otorgar puntos manuales" (motor existe en `PointsService`, sin UI) **[local]**
 - [ ] M2.8.2 Credencial con etiqueta visible (VIP, Prensa): marcar tags que salen en la escarapela **[local]**
 - [ ] M2.8.3 Renombres y limpiezas: Highlights → Destacados solo en la interfaz (la entidad `highlights` es contrato con 8 clientes del socket), borrar `EventOnboardingResource`, toggle de Silent Disco segun `decisiones.md` **[local]**
 - [ ] M2.8.4 Manual del organizador se reescribe sobre el admin nuevo (ROADMAP-MANUAL M1 a M7 cambian de pantallas) **[local]**
+- [ ] M2.8.5 Lista "no repetir" del inventario del admin (`contratos/acciones-admin.md`, seccion Hallazgos): un solo camino por accion con los mismos efectos que la API (push con el mismo publico, aprobar fotos y muro con puntos y avisos iguales, marcar premio reclamado con `RewardService::confirm`, encuestas que avisan por socket, asignar speakers que avisa); nada de logica en hooks de guardar; permisos por accion **[local]**
 
 ### 2.9 Torre de control minima (M2b, 1 semana, segun D.4) — 0/3
 - [ ] M2.9.1 Pagina solo super_admin en el admin nuevo: peticiones por segundo y p95 por ruta (desde los logs de M1.1.3), errores del ultimo minuto, colas de Hangfire y Horizon (leyendo Redis), estado de cada nodo del LB **[local]**
