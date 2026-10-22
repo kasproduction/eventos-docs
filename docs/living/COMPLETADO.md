@@ -4,9 +4,19 @@
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
 > **NOTA:** Los numeros BUG-XXX en este archivo son historicos. La numeracion fue reorganizada el 2026-04-23.
 > Fuente de verdad para bugs: `docs/BUG-LOG.md` (numeracion secuencial BUG-001 a BUG-232).
-> Actualizado: 2026-10-21
+> Actualizado: 2026-10-22
 
 ---
+
+## 2026-10-22 (tercera parte): bloque 0.4 cerrado, tiempo real por una sola puerta
+
+- **BUG-366** Mission Control se entera del fin de la trivia (`b060f2b`). **BUG-367** cifras del Data Center al dia
+  apenas cambia algo (version por evento, `3add5d4`).
+- **M0.4.2 / M0.4.3** webapp, app, kiosko y las 5 paginas sueltas hablan con el tiempo real por un solo archivo cada uno
+  (eventos-web `e708bcf`, eventos-app `c461d0c`, eventos-kiosko `e6412c2`, backend `79194af`).
+- **M0.4.5** canal Redis `eventos:invalidate` para la cache de C# (`a8bf77e`).
+- **M0.4.6** fuera dos avisos que nadie escuchaba (`f8c3cde`, BUG-369 escaneo de sala mas rapido); cartel de anuncio sobre
+  el video de vuelta (eventos-web `dcf4079`, BUG-368). Anexo A aprobado (24 nombres).
 
 ## 2026-10-22 (segunda parte): bloque 0.3 cerrado, catalogos del socket y de Redis
 

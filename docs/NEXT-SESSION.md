@@ -10,6 +10,36 @@
 
 ---
 
+## SESION 2026-10-22 (Opus 5.5, tercera parte) — BLOQUE 0.4 CERRADO: UNA SOLA PUERTA AL TIEMPO REAL EN TODOS LOS CLIENTES
+
+**Decisiones Kamilo (todas en `docs/decisiones.md`):** Anexo A aprobado (24); BUG-366 y BUG-367 arreglados ya en PHP;
+M0.4.6 = fuera `agenda:updated` y `room:occupancy`, cartel de anuncios reconectado; auditoria de seguridad del backend
+SI, tamaño **estandar** recomendado (sin elegir aun), va **al cierre de la fase 0, antes de pasar rutas a C#**. MSI
+APAGADO hasta la fase 1. Orden aprobado: cerrar fase 0 (0.5, 0.6) -> auditoria -> fase 1 (prender MSI).
+
+**Hecho:**
+- **BUG-366** Mission Control escucha `game:finished` (backend `b060f2b`). **BUG-367** stats del Data Center con version por
+  evento (`ExportService::statsKey/invalidateStats`), sin KEYS; probado contra Redis local (`3add5d4`).
+- **M0.4.2** webapp `src/lib/realtime.ts` (interfaz `Realtime`, `getRealtime`, `joinEvent/Session`, `leaveSession`); prueba
+  que falla si otro archivo importa `socket.io-client` (eventos-web `e708bcf`).
+- **M0.4.3** Expo `lib/realtime.ts` (`c461d0c`), kiosko `src/lib/realtime.ts` (`e6412c2`), paginas sueltas
+  `public/js/realtime/motor.js` + `realtime.js` (backend `79194af`, motor local en vez del CDN). **Falta mirarlas en vivo.**
+- **M0.4.5** canal Redis `eventos:invalidate` `{eventId, entity, op}` por conexion `socket`, antes del throttle (`a8bf77e`).
+- **M0.4.6** fuera `agenda:updated` y `room:occupancy` (backend `f8c3cde`, BUG-369: el escaneo de sala esperaba ese POST);
+  cartel de anuncio sobre el video reconectado a la lista de la campana (eventos-web `dcf4079`, BUG-368, solo escritorio).
+  `networking:refresh` NO sobraba (bus interno de la webapp; error del catalogo corregido).
+- Roadmap 24/187, fase 0 24/34, bloque 0.4 6/6. Tests: backend 1.130 (suite completa antes de M0.4.6; despues 183 de
+  salas/sesiones/juegos + 302 contratos), vitest 684, catalogo 49 + 10.
+
+**A medias:** mirar en vivo las 5 paginas sueltas (Mission Control, Event Pulse, display, chat monitor, control de
+asistencia) cuando Laragon y el socket esten prendidos. eventos-app tiene cambios de julio sin commit (recap,
+reintentos en `lib/api.ts`): son M0.6.1, no se tocaron.
+
+**Sigue:** bloque 0.5 (M0.5.1 observers a `SessionEffects`, M0.5.2 closures de `routes/web.php`, M0.5.3 inventario de 111
+acciones de Filament, M0.5.4 variables de entorno, M0.5.5 cabecera `X-Backend: php`). Un bloque por sesion.
+
+---
+
 ## SESION 2026-10-22 (Opus 5.5, segunda parte) — BLOQUE 0.3 CERRADO, CATALOGOS DEL SOCKET Y DE REDIS
 
 **Decisiones Kamilo:** ninguna nueva (dio dale a M0.3.11, M0.4.1, M0.4.4).
