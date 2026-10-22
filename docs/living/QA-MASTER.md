@@ -22,6 +22,7 @@ determinista (`ContratoSeeder`, reloj en 2026-12-06 10:00 Bogota, bearer conocid
 | Fecha | Suite completa | Contratos | Nota |
 |---|---|---|---|
 | 2026-10-22 | 1.125 pasan, 144-236 s | 300/300 interno y orden inverso; 289 + 11 solo-php por HTTP | BUG-362/363 con regresion |
+| 2026-10-22 (2) | sin correr completa | 302/302 interno y orden inverso; 291 + 11 solo-php por HTTP | Sorteo y ruleta con gente en sala; BUG-364/365 del arnes |
 | 2026-10-21 | 1.122 pasan, 153-205 s, sin socket ni webapp | 103 estables | Laravel 12.70, formato unico de fecha |
 
 ## Resumen ejecutivo

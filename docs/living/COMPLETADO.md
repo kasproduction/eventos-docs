@@ -8,6 +8,16 @@
 
 ---
 
+## 2026-10-22 (segunda parte): bloque 0.3 cerrado, catalogos del socket y de Redis
+
+- **M0.3.11:** escenario `en-sala`; sorteo con ganador y ruleta con participantes congelados (302 pruebas). Arnes:
+  BUG-364 (todos los pasos corrian como el primero que entraba) y BUG-365 (Redis de desarrollo compartido; ahora base 15
+  vaciada por prueba). Backend `749d312`, `c65ae71`.
+- **M0.4.1:** `docs/contratos/eventos-socket.json` (61 eventos: 51 + 10) y `npm run catalogo` en eventos-socket
+  (`c090f80`), que corrigio los tipos de inicio y fin de sesion. Anexo A pasa a 24 nombres (pendiente de aprobar).
+- **M0.4.4:** `docs/contratos/claves-redis.md` (bases, prefijos, dueños, formato y vida). Docs `d1136f8`, `a67633d`, `0686cff`.
+- Registrados sin tocar: BUG-366 (Mission Control no se entera del fin de la trivia) y BUG-367 (cache del Data Center no se invalida).
+
 ## 2026-10-22: contratos de las 247 rutas, reglas de la migracion, dos bugs criticos cerrados
 
 - **Contratos completos** (M0.3.3 a M0.3.10): 300 pruebas, 330 respuestas, 247/247 rutas; corren tambien por HTTP contra

@@ -10,6 +10,30 @@
 
 ---
 
+## SESION 2026-10-22 (Opus 5.5, segunda parte) — BLOQUE 0.3 CERRADO, CATALOGOS DEL SOCKET Y DE REDIS
+
+**Decisiones Kamilo:** ninguna nueva (dio dale a M0.3.11, M0.4.1, M0.4.4).
+
+**Hecho:**
+- **M0.3.11:** escenario `en-sala` en `ContratoEscenarios`; sorteo y ruleta con gente en sala congelados. Arnes: BUG-364
+  (`forgetGuards` en `Apoyo::pedir`) y BUG-365 (Redis base 15 vaciada por prueba, `ModoContratos::redisAparte`). Orden
+  explicito en el draw. 302 interno e inverso; 291 + 11 por HTTP. Backend `749d312`, `c65ae71`.
+- **M0.4.1:** `docs/contratos/eventos-socket.json` (51 servidor->cliente, 17 sin tipar; 10 cliente->servidor; oyentes sin
+  emisor). eventos-socket `npm run catalogo` (`c090f80`) valida `types.ts` contra el catalogo; corrigio `SessionPayload`.
+- **M0.4.4:** `docs/contratos/claves-redis.md`. Prefijo de cache comprobado: `eventos_database_eventos_`.
+- Roadmap 20/187, fase 0 20/34, bloque 0.4 2/6. Docs `d1136f8`, `a67633d`, `0686cff`.
+
+**Preguntas abiertas para Kamilo (hacerlas primero):**
+1. Aprobar el Anexo A con 24 nombres camelCase (eran 15; entraron los que arma el socket: `checkedIn`, `userName`, `sentAt`...).
+2. BUG-366 (Mission Control escucha `game:ended`, se emite `game:finished`) y BUG-367 (patron de `DataCenterCacheObserver`
+   no coincide con la clave real): una linea cada uno. ¿Se arreglan?
+3. M0.4.6: sobrantes reales = `agenda:updated` y `room:occupancy` (sin oyente), `announcement:new` y `networking:refresh`
+   (sin emisor). ¿Quitar o dejar anotados?
+
+**Sigue:** M0.4.2 (capa `realtime.ts` en la webapp), M0.4.3 (Expo, kiosko, estaticas), M0.4.5 (invalidacion tambien por Redis).
+
+---
+
 ## SESION 2026-10-22 (Opus 5.5) — BLOQUE 0.3 CASI CERRADO: 247 RUTAS CONGELADAS, REGLAS DE LA MIGRACION FIJADAS
 
 **Decisiones Kamilo (no re-preguntar; todas en `docs/decisiones.md`, que es el UNICO lugar de decisiones desde hoy):**
