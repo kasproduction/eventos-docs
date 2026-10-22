@@ -3,6 +3,34 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-21 — Fase 0 de la migracion a .NET, bloques 0.1 y 0.2 (5 bugs: 5 resueltos)
+
+### BUG-360: Laravel 12 tira el token CSRF al hacer login y la activacion del 2FA volvia a dar 419 (RESUELTO 2026-10-21)
+- **Severidad:** ALTA — Al subir a Laravel 12 (backend dac3429), `SessionGuard::login()` paso de `migrate(true)` a
+  `regenerate(true)`, que ademas regenera el token CSRF. La pagina de activacion del 2FA sigue abierta con el token viejo
+  y el primer clic daba 419 "This page has expired": la misma regresion del QA del 2026-09-26, que el test
+  `TwoFactorLoginTest > conserva el token CSRF` cazo al correr la suite completa.
+- **Fix (backend dac3429):** `TwoFactorLogin::complete()` guarda el token antes de `login()` y lo vuelve a poner. El id
+  de sesion si cambia (la fijacion de sesion sigue cubierta).
+- **Archivos:** `app/Support/TwoFactorLogin.php`
+
+### BUG-361: La ruta de "lo mio" se tragaba `GET /events/support/mine` y respondia 500 (RESUELTO 2026-10-21)
+- **Severidad:** ALTA — `Route::get('/{eventId}/mine')` (85fd4c0, B3.9 del 2026-10-21) se registraba antes que
+  `/support/mine`, asi que `{eventId}` tomaba el valor "support" y `LoMioController::index(int $eventId)` reventaba con
+  TypeError. Seis tests de `SupportRequestTest` lo mostraron; en produccion la pantalla de soporte habria quedado sin
+  "mis consultas".
+- **Fix (backend dac3429):** `->whereNumber('eventId')` en la ruta de lo mio.
+- **Archivos:** `routes/api/events.php`
+
+### BUG-344, BUG-347 y BUG-348 (RESUELTOS 2026-10-21, ver sus entradas del 2026-09-13)
+- BUG-344: `tests/TestCase::refreshApplication()` aborta con mensaje claro si la configuracion esta cacheada o la
+  conexion no es sqlite, antes de que `RefreshDatabase` toque nada (backend dac3429). Probado con `config:cache`.
+- BUG-347: `Http::preventStrayRequests()` + fake que contesta 200 solo a los POST hacia el socket, la webapp y exp.host;
+  las lecturas las fakea cada test (backend 4cedb3e). Suite completa sin variables de entorno: 1.122 pasan en 153 s
+  (antes 30 min con el socket apagado).
+- BUG-348: el test prueba que la cache de stats se sirve mientras nada cambia y que un asistente nuevo la invalida de
+  inmediato (backend 4cedb3e).
+
 ## 2026-10-18 — Navegacion inmediata y agenda/social livianas (4 bugs: 2 resueltos, 2 abiertos)
 
 ### BUG-357: La transicion de cambio de modulo mueve toda la tarjeta y encima los titulos (RESUELTO 2026-10-21)
@@ -74,18 +102,18 @@
 - **Severidad:** ALTA — El campo del codigo se envia solo al completar 6 digitos; si la persona ademas presionaba Enter llegaba un segundo envio con el mismo codigo, que salia "ya se uso", y el error tapaba los codigos nuevos: los viejos ya muertos y los nuevos sin ver. **Fix:** con codigos en pantalla el segundo envio no hace nada; en el reto, el mismo codigo incorrecto repetido cuenta una sola vez para el bloqueo. Tests de regresion.
 - **Archivos:** `app/Filament/Pages/AccountSecurity.php`, `app/Filament/Auth/TwoFactorChallenge.php`
 
-## 2026-09-13 — Auditoria de infraestructura + plan noviembre B1.1/B1.2 (10 bugs: 5 resueltos, 5 abiertos)
+## 2026-09-13 — Auditoria de infraestructura + plan noviembre B1.1/B1.2 (10 bugs: 8 resueltos, 2 abiertos: BUG-345 va en B3.1, BUG-346 resuelto)
 
 > Contexto: posible cliente en noviembre, evento de 5.000 personas. Plan en
 > `docs/roadmaps/ROADMAP-INFRAESTRUCTURA.md` "PLAN DE TRABAJO — EVENTO DE NOVIEMBRE".
 > Sin commit al registrar (esperando confirmacion de Kamilo).
 
-### BUG-348: El test "stats are cached for 60s" del Data Center espera un comportamiento que se cambio a proposito en abril (ABIERTO)
+### BUG-348: El test "stats are cached for 60s" del Data Center espera un comportamiento que se cambio a proposito en abril (RESUELTO 2026-10-21, backend 4cedb3e)
 - **Severidad:** BAJA (test desactualizado, el codigo esta bien) — Es el unico fallo de la suite completa del 2026-09-13 (887 pasan, 1 falla). El test pide las estadisticas, crea un asistente y espera que la segunda consulta devuelva el valor viejo en cache (`registered = 0`); recibe 1. Falla siempre, con cache `array` y con `file`. **Causa:** `DataCenterCacheObserver` borra `dc:stats:{eventId}:*` al crear, actualizar o borrar los modelos del Data Center (registrado en `AppServiceProvider.php:95`). Lo agrego el commit `f6111e6` del 2026-04-25, posterior al commit del test (`07796dc`, mismo dia). La cache de 60 s ahora solo aplica mientras los datos no cambian, que es lo correcto para el organizador.
 - **Ajeno a B1.1/B1.2:** ninguno de los archivos de ese cambio toca Data Center, observers, asistentes ni cache.
 - **Fix pendiente:** reescribir el test para que pruebe lo que el codigo promete: dos consultas seguidas sin cambios devuelven el valor en cache, y un asistente nuevo invalida la cache y se ve de inmediato.
 - **Archivos:** `tests/Feature/DataCenter/DataCenterApiTest.php:76`
-### BUG-347: Los tests llaman al servidor de sockets real y la suite completa tarda horas (ABIERTO)
+### BUG-347: Los tests llaman al servidor de sockets real y la suite completa tarda horas (RESUELTO 2026-10-21, backend 4cedb3e)
 - **Severidad:** ALTA (confiabilidad de la suite) — Controladores, servicios y observers avisan al socket con `Http::post` a `SOCKET_SERVER_URL` (`InvalidationService`, `CheckinService`, `GameService`, `WallController`, `PollController` y otros). Ningun test usa `Http::fake()` ni `Http::preventStrayRequests()`. En Windows un puerto cerrado de localhost no rechaza la conexion: espera el tiempo completo, medido en 2,00 s. Con el socket apagado, la suite completa (unos 950 tests en 87 archivos) corrio 29 minutos con 37 s de CPU sin terminar y se detuvo a mano. El resultado de la suite depende de si el socket esta prendido en la maquina.
 - **Tambien la webapp:** `InvalidationService` avisa a la webapp local (`WEBAPP_INTERNAL_URLS`, por defecto `http://127.0.0.1:3000`) para soltar su cache del marco, con 1 s de espera por llamada. Con la webapp apagada, los tests unitarios de rate limit tardaban 1-2 s cada uno.
 - **Mitigacion usada el 2026-09-13 para validar B1.1/B1.2:** correr Pest con `SOCKET_SERVER_URL=http://0.0.0.0:1` y `WEBAPP_INTERNAL_URLS=http://0.0.0.0:1`: en Windows esa direccion falla en 1 ms en vez de esperar.
@@ -101,7 +129,7 @@
 - **Fix previsto:** cola limitada por debajo del techo, enlaces de acceso con prioridad sobre invitaciones, reintentos que no pierdan correos y pedir ampliacion a Resend. Item B3.1 del plan de noviembre.
 - **Archivos:** `app/Jobs/SendEmailJob.php`
 
-### BUG-344: Pest con la configuracion cacheada corre contra la base MySQL de desarrollo (ABIERTO, mitigado)
+### BUG-344: Pest con la configuracion cacheada corre contra la base MySQL de desarrollo (RESUELTO 2026-10-21, backend dac3429)
 - **Severidad:** ALTA (riesgo de perdida de datos) — Con `bootstrap/cache/config.php` presente (lo deja `DEMO-BUILD.bat` via `artisan optimize`), Laravel ignora los `<env>` de `phpunit.xml` y los tests usan `eventos_db` en MySQL. El 2026-09-13 fallaron 53 tests con "connection refused" porque MySQL estaba apagado. **Con MySQL encendido, `RefreshDatabase` habria migrado de cero la base de desarrollo.**
 - **Mitigacion aplicada:** `php artisan config:clear` antes de testear + memoria `feedback_tests_config_cache`.
 - **Fix pendiente:** guarda en `tests/TestCase.php` que aborte si la conexion no es `sqlite` o si existe la cache de configuracion.

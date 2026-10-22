@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 5/171
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 8/171
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > Clasificacion de pendientes: `docs/pendientes-2026-10.md`. Fuente unica de tareas: `docs/living/PENDIENTES.md`
@@ -57,6 +57,19 @@
 7. **Regla del cliente (escrita hoy para no discutirla con el cliente encima):** si aparece un cliente que paga antes
    del hito 1 (semana 12), se le entrega con PHP y la migracion se pausa donde este. Lo construido en C# no se bota.
 
+## BANCO DE PRUEBAS: el MSI de Kamilo (revisado por Tailscale 2026-10-21)
+
+`servidor@100.94.231.75`: MSI PRO X300, Ryzen 3 5300G (4 nucleos / 8 hilos, comparable a un droplet de 4 vCPU), 8 GB
+fisicos de los que Linux ve 5,7 (la BIOS reserva 2 GB a la grafica: bajar UMA Frame Buffer a 512 MB), swap 4 GB, 82 GB
+libres, Ubuntu 24.04.5. Ya tiene PHP 8.4.26 con pcntl, posix, intl, gd, zip, bcmath, pdo_mysql y opcache; Node 24;
+MySQL 8.0 (con las bases `energia_en_ruta*` de otro proyecto: no se tocan); nginx con el sitio por defecto; composer; git.
+**Le falta:** Docker + compose, Redis, .NET SDK, PHP-FPM como servicio, k6 (k6 corre desde el Windows).
+
+**Para que se usa:** Linux de verdad para los dos backends (fase 0: suite y contratos; fase 1: M1.1.2 Docker del servicio
+C#), la medicion comparativa PHP contra C# (M1.5.2, misma maquina, k6 desde el Windows por la red local) y demo/QA por
+Tailscale. **Para que no:** capacidad que se cotiza (eso se mide en el servidor real) ni carga de miles (k6 gasta 1 a 2 MB
+por usuario virtual). Instalacion pendiente para el arranque de la fase 1 (decision Kamilo 2026-10-21: primero 0.2).
+
 ## HITOS VENDIBLES
 
 | Hito | Semana | Que se le muestra a un cliente | Que corre por dentro |
@@ -80,7 +93,7 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 5/31
+## Fase 0: Preparar en PHP (3 semanas) — 8/31
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -92,10 +105,10 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 - [x] M0.1.4 BUG-344 (probado: con `config:cache` la suite aborta con mensaje claro): guarda en `tests/TestCase.php` que aborte si la conexion no es sqlite o existe `bootstrap/cache/config.php` **[local]**
 - [x] M0.1.5 Llaves reales de Turnstile como paso del runbook (ROADMAP-INFRAESTRUCTURA, "Al abrir el registro publico") y cabeceras de eventos-web revisadas: tiene nosniff, Referrer-Policy, HSTS, X-Frame-Options y CSP; le falta `Permissions-Policy` (debe ser `camera=(self)` por el escaner QR, pendiente de QA en telefono, anotado en el runbook). Cedula como contraseña no aplica: registro sin contraseña **[local]**
 
-### 0.2 Suite confiable (1 dia) — 0/3
-- [ ] M0.2.1 BUG-347: `Http::preventStrayRequests()` + fake de `/internal/*` del socket y de `/api/internal/invalidate` de la webapp en `tests/TestCase.php`; revisar los tests que asumian la llamada real **[local]**
-- [ ] M0.2.2 BUG-348: reescribir el test de cache del Data Center para la invalidacion por observer (`DataCenterApiTest.php:76`) **[local]**
-- [ ] M0.2.3 Suite completa en menos de 10 minutos con socket y webapp apagados (hoy 30 min) **[local]**
+### 0.2 Suite confiable (1 dia) — 3/3 (HECHO 2026-10-21, backend 4cedb3e)
+- [x] M0.2.1 BUG-347: `Http::preventStrayRequests()` + fake de `/internal/*` del socket y de `/api/internal/invalidate` de la webapp en `tests/TestCase.php`; revisar los tests que asumian la llamada real **[local]**
+- [x] M0.2.2 BUG-348: reescribir el test de cache del Data Center para la invalidacion por observer (`DataCenterApiTest.php:76`) **[local]**
+- [x] M0.2.3 Suite completa sin socket ni webapp: 1.122 pasan en 153 s (antes 30 min) **[local]**
 
 ### 0.3 Contratos de la API (5 a 6 dias) — 0/8
 - [ ] M0.3.1 Seeder determinista de contrato: fecha fija, un evento, 10 asistentes con roles distintos, una sesion por estado, un stand, un juego, una encuesta (`database/seeders/ContratoSeeder.php`) **[local]**
