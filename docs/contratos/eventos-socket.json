@@ -2,6 +2,7 @@
   "_leeme": [
     "Catalogo de eventos del socket (ROADMAP-MIGRACION-DOTNET M0.4.1, 2026-10-22). Es el contrato que el hub de SignalR copia en la fase 3.",
     "Fuente: eventos-socket/src/types.ts, index.ts y chat.ts; los emisores de Laravel (Http::post a /internal/*); los oyentes buscados en eventos-web/src, eventos-app, eventos-kiosko y eventos-backend/public.",
+    "M0.4.6 (2026-10-22): fuera agenda:updated y room:occupancy (nadie los escuchaba, backend f8c3cde); el cartel de anuncios de la webapp dejo de escuchar announcement:new y sale de la lista de la campana (eventos-web dcf4079). Quedan 49 del servidor al cliente.",
     "Los nombres de campo van tal cual viajan: camelCase y snake_case mezclados (ver Anexo A de BUENAS-PRACTICAS-MIGRACION). C# no los normaliza.",
     "tipado: true = esta en ServerToClientEvents/ClientToServerEvents de types.ts. `npm run catalogo` en eventos-socket valida nombres y campos de los tipados contra este archivo.",
     "Tipos: 'int', 'string', 'bool', 'iso8601' (fecha con offset), 'any', '?' al final = puede ser null, '[]' = lista, 'opcional:' = puede no venir."
@@ -12,13 +13,12 @@
     "chat:session:{sessionId}": "join:session (la misma llamada)",
     "display:session:{sessionId}": "join:session (la misma llamada)",
     "pulse:{eventId}": "automatica si el rol del token es 'pulse'",
-    "persona": "todos los sockets de un asistente (mapa attendeeConnections en memoria del proceso)",
-    "event:{eventId}:admin": "NADIE la une: lo que se manda ahi se pierde (room:occupancy)"
+    "persona": "todos los sockets de un asistente (mapa attendeeConnections en memoria del proceso)"
   },
   "oyentes": {
     "webapp": "eventos-web (Next): hooks/useGlobalSocket.tsx, hooks/streaming/*, components/app/social/*",
-    "expo": "eventos-app: lib/socket.ts + hooks",
-    "kiosko": "eventos-kiosko (useAttendance.ts)",
+    "expo": "eventos-app: lib/realtime.ts + hooks",
+    "kiosko": "eventos-kiosko (lib/realtime.ts, useAttendance.ts)",
     "mission-control": "eventos-backend/public/mission-control/app.js",
     "chat-monitor": "eventos-backend/public/chat-monitor.html",
     "display": "eventos-backend/public/display/session.html",
@@ -45,13 +45,6 @@
       "emisor": "Laravel /internal/broadcast (SessionConfigController::broadcastSessionLifecycle)",
       "payload": { "session_id": "int", "title": "string", "actual_start_at": "iso8601?", "actual_end_at": "iso8601?", "cancelled_at": "iso8601?" },
       "escuchan": ["mission-control"]
-    },
-    {
-      "nombre": "agenda:updated", "tipado": false, "sala": "event:{eventId}",
-      "emisor": "Laravel /internal/broadcast (SessionConfigController:300)",
-      "payload": { "session_id": "int", "title": "string", "actual_start_at": "iso8601?", "actual_end_at": "iso8601?", "cancelled_at": "iso8601?" },
-      "escuchan": [],
-      "nota": "Emitido, sin consumidor (decision en M0.4.6)."
     },
     {
       "nombre": "agenda:delayed", "tipado": false, "sala": "event:{eventId}",
@@ -329,13 +322,6 @@
       "escuchan": ["mission-control", "attendance-check"]
     },
     {
-      "nombre": "room:occupancy", "tipado": false, "sala": "event:{eventId}:admin (nadie la une)",
-      "emisor": "Laravel /internal/broadcast (RoomCheckinService:371)",
-      "payload": { "room_id": "int", "room_name": "string?", "occupancy": "int", "capacity": "int?" },
-      "escuchan": [],
-      "nota": "Emitido, sin consumidor (decision en M0.4.6)."
-    },
-    {
       "nombre": "error", "tipado": true, "sala": "solo el socket que provoco el error",
       "emisor": "Node",
       "payload": "string: MAX_CONNECTIONS_EXCEEDED | EVENT_ACCESS_DENIED | JOIN_RATE_LIMITED | SESSION_ACCESS_DENIED | SESSION_NOT_JOINED | CHAT_BANNED | CHAT_PAUSED | CHAT_RATE_LIMITED | FORBIDDEN",
@@ -354,7 +340,5 @@
     { "nombre": "display:project", "tipado": true, "payload": { "sessionId": "int", "type": "string", "pollId": "opcional:int", "questionData": "opcional:{body:string, author:string, upvotes:int}", "gameData": "opcional:any" }, "quien": "mission-control", "regla": "rol admin*" },
     { "nombre": "display:stop", "tipado": true, "payload": { "sessionId": "int" }, "quien": "mission-control", "regla": "rol admin*" }
   ],
-  "oyentes_sin_emisor": [
-    { "nombre": "announcement:new", "donde": "eventos-web hooks/streaming/useAnnouncementOverlay.ts:49", "nota": "Quitado del socket el 2026-07-04; los anuncios llegan por data:invalidate {entity: announcements}." }
-  ]
+  "oyentes_sin_emisor": []
 }

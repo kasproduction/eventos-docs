@@ -3,6 +3,25 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-22 — Fase 0, bloque 0.4: tiempo real (2 bugs: 2 resueltos)
+
+### BUG-369: El escaneo del totem de sala esperaba un aviso al socket que nadie recibia (RESUELTO 2026-10-22)
+- **Severidad:** MEDIA (rendimiento en puerta) — `RoomCheckinService` mandaba `room:occupancy` a `event:{id}:admin` dentro
+  del escaneo, de forma sincrona pese al comentario "async": una consulta de ocupacion + un POST de hasta 2 s antes de
+  responderle al totem. Nadie se une a esa sala; ningun totem ni el Event Pulse lo usan (el Pulse pide el aforo a la API).
+- **Fix (backend f8c3cde, decision Kamilo M0.4.6):** fuera el envio y el metodo. Junto salio `agenda:updated` (alargar
+  sesion), que tampoco escuchaba nadie.
+- **Archivos:** `app/Services/RoomCheckinService.php`, `Admin/SessionConfigController.php`
+
+### BUG-368: El cartel de anuncio sobre el video no salia desde julio (RESUELTO 2026-10-22)
+- **Severidad:** ALTA (funcion perdida sin aviso) — `useAnnouncementOverlay` escuchaba `announcement:new`, que el socket
+  dejo de emitir el 2026-07-04 (los anuncios pasaron a `data:invalidate`). El anuncio llegaba a la campana pero el
+  cartel de 5 s encima de la transmision no volvio a salir. Visto al revisar los sobrantes del socket (M0.4.6).
+- **Fix (eventos-web dcf4079, decision Kamilo):** el cartel sale de la misma lista que la campana (marco, sin pedidos
+  extra): la pagina del stream la recibe, `router.refresh` trae el anuncio nuevo y se muestra el que no estaba al abrir.
+  3 pruebas vitest. **Ojo:** el cartel solo existe en escritorio; en celular nunca estuvo.
+- **Archivos:** `src/hooks/streaming/useAnnouncementOverlay.ts`, `StreamShell.tsx`, `session-stream/[id]/page.tsx`
+
 ## 2026-10-22 — Fase 0, bloque 0.3: congelar las 247 rutas (3 bugs: 3 resueltos; 1 hallazgo por verificar)
 
 ### BUG-367: El Data Center no invalida sus estadisticas al cambiar los datos (RESUELTO 2026-10-22)
