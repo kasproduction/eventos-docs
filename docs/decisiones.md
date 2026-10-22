@@ -52,6 +52,6 @@
 - Admin: donde vive "Otorgar puntos manuales" (el motor lo soporta, no hay UI).
 - Admin: ¿vuelve el toggle de Silent Disco al form de sesion?
 - Agenda: ¿se puede volver a calificar una sesion ya calificada? Hoy queda de solo lectura (BUG-322).
-- Socket (M0.4.6, corregido 2026-10-22 con el catalogo): `session:started/ended/cancelled` SI tienen oyente (Mission Control). Sobran `agenda:updated` y `room:occupancy` (nadie escucha) y `announcement:new` y `networking:refresh` (la webapp escucha, nadie emite): ¿quitarlos o dejarlos anotados?
+- Socket (M0.4.6, corregido 2026-10-22 con el catalogo): `session:started/ended/cancelled` SI tienen oyente (Mission Control). Sobran `agenda:updated` y `room:occupancy` (nadie escucha) y `announcement:new` (la webapp escucha, nadie emite; `networking:refresh` si funciona, es del bus interno de la webapp: corregido 2026-10-22): ¿quitarlos o dejarlos anotados?
 - Event Pulse: reglas del hero (tarjetas que agregan "los ultimos 10 ingresos" + lead individual).
 - Paginas custom (iframes del organizador): construir el acceso o demoler.

@@ -355,7 +355,6 @@
     { "nombre": "display:stop", "tipado": true, "payload": { "sessionId": "int" }, "quien": "mission-control", "regla": "rol admin*" }
   ],
   "oyentes_sin_emisor": [
-    { "nombre": "announcement:new", "donde": "eventos-web hooks/streaming/useAnnouncementOverlay.ts:49", "nota": "Quitado del socket el 2026-07-04; los anuncios llegan por data:invalidate {entity: announcements}." },
-    { "nombre": "networking:refresh", "donde": "eventos-web SocialView.tsx:304, useGlobalSocket.tsx", "nota": "Nadie lo emite; la lista se refresca por networking:notify." }
+    { "nombre": "announcement:new", "donde": "eventos-web hooks/streaming/useAnnouncementOverlay.ts:49", "nota": "Quitado del socket el 2026-07-04; los anuncios llegan por data:invalidate {entity: announcements}." }
   ]
 }
