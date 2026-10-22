@@ -184,6 +184,15 @@
   los tres botones. `PushAnuncioPrivadoTest` (falla con el codigo anterior). Suite 1.141.
 - **Archivos:** `app/Filament/Resources/AnnouncementResource.php`
 
+### BUG-395: React avisa en desarrollo por el script del tema dentro del layout (ABIERTO 2026-10-22)
+- **Severidad:** BAJA (aviso de consola en `next dev`, no se ve) — `Encountered a script tag while rendering React
+  component`: es el script que pone `data-theme` antes de pintar para que no parpadee el tema (`src/app/[locale]/layout.tsx:69`).
+  En la primera carga si corre (va en el HTML). Moverlo mal trae de vuelta el parpadeo.
+- **Visto:** QA de hidratacion del BUG-358 (2026-10-22).
+- **Cuando se arregla:** cuando se toque el layout; opcion `next/script` con `beforeInteractive`, probando que no
+  parpadee en las dos pieles.
+- **Archivos:** `eventos-web/src/app/[locale]/layout.tsx`
+
 ### BUG-371: Con la suite corriendo, un pedido real del servidor local leyo la config de pruebas (ABIERTO 2026-10-22)
 - **Severidad:** BAJA (solo local) — durante `./vendor/bin/pest` completo, un pedido de Mission Control por Apache dio
   500: `no such table: personal_access_tokens (Connection: sqlite, database.sqlite)` en entorno production. Alguna
@@ -331,14 +340,23 @@
   ~100 ms, entrada despues). Alternativa si no convence: quitar la transicion (corte).
 - **Archivos:** `eventos-web/src/components/shell/TransicionModulo.tsx`, `src/app/globals.css`, `src/components/shell/CanvasCard.tsx`
 
-### BUG-358: Error de hidratacion de React #418 en la webapp de produccion (ABIERTO)
+### BUG-358: Error de hidratacion de React #418 en la webapp de produccion (RESUELTO 2026-10-22)
 - **Severidad:** BAJA por ahora — dos `Minified React error #418` (texto distinto entre servidor y navegador) en la consola
   de `localhost:3000` (build de produccion) mientras se median pantallas. Sin causa ubicada; sospecha: horas o fechas
   calculadas distinto en servidor y navegador. Reproducir con `next dev` para ver el componente.
+- **Causa (2026-10-22, reproducido con `next dev` + Playwright):** la sospecha era correcta. En home y agenda,
+  `HappeningNowM` daba "Coming Up 08:00 a. m." con un espacio fino (U+202F) en un lado y normal en el otro, y sin locale
+  fijo. 11 componentes formateaban la hora por su cuenta; el formateador comun `lib/format/time.ts` (que ya normalizaba)
+  solo lo usaban 3.
+- **Fix (eventos-web `2ff14a6`):** todas las horas pasan por `formatLocalTime` (mismas opciones, el texto visible no
+  cambia); contadores de asistentes con `es-CO` fijo. `tests/lib/formatoHoras.test.ts` falla si alguien vuelve a usar
+  `toLocaleTimeString` fuera de `lib/format/time.ts`. 9 pantallas sin error en escritorio y 5 en telefono. Vitest 688.
 
-### BUG-359: Falta `mobileNav` en `messages/pt.json` (ABIERTO)
+### BUG-359: Falta `mobileNav` en `messages/pt.json` (RESUELTO 2026-10-22)
 - **Severidad:** BAJA — `pnpm build` imprime `MISSING_MESSAGE: mobileNav (pt)`: la barra movil en portugues sale sin textos.
   Ya venia de antes. **Fix:** copiar la seccion de `es.json` y traducir.
+- **Fix (eventos-web `9dab432`):** tambien faltaba `mobileShell` (3 textos de "muy pronto"). 9 textos traducidos con el
+  estilo de `pt.json`. `tests/lib/mensajes.test.ts` falla si a `en` o `pt` les falta o sobra un texto frente a `es`.
 
 ### BUG-356: La huella del token era un hash de 32 bits y ahora guarda la sesion (RESUELTO)
 - **Severidad:** ALTA en cuanto la sesion (`/auth/me`) paso a memoria del servidor — con 32 bits y 5.000 asistentes la

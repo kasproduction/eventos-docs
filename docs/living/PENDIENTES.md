@@ -17,13 +17,13 @@
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
 > .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (29/195). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> (30/195). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
 | Area | Avance | Que falta |
 |---|---|---|
-| **Migracion a .NET, fase 0 (preparar en PHP)** | 29/40 | 0.6 cierres, 0.8 seguridad (auditoria, BUG-373, BUG-374, `.env.example`), 0.7 retro logica a la vista, 0.6 cierres, 0.7 retro |
+| **Migracion a .NET, fase 0 (preparar en PHP)** | 30/40 | 0.6 cierres, 0.8 seguridad (auditoria, BUG-373, BUG-374, `.env.example`), 0.7 retro logica a la vista, 0.6 cierres, 0.7 retro |
 
 | Area | Avance | Que falta |
 |---|---|---|
@@ -123,8 +123,9 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 > Cerrados 2026-10-21: BUG-344, BUG-347, BUG-348, y los nuevos BUG-360 y BUG-361 (ver COMPLETADO).
 > Cerrados 2026-10-22: BUG-362 a BUG-370 y BUG-372.
 
-- [ ] BUG-358 Error de hidratacion React #418 en produccion (texto distinto servidor/navegador; sospecha horas o fechas)
-- [ ] BUG-359 Falta `mobileNav` en `messages/pt.json` (barra movil en portugues sin textos)
+- [x] BUG-358 Error de hidratacion React #418: RESUELTO 2026-10-22 (horas con espacio fino; eventos-web `2ff14a6`)
+- [x] BUG-359 Falta `mobileNav` en `messages/pt.json`: RESUELTO 2026-10-22 (eventos-web `9dab432`)
+- [ ] BUG-395 Aviso de React en desarrollo por el script del tema en el layout (no se ve; cuando se toque el layout)
 
 - [ ] BUG-345 Correo sin ritmo: codigo hecho en B3.1, se cierra al medirlo
 

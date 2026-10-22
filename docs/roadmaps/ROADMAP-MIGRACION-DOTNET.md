@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 29/195
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 30/195
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 29/40
+## Fase 0: Preparar en PHP (3 semanas) — 30/40
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -148,9 +148,10 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.5.5 Cabecera `X-Backend: php` en toda respuesta de Laravel desde ya **[local]**
   **Hecho 2026-10-22 (backend):** middleware global `MarcaBackend`; API, errores, admin y paginas del operador la llevan (comprobado en vivo). Los estaticos de Apache no (no pasan por Laravel). 4 pruebas.
 
-### 0.6 Cerrar lo que quedo a medias en PHP (1 a 2 dias + medir) — 0/4
+### 0.6 Cerrar lo que quedo a medias en PHP (1 a 2 dias + medir) — 1/4
 - [ ] M0.6.1 Expo: `tsc` limpio en `main` (BUG-392, BUG-393 con decision de diseño; BUG-394). El recap NO se commitea: archivado en la rama local `archivo/2026-07-recap-haptics-reintentos` (`8176acd`) por decision de Kamilo 2026-10-22 (no funcionaba bien y se veia mal); queda como funcion pendiente de rediseño y reparacion en PENDIENTES §7 **[local]**
-- [ ] M0.6.2 BUG-359 `mobileNav` en `messages/pt.json`; BUG-358 hidratacion #418 (se espera que caiga con M0.3.2) **[local]**
+- [x] M0.6.2 BUG-359 `mobileNav` en `messages/pt.json`; BUG-358 hidratacion #418 (se espera que caiga con M0.3.2) **[local]**
+  **Hecho 2026-10-22 (eventos-web `9dab432`, `2ff14a6`):** BUG-359 (tambien faltaba `mobileShell`) y BUG-358 reproducido con `next dev`: no cayo con M0.3.2, era el formato de la hora (espacio fino U+202F) en 11 componentes. Dos pruebas de guardia (idiomas y horas). Vitest 688. Salio BUG-395 (aviso del script del tema, solo desarrollo).
 - [ ] M0.6.3 Medir en servidor B3.7, B3.8 y B3.9 con 300 personas (lo hecho el 2026-10-18 y 2026-10-21). Si el servidor sigue en pausa, queda como primera medicion de la fase 1 **[servidor]**
 - [ ] M0.6.4 Registrar este roadmap en `docs/living/PENDIENTES.md` como bloque con contadores y marcar lo congelado del admin con "congelado hasta admin .NET" (lista en `pendientes-2026-10.md` §7) **[local]**
 
