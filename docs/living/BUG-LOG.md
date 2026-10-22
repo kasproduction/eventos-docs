@@ -5,6 +5,21 @@
 
 ## 2026-10-22 — Fase 0, bloque 0.3: congelar las 247 rutas (3 bugs: 3 resueltos; 1 hallazgo por verificar)
 
+### BUG-365: Las pruebas de contrato usaban el Redis de desarrollo y lo que escribian pasaba a la corrida siguiente (RESUELTO 2026-10-22)
+- **Severidad:** MEDIA (solo pruebas) — `join` del sorteo guarda el pool en `game:{id}:pool` (TTL 1 h) en la base 0 del
+  Redis local. La segunda corrida respondia 409 "Already joined": snapshot distinto segun cuando se corriera, y llaves de
+  prueba en el Redis de desarrollo.
+- **Fix (backend 749d312):** `ModoContratos::redisAparte`: base 15 solo para contratos, vaciada al empezar cada prueba y en
+  `/__contratos/reiniciar`. C# hace lo mismo con su Redis en el reinicio.
+- **Archivos:** `app/Support/ModoContratos.php`, `tests/Pest.php`
+
+### BUG-364: En las pruebas de contrato los pasos de un flujo corrian todos como la primera persona (RESUELTO 2026-10-22)
+- **Severidad:** ALTA (solo pruebas) — en modo interno el guard de Sanctum guarda al primer usuario autenticado de la
+  prueba y no vuelve a leer el bearer: en un flujo dario → ana → fabio, ana y fabio eran dario. Contra un servidor (PHP o
+  C#) no pasa. Revisado: ningun snapshot congelado cambio al corregirlo; lo destapo el sorteo con gente (M0.3.11).
+- **Fix (backend 749d312):** `app('auth')->forgetGuards()` antes de cada peticion interna en `Apoyo::pedir`.
+- **Archivos:** `tests/Contratos/Apoyo.php`
+
 ### BUG-363: `check-email` le entregaba el codigo de activacion de una cuenta importada a quien escribiera el correo (RESUELTO 2026-10-22)
 - **Severidad:** CRITICA — persona importada por CSV y sin activar: cualquiera que supiera su correo recibia el
   `invitation_token` en la respuesta y podia ponerle su propia contraseña. Solo lo frenaba el dato de verificacion
