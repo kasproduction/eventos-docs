@@ -114,6 +114,11 @@ de los 330 snapshots y del codigo PHP:
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
 - Contra PHP: `./vendor/bin/pest tests/Contratos` (~90 s).
-- Contra C#: `CONTRATO_BASE_URL=http://localhost:<puerto> ./vendor/bin/pest tests/Contratos`.
+- Contra C#: `CONTRATO_BASE_URL=http://localhost:<puerto> ./vendor/bin/pest tests/Contratos` (el servidor en modo
+  contratos; `solo-php` se salta).
+- PHP como otro backend: `.\scripts\servidor-contratos.ps1` en una terminal y `CONTRATO_BASE_URL=http://127.0.0.1:8123`
+  en otra (~5 min). Es la prueba de que el modo externo funciona antes de que exista C#.
+- Orden de las listas: `CONTRATO_ORDEN_INVERSO=1 ./vendor/bin/pest tests/Contratos` (sqlite invierte las consultas sin
+  `ORDER BY`; si un snapshot cambia, a esa lista le falta orden).
 - Regenerar: `--update-snapshots` SOLO sin `--filter` (con filtro borra todos y regenera solo los filtrados); para uno
   solo, borrar su `.snap` y correr.

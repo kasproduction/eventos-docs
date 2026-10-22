@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 15/186
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 17/186
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 15/33
+## Fase 0: Preparar en PHP (3 semanas) — 17/33
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -108,7 +108,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.2.2 BUG-348: reescribir el test de cache del Data Center para la invalidacion por observer (`DataCenterApiTest.php:76`) **[local]**
 - [x] M0.2.3 Suite completa sin socket ni webapp: 1.122 pasan en 153 s (antes 30 min) **[local]**
 
-### 0.3 Contratos de la API (5 a 6 dias) — 7/9 (backend 90e61f8, c65edf1, 80aef0b)
+### 0.3 Contratos de la API (5 a 6 dias) — 9/9 (HECHO 2026-10-22, backend 90e61f8 a a3bd325)
 - [x] M0.3.1 Seeder determinista `ContratoSeeder`: reloj congelado 2026-12-06 10:00 Bogota, evento `contrato-2026`, 10 personas con bearer conocido, staff, 5 sesiones, stand, social, gamificacion, encuesta, juego, totem, webhook. Ampliado 2026-10-22: evento con aprobacion (kiko), invitacion/enlace magico/reset con valor fijo, QR fijo por persona, staff de check-in **[local]**
 - [x] M0.3.2 **Un solo formato de fecha: ISO 8601 con el offset de la zona de la app, sin fracciones** (`2026-12-06T13:30:00-05:00`). Trait `FechasConOffset` en los 84 modelos + 73 `toISOString` reemplazados (2026-10-21) + `Carbon::serializeUsing` para las fechas armadas a mano en arreglos (2026-10-22). Motivo: la app (`hooks/useAgenda.ts:70`) y la webapp (`AgendaView.tsx:107`) agrupan la agenda con `split('T')[0]`; con UTC las sesiones de la noche cambian de dia. Queda fuera: CSV humanos y filas crudas de `DB::table` del Data Center (el admin nuevo las redefine). Zona por evento: abierta en `decisiones.md` **[local]**
 - [x] M0.3.3 **Las 247 rutas congeladas:** 300 pruebas, 330 respuestas en 10 archivos de `tests/Contratos/` (por tema; se reparten por modulo al portar), `./vendor/bin/pest tests/Contratos` ~90 s, dos pasadas identicas. Flujos encadenados (juegos, encuestas, verificacion de asistencia, Data Center). Bugs encontrados: BUG-362 (correo de acceso perdido en la cola), BUG-363 (codigo de activacion expuesto), `generated_at` del ZIP siempre null **[local]**
@@ -117,8 +117,8 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.3.6 OpenAPI con `dedoc/scramble` 0.13: `docs/api.json`, 247 operaciones, 16 avisos; regenerado 2026-10-22 (Scramble no infiere `null` en `?->toIso8601String()`; mandan los snapshots) **[local]**
 - M0.3.7 ~~Resources en los 5 controladores grandes~~: **sacado** (`decisiones.md` 2026-10-22: el contrato ya lo fijan los snapshots)
 - [x] M0.3.8 Una sola carpeta de Resources (`V1`). No habia dos `AttendeeResource`: la duplicada era la carpeta **[local]**
-- [ ] M0.3.9 Pruebas listas para correr contra C#: etiqueta `solo-php` en las que hoy no pueden (429, ZIP listo, Data Center por sesion) con comparacion de forma; en modo externo `contrato()` llama al endpoint de reinicio antes de cada prueba que escribe; ruleta y sorteo mandan la semilla **[local]**
-- [ ] M0.3.10 **Orden explicito en toda lista:** auditar las consultas de las 247 rutas que devuelven listas sin `orderBy` y agregarlo en PHP (snapshots regenerados a proposito). Es criterio de cruce **[local]**
+- [x] M0.3.9 Pruebas listas para correr contra C#, **probadas contra el propio PHP servido como otro backend** (backend 66c9892): modo contratos (`CONTRATOS_SERVIDOR`, reloj congelado, llamadas afuera simuladas, `POST /__contratos/reiniciar {escenario?}` en 0,4 s), `scripts/servidor-contratos.ps1`, escenarios con nombre (`zip-listo`), azar determinista `Azar` (min + semilla mod rango, cabecera `X-Contrato-Semilla`). Externo: 289 pasan + 11 `solo-php` (Data Center por sesion, hasta M4e) **[local]**
+- [x] M0.3.10 **Orden explicito en toda lista** (backend a3bd325): deteccion con `CONTRATO_ORDEN_INVERSO=1` (sqlite invierte toda consulta sin ORDER BY); 15 rutas, 4 causas (speakers por sesion, salas y manifiesto, favoritos, sesiones de la verificacion), orden = el que ya daba MySQL, ningun snapshot cambio. Limite: solo ve listas con 2+ elementos en el seeder **[local]**
 
 ### 0.4 Tiempo real listo para cambiar de motor (3 a 4 dias) — 0/6
 - [ ] M0.4.1 Catalogo de eventos del socket: `docs/contratos/eventos-socket.json` con los 44 nombres, payload, sala y quien escucha (fuente: `eventos-socket/src/types.ts` + apendice B de `migracion-dotnet.md`); `types.ts` se genera o se valida contra el. Confirma los nombres camelCase del socket en la lista de excepciones JSON (BUENAS-PRACTICAS, Anexo A) **[local]**
@@ -158,8 +158,8 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M1.1.1 Repo `eventos-api-dotnet`, .NET 10 LTS, solucion con `Api`, `Worker`, `Contracts`, `Tests`; `Hub` se agrega en la fase 3 **[local]**
 - [ ] M1.1.2 Dockerfile multi-stage y `docker-compose.dev.yml` que levanta C# junto a MySQL y Redis de Laragon **[local]**
 - [ ] M1.1.3 Sentry, logs estructurados con id de peticion (`X-Request-Id`, cruza con B4.3), `/health` y `/version` con la misma forma que `HealthController` **[local]**
-- [ ] M1.1.4 CI: build, tests, y las pruebas de contrato de M0.3 corridas contra PHP y contra C# con `CONTRATO_BASE_URL` en cada push; las `solo-php` comparan forma (M0.3.9) **[local]**
-- [ ] M1.1.5 Endpoint de reinicio de la base solo para pruebas en C# (vuelve a sembrar como `ContratoSeeder`), activado por variable de entorno y sin registrarse en produccion; semilla del azar aceptada en modo pruebas para ruleta y sorteo **[local]**
+- [ ] M1.1.4 CI: build, tests, y las pruebas de contrato de M0.3 corridas contra PHP (normal y con `CONTRATO_ORDEN_INVERSO=1`) y contra C# con `CONTRATO_BASE_URL` en cada push; las `solo-php` se saltan contra C# (M0.3.9) **[local]**
+- [ ] M1.1.5 Modo contratos en C#, igual al de PHP (`app/Support/ModoContratos.php`): reloj congelado, llamadas afuera simuladas, `POST /__contratos/reiniciar {escenario?}` con los nombres de `ContratoEscenarios`, azar `min + semilla mod rango` con `X-Contrato-Semilla`; activado por variable de entorno y sin registrarse en produccion **[local]**
 - [ ] M1.1.6 Analizador de async en CI (`Microsoft.VisualStudio.Threading.Analyzers`, avisos como error): falla el build con `.Result` o `.Wait()` **[local]**
 - [ ] M1.1.7 `dotnet list package --vulnerable` en CI (falla si hay altos o criticos) y versiones fijas en los `.csproj` **[local]**
 
