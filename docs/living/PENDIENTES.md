@@ -464,6 +464,10 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 - [ ] S.7.2 Correr `security:check` contra el `.env` real de produccion (va con el montaje)
 - [ ] Passkeys (bloque S.9, ampliacion 2026-08-01) — sin fecha
+- [ ] **Auditoria de seguridad del backend** (dale de Kamilo 2026-10-22, `decisiones.md`): que es = revisar a proposito quien
+  puede ver o tocar que en cada ruta, inyecciones, limites y datos de mas en las respuestas; por que = las pruebas de
+  contrato congelan lo que hay aunque este mal (BUG-363 aparecio de rebote); lista cuando = informe con hallazgos
+  verificados, cada uno en BUG-LOG con severidad, y los graves arreglados o con decision de Kamilo.
 
 ---
 

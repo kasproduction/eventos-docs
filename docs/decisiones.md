@@ -30,6 +30,7 @@
 | 2026-10-22 | `decisiones.md` es el unico lugar de las decisiones | Estaban en tres lugares |
 | 2026-10-22 | Anexo A aprobado con 24 nombres camelCase (entran los que arma el socket hoy; sale `targetAttendeeId`) | Son los que ya reciben los clientes; C# los respeta tal cual |
 | 2026-10-22 | BUG-366 y BUG-367 se arreglan ya en PHP (backend b060f2b y 3add5d4) | Son de una linea y PHP sigue en uso hasta la fase 5 |
+| 2026-10-22 | Auditoria de seguridad del backend a proposito, aparte del roadmap (permisos ruta por ruta, inyeccion, limites, datos de mas) | Las pruebas de contrato congelan lo que hay, aunque este mal; BUG-363 aparecio de rebote |
 
 ## Abiertas
 
