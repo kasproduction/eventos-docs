@@ -5,6 +5,15 @@
 
 ## 2026-10-22 — Fase 0, bloque 0.3: congelar las 247 rutas (3 bugs: 3 resueltos; 1 hallazgo por verificar)
 
+### BUG-367: El Data Center no invalida sus estadisticas al cambiar los datos (ABIERTO 2026-10-22)
+- **Severidad:** BAJA — `DataCenterCacheObserver` busca `{cache.prefix}:dc:stats:{id}:*` (`eventos_:dc:stats...`), pero la
+  clave real es `{REDIS_PREFIX}{cache.prefix}dc:stats...` (`eventos_database_eventos_dc:stats...`, comprobado contra el
+  Redis local). El patron nunca coincide y no lanza error, asi que tampoco corre el respaldo. Las cifras quedan viejas
+  hasta que vence la cache: 60 s (300 s la del mes anterior). Visto al armar el catalogo de claves (M0.4.4).
+- **Arreglo propuesto:** patron con `Cache::store()->getStore()->getPrefix()` y el prefijo de la conexion, o una version
+  por evento como la de modulos (`event:{id}:modules:ver`). Sin tocar hasta que Kamilo decida.
+- **Archivos:** `app/Observers/DataCenterCacheObserver.php`
+
 ### BUG-366: Mission Control no se entera de que termino una trivia (ABIERTO 2026-10-22)
 - **Severidad:** BAJA — `public/mission-control/app.js` escucha `game:ended`, pero Laravel emite `game:finished`
   (`GameController::nextQuestion`, ultima ronda). El panel de juegos del operador no cambia al cerrar la trivia; la
