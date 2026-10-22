@@ -34,6 +34,7 @@
 | 2026-10-22 | BUG-370: Mission Control y el display usan un token acotado (sus rutas, su evento, su sesion), unica excepcion a D.1 (opcion A) | El operador sigue entrando por enlace firmado sin cuenta; el enlace ya no da admin completo |
 | 2026-10-22 | El recap de la app (trabajo de julio sin commit) no se commitea: queda archivado en una rama local y pasa a funcion pendiente de rediseño y reparacion. Haptics y reintentos de red del mismo archivo, aparte | No funcionaba bien y se veia mal; es sobre todo diseño |
 | 2026-10-22 | Cuando se arregla cada bug: lo critico ya (BUG-372); seguridad en el bloque 0.8 al cierre de la fase 0 (auditoria, BUG-373, BUG-374, lo que se confirme); lo solo-Filament que no es de seguridad va a la lista "no repetir" del admin nuevo (M2.8.5), salvo que aparezca un cliente antes de la semana 12 | Que C# arranque limpio y no se gaste trabajo en codigo que se apaga |
+| 2026-10-22 | Auditoria de seguridad (M0.8.1): tamaño estandar (~25 agentes), backend + socket, incluye verificar los hallazgos por verificar del inventario del admin | Equilibrio entre cobertura y costo antes de pasar rutas a C# |
 | 2026-10-22 | Auditoria de seguridad del backend a proposito, aparte del roadmap (permisos ruta por ruta, inyeccion, limites, datos de mas) | Las pruebas de contrato congelan lo que hay, aunque este mal; BUG-363 aparecio de rebote. Va al cierre de la fase 0, antes de pasar rutas a C# |
 
 ## Abiertas
