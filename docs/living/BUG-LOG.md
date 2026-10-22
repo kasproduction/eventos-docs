@@ -3,7 +3,19 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
-## 2026-10-22 — Fase 0, bloque 0.4: tiempo real (2 bugs: 2 resueltos)
+## 2026-10-22 — Fase 0, bloque 0.4: tiempo real (3 bugs: 2 resueltos, 1 abierto)
+
+### BUG-370: Mission Control abre pero la API le rechaza todo desde el 2FA del staff (ABIERTO 2026-10-22)
+- **Severidad:** ALTA (herramienta del operador en vivo sin datos) — `/monitor/{id}?token=` crea con `createToken` un
+  token de API para un admin/organizador/moderador del evento (`routes/web.php:491`). Desde D.1 del 2FA (backend
+  `83e327c`, 2026-09-27) `Sanctum::authenticateAccessTokensUsing` (`AppServiceProvider.php:104`) borra y rechaza todo
+  token de quien tiene `hasPanelAccess()`. Resultado: 401 en agenda, live-config, sponsors y juegos; el token desaparece
+  de la tabla. El socket si conecta y entra a las salas (chat y Q&A en vivo llegan), pero lo que va por la API no.
+  `ROADMAP-SEGURIDAD-STAFF.md:165` daba a Mission Control por "fuera del candado por diseño": no se vio el token interno.
+  Chat monitor y control de asistencia usan el mismo token. El display crea `display-session-{id}` igual (por revisar).
+- **Visto:** QA en vivo de las 5 paginas sueltas (M0.4.3) con Playwright, 2026-10-22.
+- **Arreglo:** decision de Kamilo (seguridad). Sin tocar.
+- **Archivos:** `routes/web.php` (/monitor, /display/session), `app/Providers/AppServiceProvider.php`
 
 ### BUG-369: El escaneo del totem de sala esperaba un aviso al socket que nadie recibia (RESUELTO 2026-10-22)
 - **Severidad:** MEDIA (rendimiento en puerta) — `RoomCheckinService` mandaba `room:occupancy` a `event:{id}:admin` dentro
