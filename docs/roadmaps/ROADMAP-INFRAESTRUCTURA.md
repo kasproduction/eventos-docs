@@ -161,6 +161,21 @@ el wizard. Con tests que lo prueben.
 5. El programador de tareas (`schedule:run`) tiene que estar activo: borra
    los ingresos de mas de 90 dias (`staff-security:prune-logins`).
 
+**Al abrir el registro publico (runbook, M0.1.5 de ROADMAP-MIGRACION-DOTNET,
+2026-10-21) — antes de que la primera persona se registre:**
+1. Cambiar las llaves de PRUEBA de Turnstile por las reales (Cloudflare >
+   Turnstile > sitio del evento). Las de prueba aprueban a cualquiera. Backend
+   `.env`: `TURNSTILE_SECRET_KEY`; eventos-web `.env` del servidor:
+   `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. Agregar el dominio real de la landing (y el
+   de cada cliente que pegue el widget) en el panel de Turnstile.
+2. Verificar con un registro real desde el navegador que el reto aparece y que
+   un POST directo a `/api/v1/public/events/{slug}/register` sin token de
+   Turnstile recibe 422.
+3. Confirmar en la webapp que `Permissions-Policy` queda definido: el backend ya
+   manda `camera=(), microphone=(), geolocation=()` para la API; la webapp no
+   manda ninguno y necesita `camera=(self)` por el escaner QR del vendedor
+   (revision M0.1.5; cambio pendiente de QA con el escaner en telefono).
+
 **Compuerta B2:** el Nivel 1 se monta desde cero SOLO con el pipeline, pasa el
 humo en verde y se destruye sin dejar nada cobrando. Nadie toca una maquina a mano.
 
