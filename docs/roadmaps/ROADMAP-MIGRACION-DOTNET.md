@@ -1,6 +1,9 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 11/171
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 15/186
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
+> **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
+> **Decisiones (tomadas y abiertas, D.1 a D.6 incluidas):** `docs/decisiones.md`, unico lugar.
+> **Solo la fase activa queda abierta;** las demas van plegadas (clic en el titulo para verlas).
 > Clasificacion de pendientes: `docs/pendientes-2026-10.md`. Fuente unica de tareas: `docs/living/PENDIENTES.md`
 > (cuando Kamilo de el dale, este roadmap se registra alla como bloque con sus contadores).
 >
@@ -82,18 +85,13 @@ por usuario virtual). Instalacion pendiente para el arranque de la fase 1 (decis
 
 Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta en `migracion-dotnet.md` seccion 5.
 
-## DECISIONES DE KAMILO — 1/6
+## DECISIONES DE KAMILO
 
-- [x] **D.1 Dale a la fase 0.** Dado 2026-10-21. Son tres semanas que mejoran PHP aunque la migracion nunca siga.
-- [ ] **D.2 Orden admin → tiempo real → API publica** (este roadmap) o el orden clasico API primero (`migracion-dotnet.md` §5). Recomendado: este.
-- [ ] **D.3 Alcance del admin del hito 1:** los modulos que usa un demo (eventos, agenda, speakers, sponsors, asistentes, branding, modulos, anuncios, login con 2FA) y el resto despues (M2b), o los 45 resources antes de mostrar nada. Recomendado: demo primero.
-- [ ] **D.4 Torre de control:** version minima en C# dentro del admin nuevo (M2.9) y nada en Filament. Recomendado: si.
-- [ ] **D.5 App en tiendas:** no publicar build en tiendas antes de la fase 3 (cada build congela el cliente de Socket.IO semanas). Si un cliente la pide antes, la fase 3 se adelanta.
-- [ ] **D.6 Nombre y repo del servicio C#** (propuesta: `eventos-api-dotnet`, .NET 10 LTS, un solo repo con `Api`, `Hub`, `Worker`, `Contracts`, `Tests`).
+Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 11/31
+## Fase 0: Preparar en PHP (3 semanas) — 15/33
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -110,23 +108,25 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 - [x] M0.2.2 BUG-348: reescribir el test de cache del Data Center para la invalidacion por observer (`DataCenterApiTest.php:76`) **[local]**
 - [x] M0.2.3 Suite completa sin socket ni webapp: 1.122 pasan en 153 s (antes 30 min) **[local]**
 
-### 0.3 Contratos de la API (5 a 6 dias) — 3/8 (en curso 2026-10-21, backend 6c4087c)
-- [x] M0.3.1 Seeder determinista `ContratoSeeder`: reloj congelado 2026-12-06 10:00 Bogota, evento `contrato-2026`, 10 personas con bearer conocido, staff, 5 sesiones, stand, social, gamificacion, encuesta, juego, totem, webhook **[local]**
-- [x] M0.3.2 **Un solo formato de fecha: ISO 8601 con el offset del evento, sin fracciones** (`2026-12-06T13:30:00-05:00`). Decidido y aplicado 2026-10-21: trait `FechasConOffset` en los 84 modelos + 73 `toISOString` reemplazados; 16 snapshots regenerados; suite 1.122 verdes; clientes sin cambios. HALLAZGO que lo decidio: la app (`hooks/useAgenda.ts:70`, `useDataInvalidation.ts:285`) y la webapp (`AgendaView.tsx:107`, `EventArchive.tsx:225`) cortan `start` con `split('T')[0]` para agrupar por dia, asi que pasar la agenda a UTC con Z correria las sesiones de la noche al dia siguiente. La opcion segura es el OFFSET DEL EVENTO en todo (`2026-12-06T13:30:00-05:00`, sin microsegundos), que .NET produce igual con `DateTimeOffset`. Lo que queda en otro formato: los CSV humanos (`Y-m-d H:i`) y las filas crudas de `DB::table` en Data Center y Pulse, que se revisan al congelar esas rutas. Hoy conviven `toIso8601String()` (offset -05:00) y `toISOString()` (UTC con microsegundos). Propuesta: UTC con `Z` y milisegundos en todo, via `serializeDate` en un modelo base y en los 14 Resources. Avisar a web y app (113 `new Date(` en la webapp lo toleran). Cruza con BUG-358 **[local]**
-- [~] M0.3.3 Pruebas de snapshot por ruta (103/247 hechas: publico 12, contenido 51, perfil 27, errores 13; `tests/Contratos/`, `./vendor/bin/pest tests/Contratos` 25 s; dos pasadas identicas; con `--update-snapshots` se regeneran): 16 archivos (uno por modulo de `migracion-dotnet.md` §1.1) que cubren las 247 rutas; respuesta JSON guardada como archivo dorado en `tests/Contratos/__snapshots__/`; variable `CONTRATO_BASE_URL` para apuntarlas a otro backend **[local]**
-- [~] M0.3.4 Snapshots de las formas de error: hechos 401 (sin token y token invalido), 403 baneo, 403 pulse, 404 ruta y recurso, 405, 422 en español (x2), totem sin token; faltan 403 aprobacion pendiente, 429 con `Retry-After` y paginacion **[local]**
-- [~] M0.3.5 Snapshots de lo que no es JSON: `.ics` y CSV de leads hechos (los streaming se capturan con `streamedContent`); falta el ZIP de documentos **[local]**
-- [x] M0.3.6 OpenAPI con `dedoc/scramble` 0.13: `docs/api.json` versionado, 247 operaciones en 223 rutas, 16 avisos del analizador por revisar (`php -d memory_limit=1024M artisan scramble:export --path=docs/api.json`). El chequeo en CI va con M1.1.4 **[local]**
-- [ ] M0.3.7 Pasar los 106 `['data' => ...]` armados a mano a Resources en los 5 controladores grandes (Stand 884 lineas, Game 821, RoomCheckin 764, Networking 717, StaffCheckin 588); los snapshots no cambian **[local]**
-- [ ] M0.3.8 `AttendeeResource` unificado (hoy hay dos: `Api/V1` y `V1`) **[local]**
+### 0.3 Contratos de la API (5 a 6 dias) — 7/9 (backend 90e61f8, c65edf1, 80aef0b)
+- [x] M0.3.1 Seeder determinista `ContratoSeeder`: reloj congelado 2026-12-06 10:00 Bogota, evento `contrato-2026`, 10 personas con bearer conocido, staff, 5 sesiones, stand, social, gamificacion, encuesta, juego, totem, webhook. Ampliado 2026-10-22: evento con aprobacion (kiko), invitacion/enlace magico/reset con valor fijo, QR fijo por persona, staff de check-in **[local]**
+- [x] M0.3.2 **Un solo formato de fecha: ISO 8601 con el offset de la zona de la app, sin fracciones** (`2026-12-06T13:30:00-05:00`). Trait `FechasConOffset` en los 84 modelos + 73 `toISOString` reemplazados (2026-10-21) + `Carbon::serializeUsing` para las fechas armadas a mano en arreglos (2026-10-22). Motivo: la app (`hooks/useAgenda.ts:70`) y la webapp (`AgendaView.tsx:107`) agrupan la agenda con `split('T')[0]`; con UTC las sesiones de la noche cambian de dia. Queda fuera: CSV humanos y filas crudas de `DB::table` del Data Center (el admin nuevo las redefine). Zona por evento: abierta en `decisiones.md` **[local]**
+- [x] M0.3.3 **Las 247 rutas congeladas:** 300 pruebas, 330 respuestas en 10 archivos de `tests/Contratos/` (por tema; se reparten por modulo al portar), `./vendor/bin/pest tests/Contratos` ~90 s, dos pasadas identicas. Flujos encadenados (juegos, encuestas, verificacion de asistencia, Data Center). Bugs encontrados: BUG-362 (correo de acceso perdido en la cola), BUG-363 (codigo de activacion expuesto), `generated_at` del ZIP siempre null **[local]**
+- [x] M0.3.4 Formas de error: 401 (x2), 403 baneo, 403 aprobacion pendiente, 403 pulse, 404, 405, 422, 429 con `Retry-After` (texto en ingles: `Too Many Attempts.`), paginacion **[local]**
+- [x] M0.3.5 Lo que no es JSON: `.ics`, CSV de leads y de sesion (con `Content-Disposition`), ZIP de documentos (la API da 202 "en preparacion" o la URL; el ZIP vive en R2) **[local]**
+- [x] M0.3.6 OpenAPI con `dedoc/scramble` 0.13: `docs/api.json`, 247 operaciones, 16 avisos; regenerado 2026-10-22 (Scramble no infiere `null` en `?->toIso8601String()`; mandan los snapshots) **[local]**
+- M0.3.7 ~~Resources en los 5 controladores grandes~~: **sacado** (`decisiones.md` 2026-10-22: el contrato ya lo fijan los snapshots)
+- [x] M0.3.8 Una sola carpeta de Resources (`V1`). No habia dos `AttendeeResource`: la duplicada era la carpeta **[local]**
+- [ ] M0.3.9 Pruebas listas para correr contra C#: etiqueta `solo-php` en las que hoy no pueden (429, ZIP listo, Data Center por sesion) con comparacion de forma; en modo externo `contrato()` llama al endpoint de reinicio antes de cada prueba que escribe; ruleta y sorteo mandan la semilla **[local]**
+- [ ] M0.3.10 **Orden explicito en toda lista:** auditar las consultas de las 247 rutas que devuelven listas sin `orderBy` y agregarlo en PHP (snapshots regenerados a proposito). Es criterio de cruce **[local]**
 
 ### 0.4 Tiempo real listo para cambiar de motor (3 a 4 dias) — 0/6
-- [ ] M0.4.1 Catalogo de eventos del socket: `docs/contratos/eventos-socket.json` con los 44 nombres, payload, sala y quien escucha (fuente: `eventos-socket/src/types.ts` + apendice B de `migracion-dotnet.md`); `types.ts` se genera o se valida contra el **[local]**
+- [ ] M0.4.1 Catalogo de eventos del socket: `docs/contratos/eventos-socket.json` con los 44 nombres, payload, sala y quien escucha (fuente: `eventos-socket/src/types.ts` + apendice B de `migracion-dotnet.md`); `types.ts` se genera o se valida contra el. Confirma los nombres camelCase del socket en la lista de excepciones JSON (`plantillas/CLAUDE-dotnet.md`) **[local]**
 - [ ] M0.4.2 Capa `realtime` en la webapp: `src/lib/realtime.ts` envuelve `getSocket`, `on`, `off`, `emit`, `joinSession`, `leaveSession`; los 7 hooks de `hooks/streaming/*` y `useGlobalSocket.tsx` dejan de importar `socket.io-client` **[local]**
 - [ ] M0.4.3 Lo mismo en Expo (`lib/socket.ts` ya es singleton; 8 hooks), kiosko (`useAttendance.ts`) y las 5 paginas estaticas de `public/` (mission-control, event-pulse, display, chat-monitor, attendance-check) con un `realtime.js` compartido **[local]**
 - [ ] M0.4.4 Catalogo de claves de Redis: clave, dueño (PHP, Node, los dos), formato (serializado PHP, JSON, string, set), TTL. Fuente: 9 archivos con `Redis::` en backend + `src/*.ts` del socket (`docs/contratos/claves-redis.md`) **[local]**
 - [ ] M0.4.5 `InvalidationService::broadcast` publica ademas en el canal Redis `eventos:invalidate` (`{eventId, entity, op}`) sin quitar el POST al socket. Test con `Redis::fake` o cliente real en sqlite **[local]**
-- [ ] M0.4.6 Decision registrada sobre los emits que nadie escucha (`session:started/ended/cancelled`, `agenda:updated`, `room:occupancy`): quedan en el catalogo como "emitido, sin consumidor" o se quitan (PENDIENTES §2) **[local]**
+- [ ] M0.4.6 Decision registrada sobre los emits que nadie escucha (`session:started/ended/cancelled`, `agenda:updated`, `room:occupancy`): quedan en el catalogo como "emitido, sin consumidor" o se quitan (`decisiones.md`) **[local]**
 
 ### 0.5 Logica escondida a la vista (3 dias) — 0/5
 - [ ] M0.5.1 `EventSessionObserver::updated` (4 efectos) y `saved` a `App\Services\SessionEffects` con un metodo por efecto; el observer queda en llamadas de una linea. Igual `DocumentObserver`, `EventObserver`, `ModuleObserver`, `AttendeeWebhookObserver` **[local]**
@@ -141,24 +141,34 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 - [ ] M0.6.3 Medir en servidor B3.7, B3.8 y B3.9 con 300 personas (lo hecho el 2026-10-18 y 2026-10-21). Si el servidor sigue en pausa, queda como primera medicion de la fase 1 **[servidor]**
 - [ ] M0.6.4 Registrar este roadmap en `docs/living/PENDIENTES.md` como bloque con contadores y marcar lo congelado del admin con "congelado hasta admin .NET" (lista en `pendientes-2026-10.md` §7) **[local]**
 
+### 0.7 Cierre de la fase — 0/1
+- [ ] M0.7.1 Retro de la fase 0 (regla 25 de BUENAS-PRACTICAS): estimado contra real, regla que falto, que se corrige del roadmap **[local]**
+
 ---
 
-## Fase 1: Cimientos en C# (3 semanas) — 0/18
+<details>
+<summary><b>Fase 1: Cimientos en C# (3 semanas) — 0/26</b></summary>
+
+## Fase 1: Cimientos en C# (3 semanas) — 0/26
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
 > errores. Sin trafico real. Al terminar, `GET /auth/me` pasa su snapshot contra los dos backends.
 
-### 1.1 Repositorio y esqueleto (2 dias) — 0/4
+### 1.1 Repositorio y esqueleto (2 dias) — 0/7
 - [ ] M1.1.1 Repo `eventos-api-dotnet`, .NET 10 LTS, solucion con `Api`, `Worker`, `Contracts`, `Tests`; `Hub` se agrega en la fase 3 **[local]**
 - [ ] M1.1.2 Dockerfile multi-stage y `docker-compose.dev.yml` que levanta C# junto a MySQL y Redis de Laragon **[local]**
 - [ ] M1.1.3 Sentry, logs estructurados con id de peticion (`X-Request-Id`, cruza con B4.3), `/health` y `/version` con la misma forma que `HealthController` **[local]**
-- [ ] M1.1.4 CI: build, tests, y las pruebas de contrato de M0.3 corridas contra C# con `CONTRATO_BASE_URL` **[local]**
+- [ ] M1.1.4 CI: build, tests, y las pruebas de contrato de M0.3 corridas contra PHP y contra C# con `CONTRATO_BASE_URL` en cada push; las `solo-php` comparan forma (M0.3.9) **[local]**
+- [ ] M1.1.5 Endpoint de reinicio de la base solo para pruebas en C# (vuelve a sembrar como `ContratoSeeder`), activado por variable de entorno y sin registrarse en produccion; semilla del azar aceptada en modo pruebas para ruleta y sorteo **[local]**
+- [ ] M1.1.6 Analizador de async en CI (`Microsoft.VisualStudio.Threading.Analyzers`, avisos como error): falla el build con `.Result` o `.Wait()` **[local]**
+- [ ] M1.1.7 `dotnet list package --vulnerable` en CI (falla si hay altos o criticos) y versiones fijas en los `.csproj` **[local]**
 
-### 1.2 Datos (3 dias) — 0/4
+### 1.2 Datos (3 dias) — 0/5
 - [ ] M1.2.1 Scaffold de las 105 tablas con Pomelo; script repetible `scaffold.ps1` que se corre despues de cada migracion Laravel **[local]**
 - [ ] M1.2.2 Conversor de fechas: columnas `DATETIME` guardadas en hora de Bogota (`APP_TIMEZONE`), leidas como `Unspecified` y convertidas a UTC; serializadas con el formato decidido en M0.3.2 **[local]**
 - [ ] M1.2.3 Los 38 casts `array` como `JsonDocument` o tipos propios; los 69 `boolean` desde `tinyint`; los 3 `encrypted` (2FA) con el descifrado AES-256-CBC + MAC de Laravel portado y probado contra valores reales **[local]**
 - [ ] M1.2.4 Segundo `DbContext` de solo lectura para la replica (`reports`, cruza con B3.4) **[local]**
+- [ ] M1.2.5 Verificar la zona horaria del MySQL de produccion (`SELECT @@global.time_zone, @@session.time_zone`): las 22 columnas con `useCurrent()` toman la hora de la base. Si no es Bogota, medir cuantas filas estan corridas y decidir (`decisiones.md`) **[servidor]**
 
 ### 1.3 Autenticacion compatible (3 dias) — 0/4
 - [ ] M1.3.1 `AuthenticationHandler` Sanctum: parte `id|secreto`, compara `sha256` con `personal_access_tokens.token`, respeta `expires_at` (7 dias) y `abilities`, actualiza `last_used_at` **[local]**
@@ -167,18 +177,29 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 - [ ] M1.3.4 `GET /auth/me` identico: snapshot de M0.3 pasa contra PHP y contra C# **[local]**
 
 ### 1.4 Forma de las respuestas y limites (3 dias) — 0/4
-- [ ] M1.4.1 `JsonNamingPolicy.SnakeCaseLower` global, `JsonPropertyName` para los 15 campos camelCase, nulos incluidos, campos condicionales omitidos (no `null`) donde el Resource usa `when()` **[local]**
+- [ ] M1.4.1 `JsonNamingPolicy.SnakeCaseLower` global, nulos incluidos, campos condicionales omitidos (no `null`) donde el Resource usa `when()`; excepciones en lista cerrada `Contracts/ExcepcionesJson.cs` (los 15 de `plantillas/CLAUDE-dotnet.md`; nada entra sin decision) **[local]**
 - [ ] M1.4.2 Formas de error de Laravel en vez de `ProblemDetails`: 401 `Unauthenticated.`, 422 `{message, errors}` con los textos de `lang/es`, 429 con `Retry-After`; snapshots de M0.3.4 pasan **[local]**
 - [ ] M1.4.3 Limitador de tasa en Redis (INCR + EXPIRE o ventana deslizante en Lua) con las 12 claves de `AppServiceProvider::configureRateLimiting` (por correo, token, usuario, IP) y `TrustProxies` equivalente (`ForwardedHeaders` con la misma lista) **[local]**
 - [ ] M1.4.4 Cache con prefijo `dotnet:` sobre Redis y suscriptor del canal `eventos:invalidate` (M0.4.5) que borra lo suyo **[local]**
 
-### 1.5 Proxy y primera medicion (2 dias) — 0/2
+### 1.5 Proxy y primera medicion (2 dias) — 0/5
 - [ ] M1.5.1 Nginx (o YARP) con tabla de rutas por ruta exacta: todo a PHP salvo `/api/v1/health`, `/version` y `/auth/me` a C#. Cabecera `X-Backend`. Script `cruzar.ps1 <ruta>` que cambia el dueño de una ruta **[local]**
 - [ ] M1.5.2 **La medicion que faltaba:** `e3-agenda-storm.js` contra `/auth/me` y `/events/by-slug` servidos por PHP y por C# en la misma maquina. Es el numero real de "cuanto menos consume" **[local+medir]**
+- [ ] M1.5.3 `descruzar.ps1 <ruta>` (devuelve la ruta a PHP en un despliegue) y `mysqldump` automatico dentro de `cruzar.ps1` para rutas que escriben; los dos probados antes del primer cruce real **[local]**
+- [ ] M1.5.4 Panel por ruta y por `X-Backend` (p95, errores, req/s) desde los logs de M1.1.3; despues de cada cruce, la ruta contra su propio numero en PHP **[local]**
+- [ ] M1.5.5 `medir-cruce.ps1 <ruta>`: k6 de agosto contra PHP y contra C# en el MSI, deja el numero para anotar en el roadmap. Criterio de cruce completo (regla 20): snapshot igual, orden explicito, prueba cruzada si escribe, medicion anotada, `descruzar.ps1` probado. En el servidor real se mide por hito **[local+medir]**
+
+### 1.6 Cierre de la fase — 0/1
+- [ ] M1.6.1 Retro de la fase 1 **[local]**
+
+</details>
 
 ---
 
-## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/42
+<details>
+<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/44</b></summary>
+
+## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/44
 
 > Next sirve la interfaz; C# sirve la API admin y reproduce los efectos secundarios que hoy hacen los observers de
 > Laravel. Filament se apaga modulo por modulo. La API publica, Node y los correos siguen en PHP y no se enteran.
@@ -236,7 +257,7 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 ### 2.8 Lo congelado que nace aqui (dentro de los bloques de arriba) — 0/4
 - [ ] M2.8.1 "Otorgar puntos manuales" (motor existe en `PointsService`, sin UI) **[local]**
 - [ ] M2.8.2 Credencial con etiqueta visible (VIP, Prensa): marcar tags que salen en la escarapela **[local]**
-- [ ] M2.8.3 Renombres y limpiezas: Highlights → Destacados solo en la interfaz (la entidad `highlights` es contrato con 8 clientes del socket), borrar `EventOnboardingResource`, toggle de Silent Disco segun D de PENDIENTES §2 **[local]**
+- [ ] M2.8.3 Renombres y limpiezas: Highlights → Destacados solo en la interfaz (la entidad `highlights` es contrato con 8 clientes del socket), borrar `EventOnboardingResource`, toggle de Silent Disco segun `decisiones.md` **[local]**
 - [ ] M2.8.4 Manual del organizador se reescribe sobre el admin nuevo (ROADMAP-MANUAL M1 a M7 cambian de pantallas) **[local]**
 
 ### 2.9 Torre de control minima (M2b, 1 semana, segun D.4) — 0/3
@@ -244,9 +265,18 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 - [ ] M2.9.2 Conectados por nodo: hasta la fase 3 los da Node por `/internal/session-metrics`; despues los da el hub **[local]**
 - [ ] M2.9.3 Alertas por umbral (B4.4) salen de aqui a BetterStack/UptimeRobot **[servidor]**
 
+### 2.10 Cierre de la fase (hito 1) — 0/2
+- [ ] M2.10.1 Medicion del hito 1 en el servidor real (admin nuevo + API PHP) con los k6 de agosto; numero anotado aqui **[servidor]**
+- [ ] M2.10.2 Retro de la fase 2 **[local]**
+
+</details>
+
 ---
 
-## Fase 3: Tiempo real en SignalR (6 semanas) — 0/22
+<details>
+<summary><b>Fase 3: Tiempo real en SignalR (6 semanas) — 0/23</b></summary>
+
+## Fase 3: Tiempo real en SignalR (6 semanas) — 0/23
 
 > El hub vive en el mismo proceso que la API admin (o en `Hub`, mismo repo). Mantiene una fachada HTTP identica a los
 > 17 endpoints internos de Node para que PHP siga avisando sin enterarse. Los 8 clientes cambian un archivo cada uno.
@@ -284,12 +314,21 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 - [ ] M3.5.2 Medir con `e4-chat-magistral.js` adaptado a SignalR: 1.000 en una sala, 40 mensajes por segundo, mismo criterio que agosto **[servidor]**
 - [ ] M3.5.3 Apagar Node y PM2; borrar `eventos-socket` del despliegue; `tests/load` actualizados **[servidor]**
 
+### 3.6 Cierre de la fase (hito 2) — 0/1
+- [ ] M3.6.1 Retro de la fase 3 (la medicion del hito es M3.5.2) **[local]**
+
+</details>
+
 ---
 
-## Fase 4: API publica, modulo por modulo (27 semanas) — 0/46
+<details>
+<summary><b>Fase 4: API publica, modulo por modulo (27 semanas) — 0/48</b></summary>
+
+## Fase 4: API publica, modulo por modulo (27 semanas) — 0/48
 
 > Cada modulo sigue el mismo ciclo: portar servicios con nombre, pasar snapshots, mover sus jobs y tareas a Hangfire,
-> cruzar las rutas con `cruzar.ps1`, medir con k6, quitar el codigo PHP una semana despues si no hubo vuelta atras.
+> cruzar las rutas con `cruzar.ps1` cumpliendo el criterio de cruce (M1.5.5), medir en el MSI, quitar el codigo PHP una
+> semana despues si no hubo vuelta atras.
 > Orden: lo que no escribe primero; auth despues de tener contratos de todo lo que emite tokens; operacion del evento
 > al final porque es lo mas complejo; Data Center de ultimo porque es lo mas aislado.
 
@@ -349,7 +388,16 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 - [ ] M4e.8 Cruce de rutas; medir export aislado con carga (D.4.4 del plan viejo) **[servidor]**
 - [ ] M4e.9 Quitar PHP del modulo **[local]**
 
+### 4f. Cierre de la fase (hito 3) — 0/2
+- [ ] M4f.1 Medicion del hito 3 en el servidor real (C# casi todo) con los k6 de agosto; numero anotado aqui **[servidor]**
+- [ ] M4f.2 Retro de la fase 4 **[local]**
+
+</details>
+
 ---
+
+<details>
+<summary><b>Fase 5: Apagar PHP (3 semanas) — 0/12</b></summary>
 
 ## Fase 5: Apagar PHP (3 semanas) — 0/12
 
@@ -369,7 +417,9 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 ### 5.3 Cierre (1 semana) — 0/3
 - [ ] M5.3.1 `eventos-backend` archivado en GitHub (no borrado); `docs/` apunta al repo nuevo; `reference_project_paths` actualizado **[local]**
 - [ ] M5.3.2 Documentacion del sistema final: un solo `ARQUITECTURA.md` (API, hub, worker, Next, Redis, MySQL, R2) y el runbook del dia del evento (B6.3) reescrito **[local]**
-- [ ] M5.3.3 Retrospectiva con numeros: semanas reales por fase contra las estimadas, para la proxima vez **[local]**
+- [ ] M5.3.3 Retrospectiva con numeros: semanas reales por fase contra las estimadas, para la proxima vez (la medicion del hito 4 es M5.2.5) **[local]**
+
+</details>
 
 ---
 

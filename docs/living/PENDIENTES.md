@@ -114,24 +114,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 
 ## 2. DECISIONES Y PREGUNTAS ABIERTAS DE KAMILO
 
-> **Decidido por Kamilo 2026-10-16:** no hay cliente para el 6 de diciembre todavía (prioridad: demo vendible; medir
-> 5.000 espera a que haya cliente). El servidor sigue EN PAUSA. El costo de pruebas de agosto hay que bajarlo cuando se
-> retome (menos máquinas, sin bases administradas mientras tanto).
-
-- [ ] ¿Cuando abre el registro de asistentes? Esa fecha fija cuando tiene que existir produccion
-- [ ] ¿Carga y caida de nodo (I.7.7) obligatorias antes de evento real y opcionales en demos? (`project_orquestador_pipeline`)
-- [ ] Umbrales verde/amarillo/rojo del canario: hoy propuesta (`infra/PLAN-EXPERIENCIA-ENTERPRISE.md:37`)
-- [ ] W.19 Spatial Player: aprobar la arquitectura propuesta 2026-09-13 y decidir 8.7
-- [ ] Bintec: ¿agenda en grilla por auditorio (horas en un eje, salas en columnas) para eventos de varias salas?
-      (`REFERENCIA-BINTEC-2026.md:23`, :106)
-- [ ] Admin: renombrar "Highlights" a "Destacados" (`HighlightResource.php:23`; `NEXT-SESSION.md:1767`)
-- [ ] Admin: donde vive "Otorgar puntos manuales" (el motor lo soporta, no hay UI) (`NEXT-SESSION.md:1768`)
-- [ ] Admin: ¿vuelve el toggle de Silent Disco al form de sesion? (`NEXT-SESSION.md:1769`)
-- [ ] Agenda: ¿se puede volver a calificar una sesion ya calificada? Hoy queda de solo lectura (BUG-322)
-- [ ] Socket: emits que nadie escucha (`session:started/ended/cancelled`, `agenda:updated`, `room:occupancy`):
-      consumirlos o quitarlos (`AUDITORIA-SOCKETS-SUPERFICIES-2026-07-04.md:216`)
-- [ ] Event Pulse: reglas del hero (tarjetas que agregan "los ultimos 10 ingresos" + lead individual): lab → aprobacion → codigo
-- [ ] Paginas custom (iframes del organizador): construir el acceso o demoler (diferido post-deploy 2026-07-20)
+> Viven en **`docs/decisiones.md`** (unico lugar desde 2026-10-22): tomadas con fecha y por que, y abiertas.
 
 ---
 

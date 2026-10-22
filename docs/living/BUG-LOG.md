@@ -3,6 +3,32 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-22 — Fase 0, bloque 0.3: congelar las 247 rutas (3 bugs: 3 resueltos; 1 hallazgo por verificar)
+
+### BUG-363: `check-email` le entregaba el codigo de activacion de una cuenta importada a quien escribiera el correo (RESUELTO 2026-10-22)
+- **Severidad:** CRITICA — persona importada por CSV y sin activar: cualquiera que supiera su correo recibia el
+  `invitation_token` en la respuesta y podia ponerle su propia contraseña. Solo lo frenaba el dato de verificacion
+  (cedula) si el evento lo tenia configurado (fix parcial de abril, 1198cae).
+- **Fix (backend 80aef0b, decision Kamilo):** la respuesta ya no trae el codigo: `{status: pending_activation, email_sent}`;
+  el codigo viaja solo en el correo (enlace `/join/{token}` que abre la app). La app ya manejaba el caso sin codigo.
+- **Archivos:** `app/Http/Controllers/Api/V1/AuthController.php`, `tests/Feature/Auth/ActivacionImportadoTest.php`
+
+### BUG-362: El correo de acceso del registro publico no llegaba nunca (RESUELTO 2026-10-22)
+- **Severidad:** CRITICA — `WelcomeAccessMail` hereda de `WelcomeMail`, que guardaba la persona como `private`. Al
+  serializar para la cola, `SerializesModels` solo ve las propiedades que la clase hija alcanza, asi que la persona se
+  perdia y el job fallaba al salir de Redis. En produccion: registro OK, correo nunca enviado. Desde 7d46d5c (2026-10-12).
+  Se vio porque con la cola sincrona de las pruebas de contrato el registro respondia 500.
+- **Fix (backend 90e61f8):** `protected readonly` en `WelcomeMail`; prueba de regresion que serializa y vuelve.
+- **Archivos:** `app/Mail/WelcomeMail.php`, `tests/Feature/Emails/WelcomeAccessMailTest.php`
+
+### Sin numero: `GET events/{id}/documents/zip` devolvia `generated_at` siempre null (RESUELTO 2026-10-22)
+- Faltaba el cast `datetime` de `documents_zip_generated_at`; `optional()` sobre un string devolvia null en silencio.
+  Fix en backend 90e61f8 (`app/Models/Event.php`).
+
+### Hallazgo por verificar: 22 columnas con `useCurrent()` toman la hora de la base, no la de la app
+- Si el MySQL de produccion no esta en hora de Bogota, esas fechas (votos, historias, ediciones de leads, QR...) quedan
+  corridas 5 horas. Se verifica en M1.2.5 (roadmap de la migracion).
+
 ## 2026-10-21 — Fase 0 de la migracion a .NET, bloques 0.1 y 0.2 (5 bugs: 5 resueltos)
 
 ### BUG-360: Laravel 12 tira el token CSRF al hacer login y la activacion del 2FA volvia a dar 419 (RESUELTO 2026-10-21)
