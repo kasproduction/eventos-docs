@@ -31,8 +31,11 @@ APAGADO hasta la fase 1. Orden aprobado: cerrar fase 0 (0.5, 0.6) -> auditoria -
 - Roadmap 24/187, fase 0 24/34, bloque 0.4 6/6. Tests: backend 1.130 (suite completa antes de M0.4.6; despues 183 de
   salas/sesiones/juegos + 302 contratos), vitest 684, catalogo 49 + 10.
 
-**A medias:** mirar en vivo las 5 paginas sueltas (Mission Control, Event Pulse, display, chat monitor, control de
-asistencia) cuando Laragon y el socket esten prendidos. eventos-app tiene cambios de julio sin commit (recap,
+**Despues del cierre:** push hecho; paginas sueltas miradas en vivo (OK). Destapo **BUG-370** (Mission Control sin datos
+de la API desde el 2FA del staff): arreglado con token acotado `App\Support\TokenDeOperador` (backend `13aa3ac`,
+decision Kamilo opcion A). Suite 1.135.
+
+**A medias:** nada de este bloque. eventos-app tiene cambios de julio sin commit (recap,
 reintentos en `lib/api.ts`): son M0.6.1, no se tocaron.
 
 **Sigue:** bloque 0.5 (M0.5.1 observers a `SessionEffects`, M0.5.2 closures de `routes/web.php`, M0.5.3 inventario de 111

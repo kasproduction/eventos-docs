@@ -163,7 +163,8 @@ Las 3 decisiones que salieron aqui (token por API, correo al activar, cerrar
 sesiones al desplegar) se movieron arriba: **DECISIONES PENDIENTES D.1-D.3**.
 
 - Nota (no decision): Mission Control entra por enlace firmado (HMAC), no por sesion: fuera de este
-   candado por diseño. `/data-center/` como HTML es estatico del servidor web;
+   candado por diseño. **Corregido 2026-10-22 (BUG-370):** por dentro emitia un token `*` de admin que D.1 borraba;
+   ahora es un token acotado (`App\Support\TokenDeOperador`), la unica excepcion de D.1. `/data-center/` como HTML es estatico del servidor web;
    los datos van por la API.
 
 ## S.3 — Recuperacion / rescate (CRITICO por la obligatoriedad) — 3/3 (HECHO 2026-09-26, 13 tests en `TwoFactorRescueTest`)

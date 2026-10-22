@@ -3,9 +3,9 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
-## 2026-10-22 — Fase 0, bloque 0.4: tiempo real (3 bugs: 2 resueltos, 1 abierto)
+## 2026-10-22 — Fase 0, bloque 0.4: tiempo real (3 bugs: 3 resueltos)
 
-### BUG-370: Mission Control abre pero la API le rechaza todo desde el 2FA del staff (ABIERTO 2026-10-22)
+### BUG-370: Mission Control abre pero la API le rechaza todo desde el 2FA del staff (RESUELTO 2026-10-22)
 - **Severidad:** ALTA (herramienta del operador en vivo sin datos) — `/monitor/{id}?token=` crea con `createToken` un
   token de API para un admin/organizador/moderador del evento (`routes/web.php:491`). Desde D.1 del 2FA (backend
   `83e327c`, 2026-09-27) `Sanctum::authenticateAccessTokensUsing` (`AppServiceProvider.php:104`) borra y rechaza todo
@@ -14,7 +14,12 @@
   `ROADMAP-SEGURIDAD-STAFF.md:165` daba a Mission Control por "fuera del candado por diseño": no se vio el token interno.
   Chat monitor y control de asistencia usan el mismo token. El display crea `display-session-{id}` igual (por revisar).
 - **Visto:** QA en vivo de las 5 paginas sueltas (M0.4.3) con Playwright, 2026-10-22.
-- **Arreglo:** decision de Kamilo (seguridad). Sin tocar.
+- **Fix (backend 13aa3ac, decision Kamilo opcion A):** token acotado `App\Support\TokenDeOperador`: permisos
+  `operador:{mission-control|display}`, `evento:{id}`, `sesion:{id}` en vez de `*`; la regla D.1 lo deja pasar solo en
+  su lista de rutas (41 de Mission Control, 2 del display) y con su evento y su sesion; afuera 401 sin borrarlo. El
+  display quedo de verdad en solo lectura (antes `*` pese al comentario "read-only"). `auth/me` en la lista: el socket
+  valida ahi al vencer su ficha de Redis (15 min). 5 pruebas en `TokenDeOperadorTest`; en vivo Mission Control 11/11
+  respuestas 200. Suite 1.135.
 - **Archivos:** `routes/web.php` (/monitor, /display/session), `app/Providers/AppServiceProvider.php`
 
 ### BUG-369: El escaneo del totem de sala esperaba un aviso al socket que nadie recibia (RESUELTO 2026-10-22)
