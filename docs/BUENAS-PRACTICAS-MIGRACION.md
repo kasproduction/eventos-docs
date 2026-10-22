@@ -52,7 +52,7 @@
     sobreescribe por endpoint. Las unicas excepciones son por campo, en **una lista cerrada en un solo archivo**
     (`Contracts/ExcepcionesJson.cs`, M1.4.1). **Nada entra a la lista sin una decision en `decisiones.md`.** Hoy son 15
     nombres que llegan a un cliente (Anexo A): 2 en la API HTTP (`eventId`,
-    `sessionId`, encuestas), 1 en datos de push y el resto en el socket, que se confirma en M0.4.1.
+    `sessionId`, encuestas), 1 en datos de push y el resto en el socket (confirmado en M0.4.1).
 15. **Jobs de Hangfire idempotentes.** `ShouldBeUnique` de Laravel NO equivale a `DisableConcurrentExecution` (ese solo
     evita correr dos a la vez; los duplicados igual se encolan). La unicidad es **un filtro propio de Hangfire (o una
     verificacion antes de encolar), escrito una vez en `Worker` y reutilizado** por todo job que en PHP es
@@ -91,15 +91,20 @@ de los 330 snapshots y del codigo PHP:
 |---|---|---|---|
 | 1 | `eventId` | API: encuestas (junto a `event_id`); socket | `PollController.php:400`; `InvalidationService`, `WallController`, `SessionConfigController` |
 | 2 | `sessionId` | API: encuestas (junto a `session_id`); push; socket | `PollController.php:398`; `SendAgendaRemindersJob:125`, `SendSessionChangedNotificationJob:57`; `QuestionController:214`, `EventSessionObserver:108` |
-| 3 | `attendeeId` | socket | `BanController:187`, `InvalidationService:181`, `StaffNotificationService` |
-| 4 | `targetAttendeeId` | socket | `NetworkingController:708`, `StaffCheckinController:553`, `InvalidationService:207`, `StaffNotificationService:88` |
-| 5 | `fromName` | socket | `NetworkingController:710` |
-| 6 | `fromAttendeeId` | socket | `NetworkingController:711` |
-| 7 | `streamUrl` | socket | `EventSessionObserver:110` |
-| 8 a 15 | `invitationId`, `sponsorId`, `sponsorName`, `sponsorLogo`, `sponsorTier`, `inviterName`, `attendeeName`, `expiresAt` | socket | `StaffNotificationService` |
+| 3 | `attendeeId` | socket | `BanController:187`, `InvalidationService:181`, `StaffNotificationService`; Node en `chat:message`, `chat:emoji` |
+| 4 | `fromName` | socket | `NetworkingController:710` |
+| 5 | `fromAttendeeId` | socket | `NetworkingController:711` |
+| 6 | `streamUrl` | socket | `EventSessionObserver:110` |
+| 7 a 14 | `invitationId`, `sponsorId`, `sponsorName`, `sponsorLogo`, `sponsorTier`, `inviterName`, `attendeeName`, `expiresAt` | socket | `StaffNotificationService` |
+| 15 | `checkedIn` | socket (`checkin:update`) | Node convierte `checked_in` de `CheckinService:216` |
+| 16 a 19 | `dbId`, `userName`, `sentAt`, `pinnedAt` | socket (`chat:*`) | Node (`chat.ts`); en C# los arma el hub |
+| 20 | `chatCount` | socket (`session:metrics`) | Node (`chat.ts`) |
+| 21 a 24 | `pollId`, `questionData`, `gameData`, `messageId` | socket, del cliente al servidor (`display:project`, `chat:delete`) | Mission Control, chat-monitor |
 
-- En la API HTTP solo existen 1 y 2. Los del socket son lo que PHP le manda a Node; los nombres que llegan al cliente se
-  confirman en M0.4.1 contra `eventos-socket/src/types.ts` y la lista se corrige ahi.
+- En la API HTTP solo existen 1 y 2. **Confirmado en M0.4.1 (2026-10-22)** contra `docs/contratos/eventos-socket.json`, que
+  dice evento por evento que campo viaja: entran 15 a 24, que arma Node y antes no estaban. `targetAttendeeId` sale de la
+  lista: va de PHP a Node (`/internal/*`) y nunca llega a un cliente; en la fase 3 lo usa solo la fachada `/internal/*`.
+  Los eventos de juegos, asistencia, agenda y staff de salas viajan en snake_case y se copian igual.
 - No se copian: los campos de botones de Filament que hoy salen en `GET data-center/{id}/exports` (`dispatchDirection`,
   `isOutlined`, `shouldClose`...), que el admin nuevo redefine; y `storeUrlIos`, `expiresIn`, `logoUrl`, que son datos
   de vistas Blade, no JSON.

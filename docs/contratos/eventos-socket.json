@@ -1,0 +1,362 @@
+{
+  "_leeme": [
+    "Catalogo de eventos del socket (ROADMAP-MIGRACION-DOTNET M0.4.1, 2026-10-22). Es el contrato que el hub de SignalR copia en la fase 3.",
+    "Fuente: eventos-socket/src/types.ts, index.ts y chat.ts; los emisores de Laravel (Http::post a /internal/*); los oyentes buscados en eventos-web/src, eventos-app, eventos-kiosko y eventos-backend/public.",
+    "Los nombres de campo van tal cual viajan: camelCase y snake_case mezclados (ver Anexo A de BUENAS-PRACTICAS-MIGRACION). C# no los normaliza.",
+    "tipado: true = esta en ServerToClientEvents/ClientToServerEvents de types.ts. `npm run catalogo` en eventos-socket valida nombres y campos de los tipados contra este archivo.",
+    "Tipos: 'int', 'string', 'bool', 'iso8601' (fecha con offset), 'any', '?' al final = puede ser null, '[]' = lista, 'opcional:' = puede no venir."
+  ],
+  "salas": {
+    "event:{eventId}": "join:event (solo el evento del token). Webapp, Expo, kiosko, Mission Control, display, event-pulse, attendance-check",
+    "session:{sessionId}": "join:session (admin entra a cualquiera; los demas solo sesiones de su evento)",
+    "chat:session:{sessionId}": "join:session (la misma llamada)",
+    "display:session:{sessionId}": "join:session (la misma llamada)",
+    "pulse:{eventId}": "automatica si el rol del token es 'pulse'",
+    "persona": "todos los sockets de un asistente (mapa attendeeConnections en memoria del proceso)",
+    "event:{eventId}:admin": "NADIE la une: lo que se manda ahi se pierde (room:occupancy)"
+  },
+  "oyentes": {
+    "webapp": "eventos-web (Next): hooks/useGlobalSocket.tsx, hooks/streaming/*, components/app/social/*",
+    "expo": "eventos-app: lib/socket.ts + hooks",
+    "kiosko": "eventos-kiosko (useAttendance.ts)",
+    "mission-control": "eventos-backend/public/mission-control/app.js",
+    "chat-monitor": "eventos-backend/public/chat-monitor.html",
+    "display": "eventos-backend/public/display/session.html",
+    "event-pulse": "eventos-backend/public/event-pulse/",
+    "attendance-check": "eventos-backend/public/attendance-check.html"
+  },
+  "servidor_a_cliente": [
+    {
+      "nombre": "session:started", "tipado": true, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (SessionConfigController::broadcastSessionLifecycle)",
+      "payload": { "session_id": "int", "title": "string", "actual_start_at": "iso8601?", "actual_end_at": "iso8601?", "cancelled_at": "iso8601?" },
+      "escuchan": ["mission-control"],
+      "nota": "types.ts lo declara con SessionPayload {id, title, eventId, startsAt}, que NO es lo que viaja. Lo que manda Laravel es lo de arriba."
+    },
+    {
+      "nombre": "session:ended", "tipado": true, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (SessionConfigController::broadcastSessionLifecycle)",
+      "payload": { "session_id": "int", "title": "string", "actual_start_at": "iso8601?", "actual_end_at": "iso8601?", "cancelled_at": "iso8601?" },
+      "escuchan": ["mission-control"],
+      "nota": "Mismo desfase de tipo que session:started."
+    },
+    {
+      "nombre": "session:cancelled", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (SessionConfigController::broadcastSessionLifecycle)",
+      "payload": { "session_id": "int", "title": "string", "actual_start_at": "iso8601?", "actual_end_at": "iso8601?", "cancelled_at": "iso8601?" },
+      "escuchan": ["mission-control"]
+    },
+    {
+      "nombre": "agenda:updated", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (SessionConfigController:300)",
+      "payload": { "session_id": "int", "title": "string", "actual_start_at": "iso8601?", "actual_end_at": "iso8601?", "cancelled_at": "iso8601?" },
+      "escuchan": [],
+      "nota": "Emitido, sin consumidor (decision en M0.4.6)."
+    },
+    {
+      "nombre": "agenda:delayed", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (SessionConfigController:394)",
+      "payload": { "room_name": "string", "minutes": "int", "affected_sessions": "any[]" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
+      "nombre": "session:mode_changed", "tipado": true, "sala": "session:{sessionId}",
+      "emisor": "Laravel /internal/session/mode_changed (EventSessionObserver:107)",
+      "payload": { "sessionId": "int", "mode": "string", "streamUrl": "string?" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
+      "nombre": "session:config_updated", "tipado": true, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/session-config (SessionConfigController:495); ademas publica slow_mode en el canal Redis de configuracion",
+      "payload": { "session_id": "int", "chat_enabled": "opcional:bool", "qna_enabled": "opcional:bool", "polls_enabled": "opcional:bool", "emoji_only": "opcional:bool", "slow_mode_seconds": "opcional:int", "custom_enabled": "opcional:bool", "custom_url": "opcional:string?" },
+      "escuchan": ["webapp", "expo", "event-pulse"]
+    },
+    {
+      "nombre": "session:audience", "tipado": true, "sala": "session:{sessionId} y pulse:{eventId}",
+      "emisor": "Node (chat.ts broadcastAudience, con debounce de 500 ms al entrar o salir de una sesion)",
+      "payload": { "sessionId": "int", "count": "int", "viewers": "{id:int, name:string}[]" },
+      "escuchan": ["mission-control", "event-pulse"],
+      "nota": "types.ts no declara `viewers` (hasta 20, sin staff)."
+    },
+    {
+      "nombre": "session:metrics", "tipado": true, "sala": "solo el socket que entra (al join:session)",
+      "emisor": "Node (chat.ts, lee chat:count:session:{id} de Redis)",
+      "payload": { "sessionId": "int", "chatCount": "int" },
+      "escuchan": ["mission-control"]
+    },
+    {
+      "nombre": "poll:new", "tipado": true, "sala": "session:{sessionId} si scope=session con sesion; si no event:{eventId}",
+      "emisor": "Laravel /internal/poll/broadcast (PollController:472)",
+      "payload": { "id": "int", "title": "string", "scope": "string", "status": "string", "session_id": "int?", "sessionId": "int?", "event_id": "int", "eventId": "int", "questions": "PollQuestion[]", "my_answers": "any[]" },
+      "escuchan": ["webapp", "expo", "mission-control", "chat-monitor"]
+    },
+    {
+      "nombre": "poll:updated", "tipado": true, "sala": "igual que poll:new",
+      "emisor": "Laravel /internal/poll/broadcast (PollController:472)",
+      "payload": { "id": "int", "title": "string", "scope": "string", "status": "string", "session_id": "int?", "sessionId": "int?", "event_id": "int", "eventId": "int", "questions": "PollQuestion[]", "my_answers": "any[]" },
+      "escuchan": ["webapp", "expo", "mission-control", "chat-monitor", "display"]
+    },
+    {
+      "nombre": "poll:closed", "tipado": true, "sala": "igual que poll:new",
+      "emisor": "Laravel /internal/poll/broadcast (PollController:472)",
+      "payload": { "id": "int", "title": "string", "scope": "string", "status": "string", "session_id": "int?", "sessionId": "int?", "event_id": "int", "eventId": "int", "questions": "PollQuestion[]", "my_answers": "any[]" },
+      "escuchan": ["webapp", "expo", "mission-control", "chat-monitor", "display"]
+    },
+    {
+      "nombre": "chat:message", "tipado": true, "sala": "chat:session:{sessionId}",
+      "emisor": "Node (chat.ts, al recibir chat:send; persiste en MySQL por POST a Laravel)",
+      "payload": { "id": "string", "dbId": "opcional:int", "attendeeId": "int", "userName": "string", "role": "string", "message": "string", "sessionId": "int", "sentAt": "iso8601" },
+      "escuchan": ["webapp", "expo", "mission-control", "chat-monitor"]
+    },
+    {
+      "nombre": "chat:history", "tipado": true, "sala": "solo el socket que entra (al join:session)",
+      "emisor": "Node (chat.ts, historial en Redis)",
+      "payload": "ChatMessagePayload[] (lista de chat:message)",
+      "escuchan": ["webapp", "expo", "mission-control", "chat-monitor"]
+    },
+    {
+      "nombre": "chat:deleted", "tipado": true, "sala": "chat:session:{sessionId}",
+      "emisor": "Node (chat.ts, al recibir chat:delete de un admin)",
+      "payload": { "id": "string" },
+      "escuchan": ["webapp", "expo", "mission-control", "chat-monitor"]
+    },
+    {
+      "nombre": "chat:emoji", "tipado": true, "sala": "chat:session:{sessionId}",
+      "emisor": "Node (chat.ts, al recibir chat:emoji)",
+      "payload": { "emoji": "string", "attendeeId": "int", "sessionId": "int" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
+      "nombre": "chat:pinned", "tipado": true, "sala": "chat:session:{sessionId}; y al socket que entra si hay uno fijado",
+      "emisor": "Node (chat.ts, al recibir chat:pin de un admin)",
+      "payload": { "sessionId": "int", "message": "string", "author": "string?", "pinnedAt": "iso8601" },
+      "escuchan": ["webapp", "expo", "mission-control", "chat-monitor"]
+    },
+    {
+      "nombre": "chat:unpinned", "tipado": true, "sala": "chat:session:{sessionId}",
+      "emisor": "Node (chat.ts, al recibir chat:unpin de un admin)",
+      "payload": { "sessionId": "int" },
+      "escuchan": ["webapp", "expo", "mission-control", "chat-monitor"]
+    },
+    {
+      "nombre": "checkin:update", "tipado": true, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/checkin (CheckinService:216); Node pasa checked_in a checkedIn",
+      "payload": { "checkedIn": "int", "total": "int", "attendee": "{id:int, name:string, role:string, stand_name:string?}" },
+      "escuchan": ["expo", "kiosko", "event-pulse"]
+    },
+    {
+      "nombre": "question:submitted", "tipado": true, "sala": "session:{sessionId}",
+      "emisor": "Laravel /internal/question/broadcast (QuestionController:212, QuestionsRelationManager:159)",
+      "payload": { "id": "int", "body": "string", "status": "string", "upvotes": "int", "is_anonymous": "bool", "my_upvote": "bool", "author": "string?", "created_at": "iso8601", "sessionId": "int" },
+      "escuchan": ["mission-control", "chat-monitor"]
+    },
+    {
+      "nombre": "question:approved", "tipado": true, "sala": "session:{sessionId}",
+      "emisor": "Laravel /internal/question/broadcast",
+      "payload": { "id": "int", "body": "string", "status": "string", "upvotes": "int", "is_anonymous": "bool", "my_upvote": "bool", "author": "string?", "created_at": "iso8601", "sessionId": "int" },
+      "escuchan": ["webapp", "expo", "mission-control", "chat-monitor"]
+    },
+    {
+      "nombre": "question:answered", "tipado": true, "sala": "session:{sessionId}",
+      "emisor": "Laravel /internal/question/broadcast",
+      "payload": { "id": "int", "body": "string", "status": "string", "upvotes": "int", "is_anonymous": "bool", "my_upvote": "bool", "author": "string?", "created_at": "iso8601", "sessionId": "int" },
+      "escuchan": ["webapp", "expo", "mission-control", "chat-monitor"]
+    },
+    {
+      "nombre": "question:upvoted", "tipado": true, "sala": "session:{sessionId}",
+      "emisor": "Laravel /internal/question/broadcast",
+      "payload": { "id": "int", "body": "string", "status": "string", "upvotes": "int", "is_anonymous": "bool", "my_upvote": "bool", "author": "string?", "created_at": "iso8601", "sessionId": "int" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
+      "nombre": "wall:post", "tipado": true, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/wall/broadcast (WallController:308, WallPostResource:151)",
+      "payload": { "id": "int", "body": "string", "photo_url": "string?", "likes_count": "int", "comments_count": "int", "author": "string", "author_photo": "string?", "created_at": "iso8601" },
+      "escuchan": ["webapp", "expo", "event-pulse"]
+    },
+    {
+      "nombre": "wall:comment", "tipado": true, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/wall/broadcast (WallController:336)",
+      "payload": { "id": "int", "post_id": "int", "attendee_id": "int", "body": "string", "author": "string", "author_photo": "string?", "created_at": "iso8601" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
+      "nombre": "data:invalidate", "tipado": true, "sala": "event:{eventId}; o persona (InvalidationService::broadcastToAttendee por /internal/emit-to-user)",
+      "emisor": "Laravel /internal/data/invalidate (InvalidationService:59, EditEventBranding, EditEventOnboardingSettings, SessionConfigController:471) y /internal/emit-to-user",
+      "payload": { "entity": "string" },
+      "escuchan": ["webapp", "expo", "event-pulse"]
+    },
+    {
+      "nombre": "data:sync", "tipado": true, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/data/sync (InvalidationService:118)",
+      "payload": { "entity": "string", "op": "string", "payload": "any" },
+      "escuchan": ["webapp", "expo"],
+      "nota": "El payload nunca lleva campos por usuario (is_favorite): cada cliente conserva los suyos."
+    },
+    {
+      "nombre": "networking:notify", "tipado": true, "sala": "persona (targetAttendeeId)",
+      "emisor": "Laravel /internal/networking/notify (NetworkingController:700)",
+      "payload": { "type": "string", "fromName": "string", "fromAttendeeId": "int" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
+      "nombre": "ban:enforced", "tipado": true, "sala": "persona; despues Node desconecta sus sockets",
+      "emisor": "Laravel /internal/ban/enforce (BanController:180)",
+      "payload": { "reason": "string", "expires_at": "iso8601?" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
+      "nombre": "staff:invited", "tipado": true, "sala": "persona",
+      "emisor": "Laravel /internal/staff/notify (StaffNotificationService)",
+      "payload": { "invitationId": "int", "token": "string", "sponsorName": "string", "sponsorLogo": "string?", "sponsorTier": "string", "inviterName": "string", "expiresAt": "iso8601?" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
+      "nombre": "staff:accepted", "tipado": true, "sala": "persona (quien invito)",
+      "emisor": "Laravel /internal/staff/notify (StaffNotificationService)",
+      "payload": { "invitationId": "int", "attendeeName": "string", "attendeeId": "int", "sponsorId": "int", "accepted": "bool" },
+      "escuchan": ["expo"]
+    },
+    {
+      "nombre": "staff:rejected", "tipado": true, "sala": "persona (quien invito)",
+      "emisor": "Laravel /internal/staff/notify (StaffNotificationService)",
+      "payload": { "invitationId": "int", "attendeeName": "string", "attendeeId": "int", "sponsorId": "int", "accepted": "bool" },
+      "escuchan": ["expo"]
+    },
+    {
+      "nombre": "staff:removed", "tipado": true, "sala": "persona",
+      "emisor": "Laravel /internal/staff/notify (StaffNotificationService)",
+      "payload": { "sponsorName": "string", "sponsorId": "int" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
+      "nombre": "staff:room_changed", "tipado": false, "sala": "persona",
+      "emisor": "Laravel /internal/staff/notify (StaffCheckinController:203)",
+      "payload": { "from_room": "int", "to_room_id": "int", "to_room_name": "string" },
+      "escuchan": ["expo"]
+    },
+    {
+      "nombre": "staff:assignment_request", "tipado": false, "sala": "persona",
+      "emisor": "Laravel /internal/staff/notify (StaffCheckinController:567)",
+      "payload": { "assignment_id": "int?", "room_id": "int", "room_name": "string", "assigned_by": "string" },
+      "escuchan": ["expo"]
+    },
+    {
+      "nombre": "staff:assignment_accepted", "tipado": false, "sala": "persona (quien asigno)",
+      "emisor": "Laravel /internal/staff/notify (StaffCheckinController:579)",
+      "payload": { "attendee_name": "string", "room_name": "string" },
+      "escuchan": ["expo"]
+    },
+    {
+      "nombre": "staff:room_unassigned", "tipado": false, "sala": "persona",
+      "emisor": "Laravel /internal/staff/notify (StaffCheckinController:587)",
+      "payload": {},
+      "escuchan": ["expo"]
+    },
+    {
+      "nombre": "display:project", "tipado": true, "sala": "display:session:{sessionId}; y al socket que entra si hay una proyeccion guardada (con restored: true)",
+      "emisor": "Node (chat.ts, al recibir display:project de un admin; estado en Redis display:active:session:{id})",
+      "payload": { "sessionId": "int", "type": "string", "pollId": "opcional:int", "questionData": "opcional:{body:string, author:string, upvotes:int}", "gameData": "opcional:any", "data": "opcional:any", "restored": "opcional:bool" },
+      "escuchan": ["display"],
+      "nota": "types.ts no declara questionData ni restored."
+    },
+    {
+      "nombre": "display:stop", "tipado": true, "sala": "display:session:{sessionId}",
+      "emisor": "Node (chat.ts, al recibir display:stop de un admin)",
+      "payload": { "sessionId": "int" },
+      "escuchan": ["display"]
+    },
+    {
+      "nombre": "pulse:active_users", "tipado": true, "sala": "pulse:{eventId}",
+      "emisor": "Node (index.ts, cada 10 s por evento)",
+      "payload": { "count": "int" },
+      "escuchan": ["event-pulse"]
+    },
+    {
+      "nombre": "game:launched", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (GameService::broadcast desde GameController::launch)",
+      "payload": { "game_id": "int", "type": "string", "title": "string", "sponsor": "{name:string, logo_url:string?}?", "audience": "string", "eligible_count": "int" },
+      "escuchan": ["webapp", "expo", "mission-control"]
+    },
+    {
+      "nombre": "game:question", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (GameService::broadcast, trivia)",
+      "payload": { "game_id": "int", "type": "string", "title": "string", "sponsor": "object?", "round": "int", "total_rounds": "int", "question": "string", "options": "string[]", "time_limit": "int" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
+      "nombre": "game:update", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (GameController::join del sorteo)",
+      "payload": { "game_id": "int", "type": "string", "title": "string", "sponsor": "object?", "participants_count": "int" },
+      "escuchan": ["mission-control", "display"]
+    },
+    {
+      "nombre": "game:result", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (GameService::broadcast desde spin y draw)",
+      "payload": { "game_id": "int", "type": "string", "title": "string", "sponsor": "object?", "sector_index": "opcional:int", "sector": "opcional:object", "mode": "opcional:string", "points": "opcional:int", "winner": "opcional:object", "participants": "opcional:object[]", "participants_count": "int", "prize_title": "opcional:string", "prize_description": "opcional:string" },
+      "escuchan": ["webapp", "expo", "mission-control", "display"],
+      "nota": "Ruleta trae sector_*; sorteo trae winner, participants y prize_*."
+    },
+    {
+      "nombre": "game:answer-count", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (GameController::answer, trivia)",
+      "payload": { "game_id": "int", "type": "string", "title": "string", "sponsor": "object?", "round": "int", "count": "int" },
+      "escuchan": ["mission-control", "display"]
+    },
+    {
+      "nombre": "game:round-result", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (GameController::nextQuestion al cerrar la ronda, trivia)",
+      "payload": { "game_id": "int", "type": "string", "title": "string", "sponsor": "object?", "round": "int", "correct": "int", "distribution": "any", "total_answered": "int", "leaderboard": "{attendee_id:int, name:string, photo_url:string, total_score:int}[]", "is_last_round": "bool" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
+      "nombre": "game:finished", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (GameService::broadcast al cerrar trivia)",
+      "payload": { "game_id": "int", "type": "string", "title": "string", "sponsor": "object?", "leaderboard": "object[]" },
+      "escuchan": ["webapp", "expo"],
+      "nota": "Mission Control escucha `game:ended`, que nadie emite: no se entera del cierre (hallazgo M0.4.1)."
+    },
+    {
+      "nombre": "attendance:check", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (RoomCheckinController:704)",
+      "payload": { "check_id": "int", "room_id": "int", "expires_at": "iso8601", "ttl": "int", "sessions": "{id:int, title:string}[]" },
+      "escuchan": ["expo"]
+    },
+    {
+      "nombre": "attendance:check:update", "tipado": false, "sala": "event:{eventId}",
+      "emisor": "Laravel /internal/broadcast (RoomCheckinController:753)",
+      "payload": { "check_id": "int", "counts": "object (session_id -> total)", "total_responses": "int" },
+      "escuchan": ["mission-control", "attendance-check"]
+    },
+    {
+      "nombre": "room:occupancy", "tipado": false, "sala": "event:{eventId}:admin (nadie la une)",
+      "emisor": "Laravel /internal/broadcast (RoomCheckinService:371)",
+      "payload": { "room_id": "int", "room_name": "string?", "occupancy": "int", "capacity": "int?" },
+      "escuchan": [],
+      "nota": "Emitido, sin consumidor (decision en M0.4.6)."
+    },
+    {
+      "nombre": "error", "tipado": true, "sala": "solo el socket que provoco el error",
+      "emisor": "Node",
+      "payload": "string: MAX_CONNECTIONS_EXCEEDED | EVENT_ACCESS_DENIED | JOIN_RATE_LIMITED | SESSION_ACCESS_DENIED | SESSION_NOT_JOINED | CHAT_BANNED | CHAT_PAUSED | CHAT_RATE_LIMITED | FORBIDDEN",
+      "escuchan": []
+    }
+  ],
+  "cliente_a_servidor": [
+    { "nombre": "join:event", "tipado": true, "payload": { "eventId": "int" }, "quien": "todos", "regla": "solo el evento del token (si no, error EVENT_ACCESS_DENIED)" },
+    { "nombre": "join:session", "tipado": true, "payload": { "sessionId": "int" }, "quien": "webapp, expo, mission-control, chat-monitor, display", "regla": "une session, chat y display; manda chat:history, chat:pinned, session:metrics y display:project guardados; limite de ritmo" },
+    { "nombre": "leave:session", "tipado": true, "payload": { "sessionId": "int" }, "quien": "webapp, expo" },
+    { "nombre": "chat:send", "tipado": true, "payload": { "sessionId": "int", "message": "string" }, "quien": "webapp, expo", "regla": "dentro de la sesion, sin ban, chat abierto, slow mode, palabras bloqueadas" },
+    { "nombre": "chat:emoji", "tipado": true, "payload": { "sessionId": "int", "emoji": "string" }, "quien": "webapp, expo" },
+    { "nombre": "chat:delete", "tipado": true, "payload": { "sessionId": "int", "messageId": "string" }, "quien": "mission-control, chat-monitor, expo", "regla": "rol admin*" },
+    { "nombre": "chat:pin", "tipado": true, "payload": { "sessionId": "int", "message": "string", "author": "opcional:string" }, "quien": "mission-control, chat-monitor", "regla": "rol admin*" },
+    { "nombre": "chat:unpin", "tipado": true, "payload": { "sessionId": "int" }, "quien": "mission-control, chat-monitor", "regla": "rol admin*" },
+    { "nombre": "display:project", "tipado": true, "payload": { "sessionId": "int", "type": "string", "pollId": "opcional:int", "questionData": "opcional:{body:string, author:string, upvotes:int}", "gameData": "opcional:any" }, "quien": "mission-control", "regla": "rol admin*" },
+    { "nombre": "display:stop", "tipado": true, "payload": { "sessionId": "int" }, "quien": "mission-control", "regla": "rol admin*" }
+  ],
+  "oyentes_sin_emisor": [
+    { "nombre": "announcement:new", "donde": "eventos-web hooks/streaming/useAnnouncementOverlay.ts:49", "nota": "Quitado del socket el 2026-07-04; los anuncios llegan por data:invalidate {entity: announcements}." },
+    { "nombre": "networking:refresh", "donde": "eventos-web SocialView.tsx:304, useGlobalSocket.tsx", "nota": "Nadie lo emite; la lista se refresca por networking:notify." },
+    { "nombre": "game:ended", "donde": "eventos-backend public/mission-control/app.js", "nota": "El nombre real es game:finished." }
+  ]
+}

@@ -595,6 +595,10 @@ POST   v1/webhooks/checkin/batch                      WebhookInboundController@c
 
 ## Apendice B. Eventos del socket por cliente
 
+> **2026-10-22:** la fuente es `docs/contratos/eventos-socket.json` (M0.4.1). Esta tabla quedo con errores: Mission
+> Control no escucha `display:*` y si `session:*`; faltan `game:round-result`, `game:answer-count`, `room:occupancy` y los
+> 4 `staff:*` de salas.
+
 | Cliente | Eventos que escucha |
 |---|---|
 | Webapp (Next) | ban:enforced, chat:deleted, chat:emoji, chat:history, chat:message, chat:pinned, chat:unpinned, data:invalidate, data:sync, game:result, networking:notify, poll:closed, poll:new, poll:updated, question:answered, question:approved, question:upvoted, session:config_updated, session:mode_changed, staff:invited, staff:removed, wall:comment, wall:post |

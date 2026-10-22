@@ -5,6 +5,13 @@
 
 ## 2026-10-22 — Fase 0, bloque 0.3: congelar las 247 rutas (3 bugs: 3 resueltos; 1 hallazgo por verificar)
 
+### BUG-366: Mission Control no se entera de que termino una trivia (ABIERTO 2026-10-22)
+- **Severidad:** BAJA — `public/mission-control/app.js` escucha `game:ended`, pero Laravel emite `game:finished`
+  (`GameController::nextQuestion`, ultima ronda). El panel de juegos del operador no cambia al cerrar la trivia; la
+  webapp y la app si (escuchan `game:finished`). Visto al armar el catalogo del socket (M0.4.1).
+- **Arreglo propuesto:** escuchar `game:finished` en Mission Control. Sin tocar hasta que Kamilo decida (M0.4.6).
+- **Archivos:** `eventos-backend/public/mission-control/app.js`
+
 ### BUG-365: Las pruebas de contrato usaban el Redis de desarrollo y lo que escribian pasaba a la corrida siguiente (RESUELTO 2026-10-22)
 - **Severidad:** MEDIA (solo pruebas) — `join` del sorteo guarda el pool en `game:{id}:pool` (TTL 1 h) en la base 0 del
   Redis local. La segunda corrida respondia 409 "Already joined": snapshot distinto segun cuando se corriera, y llaves de

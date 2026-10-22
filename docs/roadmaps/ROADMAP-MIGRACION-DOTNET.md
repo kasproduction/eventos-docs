@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 18/187
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 19/187
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 18/34
+## Fase 0: Preparar en PHP (3 semanas) — 19/34
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -122,13 +122,14 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.3.11 Cubrir el sorteo con ganador: hoy el flujo jackpot de `JuegosTest` responde 403 "Not eligible" porque en el seeder nadie esta dentro de una sala (`GameService::getEligiblePool` pide estar en la sala de la sesion o viendola en vivo). No es bug de la app: falta un escenario `en-sala` (ana y fabio dentro del auditorio) para congelar `draw` y `spin` con participantes **[local]**
   **Hecho 2026-10-22 (backend c65ae71):** escenario `en-sala` (ana y fabio en el auditorio); flujos jackpot y ruleta con gente, interno 302 (normal e inverso), externo 291 + 11 solo-php. Destapo BUG-364 y BUG-365 del arnes (749d312) y un orden faltante en `draw`. **Hallazgo para M4 (portar juegos):** el sorteo elige entre quienes estan en la sala o viendo en vivo, no entre quienes tocaron "unirse" (el set de Redis `game:{id}:pool` solo cuenta), y solo guarda al ganador como participante; C# copia eso tal cual salvo decision.
 
-### 0.4 Tiempo real listo para cambiar de motor (3 a 4 dias) — 0/6
-- [ ] M0.4.1 Catalogo de eventos del socket: `docs/contratos/eventos-socket.json` con los 44 nombres, payload, sala y quien escucha (fuente: `eventos-socket/src/types.ts` + apendice B de `migracion-dotnet.md`); `types.ts` se genera o se valida contra el. Confirma los nombres camelCase del socket en la lista de excepciones JSON (BUENAS-PRACTICAS, Anexo A) **[local]**
+### 0.4 Tiempo real listo para cambiar de motor (3 a 4 dias) — 1/6
+- [x] M0.4.1 Catalogo de eventos del socket: `docs/contratos/eventos-socket.json` con todos los nombres, payload, sala y quien escucha (fuente: `eventos-socket/src/types.ts` + apendice B de `migracion-dotnet.md`); `types.ts` se genera o se valida contra el. Confirma los nombres camelCase del socket en la lista de excepciones JSON (BUENAS-PRACTICAS, Anexo A) **[local]**
+  **Hecho 2026-10-22:** eran 61, no 44: 51 del servidor al cliente (17 sin tipar en `types.ts`: juegos, asistencia, agenda, staff de salas, `session:cancelled`, `room:occupancy`) y 10 del cliente. `npm run catalogo` en eventos-socket valida nombres y campos; destapo que `types.ts` tipaba `session:started/ended` con una forma que Laravel no manda (corregido, solo tipos). Anexo A confirmado: 24 nombres (entran los que arma Node; `targetAttendeeId` sale, es interno). El apendice B de `migracion-dotnet.md` tenia errores (Mission Control no escucha `display:*`; si escucha `session:*`). Hallazgos: BUG-366 (Mission Control escucha `game:ended`, que nadie emite) y dos oyentes sin emisor en la webapp (`announcement:new`, `networking:refresh`), anotados para M0.4.6.
 - [ ] M0.4.2 Capa `realtime` en la webapp: `src/lib/realtime.ts` envuelve `getSocket`, `on`, `off`, `emit`, `joinSession`, `leaveSession`; los 7 hooks de `hooks/streaming/*` y `useGlobalSocket.tsx` dejan de importar `socket.io-client` **[local]**
 - [ ] M0.4.3 Lo mismo en Expo (`lib/socket.ts` ya es singleton; 8 hooks), kiosko (`useAttendance.ts`) y las 5 paginas estaticas de `public/` (mission-control, event-pulse, display, chat-monitor, attendance-check) con un `realtime.js` compartido **[local]**
 - [ ] M0.4.4 Catalogo de claves de Redis: clave, dueño (PHP, Node, los dos), formato (serializado PHP, JSON, string, set), TTL. Fuente: 9 archivos con `Redis::` en backend + `src/*.ts` del socket (`docs/contratos/claves-redis.md`) **[local]**
 - [ ] M0.4.5 `InvalidationService::broadcast` publica ademas en el canal Redis `eventos:invalidate` (`{eventId, entity, op}`) sin quitar el POST al socket. Test con `Redis::fake` o cliente real en sqlite **[local]**
-- [ ] M0.4.6 Decision registrada sobre los emits que nadie escucha (`session:started/ended/cancelled`, `agenda:updated`, `room:occupancy`): quedan en el catalogo como "emitido, sin consumidor" o se quitan (`decisiones.md`) **[local]**
+- [ ] M0.4.6 Decision registrada sobre lo que sobra (`decisiones.md`): emitidos sin consumidor (`agenda:updated`, `room:occupancy`, que va a una sala que nadie une) y oyentes sin emisor (`announcement:new` y `networking:refresh` en la webapp, `game:ended` en Mission Control = BUG-366): quedan en el catalogo como estan o se quitan. Corregido en M0.4.1: `session:started/ended/cancelled` SI tienen consumidor (Mission Control, `app.js:1703`) **[local]**
 
 ### 0.5 Logica escondida a la vista (3 dias) — 0/5
 - [ ] M0.5.1 `EventSessionObserver::updated` (4 efectos) y `saved` a `App\Services\SessionEffects` con un metodo por efecto; el observer queda en llamadas de una linea. Igual `DocumentObserver`, `EventObserver`, `ModuleObserver`, `AttendeeWebhookObserver` **[local]**
@@ -179,7 +180,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M1.3.4 `GET /auth/me` identico: snapshot de M0.3 pasa contra PHP y contra C# **[local]**
 
 ### 1.4 Forma de las respuestas y limites (3 dias) — 0/4
-- [ ] M1.4.1 `JsonNamingPolicy.SnakeCaseLower` global, nulos incluidos, campos condicionales omitidos (no `null`) donde el Resource usa `when()`; excepciones en lista cerrada `Contracts/ExcepcionesJson.cs` (los 15 del Anexo A de BUENAS-PRACTICAS; nada entra sin decision) **[local]**
+- [ ] M1.4.1 `JsonNamingPolicy.SnakeCaseLower` global, nulos incluidos, campos condicionales omitidos (no `null`) donde el Resource usa `when()`; excepciones en lista cerrada `Contracts/ExcepcionesJson.cs` (los 24 del Anexo A de BUENAS-PRACTICAS, confirmados en M0.4.1; nada entra sin decision) **[local]**
 - [ ] M1.4.2 Formas de error de Laravel en vez de `ProblemDetails`: 401 `Unauthenticated.`, 422 `{message, errors}` con los textos de `lang/es`, 429 con `Retry-After`; snapshots de M0.3.4 pasan **[local]**
 - [ ] M1.4.3 Limitador de tasa en Redis (INCR + EXPIRE o ventana deslizante en Lua) con las 12 claves de `AppServiceProvider::configureRateLimiting` (por correo, token, usuario, IP) y `TrustProxies` equivalente (`ForwardedHeaders` con la misma lista) **[local]**
 - [ ] M1.4.4 Cache con prefijo `dotnet:` sobre Redis y suscriptor del canal `eventos:invalidate` (M0.4.5) que borra lo suyo **[local]**
