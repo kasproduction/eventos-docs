@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 26/187
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 27/187
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 26/34
+## Fase 0: Preparar en PHP (3 semanas) — 27/34
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -136,14 +136,15 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.4.6 Decision registrada sobre lo que sobra (`decisiones.md`): emitidos sin consumidor (`agenda:updated`, `room:occupancy`, que va a una sala que nadie une) y oyentes sin emisor (`announcement:new` en la webapp; `networking:refresh` NO va aqui: es del bus interno de la webapp, `useGlobalSocket` lo emite con `emitBus` despues de `networking:notify` y `SocialView` lo escucha; error del catalogo corregido 2026-10-22; `game:ended` en Mission Control era BUG-366, resuelto 2026-10-22): quedan en el catalogo como estan o se quitan. Corregido en M0.4.1: `session:started/ended/cancelled` SI tienen consumidor (Mission Control, `app.js:1703`) **[local]**
   **Hecho 2026-10-22 (decision Kamilo):** fuera `agenda:updated` y `room:occupancy` (backend f8c3cde; BUG-369: el escaneo de sala esperaba ese POST). `announcement:new` era un cartel perdido desde julio: reconectado a la lista de la campana (eventos-web dcf4079, BUG-368). `networking:refresh` no sobraba (bus interno de la webapp). Catalogo: 49 + 10, `oyentes_sin_emisor` vacio.
 
-### 0.5 Logica escondida a la vista (3 dias) — 2/5
+### 0.5 Logica escondida a la vista (3 dias) — 3/5
 - [x] M0.5.1 `EventSessionObserver::updated` (4 efectos) y `saved` a `App\Services\SessionEffects` con un metodo por efecto; el observer queda en llamadas de una linea. Igual `DocumentObserver`, `EventObserver`, `ModuleObserver`, `AttendeeWebhookObserver` **[local]**
   **Hecho 2026-10-22 (backend 56ef5d6):** `SessionEffects`, `DocumentEffects`, `EventEffects`, `ModuleEffects`, `AttendeeWebhookEffects` en `app/Services`; cada efecto con nombre y el observer como indice. Suite 1.135 igual. Fuera el borrado por patron de modulos, que nunca hizo nada.
 - [x] M0.5.2 Las 16 closures de `routes/web.php` (561 lineas) a controladores con nombre: `InternalChatController` (5 rutas), `DisplayController`, `JoinController`, `DataCenterPageController` **[local]**
   **Hecho 2026-10-22 (backend ae22313):** 5 controladores en `app/Http/Controllers/Web` (`OperadorController`, `InternalChatController`, `DeepLinkController`, `AdminDescargasController`, `DataCenterPageController`); `/` pasa a `Route::view`. Mismas rutas, nombres y middlewares (route:list) y mismas respuestas en vivo. Secreto interno con `hash_equals`.
 - [ ] M0.5.3 Inventario de las 111 acciones con logica de Filament: archivo, que hace, que jobs o correos dispara, que claves de cache toca (`docs/contratos/acciones-admin.md`). Es la lista de lo que el admin nuevo tiene que reproducir **[local]**
 - [ ] M0.5.4 Catalogo de variables de entorno: las 60 de `.env` con dueño y si C# la necesita (`docs/contratos/variables.md`) **[local]**
-- [ ] M0.5.5 Cabecera `X-Backend: php` en toda respuesta de Laravel desde ya **[local]**
+- [x] M0.5.5 Cabecera `X-Backend: php` en toda respuesta de Laravel desde ya **[local]**
+  **Hecho 2026-10-22 (backend):** middleware global `MarcaBackend`; API, errores, admin y paginas del operador la llevan (comprobado en vivo). Los estaticos de Apache no (no pasan por Laravel). 4 pruebas.
 
 ### 0.6 Cerrar lo que quedo a medias en PHP (1 a 2 dias + medir) — 0/4
 - [ ] M0.6.1 Expo: commitear el recap del working tree arreglando los 5 errores de `tsc` (`leaderboard.tsx`, `RecapCard.tsx`, `ContestBanner.tsx`, `AttendanceCheckModal.tsx`) **[local]**
