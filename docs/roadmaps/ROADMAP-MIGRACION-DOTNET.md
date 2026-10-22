@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 8/171
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 10/171
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > Clasificacion de pendientes: `docs/pendientes-2026-10.md`. Fuente unica de tareas: `docs/living/PENDIENTES.md`
@@ -93,7 +93,7 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 8/31
+## Fase 0: Preparar en PHP (3 semanas) — 10/31
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -110,13 +110,13 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 - [x] M0.2.2 BUG-348: reescribir el test de cache del Data Center para la invalidacion por observer (`DataCenterApiTest.php:76`) **[local]**
 - [x] M0.2.3 Suite completa sin socket ni webapp: 1.122 pasan en 153 s (antes 30 min) **[local]**
 
-### 0.3 Contratos de la API (5 a 6 dias) — 0/8
-- [ ] M0.3.1 Seeder determinista de contrato: fecha fija, un evento, 10 asistentes con roles distintos, una sesion por estado, un stand, un juego, una encuesta (`database/seeders/ContratoSeeder.php`) **[local]**
-- [ ] M0.3.2 **Decidir y aplicar un solo formato de fecha.** Hoy conviven `toIso8601String()` (offset -05:00) y `toISOString()` (UTC con microsegundos). Propuesta: UTC con `Z` y milisegundos en todo, via `serializeDate` en un modelo base y en los 14 Resources. Avisar a web y app (113 `new Date(` en la webapp lo toleran). Cruza con BUG-358 **[local]**
-- [ ] M0.3.3 Pruebas de snapshot por ruta: 16 archivos (uno por modulo de `migracion-dotnet.md` §1.1) que cubren las 247 rutas; respuesta JSON guardada como archivo dorado en `tests/Contratos/__snapshots__/`; variable `CONTRATO_BASE_URL` para apuntarlas a otro backend **[local]**
-- [ ] M0.3.4 Snapshots de las formas de error: 401, 403 baneo, 403 aprobacion pendiente, 422 con mensajes en español, 429 con `Retry-After`, paginacion (`paginate` y `cursorPaginate`) **[local]**
-- [ ] M0.3.5 Snapshots de lo que no es JSON: `.ics`, CSV de leads, ZIP de documentos (cabeceras y primeras lineas) **[local]**
-- [ ] M0.3.6 OpenAPI generado con `dedoc/scramble`, publicado en `/docs/api.json` y versionado en el repo; CI falla si cambia sin commit **[local]**
+### 0.3 Contratos de la API (5 a 6 dias) — 2/8 (en curso 2026-10-21, backend 6c4087c)
+- [x] M0.3.1 Seeder determinista `ContratoSeeder`: reloj congelado 2026-12-06 10:00 Bogota, evento `contrato-2026`, 10 personas con bearer conocido, staff, 5 sesiones, stand, social, gamificacion, encuesta, juego, totem, webhook **[local]**
+- [ ] M0.3.2 **Decidir y aplicar un solo formato de fecha.** HALLAZGO 2026-10-21: la app (`hooks/useAgenda.ts:70`, `useDataInvalidation.ts:285`) y la webapp (`AgendaView.tsx:107`, `EventArchive.tsx:225`) cortan `start` con `split('T')[0]` para agrupar por dia, asi que pasar la agenda a UTC con Z correria las sesiones de la noche al dia siguiente. La opcion segura es el OFFSET DEL EVENTO en todo (`2026-12-06T13:30:00-05:00`, sin microsegundos), que .NET produce igual con `DateTimeOffset`. Decision de Kamilo pendiente. Hoy conviven `toIso8601String()` (offset -05:00) y `toISOString()` (UTC con microsegundos). Propuesta: UTC con `Z` y milisegundos en todo, via `serializeDate` en un modelo base y en los 14 Resources. Avisar a web y app (113 `new Date(` en la webapp lo toleran). Cruza con BUG-358 **[local]**
+- [~] M0.3.3 Pruebas de snapshot por ruta (103/247 hechas: publico 12, contenido 51, perfil 27, errores 13; `tests/Contratos/`, `./vendor/bin/pest tests/Contratos` 25 s; dos pasadas identicas; con `--update-snapshots` se regeneran): 16 archivos (uno por modulo de `migracion-dotnet.md` §1.1) que cubren las 247 rutas; respuesta JSON guardada como archivo dorado en `tests/Contratos/__snapshots__/`; variable `CONTRATO_BASE_URL` para apuntarlas a otro backend **[local]**
+- [~] M0.3.4 Snapshots de las formas de error: hechos 401 (sin token y token invalido), 403 baneo, 403 pulse, 404 ruta y recurso, 405, 422 en español (x2), totem sin token; faltan 403 aprobacion pendiente, 429 con `Retry-After` y paginacion **[local]**
+- [~] M0.3.5 Snapshots de lo que no es JSON: `.ics` y CSV de leads hechos (los streaming se capturan con `streamedContent`); falta el ZIP de documentos **[local]**
+- [x] M0.3.6 OpenAPI con `dedoc/scramble` 0.13: `docs/api.json` versionado, 247 operaciones en 223 rutas, 16 avisos del analizador por revisar (`php -d memory_limit=1024M artisan scramble:export --path=docs/api.json`). El chequeo en CI va con M1.1.4 **[local]**
 - [ ] M0.3.7 Pasar los 106 `['data' => ...]` armados a mano a Resources en los 5 controladores grandes (Stand 884 lineas, Game 821, RoomCheckin 764, Networking 717, StaffCheckin 588); los snapshots no cambian **[local]**
 - [ ] M0.3.8 `AttendeeResource` unificado (hoy hay dos: `Api/V1` y `V1`) **[local]**
 
