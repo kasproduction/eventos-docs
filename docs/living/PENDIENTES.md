@@ -17,13 +17,13 @@
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
 > .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (24/187). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> (26/187). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
 | Area | Avance | Que falta |
 |---|---|---|
-| **Migracion a .NET, fase 0 (preparar en PHP)** | 24/34 | 0.5 logica a la vista, 0.6 cierres, 0.7 retro |
+| **Migracion a .NET, fase 0 (preparar en PHP)** | 26/34 | 0.5 (faltan M0.5.3 a M0.5.5) logica a la vista, 0.6 cierres, 0.7 retro |
 
 | Area | Avance | Que falta |
 |---|---|---|
@@ -468,6 +468,9 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
   puede ver o tocar que en cada ruta, inyecciones, limites y datos de mas en las respuestas; por que = las pruebas de
   contrato congelan lo que hay aunque este mal (BUG-363 aparecio de rebote); lista cuando = informe con hallazgos
   verificados, cada uno en BUG-LOG con severidad, y los graves arreglados o con decision de Kamilo.
+  Ya vistos de rebote (2026-10-22, M0.5.2): `/display/polls/{id}` publica sin token (resultados y respuestas abiertas de
+  cualquier encuesta cambiando el numero); `/dc-embed` manda `X-Frame-Options: ALLOWALL` (valor invalido); confirmar que el
+  `SOCKET_INTERNAL_SECRET` de produccion no sea el de ejemplo; `/internal/*` comparaba con `!==` (ya `hash_equals`).
 
 ---
 

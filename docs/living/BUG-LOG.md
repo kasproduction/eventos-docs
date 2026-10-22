@@ -5,6 +5,13 @@
 
 ## 2026-10-22 — Fase 0, bloque 0.4: tiempo real (3 bugs: 3 resueltos)
 
+### BUG-371: Con la suite corriendo, un pedido real del servidor local leyo la config de pruebas (ABIERTO 2026-10-22)
+- **Severidad:** BAJA (solo local) — durante `./vendor/bin/pest` completo, un pedido de Mission Control por Apache dio
+  500: `no such table: personal_access_tokens (Connection: sqlite, database.sqlite)` en entorno production. Alguna
+  prueba deja visible a Apache una config con sqlite por un instante. No se reprodujo sin la suite.
+- **Regla mientras tanto:** no correr la suite completa mientras se hace QA en vivo contra Laragon.
+- **Por revisar:** que prueba escribe algo compartido (`bootstrap/cache`, `.env`, `database.sqlite`).
+
 ### BUG-370: Mission Control abre pero la API le rechaza todo desde el 2FA del staff (RESUELTO 2026-10-22)
 - **Severidad:** ALTA (herramienta del operador en vivo sin datos) — `/monitor/{id}?token=` crea con `createToken` un
   token de API para un admin/organizador/moderador del evento (`routes/web.php:491`). Desde D.1 del 2FA (backend
