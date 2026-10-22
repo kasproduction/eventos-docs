@@ -95,3 +95,9 @@ cache de palabras bloqueadas y el slow mode por sesion. `/internal/session/viewe
    el prefijo completo, o sube `event:{id}:modules:ver` (ese es un entero, se puede tocar).
 3. `socketauth:*` lo escriben los dos: C# respeta el JSON y la vida de 900 s, y borra al revocar un token.
 4. Lo de Horizon y `RateLimiter` no se comparte: cada lado tiene el suyo.
+
+## Canales pub/sub
+
+| Canal | Quien publica | Mensaje | Quien escucha |
+|---|---|---|---|
+| `eventos:invalidate` (conexion `socket`, sin prefijo) | `InvalidationService::publicarEnRedis` en cada `broadcast` y `sync` (M0.4.5, 2026-10-22) | JSON `{eventId, entity, op}`; `op` = `invalidate` o la operacion de sync | Nadie todavia; la cache de C# (M1.4.4) |

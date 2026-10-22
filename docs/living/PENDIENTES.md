@@ -17,13 +17,13 @@
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
 > .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (22/187). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> (23/187). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
 | Area | Avance | Que falta |
 |---|---|---|
-| **Migracion a .NET, fase 0 (preparar en PHP)** | 22/34 | 0.4 mirar en vivo las 5 paginas sueltas (M0.4.3), invalidacion por Redis (M0.4.5), sobrantes del socket (M0.4.6), 0.5 logica a la vista, 0.6 cierres, 0.7 retro |
+| **Migracion a .NET, fase 0 (preparar en PHP)** | 23/34 | 0.4 mirar en vivo las 5 paginas sueltas (M0.4.3), sobrantes del socket (M0.4.6), 0.5 logica a la vista, 0.6 cierres, 0.7 retro |
 
 | Area | Avance | Que falta |
 |---|---|---|

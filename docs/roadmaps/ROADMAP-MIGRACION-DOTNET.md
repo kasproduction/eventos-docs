@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 22/187
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 23/187
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 22/34
+## Fase 0: Preparar en PHP (3 semanas) — 23/34
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -122,7 +122,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.3.11 Cubrir el sorteo con ganador: hoy el flujo jackpot de `JuegosTest` responde 403 "Not eligible" porque en el seeder nadie esta dentro de una sala (`GameService::getEligiblePool` pide estar en la sala de la sesion o viendola en vivo). No es bug de la app: falta un escenario `en-sala` (ana y fabio dentro del auditorio) para congelar `draw` y `spin` con participantes **[local]**
   **Hecho 2026-10-22 (backend c65ae71):** escenario `en-sala` (ana y fabio en el auditorio); flujos jackpot y ruleta con gente, interno 302 (normal e inverso), externo 291 + 11 solo-php. Destapo BUG-364 y BUG-365 del arnes (749d312) y un orden faltante en `draw`. **Hallazgo para M4 (portar juegos):** el sorteo elige entre quienes estan en la sala o viendo en vivo, no entre quienes tocaron "unirse" (el set de Redis `game:{id}:pool` solo cuenta), y solo guarda al ganador como participante; C# copia eso tal cual salvo decision.
 
-### 0.4 Tiempo real listo para cambiar de motor (3 a 4 dias) — 4/6
+### 0.4 Tiempo real listo para cambiar de motor (3 a 4 dias) — 5/6
 - [x] M0.4.1 Catalogo de eventos del socket: `docs/contratos/eventos-socket.json` con todos los nombres, payload, sala y quien escucha (fuente: `eventos-socket/src/types.ts` + apendice B de `migracion-dotnet.md`); `types.ts` se genera o se valida contra el. Confirma los nombres camelCase del socket en la lista de excepciones JSON (BUENAS-PRACTICAS, Anexo A) **[local]**
   **Hecho 2026-10-22:** eran 61, no 44: 51 del servidor al cliente (17 sin tipar en `types.ts`: juegos, asistencia, agenda, staff de salas, `session:cancelled`, `room:occupancy`) y 10 del cliente. `npm run catalogo` en eventos-socket valida nombres y campos; destapo que `types.ts` tipaba `session:started/ended` con una forma que Laravel no manda (corregido, solo tipos). Anexo A confirmado: 24 nombres (entran los que arma Node; `targetAttendeeId` sale, es interno). El apendice B de `migracion-dotnet.md` tenia errores (Mission Control no escucha `display:*`; si escucha `session:*`). Hallazgos: BUG-366 (Mission Control escucha `game:ended`, que nadie emite) y dos oyentes sin emisor en la webapp (`announcement:new`, `networking:refresh`), anotados para M0.4.6.
 - [x] M0.4.2 Capa `realtime` en la webapp: `src/lib/realtime.ts` envuelve `getSocket`, `on`, `off`, `emit`, `joinSession`, `leaveSession`; los 7 hooks de `hooks/streaming/*` y `useGlobalSocket.tsx` dejan de importar `socket.io-client` **[local]**
@@ -131,7 +131,8 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
   **Hecho 2026-10-22:** Expo (eventos-app c461d0c): `lib/socket.ts` pasa a `lib/realtime.ts` con la interfaz `Realtime` de la webapp; eran 6 consumidores (useChat, useDataInvalidation, useQnA, useSessionMode, useWall, encuestas), no 8. Kiosko (eventos-kiosko e6412c2): `src/lib/realtime.ts` con `abrirRealtime`/`joinEvent`. Paginas sueltas (backend 79194af): `public/js/realtime/motor.js` (Socket.IO 4.7.5 local, antes 4 del CDN y 1 copia en event-pulse) + `realtime.js` con `Realtime.abrir/joinEvent/joinSession`. Verificado sin servidor (sintaxis + motor y capa cargados juntos: mismas opciones que antes). **Falta mirarlas en vivo** cuando se prenda Laragon y el socket. Expo: los 5 errores de `tsc` que salen ya estaban (leaderboard, recap y otros, sin commit desde julio).
 - [x] M0.4.4 Catalogo de claves de Redis: clave, dueño (PHP, Node, los dos), formato (serializado PHP, JSON, string, set), TTL. Fuente: 9 archivos con `Redis::` en backend + `src/*.ts` del socket (`docs/contratos/claves-redis.md`) **[local]**
   **Hecho 2026-10-22:** 4 bases (0 PHP con prefijo, 1 cache con doble prefijo, 2 compartida sin prefijo, 15 contratos), 15 claves y un canal en la 2, 5 grupos en la 0, 30 en la 1. Hallazgos: BUG-367 (el Data Center no invalida sus estadisticas: el patron no coincide con el prefijo real); `event:{id}:agenda` y `:branding` solo se borran, nadie las escribe.
-- [ ] M0.4.5 `InvalidationService::broadcast` publica ademas en el canal Redis `eventos:invalidate` (`{eventId, entity, op}`) sin quitar el POST al socket. Test con `Redis::fake` o cliente real en sqlite **[local]**
+- [x] M0.4.5 `InvalidationService::broadcast` publica ademas en el canal Redis `eventos:invalidate` (`{eventId, entity, op}`) sin quitar el POST al socket. Test con `Redis::fake` o cliente real en sqlite **[local]**
+  **Hecho 2026-10-22 (backend):** `InvalidationService::publicarEnRedis` por la conexion `socket` (sin prefijo: el canal es exactamente `eventos:invalidate`), ANTES del throttle (el throttle frena a los clientes, no a las caches). `broadcast` publica `op: invalidate`; `sync` publica su operacion (tambien cambia datos; si cae al plan B llega dos veces, borrar dos veces da igual). Prueba con los eventos de comando de Redis (PUBLISH real) + suscriptor real de ioredis. Suite 1.130 verdes.
 - [ ] M0.4.6 Decision registrada sobre lo que sobra (`decisiones.md`): emitidos sin consumidor (`agenda:updated`, `room:occupancy`, que va a una sala que nadie une) y oyentes sin emisor (`announcement:new` y `networking:refresh` en la webapp; `game:ended` en Mission Control era BUG-366, resuelto 2026-10-22): quedan en el catalogo como estan o se quitan. Corregido en M0.4.1: `session:started/ended/cancelled` SI tienen consumidor (Mission Control, `app.js:1703`) **[local]**
 
 ### 0.5 Logica escondida a la vista (3 dias) — 0/5
