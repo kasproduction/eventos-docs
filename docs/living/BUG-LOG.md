@@ -3,6 +3,131 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-22 — Hallazgos del inventario del admin y de la fase 0 (17 abiertos)
+
+> Orden de arreglo (decision Kamilo 2026-10-22, `decisiones.md`): seguridad en el bloque 0.8 al cierre de la fase 0;
+> lo solo-Filament que no es de seguridad va a la lista no repetir del admin nuevo (M2.8.5). La logica que vive en
+> hooks de guardar o crear de 20 paginas (no en acciones) queda descrita en `contratos/acciones-admin.md` (hallazgo 15).
+
+### BUG-391: Secretos con valor por defecto inseguro y variables que faltan en `.env.example` (ABIERTO 2026-10-22)
+- **Severidad propuesta:** ALTA si pasa a produccion
+- **Que pasa:** `APP_QR_SECRET` (firma QR y enlaces del operador) y los secretos internos caen a `change_this_secret_in_production` si no estan en el `.env`; 12 variables propias no estan en `.env.example`, asi que una instalacion copiada del ejemplo arranca sin ellas. En local `SOCKET_INTERNAL_SECRET` tiene ese valor.
+- **Fuente:** catalogo de variables (`docs/contratos/variables.md`, M0.5.4), verificado a mano.
+- **Cuando se arregla:** M0.8.5 (bloque de seguridad).
+- **Archivos:** `config/app.php:166`, `config/services.php`, `.env.example`
+
+### BUG-390: `/dc-embed` manda `X-Frame-Options: ALLOWALL`, que no es un valor valido (ABIERTO 2026-10-22)
+- **Severidad propuesta:** BAJA
+- **Que pasa:** El navegador ignora el valor y aplica su comportamiento por defecto; la intencion (dejar embeber) no queda expresada. Va con `frame-ancestors` de CSP.
+- **Fuente:** lectura de `routes/web.php` al mover las rutas (M0.5.2), verificado a mano.
+- **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `app/Http/Controllers/Web/DataCenterPageController.php`
+
+### BUG-389: Los resultados de cualquier encuesta se ven sin token en `/display/polls/{id}` (ABIERTO 2026-10-22)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** La pagina es publica y sin firma: cambiando el numero se ven los resultados de cualquier encuesta de cualquier evento, incluidas las respuestas abiertas (texto libre de los asistentes).
+- **Fuente:** lectura de `routes/web.php` al mover las rutas (M0.5.2), verificado a mano.
+- **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `app/Http/Controllers/Web/OperadorController.php` (`displayEncuesta`)
+
+### BUG-388: El correo de prueba de las plantillas sale por el mailer por defecto, no por el SMTP de la organizacion (ABIERTO 2026-10-22)
+- **Severidad propuesta:** BAJA
+- **Que pasa:** La prueba no usa el remitente real (`EmailService::mailerFor`): puede salir bien y el correo real fallar.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
+- **Archivos:** `EditEmail.php:258`
+
+### BUG-387: Paginas del admin sin permiso propio y sin permisos por accion (ABIERTO 2026-10-22)
+- **Severidad propuesta:** ALTA
+- **Que pasa:** No hay Policies ni `->authorize` en ninguna accion: el acceso es por recurso completo. `LiveGameResults` y `PrizeRedemptions` no definen permiso, entra cualquier usuario del panel.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `app/Filament/Traits/HasResourcePermission.php`, paginas `LiveGameResults` y `PrizeRedemptions`
+
+### BUG-386: Importar asistentes: contraseña igual al telefono, invitaciones con enlace roto y archivos que no se borran (ABIERTO 2026-10-22)
+- **Severidad propuesta:** ALTA (la contraseña)
+- **Que pasa:** En modo telefono la contraseña es el telefono y la cuenta queda activada. Si el correo ya tiene cuenta activada, se manda una invitacion con un token que no se guarda (enlace roto). Corre sincrono dentro de la peticion. El archivo subido y los temporales de fotos oficiales no se borran.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `AttendeesImport.php:72-74, 76, 91-92, 131-138`, `ListAttendeeAdmins.php:95`, `EventPhotoResource.php:411-425`
+
+### BUG-385: Secretos de webhooks a la vista en notificaciones y en un .txt (ABIERTO 2026-10-22)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** `copy_secret` muestra el secreto HMAC en una notificacion; `regenerate` muestra la llave nueva; `download_spec` escribe el secreto y la llave de entrada en un .txt descargable.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `WebhookEndpointResource.php:186, 236, 241, 269`, `WebhookApiKeyResource.php:116`
+
+### BUG-384: Webhooks: "Simular evento" manda asistentes inventados como reales; reenviar puede triplicar (ABIERTO 2026-10-22)
+- **Severidad propuesta:** ALTA (datos a terceros)
+- **Que pasa:** `simulate_event` marca `test` segun el modo del endpoint: a uno en modo real le llegan asistentes inventados como registros reales. `resend_failed` reenvia cada intento fallido y cada reintento crea su log (hasta 3 envios del mismo payload); no toma los fallos de red (`response_status = 0`). En `send_test`, si la conexion falla el admin ve un error en vez de "Prueba fallo".
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `WebhookDispatchService.php:24`, `WebhookEndpointResource.php:195-204, 315-336`, `DispatchWebhookJob`
+
+### BUG-383: Abrir dos paginas del admin ya cambia datos (ABIERTO 2026-10-22)
+- **Severidad propuesta:** BAJA
+- **Que pasa:** La lista de encuestas crea la encuesta post-evento con 3 preguntas al montarse; abrir una solicitud de soporte la pasa de `open` a `read` aunque nadie la lea.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
+- **Archivos:** `ListEventSurveys.php:32-53`, `EditSupportRequest.php:33-40`
+
+### BUG-382: Activar o cerrar encuestas desde el admin no avisa por socket (ABIERTO 2026-10-22)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** La API emite `poll:new` y `poll:closed`; Filament no: los asistentes no ven la encuesta hasta refrescar.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
+- **Archivos:** `EventSurveyResource.php:125-139`, `EditEventSurvey.php:40-56`, `Api/V1/PollController.php:104, 123`
+
+### BUG-381: `QuestionsRelationManager` de sesiones es codigo muerto (ABIERTO 2026-10-22)
+- **Severidad propuesta:** BAJA
+- **Que pasa:** 5 acciones con aviso al socket que nadie usa: no esta registrado (`getRelations()` devuelve vacio). La moderacion de preguntas vive en Mission Control.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
+- **Archivos:** `EventSessionResource/RelationManagers/QuestionsRelationManager.php`, `EventSessionResource.php:393-399`
+
+### BUG-380: Asignar speakers a una sesion no avisa a la app ni a la webapp (ABIERTO 2026-10-22)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** `speakers()->sync` cambia la tabla intermedia sin pasar por `EventSessionObserver`: nadie se entera hasta que otra cosa invalide la agenda.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
+- **Archivos:** `EventSessionResource.php:130`
+
+### BUG-379: Muro: seis caminos para publicar u ocultar, cada uno con efectos distintos (ABIERTO 2026-10-22)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** Fila: puntos y socket, sin webapp. Masivo: puntos, sin socket ni webapp. Detalle: solo webapp. Ocultar (fila o masivo) no avisa a nadie. `WallPost` no tiene observer propio.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
+- **Archivos:** `WallPostResource.php:136-163, 174-175, 184-195, 222-224`, `ViewWallPost.php:23-38`
+
+### BUG-378: Fotos: aprobar da resultados distintos y "aprobar seleccionadas" puede romper (ABIERTO 2026-10-22)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** Aprobar en la fila da puntos; en el detalle no. `bulk_approve` no filtra por estado y vuelve a aprobar rechazadas. Si la seleccion incluye una foto oficial (`attendee_id` nulo) llama `tryAward` con null en un `int`: TypeError.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
+- **Archivos:** `EventPhotoResource.php:176-179, 255-260`, `ViewEventPhoto.php:24`, `PointsService.php:120-122`
+
+### BUG-377: "Marcar reclamado" del Golden Ticket no registra quien, no bloquea y no mira vencimiento (ABIERTO 2026-10-22)
+- **Severidad propuesta:** MEDIA (premios)
+- **Que pasa:** GoldenTicket actualiza directo; PrizeRedemptions usa `RewardService::confirm`, que guarda `confirmed_by`, bloquea la fila y revisa el vencimiento. Dos clics a la vez o un premio vencido pasan igual.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
+- **Archivos:** `GoldenTicketResource.php:127-130`, `PrizeRedemptions.php:108`, `RewardService.php:102-121`
+
+### BUG-376: Cambiar el rol de un asistente tiene reglas distintas en el admin y en la API (ABIERTO 2026-10-22)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** Filament ofrece `attendee` y `staff_checkin`; la API acepta `Roles::ATTENDEE_ASSIGNABLE`, que no tiene `staff_checkin` y si tiene `vendedor` y los `admin*`. Hay que confirmar quien puede subir a alguien a admin por la API.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `AttendeeAdminResource.php:321-324`, `Support/Roles.php:60`, `Api/V1/Admin/AttendeeController.php:65`
+
+### BUG-375: Cuatro formas de mandar push "ya", cada una con otro publico (ABIERTO 2026-10-22)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** Filament (`sendPush`, `send_now`, `resend`) solo usa Expo (deja fuera a quien solo tiene web push) y no excluye baneados. La API excluye baneados pero tambien solo usa Expo. El job programado si incluye web push y ademas crea un anuncio; `send_now` no.
+- **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
+- **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
+- **Archivos:** `AnnouncementResource.php:275-276`, `ScheduledNotificationResource.php:111-112, 151-152`, `Admin/NotificationController.php:78-80`, `DispatchScheduledNotificationsJob.php:24-54`
+
 ## 2026-10-22 — Fase 0, bloque 0.4: tiempo real (3 bugs: 3 resueltos)
 
 ### BUG-374: El admin muestra los eventos de todas las organizaciones (ABIERTO 2026-10-22)
@@ -17,6 +142,8 @@
 - **Severidad:** MEDIA — `AttendeeAdminResource` crea el `AttendeeBan` pero no llama `/internal/ban/enforce`, que la
   API si llama (`Admin/BanController.php:180`). El `AttendeeBan::created` del AppServiceProvider solo borra la ficha de
   auth del socket: la conexion abierta sigue (chat incluido) hasta que se reconecte.
+  Ademas Filament no guarda la IP en la auditoria del ban y la push de ban sale distinta que la de la API
+  (`BanController.php:68-79`).
 - **Visto:** inventario M0.5.3, verificado a mano.
 - **Arreglo:** que las dos puertas usen el mismo servicio de ban. Agendado: M0.8.2 (bloque de seguridad).
 - **Archivos:** `app/Filament/Resources/AttendeeAdminResource.php`, `Admin/BanController.php`

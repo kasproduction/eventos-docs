@@ -121,11 +121,37 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 ## 3. BUGS ABIERTOS (detalle en `BUG-LOG.md`)
 
 > Cerrados 2026-10-21: BUG-344, BUG-347, BUG-348, y los nuevos BUG-360 y BUG-361 (ver COMPLETADO).
+> Cerrados 2026-10-22: BUG-362 a BUG-370 y BUG-372.
 
 - [ ] BUG-358 Error de hidratacion React #418 en produccion (texto distinto servidor/navegador; sospecha horas o fechas)
 - [ ] BUG-359 Falta `mobileNav` en `messages/pt.json` (barra movil en portugues sin textos)
 
 - [ ] BUG-345 Correo sin ritmo: codigo hecho en B3.1, se cierra al medirlo
+
+**Abiertos el 2026-10-22** (orden de arreglo en `decisiones.md`):
+- Bloque 0.8 de seguridad (cierre de la fase 0):
+  - [ ] BUG-373 Banear desde el admin no saca del socket en el momento (M0.8.2)
+  - [ ] BUG-374 El admin muestra eventos de todas las organizaciones (M0.8.3)
+  - [ ] BUG-376 Cambiar rol: reglas distintas en admin y API; confirmar quien sube a admin (M0.8.4)
+  - [ ] BUG-384 Webhooks: "Simular evento" manda asistentes inventados como reales; reenviar triplica (M0.8.4)
+  - [ ] BUG-385 Secretos de webhooks a la vista en notificaciones y en un .txt (M0.8.4)
+  - [ ] BUG-386 Importar asistentes: contraseña igual al telefono, enlaces rotos, archivos sin borrar (M0.8.4)
+  - [ ] BUG-387 Paginas del admin sin permiso propio y sin permisos por accion (M0.8.4)
+  - [ ] BUG-389 Resultados de cualquier encuesta sin token en `/display/polls/{id}` (M0.8.4)
+  - [ ] BUG-390 `/dc-embed` con `X-Frame-Options: ALLOWALL` (M0.8.4)
+  - [ ] BUG-391 Secretos con valor por defecto y faltantes en `.env.example` (M0.8.5)
+- Lista no repetir del admin nuevo (M2.8.5; antes si llega un cliente antes de la semana 12):
+  - [ ] BUG-375 Cuatro formas de mandar push "ya", cada una con otro publico
+  - [ ] BUG-377 "Marcar reclamado" del Golden Ticket sin quien, sin bloqueo, sin vencimiento
+  - [ ] BUG-378 Fotos: aprobar da resultados distintos; aprobar seleccionadas puede romper
+  - [ ] BUG-379 Muro: seis caminos con efectos distintos
+  - [ ] BUG-380 Asignar speakers no avisa a la app ni a la webapp
+  - [ ] BUG-381 `QuestionsRelationManager` de sesiones es codigo muerto
+  - [ ] BUG-382 Activar o cerrar encuestas desde el admin no avisa por socket
+  - [ ] BUG-383 Abrir dos paginas del admin ya cambia datos
+  - [ ] BUG-388 El correo de prueba de plantillas no usa el SMTP de la organizacion
+- Solo local:
+  - [ ] BUG-371 Con la suite corriendo, un pedido real leyo la config de pruebas (no correr la suite durante QA en vivo)
 - [ ] Pulse cuenta 84 mensajes y la BD tiene 2.156: revisar el criterio de `stats.messages` (sin verificar)
 
 ---
