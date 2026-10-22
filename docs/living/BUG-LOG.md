@@ -5,6 +5,32 @@
 
 ## 2026-10-22 — Fase 0, bloque 0.4: tiempo real (3 bugs: 3 resueltos)
 
+### BUG-374: El admin muestra los eventos de todas las organizaciones (ABIERTO 2026-10-22)
+- **Severidad:** ALTA cuando haya un segundo cliente (hoy hay una sola organizacion) — `EventResource` no tiene
+  `getEloquentQuery`: cualquier usuario con acceso al panel ve todos los eventos y "Trabajar en este" lo deja operar en
+  cualquiera, de cualquier organizacion. Los demas recursos filtran por el evento activo, asi que el cruce entra por aqui.
+- **Visto:** inventario de acciones del admin (M0.5.3), verificado a mano.
+- **Arreglo:** filtrar por `organization_id` del usuario (super_admin ve todo). Decision de Kamilo; va con la auditoria.
+- **Archivos:** `app/Filament/Resources/EventResource.php`
+
+### BUG-373: Banear desde el admin no saca a la persona del socket en el momento (ABIERTO 2026-10-22)
+- **Severidad:** MEDIA — `AttendeeAdminResource` crea el `AttendeeBan` pero no llama `/internal/ban/enforce`, que la
+  API si llama (`Admin/BanController.php:180`). El `AttendeeBan::created` del AppServiceProvider solo borra la ficha de
+  auth del socket: la conexion abierta sigue (chat incluido) hasta que se reconecte.
+- **Visto:** inventario M0.5.3, verificado a mano.
+- **Arreglo:** que las dos puertas usen el mismo servicio de ban. Decision de Kamilo.
+- **Archivos:** `app/Filament/Resources/AttendeeAdminResource.php`, `Admin/BanController.php`
+
+### BUG-372: "Enviar push" de un anuncio privado se lo manda a todo el evento, con el codigo del premio (ABIERTO 2026-10-22)
+- **Severidad:** CRITICA (fuga de codigos canjeables) — `AnnouncementResource::sendPush` arma la audiencia por evento y
+  roles e ignora `target_attendee_id`. Los anuncios privados (premio del Golden Ticket "Tienes un premio sin reclamar.
+  Codigo: XXXXXX", respuestas de soporte) salen en la misma tabla ya publicados, con el boton "Enviar push" visible.
+  Un clic del staff y el codigo llega a todos los telefonos del evento; cualquiera puede reclamar el premio.
+- **Visto:** inventario M0.5.3, verificado a mano (`AnnouncementResource.php:273-292`, `GoldenTicketResource.php:143`).
+- **Arreglo propuesto:** si el anuncio tiene destinatario, la push va solo a esa persona (o el boton no aparece).
+  Decision de Kamilo.
+- **Archivos:** `app/Filament/Resources/AnnouncementResource.php`
+
 ### BUG-371: Con la suite corriendo, un pedido real del servidor local leyo la config de pruebas (ABIERTO 2026-10-22)
 - **Severidad:** BAJA (solo local) — durante `./vendor/bin/pest` completo, un pedido de Mission Control por Apache dio
   500: `no such table: personal_access_tokens (Connection: sqlite, database.sqlite)` en entorno production. Alguna

@@ -17,13 +17,13 @@
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
 > .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (28/188). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> (29/188). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
 | Area | Avance | Que falta |
 |---|---|---|
-| **Migracion a .NET, fase 0 (preparar en PHP)** | 28/34 | 0.5 (falta M0.5.3) logica a la vista, 0.6 cierres, 0.7 retro |
+| **Migracion a .NET, fase 0 (preparar en PHP)** | 29/34 | BUG-372 a BUG-374 (decision Kamilo), 0.6 cierres, 0.7 retro logica a la vista, 0.6 cierres, 0.7 retro |
 
 | Area | Avance | Que falta |
 |---|---|---|
@@ -472,7 +472,8 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
   cualquier encuesta cambiando el numero); `/dc-embed` manda `X-Frame-Options: ALLOWALL` (valor invalido); confirmar que el
   `SOCKET_INTERNAL_SECRET` de produccion no sea el de ejemplo; `/internal/*` comparaba con `!==` (ya `hash_equals`); 12 variables propias faltan en `.env.example`, entre ellas
   `APP_QR_SECRET` y los secretos internos, que caen al valor por defecto `change_this_secret_in_production`
-  (`docs/contratos/variables.md`).
+  (`docs/contratos/variables.md`). Y los 13 hallazgos por verificar del inventario del admin
+  (`docs/contratos/acciones-admin.md`, seccion Hallazgos).
 
 ---
 
