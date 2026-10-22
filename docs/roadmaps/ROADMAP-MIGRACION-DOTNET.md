@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 30/195
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 31/195
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 30/40
+## Fase 0: Preparar en PHP (3 semanas) — 31/39
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -148,12 +148,14 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.5.5 Cabecera `X-Backend: php` en toda respuesta de Laravel desde ya **[local]**
   **Hecho 2026-10-22 (backend):** middleware global `MarcaBackend`; API, errores, admin y paginas del operador la llevan (comprobado en vivo). Los estaticos de Apache no (no pasan por Laravel). 4 pruebas.
 
-### 0.6 Cerrar lo que quedo a medias en PHP (1 a 2 dias + medir) — 1/4
+### 0.6 Cerrar lo que quedo a medias en PHP (1 a 2 dias + medir) — 2/3 (M0.6.3 movida a la fase 1)
 - [ ] M0.6.1 Expo: `tsc` limpio en `main` (BUG-392, BUG-393 con decision de diseño; BUG-394). El recap NO se commitea: archivado en la rama local `archivo/2026-07-recap-haptics-reintentos` (`8176acd`) por decision de Kamilo 2026-10-22 (no funcionaba bien y se veia mal); queda como funcion pendiente de rediseño y reparacion en PENDIENTES §7 **[local]**
 - [x] M0.6.2 BUG-359 `mobileNav` en `messages/pt.json`; BUG-358 hidratacion #418 (se espera que caiga con M0.3.2) **[local]**
   **Hecho 2026-10-22 (eventos-web `9dab432`, `2ff14a6`):** BUG-359 (tambien faltaba `mobileShell`) y BUG-358 reproducido con `next dev`: no cayo con M0.3.2, era el formato de la hora (espacio fino U+202F) en 11 componentes. Dos pruebas de guardia (idiomas y horas). Vitest 688. Salio BUG-395 (aviso del script del tema, solo desarrollo).
-- [ ] M0.6.3 Medir en servidor B3.7, B3.8 y B3.9 con 300 personas (lo hecho el 2026-10-18 y 2026-10-21). Si el servidor sigue en pausa, queda como primera medicion de la fase 1 **[servidor]**
-- [ ] M0.6.4 Registrar este roadmap en `docs/living/PENDIENTES.md` como bloque con contadores y marcar lo congelado del admin con "congelado hasta admin .NET" (lista en `pendientes-2026-10.md` §7) **[local]**
+- [→] M0.6.3 Medir en servidor B3.7, B3.8 y B3.9 con 300 personas (lo hecho el 2026-10-18 y 2026-10-21). Si el servidor sigue en pausa, queda como primera medicion de la fase 1 **[servidor]**
+  **Movida a la fase 1 el 2026-10-22 (decision Kamilo): ahora es M1.5.6.** El servidor sigue en pausa. No cuenta en la fase 0.
+- [x] M0.6.4 Registrar este roadmap en `docs/living/PENDIENTES.md` como bloque con contadores y marcar lo congelado del admin con "congelado hasta admin .NET" (lista en `pendientes-2026-10.md` §7) **[local]**
+  **Hecho 2026-10-22:** la fila con contadores ya estaba en PENDIENTES §0. De los 17 congelados de `pendientes-2026-10.md` §7, 6 no tenian la marca (credencial en §4, landing builder, A/B de correos, torre de control, passkeys, cache de `auth/me` con `data:sync`, Pulse y canario): marcados con su motivo. C1 a C3 (Destacados, puntos manuales, Silent Disco) viven en `decisiones.md` y en M2.8.1 y M2.8.3; nota en PENDIENTES §8.
 
 ### 0.8 Seguridad (al cierre de la fase 0, antes de la retro; decision Kamilo 2026-10-22) — 0/6
 
@@ -173,9 +175,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 ---
 
 <details>
-<summary><b>Fase 1: Cimientos en C# (3 semanas) — 0/27</b></summary>
+<summary><b>Fase 1: Cimientos en C# (3 semanas) — 0/28</b></summary>
 
-## Fase 1: Cimientos en C# (3 semanas) — 0/27
+## Fase 1: Cimientos en C# (3 semanas) — 0/28
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
 > errores. Sin trafico real. Al terminar, `GET /auth/me` pasa su snapshot contra los dos backends.
@@ -209,12 +211,13 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M1.4.3 Limitador de tasa en Redis (INCR + EXPIRE o ventana deslizante en Lua) con las 12 claves de `AppServiceProvider::configureRateLimiting` (por correo, token, usuario, IP) y `TrustProxies` equivalente (`ForwardedHeaders` con la misma lista) **[local]**
 - [ ] M1.4.4 Cache con prefijo `dotnet:` sobre Redis y suscriptor del canal `eventos:invalidate` (M0.4.5) que borra lo suyo **[local]**
 
-### 1.5 Proxy y primera medicion (2 dias) — 0/5
+### 1.5 Proxy y primera medicion (2 dias) — 0/6
 - [ ] M1.5.1 Nginx (o YARP) con tabla de rutas por ruta exacta: todo a PHP salvo `/api/v1/health`, `/version` y `/auth/me` a C#. Cabecera `X-Backend`. Script `cruzar.ps1 <ruta>` que cambia el dueño de una ruta **[local]**
 - [ ] M1.5.2 **La medicion que faltaba:** `e3-agenda-storm.js` contra `/auth/me` y `/events/by-slug` servidos por PHP y por C# en la misma maquina. Es el numero real de "cuanto menos consume" **[local+medir]**
 - [ ] M1.5.3 `descruzar.ps1 <ruta>` (devuelve la ruta a PHP en un despliegue) y `mysqldump` automatico dentro de `cruzar.ps1` para rutas que escriben; los dos probados antes del primer cruce real **[local]**
 - [ ] M1.5.4 Panel por ruta y por `X-Backend` (p95, errores, req/s) desde los logs de M1.1.3; despues de cada cruce, la ruta contra su propio numero en PHP **[local]**
 - [ ] M1.5.5 `medir-cruce.ps1 <ruta>`: k6 de agosto contra PHP y contra C# en el MSI, deja el numero para anotar en el roadmap. Criterio de cruce completo (regla 20): snapshot igual, orden explicito, prueba cruzada si escribe, medicion anotada, `descruzar.ps1` probado. En el servidor real se mide por hito **[local+medir]**
+- [ ] M1.5.6 Medir en el servidor real, con 300 personas, lo hecho en octubre para bajar pedidos por pantalla: agenda partida (B3.7), Social por pestañas (B3.8) y "lo mio" en un pedido (B3.9). Venia de M0.6.3 (servidor en pausa). Es la primera medicion de la fase 1 en servidor; pedirle a Kamilo que lo prenda **[servidor]**
 
 ### 1.6 Cierre de la fase — 0/1
 - [ ] M1.6.1 Retro de la fase 1 **[local]**

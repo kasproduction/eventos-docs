@@ -17,13 +17,13 @@
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
 > .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (30/195). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> (31/195). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
 | Area | Avance | Que falta |
 |---|---|---|
-| **Migracion a .NET, fase 0 (preparar en PHP)** | 30/40 | 0.6 cierres, 0.8 seguridad (auditoria, BUG-373, BUG-374, `.env.example`), 0.7 retro logica a la vista, 0.6 cierres, 0.7 retro |
+| **Migracion a .NET, fase 0 (preparar en PHP)** | 31/39 | 0.6 cierres, 0.8 seguridad (auditoria, BUG-373, BUG-374, `.env.example`), 0.7 retro logica a la vista, 0.6 cierres, 0.7 retro |
 
 | Area | Avance | Que falta |
 |---|---|---|
@@ -82,7 +82,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 - [ ] B4.2 Respaldo cifrado a R2 por cron CON restauracion probada (= I.4) **[servidor]**
 - [ ] B4.3 Logs centralizados con id de peticion: "que le paso a la persona 1320 a las 10:42" **[local]**
 - [ ] B4.4 Alertas por umbral salidas de lo medido; cualquier 429 a un usuario legitimo suena **[servidor]**
-- [ ] B4.5 **Torre de control** (pedida 2026-04-19 y 2026-08-17): UNA pantalla en el admin solo super_admin con
+- [ ] B4.5 **Torre de control** (pedida 2026-04-19 y 2026-08-17): UNA pantalla en el admin solo super_admin con **[congelado hasta admin .NET si Kamilo elige D.4 (nace en el admin nuevo con los conectados del hub)]**
       conectados por nodo, peticiones/s, p95 por endpoint, errores del ultimo minuto, CPU por rol, colas y estado de
       cada nodo, en vivo por socket. Lab antes de codear. Brief: ROADMAP-INFRAESTRUCTURA I.5 **[local]**
 - [ ] B4.6 Escalar con un comando: `escalar.sh --api +1` desde el pipeline **[servidor]**
@@ -175,7 +175,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   visible SOLO con `?demo` (una landing real no deja al asistente cambiar la plantilla del admin); el parametro viaja a la
   confirmacion y al widget. Minilab A (pildora abajo a la derecha) / B (barra fina arriba, con color del cliente como el lab v3)
   antes de codear. Sin backend. Hoy el tema se fuerza con `?tema=lux|noir` (`src/lib/landingEvent.ts:10`).
-- [ ] Credencial con etiqueta visible (VIP, Prensa): en el admin marcar que tags salen en la escarapela (idea Kamilo 2026-10-11, despues)
+- [ ] Credencial con etiqueta visible (VIP, Prensa): en el admin marcar que tags salen en la escarapela (idea Kamilo 2026-10-11, despues) **[congelado hasta admin .NET: es la misma de la seccion 8]**
 - [ ] "Ya tenias tu lugar" con varios eventos: hoy sale tambien si el correo tiene cuenta en OTRO evento y no en este
 - [ ] Tarjeta al compartir cuando el evento NO tiene "Card del Home": hoy sale sin imagen. Generarla (nombre, fecha, lugar,
   color del evento) necesita lab antes
@@ -218,7 +218,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   reloj sin cambiar las paginas. Medido local tibio (cada pantalla + su precarga en reposo): home 15 → 10, speakers 7 → 5,
   live 8 → 6, detalle de speaker 8 → 5, social 7 → 6, desafio 11 → 9. Por render queda UN pedido de lo mio; lo que se ve
   repetido (`/mine` x3) son las precargas de agenda, social y speakers, una cada una.
-  **Siguiente en B.1:** medir en servidor con 300 (B3.7/B3.8/B3.9), y las piezas que faltan del desafio (premios, pasaporte,
+  **Siguiente en B.1:** medir en servidor con 300 (B3.7/B3.8/B3.9; desde 2026-10-22 es la tarea M1.5.6 del roadmap de la migracion), y las piezas que faltan del desafio (premios, pasaporte,
   recompensas) e invitaciones/historias de social si pesan en la medida real.
 
 ### Navegacion inmediata (Kamilo 2026-10-18) — 8/9
@@ -452,6 +452,8 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 8. ADMIN Y MODULOS DEL ORGANIZADOR **[congelado hasta admin .NET, salvo Mission Control iPad]**
 
+> Tambien congelados (lista `pendientes-2026-10.md` §7, C1 a C3): renombrar "Highlights" a "Destacados", donde vive "Otorgar puntos manuales" y el toggle de Silent Disco. Las preguntas estan en `decisiones.md` (Abiertas, Producto) y el trabajo en el roadmap de la migracion (M2.8.1 y M2.8.3).
+
 > Justificacion por item en `docs/pendientes-2026-10.md` seccion 7. Nacen en el admin nuevo (fase 2 del roadmap de migracion).
 
 - [ ] Configuracion canales WhatsApp/SMS desde Filament (email/SMTP ya existe;
@@ -494,7 +496,7 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 > Ventana: `docs/roadmaps/ROADMAP-SEGURIDAD-STAFF.md`. Raya de Kamilo: la URL del admin no sale sin esto.
 
 - [ ] S.7.2 Correr `security:check` contra el `.env` real de produccion (va con el montaje)
-- [ ] Passkeys (bloque S.9, ampliacion 2026-08-01) — sin fecha
+- [ ] Passkeys (bloque S.9, ampliacion 2026-08-01) — sin fecha **[congelado hasta admin .NET: toca el login de Filament; en .NET va sobre Identity]**
 - [ ] **Auditoria de seguridad del backend** (dale de Kamilo 2026-10-22, `decisiones.md`): que es = revisar a proposito quien
   puede ver o tocar que en cada ruta, inyecciones, limites y datos de mas en las respuestas; por que = las pruebas de
   contrato congelan lo que hay aunque este mal (BUG-363 aparecio de rebote); lista cuando = informe con hallazgos
@@ -631,8 +633,8 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] Wallet digital (.pkpass + Google Wallet)
 - [ ] Digital signage (pantallas venue)
 - [ ] Badge printing fisico
-- [ ] Landing builder Filament (Fase 2+)
-- [ ] A/B testing emails (Fase 2+)
+- [ ] Landing builder Filament (Fase 2+) **[congelado hasta admin .NET]**
+- [ ] A/B testing emails (Fase 2+) **[congelado hasta admin .NET]**
 - [ ] Juegos Unity en stands (requiere dev Unity separado)
 
 #### Showcase / Demo inversor
@@ -648,9 +650,9 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 13. DESPUES DEL 6 DE DICIEMBRE — infraestructura (`ROADMAP-INFRAESTRUCTURA.md:260`)
 
-- [ ] Cache de `auth/me` en Next · precarga completa · `data:sync` en vez de `data:invalidate` (refrescar solo lo que cambio)
+- [ ] Cache de `auth/me` en Next · precarga completa · `data:sync` en vez de `data:invalidate` (refrescar solo lo que cambio) **[congelado hasta SignalR: cambia el protocolo del socket]**
 - [ ] Consultas duplicadas de auth · COUNT de branding · re-medir el techo publicado por endpoint
-- [ ] Laravel Pulse como panel (capa 2) y canario automatico (capa 3) si no entran con la torre
+- [ ] Laravel Pulse como panel (capa 2) y canario automatico (capa 3) si no entran con la torre **[congelado hasta admin .NET salvo que se use para el evento (camino b de D.4)]**
 - [ ] Pagina de estado publica · niveles de 10.000 · montar en otro proveedor con RTO/RPO
 - [ ] Stress 10K (TEST 6-9 del plan viejo: 10K 2 h, failover, export aislado, break point)
 - [ ] I.7.9 hermanos del pipeline (actualizar, destruir) + I.7.10 prueba de punta a punta
