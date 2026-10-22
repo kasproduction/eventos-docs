@@ -51,7 +51,7 @@
 14. **Politica JSON global en un solo lugar:** snake_case, nulos incluidos, campos condicionales omitidos. Nunca se
     sobreescribe por endpoint. Las unicas excepciones son por campo, en **una lista cerrada en un solo archivo**
     (`Contracts/ExcepcionesJson.cs`, M1.4.1). **Nada entra a la lista sin una decision en `decisiones.md`.** Hoy son 15
-    nombres que llegan a un cliente (detalle en `plantillas/CLAUDE-dotnet.md`): 2 en la API HTTP (`eventId`,
+    nombres que llegan a un cliente (Anexo A): 2 en la API HTTP (`eventId`,
     `sessionId`, encuestas), 1 en datos de push y el resto en el socket, que se confirma en M0.4.1.
 15. **Jobs de Hangfire idempotentes.** `ShouldBeUnique` de Laravel NO equivale a `DisableConcurrentExecution` (ese solo
     evita correr dos a la vez; los duplicados igual se encolan). La unicidad es **un filtro propio de Hangfire (o una
@@ -79,3 +79,41 @@
     linea cada una (fecha, que, por que); el roadmap y `PENDIENTES.md` solo enlazan.
 25. **Retro al cerrar cada fase:** que se estimo y que costo, que regla falto, que se corrige del roadmap. Va al final de
     la fase en el roadmap, en cinco lineas.
+
+---
+
+## Anexo A. Excepciones JSON (lista cerrada)
+
+Van en `Contracts/ExcepcionesJson.cs` (M1.4.1). Nada entra sin decision en `decisiones.md`. Lista al 2026-10-22, sacada
+de los 330 snapshots y del codigo PHP:
+
+| # | Campo | Donde viaja | Origen en PHP |
+|---|---|---|---|
+| 1 | `eventId` | API: encuestas (junto a `event_id`); socket | `PollController.php:400`; `InvalidationService`, `WallController`, `SessionConfigController` |
+| 2 | `sessionId` | API: encuestas (junto a `session_id`); push; socket | `PollController.php:398`; `SendAgendaRemindersJob:125`, `SendSessionChangedNotificationJob:57`; `QuestionController:214`, `EventSessionObserver:108` |
+| 3 | `attendeeId` | socket | `BanController:187`, `InvalidationService:181`, `StaffNotificationService` |
+| 4 | `targetAttendeeId` | socket | `NetworkingController:708`, `StaffCheckinController:553`, `InvalidationService:207`, `StaffNotificationService:88` |
+| 5 | `fromName` | socket | `NetworkingController:710` |
+| 6 | `fromAttendeeId` | socket | `NetworkingController:711` |
+| 7 | `streamUrl` | socket | `EventSessionObserver:110` |
+| 8 a 15 | `invitationId`, `sponsorId`, `sponsorName`, `sponsorLogo`, `sponsorTier`, `inviterName`, `attendeeName`, `expiresAt` | socket | `StaffNotificationService` |
+
+- En la API HTTP solo existen 1 y 2. Los del socket son lo que PHP le manda a Node; los nombres que llegan al cliente se
+  confirman en M0.4.1 contra `eventos-socket/src/types.ts` y la lista se corrige ahi.
+- No se copian: los campos de botones de Filament que hoy salen en `GET data-center/{id}/exports` (`dispatchDirection`,
+  `isOutlined`, `shouldClose`...), que el admin nuevo redefine; y `storeUrlIos`, `expiresIn`, `logoUrl`, que son datos
+  de vistas Blade, no JSON.
+
+## Anexo B. Formas de Laravel que se copian tal cual
+
+- 401 `{"message": "Unauthenticated."}`; 422 `{message, errors}` con los textos de `lang/es`; 429 `Too Many Attempts.`
+  con `Retry-After`; 404 de modelo `No query results for model [App\Models\X] N` (sale asi en produccion).
+- Paginacion donde PHP la arma a mano: `{data, meta: {current_page, last_page, total}}`; revisar el snapshot de cada ruta.
+- Codigos de negocio en `code` (`FORBIDDEN`, `QR_INVALID`, `DUPLICATE_LEAD`, `staff_uses_panel`...).
+
+## Anexo C. Comandos de los contratos (desde `eventos-backend`)
+
+- Contra PHP: `./vendor/bin/pest tests/Contratos` (~90 s).
+- Contra C#: `CONTRATO_BASE_URL=http://localhost:<puerto> ./vendor/bin/pest tests/Contratos`.
+- Regenerar: `--update-snapshots` SOLO sin `--filter` (con filtro borra todos y regenera solo los filtrados); para uno
+  solo, borrar su `.snap` y correr.

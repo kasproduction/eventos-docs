@@ -121,7 +121,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M0.3.10 **Orden explicito en toda lista:** auditar las consultas de las 247 rutas que devuelven listas sin `orderBy` y agregarlo en PHP (snapshots regenerados a proposito). Es criterio de cruce **[local]**
 
 ### 0.4 Tiempo real listo para cambiar de motor (3 a 4 dias) — 0/6
-- [ ] M0.4.1 Catalogo de eventos del socket: `docs/contratos/eventos-socket.json` con los 44 nombres, payload, sala y quien escucha (fuente: `eventos-socket/src/types.ts` + apendice B de `migracion-dotnet.md`); `types.ts` se genera o se valida contra el. Confirma los nombres camelCase del socket en la lista de excepciones JSON (`plantillas/CLAUDE-dotnet.md`) **[local]**
+- [ ] M0.4.1 Catalogo de eventos del socket: `docs/contratos/eventos-socket.json` con los 44 nombres, payload, sala y quien escucha (fuente: `eventos-socket/src/types.ts` + apendice B de `migracion-dotnet.md`); `types.ts` se genera o se valida contra el. Confirma los nombres camelCase del socket en la lista de excepciones JSON (BUENAS-PRACTICAS, Anexo A) **[local]**
 - [ ] M0.4.2 Capa `realtime` en la webapp: `src/lib/realtime.ts` envuelve `getSocket`, `on`, `off`, `emit`, `joinSession`, `leaveSession`; los 7 hooks de `hooks/streaming/*` y `useGlobalSocket.tsx` dejan de importar `socket.io-client` **[local]**
 - [ ] M0.4.3 Lo mismo en Expo (`lib/socket.ts` ya es singleton; 8 hooks), kiosko (`useAttendance.ts`) y las 5 paginas estaticas de `public/` (mission-control, event-pulse, display, chat-monitor, attendance-check) con un `realtime.js` compartido **[local]**
 - [ ] M0.4.4 Catalogo de claves de Redis: clave, dueño (PHP, Node, los dos), formato (serializado PHP, JSON, string, set), TTL. Fuente: 9 archivos con `Redis::` en backend + `src/*.ts` del socket (`docs/contratos/claves-redis.md`) **[local]**
@@ -177,7 +177,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M1.3.4 `GET /auth/me` identico: snapshot de M0.3 pasa contra PHP y contra C# **[local]**
 
 ### 1.4 Forma de las respuestas y limites (3 dias) — 0/4
-- [ ] M1.4.1 `JsonNamingPolicy.SnakeCaseLower` global, nulos incluidos, campos condicionales omitidos (no `null`) donde el Resource usa `when()`; excepciones en lista cerrada `Contracts/ExcepcionesJson.cs` (los 15 de `plantillas/CLAUDE-dotnet.md`; nada entra sin decision) **[local]**
+- [ ] M1.4.1 `JsonNamingPolicy.SnakeCaseLower` global, nulos incluidos, campos condicionales omitidos (no `null`) donde el Resource usa `when()`; excepciones en lista cerrada `Contracts/ExcepcionesJson.cs` (los 15 del Anexo A de BUENAS-PRACTICAS; nada entra sin decision) **[local]**
 - [ ] M1.4.2 Formas de error de Laravel en vez de `ProblemDetails`: 401 `Unauthenticated.`, 422 `{message, errors}` con los textos de `lang/es`, 429 con `Retry-After`; snapshots de M0.3.4 pasan **[local]**
 - [ ] M1.4.3 Limitador de tasa en Redis (INCR + EXPIRE o ventana deslizante en Lua) con las 12 claves de `AppServiceProvider::configureRateLimiting` (por correo, token, usuario, IP) y `TrustProxies` equivalente (`ForwardedHeaders` con la misma lista) **[local]**
 - [ ] M1.4.4 Cache con prefijo `dotnet:` sobre Redis y suscriptor del canal `eventos:invalidate` (M0.4.5) que borra lo suyo **[local]**
