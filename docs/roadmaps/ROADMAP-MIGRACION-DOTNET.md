@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 10/171
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 11/171
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > Clasificacion de pendientes: `docs/pendientes-2026-10.md`. Fuente unica de tareas: `docs/living/PENDIENTES.md`
@@ -93,7 +93,7 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 10/31
+## Fase 0: Preparar en PHP (3 semanas) — 11/31
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -110,9 +110,9 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 - [x] M0.2.2 BUG-348: reescribir el test de cache del Data Center para la invalidacion por observer (`DataCenterApiTest.php:76`) **[local]**
 - [x] M0.2.3 Suite completa sin socket ni webapp: 1.122 pasan en 153 s (antes 30 min) **[local]**
 
-### 0.3 Contratos de la API (5 a 6 dias) — 2/8 (en curso 2026-10-21, backend 6c4087c)
+### 0.3 Contratos de la API (5 a 6 dias) — 3/8 (en curso 2026-10-21, backend 6c4087c)
 - [x] M0.3.1 Seeder determinista `ContratoSeeder`: reloj congelado 2026-12-06 10:00 Bogota, evento `contrato-2026`, 10 personas con bearer conocido, staff, 5 sesiones, stand, social, gamificacion, encuesta, juego, totem, webhook **[local]**
-- [ ] M0.3.2 **Decidir y aplicar un solo formato de fecha.** HALLAZGO 2026-10-21: la app (`hooks/useAgenda.ts:70`, `useDataInvalidation.ts:285`) y la webapp (`AgendaView.tsx:107`, `EventArchive.tsx:225`) cortan `start` con `split('T')[0]` para agrupar por dia, asi que pasar la agenda a UTC con Z correria las sesiones de la noche al dia siguiente. La opcion segura es el OFFSET DEL EVENTO en todo (`2026-12-06T13:30:00-05:00`, sin microsegundos), que .NET produce igual con `DateTimeOffset`. Decision de Kamilo pendiente. Hoy conviven `toIso8601String()` (offset -05:00) y `toISOString()` (UTC con microsegundos). Propuesta: UTC con `Z` y milisegundos en todo, via `serializeDate` en un modelo base y en los 14 Resources. Avisar a web y app (113 `new Date(` en la webapp lo toleran). Cruza con BUG-358 **[local]**
+- [x] M0.3.2 **Un solo formato de fecha: ISO 8601 con el offset del evento, sin fracciones** (`2026-12-06T13:30:00-05:00`). Decidido y aplicado 2026-10-21: trait `FechasConOffset` en los 84 modelos + 73 `toISOString` reemplazados; 16 snapshots regenerados; suite 1.122 verdes; clientes sin cambios. HALLAZGO que lo decidio: la app (`hooks/useAgenda.ts:70`, `useDataInvalidation.ts:285`) y la webapp (`AgendaView.tsx:107`, `EventArchive.tsx:225`) cortan `start` con `split('T')[0]` para agrupar por dia, asi que pasar la agenda a UTC con Z correria las sesiones de la noche al dia siguiente. La opcion segura es el OFFSET DEL EVENTO en todo (`2026-12-06T13:30:00-05:00`, sin microsegundos), que .NET produce igual con `DateTimeOffset`. Lo que queda en otro formato: los CSV humanos (`Y-m-d H:i`) y las filas crudas de `DB::table` en Data Center y Pulse, que se revisan al congelar esas rutas. Hoy conviven `toIso8601String()` (offset -05:00) y `toISOString()` (UTC con microsegundos). Propuesta: UTC con `Z` y milisegundos en todo, via `serializeDate` en un modelo base y en los 14 Resources. Avisar a web y app (113 `new Date(` en la webapp lo toleran). Cruza con BUG-358 **[local]**
 - [~] M0.3.3 Pruebas de snapshot por ruta (103/247 hechas: publico 12, contenido 51, perfil 27, errores 13; `tests/Contratos/`, `./vendor/bin/pest tests/Contratos` 25 s; dos pasadas identicas; con `--update-snapshots` se regeneran): 16 archivos (uno por modulo de `migracion-dotnet.md` §1.1) que cubren las 247 rutas; respuesta JSON guardada como archivo dorado en `tests/Contratos/__snapshots__/`; variable `CONTRATO_BASE_URL` para apuntarlas a otro backend **[local]**
 - [~] M0.3.4 Snapshots de las formas de error: hechos 401 (sin token y token invalido), 403 baneo, 403 pulse, 404 ruta y recurso, 405, 422 en español (x2), totem sin token; faltan 403 aprobacion pendiente, 429 con `Retry-After` y paginacion **[local]**
 - [~] M0.3.5 Snapshots de lo que no es JSON: `.ics` y CSV de leads hechos (los streaming se capturan con `streamedContent`); falta el ZIP de documentos **[local]**
