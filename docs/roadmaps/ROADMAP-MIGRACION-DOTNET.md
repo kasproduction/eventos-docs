@@ -159,9 +159,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 ---
 
 <details>
-<summary><b>Fase 1: Cimientos en C# (3 semanas) — 0/26</b></summary>
+<summary><b>Fase 1: Cimientos en C# (3 semanas) — 0/27</b></summary>
 
-## Fase 1: Cimientos en C# (3 semanas) — 0/26
+## Fase 1: Cimientos en C# (3 semanas) — 0/27
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
 > errores. Sin trafico real. Al terminar, `GET /auth/me` pasa su snapshot contra los dos backends.
