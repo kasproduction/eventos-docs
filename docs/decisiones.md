@@ -38,6 +38,8 @@
 - **D.5** App en tiendas: no publicar build antes de la fase 3 (cada build congela el cliente de Socket.IO semanas). Si un cliente la pide antes, la fase 3 se adelanta.
 - **D.6** Nombre y repo del servicio C# (propuesta: `eventos-api-dotnet`, .NET 10 LTS, un repo con `Api`, `Hub`, `Worker`, `Contracts`, `Tests`).
 - Zona horaria por evento (hoy toda la API usa la de la app): se decide despues de la fase 5.
+- **Anexo A con 24 nombres camelCase** (2026-10-22, M0.4.1): eran 15; el catalogo del socket sumo los que arma el socket hoy (`checkedIn`, `dbId`, `userName`, `sentAt`, `pinnedAt`, `chatCount`, `pollId`, `questionData`, `gameData`, `messageId`) y saco `targetAttendeeId` (solo interno). ¿Se aprueban? (`BUENAS-PRACTICAS-MIGRACION.md` Anexo A)
+- **BUG-366 y BUG-367** (2026-10-22): Mission Control no se entera del fin de la trivia (`game:ended` vs `game:finished`) y la cache del Data Center no se invalida (patron que no coincide con la clave real). Una linea cada uno. ¿Se arreglan en PHP ahora o se anotan para C#? (`living/BUG-LOG.md`)
 
 ### Producto (venian de `PENDIENTES.md` §2)
 - ¿Cuando abre el registro de asistentes? Esa fecha fija cuando tiene que existir produccion.
@@ -49,6 +51,6 @@
 - Admin: donde vive "Otorgar puntos manuales" (el motor lo soporta, no hay UI).
 - Admin: ¿vuelve el toggle de Silent Disco al form de sesion?
 - Agenda: ¿se puede volver a calificar una sesion ya calificada? Hoy queda de solo lectura (BUG-322).
-- Socket: emits que nadie escucha (`session:started/ended/cancelled`, `agenda:updated`, `room:occupancy`): consumirlos o quitarlos (cruza con M0.4.6).
+- Socket (M0.4.6, corregido 2026-10-22 con el catalogo): `session:started/ended/cancelled` SI tienen oyente (Mission Control). Sobran `agenda:updated` y `room:occupancy` (nadie escucha) y `announcement:new` y `networking:refresh` (la webapp escucha, nadie emite): ¿quitarlos o dejarlos anotados?
 - Event Pulse: reglas del hero (tarjetas que agregan "los ultimos 10 ingresos" + lead individual).
 - Paginas custom (iframes del organizador): construir el acceso o demoler.
