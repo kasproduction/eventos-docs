@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 27/187
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 28/188
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 27/34
+## Fase 0: Preparar en PHP (3 semanas) — 28/34
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -136,13 +136,14 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.4.6 Decision registrada sobre lo que sobra (`decisiones.md`): emitidos sin consumidor (`agenda:updated`, `room:occupancy`, que va a una sala que nadie une) y oyentes sin emisor (`announcement:new` en la webapp; `networking:refresh` NO va aqui: es del bus interno de la webapp, `useGlobalSocket` lo emite con `emitBus` despues de `networking:notify` y `SocialView` lo escucha; error del catalogo corregido 2026-10-22; `game:ended` en Mission Control era BUG-366, resuelto 2026-10-22): quedan en el catalogo como estan o se quitan. Corregido en M0.4.1: `session:started/ended/cancelled` SI tienen consumidor (Mission Control, `app.js:1703`) **[local]**
   **Hecho 2026-10-22 (decision Kamilo):** fuera `agenda:updated` y `room:occupancy` (backend f8c3cde; BUG-369: el escaneo de sala esperaba ese POST). `announcement:new` era un cartel perdido desde julio: reconectado a la lista de la campana (eventos-web dcf4079, BUG-368). `networking:refresh` no sobraba (bus interno de la webapp). Catalogo: 49 + 10, `oyentes_sin_emisor` vacio.
 
-### 0.5 Logica escondida a la vista (3 dias) — 3/5
+### 0.5 Logica escondida a la vista (3 dias) — 4/5
 - [x] M0.5.1 `EventSessionObserver::updated` (4 efectos) y `saved` a `App\Services\SessionEffects` con un metodo por efecto; el observer queda en llamadas de una linea. Igual `DocumentObserver`, `EventObserver`, `ModuleObserver`, `AttendeeWebhookObserver` **[local]**
   **Hecho 2026-10-22 (backend 56ef5d6):** `SessionEffects`, `DocumentEffects`, `EventEffects`, `ModuleEffects`, `AttendeeWebhookEffects` en `app/Services`; cada efecto con nombre y el observer como indice. Suite 1.135 igual. Fuera el borrado por patron de modulos, que nunca hizo nada.
 - [x] M0.5.2 Las 16 closures de `routes/web.php` (561 lineas) a controladores con nombre: `InternalChatController` (5 rutas), `DisplayController`, `JoinController`, `DataCenterPageController` **[local]**
   **Hecho 2026-10-22 (backend ae22313):** 5 controladores en `app/Http/Controllers/Web` (`OperadorController`, `InternalChatController`, `DeepLinkController`, `AdminDescargasController`, `DataCenterPageController`); `/` pasa a `Route::view`. Mismas rutas, nombres y middlewares (route:list) y mismas respuestas en vivo. Secreto interno con `hash_equals`.
 - [ ] M0.5.3 Inventario de las 111 acciones con logica de Filament: archivo, que hace, que jobs o correos dispara, que claves de cache toca (`docs/contratos/acciones-admin.md`). Es la lista de lo que el admin nuevo tiene que reproducir **[local]**
-- [ ] M0.5.4 Catalogo de variables de entorno: las 60 de `.env` con dueño y si C# la necesita (`docs/contratos/variables.md`) **[local]**
+- [x] M0.5.4 Catalogo de variables de entorno: las 60 de `.env` con dueño y si C# la necesita (`docs/contratos/variables.md`) **[local]**
+  **Hecho 2026-10-22:** `docs/contratos/variables.md`: eran 71, no 60. Hallazgos: `APP_KEY` compartida (3 columnas cifradas: 2FA, SMTP por organizacion, sesiones del staff -> M1.3.5 nueva); `APP_QR_SECRET` firma QR y enlaces; 12 variables propias faltan en `.env.example` (secretos incluidos, para la auditoria); 4 sin uso.
 - [x] M0.5.5 Cabecera `X-Backend: php` en toda respuesta de Laravel desde ya **[local]**
   **Hecho 2026-10-22 (backend):** middleware global `MarcaBackend`; API, errores, admin y paginas del operador la llevan (comprobado en vivo). Los estaticos de Apache no (no pasan por Laravel). 4 pruebas.
 
@@ -181,11 +182,12 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M1.2.4 Segundo `DbContext` de solo lectura para la replica (`reports`, cruza con B3.4) **[local]**
 - [ ] M1.2.5 Verificar la zona horaria del MySQL de produccion (`SELECT @@global.time_zone, @@session.time_zone`): las 22 columnas con `useCurrent()` toman la hora de la base. Si no es Bogota, medir cuantas filas estan corridas y decidir (`decisiones.md`) **[servidor]**
 
-### 1.3 Autenticacion compatible (3 dias) — 0/4
+### 1.3 Autenticacion compatible (3 dias) — 0/5
 - [ ] M1.3.1 `AuthenticationHandler` Sanctum: parte `id|secreto`, compara `sha256` con `personal_access_tokens.token`, respeta `expires_at` (7 dias) y `abilities`, actualiza `last_used_at` **[local]**
-- [ ] M1.3.2 Rechazo de tokens de usuarios con acceso al panel (`hasPanelAccess`, roles de `Roles::PANEL_ACCESS` desde `model_has_roles`) y borrado del token + ficha `socketauth:t:*` al rechazar **[local]**
+- [ ] M1.3.2 Rechazo de tokens de usuarios con acceso al panel (`hasPanelAccess`, roles de `Roles::PANEL_ACCESS` desde `model_has_roles`) y borrado del token + ficha `socketauth:t:*` al rechazar **[local]** Excepcion: el token de operador (`App\Support\TokenDeOperador`, BUG-370): `operador:{tipo}`, `evento:{id}`, `sesion:{id}`, solo su lista de rutas, sin borrarlo.
 - [ ] M1.3.3 Claims de rol de plataforma (spatie) y rol de asistente (`attendees.role`) en el principal; `CheckBan` y `CheckApproval` como filtros con las mismas respuestas 403 **[local]**
 - [ ] M1.3.4 `GET /auth/me` identico: snapshot de M0.3 pasa contra PHP y contra C# **[local]**
+- [ ] M1.3.5 Lector del cifrado de Laravel (`APP_KEY`, AES-256-CBC + HMAC, carga JSON base64) en `Contracts`: `users.two_factor_secret`, `organization_email_settings.password`, `staff_sessions.session_id`. Prueba contra valores cifrados por PHP; escribir en el mismo formato mientras conviven (`contratos/variables.md`, M0.5.4) **[local]**
 
 ### 1.4 Forma de las respuestas y limites (3 dias) — 0/4
 - [ ] M1.4.1 `JsonNamingPolicy.SnakeCaseLower` global, nulos incluidos, campos condicionales omitidos (no `null`) donde el Resource usa `when()`; excepciones en lista cerrada `Contracts/ExcepcionesJson.cs` (los 24 del Anexo A de BUENAS-PRACTICAS, confirmados en M0.4.1; nada entra sin decision) **[local]**
