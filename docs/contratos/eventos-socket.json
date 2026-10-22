@@ -313,8 +313,8 @@
       "nombre": "game:finished", "tipado": false, "sala": "event:{eventId}",
       "emisor": "Laravel /internal/broadcast (GameService::broadcast al cerrar trivia)",
       "payload": { "game_id": "int", "type": "string", "title": "string", "sponsor": "object?", "leaderboard": "object[]" },
-      "escuchan": ["webapp", "expo"],
-      "nota": "Mission Control escucha `game:ended`, que nadie emite: no se entera del cierre (hallazgo M0.4.1)."
+      "escuchan": ["webapp", "expo", "mission-control"],
+      "nota": "Mission Control escuchaba `game:ended`, que nadie emite (BUG-366, resuelto 2026-10-22)."
     },
     {
       "nombre": "attendance:check", "tipado": false, "sala": "event:{eventId}",
@@ -356,7 +356,6 @@
   ],
   "oyentes_sin_emisor": [
     { "nombre": "announcement:new", "donde": "eventos-web hooks/streaming/useAnnouncementOverlay.ts:49", "nota": "Quitado del socket el 2026-07-04; los anuncios llegan por data:invalidate {entity: announcements}." },
-    { "nombre": "networking:refresh", "donde": "eventos-web SocialView.tsx:304, useGlobalSocket.tsx", "nota": "Nadie lo emite; la lista se refresca por networking:notify." },
-    { "nombre": "game:ended", "donde": "eventos-backend public/mission-control/app.js", "nota": "El nombre real es game:finished." }
+    { "nombre": "networking:refresh", "donde": "eventos-web SocialView.tsx:304, useGlobalSocket.tsx", "nota": "Nadie lo emite; la lista se refresca por networking:notify." }
   ]
 }

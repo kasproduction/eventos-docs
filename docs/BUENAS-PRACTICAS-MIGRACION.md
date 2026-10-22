@@ -84,7 +84,7 @@
 
 ## Anexo A. Excepciones JSON (lista cerrada)
 
-Van en `Contracts/ExcepcionesJson.cs` (M1.4.1). Nada entra sin decision en `decisiones.md`. Lista al 2026-10-22, sacada
+Van en `Contracts/ExcepcionesJson.cs` (M1.4.1). Nada entra sin decision en `decisiones.md`. **Aprobada por Kamilo el 2026-10-22 (24 nombres).** Lista al 2026-10-22, sacada
 de los 330 snapshots y del codigo PHP:
 
 | # | Campo | Donde viaja | Origen en PHP |

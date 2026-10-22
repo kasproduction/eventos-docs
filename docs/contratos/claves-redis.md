@@ -69,7 +69,8 @@ cache de palabras bloqueadas y el slow mode por sesion. `/internal/session/viewe
 | `event:{id}:room_debounce` | 300 s | — | Segundos de debounce del escaneo en sala (del evento) |
 | `public-landing:{id}` | 60 s | — | Landing publica |
 | `login-slides:event:{id}` | 300 s | observer de slides | Carrusel del login |
-| `dc:stats:{id}:{hash de filtros o none}`, `:curr30`, `:prev30` | 60 s / 300 s | `DataCenterCacheObserver` (**no borra nada: BUG-367**) | Data Center |
+| `dc:stats:{id}:v{ver}:{hash de filtros o none}`, `:curr30`, `:prev30` | 60 s / 300 s | `ExportService::statsKey`; `DataCenterCacheObserver` sube la version (BUG-367 resuelto) | Data Center |
+| `dc:stats:{id}:ver` | sin vencimiento | `ExportService::invalidateStats` (INCR en cada cambio del evento y al guardar o borrar metas) | Data Center |
 | `dc:exports:pending:{id}` | 600 s | `ExportService` | Exports en cola |
 | `dc:master_export:{id}` | 1.800 s | — | Freno del export maestro |
 | `recap:{eventId}:{attendeeId}` | `RecapService::CACHE_TTL` | `RecapService` | Recap personal |
