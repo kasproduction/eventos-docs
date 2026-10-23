@@ -17,13 +17,13 @@
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
 > .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (31/195). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> (32/197). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
 | Area | Avance | Que falta |
 |---|---|---|
-| **Migracion a .NET, fase 0 (preparar en PHP)** | 31/39 | 0.6 cierres, 0.8 seguridad (auditoria, BUG-373, BUG-374, `.env.example`), 0.7 retro logica a la vista, 0.6 cierres, 0.7 retro |
+| **Migracion a .NET, fase 0 (preparar en PHP)** | 32/41 | 0.6 cierres, 0.8 seguridad (auditoria, BUG-373, BUG-374, `.env.example`), 0.7 retro logica a la vista, 0.6 cierres, 0.7 retro |
 
 | Area | Avance | Que falta |
 |---|---|---|
@@ -128,6 +128,65 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 - [ ] BUG-395 Aviso de React en desarrollo por el script del tema en el layout (no se ve; cuando se toque el layout)
 
 - [ ] BUG-345 Correo sin ritmo: codigo hecho en B3.1, se cierra al medirlo
+
+**Abiertos el 2026-10-23** (auditoria M0.8.1, todos por verificar con prueba; prioridad A en M0.8.6, B en M0.8.7, C en M0.8.8):
+  - [ ] BUG-396 El reto 2FA del panel no cuenta para el bloqueo un codigo TOTP incorrecto repetido en intervalos distintos (M0.8.7)
+  - [ ] BUG-397 check-email anonimo rota el codigo de activacion y reenvia la invitacion en cada llamada (M0.8.8)
+  - [ ] BUG-398 Los limites por correo normalizan con strtolower y trim, pero MySQL compara sin acentos ni mayusculas: cada... (M0.8.8)
+  - [ ] BUG-399 Desactivar una cuenta (is_active = false) solo frena el login con contraseña: el magic link y los tokens... (M0.8.7)
+  - [ ] BUG-400 El enlace de restablecer contraseña se arma con el Host de la peticion (sin TrustHosts ni raiz forzada) (M0.8.6)
+  - [ ] BUG-401 verify-identity entrega el codigo de activacion a quien sepa el correo y el telefono de un importado (M0.8.6)
+  - [ ] BUG-402 Un codigo de acceso con un espacio intercalado se valida pero no gasta usos (M0.8.8)
+  - [ ] BUG-403 El limitador del handoff cuenta por un correo que la peticion no trae: 5 canjes por hora para toda la... (M0.8.8)
+  - [ ] BUG-404 El registro entrega sesion para un correo nunca probado y las reglas que confian en el correo la aceptan (M0.8.6)
+  - [ ] BUG-405 El embed publico /dc-embed entrega todas las estadisticas internas, incluidas IP y nombre de los admins y la... (M0.8.7)
+  - [ ] BUG-406 Staff y permisos: con manage-users (event_admin, org_admin) se puede subir el propio rol hasta super_admin... (M0.8.6)
+  - [ ] BUG-407 El Data Center y /dc-embed pintan nombres de asistentes y de eventos sin escape en innerHTML (M0.8.6)
+  - [ ] BUG-408 Los exports del Data Center quedan en almacenamiento publico con nombres que se pueden adivinar (M0.8.6)
+  - [ ] BUG-409 Los exports CSV/XLSX guardan como formula los textos de asistentes que empiezan con '=' (M0.8.8)
+  - [ ] BUG-410 Las variables de las plantillas de correo se insertan como HTML sin escape, incluidas las que controla otra... (M0.8.7)
+  - [ ] BUG-411 Peticiones salientes a URLs configuradas por staff del evento sin politica de destino (ZIP de documentos,... (M0.8.7)
+  - [ ] BUG-412 chat-monitor.html toma stream_iframe y stream_url de la URL, sin token, y los pinta como HTML en el origen... (M0.8.6)
+  - [ ] BUG-413 XSS almacenado en Event Pulse: el nombre del asistente se pinta con innerHTML sin codificar, en el mismo... (M0.8.6)
+  - [ ] BUG-414 El embed de stream que guarda un rol admin* del asistente se ejecuta en Mission Control con el origen del... (M0.8.6)
+  - [ ] BUG-415 Un admin de un evento puede lanzar un control de asistencia sobre un salon de otro evento: push a sus... (M0.8.6)
+  - [ ] BUG-416 Los enlaces firmados de Mission Control y del display no vencen ni se pueden revocar, y el de una sesion... (M0.8.7)
+  - [ ] BUG-417 El token de Mission Control y del display se sale de su evento y su sesion: solo se ata a los parametros de... (M0.8.6)
+  - [ ] BUG-418 El manifiesto del totem entrega el QR estatico (credencial reutilizable) de todos los asistentes con check-in... (M0.8.7)
+  - [ ] BUG-419 GameController::authorizeAdmin acepta al admin* de cualquier evento para operar juegos, exportar... (M0.8.6)
+  - [ ] BUG-420 Las acciones admin de encuestas no revisan rol ni evento: cualquier asistente crea, activa, cierra, modera y... (M0.8.6)
+  - [ ] BUG-421 POST y DELETE /api/v1/admin/uploads no exigen ningun rol: cualquier asistente sube archivos de cualquier tipo... (M0.8.6)
+  - [ ] BUG-422 StorageService::upload conserva la extension del cliente: en el disco public un .php subido por... (M0.8.6)
+  - [ ] BUG-423 Un anuncio 'Programado' llega a los asistentes antes de su hora: la API y el socket solo miran que... (M0.8.8)
+  - [ ] BUG-424 Las restricciones de audiencia se aplican solo al listar: /pages/{id} ignora 'Quien la ve' y los datos de los... (M0.8.7)
+  - [ ] BUG-425 El ban y la aprobacion se revisan sobre el ultimo evento activo del usuario, no sobre el evento de la ruta (M0.8.7)
+  - [ ] BUG-426 Rutas de contenido del evento solo piden sesion: un asistente de cualquier otro evento lee enlaces de... (M0.8.6)
+  - [ ] BUG-427 PUT /me/registration-fields deja cambiar campos que el organizador bloqueo ('Editable despues del registro'... (M0.8.8)
+  - [ ] BUG-428 Quitar el rol de admin a un asistente no invalida su ficha del socket: conserva poderes de admin en el chat y... (M0.8.7)
+  - [ ] BUG-429 Banear no borra la ficha de autenticacion del socket si el indice del usuario ya vencio: el baneado reconecta... (M0.8.7)
+  - [ ] BUG-430 El check-in de puerta acepta registros pendientes de aprobacion con el QR estatico que reciben al registrarse... (M0.8.7)
+  - [ ] BUG-431 staff-checkin/unassign deja a un staff de check-in bajar a 'attendee' a cualquier asistente del evento,... (M0.8.7)
+  - [ ] BUG-432 La restriccion 'Quienes ganan estos puntos' del admin no se aplica al otorgar puntos (M0.8.8)
+  - [ ] BUG-433 Acciones de una sola vez (completar intereses y check-in) se premian sin referencia y no se deduplican (M0.8.8)
+  - [ ] BUG-434 Canje de premios: el saldo se calcula con SUM sin bloqueo y canjes simultaneos de premios distintos gastan... (M0.8.8)
+  - [ ] BUG-435 Trivia en vivo: el puntaje usa el tiempo que manda el cliente y la ronda sigue abierta despues de revelar la... (M0.8.8)
+  - [ ] BUG-436 Registrar la vista de un patrocinador no valida que sea del evento ni deduplica, e infla las estadisticas de... (M0.8.8)
+  - [ ] BUG-437 Cambiar o quitar el lider del stand desde el admin no le quita el acceso al pool de leads: el lider anterior,... (M0.8.7)
+  - [ ] BUG-438 El cupo de colaboradores del stand no se revalida al aceptar y ni el lider ni el staff pueden retirar... (M0.8.8)
+  - [ ] BUG-439 El lider de un stand obtiene correo, empresa y rol de cualquier asistente del evento sin que este haya dado... (M0.8.7)
+  - [ ] BUG-440 Un registro pendiente de aprobacion entra al socket con acceso completo al evento (M0.8.7)
+  - [ ] BUG-441 Una cuenta sin asistente en un evento activo recibe el rol 'admin' en el socket y puede moderar y proyectar... (M0.8.6)
+  - [ ] BUG-442 El token de solo lectura del display, y el acotado de Mission Control, dan poderes de admin en el socket (M0.8.6)
+  - [ ] BUG-443 Los tokens revocados en bloque siguen abriendo el socket hasta 24 horas (M0.8.7)
+  - [ ] BUG-444 Las acciones de moderacion y proyeccion del socket no se atan al evento de la sesion (M0.8.6)
+  - [ ] BUG-445 Un mensaje de un remitente sin asistente (Pulse o cuenta sin evento activo) hace fallar el guardado en lote... (M0.8.8)
+  - [ ] BUG-446 Un evento de socket sin payload tumba el proceso del servidor (M0.8.6)
+  - [ ] BUG-447 /internal/session-config acepta un secreto vacio si INTERNAL_SECRET no esta definido (M0.8.7)
+  - [ ] BUG-448 Borrar un mensaje del chat por la API (DELETE /admin/chat/messages/{id}) no lo saca del historial que el... (M0.8.8)
+  - [ ] BUG-449 Las preguntas de Q&A pendientes de moderacion (texto y autor) se reparten a toda la sala de la sesion (M0.8.7)
+  - [ ] BUG-450 La asistencia virtual que decide el certificado y el nivel sale de la sala del socket sin atarse al horario,... (M0.8.8)
+  - [ ] BUG-451 checkin:update reparte a todo asistente conectado el nombre, rol, id y stand de cada persona que hace... (M0.8.7)
+  - [ ] BUG-452 Bloquear a un contacto aceptado no le quita el acceso: sigue en Mis contactos y sigue viendo las historias de... (M0.8.7)
 
 **Abiertos el 2026-10-22** (orden de arreglo en `decisiones.md`):
 - Bloque 0.8 de seguridad (cierre de la fase 0):

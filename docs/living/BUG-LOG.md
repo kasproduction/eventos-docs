@@ -3,6 +3,416 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-23 — Auditoria de seguridad M0.8.1 (57 nuevos, BUG-396 a BUG-452)
+
+> Auditoria estandar de eventos-backend (`a23884a`) y eventos-socket (`c090f80`), solo lectura de codigo, 54 agentes.
+> 65 pistas, todas `needs_validation`: el camino esta en el codigo y lo revisaron dos agentes independientes, pero sin
+> sandbox no hubo prueba que lo muestre. Por eso van como **por verificar con prueba**; la prueba que falle se escribe
+> al arreglar. 8 pistas ya tenian numero (BUG-373, 374, 376, 385, 386, 387, 389, 391: se les agrego la nota).
+> Informe: `~/security-audit-skill/eventos-backend/run-1/REPORT.md` y `NEEDS-VALIDATION.md` (fuera del repo, no se sube).
+> Prioridad sugerida -> tarea: A (cruce entre eventos, toma de cuenta o de rol, codigo en el origen del admin) -> M0.8.6;
+> B (datos personales o controles dentro del evento) -> M0.8.7; C (puntos, conteos, endurecimiento) -> M0.8.8.
+> Nuevos: A 20, B 21, C 16.
+
+### BUG-452: Bloquear a un contacto aceptado no le quita el acceso: sigue en Mis contactos y sigue viendo las historias de quien lo bloqueo (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Cuando el asistente B bloquea al asistente A, con quien ya tenia un contacto aceptado, block() crea el ContactBlock pero solo borra las ContactRequest pendientes. La solicitud aceptada sigue existiendo. GET /me/contacts (myContacts) y GET /events/{eventId}/stories (AttendeeStoryController::index) dan acceso con solo esa solicitud aceptada y no consultan ContactBlock.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #65 (`eventos-backend/NetworkingController.block:accepted-contact-survives-block`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/networking.php`, `backend: app/Http/Controllers/Api/V1/NetworkingController.php`, `backend: app/Http/Controllers/Api/V1/AttendeeStoryController.php`, `backend: app/Models/ContactBlock.php`, `backend: routes/api/events.php`
+
+### BUG-451: checkin:update reparte a todo asistente conectado el nombre, rol, id y stand de cada persona que hace check-in, y session:audience reparte hasta 20 espectadores por sesion (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** CheckinService::broadcastCheckin manda en cada check-in de puerta el asistente con id, nombre, rol y stand (CheckinService.php:220-225) y el socket lo emite como checkin:update a event:{id} (index.ts:55), sala comentada como 'kiosk + admin' (54) pero a la que entra cualquier asistente con solo coincidir el evento del token (index.ts:675-683).
+- **Fuente:** auditoria de seguridad M0.8.1, pista #64 (`eventos-socket:fanout:attendee-identity-to-shared-rooms`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `socket: src/index.ts`, `backend: app/Services/CheckinService.php`, `socket: src/chat.ts`, `backend: app/Http/Controllers/Api/V1/NetworkingController.php`, `backend: app/Filament/Resources/AttendeeAdminResource.php` (y mas)
+
+### BUG-450: La asistencia virtual que decide el certificado y el nivel sale de la sala del socket sin atarse al horario, al estado ni a una sesion a la vez: unirse a muchas sesiones infla sesiones y horas (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** El recap y su tarjeta 'Certificado de asistencia' salen de session_attendances con source 'app', que FlushSessionAttendanceJob arma desde los hashes Redis session:{id}:joined|left que escribe el socket. join:session (eventos-socket/src/chat.ts:252) para un rol no admin solo pide a Laravel que la sesion sea del evento del token (InternalChatController.php:162-164): no mira cancelled_at, horario ni otras sesiones abiertas, y escribe la entrada con la hora actual (chat.ts:299).
+- **Fuente:** auditoria de seguridad M0.8.1, pista #63 (`eventos-backend:recap-attendance:socket-presence-duration-unbounded`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `socket: src/chat.ts`, `backend: app/Http/Controllers/Web/InternalChatController.php`, `socket: src/index.ts`, `backend: app/Jobs/FlushSessionAttendanceJob.php`, `backend: app/Services/RecapService.php` (y mas)
+
+### BUG-449: Las preguntas de Q&A pendientes de moderacion (texto y autor) se reparten a toda la sala de la sesion (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** QuestionController::store crea la pregunta con status 'pending' (91) y la difunde como question:submitted (100) con id, texto, estado, votos y nombre del autor; el autor solo va nulo si la pregunta es anonima (222).
+- **Fuente:** auditoria de seguridad M0.8.1, pista #62 (`eventos-backend:qna:pending-question-broadcast-to-session-room`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: app/Http/Controllers/Api/V1/QuestionController.php`, `socket: src/index.ts`, `socket: src/chat.ts`, `backend: public/mission-control/app.js`, `backend: public/chat-monitor.html`
+
+### BUG-448: Borrar un mensaje del chat por la API (DELETE /admin/chat/messages/{id}) no lo saca del historial que el socket reenvia a cada persona que entra (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** El chat tiene dos copias: MySQL (fuente de GET /sessions/{id}/chat/messages, que excluye borrados en ChatController.php:35) y la lista Redis chat:history:session:{id} con los ultimos 20 mensajes y sin vencimiento (chat.ts:145-149), que join:session reenvia a cada socket que entra (280-282) y que eventos-web muestra (useChat.ts:340). El borrado por socket (chat:delete) emite chat:deleted (457) y quita la entrada de Redis (468).
+- **Fuente:** auditoria de seguridad M0.8.1, pista #61 (`eventos-backend:chat:rest-delete-keeps-socket-history-copy`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `socket: src/chat.ts`, `backend: app/Http/Controllers/Api/V1/ChatController.php`, `backend: routes/api/chat.php`, `eventos-web/src/hooks/streaming/useChat.ts`, `backend: tests/Feature/Chat/ChatTest.php`
+
+### BUG-447: /internal/session-config acepta un secreto vacio si INTERNAL_SECRET no esta definido (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Verificado en el codigo. Los otros 15 endpoints internos del socket rechazan la peticion si config.internalSecret esta vacio, y leen el secreto de la cabecera X-Internal-Secret antes de leer el cuerpo. /internal/session-config lo toma del cuerpo JSON, despues de leer el cuerpo completo, y compara `secret !== config.internalSecret` sin esa guardia.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #60 (`eventos-socket:internal:session-config-body-secret-fail-open`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `socket: src/index.ts`, `socket: src/config.ts`, `socket: .env.example`, `backend: app/Console/Commands/SecurityCheckCommand.php`, `backend: app/Http/Controllers/Api/V1/Admin/SessionConfigController.php` (y mas)
+
+### BUG-446: Un evento de socket sin payload tumba el proceso del servidor (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Verificado en el codigo. Los manejadores desestructuran el payload en la firma y no validan su forma. En Socket.IO 4.8.3, Socket.dispatch llama a los oyentes dentro de process.nextTick y sin try/catch, a traves de EventEmitter de node:events. Correccion: no es @socket.io/component-emitter, que solo usa socket.io-parser. Una excepcion sincronica en un oyente se vuelve uncaughtException, y src no registra ningun process.on.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #59 (`eventos-socket:events:unvalidated-payload-crashes-worker`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `socket: src/index.ts`, `socket: node_modules/socket.io/dist/socket.js`, `socket: node_modules/socket.io/dist/typed-events.js`, `socket: ecosystem.config.js`, `socket: src/chat.ts` (y mas)
+
+### BUG-445: Un mensaje de un remitente sin asistente (Pulse o cuenta sin evento activo) hace fallar el guardado en lote de los mensajes de otros (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Verificado en el codigo. chat:send no exige attendeeId > 0. Lo pueden enviar un visor de Event Pulse (token ep_ de un panel que la API declara de solo lectura, con attendeeId 0, que puede unirse a las sesiones de su evento) o una cuenta sin asistente activo. persistMessage encola el mensaje con attendee_id 0 en el lote del proceso, que junta los mensajes de todas las sesiones de ese proceso en la ventana de 200 ms.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #58 (`eventos-socket:chat:attendee-zero-sender-poisons-persist-batch`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `socket: src/chat.ts`, `backend: app/Http/Controllers/Web/InternalChatController.php`, `backend: database/migrations/2026_03_28_200015_create_chat_and_polls_tables.php`, `socket: src/auth.ts`, `backend: routes/api.php`
+
+### BUG-444: Las acciones de moderacion y proyeccion del socket no se atan al evento de la sesion (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Verificado en el codigo. Un asistente con rol admin* de un evento A (admin, admin_content, admin_notifs o admin_analytics) puede unirse desde el socket a sesiones de cualquier evento B, porque join:session no valida la sesion para los roles admin*. Una vez en la sala de B puede borrar mensajes (se emite chat:deleted y se borra en la base de B; si el mensaje no esta en el historial de Redis, borrarMensaje borra el ultimo de la sala), anclar y desanclar.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #57 (`eventos-socket:chat:admin-actions-not-bound-to-session-event`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `socket: src/chat.ts`, `backend: app/Http/Controllers/Web/InternalChatController.php`, `backend: app/Http/Controllers/Api/V1/ChatController.php`, `backend: app/Services/GameService.php`, `backend: app/Http/Controllers/Api/V1/Admin/GameController.php` (y mas)
+
+### BUG-443: Los tokens revocados en bloque siguen abriendo el socket hasta 24 horas (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Verificado en el codigo; este candidato incluye el duplicado fusionado eventos-backend:auth:password-reset-bulk-token-delete-skips-socket-revocation. El socket acepta un token si encuentra su ficha socketauth:t:{hash} en Redis. No consulta personal_access_tokens ni expires_at, y le renueva el TTL de 15 minutos en cada lectura, con un tope de 24 h desde iat. La limpieza depende solo del evento de modelo PersonalAccessToken::deleted (AppServiceProvider.php:90-94).
+- **Fuente:** auditoria de seguridad M0.8.1, pista #55 (`eventos-socket:auth:shared-ficha-survives-mass-token-revocation`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: app/Http/Controllers/Api/V1/AuthController.php`, `backend: app/Providers/AppServiceProvider.php`, `socket: src/index.ts`, `socket: src/auth.ts`, `backend: vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php` (y mas)
+
+### BUG-442: El token de solo lectura del display, y el acotado de Mission Control, dan poderes de admin en el socket (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Verificado en el codigo. En Laravel, TokenDeOperador limita el token del display de sala a GET auth/me y GET admin/polls/{poll}/results (BUG-370), y el de Mission Control a sus rutas, su evento y su sesion. El socket no conoce esos permisos. SocketAuthCache::put guarda la ficha del dueño sin abilities, y auth.ts arma la identidad con el asistente activo mas reciente del dueño.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #54 (`eventos-socket:auth:operator-token-abilities-ignored`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: app/Http/Controllers/Web/OperadorController.php`, `backend: app/Support/TokenDeOperador.php`, `backend: app/Services/SocketAuthCache.php`, `backend: public/display/session.html`, `socket: src/auth.ts` (y mas)
+
+### BUG-441: Una cuenta sin asistente en un evento activo recibe el rol 'admin' en el socket y puede moderar y proyectar en cualquier sesion (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Verificado en el codigo. Si la ficha de Redis (SocketAuthCache::buildPayload) o GET /auth/me traen attendee null, auth.ts arma la identidad con role 'admin', eventId 0 y attendeeId 0 (lineas 61-65 y 196-200). attendee es null cuando el usuario no tiene asistente en un evento con is_active=true. El codigo muestra tres caminos.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #53 (`eventos-socket:auth:default-admin-role-without-attendee`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: app/Http/Controllers/Api/V1/AuthController.php`, `backend: app/Models/User.php`, `backend: app/Services/SocketAuthCache.php`, `socket: src/auth.ts`, `socket: src/chat.ts` (y mas)
+
+### BUG-440: Un registro pendiente de aprobacion entra al socket con acceso completo al evento (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Verificado en el codigo. En un evento con registration_requires_approval, CheckApproval responde 403 en las rutas del evento, incluido el chat HTTP, hasta que un admin aprueba. Sin embargo, POST /api/v1/auth/register le entrega el token al pendiente en la misma respuesta y escribe su ficha. Por la landing, el token se borra pero se envia un enlace magico, y verifyMagicLink emite el token sin revisar la aprobacion. El socket no consulta registration_approved_at.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #52 (`eventos-socket:auth:approval-gate-not-enforced`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/auth.php`, `backend: app/Services/AuthService.php`, `backend: app/Services/SocketAuthCache.php`, `socket: src/index.ts`, `socket: src/chat.ts` (y mas)
+
+### BUG-439: El lider de un stand obtiene correo, empresa y rol de cualquier asistente del evento sin que este haya dado su consentimiento (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Un asistente que el staff designa como lider (owner_attendee_id) de un patrocinador puede llamar GET /api/v1/me/stand/search-attendees. El endpoint busca entre todos los asistentes del evento con user.name LIKE '%q%' (q de 2 caracteres o mas, sin escapar % ni _) y no filtra networking_visible ni ContactBlock. Devuelve email, company, photo_url y role: 15 por consulta, sin orden ni paginacion. q='%%' devuelve siempre los mismos 15.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #50 (`eventos-backend:stand:owner-harvests-attendee-contact-pii`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/stand.php`, `backend: app/Http/Controllers/Api/V1/StandController.php`, `backend: app/Http/Resources/V1/StandMemberResource.php`, `backend: app/Services/StaffNotificationService.php`, `backend: app/Http/Controllers/Api/V1/NetworkingController.php` (y mas)
+
+### BUG-438: El cupo de colaboradores del stand no se revalida al aceptar y ni el lider ni el staff pueden retirar invitaciones pendientes (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** El staff fija max_collaborators por patrocinador (de 1 a 20, por defecto 4). addMember y generateShareLink solo comparan los miembros activos al crear la invitacion, sin contar las pendientes, y acceptInvitation no revalida el cupo. Al aceptar, activa al miembro y le da has_vendor_access y sponsor_id, que abren el pool de leads del stand: la lista con correo, telefono, empresa y cargo, la exportacion CSV y la captura por QR.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #49 (`eventos-backend:stand:invitation-cap-not-enforced-on-accept`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/stand.php`, `backend: app/Http/Controllers/Api/V1/StandController.php`, `backend: app/Filament/Resources/SponsorResource.php`, `backend: app/Http/Controllers/Api/V1/LeadController.php`, `backend: database/migrations/2026_04_15_100000_add_staff_invitation_fields.php` (y mas)
+
+### BUG-437: Cambiar o quitar el lider del stand desde el admin no le quita el acceso al pool de leads: el lider anterior, y cualquiera elegido de paso en el selector, sigue listando y exportando los leads con correo y telefono (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** En EditSponsor, el selector 'Lider' tiene live() y afterStateUpdated. Cada vez que el staff elige a alguien, ese asistente recibe has_vendor_access=true y el sponsor_id del stand, aunque el staff no guarde y aunque despues abandone el formulario sin guardar. Al cambiar de lider o vaciar el campo, nadie le quita esas banderas al anterior ni a quien se eligio de paso.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #48 (`eventos-backend:stand-leads:leader-select-grants-vendor-access-without-revocation`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: app/Filament/Resources/SponsorResource.php`, `backend: app/Filament/Resources/SponsorResource/Pages/EditSponsor.php`, `backend: app/Http/Controllers/Api/V1/LeadController.php`, `backend: vendor/filament/forms/src/Concerns/InteractsWithForms.php`, `backend: resources/views/filament/forms/sponsor-team-members.blade.php` (y mas)
+
+### BUG-436: Registrar la vista de un patrocinador no valida que sea del evento ni deduplica, e infla las estadisticas de patrocinadores de otros eventos (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** POST /api/v1/events/{eventId}/sponsors/{sponsorId}/view solo exige que el usuario sea asistente de eventId. Guarda un ActivityLog con event_id = eventId y target_id = sponsorId sin comprobar que el patrocinador pertenezca a ese evento ni que este habilitado, y sin deduplicar por asistente. Las 'Visitas al perfil' que ve el patrocinador en /me/stand/stats y en el CSV de su stand se cuentan por target_id, sin filtrar por event_id ni por asistentes distintos.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #47 (`eventos-backend:sponsors:record-view-not-bound-to-event`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/sponsors.php`, `backend: app/Http/Controllers/Api/V1/SponsorController.php`, `backend: app/Http/Controllers/Api/V1/StandController.php`, `backend: app/Http/Controllers/Api/V1/LeadController.php`, `backend: app/Providers/AppServiceProvider.php`
+
+### BUG-435: Trivia en vivo: el puntaje usa el tiempo que manda el cliente y la ronda sigue abierta despues de revelar la respuesta (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Cualquier asistente autenticado y aprobado del evento del juego manda POST /api/v1/events/games/{id}/answer con cuerpo JSON {option: <correcta como entero>, time_elapsed: -20000}. La opcion debe ir como entero JSON porque la comparacion es estricta (GameController.php:416).
+- **Fuente:** auditoria de seguridad M0.8.1, pista #46 (`eventos-backend:gamification:trivia-client-asserted-time-score`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/events.php`, `backend: app/Http/Controllers/Api/V1/Admin/GameController.php`, `backend: app/Jobs/ProcessTriviaRewardsJob.php`, `backend: app/Services/GameService.php`, `backend: database/migrations/2026_04_21_194545_create_live_game_participants_table.php` (y mas)
+
+### BUG-434: Canje de premios: el saldo se calcula con SUM sin bloqueo y canjes simultaneos de premios distintos gastan los mismos puntos (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** RewardService::redeem abre una transaccion y bloquea solo la fila del premio pedido. El saldo del asistente es un SUM de points_log con lectura no bloqueante y la deduccion es un INSERT posterior. Si el mismo asistente pide a la vez dos premios distintos A y B, cada transaccion bloquea una fila diferente y ninguna espera a la otra.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #45 (`eventos-backend:gamification:reward-redeem-unlocked-balance`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/rewards.php`, `backend: app/Http/Controllers/Api/V1/RewardController.php`, `backend: app/Services/RewardService.php`, `backend: database/migrations/2026_04_23_095924_add_unique_index_to_points_log.php`
+
+### BUG-433: Acciones de una sola vez (completar intereses y check-in) se premian sin referencia y no se deduplican (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** PointsService::award solo busca duplicados si recibe reference_type y reference_id, y el indice unico points_log_unique_award incluye esas dos columnas nullable; con NULL, MySQL no las trata como duplicadas.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #44 (`eventos-backend:gamification:one-time-award-without-reference`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api.php`, `backend: app/Http/Controllers/Api/V1/OnboardingController.php`, `backend: app/Traits/AwardsPoints.php`, `backend: app/Services/PointsService.php`, `backend: app/Filament/Resources/GamificationSettingsResource.php` (y mas)
+
+### BUG-432: La restriccion 'Quienes ganan estos puntos' del admin no se aplica al otorgar puntos (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** El organizador define por accion quienes ganan puntos (gamification_config[accion]['roles']). El panel guarda siempre esa lista al editar la accion y avisa 'Sin ninguno marcado, nadie gana esta accion'. PointsService::isEnabled solo aplica la lista si recibe un rol, pero tryAward lo llama sin rol y no hay otro llamador de isEnabled en app/.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #43 (`eventos-backend:gamification:award-ignores-role-restriction`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/events.php`, `backend: app/Http/Controllers/Api/V1/GamificationController.php`, `backend: app/Services/PointsService.php`, `backend: app/Filament/Resources/GamificationSettingsResource.php`
+
+### BUG-431: staff-checkin/unassign deja a un staff de check-in bajar a 'attendee' a cualquier asistente del evento, incluidos los admins (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** POST /api/v1/events/staff-checkin/unassign usa requireAdmin, que acepta a quien canAssignStaff(), y eso incluye attendees.role 'staff_checkin' (la documentacion del endpoint dice que es solo para admin: QA-MASTER.md:862). El objetivo se busca solo por id dentro del evento de quien llama, sin mirar su rol ni si tiene asignaciones de salon.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #42 (`eventos-backend:checkin:staff-unassign-demotes-any-role`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/events.php`, `backend: app/Http/Controllers/Api/V1/StaffCheckinController.php`, `backend: app/Models/Attendee.php`, `backend: app/Support/Roles.php`, `backend: app/Http/Controllers/Api/V1/Admin/AttendeeController.php` (y mas)
+
+### BUG-430: El check-in de puerta acepta registros pendientes de aprobacion con el QR estatico que reciben al registrarse o iniciar sesion (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** En eventos con registration_requires_approval, AuthService::register crea el asistente con registration_approved_at = null y genera un QR estatico permanente. AuthController::register, login y activate devuelven AttendeeResource con qr_token aunque el registro siga pendiente.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #41 (`eventos-backend:checkin:pending-registration-checked-in`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/checkin.php`, `backend: app/Http/Controllers/Api/V1/CheckinController.php`, `backend: app/Services/CheckinService.php`, `backend: app/Services/AuthService.php`, `backend: app/Http/Controllers/Api/V1/AuthController.php` (y mas)
+
+### BUG-429: Banear no borra la ficha de autenticacion del socket si el indice del usuario ya vencio: el baneado reconecta y sigue en el chat (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** SocketAuthCache guarda dos cosas: la ficha por token (socketauth:t:{hash}) y un indice por usuario (socketauth:u:{id}). forgetUser solo revoca a traves de ese indice. El indice nace con un TTL fijo de 1.800 s, en put() al emitir el token o en writeSharedAuth al volver de /auth/me.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #40 (`eventos-backend:attendee-api:socket-auth-index-expires-before-token`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `socket: src/index.ts`, `socket: src/auth.ts`, `backend: app/Services/SocketAuthCache.php`, `socket: src/chat.ts`, `backend: app/Providers/AppServiceProvider.php` (y mas)
+
+### BUG-428: Quitar el rol de admin a un asistente no invalida su ficha del socket: conserva poderes de admin en el chat y en las pantallas (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** La ficha de SocketAuthCache copia attendee.role al emitir el token. Los cambios de rol no llaman a forgetUser ni borran la ficha: API Admin/AttendeeController::updateRole, la accion 'Cambiar rol' de Filament y StaffCheckinController (acceptAssignment y unassign). Attendee tiene dos observers, el de webhooks y DataCenterCacheObserver, y ninguno toca la ficha del socket. Solo el hook de AttendeeBan la invalida.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #39 (`eventos-backend:attendee-api:socket-auth-cache-role-change-not-invalidated`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: app/Http/Controllers/Api/V1/Admin/AttendeeController.php`, `backend: app/Services/SocketAuthCache.php`, `socket: src/auth.ts`, `socket: src/chat.ts`, `backend: app/Providers/AppServiceProvider.php` (y mas)
+
+### BUG-427: PUT /me/registration-fields deja cambiar campos que el organizador bloqueo ('Editable despues del registro' apagado) (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** El admin de campos promete: 'Apagado: el asistente no podra cambiarlo desde su perfil.' Pero updateMyFields considera escribible todo campo con show_in onboarding o both aunque editable_after sea false, y lo deja reescribir en cualquier momento, no solo en el primer llenado del onboarding. El docblock del metodo dice lo contrario: 'updates only editable_after=true fields'.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #38 (`eventos-backend:attendee-api:registration-field-lock-ignored`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api.php`, `backend: app/Http/Controllers/Api/V1/RegistrationFieldController.php`, `backend: app/Filament/Resources/RegistrationFieldResource.php`, `backend: app/Imports/AttendeesImport.php`, `backend: app/Http/Controllers/Api/V1/AuthController.php` (y mas)
+
+### BUG-426: Rutas de contenido del evento solo piden sesion: un asistente de cualquier otro evento lee enlaces de transmision, documentos, anuncios, paginas y preguntas (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Basta un token de cualquier evento. Por ejemplo, el que el registro publico de cualquier evento abierto entrega al instante (PublicRegistrationController.php:81). Con ese token, GET /api/v1/events/{X}/sessions/{S}/live-config devuelve stream_url, stream_iframe, recording_url y custom_url de cualquier sesion de la plataforma: publicShow ignora eventId y hace EventSession::findOrFail(S).
+- **Fuente:** auditoria de seguridad M0.8.1, pista #37 (`eventos-backend:attendee-api:event-content-without-membership`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/events.php`, `backend: app/Http/Controllers/Api/V1/Admin/SessionConfigController.php`, `backend: app/Http/Controllers/Api/V1/PublicLandingController.php`, `backend: app/Http/Controllers/Api/V1/AgendaController.php`, `backend: app/Http/Controllers/Api/V1/DocumentController.php` (y mas)
+
+### BUG-425: El ban y la aprobacion se revisan sobre el ultimo evento activo del usuario, no sobre el evento de la ruta (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Un asistente baneado en el evento A sigue usando las rutas HTTP de A si tiene un attendee mas nuevo (por created_at) en otro evento activo B. CheckBan (CheckBan.php:20-26) evalua solo ese attendee de B. Los controladores de A atan el attendee al evento de la ruta pero no miran activeBan: WallController::requireAttendee (290-296), QuestionController::requireAttendee (185-190) y ChatController::index (22-28). Las form requests devuelven authorize() true.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #36 (`eventos-backend:attendee-api:ban-checked-on-latest-attendee`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api.php`, `backend: app/Http/Middleware/CheckBan.php`, `backend: app/Http/Controllers/Api/V1/WallController.php`, `backend: app/Http/Controllers/Api/V1/Admin/BanController.php`, `backend: app/Http/Middleware/CheckApproval.php` (y mas)
+
+### BUG-424: Las restricciones de audiencia se aplican solo al listar: /pages/{id} ignora 'Quien la ve' y los datos de los modulos ignoran grupos, presencia y rol (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** CustomPageController::index filtra las paginas por rol (whereNull('roles') o roles que contengan 'attendee' o 'vendedor', lineas 25-28). show() trae cualquier pagina habilitada del evento por id sin ese filtro (38-39). Asi, un asistente comun lee paginas que el organizador marco solo para 'Equipos de stands' (body HTML e iframe_url), y los ids son enteros consecutivos. El dato expuesto es del mismo evento y no cruza organizaciones.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #35 (`eventos-backend:attendee-api:audience-filter-only-on-listing`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/events.php`, `backend: app/Http/Controllers/Api/V1/CustomPageController.php`, `backend: app/Http/Resources/V1/CustomPageResource.php`, `backend: app/Filament/Resources/CustomPageResource.php`, `backend: app/Http/Controllers/Api/V1/ModuleController.php` (y mas)
+
+### BUG-423: Un anuncio 'Programado' llega a los asistentes antes de su hora: la API y el socket solo miran que published_at no sea nulo (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Un asistente del evento recibe el titulo, el cuerpo, la imagen y el enlace de un anuncio que el staff dejo 'Programado' para mas tarde. GET /api/v1/events/{id}/announcements lo devuelve apenas se guarda, porque solo exige published_at no nulo. Si el anuncio es para todos, AnnouncementObserver ademas lo reparte completo por socket (data:sync a event:{id}) al crearlo. Si tiene roles, llega antes de hora a los asistentes de ese rol.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #34 (`eventos-backend/announcements:anuncio-programado-visible-antes-de-published_at`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/events.php`, `backend: app/Http/Controllers/Api/V1/AnnouncementController.php`, `backend: app/Filament/Resources/AnnouncementResource.php`, `backend: app/Observers/AnnouncementObserver.php`, `socket: src/index.ts` (y mas)
+
+### BUG-422: StorageService::upload conserva la extension del cliente: en el disco public un .php subido por /admin/uploads quedaria ejecutable y un poliglota imagen/HTML del muro, fotos o historias se serviria como HTML en el origen de la API (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** upload arma el nombre con getClientOriginalExtension(). admin/uploads valida solo 'file', y shouldBlockPhpUpload solo corre en mimes, mimetypes y extensions, asi que acepta .php, .phtml, .html y .svg. Las rutas de asistente (muro, fotos, historias) validan 'image', que compara la extension adivinada por contenido y bloquea extensiones php del cliente. Aun asi acepta un poliglota GIF89a/HTML llamado x.html y lo guarda como {uuid}.html.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #33 (`eventos-backend:uploads:client-extension-preserved`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/admin.php`, `backend: app/Http/Controllers/Api/V1/Admin/UploadController.php`, `backend: app/Services/StorageService.php`, `backend: vendor/laravel/framework/src/Illuminate/Validation/Concerns/ValidatesAttributes.php`, `backend: app/Http/Requests/Api/V1/StoreWallPostRequest.php` (y mas)
+
+### BUG-421: POST y DELETE /api/v1/admin/uploads no exigen ningun rol: cualquier asistente sube archivos de cualquier tipo al almacenamiento publico y borra cualquier objeto del bucket R2 o del disco public por URL (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Quien ataca: cualquier usuario con token Sanctum normal. Por la regla D.1 los tokens del staff del panel se borran, asi que el camino real es un asistente de cualquier evento. El registro publico de la landing entrega ese token al instante en los eventos sin aprobacion. store valida solo file|max:10240 y un directory con regex. Sube con visibilidad public a R2, o al disco public si R2 no esta configurado o la subida a R2 falla, y devuelve la URL.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #32 (`eventos-backend:admin-api:uploads-without-authorization`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/admin.php`, `backend: routes/api.php`, `backend: app/Http/Controllers/Api/V1/Admin/UploadController.php`, `backend: app/Services/StorageService.php`, `backend: app/Http/Controllers/Api/V1/ProfileController.php` (y mas)
+
+### BUG-420: Las acciones admin de encuestas no revisan rol ni evento: cualquier asistente crea, activa, cierra, modera y lee resultados de encuestas de cualquier evento (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Quien ataca: un asistente con token Sanctum normal de cualquier evento activo, que pasa check.ban y check.approval. El registro publico de la landing entrega ese token al instante en los eventos que no exigen aprobacion. Las rutas /api/v1/admin/polls* llegan a PollController sin ningun chequeo de rol ni de evento. (a) store acepta cualquier event_id y session_id, sin comparar la sesion con el evento.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #30 (`eventos-backend:admin-api:poll-admin-actions-without-role`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/admin.php`, `backend: routes/api.php`, `backend: app/Http/Controllers/Api/V1/PollController.php`, `socket: src/index.ts`, `backend: tests/Feature/Polls/PollTest.php` (y mas)
+
+### BUG-419: GameController::authorizeAdmin acepta al admin* de cualquier evento para operar juegos, exportar participantes y sortear premios de otro evento (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Quien ataca: un usuario con un rol admin* (admin, admin_content, admin_notifs o admin_analytics) en el evento A, en la fila de attendees que devuelve Attendee::where('user_id')->first(). La consulta no tiene ORDER BY. Con el indice unico (user_id, event_id) de MySQL suele salir la fila de menor event_id, no la de menor id. Ejemplos: quien fue admin_analytics de un evento anterior y hoy es asistente de B, o el admin de otra organizacion.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #29 (`eventos-backend:admin-api:game-admin-check-not-bound-to-game-event`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/admin.php`, `backend: routes/api.php`, `backend: app/Http/Controllers/Api/V1/Admin/GameController.php`, `backend: app/Models/Attendee.php`, `backend: database/migrations/2026_03_28_200004_create_attendees_table.php` (y mas)
+
+### BUG-418: El manifiesto del totem entrega el QR estatico (credencial reutilizable) de todos los asistentes con check-in del evento (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** GET /api/v1/rooms/manifest, con solo el X-Totem-Token de un salon, devuelve todos los asistentes con check-in del evento y, para cada uno, nombre, foto y el valor crudo de su QR estatico (qr_tokens.token). El alcance de evento tiene sentido funcional (cualquier asistente puede llegar a la puerta de cualquier salon), pero el kiosko solo usa ese valor como llave del mapa para mostrar el nombre al escanear; con un hash bastaria.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #28 (`eventos-backend:totems:manifest-exposes-static-qr`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/web.php`, `backend: app/Http/Controllers/Api/V1/RoomCheckinController.php`, `backend: app/Services/RoomCheckinService.php`, `eventos-kiosko/src/hooks/useAttendeeCache.ts`, `backend: app/Http/Controllers/Api/V1/LeadController.php` (y mas)
+
+### BUG-417: El token de Mission Control y del display se sale de su evento y su sesion: solo se ata a los parametros de la ruta, y en el socket actua como el staff dueño (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Cada visita a /monitor/{id} o /display/session/{id} con la firma valida emite un token Sanctum de 12 h a nombre del primer usuario activo con attendee admin, organizer o moderator del evento E, con permisos operador:{tipo}, evento:{E}, sesion:{S}. La unica barrera es TokenDeOperador::permite en el callback de Sanctum, que compara {eventId} y {sessionId} de la ruta y event_id de la query.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #27 (`eventos-backend:operator-token:scope-bound-only-to-route-params`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/web.php`, `backend: app/Http/Controllers/Web/OperadorController.php`, `backend: app/Support/TokenDeOperador.php`, `backend: app/Providers/AppServiceProvider.php`, `backend: app/Http/Controllers/Api/V1/Admin/BanController.php` (y mas)
+
+### BUG-416: Los enlaces firmados de Mission Control y del display no vencen ni se pueden revocar, y el de una sesion entrega los de todas las sesiones del evento (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** La firma de /monitor/{id} es HMAC-SHA256(app.qr_secret, 'sessionId|eventId') y la de /display/session/{id} es igual con el prefijo 'display|'. No lleva vencimiento, nonce, version ni usuario, y el controlador solo exige ademas que el evento siga activo.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #25 (`eventos-backend:operator-pages:hmac-links-no-expiry-no-revocation`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/web.php`, `backend: app/Http/Controllers/Web/OperadorController.php`, `backend: config/app.php`, `backend: .env.production.example`, `backend: app/Console/Commands/SecurityCheckCommand.php` (y mas)
+
+### BUG-415: Un admin de un evento puede lanzar un control de asistencia sobre un salon de otro evento: push a sus asistentes y bloqueo del control legitimo (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** POST /api/v1/events/attendance-checks/trigger autoriza contra el event_id del cuerpo (attendee con rol de EVENT_ADMINS en E) y comprueba que las sesiones sean de E, pero room_id solo se valida con exists:event_rooms,id.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #24 (`eventos-backend:attendance-checks:trigger-room-not-scoped-to-event`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/events.php`, `backend: app/Http/Controllers/Api/V1/RoomCheckinController.php`, `backend: app/Http/Controllers/Api/V1/StaffCheckinController.php`, `backend: app/Support/Roles.php`, `backend: app/Support/TokenDeOperador.php`
+
+### BUG-414: El embed de stream que guarda un rol admin* del asistente se ejecuta en Mission Control con el origen del backend (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Pueden guardar stream_iframe con PATCH /api/v1/admin/sessions/{id}/live-config dos tipos de usuario: (1) un asistente con attendees.role admin, admin_content, admin_notifs o admin_analytics que no tiene rol Spatie de panel, y por eso conserva su bearer, porque la regla D.1 solo borra tokens de quien entra al panel; (2) quien tenga el token de Mission Control de la sesion. El servidor solo aplica strip_tags(..., '<iframe>').
+- **Fuente:** auditoria de seguridad M0.8.1, pista #23 (`eventos-backend:static-pages:stream-iframe-unsandboxed-srcdoc`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/admin.php`, `backend: app/Http/Controllers/Api/V1/Admin/SessionConfigController.php`, `backend: app/Http/Controllers/Web/OperadorController.php`, `backend: public/mission-control/app.js`, `backend: app/Support/Roles.php` (y mas)
+
+### BUG-413: XSS almacenado en Event Pulse: el nombre del asistente se pinta con innerHTML sin codificar, en el mismo origen que /admin (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Un asistente de un evento con el Pulse activo, incluido quien se registra por la landing publica, puede guardar en users.name un valor con marcado HTML. Lo hace con PUT /api/v1/me/profile (regla sometimes|string|max:255) o al registrarse (string|max:255). Ni User ni ningun middleware global lo sanean. El Pulse arma su HTML concatenando cadenas sin ninguna funcion de escape y lo asigna con innerHTML en tres lugares.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #22 (`eventos-backend:event-pulse:unescaped-attendee-name-innerhtml`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api.php`, `backend: app/Http/Controllers/Api/V1/ProfileController.php`, `backend: app/Http/Controllers/PulseController.php`, `backend: public/event-pulse/js/moments.js`, `backend: app/Http/Requests/Api/V1/Auth/RegisterRequest.php` (y mas)
+
+### BUG-412: chat-monitor.html toma stream_iframe y stream_url de la URL, sin token, y los pinta como HTML en el origen del backend (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Ninguna ruta ni controlador sirve chat-monitor.html con __MC_CONFIG__: no hay referencias en app/, routes/, resources/ ni public/. Se entrega como archivo estatico (public/.htaccess sirve directo los archivos que existen), asi que _mc queda vacio y la config sale siempre de la query string. El render del stream corre aunque falte el token: la linea 356 solo muestra un aviso y no detiene el script.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #20 (`eventos-backend:chat-monitor:url-query-config-into-html-sinks`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: public/chat-monitor.html`, `backend: public/.htaccess`, `backend: app/Http/Middleware/SecurityHeaders.php`
+
+### BUG-411: Peticiones salientes a URLs configuradas por staff del evento sin politica de destino (ZIP de documentos, webhooks, SMTP) (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Un admin de evento (event_admin, permiso manage-content, RoleSeeder.php:40) puede pegar a mano cualquier URL en el campo file_url de un documento: ImageUploadField::fileField solo aplica ->url() y maxLength 500. Al guardar, DocumentObserver encola RegenerateDocumentsZipJob. El job hace Http::timeout(30)->get($doc->file_url) desde el worker, sin limitar host ni esquema, y siguiendo redirecciones (Guzzle sigue hasta 5 por defecto).
+- **Fuente:** auditoria de seguridad M0.8.1, pista #19 (`eventos-backend:outbound-requests:admin-configured-url-fetch-without-host-policy`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: app/Filament/Components/ImageUploadField.php`, `backend: app/Filament/Resources/DocumentResource.php`, `backend: app/Services/DocumentEffects.php`, `backend: app/Jobs/RegenerateDocumentsZipJob.php`, `backend: database/seeders/RoleSeeder.php` (y mas)
+
+### BUG-410: Las variables de las plantillas de correo se insertan como HTML sin escape, incluidas las que controla otra persona (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** EmailTemplate::render sustituye cada {{variable}} con str_replace del valor crudo dentro del HTML ya envuelto por EmailLayout, y BaseEventosMail envia el resultado como htmlString. Solo el encabezado del layout usa e(). Varias variables las controla alguien distinto del destinatario.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #18 (`eventos-backend:mail:email-template-raw-html-substitution`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/auth.php`, `backend: app/Http/Controllers/Api/V1/AuthController.php`, `backend: app/Services/MagicLinkService.php`, `backend: app/Mail/MagicLinkMail.php`, `backend: app/Models/EmailTemplate.php` (y mas)
+
+### BUG-409: Los exports CSV/XLSX guardan como formula los textos de asistentes que empiezan con '=' (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** BaseExportJob escribe las filas sin neutralizar. En XLSX, Maatwebsite usa su DefaultValueBinder, que viene en la config del paquete porque el proyecto no tiene config/excel.php. Ese binder delega en el de PhpSpreadsheet 1.30.7, que deja como TYPE_FORMULA todo string de mas de un caracter que empieza con '='. El archivo guarda entonces una formula real y no texto. pre_calculate_formulas=false evita que se evalue en el servidor.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #17 (`eventos-backend:exports:spreadsheet-formula-injection`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: app/Http/Controllers/Api/V1/ProfileController.php`, `backend: app/Jobs/Exports/ExportAttendeesMasterJob.php`, `backend: app/Jobs/Exports/BaseExportJob.php`, `backend: vendor/maatwebsite/excel/config/excel.php`, `backend: vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Cell/DefaultValueBinder.php` (y mas)
+
+### BUG-408: Los exports del Data Center quedan en almacenamiento publico con nombres que se pueden adivinar (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Los exports del Data Center son 44 tipos. Entre ellos estan asistentes_master (nombre, correo, telefono, empresa, cargo y respuestas del registro), leads, chat y consent_log. Se escriben como exports/{tipo}_{eventId}_{Ymd_His}.csv|xlsx (BaseExportJob.php:53, por ejemplo asistentes_master_1_20261022_163717.csv) en storage/app/public. Si hay un bucket R2 configurado, el archivo se sube al disco r2 con la misma clave y se borra la copia local.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #16 (`eventos-backend:exports:public-storage-predictable-filenames`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/data-center.php`, `backend: app/Http/Controllers/Api/V1/DataCenterController.php`, `backend: app/Jobs/Exports/BaseExportJob.php`, `backend: config/filesystems.php`, `backend: app/Services/StorageService.php` (y mas)
+
+### BUG-407: El Data Center y /dc-embed pintan nombres de asistentes y de eventos sin escape en innerHTML (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** La SPA del Data Center (/data-center) la sirve Laravel en el mismo host que /admin, solo a super_admin, org_admin y event_admin con sesion y 2FA. Arma el HTML con template literals y lo asigna a innerHTML sin ninguna funcion de escape. Interpolan users.name crudo: el podio y la lista del leaderboard (app.js:809-813, en tabGamificacion), el top de preguntas (1031, tabEngagement) y el top del muro (1106, tabSocial).
+- **Fuente:** auditoria de seguridad M0.8.1, pista #15 (`eventos-backend:data-center:unescaped-server-data-innerhtml`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: app/Http/Controllers/Api/V1/ProfileController.php`, `backend: app/Services/ExportService.php`, `backend: app/Http/Controllers/Api/V1/DataCenterController.php`, `backend: public/data-center/assets/app.js`, `backend: public/data-center/embed.html` (y mas)
+
+### BUG-406: Staff y permisos: con manage-users (event_admin, org_admin) se puede subir el propio rol hasta super_admin con un estado Livewire forjado y tomar, editar o borrar cuentas super_admin (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** UserResource (Sistema > Staff y permisos) solo exige manage-users, que RoleSeeder da a org_admin (linea 39) y a event_admin (linea 40). No hay Policies ni Gate::before que limiten registros: el helper authorize de Filament devuelve allow cuando no hay policy (vendor/filament/filament/src/helpers.php:42), asi que canEdit y canDelete son verdaderos sobre cualquier registro listado, incluidos los super_admin (STAFF_LISTING).
+- **Fuente:** auditoria de seguridad M0.8.1, pista #12 (`eventos-backend:filament:staff-roles-no-hierarchy`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: app/Filament/Resources/UserResource.php`, `backend: database/seeders/RoleSeeder.php`, `backend: app/Filament/Traits/HasResourcePermission.php`, `backend: vendor/filament/filament/src/Resources/Pages/EditRecord.php`, `backend: app/Filament/Resources/UserResource/Pages/EditUser.php` (y mas)
+
+### BUG-405: El embed publico /dc-embed entrega todas las estadisticas internas, incluidas IP y nombre de los admins y la ultima auditoria (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** DataCenterPageController::embed no pide sesion: con el token UUID (vigente) inyecta en el HTML (window.__DC_EMBED__) el resultado completo de ExportService::getStats. embed.html solo usa registered, checked_in, rating_avg, total_ratings, leads, sessions_total, sponsors y leaderboard (los nombres del leaderboard se muestran a proposito), pero el JSON trae audit.recent_actions con la IP, el nombre y el avatar de cada admin y la accion hecha con su objetivo, audit.top_admins,...
+- **Fuente:** auditoria de seguridad M0.8.1, pista #10 (`eventos-backend:data-center:embed-full-stats`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/web.php`, `backend: app/Http/Controllers/Web/DataCenterPageController.php`, `backend: app/Services/ExportService.php`, `backend: public/data-center/embed.html`
+
+### BUG-404: El registro entrega sesion para un correo nunca probado y las reglas que confian en el correo la aceptan (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** POST /api/v1/public/events/{slug}/register (y /auth/register) crea la cuenta para cualquier correo nuevo y devuelve un bearer al instante, sin prueba de que el correo sea de quien se registra. Ninguna ruta exige email_verified_at. Dar sesion a un registro nuevo es una decision de producto: el comentario del controlador solo la niega a 'existing'. El problema son las decisiones de acceso que se toman sobre ese correo sin probar.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #9 (`eventos-backend:public-registration:session-for-unproven-email`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api.php`, `backend: app/Http/Controllers/Api/V1/PublicRegistrationController.php`, `backend: app/Services/AuthService.php`, `backend: app/Http/Controllers/Api/V1/StandController.php`, `backend: app/Http/Controllers/Api/V1/AuthController.php` (y mas)
+
+### BUG-403: El limitador del handoff cuenta por un correo que la peticion no trae: 5 canjes por hora para toda la plataforma (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** POST /api/v1/public/handoff usa throttle:public_register, cuyo limite principal es 5 por hora por sha1 del campo email. El handoff solo manda code (la webapp envia {code}), asi que todas las redenciones de todas las personas caen en el mismo cubo, sha1(''). Fuera de local, despues de 5 canjes en una hora el resto recibe 429: la confirmacion del widget vuelve al registro y la persona no recibe la sesion.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #8 (`eventos-backend:public-registration:handoff-throttle-keyed-by-absent-email`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api.php`, `eventos-web/src/app/api/public/handoff/route.ts`, `backend: app/Providers/AppServiceProvider.php`, `backend: app/Http/Controllers/Api/V1/PublicHandoffController.php`, `eventos-web/src/lib/publicRegistration.ts` (y mas)
+
+### BUG-402: Un codigo de acceso con un espacio intercalado se valida pero no gasta usos (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** En eventos con requires_access_code, el validador de RegisterRequest (que hereda PublicRegisterRequest) quita los espacios y pasa a mayusculas para buscar el codigo y comprobar isValid(). El merge del valor limpio cambia el input de la peticion, pero no los datos del validador, que se copiaron al crearlo. Por eso validated() entrega el valor crudo.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #7 (`eventos-backend:public-registration:access-code-normalization-skips-use-count`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api.php`, `backend: app/Http/Requests/Api/V1/Auth/RegisterRequest.php`, `backend: app/Http/Controllers/Api/V1/PublicRegistrationController.php`, `backend: app/Services/AuthService.php`, `backend: vendor/laravel/framework/src/Illuminate/Foundation/Http/FormRequest.php` (y mas)
+
+### BUG-401: verify-identity entrega el codigo de activacion a quien sepa el correo y el telefono de un importado (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Caso: un usuario importado por CSV que todavia no activa su cuenta (invitation_token presente, activated_at nulo), cuyo evento activo mas reciente tiene activation_verify_field = 'phone', que es la unica opcion que ofrece el admin. POST /api/v1/auth/verify-identity no pide autenticacion. Compara el valor enviado con users.phone, sin espacios y en minusculas, y si coincide rota invitation_token y lo devuelve en el cuerpo de la respuesta.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #6 (`eventos-backend:auth:verify-identity-token-on-field-match`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/auth.php`, `backend: app/Http/Controllers/Api/V1/AuthController.php`, `backend: app/Services/AuthService.php`, `APP EVENTOS/docs/decisiones.md`, `APP EVENTOS/docs/living/BUG-LOG.md` (y mas)
+
+### BUG-400: El enlace de restablecer contraseña se arma con el Host de la peticion (sin TrustHosts ni raiz forzada) (ABIERTO 2026-10-23)
+- **Severidad propuesta:** ALTA (prioridad A de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** POST /api/v1/auth/forgot-password crea el token del broker y arma el enlace con route('password.reset', ...). Es una URL absoluta cuya raiz sale del Host de la peticion, o de X-Forwarded-Host si la peticion viene de un proxy confiable. No hay TrustHosts (Laravel lo deja apagado), ni URL::forceRootUrl, ni config('app.url') en esta ruta, a diferencia del magic link (app.webapp_url) y de la invitacion (app.url).
+- **Fuente:** auditoria de seguridad M0.8.1, pista #5 (`eventos-backend:auth:password-reset-link-from-request-host`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.6 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/auth.php`, `backend: app/Http/Controllers/Api/V1/AuthController.php`, `backend: app/Mail/PasswordResetMail.php`, `backend: bootstrap/app.php`, `backend: vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php` (y mas)
+
+### BUG-399: Desactivar una cuenta (is_active = false) solo frena el login con contraseña: el magic link y los tokens existentes siguen dando acceso (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** El login con contraseña responde 403 'Cuenta desactivada' si is_active es falso, y 'Staff y permisos' ofrece el interruptor 'Cuenta activa'. Ese listado incluye a staff_checkin (rol Spatie sin acceso al panel) y a quien tenga attendees.role admin* en algun evento. Esas cuentas no caen en el veto D.1.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #4 (`eventos-backend:auth:is-active-only-enforced-on-password-login`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/auth.php`, `backend: app/Services/MagicLinkService.php`, `backend: app/Http/Controllers/Api/V1/AuthController.php`, `backend: app/Filament/Resources/UserResource.php`, `backend: app/Support/Roles.php` (y mas)
+
+### BUG-398: Los limites por correo normalizan con strtolower y trim, pero MySQL compara sin acentos ni mayusculas: cada variante abre un cubo nuevo (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** entry_check (check-email, verify-identity) y cuenta_correo (forgot-password, register) cuentan por sha1(strtolower(trim(email))). En PHP 8.2 y despues, strtolower solo cambia ASCII. En cambio, el controlador busca User::where('email', ...) con la colacion por defecto utf8mb4_unicode_ci, que iguala acentos, formas anchas y mayusculas.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #3 (`eventos-backend:auth:email-throttle-key-differs-from-db-collation`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/auth.php`, `backend: app/Providers/AppServiceProvider.php`, `backend: app/Http/Controllers/Api/V1/AuthController.php`, `backend: config/database.php`, `backend: database/migrations/0001_01_01_000000_create_users_table.php` (y mas)
+
+### BUG-397: check-email anonimo rota el codigo de activacion y reenvia la invitacion en cada llamada (ABIERTO 2026-10-23)
+- **Severidad propuesta:** BAJA (prioridad C de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** POST /api/v1/auth/check-email no pide autenticacion. Para un usuario con invitation_token y sin activated_at, cada llamada rota invitation_token (lineas 51-52, antes incluso de mirar si tiene evento activo). Si tiene asistente en un evento activo, ademas encola un InvitationMail con el enlace nuevo al correo guardado. El unico limite es entry_check: 10 por minuto por texto del correo (600 por hora, 14.400 por dia a un mismo buzon) y 1500 por minuto por red.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #2 (`eventos-backend:auth:check-email-anonymous-invitation-rotation-resend`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.8 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: routes/api/auth.php`, `backend: app/Http/Controllers/Api/V1/AuthController.php`, `backend: app/Providers/AppServiceProvider.php`, `backend: config/auth.php`, `backend: app/Services/AuthService.php` (y mas)
+
+### BUG-396: El reto 2FA del panel no cuenta para el bloqueo un codigo TOTP incorrecto repetido en intervalos distintos (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
+- **Que pasa:** Alguien que ya tiene la contraseña de una cuenta del staff llega al reto /admin/dos-pasos/verificar. Para no contar dos veces el doble envio (envio automatico al completar 6 digitos y luego Enter), el reto guarda en la sesion una huella del ultimo codigo fallido y no cuenta un fallo igual al anterior. La huella es sha256(id|codigo): no incluye el intervalo TOTP de 30 s ni un tiempo maximo, y solo se borra con un acierto.
+- **Fuente:** auditoria de seguridad M0.8.1, pista #1 (`eventos-backend/app/Filament/Auth/TwoFactorChallenge.php:verify:huella-de-codigo-fallido-sin-intervalo-totp`). Dos revisiones de codigo independientes; **por verificar con prueba** (no hubo sandbox). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
+- **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
+- **Archivos:** `backend: app/Filament/Auth/TwoFactorChallenge.php`, `backend: app/Services/TwoFactorService.php`, `backend: app/Support/StaffLockout.php`, `backend: app/Support/TwoFactorLogin.php`, `backend: tests/Feature/Security/StaffLockoutTest.php`
+
 ## 2026-10-22 — App movil: errores de TypeScript en `main` (3 abiertos)
 
 > Salieron al archivar el trabajo de julio (recap, haptics, reintentos) en la rama local
@@ -41,6 +451,7 @@
 - **Fuente:** catalogo de variables (`docs/contratos/variables.md`, M0.5.4), verificado a mano.
 - **Cuando se arregla:** M0.8.5 (bloque de seguridad).
 - **Archivos:** `config/app.php:166`, `config/services.php`, `.env.example`
+- **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #21 (`eventos-backend:config:qr-secret-insecure-default`); prioridad sugerida A. Sigue por verificar con prueba.
 
 ### BUG-390: `/dc-embed` manda `X-Frame-Options: ALLOWALL`, que no es un valor valido (ABIERTO 2026-10-22)
 - **Severidad propuesta:** BAJA
@@ -55,6 +466,7 @@
 - **Fuente:** lectura de `routes/web.php` al mover las rutas (M0.5.2), verificado a mano.
 - **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
 - **Archivos:** `app/Http/Controllers/Web/OperadorController.php` (`displayEncuesta`)
+- **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #26 (`eventos-backend:operator-pages:public-poll-display-without-token`); prioridad sugerida B. Sigue por verificar con prueba.
 
 ### BUG-388: El correo de prueba de las plantillas sale por el mailer por defecto, no por el SMTP de la organizacion (ABIERTO 2026-10-22)
 - **Severidad propuesta:** BAJA
@@ -69,6 +481,7 @@
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
 - **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
 - **Archivos:** `app/Filament/Traits/HasResourcePermission.php`, paginas `LiveGameResults` y `PrizeRedemptions`
+- **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #11 (`eventos-backend:filament:pages-without-permission`); prioridad sugerida A. Sigue por verificar con prueba.
 
 ### BUG-386: Importar asistentes: contraseña igual al telefono, invitaciones con enlace roto y archivos que no se borran (ABIERTO 2026-10-22)
 - **Severidad propuesta:** ALTA (la contraseña)
@@ -76,6 +489,7 @@
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
 - **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
 - **Archivos:** `AttendeesImport.php:72-74, 76, 91-92, 131-138`, `ListAttendeeAdmins.php:95`, `EventPhotoResource.php:411-425`
+- **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #13 (`eventos-backend:import:phone-as-password`); prioridad sugerida A. Sigue por verificar con prueba.
 
 ### BUG-385: Secretos de webhooks a la vista en notificaciones y en un .txt (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA
@@ -83,6 +497,7 @@
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
 - **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
 - **Archivos:** `WebhookEndpointResource.php:186, 236, 241, 269`, `WebhookApiKeyResource.php:116`
+- **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #51 (`eventos-backend:webhooks:spec-embeds-unbound-inbound-key`); prioridad sugerida A. Sigue por verificar con prueba.
 
 ### BUG-384: Webhooks: "Simular evento" manda asistentes inventados como reales; reenviar puede triplicar (ABIERTO 2026-10-22)
 - **Severidad propuesta:** ALTA (datos a terceros)
@@ -146,6 +561,7 @@
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
 - **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
 - **Archivos:** `AttendeeAdminResource.php:321-324`, `Support/Roles.php:60`, `Api/V1/Admin/AttendeeController.php:65`
+- **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #31 (`eventos-backend:admin-api:update-role-sub-admin-self-escalation`); prioridad sugerida A. Sigue por verificar con prueba.
 
 ### BUG-375: Cuatro formas de mandar push "ya", cada una con otro publico (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA
@@ -163,6 +579,7 @@
 - **Visto:** inventario de acciones del admin (M0.5.3), verificado a mano.
 - **Arreglo:** filtrar por `organization_id` del usuario (super_admin ve todo). Agendado: M0.8.3 (bloque de seguridad).
 - **Archivos:** `app/Filament/Resources/EventResource.php`
+- **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #14 (`eventos-backend:staff:global-scope-no-org-binding`); prioridad sugerida A. Sigue por verificar con prueba.
 
 ### BUG-373: Banear desde el admin no saca a la persona del socket en el momento (ABIERTO 2026-10-22)
 - **Severidad:** MEDIA — `AttendeeAdminResource` crea el `AttendeeBan` pero no llama `/internal/ban/enforce`, que la
@@ -173,6 +590,7 @@
 - **Visto:** inventario M0.5.3, verificado a mano.
 - **Arreglo:** que las dos puertas usen el mismo servicio de ban. Agendado: M0.8.2 (bloque de seguridad).
 - **Archivos:** `app/Filament/Resources/AttendeeAdminResource.php`, `Admin/BanController.php`
+- **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #56 (`eventos-socket:ban:live-revocation-not-propagated`); prioridad sugerida B. Sigue por verificar con prueba.
 
 ### BUG-372: "Enviar push" de un anuncio privado se lo manda a todo el evento, con el codigo del premio (RESUELTO 2026-10-22)
 - **Severidad:** CRITICA (fuga de codigos canjeables) — `AnnouncementResource::sendPush` arma la audiencia por evento y
