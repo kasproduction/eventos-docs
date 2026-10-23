@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-10-22 (Opus 5.5, cuarta parte) — AUDITORIA DE SEGURIDAD M0.8.1 A MEDIAS
+
+- Decisiones de Kamilo: tamaño estandar, presupuesto ~50 agentes, verificacion por grupos de subsistema. Solo lectura de codigo (sin Docker ni sandbox).
+- Carpeta (fuera del repo): `C:/Users/Kasproduction/security-audit-skill/eventos-backend/run-1/`.
+- Hecho: reconocimiento, 4 tandas de buscadores (h01-h14), 63 candidatos, fase 3 con 11 verificadores (63 needs_validation, 0 rechazados), fase 4 `findings.json` validado. ~34 agentes gastados.
+- Lo mas serio (sin confirmar): acciones admin de encuestas y subidas sin rol, subadmin que se sube a admin, juegos de otro evento, XSS guardado en Event Pulse y Data Center, exports con PII en almacenamiento publico, APP_QR_SECRET con valor por defecto.
+- Falta: resultado del buscador h15 (login del panel + 2FA, pedido por el critico final), criticos de cierre, fase 5 (11 verificadores), informe (REPORT.md, NEEDS-VALIDATION.md) y pasar cada hallazgo al BUG-LOG (BUG-373 a 391 ya cubren varios: buscar antes).
+- Pasos exactos para retomar: memoria `project_siguiente_paso`.
+
 ## SESION 2026-10-22 (Opus 5.5, tercera parte) — BLOQUE 0.4 CERRADO: UNA SOLA PUERTA AL TIEMPO REAL EN TODOS LOS CLIENTES
 
 **Decisiones Kamilo (todas en `docs/decisiones.md`):** Anexo A aprobado (24); BUG-366 y BUG-367 arreglados ya en PHP;

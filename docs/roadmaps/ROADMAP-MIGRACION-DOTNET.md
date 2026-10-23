@@ -162,7 +162,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 > Va antes de M0.7.1: C# arranca sobre un contrato limpio y no copia fallas. Lo que es solo de Filament y no es de
 > seguridad va a la lista "no repetir" de la fase 2 (M2.8.5), salvo que aparezca un cliente antes de la semana 12.
 
-- [ ] M0.8.1 Auditoria de seguridad del backend y del socket (tamaño a elegir: rapida, estandar o profunda; recomendada estandar). Informe con hallazgos verificados, cada uno en BUG-LOG con severidad **[local]**
+- [ ] M0.8.1 (EN CURSO 2026-10-22: estandar, 50 agentes; fases 1-4 hechas, 63 hallazgos por validar, falta 2FA del panel, fase 5, informe y pasar al BUG-LOG) Auditoria de seguridad del backend y del socket (tamaño a elegir: rapida, estandar o profunda; recomendada estandar). Informe con hallazgos verificados, cada uno en BUG-LOG con severidad **[local]**
 - [ ] M0.8.2 BUG-373: banear desde el admin expulsa del socket en el momento (mismo servicio que la API) **[local]**
 - [ ] M0.8.3 BUG-374: el admin solo muestra los eventos de la organizacion del usuario (super_admin ve todo) **[local]**
 - [ ] M0.8.4 Verificar los 13 hallazgos del inventario del admin (`contratos/acciones-admin.md`) y los de M0.5.2 (`/display/polls` publica, `X-Frame-Options: ALLOWALL`); arreglar los de seguridad confirmados **[local]**
