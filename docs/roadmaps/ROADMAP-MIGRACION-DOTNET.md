@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 35/197
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 36/197
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 35/41
+## Fase 0: Preparar en PHP (3 semanas) — 36/41
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -157,7 +157,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.6.4 Registrar este roadmap en `docs/living/PENDIENTES.md` como bloque con contadores y marcar lo congelado del admin con "congelado hasta admin .NET" (lista en `pendientes-2026-10.md` §7) **[local]**
   **Hecho 2026-10-22:** la fila con contadores ya estaba en PENDIENTES §0. De los 17 congelados de `pendientes-2026-10.md` §7, 6 no tenian la marca (credencial en §4, landing builder, A/B de correos, torre de control, passkeys, cache de `auth/me` con `data:sync`, Pulse y canario): marcados con su motivo. C1 a C3 (Destacados, puntos manuales, Silent Disco) viven en `decisiones.md` y en M2.8.1 y M2.8.3; nota en PENDIENTES §8.
 
-### 0.8 Seguridad (al cierre de la fase 0, antes de la retro; decision Kamilo 2026-10-22) — 4/8
+### 0.8 Seguridad (al cierre de la fase 0, antes de la retro; decision Kamilo 2026-10-22) — 5/8
 
 > Va antes de M0.7.1: C# arranca sobre un contrato limpio y no copia fallas. Lo que es solo de Filament y no es de
 > seguridad va a la lista "no repetir" de la fase 2 (M2.8.5), salvo que aparezca un cliente antes de la semana 12.
@@ -170,7 +170,8 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
   **Hecho 2026-10-23:** decision Kamilo: una organizacion por persona; org_admin ve todos los de su organizacion; event_admin y moderador solo los asignados. `AccesoDelStaff` + migracion (`users.organization_id`, `event_staff`). Backend `4a3153f`. Suite 1.150, contratos 302 (1 snapshot cambiado a proposito).
 - [x] M0.8.4 Verificar los 13 hallazgos del inventario del admin (`contratos/acciones-admin.md`) y los de M0.5.2 (`/display/polls` publica, `X-Frame-Options: ALLOWALL`); arreglar los de seguridad confirmados **[local]**
   **Hecho 2026-10-23:** arreglados BUG-376, 384, 385, 386, 387, 389, 390 (decisiones de Kamilo en `decisiones.md`; backend `8b99911`); los 9 del inventario que no son de seguridad (375, 377-383, 388) confirmados con prueba y siguen en M2.8.5. Suite 1.157, contratos 302.
-- [ ] M0.8.5 `.env.example` completo: las 12 variables propias que faltan, secretos sin valor por defecto inseguro, y `security:check` que falle si un secreto quedo en `change_this_secret_in_production` (`contratos/variables.md`) **[local]**
+- [x] M0.8.5 `.env.example` completo: las 12 variables propias que faltan, secretos sin valor por defecto inseguro, y `security:check` que falle si un secreto quedo en `change_this_secret_in_production` (`contratos/variables.md`) **[local]**
+  **Hecho 2026-10-23:** BUG-391 resuelto. `APP_QR_SECRET` sin valor por defecto; `Secretos::qr()` se niega a firmar o verificar (QR, premios, enlaces del operador) si falta o es de ejemplo; `security:check` revisa tambien `WEBAPP_INTERNAL_SECRET`; `.env.example` con los secretos vacios y las variables que faltaban. En local los dos secretos estaban con el valor de ejemplo: rotados (backend y socket). Backend `2155f56`. Suite 1.166, contratos 302.
 - [ ] M0.8.6 Arreglar las pistas de prioridad A de M0.8.1 (20 nuevas: cruce entre eventos u organizaciones, toma de cuenta o de rol, codigo en el origen del admin), cada una con su prueba que falle primero (BUG-LOG 2026-10-23) **[local]**
   **Antes de arreglar (decision Kamilo 2026-10-23):** confirmar o descartar las 65 con prueba en `tests/Auditoria` (rama `auditoria/validacion`). **Hecho: 65/65 confirmadas, 0 descartadas.** Al arreglar cada una, su prueba pasa a verde y se mueve a `Feature/Security`.
 - [ ] M0.8.7 Arreglar las pistas de prioridad B de M0.8.1 (21: datos personales y controles dentro del evento), con su prueba **[local]**

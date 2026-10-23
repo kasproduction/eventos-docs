@@ -449,13 +449,14 @@
 > lo solo-Filament que no es de seguridad va a la lista no repetir del admin nuevo (M2.8.5). La logica que vive en
 > hooks de guardar o crear de 20 paginas (no en acciones) queda descrita en `contratos/acciones-admin.md` (hallazgo 15).
 
-### BUG-391: Secretos con valor por defecto inseguro y variables que faltan en `.env.example` (ABIERTO 2026-10-22)
+### BUG-391: Secretos con valor por defecto inseguro y variables que faltan en `.env.example` (RESUELTO 2026-10-23)
 - **Severidad propuesta:** ALTA si pasa a produccion
 - **Que pasa:** `APP_QR_SECRET` (firma QR y enlaces del operador) y los secretos internos caen a `change_this_secret_in_production` si no estan en el `.env`; 12 variables propias no estan en `.env.example`, asi que una instalacion copiada del ejemplo arranca sin ellas. En local `SOCKET_INTERNAL_SECRET` tiene ese valor.
 - **Fuente:** catalogo de variables (`docs/contratos/variables.md`, M0.5.4), verificado a mano.
 - **Cuando se arregla:** M0.8.5 (bloque de seguridad).
 - **Archivos:** `config/app.php:166`, `config/services.php`, `.env.example`
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #21 (`eventos-backend:config:qr-secret-insecure-default`); prioridad sugerida A. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/PaginasYOperadorTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
+- **Resuelto 2026-10-23 (M0.8.5):** `config/app.php` sin valor por defecto; `App\Support\Secretos::qr()` lanza error si el secreto falta o es de ejemplo, asi que nada se firma con una clave conocida. `security:check` suma `WEBAPP_INTERNAL_SECRET`. `.env.example` trae los secretos vacios y las variables que faltaban. En local `APP_QR_SECRET` y `SOCKET_INTERNAL_SECRET` estaban con el valor de ejemplo: rotados en backend y socket (los QR estaticos ya guardados siguen valiendo; los enlaces de Mission Control viejos no). Prueba `tests/Feature/Security/SecretosSinValorPorDefectoTest.php`. Backend `2155f56`.
 
 ### BUG-390: `/dc-embed` manda `X-Frame-Options: ALLOWALL`, que no es un valor valido (RESUELTO 2026-10-23)
 - **Severidad propuesta:** BAJA

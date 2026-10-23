@@ -19,6 +19,7 @@
 - Hecho: acceso (9), staff (5), API admin (5), exportes (5) = **24 confirmados, 0 descartados**. Marcados "CONFIRMADO con prueba" en el BUG-LOG.
 - Despues: paginas, operador, asistente, logica, stands, networking y socket. **Total 65/65 confirmadas, 0 descartadas.** Archivos: AccesoTest, StaffYAdminApiTest, ExportesTest, PaginasYOperadorTest, AsistenteYLogicaTest, StandsYNetworkingTest, SocketLadoLaravelTest (Redis base 14) y `navegador/` (xss412 con Playwright; socket-auditoria.cjs levanta el socket real en 3101 con Redis base 13 y un Laravel falso).
 - Sigue: M0.8.2 a M0.8.8, arreglar por prioridad A -> B -> C, cada prueba a verde y a `Feature/Security`. Pregunta abierta a Kamilo: ¿bloquear debe cortar tambien "mis contactos" y las historias? (BUG networking).
+- Mismo dia: M0.8.2 a M0.8.5 hechas (BUG-373, 374, 376, 384-387, 389-391). En M0.8.5 los secretos locales `APP_QR_SECRET` y `SOCKET_INTERNAL_SECRET` (y el `INTERNAL_SECRET` del socket) estaban con el valor de ejemplo: rotados; los enlaces de Mission Control viejos dejan de servir. Sigue M0.8.6 (20 de prioridad A). 36/197.
 
 ## SESION 2026-10-22 (Opus 5.5, cuarta parte) — AUDITORIA DE SEGURIDAD M0.8.1 A MEDIAS
 

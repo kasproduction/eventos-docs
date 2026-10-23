@@ -17,7 +17,7 @@
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
 > .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (35/197). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> (36/197). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
@@ -199,7 +199,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   - [x] BUG-387 Paginas del admin sin permiso propio y sin permisos por accion (M0.8.4): RESUELTO 2026-10-23 (M0.8.4)
   - [x] BUG-389 Resultados de cualquier encuesta sin token en `/display/polls/{id}` (M0.8.4): RESUELTO 2026-10-23 (M0.8.4)
   - [x] BUG-390 `/dc-embed` con `X-Frame-Options: ALLOWALL` (M0.8.4): RESUELTO 2026-10-23 (M0.8.4)
-  - [ ] BUG-391 Secretos con valor por defecto y faltantes en `.env.example` (M0.8.5)
+  - [x] BUG-391 Secretos con valor por defecto y faltantes en `.env.example` (M0.8.5): RESUELTO 2026-10-23 (M0.8.5)
 - Lista no repetir del admin nuevo (M2.8.5; antes si llega un cliente antes de la semana 12):
   - [ ] BUG-375 Cuatro formas de mandar push "ya", cada una con otro publico
   - [ ] BUG-377 "Marcar reclamado" del Golden Ticket sin quien, sin bloqueo, sin vencimiento
