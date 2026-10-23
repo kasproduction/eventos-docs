@@ -576,7 +576,7 @@
 
 ## 2026-10-22 — Fase 0, bloque 0.4: tiempo real (3 bugs: 3 resueltos)
 
-### BUG-374: El admin muestra los eventos de todas las organizaciones (ABIERTO 2026-10-22)
+### BUG-374: El admin muestra los eventos de todas las organizaciones (RESUELTO 2026-10-23)
 - **Severidad:** ALTA cuando haya un segundo cliente (hoy hay una sola organizacion) — `EventResource` no tiene
   `getEloquentQuery`: cualquier usuario con acceso al panel ve todos los eventos y "Trabajar en este" lo deja operar en
   cualquiera, de cualquier organizacion. Los demas recursos filtran por el evento activo, asi que el cruce entra por aqui.
@@ -584,6 +584,7 @@
 - **Arreglo:** filtrar por `organization_id` del usuario (super_admin ve todo). Agendado: M0.8.3 (bloque de seguridad).
 - **Archivos:** `app/Filament/Resources/EventResource.php`
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #14 (`eventos-backend:staff:global-scope-no-org-binding`); prioridad sugerida A. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/StaffYAdminApiTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
+- **Resuelto 2026-10-23 (M0.8.3):** `users.organization_id` + tabla `event_staff`; `App\Support\AccesoDelStaff` (super_admin todo, org_admin su organizacion, event_admin y moderador los asignados) en el selector de evento, el contexto por defecto, `EventResource`, el Data Center y el CSV de sesion; Staff y permisos filtra por organizacion. Prueba `tests/Feature/Security/StaffPorOrganizacionTest.php`. Migracion aplicada en la base local. Backend `4a3153f`.
 
 ### BUG-373: Banear desde el admin no saca a la persona del socket en el momento (RESUELTO 2026-10-23)
 - **Severidad:** MEDIA — `AttendeeAdminResource` crea el `AttendeeBan` pero no llama `/internal/ban/enforce`, que la
