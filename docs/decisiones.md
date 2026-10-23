@@ -19,6 +19,9 @@
 | 2026-10-21 | Un solo formato de fecha en la API: ISO 8601 con el offset de la zona de la app, sin fracciones (M0.3.2) | La app y la webapp agrupan la agenda con `split('T')[0]`; con UTC las sesiones de la noche cambian de dia |
 | 2026-10-21 | En el MSI primero va 0.2 (suite) y la instalacion de Docker/Redis/.NET queda para el arranque de la fase 1 | Orden: red de pruebas antes que infraestructura |
 | 2026-10-21 | Speakers en escritorio conserva su animacion de abrir | Se ve bien como esta |
+| 2026-10-23 | Bloquear a un asistente corta todo, en las dos direcciones, como si nunca hubieran sido contactos: el bloqueado no ve al otro en mis contactos, historias, directorio, sugerencias ni perfil, y no puede mandarle solicitud (BUG-452) | Bloquear es retirar el consentimiento; dejar el contacto aceptado vivo lo contradice |
+| 2026-10-23 | Las 65 pistas de la auditoria se confirman o descartan con prueba antes de pasar de fase (resultado: 65 confirmadas, 0 descartadas); despues se arreglan en PHP por prioridad A, B, C, y el filtro de inquilino obligatorio va de raiz en .NET | Kamilo dudaba de los hallazgos; la prueba en rojo es la evidencia |
+| 2026-10-23 | Auditoria: presupuesto subido de 50 a 55 agentes para cubrir networking (hueco que encontro el critico final) | Cobertura completa en vez de dejar un hueco declarado |
 | 2026-10-22 | M0.3.7 (pasar respuestas a Resources en PHP) sale del roadmap | El contrato ya lo fijan los 330 snapshots; ordenar codigo que se apaga en la fase 5 no aporta |
 | 2026-10-22 | Cuenta importada sin activar: el codigo de activacion viaja solo por correo, nunca en la respuesta de `check-email` (BUG-363) | Quien sabia el correo podia ponerle su contraseña |
 | 2026-10-22 | Reglas de la migracion fijadas en `BUENAS-PRACTICAS-MIGRACION.md` | Fijarlas antes de la primera linea de C# |

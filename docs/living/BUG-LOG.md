@@ -15,7 +15,7 @@
 > Nuevos: A 20, B 21, C 16.
 > **Validacion 2026-10-23: las 65 CONFIRMADAS con prueba, 0 descartadas** (eventos-backend `tests/Auditoria`, rama
 > `auditoria/validacion`; el socket con `tests/Auditoria/navegador/socket-auditoria.cjs`). BUG-452 (bloquear no corta
-> contactos e historias) queda confirmado como conducta; falta que Kamilo diga si es lo esperado.
+> contactos e historias): Kamilo decidio que bloquear corta todo, como si nunca hubieran sido contactos (`decisiones.md`).
 
 ### BUG-452: Bloquear a un contacto aceptado no le quita el acceso: sigue en Mis contactos y sigue viendo las historias de quien lo bloqueo (ABIERTO 2026-10-23)
 - **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
@@ -23,6 +23,7 @@
 - **Fuente:** auditoria de seguridad M0.8.1, pista #65 (`eventos-backend/NetworkingController.block:accepted-contact-survives-block`). Dos revisiones de codigo independientes; **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/StandsYNetworkingTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo). Detalle, rastro y plan en `NEEDS-VALIDATION.md` de la corrida.
 - **Cuando se arregla:** M0.8.7 (bloque de seguridad, cierre de la fase 0).
 - **Archivos:** `backend: routes/api/networking.php`, `backend: app/Http/Controllers/Api/V1/NetworkingController.php`, `backend: app/Http/Controllers/Api/V1/AttendeeStoryController.php`, `backend: app/Models/ContactBlock.php`, `backend: routes/api/events.php`
+- **Decision Kamilo 2026-10-23:** bloquear corta todo en las dos direcciones, como si nunca hubieran sido contactos: nada en mis contactos, historias, directorio, sugerencias ni perfil, y sin solicitudes nuevas. El arreglo: `block()` borra tambien la solicitud aceptada (o `myContacts` e historias filtran `ContactBlock`), y `respondRequest` revisa el bloqueo antes de aceptar.
 
 ### BUG-451: checkin:update reparte a todo asistente conectado el nombre, rol, id y stand de cada persona que hace check-in, y session:audience reparte hasta 20 espectadores por sesion (ABIERTO 2026-10-23)
 - **Severidad propuesta:** MEDIA (prioridad B de la auditoria; la severidad real sale de la prueba)
