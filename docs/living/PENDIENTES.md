@@ -17,13 +17,13 @@
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
 > .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (32/197). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> (33/197). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
 | Area | Avance | Que falta |
 |---|---|---|
-| **Migracion a .NET, fase 0 (preparar en PHP)** | 32/41 | 0.6 cierres, 0.8 seguridad (auditoria, BUG-373, BUG-374, `.env.example`), 0.7 retro logica a la vista, 0.6 cierres, 0.7 retro |
+| **Migracion a .NET, fase 0 (preparar en PHP)** | 33/41 | 0.6 cierres, 0.8 seguridad (auditoria, BUG-373, BUG-374, `.env.example`), 0.7 retro logica a la vista, 0.6 cierres, 0.7 retro |
 
 | Area | Avance | Que falta |
 |---|---|---|
@@ -190,7 +190,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 
 **Abiertos el 2026-10-22** (orden de arreglo en `decisiones.md`):
 - Bloque 0.8 de seguridad (cierre de la fase 0):
-  - [ ] BUG-373 Banear desde el admin no saca del socket en el momento (M0.8.2)
+  - [x] BUG-373 Banear desde el admin no saca del socket en el momento: RESUELTO 2026-10-23 (M0.8.2, BanService)
   - [ ] BUG-374 El admin muestra eventos de todas las organizaciones (M0.8.3)
   - [ ] BUG-376 Cambiar rol: reglas distintas en admin y API; confirmar quien sube a admin (M0.8.4)
   - [ ] BUG-384 Webhooks: "Simular evento" manda asistentes inventados como reales; reenviar triplica (M0.8.4)

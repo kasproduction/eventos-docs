@@ -585,7 +585,7 @@
 - **Archivos:** `app/Filament/Resources/EventResource.php`
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #14 (`eventos-backend:staff:global-scope-no-org-binding`); prioridad sugerida A. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/StaffYAdminApiTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
 
-### BUG-373: Banear desde el admin no saca a la persona del socket en el momento (ABIERTO 2026-10-22)
+### BUG-373: Banear desde el admin no saca a la persona del socket en el momento (RESUELTO 2026-10-23)
 - **Severidad:** MEDIA — `AttendeeAdminResource` crea el `AttendeeBan` pero no llama `/internal/ban/enforce`, que la
   API si llama (`Admin/BanController.php:180`). El `AttendeeBan::created` del AppServiceProvider solo borra la ficha de
   auth del socket: la conexion abierta sigue (chat incluido) hasta que se reconecte.
@@ -595,6 +595,7 @@
 - **Arreglo:** que las dos puertas usen el mismo servicio de ban. Agendado: M0.8.2 (bloque de seguridad).
 - **Archivos:** `app/Filament/Resources/AttendeeAdminResource.php`, `Admin/BanController.php`
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #56 (`eventos-socket:ban:live-revocation-not-propagated`); prioridad sugerida B. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/SocketLadoLaravelTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
+- **Resuelto 2026-10-23 (M0.8.2):** `App\Services\BanService` es la unica puerta (API y panel: aviso al socket, IP en la auditoria, misma push). En el socket, `/internal/ban/enforce` publica en `socket:config` y cada proceso desconecta a los suyos. Prueba: `tests/Feature/Security/BanUnicaPuertaTest.php` y el caso de dos procesos del arnes (rojo sin el arreglo, verde con el). Backend `fe92d72`, socket `4a5bb20`.
 
 ### BUG-372: "Enviar push" de un anuncio privado se lo manda a todo el evento, con el codigo del premio (RESUELTO 2026-10-22)
 - **Severidad:** CRITICA (fuga de codigos canjeables) — `AnnouncementResource::sendPush` arma la audiencia por evento y
