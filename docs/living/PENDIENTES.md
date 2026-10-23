@@ -129,7 +129,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 
 - [ ] BUG-345 Correo sin ritmo: codigo hecho en B3.1, se cierra al medirlo
 
-**Abiertos el 2026-10-23** (auditoria M0.8.1, todos por verificar con prueba; prioridad A en M0.8.6, B en M0.8.7, C en M0.8.8):
+**Abiertos el 2026-10-23** (auditoria M0.8.1, **las 65 confirmadas con prueba el mismo dia**; prioridad A en M0.8.6, B en M0.8.7, C en M0.8.8):
   - [ ] BUG-396 El reto 2FA del panel no cuenta para el bloqueo un codigo TOTP incorrecto repetido en intervalos distintos (M0.8.7)
   - [ ] BUG-397 check-email anonimo rota el codigo de activacion y reenvia la invitacion en cada llamada (M0.8.8)
   - [ ] BUG-398 Los limites por correo normalizan con strtolower y trim, pero MySQL compara sin acentos ni mayusculas: cada... (M0.8.8)
