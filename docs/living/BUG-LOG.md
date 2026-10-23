@@ -457,14 +457,15 @@
 - **Archivos:** `config/app.php:166`, `config/services.php`, `.env.example`
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #21 (`eventos-backend:config:qr-secret-insecure-default`); prioridad sugerida A. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/PaginasYOperadorTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
 
-### BUG-390: `/dc-embed` manda `X-Frame-Options: ALLOWALL`, que no es un valor valido (ABIERTO 2026-10-22)
+### BUG-390: `/dc-embed` manda `X-Frame-Options: ALLOWALL`, que no es un valor valido (RESUELTO 2026-10-23)
 - **Severidad propuesta:** BAJA
 - **Que pasa:** El navegador ignora el valor y aplica su comportamiento por defecto; la intencion (dejar embeber) no queda expresada. Va con `frame-ancestors` de CSP.
 - **Fuente:** lectura de `routes/web.php` al mover las rutas (M0.5.2), verificado a mano.
 - **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
 - **Archivos:** `app/Http/Controllers/Web/DataCenterPageController.php`
 
-### BUG-389: Los resultados de cualquier encuesta se ven sin token en `/display/polls/{id}` (ABIERTO 2026-10-22)
+- **Resuelto 2026-10-23 (M0.8.4):** el embed declara `frame-ancestors *` por CSP y SecurityHeaders ya no lo pisa con DENY (antes no se podia incrustar). Prueba `tests/Feature/Security/PanelAdminSeguridadTest.php`. Backend `8b99911`.
+### BUG-389: Los resultados de cualquier encuesta se ven sin token en `/display/polls/{id}` (RESUELTO 2026-10-23)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** La pagina es publica y sin firma: cambiando el numero se ven los resultados de cualquier encuesta de cualquier evento, incluidas las respuestas abiertas (texto libre de los asistentes).
 - **Fuente:** lectura de `routes/web.php` al mover las rutas (M0.5.2), verificado a mano.
@@ -472,6 +473,7 @@
 - **Archivos:** `app/Http/Controllers/Web/OperadorController.php` (`displayEncuesta`)
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #26 (`eventos-backend:operator-pages:public-poll-display-without-token`); prioridad sugerida B. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/PaginasYOperadorTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
 
+- **Resuelto 2026-10-23 (M0.8.4):** se borro `/display/polls/{id}`. Prueba `tests/Feature/Security/PanelAdminSeguridadTest.php`. Backend `8b99911`.
 ### BUG-388: El correo de prueba de las plantillas sale por el mailer por defecto, no por el SMTP de la organizacion (ABIERTO 2026-10-22)
 - **Severidad propuesta:** BAJA
 - **Que pasa:** La prueba no usa el remitente real (`EmailService::mailerFor`): puede salir bien y el correo real fallar.
@@ -479,7 +481,8 @@
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `EditEmail.php:258`
 
-### BUG-387: Paginas del admin sin permiso propio y sin permisos por accion (ABIERTO 2026-10-22)
+- **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
+### BUG-387: Paginas del admin sin permiso propio y sin permisos por accion (RESUELTO 2026-10-23)
 - **Severidad propuesta:** ALTA
 - **Que pasa:** No hay Policies ni `->authorize` en ninguna accion: el acceso es por recurso completo. `LiveGameResults` y `PrizeRedemptions` no definen permiso, entra cualquier usuario del panel.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
@@ -487,7 +490,8 @@
 - **Archivos:** `app/Filament/Traits/HasResourcePermission.php`, paginas `LiveGameResults` y `PrizeRedemptions`
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #11 (`eventos-backend:filament:pages-without-permission`); prioridad sugerida A. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/StaffYAdminApiTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
 
-### BUG-386: Importar asistentes: contraseña igual al telefono, invitaciones con enlace roto y archivos que no se borran (ABIERTO 2026-10-22)
+- **Resuelto 2026-10-23 (M0.8.4):** Resultados de juegos pide `view-analytics`, Canjes `manage-checkin`; CSV solo del evento activo. Prueba `tests/Feature/Security/PanelAdminSeguridadTest.php`. Backend `8b99911`.
+### BUG-386: Importar asistentes: contraseña igual al telefono, invitaciones con enlace roto y archivos que no se borran (RESUELTO 2026-10-23)
 - **Severidad propuesta:** ALTA (la contraseña)
 - **Que pasa:** En modo telefono la contraseña es el telefono y la cuenta queda activada. Si el correo ya tiene cuenta activada, se manda una invitacion con un token que no se guarda (enlace roto). Corre sincrono dentro de la peticion. El archivo subido y los temporales de fotos oficiales no se borran.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
@@ -495,7 +499,8 @@
 - **Archivos:** `AttendeesImport.php:72-74, 76, 91-92, 131-138`, `ListAttendeeAdmins.php:95`, `EventPhotoResource.php:411-425`
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #13 (`eventos-backend:import:phone-as-password`); prioridad sugerida A. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/StaffYAdminApiTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
 
-### BUG-385: Secretos de webhooks a la vista en notificaciones y en un .txt (ABIERTO 2026-10-22)
+- **Resuelto 2026-10-23 (M0.8.4):** se quito el modo de importar con telefono como contraseña. Prueba `tests/Feature/Security/PanelAdminSeguridadTest.php`. Backend `8b99911`.
+### BUG-385: Secretos de webhooks a la vista en notificaciones y en un .txt (RESUELTO 2026-10-23)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** `copy_secret` muestra el secreto HMAC en una notificacion; `regenerate` muestra la llave nueva; `download_spec` escribe el secreto y la llave de entrada en un .txt descargable.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
@@ -503,13 +508,15 @@
 - **Archivos:** `WebhookEndpointResource.php:186, 236, 241, 269`, `WebhookApiKeyResource.php:116`
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #51 (`eventos-backend:webhooks:spec-embeds-unbound-inbound-key`); prioridad sugerida A. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/StandsYNetworkingTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
 
-### BUG-384: Webhooks: "Simular evento" manda asistentes inventados como reales; reenviar puede triplicar (ABIERTO 2026-10-22)
+- **Resuelto 2026-10-23 (M0.8.4):** cada llave de entrada se liga a su partner (`webhook_endpoint_id`); la especificacion trae solo la suya. Prueba `tests/Feature/Security/PanelAdminSeguridadTest.php`. Backend `8b99911`.
+### BUG-384: Webhooks: "Simular evento" manda asistentes inventados como reales; reenviar puede triplicar (RESUELTO 2026-10-23)
 - **Severidad propuesta:** ALTA (datos a terceros)
 - **Que pasa:** `simulate_event` marca `test` segun el modo del endpoint: a uno en modo real le llegan asistentes inventados como registros reales. `resend_failed` reenvia cada intento fallido y cada reintento crea su log (hasta 3 envios del mismo payload); no toma los fallos de red (`response_status = 0`). En `send_test`, si la conexion falla el admin ve un error en vez de "Prueba fallo".
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
 - **Cuando se arregla:** M0.8.4 (bloque de seguridad, cierre de la fase 0).
 - **Archivos:** `WebhookDispatchService.php:24`, `WebhookEndpointResource.php:195-204, 315-336`, `DispatchWebhookJob`
 
+- **Resuelto 2026-10-23 (M0.8.4):** Simular evento sale como prueba; Reenviar fallidos una vez por envio e incluye caidas de red. Prueba `tests/Feature/Security/PanelAdminSeguridadTest.php`. Backend `8b99911`.
 ### BUG-383: Abrir dos paginas del admin ya cambia datos (ABIERTO 2026-10-22)
 - **Severidad propuesta:** BAJA
 - **Que pasa:** La lista de encuestas crea la encuesta post-evento con 3 preguntas al montarse; abrir una solicitud de soporte la pasa de `open` a `read` aunque nadie la lea.
@@ -517,6 +524,7 @@
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `ListEventSurveys.php:32-53`, `EditSupportRequest.php:33-40`
 
+- **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 ### BUG-382: Activar o cerrar encuestas desde el admin no avisa por socket (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** La API emite `poll:new` y `poll:closed`; Filament no: los asistentes no ven la encuesta hasta refrescar.
@@ -524,6 +532,7 @@
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `EventSurveyResource.php:125-139`, `EditEventSurvey.php:40-56`, `Api/V1/PollController.php:104, 123`
 
+- **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 ### BUG-381: `QuestionsRelationManager` de sesiones es codigo muerto (ABIERTO 2026-10-22)
 - **Severidad propuesta:** BAJA
 - **Que pasa:** 5 acciones con aviso al socket que nadie usa: no esta registrado (`getRelations()` devuelve vacio). La moderacion de preguntas vive en Mission Control.
@@ -531,6 +540,7 @@
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `EventSessionResource/RelationManagers/QuestionsRelationManager.php`, `EventSessionResource.php:393-399`
 
+- **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 ### BUG-380: Asignar speakers a una sesion no avisa a la app ni a la webapp (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** `speakers()->sync` cambia la tabla intermedia sin pasar por `EventSessionObserver`: nadie se entera hasta que otra cosa invalide la agenda.
@@ -538,6 +548,7 @@
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `EventSessionResource.php:130`
 
+- **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 ### BUG-379: Muro: seis caminos para publicar u ocultar, cada uno con efectos distintos (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Fila: puntos y socket, sin webapp. Masivo: puntos, sin socket ni webapp. Detalle: solo webapp. Ocultar (fila o masivo) no avisa a nadie. `WallPost` no tiene observer propio.
@@ -545,6 +556,7 @@
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `WallPostResource.php:136-163, 174-175, 184-195, 222-224`, `ViewWallPost.php:23-38`
 
+- **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 ### BUG-378: Fotos: aprobar da resultados distintos y "aprobar seleccionadas" puede romper (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Aprobar en la fila da puntos; en el detalle no. `bulk_approve` no filtra por estado y vuelve a aprobar rechazadas. Si la seleccion incluye una foto oficial (`attendee_id` nulo) llama `tryAward` con null en un `int`: TypeError.
@@ -552,6 +564,7 @@
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `EventPhotoResource.php:176-179, 255-260`, `ViewEventPhoto.php:24`, `PointsService.php:120-122`
 
+- **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 ### BUG-377: "Marcar reclamado" del Golden Ticket no registra quien, no bloquea y no mira vencimiento (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA (premios)
 - **Que pasa:** GoldenTicket actualiza directo; PrizeRedemptions usa `RewardService::confirm`, que guarda `confirmed_by`, bloquea la fila y revisa el vencimiento. Dos clics a la vez o un premio vencido pasan igual.
@@ -559,7 +572,8 @@
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `GoldenTicketResource.php:127-130`, `PrizeRedemptions.php:108`, `RewardService.php:102-121`
 
-### BUG-376: Cambiar el rol de un asistente tiene reglas distintas en el admin y en la API (ABIERTO 2026-10-22)
+- **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
+### BUG-376: Cambiar el rol de un asistente tiene reglas distintas en el admin y en la API (RESUELTO 2026-10-23)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Filament ofrece `attendee` y `staff_checkin`; la API acepta `Roles::ATTENDEE_ASSIGNABLE`, que no tiene `staff_checkin` y si tiene `vendedor` y los `admin*`. Hay que confirmar quien puede subir a alguien a admin por la API.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
@@ -567,6 +581,7 @@
 - **Archivos:** `AttendeeAdminResource.php:321-324`, `Support/Roles.php:60`, `Api/V1/Admin/AttendeeController.php:65`
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #31 (`eventos-backend:admin-api:update-role-sub-admin-self-escalation`); prioridad sugerida A. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/StaffYAdminApiTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
 
+- **Resuelto 2026-10-23 (M0.8.4):** solo el admin completo cambia roles por la API y nadie el suyo. Prueba `tests/Feature/Security/PanelAdminSeguridadTest.php`. Backend `8b99911`.
 ### BUG-375: Cuatro formas de mandar push "ya", cada una con otro publico (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Filament (`sendPush`, `send_now`, `resend`) solo usa Expo (deja fuera a quien solo tiene web push) y no excluye baneados. La API excluye baneados pero tambien solo usa Expo. El job programado si incluye web push y ademas crea un anuncio; `send_now` no.
@@ -574,6 +589,7 @@
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `AnnouncementResource.php:275-276`, `ScheduledNotificationResource.php:111-112, 151-152`, `Admin/NotificationController.php:78-80`, `DispatchScheduledNotificationsJob.php:24-54`
 
+- **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 ## 2026-10-22 — Fase 0, bloque 0.4: tiempo real (3 bugs: 3 resueltos)
 
 ### BUG-374: El admin muestra los eventos de todas las organizaciones (RESUELTO 2026-10-23)
