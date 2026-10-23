@@ -424,6 +424,7 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ### Sueltos de la webapp (inventario 2026-10-16)
 
+- [ ] BUG-455 La webapp usa un evento fijo (`DEFAULT_SLUG`) y no el de la persona como Expo; sin inscripcion, pantalla propia como baneado o pendiente (lab antes)
 - [ ] Precarga de modulos vecinos (`RouteWarmer`): se paso a W.12 y nunca quedo listada; no existe (`W.12-polish.md:103`)
 - [ ] Sugerencia de typo del correo tambien al editar el email en el paso de contraseña (`W.1-setup-auth.md:437`)
 - [ ] Verificar que un modulo apagado no haga peticiones ("paquete minimo"); entra en B.1 (`REFERENCIA-BINTEC-2026.md:104`)

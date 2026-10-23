@@ -5,6 +5,13 @@
 
 ## 2026-10-23 — Encontrados al arreglar M0.8.6
 
+### BUG-455: La webapp usa un evento fijo (`DEFAULT_SLUG`) en vez del evento de la persona, como hace Expo (ABIERTO 2026-10-23)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** Expo toma el evento del asistente de la sesion (`user.eventId`, `eventos-app/app/(app)/_layout.tsx:20`) y si no hay asistente no pide nada. La webapp siempre pide `DEFAULT_SLUG` (`eventos-web/src/app/[locale]/(app)/layout.tsx:51`) y sus gates solo miran ban y aprobacion (`src/lib/auth.ts:144`). Alguien con sesion de otro evento entra igual: antes veia el contenido (BUG-426); desde M0.8.6 le llega 403 `NOT_IN_EVENT` y ve secciones vacias o el mensaje generico de error (`src/lib/apiErrors.ts:87`).
+- **Fuente:** pregunta de Kamilo al revisar M0.8.6 ("en Expo estaba contemplado"), verificado leyendo los dos layouts.
+- **Arreglo propuesto:** la webapp toma el evento de la persona como Expo; si no tiene asistente en ningun evento, la misma salida que baneado o pendiente (pantalla con lab antes de codear).
+- **Archivos:** `eventos-web/src/app/[locale]/(app)/layout.tsx`, `eventos-web/src/lib/auth.ts`, `eventos-web/src/lib/publicEvent.ts`
+
 ### BUG-454: Sin sesion, las descargas del admin (`/admin/...`) daban 500 en vez de mandar al login (RESUELTO 2026-10-23)
 - **Severidad propuesta:** BAJA
 - **Que pasa:** El middleware `auth` buscaba la ruta `login`, que no existe (el login es el de Filament): `Route [login] not defined`.
