@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-10-23 (Opus 5.5) — AUDITORIA M0.8.1 CERRADA Y VALIDACION CON PRUEBAS 24/65
+
+- Auditoria terminada: 54 agentes (Kamilo subio el presupuesto a 55 para cubrir networking), cobertura limpia, 65 pistas. Informe fuera del repo: `C:/Users/Kasproduction/security-audit-skill/eventos-backend/run-1/REPORT.md` y `NEEDS-VALIDATION.md`.
+- Al BUG-LOG: 57 nuevos (BUG-396 a BUG-452) + nota en los 8 que ya existian. Roadmap: M0.8.1 hecha; arreglo partido en M0.8.6 (A), M0.8.7 (B), M0.8.8 (C). 32/197.
+- Decision Kamilo: antes de pasar de fase, **confirmar o descartar las 65 con prueba**, sin arreglar todavia. Despues arreglar en PHP por prioridad (cada prueba pasa a verde y a `Feature/Security`); el filtro de inquilino obligatorio va de raiz en .NET.
+- Pruebas en `eventos-backend/tests/Auditoria/` (rama `auditoria/validacion`, fuera de las suites por defecto: `vendor/bin/pest tests/Auditoria`). Cada prueba afirma lo correcto: rojo = bug real.
+- Hecho: acceso (9), staff (5), API admin (5), exportes (5) = **24 confirmados, 0 descartados**. Marcados "CONFIRMADO con prueba" en el BUG-LOG.
+- Falta: paginas (4), operador (5), API del asistente (7), logica (6), stands (5), networking (1) y socket (13, en Node). Pregunta abierta a Kamilo: ¿bloquear debe cortar tambien "mis contactos" y las historias? (BUG networking).
+
 ## SESION 2026-10-22 (Opus 5.5, cuarta parte) — AUDITORIA DE SEGURIDAD M0.8.1 A MEDIAS
 
 - Decisiones de Kamilo: tamaño estandar, presupuesto ~50 agentes, verificacion por grupos de subsistema. Solo lectura de codigo (sin Docker ni sandbox).

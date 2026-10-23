@@ -169,6 +169,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M0.8.4 Verificar los 13 hallazgos del inventario del admin (`contratos/acciones-admin.md`) y los de M0.5.2 (`/display/polls` publica, `X-Frame-Options: ALLOWALL`); arreglar los de seguridad confirmados **[local]**
 - [ ] M0.8.5 `.env.example` completo: las 12 variables propias que faltan, secretos sin valor por defecto inseguro, y `security:check` que falle si un secreto quedo en `change_this_secret_in_production` (`contratos/variables.md`) **[local]**
 - [ ] M0.8.6 Arreglar las pistas de prioridad A de M0.8.1 (20 nuevas: cruce entre eventos u organizaciones, toma de cuenta o de rol, codigo en el origen del admin), cada una con su prueba que falle primero (BUG-LOG 2026-10-23) **[local]**
+  **Antes de arreglar (decision Kamilo 2026-10-23):** confirmar o descartar las 65 con prueba en `tests/Auditoria` (rama `auditoria/validacion`). Van 24/65 confirmadas, 0 descartadas.
 - [ ] M0.8.7 Arreglar las pistas de prioridad B de M0.8.1 (21: datos personales y controles dentro del evento), con su prueba **[local]**
 - [ ] M0.8.8 Arreglar las pistas de prioridad C de M0.8.1 (16: puntos, conteos y endurecimiento), con su prueba; las que sean solo de Filament pueden ir a la lista no repetir (M2.8.5) si Kamilo decide **[local]**
 
