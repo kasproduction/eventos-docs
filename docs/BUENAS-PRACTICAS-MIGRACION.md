@@ -80,6 +80,15 @@
 25. **Retro al cerrar cada fase:** que se estimo y que costo, que regla falto, que se corrige del roadmap. Va al final de
     la fase en el roadmap, en cinco lineas.
 
+## Seguridad
+
+26. **Todo lo que cuelga de un evento se filtra por evento de raiz, no endpoint por endpoint.** En PHP el filtro estaba
+    repartido y la auditoria M0.8.1 encontro cruces entre eventos (BUG-415, 417, 426, 436). En C#: el evento sale de la
+    ruta, nunca del "ultimo evento activo" del usuario (BUG-425); filtro global de EF Core por `EventId` en las
+    entidades del evento; la membresia es requisito de la ruta, como `miembro.evento` en PHP (403 `NOT_IN_EVENT`, `/mine`
+    queda afuera, decision 2026-10-23). Un id de otro evento responde 404 y no escribe nada. Cada modulo lleva su prueba
+    de cruce: alguien de otro evento no ve ni toca nada.
+
 ---
 
 ## Anexo A. Excepciones JSON (lista cerrada)

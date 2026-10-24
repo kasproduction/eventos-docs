@@ -25,4 +25,6 @@
 - Tocar Next o Expo fuera de la capa `realtime` (fase 3) y del admin nuevo (fase 2).
 - Sobreescribir la politica JSON en un endpoint, o sumar una excepcion sin decision en `decisiones.md`.
 - Leer claves de Redis de PHP (solo borrarlas por nombre).
+- Leer o escribir algo de un evento sin el filtro por evento (regla 26): el evento sale de la ruta, la membresia se
+  exige en la ruta y un id de otro evento es 404.
 - "Aprovecho y tambien": un bug se registra y se arregla solo si bloquea o si Kamilo lo decide.
