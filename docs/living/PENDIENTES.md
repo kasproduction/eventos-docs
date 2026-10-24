@@ -17,7 +17,7 @@
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
 > .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (39/197). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> (40/197). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
@@ -31,7 +31,7 @@
 | Registro publico, landing y widget | 26/32 = **81%** | Llaves reales de Turnstile, toggle de tema para el demo, 4 menores (§4) |
 | Admin y modulos del organizador | **100%** | Nada bloqueante (decisiones menores en §2) |
 | Seguridad del staff (2FA) | 25/26 = **96%** | S.7.2: correr `security:check` en el servidor real |
-| App Expo | Implementada | Recap archivado para rediseño (rama local), BUG-392/393 visuales, QA en telefono, tiendas sin empezar |
+| App Expo | Implementada | Recap archivado para rediseño (rama local), QA en telefono, tiendas sin empezar |
 | QA presencial con Kamilo | **0%** | §6 |
 | Bintec 2026 (B.1-B.6) | 0/6 = **0%** (B.1 casi) | Todo lo compartido ya vive en memoria del servidor (2026-10-21); queda juntar "lo mio" por pantalla y medir en servidor |
 | **Salida a produccion** (plan B1-B6) | ~4/31 = **13%** | §1 |
@@ -211,9 +211,9 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   - [ ] BUG-383 Abrir dos paginas del admin ya cambia datos
   - [ ] BUG-388 El correo de prueba de plantillas no usa el SMTP de la organizacion
 - App movil (M0.6.1):
-  - [ ] BUG-392 Insignia "reclamado" de Golden Tickets con el estilo del modal (diseño)
-  - [ ] BUG-393 Banner del concurso de fotos sin borde (diseño)
-  - [ ] BUG-394 `AttendanceCheckModal` no compila en TypeScript (solo tipos)
+  - [x] BUG-392 Insignia "reclamado" de Golden Tickets con el estilo del modal (diseño): RESUELTO 2026-10-24 (M0.6.1)
+  - [x] BUG-393 Banner del concurso de fotos sin borde (diseño): RESUELTO 2026-10-24 (M0.6.1)
+  - [x] BUG-394 `AttendanceCheckModal` no compila en TypeScript (solo tipos): RESUELTO 2026-10-24 (M0.6.1)
 - Solo local:
   - [ ] BUG-371 Con la suite corriendo, un pedido real leyo la config de pruebas (no correr la suite durante QA en vivo)
 - [ ] Pulse cuenta 84 mensajes y la BD tiene 2.156: revisar el criterio de `stats.messages` (sin verificar)
@@ -424,7 +424,8 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ### Sueltos de la webapp (inventario 2026-10-16)
 
-- [ ] BUG-455 La webapp usa un evento fijo (`DEFAULT_SLUG`) y no el de la persona como Expo; sin inscripcion, pantalla propia como baneado o pendiente (lab antes)
+- [x] BUG-455 La webapp usa un evento fijo (`DEFAULT_SLUG`) y no el de la persona como Expo; sin inscripcion, pantalla propia como baneado o pendiente (lab antes): RESUELTO 2026-10-24 (M0.6.1)
+- [ ] `--shadow-card` de la webapp (y `shadow.sm` de la app) en una capa; Lux v2 pide dos (`project_lux_v2_design`). Cambiarlo toca todas las tarjetas Lux: decide Kamilo (hallado 2026-10-24)
 - [ ] Precarga de modulos vecinos (`RouteWarmer`): se paso a W.12 y nunca quedo listada; no existe (`W.12-polish.md:103`)
 - [ ] Sugerencia de typo del correo tambien al editar el email en el paso de contraseña (`W.1-setup-auth.md:437`)
 - [ ] Verificar que un modulo apagado no haga peticiones ("paquete minimo"); entra en B.1 (`REFERENCIA-BINTEC-2026.md:104`)
@@ -473,7 +474,7 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] Rediseño y reparacion del recap de la app: lab de diseño aprobado y funcionando contra el backend real (que ya
   existe). Partir de la rama de archivo y de `docs/ROADMAP-RECAP.md`.
 - [ ] Revisar aparte, de la misma rama: la vibracion al tocar (4 hooks) y los reintentos de red de `lib/api.ts`.
-- [ ] BUG-392 y BUG-393 con lab de diseño (M0.6.1).
+- [x] BUG-392 y BUG-393 con lab de diseño (M0.6.1).: RESUELTO 2026-10-24 (M0.6.1)
 
 ### Recap compartible — post-evento — IMPLEMENTADO
 

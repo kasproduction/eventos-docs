@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab M0.6.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a; --page: #111214;
+    --s-low: rgba(255,255,255,0.03); --s-med: rgba(255,255,255,0.04); --s-high: rgba(255,255,255,0.08);
+    --b: rgba(255,255,255,0.06); --b-light: rgba(255,255,255,0.12); --b-strong: rgba(255,255,255,0.18);
+    --t1: #ffffff; --t2: rgba(255,255,255,0.72); --t3: rgba(255,255,255,0.48); --t-label: rgba(255,255,255,0.4);
+    --gold: #B5A68B; --teal: #39d2c0; --green: #22C55E;
+    --ui: 'Urbanist', sans-serif; --display: 'Plus Jakarta Sans', sans-serif;
+  }
+  :root[data-theme="lux"] {
+    --bg: #F6F8FA; --page: #E9ECEF;
+    --s-low: rgba(0,0,0,0.02); --s-med: rgba(0,0,0,0.04); --s-high: rgba(0,0,0,0.06);
+    --b: rgba(0,0,0,0.08); --b-light: rgba(0,0,0,0.04); --b-strong: rgba(0,0,0,0.14);
+    --t1: #111214; --t2: rgba(0,0,0,0.68); --t3: rgba(0,0,0,0.48); --t-label: rgba(0,0,0,0.42);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--page); color: var(--t1); font-family: var(--ui); padding: 32px 16px 64px; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  header.top { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 40px; flex-wrap: wrap; }
+  h1 { font-family: var(--display); font-weight: 800; font-size: 26px; letter-spacing: -0.6px; }
+  .sub { color: var(--t3); font-size: 14px; margin-top: 4px; }
+  .toggle { display: flex; border: 1px solid var(--b-strong); border-radius: 999px; padding: 3px; }
+  .toggle button { border: 0; background: transparent; color: var(--t2); font: 600 13px var(--ui); padding: 7px 16px; border-radius: 999px; cursor: pointer; }
+  .toggle button[aria-pressed="true"] { background: var(--t1); color: var(--bg); }
+  section { margin-bottom: 56px; }
+  h2 { font-family: var(--display); font-weight: 700; font-size: 19px; letter-spacing: -0.3px; }
+  .why { color: var(--t3); font-size: 14px; margin: 6px 0 20px; max-width: 760px; line-height: 1.5; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+  .opt { display: flex; flex-direction: column; gap: 10px; }
+  .tag { font-family: var(--display); font-weight: 700; font-size: 15px; }
+  .tag small { font-family: var(--ui); font-weight: 500; color: var(--t3); font-size: 13px; margin-left: 6px; }
+  .phone { background: var(--bg); border: 1px solid var(--b-strong); border-radius: 28px; padding: 20px 16px; min-height: 180px; }
+  .phone.tall { min-height: 560px; display: flex; flex-direction: column; padding: 24px 20px; }
+
+  /* 392: tarjeta Golden Ticket de la lista */
+  .gcard { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px; border-radius: 14px; background: rgba(57,210,192,0.04); border: 1px solid rgba(57,210,192,0.12); }
+  .gcard + .gcard { margin-top: 10px; }
+  .gcard.pend { background: rgba(181,166,139,0.06); border-color: rgba(181,166,139,0.15); }
+  .gleft { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .gname { font-weight: 600; font-size: 13px; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gcode { font-family: var(--display); font-weight: 700; font-size: 15px; color: var(--gold); letter-spacing: 2px; margin-top: 2px; }
+  .badge { display: flex; align-items: center; flex-shrink: 0; }
+  .b-hoy { gap: 6px; padding: 6px 14px; border-radius: 20px; border: 1px solid #000; font: 700 11px var(--display); letter-spacing: .5px; color: #000; }
+  .b-a { gap: 4px; font: 600 11px var(--ui); color: var(--teal); }
+  .b-b { gap: 5px; padding: 5px 11px; border-radius: 20px; border: 1px solid rgba(57,210,192,0.22); background: rgba(57,210,192,0.08); font: 700 11px var(--display); letter-spacing: .3px; color: var(--teal); }
+  .b-pend { gap: 2px; font: 600 12px var(--ui); color: var(--gold); }
+
+  /* 393: banner del concurso */
+  .contest { border-radius: 16px; border: 1px solid transparent; padding: 16px; background: var(--s-med); }
+  .c-head { display: flex; align-items: center; gap: 8px; }
+  .c-title { font-family: var(--display); font-weight: 700; font-size: 15px; flex: 1; }
+  .c-pill { background: var(--s-high); border-radius: 999px; padding: 3px 9px; font: 700 12px var(--display); color: var(--green); }
+  .c-info { color: var(--t2); font-size: 13px; margin-top: 6px; }
+  .podium { display: flex; gap: 8px; margin-top: 12px; }
+  .podium div { flex: 1; aspect-ratio: 1; border-radius: 10px; background-size: cover; background-position: center; }
+
+  /* 455: sin inscripcion */
+  .s-mid { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .s-icon { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; background: var(--s-low); border: 1px solid var(--b); }
+  .s-h { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -0.7px; margin-top: 22px; }
+  .s-p { color: var(--t3); font-size: 14px; margin-top: 8px; line-height: 1.45; max-width: 290px; }
+  .s-box { width: 100%; text-align: left; background: var(--s-low); border: 1px solid var(--b); border-radius: 14px; padding: 13px 16px; margin-top: 12px; }
+  .s-box:first-of-type { margin-top: 28px; }
+  .s-label { font-size: 12px; font-weight: 600; color: var(--t-label); }
+  .s-val { font-size: 14.5px; font-weight: 500; margin-top: 4px; color: var(--t1); }
+  .s-val small { display: block; font-size: 13px; color: var(--t3); font-weight: 400; margin-top: 2px; }
+  .s-btn { width: 100%; border-radius: 16px; padding: 15px; font: 700 15px var(--ui); border: 1px solid var(--b); background: var(--s-low); color: var(--t2); }
+  .s-btn.primary { background: var(--t1); color: var(--bg); border-color: var(--t1); }
+  .s-link { display: block; text-align: center; margin-top: 14px; font-size: 12px; color: var(--t-label); }
+  .s-foot { padding-top: 16px; }
+  .ev { width: 100%; border-radius: 18px; overflow: hidden; border: 1px solid var(--b); text-align: left; margin-top: 28px; }
+  .ev-img { height: 120px; background: linear-gradient(135deg, #2b2a26, #5a523f 60%, #B5A68B); }
+  .ev-body { padding: 14px 16px; background: var(--s-low); }
+  .ev-name { font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: -0.3px; }
+  .ev-meta { font-size: 13px; color: var(--t3); margin-top: 3px; }
+  .note { color: var(--t3); font-size: 13px; line-height: 1.45; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Lab M0.6.1</h1>
+      <p class="sub">Tres decisiones de diseño antes de cerrar la fase 0. Elige una letra por bloque.</p>
+    </div>
+    <div class="toggle" role="group" aria-label="Tema">
+      <button type="button" data-t="noir" aria-pressed="true">Noir</button>
+      <button type="button" data-t="lux" aria-pressed="false">Lux</button>
+    </div>
+  </header>
+
+  <!-- 392 -->
+  <section>
+    <h2>BUG-392: insignia "Reclamado" en la lista de Golden Tickets</h2>
+    <p class="why">El estilo de la lista está escrito dos veces y el segundo, que es el del modal, pisa al primero. Hoy la insignia sale con borde y texto negros, casi invisible en Noir. Abajo está la lista con un ticket reclamado y otro pendiente.</p>
+    <div class="grid">
+      <div class="opt">
+        <p class="tag">Hoy <small>como se ve ahora</small></p>
+        <div class="phone" data-tickets="hoy"></div>
+      </div>
+      <div class="opt">
+        <p class="tag">A <small>solo texto, como se diseñó la lista</small></p>
+        <div class="phone" data-tickets="a"></div>
+      </div>
+      <div class="opt">
+        <p class="tag">B <small>pastilla teal, igual que el modal</small></p>
+        <div class="phone" data-tickets="b"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 393 -->
+  <section>
+    <h2>BUG-393: borde del banner del concurso de fotos</h2>
+    <p class="why">El banner pide un color de borde que no existe en el tema, así que hoy no tiene borde. Las tres opciones usan tokens que ya existen.</p>
+    <div class="grid">
+      <div class="opt"><p class="tag">Hoy <small>sin borde</small></p><div class="phone" data-contest="transparent"></div></div>
+      <div class="opt"><p class="tag">A <small>borde sutil, el de las tarjetas</small></p><div class="phone" data-contest="var(--b)"></div></div>
+      <div class="opt"><p class="tag">B <small>borde marcado</small></p><div class="phone" data-contest="var(--b-light)"></div></div>
+      <div class="opt"><p class="tag">C <small>borde dorado, como los premios</small></p><div class="phone" data-contest="rgba(181,166,139,0.22)"></div></div>
+    </div>
+  </section>
+
+  <!-- 455 -->
+  <section>
+    <h2>BUG-455: la webapp para quien no está inscrito</h2>
+    <p class="why">La webapp va a tomar el evento de la persona, como Expo. Si la cuenta no está inscrita en ningún evento, ve esta pantalla en vez de secciones vacías. Va en la misma familia que "Registro en revisión" y "Acceso suspendido".</p>
+    <div class="grid">
+      <div class="opt">
+        <p class="tag">A <small>espejo de "Registro en revisión"</small></p>
+        <div class="phone tall">
+          <div class="s-mid">
+            <span class="s-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+            <p class="s-h">Aún no estás inscrito</p>
+            <p class="s-p">Esta cuenta no tiene inscripción en ningún evento.</p>
+            <div class="s-box"><p class="s-label">Entraste como</p><p class="s-val">Laura Gómez<small>laura.gomez@empresa.co</small></p></div>
+            <div class="s-box"><p class="s-label">Qué puedes hacer</p><p class="s-val">Inscríbete o entra con la cuenta con la que te registraste.</p></div>
+          </div>
+          <div class="s-foot">
+            <button class="s-btn" type="button">Inscribirme</button>
+            <a class="s-link">Entrar con otra cuenta</a>
+          </div>
+        </div>
+      </div>
+      <div class="opt">
+        <p class="tag">B <small>con la tarjeta del evento</small></p>
+        <div class="phone tall">
+          <div class="s-mid">
+            <p class="s-h" style="margin-top:0">Aún no estás inscrito</p>
+            <p class="s-p">Tu cuenta laura.gomez@empresa.co no está en este evento.</p>
+            <div class="ev">
+              <div class="ev-img"></div>
+              <div class="ev-body"><p class="ev-name">Summit Empresarial 2026</p><p class="ev-meta">6 de diciembre, Bogotá</p></div>
+            </div>
+          </div>
+          <div class="s-foot">
+            <button class="s-btn primary" type="button">Inscribirme</button>
+            <a class="s-link">Entrar con otra cuenta</a>
+          </div>
+        </div>
+      </div>
+      <div class="opt">
+        <p class="tag">C <small>mínima</small></p>
+        <div class="phone tall">
+          <div class="s-mid">
+            <p class="s-h" style="margin-top:0">Aún no estás inscrito</p>
+            <p class="s-p">Entraste como laura.gomez@empresa.co. Si te inscribiste con otro correo, entra con ese.</p>
+          </div>
+          <div class="s-foot">
+            <button class="s-btn" type="button">Entrar con otra cuenta</button>
+            <a class="s-link">Inscribirme</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:16px">"Inscribirme" lleva a la landing del evento. Si el registro está cerrado, ese botón no aparece y solo queda "Entrar con otra cuenta".</p>
+  </section>
+</div>
+
+<script>
+  const ticketIcon = (c) => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linejoin="round"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M9 10.5l2 2 4-4" /></svg>`;
+  const check = (c) => `<svg width="14" height="14" viewBox="0 0 24 24" fill="${c}"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.4 14.2-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z"/></svg>`;
+  const chevron = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B5A68B" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>`;
+  const badge = {
+    hoy: `<span class="badge b-hoy">${check('#39d2c0')}Reclamado</span>`,
+    a: `<span class="badge b-a">${check('#39d2c0')}Reclamado</span>`,
+    b: `<span class="badge b-b">${check('#39d2c0')}Reclamado</span>`,
+  };
+  document.querySelectorAll('[data-tickets]').forEach((el) => {
+    const k = el.dataset.tickets;
+    el.innerHTML = `
+      <div class="gcard"><div class="gleft">${ticketIcon('#39d2c0')}<div style="min-width:0"><p class="gname">Kit de bienvenida Acme</p><p class="gcode">K7M2QX</p></div></div>${badge[k]}</div>
+      <div class="gcard pend"><div class="gleft">${ticketIcon('#B5A68B')}<div style="min-width:0"><p class="gname">Audífonos inalámbricos</p><p class="gcode">P4HN8A</p></div></div><span class="badge b-pend">Reclamar${chevron}</span></div>`;
+  });
+  const trophy = `<svg width="18" height="18" viewBox="0 0 24 24" fill="#B5A68B"><path d="M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V18h3v3H8v-3h3v-3.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3zm-1 4v1a2 2 0 0 0 1 1.7V7zm12 0v2.7A2 2 0 0 0 19 8V7z"/></svg>`;
+  const fotos = ['photo-1511578314322-379afb476865', 'photo-1540575467063-178a50c2df87', 'photo-1505373877841-8d25f7d46678'];
+  document.querySelectorAll('[data-contest]').forEach((el) => {
+    el.innerHTML = `
+      <div class="contest" style="border-color:${el.dataset.contest}">
+        <div class="c-head">${trophy}<p class="c-title">Concurso en curso</p><span class="c-pill">1h 24m</span></div>
+        <p class="c-info">18 fotos participando</p>
+        <div class="podium">${fotos.map((f) => `<div style="background-image:url(https://images.unsplash.com/${f}?w=200&q=60)"></div>`).join('')}</div>
+      </div>`;
+  });
+  document.querySelectorAll('.toggle button').forEach((b) => b.addEventListener('click', () => {
+    document.documentElement.dataset.theme = b.dataset.t;
+    document.querySelectorAll('.toggle button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  }));
+</script>
+</body>
+</html>

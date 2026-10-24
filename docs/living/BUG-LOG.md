@@ -5,12 +5,13 @@
 
 ## 2026-10-23 — Encontrados al arreglar M0.8.6
 
-### BUG-455: La webapp usa un evento fijo (`DEFAULT_SLUG`) en vez del evento de la persona, como hace Expo (ABIERTO 2026-10-23)
+### BUG-455: La webapp usa un evento fijo (`DEFAULT_SLUG`) en vez del evento de la persona, como hace Expo (RESUELTO 2026-10-24)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Expo toma el evento del asistente de la sesion (`user.eventId`, `eventos-app/app/(app)/_layout.tsx:20`) y si no hay asistente no pide nada. La webapp siempre pide `DEFAULT_SLUG` (`eventos-web/src/app/[locale]/(app)/layout.tsx:51`) y sus gates solo miran ban y aprobacion (`src/lib/auth.ts:144`). Alguien con sesion de otro evento entra igual: antes veia el contenido (BUG-426); desde M0.8.6 le llega 403 `NOT_IN_EVENT` y ve secciones vacias o el mensaje generico de error (`src/lib/apiErrors.ts:87`).
 - **Fuente:** pregunta de Kamilo al revisar M0.8.6 ("en Expo estaba contemplado"), verificado leyendo los dos layouts.
 - **Arreglo propuesto:** la webapp toma el evento de la persona como Expo; si no tiene asistente en ningun evento, la misma salida que baneado o pendiente (pantalla con lab antes de codear).
 - **Archivos:** `eventos-web/src/app/[locale]/(app)/layout.tsx`, `eventos-web/src/lib/auth.ts`, `eventos-web/src/lib/publicEvent.ts`
+- **Resuelto 2026-10-24 (M0.6.1):** La webapp toma el evento de la persona (`event_slug` de /auth/me, `fetchMyEvent`) en toda el area autenticada y en push/showcase; sesion sin asistente en ningun evento activo va a `/sin-inscripcion` (lab M0.6.1 opcion A: Noir con borde, Lux con sombra sin borde). Prueba `tests/lib/miEvento.test.ts` (3, con control) y QA con Playwright en Noir y Lux (redireccion y control con asistente). Webapp `cee7ec6`, `b02d206`.
 
 ### BUG-454: Sin sesion, las descargas del admin (`/admin/...`) daban 500 en vez de mandar al login (RESUELTO 2026-10-23)
 - **Severidad propuesta:** BAJA
@@ -502,24 +503,27 @@
 > **Ya estaban anotados por Kamilo** en `PENDIENTES.md` §7 desde el 2026-07-04 (lista de 5 errores del WIP del recap);
 > aqui solo reciben numero.
 
-### BUG-394: `AttendanceCheckModal` no compila en TypeScript (`useRef` sin valor inicial) (ABIERTO 2026-10-22)
+### BUG-394: `AttendanceCheckModal` no compila en TypeScript (`useRef` sin valor inicial) (RESUELTO 2026-10-24)
 - **Severidad:** BAJA (solo tipos; en la app no cambia nada) — `useRef<ReturnType<typeof setInterval>>()` sin argumento,
   que los tipos de React 19 ya no aceptan. Ensucia `tsc` y tapa errores nuevos.
 - **Arreglo:** `useRef<...>(undefined)`. **Cuando:** M0.6.1.
 - **Archivos:** `eventos-app/components/ui/AttendanceCheckModal.tsx:24`
+- **Resuelto 2026-10-24 (M0.6.1):** Ya estaba arreglado en eventos-app `3b845dc` (useRef con valor inicial); se cierra al verificar `tsc` limpio en M0.6.1.
 
-### BUG-393: El banner del concurso de fotos sale sin borde en la app (ABIERTO 2026-10-22)
+### BUG-393: El banner del concurso de fotos sale sin borde en la app (RESUELTO 2026-10-24)
 - **Severidad:** BAJA (visual) — `ContestBanner` lee `border` de `useTheme()`, que no existe en `ThemeTokens`: cae a
   `transparent`. Es diseño: se decide con lab que borde lleva.
 - **Cuando:** M0.6.1 con decision de diseño de Kamilo.
 - **Archivos:** `eventos-app/components/social/ContestBanner.tsx:25`
+- **Resuelto 2026-10-24 (M0.6.1):** Lab M0.6.1 opcion A: Noir con el borde sutil de tarjeta (`surface.border`); Lux tarjeta blanca con `shadow.sm` y sin borde (decision Kamilo: Lux usa elevacion). App `d863e2f`.
 
-### BUG-392: La insignia "reclamado" de la lista de Golden Tickets sale con el estilo del modal (ABIERTO 2026-10-22)
+### BUG-392: La insignia "reclamado" de la lista de Golden Tickets sale con el estilo del modal (RESUELTO 2026-10-24)
 - **Severidad:** BAJA (visual) — en `leaderboard.tsx` los estilos `goldenClaimedBadge` y `goldenClaimedText` estan
   definidos dos veces (lista y modal); el segundo pisa al primero, asi que la lista usa el del modal (padding, borde,
   radio). Arreglarlo cambia como se ve: es diseño, con lab.
 - **Cuando:** M0.6.1 con decision de diseño de Kamilo.
 - **Archivos:** `eventos-app/app/(app)/leaderboard.tsx:1373-1374, 1387-1388`
+- **Resuelto 2026-10-24 (M0.6.1):** Lab M0.6.1 opcion A: la lista usa su propio estilo (`goldenListClaimed*`, solo texto teal); ya no la pisa la pastilla del modal. La pantalla es isla Noir. App `d863e2f`.
 
 ## 2026-10-22 — Hallazgos del inventario del admin y de la fase 0 (17 abiertos)
 

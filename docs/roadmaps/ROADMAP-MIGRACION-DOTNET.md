@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 39/197
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 40/197
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 39/41
+## Fase 0: Preparar en PHP (3 semanas) — 40/41
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -148,8 +148,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.5.5 Cabecera `X-Backend: php` en toda respuesta de Laravel desde ya **[local]**
   **Hecho 2026-10-22 (backend):** middleware global `MarcaBackend`; API, errores, admin y paginas del operador la llevan (comprobado en vivo). Los estaticos de Apache no (no pasan por Laravel). 4 pruebas.
 
-### 0.6 Cerrar lo que quedo a medias en PHP (1 a 2 dias + medir) — 2/3 (M0.6.3 movida a la fase 1)
-- [ ] M0.6.1 Expo: `tsc` limpio en `main` (BUG-392, BUG-393 con decision de diseño; BUG-394). El recap NO se commitea: archivado en la rama local `archivo/2026-07-recap-haptics-reintentos` (`8176acd`) por decision de Kamilo 2026-10-22 (no funcionaba bien y se veia mal); queda como funcion pendiente de rediseño y reparacion en PENDIENTES §7 **[local]**
+### 0.6 Cerrar lo que quedo a medias en PHP (1 a 2 dias + medir) — 3/3 (M0.6.3 movida a la fase 1)
+- [x] M0.6.1 Expo: `tsc` limpio en `main` (BUG-392, BUG-393 con decision de diseño; BUG-394). El recap NO se commitea: archivado en la rama local `archivo/2026-07-recap-haptics-reintentos` (`8176acd`) por decision de Kamilo 2026-10-22 (no funcionaba bien y se veia mal); queda como funcion pendiente de rediseño y reparacion en PENDIENTES §7 **[local]**
+  **Hecho 2026-10-24:** `tsc` limpio en la app (BUG-394 ya estaba en `3b845dc`); lab `design/features/app/lab-m061.html`, Kamilo eligio A en los tres con Lux por elevacion: BUG-392 y 393 en app `d863e2f`; BUG-455 (webapp con el evento de la persona y pantalla `/sin-inscripcion`) en webapp `cee7ec6` y `b02d206`, con prueba y QA en Noir y Lux. Vitest 691. Regla 26 (filtro por evento) en BUENAS-PRACTICAS `2d6c9e1`; main del backend avanzado a `6c4abd8`.
 - [x] M0.6.2 BUG-359 `mobileNav` en `messages/pt.json`; BUG-358 hidratacion #418 (se espera que caiga con M0.3.2) **[local]**
   **Hecho 2026-10-22 (eventos-web `9dab432`, `2ff14a6`):** BUG-359 (tambien faltaba `mobileShell`) y BUG-358 reproducido con `next dev`: no cayo con M0.3.2, era el formato de la hora (espacio fino U+202F) en 11 componentes. Dos pruebas de guardia (idiomas y horas). Vitest 688. Salio BUG-395 (aviso del script del tema, solo desarrollo).
 - [→] M0.6.3 Medir en servidor B3.7, B3.8 y B3.9 con 300 personas (lo hecho el 2026-10-18 y 2026-10-21). Si el servidor sigue en pausa, queda como primera medicion de la fase 1 **[servidor]**
