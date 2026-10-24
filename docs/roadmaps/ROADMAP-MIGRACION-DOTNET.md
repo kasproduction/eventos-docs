@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 38/197
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 39/197
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 38/41
+## Fase 0: Preparar en PHP (3 semanas) — 39/41
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -157,7 +157,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.6.4 Registrar este roadmap en `docs/living/PENDIENTES.md` como bloque con contadores y marcar lo congelado del admin con "congelado hasta admin .NET" (lista en `pendientes-2026-10.md` §7) **[local]**
   **Hecho 2026-10-22:** la fila con contadores ya estaba en PENDIENTES §0. De los 17 congelados de `pendientes-2026-10.md` §7, 6 no tenian la marca (credencial en §4, landing builder, A/B de correos, torre de control, passkeys, cache de `auth/me` con `data:sync`, Pulse y canario): marcados con su motivo. C1 a C3 (Destacados, puntos manuales, Silent Disco) viven en `decisiones.md` y en M2.8.1 y M2.8.3; nota en PENDIENTES §8.
 
-### 0.8 Seguridad (al cierre de la fase 0, antes de la retro; decision Kamilo 2026-10-22) — 7/8
+### 0.8 Seguridad (al cierre de la fase 0, antes de la retro; decision Kamilo 2026-10-22) — 8/8
 
 > Va antes de M0.7.1: C# arranca sobre un contrato limpio y no copia fallas. Lo que es solo de Filament y no es de
 > seguridad va a la lista "no repetir" de la fase 2 (M2.8.5), salvo que aparezca un cliente antes de la semana 12.
@@ -177,7 +177,8 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
   **Antes de arreglar (decision Kamilo 2026-10-23):** confirmar o descartar las 65 con prueba en `tests/Auditoria` (rama `auditoria/validacion`). **Hecho: 65/65 confirmadas, 0 descartadas.** Al arreglar cada una, su prueba pasa a verde y se mueve a `Feature/Security`.
 - [x] M0.8.7 Arreglar las pistas de prioridad B de M0.8.1 (21: datos personales y controles dentro del evento), con su prueba **[local]**
   **Hecho 2026-10-23:** los 21 con prueba y control: bloquear y banear (452, 425, 429), cuentas y tokens (399, 443, 428), datos de mas (405, 418, 439, 449, 451), pendientes de aprobacion (430, 440), stands y check-in (437, 431), y 396, 410, 411, 416, 424, 447. Decisiones de Kamilo en 416 y 424. Backend `1e044de` a `112717c`, socket `2f99985`, `dbe2713`, `eab5820`, kiosko `68096db`, `0f46ee3`. Suite 1.234, contratos 302.
-- [ ] M0.8.8 Arreglar las pistas de prioridad C de M0.8.1 (16: puntos, conteos y endurecimiento), con su prueba; las que sean solo de Filament pueden ir a la lista no repetir (M2.8.5) si Kamilo decide **[local]**
+- [x] M0.8.8 Arreglar las pistas de prioridad C de M0.8.1 (16: puntos, conteos y endurecimiento), con su prueba; las que sean solo de Filament pueden ir a la lista no repetir (M2.8.5) si Kamilo decide **[local]**
+  **Hecho 2026-10-24:** los 16 con prueba y control: puntos y juegos (432-435, 445, 450), limites y codigos (397, 398, 402, 403), datos y contenido (409, 423, 427, 436, 438, 448). Ninguno era solo de Filament. BUG-397 respeta la regla de BUG-363 (el codigo cambia al reenviar). De 438 queda retirar invitaciones pendientes para el admin nuevo. Backend `a8b6172` a `6c4abd8`, socket `431ff50`, `57f3e1e`, `ead3c31`. Suite 1.257, contratos 302, arnes del socket 11/11 en verde. En `tests/Auditoria` solo quedan los 11 del inventario del admin (M2.8.5).
 
 ### 0.7 Cierre de la fase — 0/1
 - [ ] M0.7.1 Retro de la fase 0 (regla 25 de BUENAS-PRACTICAS): estimado contra real, regla que falto, que se corrige del roadmap **[local]**
