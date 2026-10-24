@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 40/197
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 41/198
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -91,7 +91,10 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 0: Preparar en PHP (3 semanas) — 40/41
+<details>
+<summary><b>Fase 0: Preparar en PHP (3 semanas; real 4 dias) — 41/41 HECHA 2026-10-24</b></summary>
+
+## Fase 0: Preparar en PHP (3 semanas; real 4 dias) — 41/41 HECHA 2026-10-24
 
 > Nada de C#. Todo esto es deuda y seguridad que vale aunque la migracion se pause. Al terminar, PHP queda al dia y con
 > una red de pruebas de contrato que permite mover pedazos sin romper la webapp ni la app.
@@ -181,15 +184,20 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M0.8.8 Arreglar las pistas de prioridad C de M0.8.1 (16: puntos, conteos y endurecimiento), con su prueba; las que sean solo de Filament pueden ir a la lista no repetir (M2.8.5) si Kamilo decide **[local]**
   **Hecho 2026-10-24:** los 16 con prueba y control: puntos y juegos (432-435, 445, 450), limites y codigos (397, 398, 402, 403), datos y contenido (409, 423, 427, 436, 438, 448). Ninguno era solo de Filament. BUG-397 respeta la regla de BUG-363 (el codigo cambia al reenviar). De 438 queda retirar invitaciones pendientes para el admin nuevo. Backend `a8b6172` a `6c4abd8`, socket `431ff50`, `57f3e1e`, `ead3c31`. Suite 1.257, contratos 302, arnes del socket 11/11 en verde. En `tests/Auditoria` solo quedan los 11 del inventario del admin (M2.8.5).
 
-### 0.7 Cierre de la fase — 0/1
-- [ ] M0.7.1 Retro de la fase 0 (regla 25 de BUENAS-PRACTICAS): estimado contra real, regla que falto, que se corrige del roadmap **[local]**
+### 0.7 Cierre de la fase — 1/1
+- [x] M0.7.1 Retro de la fase 0 (regla 25 de BUENAS-PRACTICAS): estimado contra real, regla que falto, que se corrige del roadmap **[local]**
+  **Hecho 2026-10-24. Retro:**
+  1. **Estimado contra real:** 3 semanas estimadas (0.1 a 0.6); costo 4 dias (21 al 24 de octubre) y ademas entro el bloque 0.8 completo (auditoria con 65 pistas). En la fase se registraron 99 bugs (BUG-357 a 455): 88 resueltos con prueba; quedan 11 con dueño (9 del admin en M2.8.5, BUG-371 y 395 solo de local).
+  2. **Por que no se recalcula la fase 1 con este ritmo:** fue PHP conocido, con la suite y los contratos ya puestos. La fase 1 es C# nuevo y el MSI sin instalar. Se mide la primera semana de C# y con eso se ajustan las fechas.
+  3. **Reglas que faltaron:** filtrar por evento de raiz (7 cruces entre eventos en la auditoria): regla 26. Confirmar cada hallazgo con una prueba roja y su control antes de arreglarlo, sin reescribir pruebas viejas que fijan producto (BUG-397 contra BUG-363): regla 27.
+  4. **Que se corrige del roadmap:** M1.3.3 porta tambien las piezas nuevas de PHP (evento de la ruta para ban y aprobacion, `miembro.evento`, `audiencia.modulo`); nueva M1.3.6 con el filtro por evento de C# y su prueba de cruce; M1.1.4 deja fuera `tests/Auditoria` (11 rojos a proposito).
+  5. **Antes de arrancar la fase 1:** prender el MSI e instalar Docker, Redis y el .NET SDK (con permiso de Kamilo). Todos los repos quedaron en `main` con push. Abierto sin bloquear: sombra de dos capas en Lux (PENDIENTES).
+
+</details>
 
 ---
 
-<details>
-<summary><b>Fase 1: Cimientos en C# (3 semanas) — 0/28</b></summary>
-
-## Fase 1: Cimientos en C# (3 semanas) — 0/28
+## Fase 1: Cimientos en C# (3 semanas) — 0/29
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
 > errores. Sin trafico real. Al terminar, `GET /auth/me` pasa su snapshot contra los dos backends.
@@ -198,7 +206,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M1.1.1 Repo `eventos-api-dotnet`, .NET 10 LTS, solucion con `Api`, `Worker`, `Contracts`, `Tests`; `Hub` se agrega en la fase 3 **[local]**
 - [ ] M1.1.2 Dockerfile multi-stage y `docker-compose.dev.yml` que levanta C# junto a MySQL y Redis de Laragon **[local]**
 - [ ] M1.1.3 Sentry, logs estructurados con id de peticion (`X-Request-Id`, cruza con B4.3), `/health` y `/version` con la misma forma que `HealthController` **[local]**
-- [ ] M1.1.4 CI: build, tests, y las pruebas de contrato de M0.3 corridas contra PHP (normal y con `CONTRATO_ORDEN_INVERSO=1`) y contra C# con `CONTRATO_BASE_URL` en cada push; las `solo-php` se saltan contra C# (M0.3.9) **[local]**
+- [ ] M1.1.4 CI: build, tests, y las pruebas de contrato de M0.3 corridas contra PHP (normal y con `CONTRATO_ORDEN_INVERSO=1`) y contra C# con `CONTRATO_BASE_URL` en cada push; las `solo-php` se saltan contra C# (M0.3.9) `tests/Auditoria` queda fuera (11 rojos a proposito, inventario del admin) **[local]**
 - [ ] M1.1.5 Modo contratos en C#, igual al de PHP (`app/Support/ModoContratos.php`): reloj congelado, llamadas afuera simuladas, `POST /__contratos/reiniciar {escenario?}` con los nombres de `ContratoEscenarios`, azar `min + semilla mod rango` con `X-Contrato-Semilla`; activado por variable de entorno y sin registrarse en produccion **[local]**
 - [ ] M1.1.6 Analizador de async en CI (`Microsoft.VisualStudio.Threading.Analyzers`, avisos como error): falla el build con `.Result` o `.Wait()` **[local]**
 - [ ] M1.1.7 `dotnet list package --vulnerable` en CI (falla si hay altos o criticos) y versiones fijas en los `.csproj` **[local]**
@@ -210,12 +218,13 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M1.2.4 Segundo `DbContext` de solo lectura para la replica (`reports`, cruza con B3.4) **[local]**
 - [ ] M1.2.5 Verificar la zona horaria del MySQL de produccion (`SELECT @@global.time_zone, @@session.time_zone`): las 22 columnas con `useCurrent()` toman la hora de la base. Si no es Bogota, medir cuantas filas estan corridas y decidir (`decisiones.md`) **[servidor]**
 
-### 1.3 Autenticacion compatible (3 dias) — 0/5
+### 1.3 Autenticacion compatible (3 dias) — 0/6
 - [ ] M1.3.1 `AuthenticationHandler` Sanctum: parte `id|secreto`, compara `sha256` con `personal_access_tokens.token`, respeta `expires_at` (7 dias) y `abilities`, actualiza `last_used_at` **[local]**
 - [ ] M1.3.2 Rechazo de tokens de usuarios con acceso al panel (`hasPanelAccess`, roles de `Roles::PANEL_ACCESS` desde `model_has_roles`) y borrado del token + ficha `socketauth:t:*` al rechazar **[local]** Excepcion: el token de operador (`App\Support\TokenDeOperador`, BUG-370): `operador:{tipo}`, `evento:{id}`, `sesion:{id}`, solo su lista de rutas, sin borrarlo.
-- [ ] M1.3.3 Claims de rol de plataforma (spatie) y rol de asistente (`attendees.role`) en el principal; `CheckBan` y `CheckApproval` como filtros con las mismas respuestas 403 **[local]**
+- [ ] M1.3.3 Claims de rol de plataforma (spatie) y rol de asistente (`attendees.role`) en el principal; `CheckBan` y `CheckApproval` como filtros con las mismas respuestas 403, sobre el evento de la ruta (`EventoDeLaPeticion`, BUG-425), mas `miembro.evento` (403 `NOT_IN_EVENT`, `/mine` afuera) y `audiencia.modulo` **[local]**
 - [ ] M1.3.4 `GET /auth/me` identico: snapshot de M0.3 pasa contra PHP y contra C# **[local]**
 - [ ] M1.3.5 Lector del cifrado de Laravel (`APP_KEY`, AES-256-CBC + HMAC, carga JSON base64) en `Contracts`: `users.two_factor_secret`, `organization_email_settings.password`, `staff_sessions.session_id`. Prueba contra valores cifrados por PHP; escribir en el mismo formato mientras conviven (`contratos/variables.md`, M0.5.4) **[local]**
+- [ ] M1.3.6 Filtro por evento de raiz (regla 26): filtro global de EF Core por `EventId` en las entidades del evento y membresia exigida en la ruta; un id de otro evento es 404 y no escribe. Prueba de cruce por modulo: alguien de otro evento no ve ni toca nada (retro M0.7.1) **[local]**
 
 ### 1.4 Forma de las respuestas y limites (3 dias) — 0/4
 - [ ] M1.4.1 `JsonNamingPolicy.SnakeCaseLower` global, nulos incluidos, campos condicionales omitidos (no `null`) donde el Resource usa `when()`; excepciones en lista cerrada `Contracts/ExcepcionesJson.cs` (los 24 del Anexo A de BUENAS-PRACTICAS, confirmados en M0.4.1; nada entra sin decision) **[local]**
@@ -233,8 +242,6 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ### 1.6 Cierre de la fase — 0/1
 - [ ] M1.6.1 Retro de la fase 1 **[local]**
-
-</details>
 
 ---
 

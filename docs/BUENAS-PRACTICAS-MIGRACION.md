@@ -88,6 +88,9 @@
     entidades del evento; la membresia es requisito de la ruta, como `miembro.evento` en PHP (403 `NOT_IN_EVENT`, `/mine`
     queda afuera, decision 2026-10-23). Un id de otro evento responde 404 y no escribe nada. Cada modulo lleva su prueba
     de cruce: alguien de otro evento no ve ni toca nada.
+27. **Un hallazgo se confirma con una prueba roja antes de arreglarlo, y el arreglo trae su control** (el caso bueno que
+    tiene que seguir funcionando). Si el arreglo rompe una prueba vieja que fija una regla de producto, no se reescribe
+    la prueba: se adapta el arreglo o se pregunta a Kamilo (BUG-397 contra BUG-363, retro de la fase 0).
 
 ---
 
