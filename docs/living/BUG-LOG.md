@@ -3,6 +3,21 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-25 — Encontrados al arrancar la fase 1 (M1.1.4 y parche de PHP)
+
+### BUG-457: PHP2Shell (CVE-2026-109618 y CVE-2026-109619) en el servidor real sin parchar (ABIERTO, servidor en pausa)
+- **Severidad propuesta:** CRITICA
+- **Que pasa:** Ejecucion de codigo sin sesion en PHP (CVSS 9,2, publicada 2026-10-21). Corregida en 8.3.36, 8.4.27, 8.5.12. `docs/infra/deploy.sh` instala `php8.3-*` por apt y el worker usa `php:8.3-cli-alpine`.
+- **Fuente:** aviso de Kamilo 2026-10-25; php.net ChangeLog 8.4.27.
+- **Hecho 2026-10-25:** MSI 8.4.26 a 8.4.27 (apt); Windows Laragon/Apache 8.3.26 a 8.3.36 (zip oficial verificado con sha256, `php_redis` copiada de 8.3.26, la 8.3.26 queda para volver); PHP de la terminal 8.4.12 a 8.4.27. Contratos 302 y suite 1257 en verde.
+- **Falta:** al prender el servidor real, antes de todo: `apt upgrade` (php8.3 a 8.3.36), `systemctl reload php8.3-fpm` y reconstruir la imagen del worker.
+
+### BUG-456: Los contratos solo pasaban con el `.env` de Kamilo; en una copia limpia fallaban los 302 (RESUELTO 2026-10-25)
+- **Severidad propuesta:** ALTA (bloqueaba M1.1.4)
+- **Que pasa:** Los snapshots salen de valores del `.env` local que `.env.example` trae distinto: `APP_TIMEZONE` (UTC contra Bogota), `APP_LOCALE` (en contra es), `REDIS_CLIENT` (phpredis, que el MSI no tiene) y `VAPID_PUBLIC_KEY` (vacia).
+- **Fuente:** primera corrida de `tests/Contratos` en el MSI con un clon limpio.
+- **Resuelto 2026-10-25 (M1.1.4):** `phpunit.xml` fija los cuatro (la llave VAPID es la publica, igual a la del snapshot; ningun snapshot cambia). Prueba roja: clon limpio 302 fallidos; control: el mismo clon con `.env.example` de fabrica, 302 en verde en los dos ordenes; suite completa 1257 en verde. Backend `b27279f`.
+
 ## 2026-10-23 — Encontrados al arreglar M0.8.6
 
 ### BUG-455: La webapp usa un evento fijo (`DEFAULT_SLUG`) en vez del evento de la persona, como hace Expo (RESUELTO 2026-10-24)
