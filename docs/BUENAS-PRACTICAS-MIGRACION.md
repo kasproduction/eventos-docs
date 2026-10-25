@@ -78,7 +78,8 @@
 24. **Un hallazgo corrige un numero, no abre un documento.** Las decisiones van solo en `docs/decisiones.md`, una
     linea cada una (fecha, que, por que); el roadmap y `PENDIENTES.md` solo enlazan.
 25. **Retro al cerrar cada fase:** que se estimo y que costo, que regla falto, que se corrige del roadmap. Va al final de
-    la fase en el roadmap, en cinco lineas.
+    la fase en el roadmap, en cinco lineas. **La retro actualiza `docs/ARQUITECTURA.md`** (existe desde M1.5.9 y en la
+    fase 5 queda como la version final, M5.3.2).
 
 ## Seguridad
 
@@ -91,6 +92,17 @@
 27. **Un hallazgo se confirma con una prueba roja antes de arreglarlo, y el arreglo trae su control** (el caso bueno que
     tiene que seguir funcionando). Si el arreglo rompe una prueba vieja que fija una regla de producto, no se reescribe
     la prueba: se adapta el arreglo o se pregunta a Kamilo (BUG-397 contra BUG-363, retro de la fase 0).
+
+## Documentacion
+
+28. **La documentacion tecnica se genera desde el codigo cuando se puede; lo escrito a mano es solo decisiones y el
+    porque.** Generado: el OpenAPI de PHP (`eventos-backend/docs/api.json`, Scramble, M0.3.6), los snapshots de los
+    contratos, el OpenAPI de C# con su interfaz navegable (M1.5.7, comparado en CI contra `api.json` en las rutas
+    cruzadas) y la tabla de dueños de ruta (`contratos/rutas-duenos.md`, la escriben `cruzar.ps1` y `descruzar.ps1`,
+    M1.5.8). A mano: `decisiones.md` (que se decidio y por que), `ARQUITECTURA.md` (como encaja todo y por que, regla 25)
+    y los catalogos de `contratos/` que el codigo no puede dar (acciones del admin, claves de Redis, variables). Un
+    documento a mano que repite lo que dice el codigo se borra. En la API admin nueva, ningun endpoint sin descripcion
+    en su OpenAPI (M2.1.4).
 
 ---
 

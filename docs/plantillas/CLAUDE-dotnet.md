@@ -27,4 +27,7 @@
 - Leer claves de Redis de PHP (solo borrarlas por nombre).
 - Leer o escribir algo de un evento sin el filtro por evento (regla 26): el evento sale de la ruta, la membresia se
   exige en la ruta y un id de otro evento es 404.
+- Un endpoint de la API admin nueva sin descripcion en su OpenAPI (regla 28).
+- Documentar a mano lo que se puede generar desde el codigo (regla 28): rutas, formas y dueños salen del OpenAPI, los
+  snapshots y `contratos/rutas-duenos.md`.
 - "Aprovecho y tambien": un bug se registra y se arregla solo si bloquea o si Kamilo lo decide.

@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 41/198
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 41/201
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -197,7 +197,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 1: Cimientos en C# (3 semanas) — 0/29
+## Fase 1: Cimientos en C# (3 semanas) — 0/32
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
 > errores. Sin trafico real. Al terminar, `GET /auth/me` pasa su snapshot contra los dos backends.
@@ -232,16 +232,19 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M1.4.3 Limitador de tasa en Redis (INCR + EXPIRE o ventana deslizante en Lua) con las 12 claves de `AppServiceProvider::configureRateLimiting` (por correo, token, usuario, IP) y `TrustProxies` equivalente (`ForwardedHeaders` con la misma lista) **[local]**
 - [ ] M1.4.4 Cache con prefijo `dotnet:` sobre Redis y suscriptor del canal `eventos:invalidate` (M0.4.5) que borra lo suyo **[local]**
 
-### 1.5 Proxy y primera medicion (2 dias) — 0/6
+### 1.5 Proxy y primera medicion (2 dias) — 0/9
 - [ ] M1.5.1 Nginx (o YARP) con tabla de rutas por ruta exacta: todo a PHP salvo `/api/v1/health`, `/version` y `/auth/me` a C#. Cabecera `X-Backend`. Script `cruzar.ps1 <ruta>` que cambia el dueño de una ruta **[local]**
 - [ ] M1.5.2 **La medicion que faltaba:** `e3-agenda-storm.js` contra `/auth/me` y `/events/by-slug` servidos por PHP y por C# en la misma maquina. Es el numero real de "cuanto menos consume" **[local+medir]**
 - [ ] M1.5.3 `descruzar.ps1 <ruta>` (devuelve la ruta a PHP en un despliegue) y `mysqldump` automatico dentro de `cruzar.ps1` para rutas que escriben; los dos probados antes del primer cruce real **[local]**
 - [ ] M1.5.4 Panel por ruta y por `X-Backend` (p95, errores, req/s) desde los logs de M1.1.3; despues de cada cruce, la ruta contra su propio numero en PHP **[local]**
 - [ ] M1.5.5 `medir-cruce.ps1 <ruta>`: k6 de agosto contra PHP y contra C# en el MSI, deja el numero para anotar en el roadmap. Criterio de cruce completo (regla 20): snapshot igual, orden explicito, prueba cruzada si escribe, medicion anotada, `descruzar.ps1` probado. En el servidor real se mide por hito **[local+medir]**
 - [ ] M1.5.6 Medir en el servidor real, con 300 personas, lo hecho en octubre para bajar pedidos por pantalla: agenda partida (B3.7), Social por pestañas (B3.8) y "lo mio" en un pedido (B3.9). Venia de M0.6.3 (servidor en pausa). Es la primera medicion de la fase 1 en servidor; pedirle a Kamilo que lo prenda **[servidor]**
+- [ ] M1.5.7 OpenAPI de C# generado desde el codigo (`Microsoft.AspNetCore.OpenApi`) con interfaz navegable (Scalar, solo fuera de produccion); en CI, cada ruta cruzada (segun `contratos/rutas-duenos.md`) se compara contra su operacion en `eventos-backend/docs/api.json` y falla si cambian parametros, estados o forma (regla 28) **[local]**
+- [ ] M1.5.8 Tabla de dueños de ruta `docs/contratos/rutas-duenos.md` (ruta exacta, metodo, PHP o C#, fecha del cruce, numero medido), generada por `cruzar.ps1` y `descruzar.ps1` desde la tabla del proxy; nunca editada a mano (regla 28) **[local]**
+- [ ] M1.5.9 `docs/ARQUITECTURA.md` v1: estado actual de la convivencia (proxy, quien atiende que, base y Redis compartidos, colas, tiempo real en Node), enlazando a `rutas-duenos.md` en vez de copiarla. Se actualiza en la retro de cada fase (regla 25) **[local]**
 
 ### 1.6 Cierre de la fase — 0/1
-- [ ] M1.6.1 Retro de la fase 1 **[local]**
+- [ ] M1.6.1 Retro de la fase 1 (incluye actualizar `ARQUITECTURA.md`, regla 25) **[local]**
 
 ---
 
@@ -466,7 +469,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ### 5.3 Cierre (1 semana) — 0/3
 - [ ] M5.3.1 `eventos-backend` archivado en GitHub (no borrado); `docs/` apunta al repo nuevo; `reference_project_paths` actualizado **[local]**
-- [ ] M5.3.2 Documentacion del sistema final: un solo `ARQUITECTURA.md` (API, hub, worker, Next, Redis, MySQL, R2) y el runbook del dia del evento (B6.3) reescrito **[local]**
+- [ ] M5.3.2 Version final del mismo `docs/ARQUITECTURA.md` de M1.5.9 (no uno nuevo): sin PHP ni Node, solo API, hub, worker, Next, Redis, MySQL y R2; `rutas-duenos.md` queda toda en C# y se archiva. Y el runbook del dia del evento (B6.3) reescrito **[local]**
 - [ ] M5.3.3 Retrospectiva con numeros: semanas reales por fase contra las estimadas, para la proxima vez (la medicion del hito 4 es M5.2.5) **[local]**
 
 </details>
