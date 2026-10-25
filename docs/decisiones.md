@@ -72,6 +72,8 @@
 - **D.3** Alcance del admin del hito 1: modulos de demo (eventos, agenda, speakers, sponsors, asistentes, branding, modulos, anuncios, login con 2FA) y el resto despues (M2b), o los 45 resources antes de mostrar nada. Recomendado: demo primero.
 - **D.4** Torre de control: version minima en C# dentro del admin nuevo (M2.9) y nada en Filament. Recomendado: si.
 - **D.5** App en tiendas: no publicar build antes de la fase 3 (cada build congela el cliente de Socket.IO semanas). Si un cliente la pide antes, la fase 3 se adelanta.
+- **D.7** (M1.3.2) Si Redis esta caido al borrar la ficha del socket de un token de staff rechazado, PHP responde 500 (el `deleted` de `AppServiceProvider` no atrapa el error); C# lo anota en el log y responde el 401 de siempre. Recomendado: C# asi (el tope de 24 h de la ficha es la red, como en el borrado en bloque de BUG-443).
+- **D.8** (M1.3.1) La sesion por cookie de `statefulApi()` (Sanctum prueba primero el guard `web` para dominios de `SANCTUM_STATEFUL_DOMAINS`) no se porta: ningun cliente pide `/sanctum/csrf-cookie` y la webapp manda el bearer desde su servidor. Recomendado: no portarla; si algo la usa, aparece en la prueba cruzada.
 - Zona horaria por evento (hoy toda la API usa la de la app): se decide despues de la fase 5.
 
 ### Producto (venian de `PENDIENTES.md` §2)
