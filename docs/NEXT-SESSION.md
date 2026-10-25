@@ -17,7 +17,9 @@
 - M1.1.4 parte A: runner `msi` (servicio) + `scripts/verificar.sh`; llave de solo lectura del backend en el MSI (`~/.ssh/eventos_backend_ro`, host `github-backend`). Parte B espera M1.1.5.
 - PHP2Shell (CVE-2026-109618/9): MSI 8.4.27, Laragon 8.3.36, terminal 8.4.27. Falta el servidor real (BUG-457).
 - BUG-456 resuelto: los contratos ya no dependen del `.env` (backend `b27279f`). Regla 28 de documentacion y M1.5.7 a M1.5.9.
-- Sigue (decision Kamilo: cerrar hoy el bloque 1.1): M1.1.5 modo contratos, parte B de M1.1.4, M1.1.6 analizador async, M1.1.7 paquetes vulnerables.
+- Mismo dia: BLOQUE 1.1 CERRADO (7/7). M1.1.5 modo contratos en C# (reinicio copia la base que siembra PHP; escenarios identicos), M1.1.4 parte B (health y version pasan contra C#), M1.1.6 analizador async, M1.1.7 paquetes vulnerables. Verificacion completa en el MSI ~7 min, verde en GitHub.
+- Kamilo: "siempre MySQL". Los contratos corren contra MySQL (la verdad); SQLite solo para orden inverso. Salieron BUG-458 (seeder invalido en MySQL), 459 (`total_points` como texto en produccion), 460 (orden de llaves JSON) y 461 (listas sin orden): resueltos, backend `21ecc17` a `0f001c1`. Nueva M1.2.6: suite completa de PHP contra MySQL. Roadmap 48/202.
+- Sigue: bloque 1.2 (Datos), empezando por M1.2.1 scaffold de las tablas con Pomelo.
 
 ## SESION 2026-10-23 (Opus 5.5) — AUDITORIA M0.8.1 CERRADA Y VALIDACION CON PRUEBAS 65/65
 

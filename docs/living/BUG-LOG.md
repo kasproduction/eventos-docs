@@ -5,6 +5,28 @@
 
 ## 2026-10-25 — Encontrados al arrancar la fase 1 (M1.1.4 y parche de PHP)
 
+### BUG-461: Listas sin orden fijo que MySQL devuelve distinto (RESUELTO 2026-10-25)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** Rankings con empate y conteos agrupados sin `ORDER BY`: en MySQL salen en otro orden que en SQLite. Rutas: `data-center/{id}/stats` (sesiones top, distribucion de calificaciones, publicadores top), `sessions/{id}/stats` (`qna.by_status`), `sessions/{id}/export` (preguntas a la misma hora).
+- **Fuente:** primera corrida de los contratos contra MySQL.
+- **Resuelto 2026-10-25:** orden explicito en todo el panel de `ExportService::stats` (16 consultas: rankings con desempate por id ascendente, conteos por su clave), `SessionStatsService` (`by_status` por estado, linea de tiempo por hora e id) y `PointsService::leaderboard` (empate por asistente). Cambia un snapshot: en publicadores top con empate sale primero el id menor (Bruno antes que Fabio). Decision en `decisiones.md`.
+
+### BUG-460: MySQL reordena las llaves de las columnas JSON y los snapshots comparaban ese orden (RESUELTO 2026-10-25)
+- **Severidad propuesta:** BAJA (solo pruebas)
+- **Que pasa:** Trivia y jackpot devuelven objetos guardados en columnas JSON; MySQL los guarda con las llaves reordenadas (`correct` antes de `options`).
+- **Resuelto 2026-10-25:** `normalizar()` ordena las llaves de los objetos; las listas se comparan estrictas. Snapshots regenerados en commit aparte (backend `21ecc17`) con `scripts/comparar-snapshots.py`: 191 cambiados, 191 solo en el orden de llaves, 0 con otro cambio; control con un valor alterado: rojo.
+
+### BUG-459: En produccion `total_points` del leaderboard sale como texto ("75") (RESUELTO 2026-10-25)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** `PointsService::leaderboard` devuelve `SUM()` crudo; MySQL lo entrega como texto. La webapp lo declara numero y llama `toLocaleString("es-CO")`: con texto no pone separador de miles (3250 en vez de 3.250). La app (Expo) lo muestra igual; kiosko no lo usa; el Pulse usa otra ruta que ya convertia. Se revisaron los demas `SUM`/`AVG`/`->sum()` del backend: todos convierten o solo comparan.
+- **Resuelto 2026-10-25:** `(int)` en `leaderboard()`. Prueba roja: contrato de `leaderboard` y `leaderboard/shared` contra MySQL; control: 302 en verde en MySQL y SQLite.
+
+### BUG-458: El seeder de contratos tenia datos que MySQL rechaza, y los contratos solo corrian en SQLite (RESUELTO 2026-10-25)
+- **Severidad propuesta:** ALTA (los snapshots fijaban respuestas imposibles en produccion)
+- **Que pasa:** `session_type = 'talk'` (el enum de MySQL no lo tiene) y un `auth_token` de totem de 66 caracteres (la columna admite 64). SQLite no valida enums ni largos.
+- **Fuente:** primera siembra de `ContratoSeeder` en MySQL para el modo contratos de C# (M1.1.5).
+- **Resuelto 2026-10-25:** seeder con `panel` y token de 64; los contratos corren contra MySQL en una base `*_pruebas` (la proteccion de BUG-344 sigue: otra base MySQL se rechaza, control con `eventos_db`); en MySQL se vacian solo las tablas usadas (`tests/TruncaSoloLoUsado.php`, ~1 s por prueba en el MSI) y la siembra va en una transaccion. Cambia un snapshot (`pulse/rooms`: `talk` a `panel`).
+
 ### BUG-457: PHP2Shell (CVE-2026-109618 y CVE-2026-109619) en el servidor real sin parchar (ABIERTO, servidor en pausa)
 - **Severidad propuesta:** CRITICA
 - **Que pasa:** Ejecucion de codigo sin sesion en PHP (CVSS 9,2, publicada 2026-10-21). Corregida en 8.3.36, 8.4.27, 8.5.12. `docs/infra/deploy.sh` instala `php8.3-*` por apt y el worker usa `php:8.3-cli-alpine`.
