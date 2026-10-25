@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 55/203
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 56/203
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -197,7 +197,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 1: Cimientos en C# (3 semanas) — 14/33
+## Fase 1: Cimientos en C# (3 semanas) — 15/33
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
 > errores. Sin trafico real. Al terminar, `GET /auth/me` pasa su snapshot contra los dos backends.
@@ -219,11 +219,11 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M1.2.5 Verificar la zona horaria del MySQL de produccion (`SELECT @@global.time_zone, @@session.time_zone`): las 22 columnas con `useCurrent()` toman la hora de la base. Si no es Bogota, medir cuantas filas estan corridas y decidir (`decisiones.md`) **[servidor]**
 - [x ] M1.2.6 Suite completa de PHP (1.257 pruebas) contra MySQL, como ya corren los contratos (BUG-458): mismas bases `*_pruebas` y `TruncaSoloLoUsado`; lo que falle es un hallazgo con su BUG **[local]** — **Hecho 2026-10-25**: medido 23 fallos de 1257 en MySQL; resueltos BUG-462 (roles de asistente inexistentes), 463 (datos de prueba invalidos) y 460 (llaves de `meta`). Ahora 1256 en MySQL (1 omitida sin el repo del socket) y 1257 en SQLite; `verificar.sh` corre la suite en MySQL (base `eventos_suite_pruebas`). Backend `d91ed89` a `955cd6f`
 
-### 1.3 Autenticacion compatible (3 dias) — 2/6
+### 1.3 Autenticacion compatible (3 dias) — 3/6
 - [x] M1.3.1 `AuthenticationHandler` Sanctum: parte `id|secreto`, compara `sha256` con `personal_access_tokens.token`, respeta `expires_at` (7 dias) y `abilities` **[local]** — **Hecho 2026-10-25** (`c11cb3d`, `src/Api/Autenticacion/TokenDeSanctum.cs`): espejo del Guard de Sanctum 4.3 (bearer como `Request::bearerToken`, formato como `isValidBearerToken`, sin `|` busca por el hash del texto entero, vence a los 7 dias de `created_at` y en `expires_at`). **Corregido:** `last_used_at` NO se escribe, PHP lo tiene apagado (`config/sanctum.php`). Sin esquema por defecto: solo autentica en las rutas `ConToken()`, como `auth:sanctum`. 401 `{"message":"Unauthenticated."}` como `bootstrap/app.php`. Pruebas con control en MySQL
 - [x] M1.3.2 Rechazo de tokens de usuarios con acceso al panel (`hasPanelAccess`, roles de `Roles::PANEL_ACCESS` desde `model_has_roles`) y borrado del token + ficha `socketauth:t:*` al rechazar **[local]** Excepcion: el token de operador (`App\Support\TokenDeOperador`, BUG-370): `operador:{tipo}`, `evento:{id}`, `sesion:{id}`, solo su lista de rutas, sin borrarlo. — **Hecho 2026-10-25** (`c11cb3d`, `TokenDeOperador.cs`): cuenta desactivada no entra (BUG-399); staff: 401, se borra el token y su ficha `socketauth:t:*` (base 2 de Redis); operador: rutas por plantilla de Laravel (los parametros de C# llevan el mismo nombre que en PHP), evento y sesion de ruta, query y cuerpo, y los ids que nombra (BUG-417). Seis controles: cada regla rota hace fallar su prueba. Dos diferencias con PHP en `decisiones.md` (abiertas)
-- [ ] M1.3.3 Claims de rol de plataforma (spatie) y rol de asistente (`attendees.role`) en el principal; `CheckBan` y `CheckApproval` como filtros con las mismas respuestas 403, sobre el evento de la ruta (`EventoDeLaPeticion`, BUG-425), mas `miembro.evento` (403 `NOT_IN_EVENT`, `/mine` afuera) y `audiencia.modulo` **[local]**
-- [ ] M1.3.4 `GET /auth/me` identico: snapshot de M0.3 pasa contra PHP y contra C# **[local]**
+- [ ] M1.3.3 Claims de rol de plataforma (spatie) y rol de asistente (`attendees.role`) en el principal; `CheckBan` y `CheckApproval` como filtros con las mismas respuestas 403, sobre el evento de la ruta (`EventoDeLaPeticion`, BUG-425), mas `miembro.evento` (403 `NOT_IN_EVENT`, `/mine` afuera) y `audiencia.modulo` **[local]** — Parte hecha en M1.3.4: `CheckBan` como filtro `ConBan()` sobre `EventoDeLaPeticion`. Falta: claims de rol, `CheckApproval`, `miembro.evento`, `audiencia.modulo`
+- [x] M1.3.4 `GET /auth/me` identico: snapshot de M0.3 pasa contra PHP y contra C# **[local]** — **Hecho 2026-10-25** (C# `a006cd2`, backend `28f9daa`): los contratos `GET auth/me` (ana y carla) pasan contra C# y estan en `contratos-csharp.txt`; control: un `sponsor_id` roto falla. Trae de M1.3.3 `check.ban` (`ConBan()`) con `EventoDeLaPeticion` (BUG-425); token de operador con rol `display` y `operador` (BUG-442). En PHP se agrego desempate por `id` a `asistenteDe`, `EventoDeLaPeticion::asistente` y `activeBan` (regla 9)
 - [ ] M1.3.5 Lector del cifrado de Laravel (`APP_KEY`, AES-256-CBC + HMAC, carga JSON base64) en `Contracts`: `users.two_factor_secret`, `organization_email_settings.password`, `staff_sessions.session_id`. Prueba contra valores cifrados por PHP; escribir en el mismo formato mientras conviven (`contratos/variables.md`, M0.5.4) **[local]**
 - [ ] M1.3.6 Filtro por evento de raiz (regla 26): filtro global de EF Core por `EventId` en las entidades del evento y membresia exigida en la ruta; un id de otro evento es 404 y no escribe. Prueba de cruce por modulo: alguien de otro evento no ve ni toca nada (retro M0.7.1) **[local]**
 
