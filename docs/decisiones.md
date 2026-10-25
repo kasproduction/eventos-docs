@@ -21,6 +21,12 @@
 | 2026-10-21 | Speakers en escritorio conserva su animacion de abrir | Se ve bien como esta |
 | 2026-10-24 | M0.6.1: opcion A en los tres del lab (BUG-392 texto teal, BUG-393 borde de tarjeta, BUG-455 pantalla tipo "Registro en revision"). En Lux, cajas, tarjetas, iconos y botones flotan con sombra y sin borde | Lux v2 reemplaza bordes por elevacion; los labs tienen que mostrar Lux asi |
 | 2026-10-24 | BUG-455: la webapp toma el evento de la persona como Expo; sin asistente en ningun evento ve `/sin-inscripcion` con "Inscribirme" (si el registro esta abierto) y "Entrar con otra cuenta". Login, verify y landing siguen con el evento del despliegue | Antes veia secciones vacias con 403 NOT_IN_EVENT |
+| 2026-10-25 | D.6: el servicio C# es `eventos-api-dotnet` (GitHub privado), .NET 10, con `Api`, `Worker`, `Contracts`, `Tests`; `Hub` en la fase 3 | Propuesta aceptada al arrancar M1.1.1 |
+| 2026-10-25 | Docker solo en Linux (MSI y servidor); en Windows se trabaja con `dotnet run` contra Laragon | Kamilo no usa Docker en Windows; un solo `docker-compose.yml` |
+| 2026-10-25 | La verificacion de cada push corre en un runner propio en el MSI, con una llave de solo lectura del backend que no sale del MSI; el mismo script corre a mano sin GitHub | Cero costo de minutos y sin depender de GitHub |
+| 2026-10-25 | Sentry de C# en un proyecto aparte del de PHP | Que los errores de un backend no se mezclen con los del otro |
+| 2026-10-25 | Regla 28: la documentacion tecnica se genera desde el codigo; a mano solo decisiones y el porque (M1.5.7 a M1.5.9) | Documentacion que no se desactualiza |
+| 2026-10-25 | El montaje viejo de medios del MSI (Jellyfin y compañia) se borra | Kamilo no lo vuelve a usar; el MSI queda para EventOS |
 | 2026-10-23 | BUG-424 (M0.8.7): la audiencia de un modulo es control de acceso: grupos y presencia cortan tambien sus datos por la API. El rol del catalogo sigue siendo navegacion (separa la app del asistente de la del vendedor) | Es lo que el admin promete ("contenido exclusivo") |
 | 2026-10-23 | BUG-416 (M0.8.7): los enlaces de Mission Control y del display vencen un dia despues del evento, se regeneran con un boton en el admin y solos cuando un operador del evento pierde el rol; se mantiene el salto entre sesiones | Un enlace repartido no puede valer para siempre |
 | 2026-10-23 | BUG-404 (M0.8.6): el registro sigue dando sesion al instante, pero nada se decide por un correo sin comprobar (invitaciones de stand por correo, eventos con restriccion por dominio o lista). Se comprueba con magic link, activacion, restablecer o verificar correo; la primera prueba por un enlace de entrada cierra las sesiones y la contraseña de antes. En eventos con restriccion no hay sesion hasta comprobarlo | Cierra la toma de cuentas por correo ajeno sin cambiar el registro de la landing ni el widget en eventos abiertos (opcion "entra, sin confiar") |
@@ -60,7 +66,6 @@
 - **D.3** Alcance del admin del hito 1: modulos de demo (eventos, agenda, speakers, sponsors, asistentes, branding, modulos, anuncios, login con 2FA) y el resto despues (M2b), o los 45 resources antes de mostrar nada. Recomendado: demo primero.
 - **D.4** Torre de control: version minima en C# dentro del admin nuevo (M2.9) y nada en Filament. Recomendado: si.
 - **D.5** App en tiendas: no publicar build antes de la fase 3 (cada build congela el cliente de Socket.IO semanas). Si un cliente la pide antes, la fase 3 se adelanta.
-- **D.6** Nombre y repo del servicio C# (propuesta: `eventos-api-dotnet`, .NET 10 LTS, un repo con `Api`, `Hub`, `Worker`, `Contracts`, `Tests`).
 - Zona horaria por evento (hoy toda la API usa la de la app): se decide despues de la fase 5.
 
 ### Producto (venian de `PENDIENTES.md` §2)

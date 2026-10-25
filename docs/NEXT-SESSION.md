@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-10-25 (Opus 5.5) — FASE 1 ARRANCA: MSI LISTO, M1.1.1 A M1.1.3 HECHAS, M1.1.4 PARTE A
+
+- MSI: Docker 29.9 + compose, Redis 7 (solo local), .NET 10; borrado el montaje viejo de medios (Kamilo no lo usa). Docker solo en Linux.
+- `eventos-api-dotnet` (GitHub privado): M1.1.1 solucion, M1.1.2 Docker, M1.1.3 health/version/X-Request-Id/logs/Sentry. Roadmap 44/201.
+- M1.1.4 parte A: runner `msi` (servicio) + `scripts/verificar.sh`; llave de solo lectura del backend en el MSI (`~/.ssh/eventos_backend_ro`, host `github-backend`). Parte B espera M1.1.5.
+- PHP2Shell (CVE-2026-109618/9): MSI 8.4.27, Laragon 8.3.36, terminal 8.4.27. Falta el servidor real (BUG-457).
+- BUG-456 resuelto: los contratos ya no dependen del `.env` (backend `b27279f`). Regla 28 de documentacion y M1.5.7 a M1.5.9.
+- Sigue (decision Kamilo: cerrar hoy el bloque 1.1): M1.1.5 modo contratos, parte B de M1.1.4, M1.1.6 analizador async, M1.1.7 paquetes vulnerables.
+
 ## SESION 2026-10-23 (Opus 5.5) — AUDITORIA M0.8.1 CERRADA Y VALIDACION CON PRUEBAS 65/65
 
 - Auditoria terminada: 54 agentes (Kamilo subio el presupuesto a 55 para cubrir networking), cobertura limpia, 65 pistas. Informe fuera del repo: `C:/Users/Kasproduction/security-audit-skill/eventos-backend/run-1/REPORT.md` y `NEEDS-VALIDATION.md`.

@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 41/201
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 44/201
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -197,16 +197,16 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 1: Cimientos en C# (3 semanas) — 0/32
+## Fase 1: Cimientos en C# (3 semanas) — 3/32
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
 > errores. Sin trafico real. Al terminar, `GET /auth/me` pasa su snapshot contra los dos backends.
 
-### 1.1 Repositorio y esqueleto (2 dias) — 0/7
-- [ ] M1.1.1 Repo `eventos-api-dotnet`, .NET 10 LTS, solucion con `Api`, `Worker`, `Contracts`, `Tests`; `Hub` se agrega en la fase 3 **[local]**
-- [ ] M1.1.2 Dockerfile multi-stage y `docker-compose.dev.yml` que levanta C# junto a MySQL y Redis de Laragon **[local]**
-- [ ] M1.1.3 Sentry, logs estructurados con id de peticion (`X-Request-Id`, cruza con B4.3), `/health` y `/version` con la misma forma que `HealthController` **[local]**
-- [ ] M1.1.4 CI: build, tests, y las pruebas de contrato de M0.3 corridas contra PHP (normal y con `CONTRATO_ORDEN_INVERSO=1`) y contra C# con `CONTRATO_BASE_URL` en cada push; las `solo-php` se saltan contra C# (M0.3.9) `tests/Auditoria` queda fuera (11 rojos a proposito, inventario del admin) **[local]**
+### 1.1 Repositorio y esqueleto (2 dias) — 3/7
+- [x] M1.1.1 Repo `eventos-api-dotnet`, .NET 10 LTS, solucion con `Api`, `Worker`, `Contracts`, `Tests`; `Hub` se agrega en la fase 3 **[local]** — **Hecho 2026-10-25** (`e7a95e0`, GitHub privado): versiones centralizadas, avisos como error, `global.json`, `CLAUDE.md` de la plantilla; compila y prueba en Windows y en el MSI
+- [x] M1.1.2 Dockerfile multi-stage y `docker-compose.yml` (solo Linux: MSI y servidor; en Windows `dotnet run` contra Laragon) que levanta C# junto a MySQL y Redis de la maquina **[local]** — **Hecho 2026-10-25** (`f4b4df6`, `be5e875`): una receta para Api y Worker, imagen sin root (~340 MB), red del host para no abrir MySQL ni Redis; en reposo Api 18 MB y Worker 10 MB
+- [x] M1.1.3 Sentry, logs estructurados con id de peticion (`X-Request-Id`, cruza con B4.3), `/health` y `/version` con la misma forma que `HealthController` **[local]** — **Hecho 2026-10-25** (`30e93eb`): cuerpo identico a PHP lado a lado; logs JSON con `RequestId`; Sentry apagado sin DSN (falta crear el proyecto aparte de C#); 7 pruebas con control. Sin `InvariantGlobalization` (Windows no reconocia `America/Bogota`)
+- [ ] M1.1.4 CI: build, tests, y las pruebas de contrato de M0.3 corridas contra PHP (normal y con `CONTRATO_ORDEN_INVERSO=1`) y contra C# con `CONTRATO_BASE_URL` en cada push; las `solo-php` se saltan contra C# (M0.3.9) `tests/Auditoria` queda fuera (11 rojos a proposito, inventario del admin) **[local]** — **Parte A hecha 2026-10-25** (`6745e96`, `6adfe77`): `scripts/verificar.sh` en runner propio en el MSI (sin costo), C# + contratos de PHP en los dos ordenes, verde en 2m19s; BUG-456 resuelto para lograrlo. **Parte B (contratos contra C#) espera M1.1.5**
 - [ ] M1.1.5 Modo contratos en C#, igual al de PHP (`app/Support/ModoContratos.php`): reloj congelado, llamadas afuera simuladas, `POST /__contratos/reiniciar {escenario?}` con los nombres de `ContratoEscenarios`, azar `min + semilla mod rango` con `X-Contrato-Semilla`; activado por variable de entorno y sin registrarse en produccion **[local]**
 - [ ] M1.1.6 Analizador de async en CI (`Microsoft.VisualStudio.Threading.Analyzers`, avisos como error): falla el build con `.Result` o `.Wait()` **[local]**
 - [ ] M1.1.7 `dotnet list package --vulnerable` en CI (falla si hay altos o criticos) y versiones fijas en los `.csproj` **[local]**
