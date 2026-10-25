@@ -153,6 +153,8 @@ de los 330 snapshots y del codigo PHP:
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
 - Contra PHP: `./vendor/bin/pest tests/Contratos` (~90 s).
+- Contra C#, solo las rutas ya portadas (Windows o MSI): `scripts/contratos-contra-csharp.sh <ruta-a-eventos-backend>` desde
+  `eventos-api-dotnet` (levanta C# en modo contratos y corre lo de `scripts/contratos-csharp.txt`).
 - Contra C#: `CONTRATO_BASE_URL=http://localhost:<puerto> ./vendor/bin/pest tests/Contratos` (el servidor en modo
   contratos; `solo-php` se salta).
 - PHP como otro backend: `.\scripts\servidor-contratos.ps1` en una terminal y `CONTRATO_BASE_URL=http://127.0.0.1:8123`
