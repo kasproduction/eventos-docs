@@ -139,6 +139,9 @@ de los 330 snapshots y del codigo PHP:
   con `Retry-After`; 404 de modelo `No query results for model [App\Models\X] N` (sale asi en produccion).
 - Paginacion donde PHP la arma a mano: `{data, meta: {current_page, last_page, total}}`; revisar el snapshot de cada ruta.
 - Codigos de negocio en `code` (`FORBIDDEN`, `QR_INVALID`, `DUPLICATE_LEAD`, `staff_uses_panel`...).
+- **Diferencias con PHP decididas (no se copian; cada una con su decision en `decisiones.md`):**
+  - D.7: token de staff rechazado con Redis caido. PHP responde 500; C# borra el token en MySQL (obligatorio), deja un
+    aviso en el log por la ficha del socket y responde el 401 de arriba.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
