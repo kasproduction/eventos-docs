@@ -25,13 +25,14 @@
    `PHP_CLI_SERVER_WORKERS`, `VITE_APP_NAME` (sobras de la plantilla). `SENTRY_LARAVEL_DSN` y
    `SENTRY_TRACES_SAMPLE_RATE` las lee el paquete de Sentry por dentro.
 
-## Las 71 variables
+## Las 71 variables (mas `APP_PREVIOUS_KEYS`, que lee `config/app.php` y no esta en el `.env`)
 
 | Variable | Donde se lee | C# | Nota |
 |---|---|---|---|
 | `APP_NAME` | app, cache, database, horizon, session | no | Arma los prefijos de cache y Redis (`claves-redis.md`) |
 | `APP_ENV` | app | equiv | `ASPNETCORE_ENVIRONMENT` |
-| `APP_KEY` | app | **si** | Ver punto 1 |
+| `APP_KEY` | app | **si** | Ver punto 1. En C#: `App:Key` (`App__Key`), mismo valor `base64:...`; lector en `Contracts/Cifrado/CifradoDeLaravel` (M1.3.5) |
+| `APP_PREVIOUS_KEYS` | app | **si** | Llaves anteriores separadas por coma (rotacion de `APP_KEY`). En C#: `App:PreviousKeys`. Agregada 2026-10-25 (M1.3.5): faltaba en la lista |
 | `APP_DEBUG` | app | equiv | |
 | `APP_TIMEZONE` | app | **si** | Offset de las fechas de la API (decision 2026-10-21) |
 | `APP_URL` | app, filesystems, mail | **si** | URLs absolutas en respuestas y correos |
