@@ -89,6 +89,12 @@
     entidades del evento; la membresia es requisito de la ruta, como `miembro.evento` en PHP (403 `NOT_IN_EVENT`, `/mine`
     queda afuera, decision 2026-10-23). Un id de otro evento responde 404 y no escribe nada. Cada modulo lleva su prueba
     de cruce: alguien de otro evento no ve ni toca nada.
+    - **Como esta hecho (M1.3.6, decision 2026-10-25):** cerrado por defecto. Toda ruta del evento termina en
+      `.DelEvento()`, que fija el evento en el contexto; sin eso las 86 tablas del evento no devuelven nada. Las hijas
+      se filtran por su padre y `events` no se filtra. Guardar algo de otro evento responde el 404 de modelo de Laravel.
+      Cruzar eventos a proposito solo con `CruzandoEventos(CruceDeEventos.X)`, lista cerrada en
+      `Contracts/Datos/CruceDeEventos.cs`; `IgnoreQueryFilters` en otro lado rompe una prueba. Detalle y pruebas en
+      `eventos-api-dotnet` (`EventosDb.Evento.cs`, `FiltroPorEventoTest`).
 27. **Un hallazgo se confirma con una prueba roja antes de arreglarlo, y el arreglo trae su control** (el caso bueno que
     tiene que seguir funcionando). Si el arreglo rompe una prueba vieja que fija una regla de producto, no se reescribe
     la prueba: se adapta el arreglo o se pregunta a Kamilo (BUG-397 contra BUG-363, retro de la fase 0).

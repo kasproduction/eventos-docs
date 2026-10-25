@@ -23,7 +23,8 @@
 - Mismo dia (noche): M1.3.1 y M1.3.2 hechas (C# `c11cb3d`): bearer de Sanctum, staff rechazado con borrado de token y ficha, token de operador acotado; seis controles en MySQL (base sembrada en Laragon). Corregido: `last_used_at` no se escribe (PHP lo apaga). Abiertas D.7 (Redis caido: log en vez de 500) y D.8 (sin sesion por cookie). Roadmap 55/203.
 - Mismo dia (cierre): M1.3.4 hecha (C# `a006cd2`, backend `28f9daa`): `/auth/me` pasa sus contratos contra C# (primer contrato real), con `check.ban` por evento de la peticion. PHP con desempate por id (regla 9). Suite PHP 1.257 verde, C# 70/70. Roadmap 56/203.
 - Mismo dia (final): D.7 decidida (ficha Redis tolerante, MySQL obligatorio; primera diferencia decidida en el Anexo B) y D.8 decidida (A: sin cookie en C#; Data Center en PHP con cookie hasta M2.7.2; revisado: el Data Center si la usa). M1.3.3 hecha (C# `41a8281`: roles y filtros de acceso). M1.3.5 hecha (C# `cf0952c`: cifrado de Laravel, PHP y C# se descifran entre si). C# 93/93. Roadmap 58/203.
-- Sigue: M1.3.6 filtro por evento de raiz (regla 26), ultimo paso del bloque 1.3. M1.2.5 y BUG-457 cuando se prenda el servidor real.
+- Mismo dia (cierre del bloque): WHITE-LABEL corregido (app propia solo desde la cuenta del cliente, Apple 4.2.6 y 4.3; webapp con marca como opcion sin tienda; decision anotada). M1.3.6 hecha (C# `c4c4ba8`): filtro por evento cerrado por defecto en 86 tablas, escrituras ajenas frenadas, excepciones con nombre (incluye org_admin y super_admin), prueba de cruce en CI. BLOQUE 1.3 CERRADO (6/6). C# 102/102. Roadmap 59/203.
+- Sigue: bloque 1.4 del roadmap. M1.2.5 y BUG-457 cuando se prenda el servidor real.
 
 ## SESION 2026-10-23 (Opus 5.5) — AUDITORIA M0.8.1 CERRADA Y VALIDACION CON PRUEBAS 65/65
 
