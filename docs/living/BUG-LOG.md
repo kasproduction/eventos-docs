@@ -5,6 +5,17 @@
 
 ## 2026-10-25 — Encontrados al arrancar la fase 1 (M1.1.4 y parche de PHP)
 
+### BUG-463: Pruebas de PHP con datos que MySQL rechaza (RESUELTO 2026-10-25)
+- **Severidad propuesta:** BAJA (solo pruebas; el codigo de la app estaba bien)
+- **Que pasa:** Al correr la suite en MySQL (M1.2.6): `session_type 'talk'` en SessionThumbnailTest; `banned_by` con id de asistente (es de usuario) en 3 pruebas; `assigned_by` con id de usuario (es de asistente) en StandsYCheckinTest; un canje pendiente creado sin subir `redeemed_count`, que al vencer bajaba a negativo (en MySQL la columna es sin signo y explota). El flujo real sube el contador al canjear y Filament no lo deja editar: no pasa en produccion.
+- **Resuelto 2026-10-25:** pruebas con datos validos. Backend `f134c56`.
+
+### BUG-462: El codigo PHP revisaba roles de asistente que no existen (`organizer`, `moderator`) (RESUELTO 2026-10-25)
+- **Severidad propuesta:** MEDIA (codigo muerto que aparentaba permisos)
+- **Que pasa:** `attendees.role` (enum de MySQL) solo admite attendee, vendedor y los admin*. QuestionController, RatingController, SessionQuestionResource, AdminDelEvento::EN_VIVO, EnlaceDeOperador::OPERADORES y TokenDeOperador aceptaban `organizer` y `moderator`: nunca se cumplia, solo `admin` entraba. `moderator` existe pero como rol de staff (spatie), otro sistema. El autor de una pregunta anonima se mostraba "si es admin" con roles inexistentes: en produccion siempre quedaba oculto.
+- **Fuente:** suite en MySQL (M1.2.6): las pruebas creaban asistentes `organizer` que SQLite aceptaba.
+- **Resuelto 2026-10-25:** fuera esos valores, sin cambio de comportamiento; 3 pruebas pasan a `admin`. El rol Organizador para el cliente (solo lectura) se hace en el admin nuevo, M2.2.6 (decisiones.md). Backend `d91ed89`.
+
 ### BUG-461: Listas sin orden fijo que MySQL devuelve distinto (RESUELTO 2026-10-25)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Rankings con empate y conteos agrupados sin `ORDER BY`: en MySQL salen en otro orden que en SQLite. Rutas: `data-center/{id}/stats` (sesiones top, distribucion de calificaciones, publicadores top), `sessions/{id}/stats` (`qna.by_status`), `sessions/{id}/export` (preguntas a la misma hora).
@@ -14,7 +25,7 @@
 ### BUG-460: MySQL reordena las llaves de las columnas JSON y los snapshots comparaban ese orden (RESUELTO 2026-10-25)
 - **Severidad propuesta:** BAJA (solo pruebas)
 - **Que pasa:** Trivia y jackpot devuelven objetos guardados en columnas JSON; MySQL los guarda con las llaves reordenadas (`correct` antes de `options`).
-- **Resuelto 2026-10-25:** `normalizar()` ordena las llaves de los objetos; las listas se comparan estrictas. Snapshots regenerados en commit aparte (backend `21ecc17`) con `scripts/comparar-snapshots.py`: 191 cambiados, 191 solo en el orden de llaves, 0 con otro cambio; control con un valor alterado: rojo.
+- **Resuelto 2026-10-25:** `normalizar()` ordena las llaves de los objetos; las listas se comparan estrictas. Snapshots regenerados en commit aparte (backend `21ecc17`). Mismo caso en la columna `meta` de los eventos de seguridad (4 pruebas a `toEqual`, `955cd6f`) con `scripts/comparar-snapshots.py`: 191 cambiados, 191 solo en el orden de llaves, 0 con otro cambio; control con un valor alterado: rojo.
 
 ### BUG-459: En produccion `total_points` del leaderboard sale como texto ("75") (RESUELTO 2026-10-25)
 - **Severidad propuesta:** MEDIA

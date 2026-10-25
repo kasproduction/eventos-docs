@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 52/202
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 53/203
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -197,7 +197,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 1: Cimientos en C# (3 semanas) — 11/33
+## Fase 1: Cimientos en C# (3 semanas) — 12/33
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
 > errores. Sin trafico real. Al terminar, `GET /auth/me` pasa su snapshot contra los dos backends.
@@ -211,13 +211,13 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x ] M1.1.6 Analizador de async en CI (`Microsoft.VisualStudio.Threading.Analyzers`, avisos como error): falla el build con `.Result` o `.Wait()` **[local]** — **Hecho 2026-10-25**: `Microsoft.VisualStudio.Threading.Analyzers` 18.12.1 en `Directory.Build.props`; Redis pasa a un solo `IConnectionMultiplexer` creado al arrancar (VSTHRD011); control: un `.Result` rompe el build (VSTHRD103)
 - [x ] M1.1.7 `dotnet list package --vulnerable` en CI (falla si hay altos o criticos) y versiones fijas en los `.csproj` **[local]** — **Hecho 2026-10-25**: `NuGetAudit` (todos los paquetes, nivel alto) rompe la restauracion y `verificar.sh` corre `dotnet list package --vulnerable --include-transitive`; versiones fijas en `Directory.Packages.props`; control: System.Text.Json 8.0.4 da NU1903
 
-### 1.2 Datos (3 dias) — 4/6
+### 1.2 Datos (3 dias) — 5/6
 - [x] M1.2.1 Scaffold de las 105 tablas con Pomelo; script repetible `scaffold.ps1` que se corre despues de cada migracion Laravel **[local]** — **Hecho 2026-10-25** (`348620e`): con `Microting.EntityFrameworkCore.MySql` 10.0.13, no Pomelo (no tiene version para EF Core 10; prueba de B y C y decision en `decisiones.md`). 114 tablas (no 105): 112 entidades y 2 tablas puente como muchos a muchos, en `src/Contracts/Datos`. `scaffold.ps1` migra con PHP una base `eventos_esquema_pruebas` y genera desde ahi; prueba en MySQL: cada entidad se lee de la base sembrada (control: un mapeo roto falla)
 - [x] M1.2.2 Conversor de fechas: columnas `DATETIME` guardadas en hora de Bogota (`APP_TIMEZONE`), leidas como `Unspecified` y convertidas a UTC; serializadas con el formato decidido en M0.3.2 **[local]** — **Hecho 2026-10-25** (`0f2f638`): `ZonaDeLaApp` en `Contracts` (sale `App:Timezone`), conversion en todas las `DateTime` fuera del archivo generado; escribir una fecha que no es UTC es error. En MySQL: Apertura sale `2026-12-06T08:30:00-05:00`, igual al snapshot; escritura en transaccion; control sin conversion: `Unspecified`
 - [x] M1.2.3 Los 38 casts `array` como `JsonDocument` o tipos propios; los 69 `boolean` desde `tinyint`; los 3 `encrypted` (2FA) con el descifrado AES-256-CBC + MAC de Laravel portado y probado contra valores reales **[local]** — **Hecho 2026-10-25** (`9e6f43f`, `43c949f`): 38 json a `JsonDocument` (UseMicrosoftJson); 77 `tinyint(1)` a `bool` sin default en el modelo y con `= true` en C# los 41 que en la base valen 1 (control: sin el ajuste un `false` insertado se guardaba `true`). `casts-de-laravel.json` generado: marca 8 `tinyint(1)` que PHP devuelve 0/1 sin cast, 2 json sin cast y 3 `array` sobre texto (lo que sale lo decide el snapshot de cada ruta). **Los 3 `encrypted` van en M1.3.5** (el mismo lector del cifrado). Pendiente al portar escrituras: columnas numericas con default (ej. `rate_limit` 100) siguen con el default de EF: un 0 explicito se guardaria como el default; la prueba cruzada de escrituras (regla 7) lo atrapa
 - [x] M1.2.4 Segundo `DbContext` de solo lectura para la replica (`reports`, cruza con B3.4) **[local]** — **Hecho 2026-10-25** (`3aa3075`): `ReportesDb` (mismo modelo, `ConnectionStrings:MySqlReportes`, sin replica lee la principal), guardar es error y sin tracking
 - [ ] M1.2.5 Verificar la zona horaria del MySQL de produccion (`SELECT @@global.time_zone, @@session.time_zone`): las 22 columnas con `useCurrent()` toman la hora de la base. Si no es Bogota, medir cuantas filas estan corridas y decidir (`decisiones.md`) **[servidor]**
-- [ ] M1.2.6 Suite completa de PHP (1.257 pruebas) contra MySQL, como ya corren los contratos (BUG-458): mismas bases `*_pruebas` y `TruncaSoloLoUsado`; lo que falle es un hallazgo con su BUG **[local]**
+- [x ] M1.2.6 Suite completa de PHP (1.257 pruebas) contra MySQL, como ya corren los contratos (BUG-458): mismas bases `*_pruebas` y `TruncaSoloLoUsado`; lo que falle es un hallazgo con su BUG **[local]** — **Hecho 2026-10-25**: medido 23 fallos de 1257 en MySQL; resueltos BUG-462 (roles de asistente inexistentes), 463 (datos de prueba invalidos) y 460 (llaves de `meta`). Ahora 1256 en MySQL (1 omitida sin el repo del socket) y 1257 en SQLite; `verificar.sh` corre la suite en MySQL (base `eventos_suite_pruebas`). Backend `d91ed89` a `955cd6f`
 
 ### 1.3 Autenticacion compatible (3 dias) — 0/6
 - [ ] M1.3.1 `AuthenticationHandler` Sanctum: parte `id|secreto`, compara `sha256` con `personal_access_tokens.token`, respeta `expires_at` (7 dias) y `abilities`, actualiza `last_used_at` **[local]**
@@ -250,9 +250,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 ---
 
 <details>
-<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/45</b></summary>
+<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/46</b></summary>
 
-## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/45
+## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/46
 
 > Next sirve la interfaz; C# sirve la API admin y reproduce los efectos secundarios que hoy hacen los observers de
 > Laravel. Filament se apaga modulo por modulo. La API publica, Node y los correos siguen en PHP y no se enteran.
@@ -264,11 +264,12 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M2.1.3 Decision de donde vive: `eventos-web` bajo `/admin` con su propio layout, o repo aparte. Recomendado: mismo repo, layout propio, para compartir tokens y auth **[local]**
 - [ ] M2.1.4 Contrato de la API admin: OpenAPI nuevo (no hereda rutas de Filament, que no tiene API) con DTOs explicitos desde el dia uno **[local]**
 
-### 2.2 Entrar al admin (1 semana) — 0/5
+### 2.2 Entrar al admin (1 semana) — 0/6
 - [ ] M2.2.1 Login del staff en C# con contraseña bcrypt `$2y$` + TOTP (Otp.NET) + codigos de recuperacion; bloqueo por fallos (`StaffLockout`), dispositivos de confianza (`trusted_devices`), sesiones abiertas (`staff_sessions`), bitacora (`staff_security_events`) **[local]**
 - [ ] M2.2.2 Token de staff para la API admin: Sanctum con ability `admin` en la misma tabla (Laravel no lo emite; C# si) o cookie propia. Recomendado: bearer con ability, para que el Data Center tambien lo use **[local]**
 - [ ] M2.2.3 Contexto de evento (hoy en sesion de Filament, `SetFilamentEventContext`) pasa a cabecera `X-Event-Id` validada por rol y organizacion **[local]**
 - [ ] M2.2.4 Roles y permisos de plataforma (`Roles.php`: super_admin, org_admin, event_admin, moderator, staff_checkin) como policies de C# **[local]**
+- [ ] M2.2.6 Rol **Organizador** (el cliente): ve Data Center, estadisticas y datos del evento, sin editar nada; el staff edita. Rol de plataforma nuevo en las policies de M2.2.4, con lab de pantallas antes de codear (decision Kamilo 2026-10-25; hoy no existe: BUG-462) **[local]**
 - [ ] M2.2.5 Correos del staff (2FA activado, cuenta bloqueada, reset) los sigue mandando PHP: C# inserta en una tabla `outbox` que `SendEmailJob` drena. Es el puente de correo hasta la fase 4c **[local]**
 
 ### 2.3 Contenido del evento (2 semanas) — 0/8

@@ -19,7 +19,8 @@
 - BUG-456 resuelto: los contratos ya no dependen del `.env` (backend `b27279f`). Regla 28 de documentacion y M1.5.7 a M1.5.9.
 - Mismo dia: BLOQUE 1.1 CERRADO (7/7). M1.1.5 modo contratos en C# (reinicio copia la base que siembra PHP; escenarios identicos), M1.1.4 parte B (health y version pasan contra C#), M1.1.6 analizador async, M1.1.7 paquetes vulnerables. Verificacion completa en el MSI ~7 min, verde en GitHub.
 - Kamilo: "siempre MySQL". Los contratos corren contra MySQL (la verdad); SQLite solo para orden inverso. Salieron BUG-458 (seeder invalido en MySQL), 459 (`total_points` como texto en produccion), 460 (orden de llaves JSON) y 461 (listas sin orden): resueltos, backend `21ecc17` a `0f001c1`. Nueva M1.2.6: suite completa de PHP contra MySQL. Roadmap 48/202.
-- Sigue: bloque 1.2 (Datos), empezando por M1.2.1 scaffold de las tablas con Pomelo.
+- Mismo dia (tarde): bloque 1.2 en 5/6. Conector EF = Microting (fork de Pomelo para EF 10; probado contra Oracle: mismo modelo y async real). M1.2.1 scaffold, M1.2.2 fechas, M1.2.3 bool/JSON (evitado: un false insertado se guardaba true), M1.2.4 ReportesDb, M1.2.6 suite completa de PHP en MySQL (23 fallos resueltos: BUG-462 roles inexistentes, 463 datos de prueba, 460 meta). Decision: rol Organizador del cliente (solo lectura) en el admin nuevo, M2.2.6. Roadmap 53/203.
+- Sigue: M1.2.5 cuando se prenda el servidor real; bloque 1.3 (autenticacion compatible), empezando por M1.3.1 handler Sanctum.
 
 ## SESION 2026-10-23 (Opus 5.5) — AUDITORIA M0.8.1 CERRADA Y VALIDACION CON PRUEBAS 65/65
 
