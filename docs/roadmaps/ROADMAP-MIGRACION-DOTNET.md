@@ -304,7 +304,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ### 2.7 Apagar Filament modulo por modulo (continuo) — 0/4
 - [ ] M2.7.1 Por cada modulo que el admin nuevo cubre, el resource de Filament se oculta del panel (no se borra) y se anota en el inventario de M0.5.3 **[local]**
-- [ ] M2.7.2 El SPA del Data Center (`public/data-center`) pasa a bearer del staff (M2.2.2) y se enlaza desde el admin nuevo; deja de depender de la sesion web de Laravel **[local]**
+- [ ] M2.7.2 El SPA del Data Center (`public/data-center`) pasa a bearer del staff (M2.2.2) y se enlaza desde el admin nuevo; deja de depender de la sesion web de Laravel **[local]** (D.8: hasta aqui sus 19 rutas siguen en PHP con cookie; despues quedan listas para M4e)
 - [ ] M2.7.3 Mission Control, Event Pulse, display, chat-monitor y attendance-check se enlazan desde el admin nuevo con el mismo token; su unificacion (PENDIENTES §11) se hace aqui o se absorben como paginas del admin **[local]**
 - [ ] M2.7.4 Cuando el ultimo modulo del hito 1 este cubierto: Filament solo queda para lo de M2b, con un aviso en el panel **[local]**
 

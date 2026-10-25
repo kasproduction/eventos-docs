@@ -142,6 +142,7 @@ de los 330 snapshots y del codigo PHP:
 - **Diferencias con PHP decididas (no se copian; cada una con su decision en `decisiones.md`):**
   - D.7: token de staff rechazado con Redis caido. PHP responde 500; C# borra el token en MySQL (obligatorio), deja un
     aviso en el log por la ficha del socket y responde el 401 de arriba.
+  - D.8: C# no acepta la sesion por cookie en `/api` (solo bearer). Las rutas del Data Center siguen en PHP hasta M2.7.2.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
