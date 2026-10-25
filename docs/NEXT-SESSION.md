@@ -22,7 +22,8 @@
 - Mismo dia (tarde): bloque 1.2 en 5/6. Conector EF = Microting (fork de Pomelo para EF 10; probado contra Oracle: mismo modelo y async real). M1.2.1 scaffold, M1.2.2 fechas, M1.2.3 bool/JSON (evitado: un false insertado se guardaba true), M1.2.4 ReportesDb, M1.2.6 suite completa de PHP en MySQL (23 fallos resueltos: BUG-462 roles inexistentes, 463 datos de prueba, 460 meta). Decision: rol Organizador del cliente (solo lectura) en el admin nuevo, M2.2.6. Roadmap 53/203.
 - Mismo dia (noche): M1.3.1 y M1.3.2 hechas (C# `c11cb3d`): bearer de Sanctum, staff rechazado con borrado de token y ficha, token de operador acotado; seis controles en MySQL (base sembrada en Laragon). Corregido: `last_used_at` no se escribe (PHP lo apaga). Abiertas D.7 (Redis caido: log en vez de 500) y D.8 (sin sesion por cookie). Roadmap 55/203.
 - Mismo dia (cierre): M1.3.4 hecha (C# `a006cd2`, backend `28f9daa`): `/auth/me` pasa sus contratos contra C# (primer contrato real), con `check.ban` por evento de la peticion. PHP con desempate por id (regla 9). Suite PHP 1.257 verde, C# 70/70. Roadmap 56/203.
-- Sigue: resto de M1.3.3 (claims de rol, `CheckApproval`, `miembro.evento`, `audiencia.modulo`), M1.3.5 cifrado de Laravel, M1.3.6 filtro por evento; M1.2.5 con el servidor real.
+- Mismo dia (final): D.7 decidida (ficha Redis tolerante, MySQL obligatorio; primera diferencia decidida en el Anexo B) y D.8 decidida (A: sin cookie en C#; Data Center en PHP con cookie hasta M2.7.2; revisado: el Data Center si la usa). M1.3.3 hecha (C# `41a8281`: roles y filtros de acceso). M1.3.5 hecha (C# `cf0952c`: cifrado de Laravel, PHP y C# se descifran entre si). C# 93/93. Roadmap 58/203.
+- Sigue: M1.3.6 filtro por evento de raiz (regla 26), ultimo paso del bloque 1.3. M1.2.5 y BUG-457 cuando se prenda el servidor real.
 
 ## SESION 2026-10-23 (Opus 5.5) — AUDITORIA M0.8.1 CERRADA Y VALIDACION CON PRUEBAS 65/65
 
