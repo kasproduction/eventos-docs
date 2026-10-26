@@ -84,6 +84,21 @@ El admin nuevo (Next en `eventos-web` bajo `/admin`) habla con una API propia de
   y que el archivo este al dia. De ese archivo salen los tipos de Next: `pnpm tipos:admin` en `eventos-web` escribe
   `src/lib/admin/api-tipos.ts`, que se commitea (Next compila sin el servidor de C#; `--revisar` falla si quedo viejo).
 
+## El admin nuevo en Next (M2.2.7)
+
+- `/admin` en `eventos-web`, sin idioma en la URL (textos en `messages/es.json`). El proxy de Next deja pasar `/admin` sin
+  el middleware de idiomas y le pasa la ruta al layout (`x-admin-ruta`) para volver despues del login.
+- Todo lo que habla con C# corre en el servidor de Next (Server Components y Server Actions, `src/lib/admin/servidor.ts`),
+  con `ADMIN_API_URL` (por defecto `http://localhost:5230/api/admin/v1`). El token del staff vive en la cookie
+  `eventos_admin` y el equipo de confianza en `eventos_admin_equipo`: `HttpOnly`, `Secure`, `SameSite=Lax`, solo `/admin`
+  (regla 30). El navegador nunca ve el token.
+- Next reenvia a C# la IP y el navegador de quien usa el admin. **En el despliegue**, C# tiene que tener la IP interna del
+  servidor de Next en `App:TrustedProxies`; si no, el limite del login (5 por minuto por red) seria de todo el staff junto.
+- `Secure` siempre: el login funciona por `https` y por `http://localhost`, no por `http` a una IP (Tailscale en
+  desarrollo).
+- Pruebas de punta a punta: `pnpm e2e:admin` (`playwright.admin.config.ts`) levanta el C# en modo contratos con reloj real
+  sobre `eventos_cruzadas_pruebas` y Next en el puerto 3200.
+
 ## Redis en el equipo de desarrollo (Windows)
 
 El servidor usa Redis 7; Laragon trae Redis 5.0.14 (sin `KEEPTTL` y otras de la 6 y la 7). Decision Kamilo 2026-10-25:
@@ -117,6 +132,7 @@ localhost:6379 como el de Laragon, asi PHP, C# y las pruebas no cambian de confi
 
 | Version | Fecha | Que cambio |
 |---|---|---|
+| v4 | 2026-10-26 | El admin nuevo en Next: rutas, cookies, llamadas a C# y lo que pide el despliegue |
 | v3 | 2026-10-25 | Redis 7 en el equipo de desarrollo por WSL2 |
 | v2 | 2026-10-25 | La API del admin nuevo (M2.1.4): prefijo propio, evento en la ruta, limite propio, OpenAPI y tipos generados |
 | v1 | 2026-10-25 | Primera version, al cerrar el bloque 1.5: proxy en Nginx, primeras rutas de C# en la tabla, nada cruzado en produccion |
