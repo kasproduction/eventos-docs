@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab: rol Organizador (M2.2.6)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Tokens de Lumina del admin (eventos-backend/resources/css/filament/admin/theme.css). Noir por defecto, Lux en [data-tema=lux]. */
+:root{
+  --bg:#0A0A0A;--bg-1:#0E0E0E;--bg-2:#141414;--card:rgba(255,255,255,.03);--card-hi:rgba(255,255,255,.05);
+  --b:rgba(255,255,255,.06);--b-hi:rgba(255,255,255,.10);--b-st:rgba(255,255,255,.14);
+  --t:#FFFFFF;--t2:rgba(255,255,255,.6);--t3:rgba(255,255,255,.4);--t4:rgba(255,255,255,.25);
+  --ink:#FFFFFF;--ink-c:#101010;--teal:#39D2C0;--amber:#E8A93E;--green:#3BBF7A;--platinum:#B5A68B;
+  --sombra:none;--borde:1px solid var(--b);
+  --f:'Urbanist',ui-sans-serif,system-ui,sans-serif;--fh:'Plus Jakarta Sans',var(--f);
+  --r:8px;--r-l:12px;
+}
+.pantalla[data-tema=lux]{
+  --bg:#F6F8FA;--bg-1:#FAFBFC;--bg-2:#F0F2F5;--card:#FFFFFF;--card-hi:#F6F8FA;
+  --b:rgba(0,0,0,.08);--b-hi:rgba(0,0,0,.13);--b-st:rgba(0,0,0,.18);
+  --t:#131417;--t2:#3A3B40;--t3:#5C5D63;--t4:#85868C;
+  --ink:#1A1B1E;--ink-c:#FFFFFF;--teal:#0F9C8A;--amber:#C2740A;--green:#2E9F62;--platinum:#8B7E5F;
+  /* Lux: sin bordes, todo flota con sombra (Lux v2) */
+  --sombra:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.06);--borde:1px solid transparent;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1b1b1d;color:#e9e9ea;font-family:var(--f);font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* ── Barra del lab (fuera de la pieza) ── */
+.lab{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:16px 24px;background:#111113;border-bottom:1px solid #2a2a2e}
+.lab h1{font:600 15px var(--fh);color:#fff;margin-right:8px}
+.seg{display:flex;background:#1f1f22;border-radius:10px;padding:4px;gap:4px}
+.seg button{all:unset;cursor:pointer;padding:8px 14px;border-radius:7px;font:600 13px var(--f);color:#a0a0a6}
+.seg button[aria-pressed=true]{background:#fff;color:#111}
+.lab p{flex-basis:100%;color:#a0a0a6;font-size:13px;line-height:1.5;max-width:900px}
+.lab p b{color:#fff;font-weight:600}
+
+/* ── Marco de la pantalla ── */
+.marco{padding:24px;overflow-x:auto}
+.pantalla{width:1280px;min-height:780px;margin:0 auto;background:var(--bg);color:var(--t);border-radius:var(--r-l);overflow:hidden;display:flex;flex-direction:column}
+.pantalla[hidden]{display:none}
+
+/* Barra superior comun */
+.top{display:flex;align-items:center;gap:16px;height:56px;padding:0 24px;border-bottom:1px solid var(--b)}
+.pantalla[data-tema=lux] .top{background:var(--bg-1);border-bottom-color:transparent;box-shadow:var(--sombra)}
+.marca{font:700 13px var(--fh);color:var(--t2)}
+.evento-sel{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r);background:var(--card);border:var(--borde);box-shadow:var(--sombra);font-weight:600;color:var(--t)}
+.evento-sel small{color:var(--t3);font-weight:500}
+.esp{flex:1}
+.chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--card-hi);color:var(--t2);border:var(--borde)}
+.chip.vivo{color:var(--teal)}
+.chip.lectura{color:var(--platinum)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--ink-c);display:grid;place-items:center;font:700 12px var(--fh)}
+
+.cuerpo{display:flex;flex:1}
+.lado{width:240px;padding:24px 16px;border-right:1px solid var(--b);display:flex;flex-direction:column;gap:4px}
+.pantalla[data-tema=lux] .lado{border-right-color:transparent;background:var(--bg-1)}
+.lado .grupo{font-size:12px;font-weight:600;color:var(--t4);padding:16px 12px 8px}
+.lado a{display:block;padding:8px 12px;border-radius:var(--r);color:var(--t2);font-weight:500;text-decoration:none}
+.lado a.on{background:var(--ink);color:var(--ink-c);font-weight:600}
+.lado a.apagado{color:var(--t4)}
+.main{flex:1;padding:32px 40px;display:flex;flex-direction:column;gap:24px;min-width:0}
+.ruta{font-size:12px;color:var(--t3)}
+h2{font:700 26px var(--fh);letter-spacing:-.4px}
+.sub{color:var(--t3);margin-top:4px}
+.card{background:var(--card);border:var(--borde);box-shadow:var(--sombra);border-radius:var(--r-l)}
+
+/* Cifras */
+.cifras{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.cifra{padding:20px}
+.cifra b{display:block;font:700 34px var(--fh);letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.cifra span{color:var(--t3);font-size:13px}
+.cifra .barra{height:4px;border-radius:4px;background:var(--b-hi);margin-top:12px;overflow:hidden}
+.cifra .barra i{display:block;height:100%;background:var(--teal)}
+
+/* Tablas */
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;font-weight:600;color:var(--t3);text-align:left;padding:12px 16px;border-bottom:1px solid var(--b)}
+td{padding:12px 16px;border-bottom:1px solid var(--b);color:var(--t2);font-variant-numeric:tabular-nums}
+td:first-child{color:var(--t);font-weight:600}
+tr:last-child td{border-bottom:0}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--r);font:600 13px var(--f);border:var(--borde);background:var(--card);color:var(--t);box-shadow:var(--sombra);cursor:pointer}
+.btn.tinta{background:var(--ink);color:var(--ink-c);border-color:transparent}
+.fila{display:flex;align-items:center;gap:12px}
+.dos{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+.titulo-card{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 4px}
+.titulo-card h3{font:700 16px var(--fh)}
+.titulo-card span{color:var(--t3);font-size:12px}
+.buscar{flex:1;max-width:320px;padding:8px 12px;border-radius:var(--r);background:var(--card);border:var(--borde);box-shadow:var(--sombra);color:var(--t3)}
+.aviso{padding:16px 20px;display:flex;gap:16px;align-items:center}
+.aviso p{color:var(--t2);line-height:1.5}
+.aviso p b{color:var(--t)}
+
+/* C: tabs arriba */
+.tabs{display:flex;gap:24px;padding:0 40px;border-bottom:1px solid var(--b)}
+.pantalla[data-tema=lux] .tabs{border-bottom-color:var(--b)}
+.tabs a{padding:16px 0;color:var(--t3);font-weight:600;text-decoration:none;border-bottom:2px solid transparent}
+.tabs a.on{color:var(--t);border-bottom-color:var(--t)}
+.grafico{padding:20px;display:flex;flex-direction:column;gap:12px}
+.barras{display:flex;align-items:flex-end;gap:10px;height:150px}
+.barras i{flex:1;border-radius:6px 6px 0 0;background:var(--teal);opacity:.85}
+.ejes{display:flex;justify-content:space-between;color:var(--t4);font-size:12px}
+.lista-sesiones{display:flex;flex-direction:column}
+.lista-sesiones div{display:flex;justify-content:space-between;gap:12px;padding:12px 20px;border-top:1px solid var(--b)}
+.lista-sesiones div:first-child{border-top:0}
+.lista-sesiones strong{font-weight:600}
+.lista-sesiones span{color:var(--t3);white-space:nowrap}
+</style>
+</head>
+<body>
+
+<div class="lab">
+  <h1>Rol Organizador: ¿cómo ve el cliente el admin nuevo?</h1>
+  <div class="seg" role="group" aria-label="Direccion">
+    <button data-dir="a" aria-pressed="true">A. Mismo admin, solo lectura</button>
+    <button data-dir="b" aria-pressed="false">B. Resumen propio</button>
+    <button data-dir="c" aria-pressed="false">C. Data Center como casa</button>
+  </div>
+  <div class="seg" role="group" aria-label="Tema">
+    <button data-tema="noir" aria-pressed="true">Noir</button>
+    <button data-tema="lux" aria-pressed="false">Lux</button>
+  </div>
+  <p id="explica"></p>
+</div>
+
+<div class="marco">
+
+<!-- ═══════════ A. Mismo admin en solo lectura ═══════════ -->
+<section class="pantalla" data-p="a">
+  <div class="top">
+    <span class="marca">EventOS</span>
+    <span class="evento-sel">Summit Empresarial 2026 <small>4 al 8 de noviembre</small></span>
+    <span class="esp"></span>
+    <span class="chip lectura">Solo lectura</span>
+    <span class="avatar">LM</span>
+  </div>
+  <div class="cuerpo">
+    <nav class="lado">
+      <a href="#">Escritorio</a>
+      <div class="grupo">Contenido</div>
+      <a href="#" class="on">Agenda</a>
+      <a href="#">Speakers</a>
+      <a href="#">Sponsors</a>
+      <div class="grupo">Personas</div>
+      <a href="#">Asistentes</a>
+      <div class="grupo">Comunicación</div>
+      <a href="#">Anuncios</a>
+      <div class="grupo">En vivo</div>
+      <a href="#">Encuestas</a>
+      <a href="#">Data Center</a>
+    </nav>
+    <main class="main">
+      <div>
+        <div class="ruta">Agenda  /  Sesiones</div>
+        <h2>Sesiones</h2>
+        <p class="sub">Las cambia tu equipo de EventOS. Si ves algo que corregir, escríbeles desde Soporte.</p>
+      </div>
+      <div class="card">
+        <table>
+          <tr><th>Título</th><th>Inicio</th><th>Fin</th><th>Sala</th><th>Tipo</th><th>Estado</th></tr>
+          <tr><td>Apertura: el futuro del trabajo corporativo</td><td>04/11 08:00</td><td>09:00</td><td>Auditorio Principal</td><td>Keynote</td><td><span class="chip">Finalizada</span></td></tr>
+          <tr><td>Workshop: Cloud Native en 90 minutos</td><td>04/11 09:30</td><td>11:00</td><td>Sala A</td><td>Workshop</td><td><span class="chip">Finalizada</span></td></tr>
+          <tr><td>IA en producción: lo que sí funciona</td><td>04/11 09:30</td><td>11:00</td><td>Sala B</td><td>Keynote</td><td><span class="chip">Finalizada</span></td></tr>
+          <tr><td>Conexiones que importan: almuerzo curado</td><td>04/11 11:30</td><td>13:00</td><td>Terraza Norte</td><td>Networking</td><td><span class="chip">Finalizada</span></td></tr>
+          <tr><td>Arquitecturas serverless a escala</td><td>04/11 13:00</td><td>14:30</td><td>Auditorio Principal</td><td>Keynote</td><td><span class="chip vivo">En vivo</span></td></tr>
+          <tr><td>Fintech en Latam: regulación y oportunidad</td><td>04/11 13:00</td><td>14:30</td><td>Sala A</td><td>Panel</td><td><span class="chip vivo">En vivo</span></td></tr>
+          <tr><td>Design Systems: de Figma a producción</td><td>04/11 13:00</td><td>14:30</td><td>Sala B</td><td>Workshop</td><td><span class="chip vivo">En vivo</span></td></tr>
+          <tr><td>DevOps y Platform Engineering</td><td>04/11 15:00</td><td>16:30</td><td>Auditorio Principal</td><td>Panel</td><td><span class="chip">Programada</span></td></tr>
+        </table>
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- ═══════════ B. Resumen propio del organizador ═══════════ -->
+<section class="pantalla" data-p="b" hidden>
+  <div class="top">
+    <span class="marca">EventOS</span>
+    <span class="evento-sel">Summit Empresarial 2026 <small>4 al 8 de noviembre</small></span>
+    <span class="esp"></span>
+    <span class="chip vivo">El evento está en curso</span>
+    <span class="avatar">LM</span>
+  </div>
+  <div class="cuerpo">
+    <nav class="lado">
+      <a href="#" class="on">Resumen</a>
+      <a href="#">Agenda</a>
+      <a href="#">Asistentes</a>
+      <a href="#">Sponsors y leads</a>
+      <a href="#">Descargas</a>
+      <div class="grupo">Más</div>
+      <a href="#">Data Center completo</a>
+    </nav>
+    <main class="main">
+      <div>
+        <h2>Hola, Laura</h2>
+        <p class="sub">Así va Summit Empresarial 2026, hoy martes 4 de noviembre a la 1:20 p. m.</p>
+      </div>
+      <div class="cifras">
+        <div class="card cifra"><b>72</b><span>registrados</span></div>
+        <div class="card cifra"><b>44</b><span>ya llegaron</span><div class="barra"><i style="width:61%"></i></div></div>
+        <div class="card cifra"><b>3</b><span>sesiones en vivo ahora</span></div>
+        <div class="card cifra"><b>2</b><span>leads en stands</span></div>
+      </div>
+      <div class="dos">
+        <div class="card">
+          <div class="titulo-card"><h3>Agenda de hoy</h3><span>8 sesiones</span></div>
+          <div class="lista-sesiones">
+            <div><strong>Arquitecturas serverless a escala</strong><span class="chip vivo">En vivo</span></div>
+            <div><strong>Fintech en Latam: regulación y oportunidad</strong><span class="chip vivo">En vivo</span></div>
+            <div><strong>Design Systems: de Figma a producción</strong><span class="chip vivo">En vivo</span></div>
+            <div><strong>DevOps y Platform Engineering</strong><span>3:00 p. m.</span></div>
+            <div><strong>Liderar equipos remotos sin perder la cultura</strong><span>3:00 p. m.</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="titulo-card"><h3>Últimos en llegar</h3><span>44 con check-in</span></div>
+          <table>
+            <tr><td>María García</td><td>Empresa XYZ</td><td>1:12 p. m.</td></tr>
+            <tr><td>Carlos López</td><td>Stand Tech Solutions</td><td>1:05 p. m.</td></tr>
+            <tr><td>Sofía Torres</td><td>Fintech Latam</td><td>12:58 p. m.</td></tr>
+            <tr><td>Diego Ramírez</td><td>Studio Digital</td><td>12:41 p. m.</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card aviso">
+        <p><b>¿Necesitas cambiar algo?</b> La agenda, los anuncios y los asistentes los edita tu equipo de EventOS. Escríbeles y lo ajustan.</p>
+        <span class="esp"></span>
+        <button class="btn">Escribir a soporte</button>
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- ═══════════ C. Data Center como casa ═══════════ -->
+<section class="pantalla" data-p="c" hidden>
+  <div class="top">
+    <span class="marca">EventOS</span>
+    <span class="evento-sel">Summit Empresarial 2026 <small>4 al 8 de noviembre</small></span>
+    <span class="esp"></span>
+    <button class="btn">Descargar reporte</button>
+    <span class="avatar">LM</span>
+  </div>
+  <nav class="tabs">
+    <a href="#" class="on">Resumen</a><a href="#">Asistencia</a><a href="#">Sesiones</a><a href="#">Sponsors</a><a href="#">Engagement</a><a href="#">Asistentes</a>
+  </nav>
+  <main class="main">
+    <div class="cifras">
+      <div class="card cifra"><b>72</b><span>registrados</span></div>
+      <div class="card cifra"><b>61%</b><span>ya llegaron (44)</span><div class="barra"><i style="width:61%"></i></div></div>
+      <div class="card cifra"><b>4,3</b><span>calificación de las sesiones (13 votos)</span></div>
+      <div class="card cifra"><b>2</b><span>leads en stands</span></div>
+    </div>
+    <div class="dos">
+      <div class="card grafico">
+        <div class="titulo-card" style="padding:0"><h3>Llegadas por hora</h3><span>hoy</span></div>
+        <div class="barras">
+          <i style="height:50%" title="7 a. m.: 5"></i><i style="height:100%" title="8 a. m.: 10"></i><i style="height:30%" title="9 a. m.: 3"></i><i style="height:70%" title="10 a. m.: 7"></i><i style="height:90%" title="11 a. m.: 9"></i><i style="height:40%" title="12 m.: 4"></i><i style="height:60%" title="1 p. m.: 6"></i><i style="height:10%" title="2 p. m.: 1"></i>
+        </div>
+        <div class="ejes"><span>7 a. m.</span><span>9 a. m.</span><span>11 a. m.</span><span>1 p. m.</span><span>2 p. m.</span></div>
+      </div>
+      <div class="card">
+        <div class="titulo-card"><h3>Sponsors</h3><span>leads</span></div>
+        <div class="lista-sesiones">
+          <div><strong>AWS</strong><span>1</span></div>
+          <div><strong>Microsoft</strong><span>1</span></div>
+          <div><strong>Google</strong><span>0</span></div>
+          <div><strong>Meta</strong><span>0</span></div>
+          <div><strong>Stripe</strong><span>0</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+</div>
+
+<script>
+const explica = {
+  a: '<b>A. Mismo admin, solo lectura.</b> El organizador entra al mismo admin que el staff, con el mismo menú, pero solo ve los módulos con datos y sin botones de crear, editar ni borrar. Menos trabajo: es el admin de siempre con permisos de lectura. Riesgo: un menú pensado para operar, con pantallas que para él son tablas mudas.',
+  b: '<b>B. Resumen propio.</b> Su casa es un resumen del día: cifras, agenda de hoy, últimos en llegar y un camino para pedir cambios. Menú corto de cinco entradas; el Data Center completo queda a un clic. Se hace una pantalla nueva (lab y luego código) y las listas reusan las del admin en lectura.',
+  c: '<b>C. Data Center como casa.</b> No hay menú lateral: entra directo al Data Center, y los datos del evento (asistentes, sesiones) son pestañas del mismo. Es lo más "reporte" de las tres. Riesgo: el Data Center hoy vive aparte (M2.7.2) y habría que traerlo al admin nuevo antes.'
+};
+const $ = s => document.querySelectorAll(s);
+function dir(d){
+  $('[data-dir]').forEach(b => b.setAttribute('aria-pressed', b.dataset.dir === d));
+  $('.pantalla').forEach(p => p.hidden = p.dataset.p !== d);
+  document.getElementById('explica').innerHTML = explica[d];
+}
+function tema(t){
+  $('button[data-tema]').forEach(b => b.setAttribute('aria-pressed', b.dataset.tema === t));
+  $('.pantalla').forEach(p => t === 'lux' ? p.setAttribute('data-tema', 'lux') : p.removeAttribute('data-tema'));
+}
+$('[data-dir]').forEach(b => b.addEventListener('click', () => dir(b.dataset.dir)));
+$('button[data-tema]').forEach(b => b.addEventListener('click', () => tema(b.dataset.tema)));
+dir('a');
+</script>
+</body>
+</html>
