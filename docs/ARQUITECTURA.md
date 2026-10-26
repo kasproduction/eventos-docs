@@ -94,11 +94,14 @@ localhost:6379 como el de Laragon, asi PHP, C# y las pruebas no cambian de confi
    (7.0.15, `bind 127.0.0.1 -::1`, servicio de systemd `redis-server` habilitado).
 2. Falta (pide administrador): apagar el servicio de Windows `Redis` de Laragon, que ocupa el 6379, en una PowerShell
    de administrador: `Stop-Service Redis; Set-Service Redis -StartupType Disabled`.
-3. Falta: Ubuntu se apaga cuando no hay ninguna terminal abierta, y con el Redis. Para dejarlo encendido al iniciar
-   sesion, una tarea programada del usuario (no pide administrador):
+3. Hecho 2026-10-25: Ubuntu se apaga cuando no hay ninguna terminal abierta, y con el Redis. Lo deja encendido al
+   iniciar sesion una tarea programada del usuario (no pide administrador):
    `Register-ScheduledTask -TaskName "EventOS Redis 7 (WSL)" -Action (New-ScheduledTaskAction -Execute conhost.exe -Argument "--headless wsl.exe -d Ubuntu-24.04 -u root --exec sleep infinity") -Trigger (New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME) -Settings (New-ScheduledTaskSettingsSet -ExecutionTimeLimit 0)`.
    Quitarla: `Unregister-ScheduledTask "EventOS Redis 7 (WSL)"`. Sin la tarea, basta abrir `wsl -d Ubuntu-24.04` antes de trabajar.
-4. Comprobar desde Windows: `C:\laragoninedisedis-x64-5.0.14.1edis-cli.exe INFO server` dice `redis_version:7.0.15`.
+4. Comprobar desde Windows: `C:\laragonin
+edis
+edis-x64-5.0.14.1
+edis-cli.exe INFO server` dice `redis_version:7.0.15`.
 
 ## Como se cruza una ruta (criterio de la regla 20)
 
