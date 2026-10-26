@@ -290,7 +290,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ### 2.1 Diseño del admin (1 semana) — 1/4
 - [ ] M2.1.1 Mapa de pantallas desde el inventario de acciones (M0.5.3): que modulos entran al hito 1 (D.3), que se demuele (paginas custom, `EventOnboardingResource`, banners) **[local]**
-- [ ] M2.1.2 Labs por letra del admin en Next (2 a 3 direcciones, Lumina Noir/Lux, linea enterprise, cero Filament). Base: `design/` y el SPA del Data Center que ya existe en Vite **[local]**
+- [ ] M2.1.2 Visual del admin = Lumina como se ve hoy en Filament, copiada tal cual (decision Kamilo 2026-10-25, sin labs por direccion): capturas de Playwright de cada pantalla del admin actual como referencia, tokens de Lumina de `design/` y del CSS existente, sin reinterpretar. Labs solo para las pantallas que hoy no existen o que Filament obligaba a hacer distinto de lo deseado, y esas se le muestran a Kamilo; el resto lo revisa por modulo cuando este **[local]**
 - [x] M2.1.3 Decision de donde vive: `eventos-web` bajo `/admin` con su propio layout, o repo aparte. Recomendado: mismo repo, layout propio, para compartir tokens y auth **[local]** — **Decidido 2026-10-25 (Kamilo): dentro de la webapp**, Next bajo `/admin` con layout propio; base de diseño: Lumina admin y `design/` (ver `decisiones.md`)
 - [ ] M2.1.4 Contrato de la API admin: OpenAPI nuevo (no hereda rutas de Filament, que no tiene API) con DTOs explicitos desde el dia uno **[local]**
 
