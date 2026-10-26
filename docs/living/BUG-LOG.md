@@ -5,6 +5,18 @@
 
 ## 2026-10-25 — Encontrados al armar el bloque 2.1 (admin nuevo)
 
+### BUG-474: En el admin nuevo, un evento ajeno mostraba la pagina de "no existe" con estado 200 (RESUELTO 2026-10-26, antes de desplegar)
+- **Severidad propuesta:** BAJA (el contenido era correcto; el estado no)
+- **Que pasa:** el layout del panel envolvia todo en `<Suspense>` (por `useSearchParams`); la respuesta empezaba a salir antes de que el layout del evento llamara `notFound()`, y el 404 quedaba en 200.
+- **Verificado a mano:** si, prueba de punta a punta "un evento que la persona no opera no existe: 404".
+- **Resuelto:** sin Suspense en el panel; la ruta de vuelta de la sesion vencida se arma al hacer clic desde `window.location`. Web `43d7635`.
+
+### BUG-473: La activacion del 2FA declaraba dos formas para el mismo 200 y el OpenAPI perdia una (RESUELTO 2026-10-26, antes de desplegar)
+- **Severidad propuesta:** MEDIA (los tipos de Next no traian la forma real de la respuesta)
+- **Que pasa:** `POST /api/admin/v1/auth/two-factor/setup` respondia `ActivacionRespuesta` o `IngresoRespuesta` segun el caso; el OpenAPI de C# solo guardaba la ultima declarada.
+- **Verificado a mano:** si, al usar los tipos generados en el login de Next (M2.2.7).
+- **Resuelto:** una sola forma, `ActivacionDatos(status, secret, otpauth_uri)`, con secreto y enlace vacios si el 2FA ya estaba activo. C# `92299b9`; `IngresoDelStaffTest` afirma el status.
+
 ### BUG-472: El reloj congelado del modo contratos dejaba a PHP sin codigo TOTP valido en las pruebas cruzadas (RESUELTO 2026-10-25, antes de desplegar)
 - **Severidad propuesta:** BAJA (solo pruebas)
 - **Que pasa:** el C# en modo contratos usa el reloj de ContratoSeeder (6 de diciembre de 2026). Al activar el 2FA marca

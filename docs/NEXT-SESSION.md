@@ -10,6 +10,17 @@
 
 ---
 
+## SESION 2026-10-25/26 (madrugada y dia, Opus 5.5) — BLOQUE 2.2 CERRADO: ENTRADA DEL STAFF EN C# Y ADMIN NUEVO EN NEXT
+
+- M2.2.5 outbox de correo (PHP manda lo que deja C#; estado "enviando" que se retoma a los 5 min), M2.2.2 token del staff amarrado a staff_sessions, M2.2.1 login en C# (contraseña, codigo o recuperacion, activacion, equipo de confianza contra trusted_devices, bloqueo 423), M2.2.3 evento en la ruta y M2.2.4 permisos de Spatie (motivo de cruce StaffAsignado).
+- Criterio de hecho de la regla 7 (Kamilo): sin prueba cruzada no esta hecha. Primeras pruebas cruzadas: `eventos-backend/tests/Cruzadas` + `scripts/cruzadas-contra-csharp.sh` (C# con reloj real, base `eventos_cruzadas_pruebas`, creada tambien en el MSI). 6/6, en verificar.sh; CI del MSI en verde.
+- M2.2.6 cambio: el Organizador (cliente) entra solo al Data Center a mirar y descargar; rol `organizer` en PHP por excepcion a la regla 6.
+- M2.2.7 nueva y hecha: admin nuevo en `eventos-web/admin` (login con 2FA, marco Lumina con menu por permisos y selector de evento, sesion vencida con borradores en sessionStorage). Regla 30 (cookies HttpOnly, Secure, SameSite=Lax). `pnpm e2e:admin` 9/9.
+- M2.8.5: regla de cero avisos nativos del navegador e inventario de donde salen hoy (`contratos/pantallas-admin.md`).
+- Redis 7.0.15 en local por WSL2 (servicio Redis de Laragon apagado); el MSI tambien tiene 7.0.15.
+- Pruebas al cierre: C# 151/151, PHP 1.273/1.273 en MySQL, contratos 302/302, cruzadas 6/6, web 708/708 y e2e admin 9/9. BUG-469 (por verificar en M2.3.3), 470 a 474 resueltos.
+- Sigue: bloque 2.3 desde M2.3.1 (eventos y organizaciones, asistente de primer ingreso, ajustes de registro, landing y widget). Roadmap 83/205.
+
 ## SESION 2026-10-25 (noche, Opus 5.5) — BLOQUE 2.1 CERRADO: MAPA, CAPTURAS Y API DEL ADMIN
 
 - M2.1.1: mapa de pantallas en `docs/contratos/pantallas-admin.md` (48: 35 al hito 1, 10 a M2b, 1 dentro de otra, 1 enlace, 1 se elimina). Kamilo: las paginas personalizadas se quedan (contenido del cliente en iframe); muro y fotos van a M2b (M2.6.5 nuevo); ajustes de registro y landing/widget suben a M2.3.1. Solo se elimina `EventOnboardingResource` (ya vive en Branding).
