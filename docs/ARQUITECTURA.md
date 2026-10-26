@@ -65,6 +65,25 @@ Filtro por evento de raiz (regla 26): toda ruta del evento termina en `.DelEvent
 del evento no devuelven nada; guardar algo de otro evento responde 404. Cruzar eventos a proposito solo con
 `CruzandoEventos(CruceDeEventos.X)`, una lista cerrada. Detalle en `BUENAS-PRACTICAS-MIGRACION.md`, regla 26.
 
+## La API del admin nuevo (M2.1.4)
+
+El admin nuevo (Next en `eventos-web` bajo `/admin`) habla con una API propia de C#. No espeja a PHP: es contrato nuevo.
+
+- **Donde vive:** todo bajo `/api/admin/v1`. Nginx manda el prefijo entero a C# (`proxy/nginx-api.conf`), sin la tabla
+  de rutas cruzadas. Las 37 rutas de PHP en `/api/v1/admin` (Mission Control, encuestas y juegos en vivo) siguen en PHP
+  hasta la fase 4.
+- **El evento va en la ruta:** `/api/admin/v1/events/{eventId}/...` con `.DelEvento()`, como toda ruta del evento. Lo que
+  cruza eventos a proposito tiene su motivo con nombre en `CruceDeEventos`: `GET /api/admin/v1/events` (super_admin,
+  `SuperAdmin`) y `GET /api/admin/v1/organizations/{organizationId}/events` (`AdminDeOrganizacion`).
+- **Misma forma que la API publica:** `snake_case`, errores 422 de Laravel, paginacion de Laravel. Una accion con
+  efectos es un `POST` propio (`/announcements/{id}/publish`): un solo camino por accion.
+- **Limite propio:** `admin`, 1.200 por minuto por persona del staff (2.400 en local, `Puerta:AdminPorMinuto`), aparte
+  del de asistentes (`api`, 300). En agosto (E8) un organizador activo se pasaba del limite por persona.
+- **Contrato generado:** documento OpenAPI aparte (`/openapi/admin.json`, copiado en `eventos-api-dotnet/openapi/admin.json`).
+  `ApiDelAdminTest` revisa que cada documento lleve solo sus rutas, que toda ruta del admin tenga resumen y descripcion
+  y que el archivo este al dia. De ese archivo salen los tipos de Next: `pnpm tipos:admin` en `eventos-web` escribe
+  `src/lib/admin/api-tipos.ts`, que se commitea (Next compila sin el servidor de C#; `--revisar` falla si quedo viejo).
+
 ## Como se cruza una ruta (criterio de la regla 20)
 
 1. Su snapshot pasa contra C# (`scripts/contratos-contra-csharp.sh`) y su OpenAPI coincide con el de PHP
@@ -78,4 +97,5 @@ del evento no devuelven nada; guardar algo de otro evento responde 404. Cruzar e
 
 | Version | Fecha | Que cambio |
 |---|---|---|
+| v2 | 2026-10-25 | La API del admin nuevo (M2.1.4): prefijo propio, evento en la ruta, limite propio, OpenAPI y tipos generados |
 | v1 | 2026-10-25 | Primera version, al cerrar el bloque 1.5: proxy en Nginx, primeras rutas de C# en la tabla, nada cruzado en produccion |
