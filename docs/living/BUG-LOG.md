@@ -5,6 +5,23 @@
 
 ## 2026-10-25 — Encontrados al armar el bloque 2.1 (admin nuevo)
 
+### BUG-472: El reloj congelado del modo contratos dejaba a PHP sin codigo TOTP valido en las pruebas cruzadas (RESUELTO 2026-10-25, antes de desplegar)
+- **Severidad propuesta:** BAJA (solo pruebas)
+- **Que pasa:** el C# en modo contratos usa el reloj de ContratoSeeder (6 de diciembre de 2026). Al activar el 2FA marca
+  como usado un intervalo del futuro, y PHP (Google2FA mira la hora real, no el reloj congelado de Carbon) ya no acepta
+  ningun codigo de hoy. Ademas C# rechazaba el codigo que PHP calculaba con la hora real.
+- **Verificado a mano:** si, primera corrida de `tests/Cruzadas` (422 "Ese codigo no coincide").
+- **Resuelto:** `Contratos:RelojReal=true` para el C# de las pruebas cruzadas (`scripts/cruzadas-contra-csharp.sh`); los
+  contratos siguen con el reloj congelado. C# `8eb07e0`.
+
+### BUG-471: Las pruebas de C# que escriben en la base sembrada rompian a las que la cuentan (RESUELTO 2026-10-25, antes de desplegar)
+- **Severidad propuesta:** BAJA (solo pruebas; falla intermitente)
+- **Que pasa:** `ModeloTest` y `ReportesDbTest` cuentan las 13 personas de ContratoSeeder; `IngresoDelStaffTest` y
+  `AccesoDelStaffTest` crean personas (y la de acceso mueve el evento 2) en paralelo. Segun el orden salian 17 o 18.
+- **Verificado a mano:** si, en la suite completa con MySQL (aisladas pasaban).
+- **Resuelto:** coleccion de xUnit `EscribeEnLaBaseSembrada` sin paralelo para las clases que escriben. Tres corridas
+  seguidas en verde. C# `bf71075`.
+
 ### BUG-470: En C#, una ruta sin grupo salia en todos los documentos OpenAPI (RESUELTO 2026-10-25, antes de desplegar)
 - **Severidad propuesta:** BAJA (documentacion generada; no llego a ningun lado)
 - **Que pasa:** al sumar el documento `admin`, `Microsoft.AspNetCore.OpenApi` incluye por defecto en cada documento las
