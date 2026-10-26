@@ -6,24 +6,24 @@
 > cada `/guardar`.
 > Inventario completo de todos los docs: 2026-10-16 (45 archivos, ~1.700 casillas; las de planes viejos de modulos
 > cerrados NO se copiaron: esos docs llevan el aviso "HISTORICO" arriba).
-> Actualizado: 2026-10-21 (noche).
+> Actualizado: 2026-10-25.
 > **Vista para priorizar (privada, celular):** https://claude.ai/artifact/UwSGdGXbJCHTeXEb7UpBDL. Kamilo marca
 > Ya / Antes del evento / Despues / Descartar y notas; Claude las lee con ArtifactData (coleccion `prioridades`, id = hash
 > de la tarea) y pasa el orden a este archivo. Si este archivo cambia, se regenera la pagina.
 
 ---
 
-## 0. ESTADO GENERAL AL 2026-10-22
+## 0. ESTADO GENERAL AL 2026-10-25
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
-> .NET; la fase 0 (preparar en PHP) ya arranco con dale. Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (53/203). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> .NET; fases 0 y 1 hechas (la 1 en 31/33: faltan dos tareas del servidor). Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
+> (73/203). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
 | Area | Avance | Que falta |
 |---|---|---|
-| **Migracion a .NET, fase 0 (preparar en PHP)** | 35/41 | 0.6 cierres, 0.8 seguridad (auditoria, BUG-373, BUG-374, `.env.example`), 0.7 retro logica a la vista, 0.6 cierres, 0.7 retro |
+| **Migracion a .NET** (roadmap 73/203) | Fase 0 hecha; fase 1 31/33; fase 2 1/46 | Fase 1: M1.2.5 y M1.5.6 (servidor). Fase 2: arranca con M2.1.1 mapa de pantallas y M2.1.2 labs del admin (Next en eventos-web) |
 
 | Area | Avance | Que falta |
 |---|---|---|
@@ -123,90 +123,16 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 > Cerrados 2026-10-21: BUG-344, BUG-347, BUG-348, y los nuevos BUG-360 y BUG-361 (ver COMPLETADO).
 > Cerrados 2026-10-22: BUG-362 a BUG-370 y BUG-372.
 
-- [x] BUG-358 Error de hidratacion React #418: RESUELTO 2026-10-22 (horas con espacio fino; eventos-web `2ff14a6`)
-- [x] BUG-359 Falta `mobileNav` en `messages/pt.json`: RESUELTO 2026-10-22 (eventos-web `9dab432`)
 - [ ] BUG-395 Aviso de React en desarrollo por el script del tema en el layout (no se ve; cuando se toque el layout)
 
 - [ ] BUG-345 Correo sin ritmo: codigo hecho en B3.1, se cierra al medirlo
 
 **Del 2026-10-25** (fase 1 en C#, detalle en BUG-LOG):
-  - [x] BUG-464 PHP elegia el registro o ban mas nuevo solo por fecha: RESUELTO 2026-10-25 (backend `28f9daa`)
-  - [x] BUG-465 Las rutas GET de C# no respondian HEAD: RESUELTO 2026-10-25 (C# `90d30bd`)
-  - [x] BUG-466 C# confiaba en cualquier proxy con la lista vacia: RESUELTO 2026-10-25 (C# `54178fa`)
-  - [x] BUG-467 C# escuchaba en todas las interfaces: RESUELTO 2026-10-25 (C# `90d30bd`)
   - [ ] BUG-468 El `api.json` de PHP describe `/health` como texto (BAJA; cuando se toque `HealthController`)
 
 **Abiertos el 2026-10-23** (auditoria M0.8.1, **las 65 confirmadas con prueba el mismo dia**; prioridad A en M0.8.6, B en M0.8.7, C en M0.8.8):
-  - [x] BUG-396 El reto 2FA del panel no cuenta para el bloqueo un codigo TOTP incorrecto repetido en intervalos distintos (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-397 check-email anonimo rota el codigo de activacion y reenvia la invitacion en cada llamada (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-398 Los limites por correo normalizan con strtolower y trim, pero MySQL compara sin acentos ni mayusculas: cada... (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-399 Desactivar una cuenta (is_active = false) solo frena el login con contraseña: el magic link y los tokens... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-400 El enlace de restablecer contraseña se arma con el Host de la peticion (sin TrustHosts ni raiz forzada) (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-401 verify-identity entrega el codigo de activacion a quien sepa el correo y el telefono de un importado (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-402 Un codigo de acceso con un espacio intercalado se valida pero no gasta usos (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-403 El limitador del handoff cuenta por un correo que la peticion no trae: 5 canjes por hora para toda la... (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-404 El registro entrega sesion para un correo nunca probado y las reglas que confian en el correo la aceptan (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-405 El embed publico /dc-embed entrega todas las estadisticas internas, incluidas IP y nombre de los admins y la... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-406 Staff y permisos: con manage-users (event_admin, org_admin) se puede subir el propio rol hasta super_admin... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-407 El Data Center y /dc-embed pintan nombres de asistentes y de eventos sin escape en innerHTML (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-408 Los exports del Data Center quedan en almacenamiento publico con nombres que se pueden adivinar (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-409 Los exports CSV/XLSX guardan como formula los textos de asistentes que empiezan con '=' (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-410 Las variables de las plantillas de correo se insertan como HTML sin escape, incluidas las que controla otra... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-411 Peticiones salientes a URLs configuradas por staff del evento sin politica de destino (ZIP de documentos,... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-412 chat-monitor.html toma stream_iframe y stream_url de la URL, sin token, y los pinta como HTML en el origen... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-413 XSS almacenado en Event Pulse: el nombre del asistente se pinta con innerHTML sin codificar, en el mismo... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-414 El embed de stream que guarda un rol admin* del asistente se ejecuta en Mission Control con el origen del... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-415 Un admin de un evento puede lanzar un control de asistencia sobre un salon de otro evento: push a sus... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-416 Los enlaces firmados de Mission Control y del display no vencen ni se pueden revocar, y el de una sesion... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-417 El token de Mission Control y del display se sale de su evento y su sesion: solo se ata a los parametros de... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-418 El manifiesto del totem entrega el QR estatico (credencial reutilizable) de todos los asistentes con check-in... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-419 GameController::authorizeAdmin acepta al admin* de cualquier evento para operar juegos, exportar... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-420 Las acciones admin de encuestas no revisan rol ni evento: cualquier asistente crea, activa, cierra, modera y... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-421 POST y DELETE /api/v1/admin/uploads no exigen ningun rol: cualquier asistente sube archivos de cualquier tipo... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-422 StorageService::upload conserva la extension del cliente: en el disco public un .php subido por... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-423 Un anuncio 'Programado' llega a los asistentes antes de su hora: la API y el socket solo miran que... (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-424 Las restricciones de audiencia se aplican solo al listar: /pages/{id} ignora 'Quien la ve' y los datos de los... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-425 El ban y la aprobacion se revisan sobre el ultimo evento activo del usuario, no sobre el evento de la ruta (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-426 Rutas de contenido del evento solo piden sesion: un asistente de cualquier otro evento lee enlaces de... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-427 PUT /me/registration-fields deja cambiar campos que el organizador bloqueo ('Editable despues del registro'... (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-428 Quitar el rol de admin a un asistente no invalida su ficha del socket: conserva poderes de admin en el chat y... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-429 Banear no borra la ficha de autenticacion del socket si el indice del usuario ya vencio: el baneado reconecta... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-430 El check-in de puerta acepta registros pendientes de aprobacion con el QR estatico que reciben al registrarse... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-431 staff-checkin/unassign deja a un staff de check-in bajar a 'attendee' a cualquier asistente del evento,... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-432 La restriccion 'Quienes ganan estos puntos' del admin no se aplica al otorgar puntos (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-433 Acciones de una sola vez (completar intereses y check-in) se premian sin referencia y no se deduplican (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-434 Canje de premios: el saldo se calcula con SUM sin bloqueo y canjes simultaneos de premios distintos gastan... (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-435 Trivia en vivo: el puntaje usa el tiempo que manda el cliente y la ronda sigue abierta despues de revelar la... (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-436 Registrar la vista de un patrocinador no valida que sea del evento ni deduplica, e infla las estadisticas de... (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-437 Cambiar o quitar el lider del stand desde el admin no le quita el acceso al pool de leads: el lider anterior,... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-438 El cupo de colaboradores del stand no se revalida al aceptar y ni el lider ni el staff pueden retirar... (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-439 El lider de un stand obtiene correo, empresa y rol de cualquier asistente del evento sin que este haya dado... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-440 Un registro pendiente de aprobacion entra al socket con acceso completo al evento (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-441 Una cuenta sin asistente en un evento activo recibe el rol 'admin' en el socket y puede moderar y proyectar... (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-442 El token de solo lectura del display, y el acotado de Mission Control, dan poderes de admin en el socket (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-443 Los tokens revocados en bloque siguen abriendo el socket hasta 24 horas (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-444 Las acciones de moderacion y proyeccion del socket no se atan al evento de la sesion (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-445 Un mensaje de un remitente sin asistente (Pulse o cuenta sin evento activo) hace fallar el guardado en lote... (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-446 Un evento de socket sin payload tumba el proceso del servidor (M0.8.6): RESUELTO 2026-10-23 (M0.8.6)
-  - [x] BUG-447 /internal/session-config acepta un secreto vacio si INTERNAL_SECRET no esta definido (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-448 Borrar un mensaje del chat por la API (DELETE /admin/chat/messages/{id}) no lo saca del historial que el... (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-449 Las preguntas de Q&A pendientes de moderacion (texto y autor) se reparten a toda la sala de la sesion (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-450 La asistencia virtual que decide el certificado y el nivel sale de la sala del socket sin atarse al horario,... (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)
-  - [x] BUG-451 checkin:update reparte a todo asistente conectado el nombre, rol, id y stand de cada persona que hace... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
-  - [x] BUG-452 Bloquear a un contacto aceptado no le quita el acceso: sigue en Mis contactos y sigue viendo las historias de... (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
 
 **Abiertos el 2026-10-22** (orden de arreglo en `decisiones.md`):
-- Bloque 0.8 de seguridad (cierre de la fase 0):
-  - [x] BUG-373 Banear desde el admin no saca del socket en el momento: RESUELTO 2026-10-23 (M0.8.2, BanService)
-  - [x] BUG-374 El admin muestra eventos de todas las organizaciones: RESUELTO 2026-10-23 (M0.8.3, staff por organizacion y eventos asignados)
-  - [x] BUG-376 Cambiar rol: reglas distintas en admin y API; confirmar quien sube a admin (M0.8.4): RESUELTO 2026-10-23 (M0.8.4)
-  - [x] BUG-384 Webhooks: "Simular evento" manda asistentes inventados como reales; reenviar triplica (M0.8.4): RESUELTO 2026-10-23 (M0.8.4)
-  - [x] BUG-385 Secretos de webhooks a la vista en notificaciones y en un .txt (M0.8.4): RESUELTO 2026-10-23 (M0.8.4)
-  - [x] BUG-386 Importar asistentes: contraseña igual al telefono, enlaces rotos, archivos sin borrar (M0.8.4): RESUELTO 2026-10-23 (M0.8.4)
-  - [x] BUG-387 Paginas del admin sin permiso propio y sin permisos por accion (M0.8.4): RESUELTO 2026-10-23 (M0.8.4)
-  - [x] BUG-389 Resultados de cualquier encuesta sin token en `/display/polls/{id}` (M0.8.4): RESUELTO 2026-10-23 (M0.8.4)
-  - [x] BUG-390 `/dc-embed` con `X-Frame-Options: ALLOWALL` (M0.8.4): RESUELTO 2026-10-23 (M0.8.4)
-  - [x] BUG-391 Secretos con valor por defecto y faltantes en `.env.example` (M0.8.5): RESUELTO 2026-10-23 (M0.8.5)
 - Lista no repetir del admin nuevo (M2.8.5; antes si llega un cliente antes de la semana 12):
   - [ ] BUG-375 Cuatro formas de mandar push "ya", cada una con otro publico
   - [ ] BUG-377 "Marcar reclamado" del Golden Ticket sin quien, sin bloqueo, sin vencimiento
@@ -217,10 +143,6 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   - [ ] BUG-382 Activar o cerrar encuestas desde el admin no avisa por socket
   - [ ] BUG-383 Abrir dos paginas del admin ya cambia datos
   - [ ] BUG-388 El correo de prueba de plantillas no usa el SMTP de la organizacion
-- App movil (M0.6.1):
-  - [x] BUG-392 Insignia "reclamado" de Golden Tickets con el estilo del modal (diseño): RESUELTO 2026-10-24 (M0.6.1)
-  - [x] BUG-393 Banner del concurso de fotos sin borde (diseño): RESUELTO 2026-10-24 (M0.6.1)
-  - [x] BUG-394 `AttendanceCheckModal` no compila en TypeScript (solo tipos): RESUELTO 2026-10-24 (M0.6.1)
 - Solo local:
   - [ ] BUG-371 Con la suite corriendo, un pedido real leyo la config de pruebas (no correr la suite durante QA en vivo)
 - [ ] Pulse cuenta 84 mensajes y la BD tiene 2.156: revisar el criterio de `stats.messages` (sin verificar)
@@ -288,22 +210,8 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   recompensas) e invitaciones/historias de social si pesan en la medida real.
 
 ### Navegacion inmediata (Kamilo 2026-10-18) — 8/9
-- [x] Sin skeleton al cambiar de modulo; el menu marca el destino en el toque; sesion 30 s en memoria; precarga al
-      pasar el mouse, al apoyar el dedo y en reposo (agenda, social, speakers). eventos-web `368fe81`. Medido local:
-      precargados 49-106 ms, el resto 324-454 ms sin skeleton (antes 275-654 ms con skeleton)
-- [x] Labs de transicion (`design/features/navigation/`): v1, v2, C2 camara (descartada: marea), v3 sutiles, **ios**
-      (aprobado). Cambio de modulo con View Transitions en `TransicionModulo` (eventos-web `bb2cf2a`)
-- [x] BUG-357 corregido 2026-10-21: solo cambia el contenido de adentro, marco quieto, salida (120 ms) y entrada (zoom 2%,
-      395 ms) en secuencia. Lab `lab-transicion-contenido.html` (A Relevo escogida); eventos-web `f9e6bfc`
-- [x] Abrir con zoom desde la tarjeta: **decision Kamilo 2026-10-21, speakers en escritorio se queda como esta** (el
-      panel ya entra deslizando con fundido). Lab `lab-abrir-desde-tarjeta.html` (A crece hasta su sitio, B nace y se
-      asienta, celular como el lab iOS) queda de referencia por si se retoma para celular, sesiones o patrocinadores
 - [ ] Skeleton solo si la espera pasa de ~300 ms (hoy no hay ninguno en modulos; con servidor lento el clic parece
       no hacer nada mas alla del menu)
-- [x] Choque en celular entre el push del detalle y la transicion de modulo: corregido 2026-10-21 (eventos-web
-      `lib/transicionModulo.ts`): dentro de un detalle se conserva la clave del modulo de origen, entrar y volver no
-      disparan la transicion. Verificado con Playwright (0 transiciones al abrir y volver, push y pop intactos)
-- [x] Tokens de prueba del asistente sembrado (277, 278, 279) borrados 2026-10-21 con permiso de Kamilo
 - [ ] **B.2 Juegos a demanda por QR.** Hueco: nuestra gamificacion es EN VIVO (trivia del streaming,
   momentos, MC); falta la capa que la persona juega cuando quiere en el stand. Un QR = un juego corto
   (trivia, memoria, ahorcado, reflejos), un intento que suma al mismo ranking, repeticiones por
@@ -431,7 +339,6 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ### Sueltos de la webapp (inventario 2026-10-16)
 
-- [x] BUG-455 La webapp usa un evento fijo (`DEFAULT_SLUG`) y no el de la persona como Expo; sin inscripcion, pantalla propia como baneado o pendiente (lab antes): RESUELTO 2026-10-24 (M0.6.1)
 - [ ] `--shadow-card` de la webapp (y `shadow.sm` de la app) en una capa; Lux v2 pide dos (`project_lux_v2_design`). Cambiarlo toca todas las tarjetas Lux: decide Kamilo (hallado 2026-10-24)
 - [ ] Precarga de modulos vecinos (`RouteWarmer`): se paso a W.12 y nunca quedo listada; no existe (`W.12-polish.md:103`)
 - [ ] Sugerencia de typo del correo tambien al editar el email en el paso de contraseña (`W.1-setup-auth.md:437`)
@@ -481,7 +388,6 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] Rediseño y reparacion del recap de la app: lab de diseño aprobado y funcionando contra el backend real (que ya
   existe). Partir de la rama de archivo y de `docs/ROADMAP-RECAP.md`.
 - [ ] Revisar aparte, de la misma rama: la vibracion al tocar (4 hooks) y los reintentos de red de `lib/api.ts`.
-- [x] BUG-392 y BUG-393 con lab de diseño (M0.6.1).: RESUELTO 2026-10-24 (M0.6.1)
 
 ### Recap compartible — post-evento — IMPLEMENTADO
 
