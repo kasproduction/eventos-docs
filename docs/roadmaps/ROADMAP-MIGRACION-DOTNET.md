@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 72/203
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 73/203
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -278,7 +278,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 <details>
 <summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/46</b></summary>
 
-## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/46
+## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 1/46
 
 > Next sirve la interfaz; C# sirve la API admin y reproduce los efectos secundarios que hoy hacen los observers de
 > Laravel. Filament se apaga modulo por modulo. La API publica, Node y los correos siguen en PHP y no se enteran.
@@ -288,10 +288,10 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 > A M2b: encuestas, juegos, ajustes finos y recap (2.6) y la torre de control minima (2.9, D.4). M2b puede ir en
 > paralelo con las fases 3 y 4. Orden de fases: admin, tiempo real, API publica (D.2).
 
-### 2.1 Diseño del admin (1 semana) — 0/4
+### 2.1 Diseño del admin (1 semana) — 1/4
 - [ ] M2.1.1 Mapa de pantallas desde el inventario de acciones (M0.5.3): que modulos entran al hito 1 (D.3), que se demuele (paginas custom, `EventOnboardingResource`, banners) **[local]**
 - [ ] M2.1.2 Labs por letra del admin en Next (2 a 3 direcciones, Lumina Noir/Lux, linea enterprise, cero Filament). Base: `design/` y el SPA del Data Center que ya existe en Vite **[local]**
-- [ ] M2.1.3 Decision de donde vive: `eventos-web` bajo `/admin` con su propio layout, o repo aparte. Recomendado: mismo repo, layout propio, para compartir tokens y auth **[local]**
+- [x] M2.1.3 Decision de donde vive: `eventos-web` bajo `/admin` con su propio layout, o repo aparte. Recomendado: mismo repo, layout propio, para compartir tokens y auth **[local]** — **Decidido 2026-10-25 (Kamilo): dentro de la webapp**, Next bajo `/admin` con layout propio; base de diseño: Lumina admin y `design/` (ver `decisiones.md`)
 - [ ] M2.1.4 Contrato de la API admin: OpenAPI nuevo (no hereda rutas de Filament, que no tiene API) con DTOs explicitos desde el dia uno **[local]**
 
 ### 2.2 Entrar al admin (1 semana) — 0/6
