@@ -1,0 +1,80 @@
+01-escritorio.png 200 admin | Summit Empresarial 2026 - EventOS Admin
+02-mi-seguridad.png 200 admin/mi-seguridad | Seguridad de tu cuenta - EventOS Admin
+03-agenda_event-sessions.png 200 admin/agenda/event-sessions | Sesiones - EventOS Admin
+04-agenda_event-sessions_create.png 200 admin/agenda/event-sessions/create | Crear Sesión - EventOS Admin
+05-agenda_event-sessions_42_edit.png 404 admin/agenda/event-sessions/42/edit | No encontrado
+06-agenda_session-tracks.png 200 admin/agenda/session-tracks | Tracks - EventOS Admin
+07-agenda_session-tracks_create.png 200 admin/agenda/session-tracks/create | Crear Track - EventOS Admin
+08-agenda_session-tracks_6_edit.png 200 admin/agenda/session-tracks/6/edit | Editar Tecnología - EventOS Admin
+09-agenda_session-types.png 200 admin/agenda/session-types | Tipos De Sesión - EventOS Admin
+10-agenda_session-types_create.png 200 admin/agenda/session-types/create | Crear Tipo De Sesión - EventOS Admin
+11-agenda_session-ratings.png 200 admin/agenda/session-ratings | Session Ratings - EventOS Admin
+12-speakers.png 200 admin/speakers | Speakers - EventOS Admin
+13-speakers_create.png 200 admin/speakers/create | Nuevo speaker - EventOS Admin
+14-speakers_19_edit.png 200 admin/speakers/19/edit | Maria Garcia - EventOS Admin
+15-sponsors_sponsors.png 200 admin/sponsors/sponsors | Sponsors - EventOS Admin
+16-sponsors_sponsors_create.png 200 admin/sponsors/sponsors/create | Crear Sponsor - EventOS Admin
+17-sponsors_sponsors_1_edit.png 200 admin/sponsors/sponsors/1/edit | AWS - EventOS Admin
+18-documents.png 200 admin/documents | Documentos - EventOS Admin
+19-documents_create.png 200 admin/documents/create | Nuevo documento - EventOS Admin
+20-documents_7_edit.png 200 admin/documents/7/edit | Agenda completa del Summit - EventOS Admin
+21-custom-pages.png 200 admin/custom-pages | Páginas - EventOS Admin
+22-custom-pages_create.png 200 admin/custom-pages/create | Nueva página - EventOS Admin
+23-custom-pages_1_edit.png 200 admin/custom-pages/1/edit | Información del recinto - EventOS Admin
+24-asistentes_attendee-admins.png 200 admin/asistentes/attendee-admins | Asistentes - EventOS Admin
+25-asistentes_attendee-admins_1_edit.png 404 admin/asistentes/attendee-admins/1/edit | No encontrado
+26-asistentes_attendee-bans.png 200 admin/asistentes/attendee-bans | Attendee Bans - EventOS Admin
+27-entrada_registration-settings_1_edit.png 200 admin/entrada/registration-settings/1/edit | Registro - EventOS Admin
+28-entrada_registration-fields.png 200 admin/entrada/registration-fields | Campos del formulario - EventOS Admin
+29-entrada_registration-fields_create.png 200 admin/entrada/registration-fields/create | Crear Campo Del Formulario - EventOS Admin
+30-entrada_registration-fields_1_edit.png 200 admin/entrada/registration-fields/1/edit | Editar Empresa - EventOS Admin
+31-entrada_access-codes.png 200 admin/entrada/access-codes | Códigos de acceso - EventOS Admin
+32-entrada_landing-widget.png 200 admin/entrada/landing-widget | Landing y widget - EventOS Admin
+33-anuncios_announcements.png 200 admin/anuncios/announcements | Anuncios - EventOS Admin
+34-anuncios_announcements_create.png 200 admin/anuncios/announcements/create | Crear Anuncio - EventOS Admin
+35-anuncios_announcements_1_edit.png 200 admin/anuncios/announcements/1/edit | ¡Bienvenidos al Summit Empresarial 2026! - EventOS Admin
+36-anuncios_scheduled-notifications.png 200 admin/anuncios/scheduled-notifications | Scheduled Notifications - EventOS Admin
+37-anuncios_scheduled-notifications_create.png 200 admin/anuncios/scheduled-notifications/create | Crear Scheduled Notification - EventOS Admin
+38-anuncios_reminder-settings_1_edit.png 200 admin/anuncios/reminder-settings/1/edit | Recordatorios - EventOS Admin
+39-emails_email-templates.png 200 admin/emails/email-templates | Emails - EventOS Admin
+40-emails_organization-email-settings_1_edit.png 200 admin/emails/organization-email-settings/1/edit | Envío (SMTP) - EventOS Admin
+41-emails_email-logs.png 200 admin/emails/email-logs | Email Logs - EventOS Admin
+42-identidad_event-branding_1_edit.png 200 admin/identidad/event-branding/1/edit?tab=-lo-esencial-tab | Branding - EventOS Admin
+43-identidad_login-slides_1_edit.png 200 admin/identidad/login-slides/1/edit | Editar Slide Del Login - EventOS Admin
+44-identidad_highlights.png 200 admin/identidad/highlights | Highlights - EventOS Admin
+45-identidad_highlights_create.png 200 admin/identidad/highlights/create | Crear Highlight - EventOS Admin
+46-identidad_highlights_1_edit.png 200 admin/identidad/highlights/1/edit | Editar Highlight - EventOS Admin
+47-identidad_event-faqs.png 200 admin/identidad/event-faqs | Preguntas - EventOS Admin
+48-identidad_event-faqs_create.png 200 admin/identidad/event-faqs/create | Crear Pregunta - EventOS Admin
+49-identidad_event-faqs_1_edit.png 200 admin/identidad/event-faqs/1/edit | Editar Pregunta - EventOS Admin
+50-identidad_event-recap-settings_1_edit.png 200 admin/identidad/event-recap-settings/1/edit | Recap - EventOS Admin
+51-modulos.png 200 admin/modulos | Módulos - EventOS Admin
+52-social_wall-posts.png 200 admin/social/wall-posts | Publicaciones - EventOS Admin
+53-social_wall-posts_1.png 200 admin/social/wall-posts/1 | Ver Publicación - EventOS Admin
+54-social_event-photos.png 200 admin/social/event-photos | Fotos - EventOS Admin
+55-social_event-photos_1.png 200 admin/social/event-photos/1 | Ver Foto - EventOS Admin
+56-social_wall-settings_1_edit.png 200 admin/social/wall-settings/1/edit | Ajustes - EventOS Admin
+57-gamificacion_gamification-settings_1_edit.png 200 admin/gamificacion/gamification-settings/1/edit | Gamificación - EventOS Admin
+58-gamificacion_golden-tickets.png 200 admin/gamificacion/golden-tickets | Golden Tickets - EventOS Admin
+59-gamificacion_rewards.png 200 admin/gamificacion/rewards | Premios - EventOS Admin
+60-gamificacion_rewards_create.png 200 admin/gamificacion/rewards/create | Crear Premio - EventOS Admin
+61-gamificacion_rewards_1_edit.png 404 admin/gamificacion/rewards/1/edit | No encontrado
+62-gamificacion_prize-redemptions.png 200 admin/gamificacion/prize-redemptions | Prize Redemptions - EventOS Admin
+63-salones.png 200 admin/salones | Salones - EventOS Admin
+64-salones_1_edit.png 200 admin/salones/1/edit | Auditorio Principal - EventOS Admin
+65-chat-settings_1_edit.png 200 admin/chat-settings/1/edit | Chat - EventOS Admin
+66-event-pulse_1_edit.png 200 admin/event-pulse/1/edit | Editar Event Pulse - EventOS Admin
+67-support-requests.png 200 admin/support-requests | Soporte - EventOS Admin
+68-live-game-results.png 200 admin/live-game-results | Live Game Results - EventOS Admin
+69-events.png 200 admin/events | Eventos - EventOS Admin
+70-events_create.png 200 admin/events/create | Crear nuevo evento - EventOS Admin
+71-users.png 200 admin/users | Staff y permisos - EventOS Admin
+72-users_create.png 200 admin/users/create | Crear Miembro Del Staff - EventOS Admin
+73-users_2_edit.png 200 admin/users/2/edit | Admin Evento - EventOS Admin
+74-rate-limit-settings_1_edit.png 200 admin/rate-limit-settings/1/edit | Límites de uso - EventOS Admin
+75-webhooks_webhook-endpoints.png 200 admin/webhooks/webhook-endpoints | Webhooks Salientes - EventOS Admin
+76-webhooks_webhook-endpoints_create.png 200 admin/webhooks/webhook-endpoints/create | Crear Webhook - EventOS Admin
+77-webhooks_webhook-endpoints_1_edit.png 200 admin/webhooks/webhook-endpoints/1/edit | Editar Webhook - EventOS Admin
+78-webhooks_webhook-api-keys.png 200 admin/webhooks/webhook-api-keys | API Keys Entrantes - EventOS Admin
+79-webhooks_webhook-api-keys_create.png 200 admin/webhooks/webhook-api-keys/create | Crear API Key - EventOS Admin
+80-webhooks_webhook-logs.png 200 admin/webhooks/webhook-logs | Webhook Logs - EventOS Admin

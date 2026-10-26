@@ -31,10 +31,14 @@ Los grupos y el orden son los de hoy (AdminPanelProvider.php:134-140 y los clust
 | Experiencia | Modulos | Panel de modulos |
 | Experiencia | Social | Publicaciones, Fotos, Ajustes del muro |
 | Experiencia | Gamificacion | Gamificacion, Golden Tickets, Premios, Premios ganados |
-| En vivo | (sueltas) | Salones, Encuestas, Chat, Event Pulse, Soporte, Live Moments (oculta) |
+| En vivo | (sueltas) | Chat, Encuestas, Salones, Soporte, Event Pulse, Data Center (enlace al SPA), Live Moments (oculta) |
 | Sistema | (sueltas) | Eventos, Staff y permisos, Limites de uso |
 | Sistema | Webhooks | Webhooks, API Keys, Logs (oculta) |
 | (menu de cuenta) | Seguridad de tu cuenta | AccountSecurity |
+
+Capturas del admin actual (M2.1.2, Noir, 1440 px, pagina completa): `design/features/admin/filament-actual/`, con
+`_indice.txt` (archivo, estado HTTP, URL final, titulo) y `capturar.mjs` para repetirlas (Kamilo entra a mano; el script
+no toca credenciales; se corre desde la raiz de `eventos-web`).
 
 ## Pantalla por pantalla
 
