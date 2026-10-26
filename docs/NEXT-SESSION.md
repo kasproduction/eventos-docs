@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-10-25 (noche, Opus 5.5) — BLOQUE 2.1 CERRADO: MAPA, CAPTURAS Y API DEL ADMIN
+
+- M2.1.1: mapa de pantallas en `docs/contratos/pantallas-admin.md` (48: 35 al hito 1, 10 a M2b, 1 dentro de otra, 1 enlace, 1 se elimina). Kamilo: las paginas personalizadas se quedan (contenido del cliente en iframe); muro y fotos van a M2b (M2.6.5 nuevo); ajustes de registro y landing/widget suben a M2.3.1. Solo se elimina `EventOnboardingResource` (ya vive en Branding).
+- M2.1.2: 87 capturas por tema (Noir y Lux, 1440 px, pagina completa) en `design/features/admin/filament-actual/` (+ `lux/`), con `_indice.txt` y `capturar.mjs` (ventana visible: Kamilo entra con su codigo; el script no toca credenciales).
+- M2.1.4: API del admin bajo `/api/admin/v1`, entera de C# (Nginx por prefijo), evento en la ruta (M2.2.3 corregida), forma de la API publica, limite `admin` 1.200/min (2.400 local), OpenAPI `admin` aparte con `ApiDelAdminTest` y `openapi/admin.json`, tipos con `pnpm tipos:admin` en eventos-web. C# `304b993`, web `6604040`. Probado con el Nginx de Laragon (9/9). C# 93 pasan, 37 omitidas en Windows (MySQL, corren en el MSI).
+- BUG-469 (por verificar: no se ve por donde llega el asistente a una pagina personalizada) y BUG-470 (resuelto).
+- Abrir encuestas y soporte para las capturas cambio datos locales (BUG-383): encuesta post-evento creada y una solicitud marcada leida.
+- Sigue: M2.2.1 login del staff en C# (bcrypt `$2y$`, TOTP con Otp.NET, codigos de recuperacion, bloqueo, dispositivos de confianza, sesiones, bitacora). Roadmap 76/204.
+
 ## SESION 2026-10-25 (Opus 5.5) — FASE 1 ARRANCA: MSI LISTO, M1.1.1 A M1.1.3 HECHAS, M1.1.4 PARTE A
 
 - MSI: Docker 29.9 + compose, Redis 7 (solo local), .NET 10; borrado el montaje viejo de medios (Kamilo no lo usa). Docker solo en Linux.

@@ -3,6 +3,26 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-25 — Encontrados al armar el bloque 2.1 (admin nuevo)
+
+### BUG-470: En C#, una ruta sin grupo salia en todos los documentos OpenAPI (RESUELTO 2026-10-25, antes de desplegar)
+- **Severidad propuesta:** BAJA (documentacion generada; no llego a ningun lado)
+- **Que pasa:** al sumar el documento `admin`, `Microsoft.AspNetCore.OpenApi` incluye por defecto en cada documento las
+  rutas sin `GroupName`: `/api/v1/auth/me`, `/health` y `/version` salian tambien en el OpenAPI del admin.
+- **Verificado a mano:** si, lo atrapo `ApiDelAdminTest.Cada_documento_lleva_solo_sus_rutas` antes del commit.
+- **Resuelto:** `ShouldInclude` explicito en los dos documentos (`OpenApiDeLaApi.cs`). C# `304b993` (M2.1.4).
+
+### BUG-469: No se encontro por donde llega el asistente a una pagina personalizada (POR VERIFICAR)
+- **Severidad propuesta:** MEDIA si se confirma (el cliente las usa para cargar su contenido en un iframe, segun Kamilo)
+- **Que pasa:** la app de Expo registra `app/(app)/pages/[id].tsx` y tiene `hooks/usePages.ts`, pero ninguna pantalla
+  enlaza a `/pages/`; la webapp no llama `GET /api/v1/events/{eventId}/pages`. Puede que llegue por un modulo o un
+  deeplink que la busqueda no vio.
+- **Verificado a mano:** no. Busqueda de texto en eventos-app (app, components, hooks, lib) y eventos-web/src, 2026-10-25.
+- **Archivos:** `eventos-app/app/(app)/pages/[id].tsx`, `eventos-app/hooks/usePages.ts`,
+  `eventos-backend/app/Http/Controllers/Api/V1/CustomPageController.php`.
+- **Cuando se verifica:** en M2.3.3, al construir la pantalla de paginas del admin nuevo (abrir una pagina con iframe
+  desde la app y la webapp).
+
 ## 2026-10-25 — Encontrados al construir la fase 1 en C# (bloques 1.3 a 1.5)
 
 ### BUG-468: El `api.json` de PHP describe `/health` como texto (ABIERTO)
