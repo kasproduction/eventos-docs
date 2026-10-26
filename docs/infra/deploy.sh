@@ -236,7 +236,8 @@ server {
     # 403 — los tableros no cargan (verificado 2026-08-02).
     # Migracion a .NET (M1.5.1): reparto por ruta entre PHP y C#. Sin archivos en /etc/nginx/eventos/ (C# todavia no
     # desplegado) no incluye nada y todo sigue en PHP. Al desplegar C#: copiar eventos-api-dotnet/proxy/nginx-api.conf
-    # a /etc/nginx/eventos/ y correr scripts/cruzar.sh ... --nginx (instala el mapa en conf.d y recarga).
+    # a /etc/nginx/eventos/, proxy/eventos-log.conf a /etc/nginx/conf.d/ (formato del log del panel, M1.5.4) y
+    # correr scripts/cruzar.sh ... --nginx (instala el mapa en conf.d y recarga).
     include /etc/nginx/eventos/*.conf;
 
     location / {
