@@ -8,6 +8,6 @@
 |---|---|---|---|---|
 | GET | `/api/v1/health` | C# | 2026-10-25 | sin medir (M1.5.2) |
 | GET | `/api/v1/version` | C# | 2026-10-25 | sin medir (M1.5.2) |
-| GET | `/api/v1/auth/me` | C# | 2026-10-25 | sin medir (M1.5.2) |
+| GET | `/api/v1/auth/me` | C# | 2026-10-25 | MSI 2026-10-25: p95 sostenida PHP 6246 ms / C# 6 ms; CPU por pedido PHP 36,1 ms / C# 5,3 ms (docs/infra/MEDICION-PHP-VS-CSHARP.md) |
 
 Todo lo demas: PHP.
