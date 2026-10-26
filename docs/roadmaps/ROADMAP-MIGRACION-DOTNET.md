@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 74/204
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 75/204
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -276,9 +276,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 ---
 
 <details>
-<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 2/47</b></summary>
+<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 3/47</b></summary>
 
-## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 2/47
+## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 3/47
 
 > Next sirve la interfaz; C# sirve la API admin y reproduce los efectos secundarios que hoy hacen los observers de
 > Laravel. Filament se apaga modulo por modulo. La API publica, Node y los correos siguen en PHP y no se enteran.
@@ -288,9 +288,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 > A M2b: encuestas, juegos, ajustes finos y recap (2.6) y la torre de control minima (2.9, D.4). M2b puede ir en
 > paralelo con las fases 3 y 4. Orden de fases: admin, tiempo real, API publica (D.2).
 
-### 2.1 Diseño del admin (1 semana) — 2/4
+### 2.1 Diseño del admin (1 semana) — 3/4
 - [x] M2.1.1 Mapa de pantallas desde el inventario de acciones (M0.5.3): que modulos entran al hito 1 (D.3), que se demuele (paginas custom, `EventOnboardingResource`, banners) **[local]** — **Hecho 2026-10-25**: `docs/contratos/pantallas-admin.md` (48 pantallas: 35 al hito 1, 10 a M2b, 1 absorbida, 1 enlace, 1 se demuele). Las paginas personalizadas se quedan (iframe de contenido del cliente, Kamilo). Registro y landing/widget suben a M2.3.1; muro y fotos van a M2.6.5
-- [ ] M2.1.2 Visual del admin = Lumina como se ve hoy en Filament, copiada tal cual (decision Kamilo 2026-10-25, sin labs por direccion): capturas de Playwright de cada pantalla del admin actual como referencia, tokens de Lumina de `design/` y del CSS existente, sin reinterpretar. Labs solo para las pantallas que hoy no existen o que Filament obligaba a hacer distinto de lo deseado, y esas se le muestran a Kamilo; el resto lo revisa por modulo cuando este **[local]** — **En curso 2026-10-25**: 77 de 80 capturas en `design/features/admin/filament-actual/` (Noir). Faltan: 3 editar con 404 (sesion 42, asistente 1, premio 1: ids que el admin no muestra), las pestanas internas de Branding (Identidad comun, App movil, Onboarding app, Webapp), la lista de encuestas y editar soporte (abrirlas cambia datos, BUG-383) y la pasada en Lux
+- [x] M2.1.2 Visual del admin = Lumina como se ve hoy en Filament, copiada tal cual (decision Kamilo 2026-10-25, sin labs por direccion): capturas de Playwright de cada pantalla del admin actual como referencia, tokens de Lumina de `design/` y del CSS existente, sin reinterpretar. Labs solo para las pantallas que hoy no existen o que Filament obligaba a hacer distinto de lo deseado, y esas se le muestran a Kamilo; el resto lo revisa por modulo cuando este **[local]** — **Hecho 2026-10-25**: 87 capturas por tema (Noir y Lux, 1440 px, pagina completa) en `design/features/admin/filament-actual/` (`lux/` para el claro), con `_indice.txt` y `capturar.mjs`. Incluye una pantalla de editar por modulo, las 5 pestanas de Branding, encuestas y soporte. Los labs de pantallas nuevas se hacen en su bloque (por ejemplo M2.2.6, rol Organizador)
 - [x] M2.1.3 Decision de donde vive: `eventos-web` bajo `/admin` con su propio layout, o repo aparte. Recomendado: mismo repo, layout propio, para compartir tokens y auth **[local]** — **Decidido 2026-10-25 (Kamilo): dentro de la webapp**, Next bajo `/admin` con layout propio; base de diseño: Lumina admin y `design/` (ver `decisiones.md`)
 - [ ] M2.1.4 Contrato de la API admin: OpenAPI nuevo (no hereda rutas de Filament, que no tiene API) con DTOs explicitos desde el dia uno **[local]**
 

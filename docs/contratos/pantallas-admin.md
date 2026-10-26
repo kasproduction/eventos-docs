@@ -36,7 +36,7 @@ Los grupos y el orden son los de hoy (AdminPanelProvider.php:134-140 y los clust
 | Sistema | Webhooks | Webhooks, API Keys, Logs (oculta) |
 | (menu de cuenta) | Seguridad de tu cuenta | AccountSecurity |
 
-Capturas del admin actual (M2.1.2, Noir, 1440 px, pagina completa): `design/features/admin/filament-actual/`, con
+Capturas del admin actual (M2.1.2, 1440 px, pagina completa, 87 por tema): `design/features/admin/filament-actual/` (Noir) y `lux/` (Lux), con
 `_indice.txt` (archivo, estado HTTP, URL final, titulo) y `capturar.mjs` para repetirlas (Kamilo entra a mano; el script
 no toca credenciales; se corre desde la raiz de `eventos-web`).
 
