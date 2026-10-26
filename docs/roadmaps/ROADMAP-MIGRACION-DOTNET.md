@@ -19,6 +19,8 @@
 > vio en vivo y es el argumento principal. Los otros dos: un solo runtime entendible de punta a punta (hoy PHP-FPM + Node
 > + PM2 + Horizon + cron, con 17 endpoints internos entre ellos) y un admin que se pueda mostrar a un cliente enterprise.
 > La cifra de cuanto menos consume C# se mide en la semana 6 (M1.5.2) y con ella se recalcula el catalogo de niveles.
+> **Primera cifra (2026-10-25, MSI, `/auth/me`):** 36,1 ms de CPU por pedido en PHP contra 5,3 ms en C# (7 veces menos;
+> `infra/MEDICION-PHP-VS-CSHARP.md`). El catalogo se recalcula con la de las rutas pesadas, en el servidor (fase 4).
 >
 > **El argumento de fondo, medido el 2026-08-01 (`docs/infra/INFORME-STRESS-2026-08-01.md`, `DIAGNOSTICO-2026-08-02.md`,
 > `COMO-CRECEMOS.md`):** en el droplet de 4 vCPU el techo fueron **70 peticiones por segundo** con la CPU al 0% libre y
@@ -382,7 +384,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 ## Fase 4: API publica, modulo por modulo (27 semanas) — 0/48
 
 > Cada modulo sigue el mismo ciclo: portar servicios con nombre, pasar snapshots, mover sus jobs y tareas a Hangfire,
-> cruzar las rutas con `cruzar.ps1` cumpliendo el criterio de cruce (M1.5.5), medir en el MSI, quitar el codigo PHP una
+> cruzar las rutas con `cruzar.sh` cumpliendo el criterio de cruce (M1.5.5), medir en el MSI, quitar el codigo PHP una
 > semana despues si no hubo vuelta atras.
 > Orden: lo que no escribe primero; auth despues de tener contratos de todo lo que emite tokens; operacion del evento
 > al final porque es lo mas complejo; Data Center de ultimo porque es lo mas aislado.
