@@ -28,6 +28,7 @@
 - Mismo dia (noche): BLOQUE 1.5 en 8/9 y RETRO M1.6.1 HECHA: Nginx reparte por ruta (decision Nginx, no YARP; cruzar.sh/descruzar.sh con respaldo; rutas-duenos.md generado), HEAD como Laravel, OpenAPI de C# comparado contra el de PHP, panel por ruta desde el log de Nginx, ARQUITECTURA.md v1. k6 instalado en el MSI; medicion /auth/me: CPU por pedido PHP 36,1 ms / C# 5,3 ms (infra/MEDICION-PHP-VS-CSHARP.md). BUG-464 a 468 registrados (4 resueltos, 468 abierto BAJA). FASE 1: 31/33, solo faltan M1.2.5 y M1.5.6 (servidor en pausa). Roadmap 72/203.
 - Mismo dia: Kamilo decidio D.2 (orden), D.3 (alcance del hito 1), D.4 (torre en M2b), D.9 (regla 29, entra al criterio de cruce) y M2.1.3 (admin = Next dentro de eventos-web bajo /admin). Roadmap 73/203.
 - Sigue: fase 2 desde M2.1.1 (mapa de pantallas del hito 1) y M2.1.2 (labs por letra del admin). Al prender el servidor: BUG-457, M1.2.5, M1.5.6.
+- /guardar: 84 cerrados de PENDIENTES pasaron a COMPLETADO. Menor: regenerar el tablero de prioridades (sin tocar desde el 2026-10-16).
 
 ## SESION 2026-10-23 (Opus 5.5) — AUDITORIA M0.8.1 CERRADA Y VALIDACION CON PRUEBAS 65/65
 
