@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 73/203
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 74/204
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -276,9 +276,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 ---
 
 <details>
-<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 0/46</b></summary>
+<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 2/47</b></summary>
 
-## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 1/46
+## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 2/47
 
 > Next sirve la interfaz; C# sirve la API admin y reproduce los efectos secundarios que hoy hacen los observers de
 > Laravel. Filament se apaga modulo por modulo. La API publica, Node y los correos siguen en PHP y no se enteran.
@@ -288,8 +288,8 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 > A M2b: encuestas, juegos, ajustes finos y recap (2.6) y la torre de control minima (2.9, D.4). M2b puede ir en
 > paralelo con las fases 3 y 4. Orden de fases: admin, tiempo real, API publica (D.2).
 
-### 2.1 Diseño del admin (1 semana) — 1/4
-- [ ] M2.1.1 Mapa de pantallas desde el inventario de acciones (M0.5.3): que modulos entran al hito 1 (D.3), que se demuele (paginas custom, `EventOnboardingResource`, banners) **[local]**
+### 2.1 Diseño del admin (1 semana) — 2/4
+- [x] M2.1.1 Mapa de pantallas desde el inventario de acciones (M0.5.3): que modulos entran al hito 1 (D.3), que se demuele (paginas custom, `EventOnboardingResource`, banners) **[local]** — **Hecho 2026-10-25**: `docs/contratos/pantallas-admin.md` (48 pantallas: 35 al hito 1, 10 a M2b, 1 absorbida, 1 enlace, 1 se demuele). Las paginas personalizadas se quedan (iframe de contenido del cliente, Kamilo). Registro y landing/widget suben a M2.3.1; muro y fotos van a M2.6.5
 - [ ] M2.1.2 Visual del admin = Lumina como se ve hoy en Filament, copiada tal cual (decision Kamilo 2026-10-25, sin labs por direccion): capturas de Playwright de cada pantalla del admin actual como referencia, tokens de Lumina de `design/` y del CSS existente, sin reinterpretar. Labs solo para las pantallas que hoy no existen o que Filament obligaba a hacer distinto de lo deseado, y esas se le muestran a Kamilo; el resto lo revisa por modulo cuando este **[local]**
 - [x] M2.1.3 Decision de donde vive: `eventos-web` bajo `/admin` con su propio layout, o repo aparte. Recomendado: mismo repo, layout propio, para compartir tokens y auth **[local]** — **Decidido 2026-10-25 (Kamilo): dentro de la webapp**, Next bajo `/admin` con layout propio; base de diseño: Lumina admin y `design/` (ver `decisiones.md`)
 - [ ] M2.1.4 Contrato de la API admin: OpenAPI nuevo (no hereda rutas de Filament, que no tiene API) con DTOs explicitos desde el dia uno **[local]**
@@ -303,9 +303,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M2.2.5 Correos del staff (2FA activado, cuenta bloqueada, reset) los sigue mandando PHP: C# inserta en una tabla `outbox` que `SendEmailJob` drena. Es el puente de correo hasta la fase 4c **[local]**
 
 ### 2.3 Contenido del evento (2 semanas) — 0/8
-- [ ] M2.3.1 Eventos y organizaciones: CRUD, wizard de primer ingreso (`PrimerIngresoWizardTest` como referencia), estado `is_active`, `pulse_token`, `registration_*` **[local]**
+- [ ] M2.3.1 Eventos y organizaciones: CRUD, wizard de primer ingreso (`PrimerIngresoWizardTest` como referencia), estado `is_active`, `pulse_token`, `registration_*`; ajustes de registro (`RegistrationSettingsResource`) y landing y widget (`LandingWidget`), subidos al hito 1 en M2.1.1 **[local]**
 - [ ] M2.3.2 Agenda: sesiones (3 tiempos original/ajustado/real), tipos, tracks, salas, speakers por sesion, delay y cancelacion con los mismos efectos que `SessionConfigController` y `EventSessionObserver` **[local]**
-- [ ] M2.3.3 Speakers, sponsors (tiers, servicios, stand, equipo), highlights, slides de login, FAQ, documentos (con `RegenerateDocumentsZipJob` en Hangfire), paginas custom (o demolidas) **[local]**
+- [ ] M2.3.3 Speakers, sponsors (tiers, servicios, stand, equipo), highlights, slides de login, FAQ, documentos (con `RegenerateDocumentsZipJob` en Hangfire), paginas personalizadas (cuerpo o `iframe_url` del cliente, con roles; se quedan segun M2.1.1) **[local]**
 - [ ] M2.3.4 Branding (keyvisual por superficie y hero modo texto nacen aqui, PENDIENTES §8) y panel de modulos (`ModuleCatalog`, templates, por rol) **[local]**
 - [ ] M2.3.5 Uploads a R2 con AWSSDK.S3 y el mismo esquema de URLs que `StorageService` (fallback a disco publico) **[local]**
 - [ ] M2.3.6 Importacion CSV de asistentes (`AttendeesImport`) con ClosedXML/CsvHelper y correo de "importacion terminada" por el outbox **[local]**
@@ -326,11 +326,12 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M2.5.3 Plantillas de correo por evento (16 tipos de `EmailCatalog`, fork por evento, vista previa con `EmailLayout` portado) y SMTP por organizacion **[local]**
 - [ ] M2.5.4 Log de correos (`email_logs`) y de push para leer **[local]**
 
-### 2.6 Operacion en vivo desde el admin (M2b, 1,5 semanas) — 0/4
+### 2.6 Operacion en vivo desde el admin (M2b, 1,5 semanas) — 0/5
 - [ ] M2.6.1 Encuestas: CRUD con preguntas y opciones, importar plantilla, moderacion de votos. Lanzar y cerrar siguen siendo de la API admin publica (PHP) hasta la fase 4d **[local]**
 - [ ] M2.6.2 Juegos en vivo: configurar trivia, ruleta y jackpot (`LiveGame`); resultados (`LiveGameResults`) **[local]**
-- [ ] M2.6.3 Ajustes por evento: gamificacion (puntos por accion, topes diarios), recordatorios, chat (palabras bloqueadas, modo lento, con POST a Node `/internal/chat/invalidate-config`), limites de tasa, registro **[local]**
+- [ ] M2.6.3 Ajustes por evento: gamificacion (puntos por accion, topes diarios), recordatorios, chat (palabras bloqueadas, modo lento, con POST a Node `/internal/chat/invalidate-config`), limites de tasa (el registro subio a M2.3.1) **[local]**
 - [ ] M2.6.4 Recap: configuracion y regeneracion (`GenerateRecapsForEventJob` queda en PHP hasta la fase 4e; C# solo lo encola via outbox) **[local]**
+- [ ] M2.6.5 Social: moderacion del muro (publicaciones y ajustes) y de fotos (aprobar, rechazar, premiar, subir oficiales) con un solo camino por accion: puntos, socket y webapp iguales desde la fila, el detalle y la accion masiva (BUG-378, BUG-379). Sale de M2.1.1, no estaba en ningun bloque **[local]**
 
 ### 2.7 Apagar Filament modulo por modulo (continuo) — 0/4
 - [ ] M2.7.1 Por cada modulo que el admin nuevo cubre, el resource de Filament se oculta del panel (no se borra) y se anota en el inventario de M0.5.3 **[local]**
@@ -341,7 +342,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 ### 2.8 Lo congelado que nace aqui (dentro de los bloques de arriba) — 0/5
 - [ ] M2.8.1 "Otorgar puntos manuales" (motor existe en `PointsService`, sin UI) **[local]**
 - [ ] M2.8.2 Credencial con etiqueta visible (VIP, Prensa): marcar tags que salen en la escarapela **[local]**
-- [ ] M2.8.3 Renombres y limpiezas: Highlights → Destacados solo en la interfaz (la entidad `highlights` es contrato con 8 clientes del socket), borrar `EventOnboardingResource`, toggle de Silent Disco segun `decisiones.md` **[local]**
+- [ ] M2.8.3 Renombres y limpiezas: Highlights → Destacados solo en la interfaz (la entidad `highlights` es contrato con 8 clientes del socket), borrar `EventOnboardingResource` (sus secciones ya viven en Branding), toggle de Silent Disco segun `decisiones.md` **[local]**
 - [ ] M2.8.4 Manual del organizador se reescribe sobre el admin nuevo (ROADMAP-MANUAL M1 a M7 cambian de pantallas) **[local]**
 - [ ] M2.8.5 Lista "no repetir" del inventario del admin (`contratos/acciones-admin.md`, seccion Hallazgos): un solo camino por accion con los mismos efectos que la API (push con el mismo publico, aprobar fotos y muro con puntos y avisos iguales, marcar premio reclamado con `RewardService::confirm`, encuestas que avisan por socket, asignar speakers que avisa); nada de logica en hooks de guardar; permisos por accion **[local]**
 
