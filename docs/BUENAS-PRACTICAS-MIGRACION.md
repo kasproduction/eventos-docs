@@ -31,6 +31,12 @@
 6. **Cada cruce se revierte en un despliegue:** `cruzar.ps1` y `descruzar.ps1`, probados antes del primer cruce real.
 7. **Prueba cruzada de escrituras para todo lo que escribe:** si C# guarda, PHP lee lo mismo que si hubiera guardado
    PHP o Filament (escribir por C#, leer el snapshot por PHP).
+   - **Criterio de hecho (Kamilo 2026-10-25):** una tarea que escribe datos que PHP lee no esta hecha hasta que su
+     prueba cruzada existe y pasa. No se marca `[x]` en el roadmap sin ella. Vale para el admin nuevo aunque no espeje
+     una ruta de PHP: lo que C# escribe y PHP lee (columnas, cifrados, JSON, bitacoras, filas que PHP lista o cierra)
+     se prueba leyendolo con el codigo de PHP.
+   - **"Lo que no probe" no es una nota de reporte:** solo puede quedar sin probar lo que una decision de Kamilo
+     registrada en `decisiones.md` permite. Sin esa decision es trabajo pendiente de la misma tarea, que sigue abierta.
 8. **`mysqldump` automatico dentro del script de cruce** para las rutas que escriben.
 9. **Toda lista con orden explicito y el mismo que PHP.** Donde PHP no pone `ORDER BY`, MySQL decide y C# puede
    devolver otro orden; se agrega el orden en PHP antes de cruzar la ruta.
