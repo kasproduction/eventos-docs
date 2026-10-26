@@ -92,13 +92,17 @@ localhost:6379 como el de Laragon, asi PHP, C# y las pruebas no cambian de confi
 
 1. Instalado: `wsl --install -d Ubuntu-24.04 --no-launch` y `wsl -d Ubuntu-24.04 -u root -- apt-get install redis-server`
    (7.0.15, `bind 127.0.0.1 -::1`, servicio de systemd `redis-server` habilitado).
-2. Falta (pide administrador): apagar el servicio de Windows `Redis` de Laragon, que ocupa el 6379, en una PowerShell
-   de administrador: `Stop-Service Redis; Set-Service Redis -StartupType Disabled`.
+2. Hecho 2026-10-26 (pide administrador): apagado el servicio de Windows `Redis` de Laragon, que ocupaba el 6379, en
+   una PowerShell de administrador: `Stop-Service Redis; Set-Service Redis -StartupType Disabled`. Si Laragon vuelve
+   a arrancar su Redis (su boton), regresa el 5.
+   Ojo: WSL publica el puerto en Windows cuando Redis arranca. Si en ese momento el `127.0.0.1:6379` esta ocupado,
+   queda publicado solo en IPv6 (`::1`) y desde `127.0.0.1` "rechaza la conexion". Arreglo: `wsl --shutdown` y volver
+   a encender (`Start-ScheduledTask "EventOS Redis 7 (WSL)"`).
 3. Hecho 2026-10-25: Ubuntu se apaga cuando no hay ninguna terminal abierta, y con el Redis. Lo deja encendido al
    iniciar sesion una tarea programada del usuario (no pide administrador):
    `Register-ScheduledTask -TaskName "EventOS Redis 7 (WSL)" -Action (New-ScheduledTaskAction -Execute conhost.exe -Argument "--headless wsl.exe -d Ubuntu-24.04 -u root --exec sleep infinity") -Trigger (New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME) -Settings (New-ScheduledTaskSettingsSet -ExecutionTimeLimit 0)`.
    Quitarla: `Unregister-ScheduledTask "EventOS Redis 7 (WSL)"`. Sin la tarea, basta abrir `wsl -d Ubuntu-24.04` antes de trabajar.
-4. Comprobar desde Windows: `C:\laragonin
+4. Comprobado 2026-10-26 desde Windows: `C:\laragonin
 edis
 edis-x64-5.0.14.1
 edis-cli.exe INFO server` dice `redis_version:7.0.15`.
