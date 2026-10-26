@@ -70,7 +70,7 @@ del evento no devuelven nada; guardar algo de otro evento responde 404. Cruzar e
 1. Su snapshot pasa contra C# (`scripts/contratos-contra-csharp.sh`) y su OpenAPI coincide con el de PHP
    (`OpenApiContraPhpTest`).
 2. Orden explicito en sus listas; si escribe, prueba cruzada (escribe C#, lee PHP) y prueba de cruce entre eventos.
-3. Medicion PHP contra C# anotada (M1.5.5).
+3. Medicion PHP contra C# anotada (M1.5.5) y la ruta probada detras del Nginx real del MSI (regla 29).
 4. `scripts/cruzar.sh "METODO /ruta" --docs ... --nginx`: si escribe, antes respalda la base; si algo sale mal,
    `scripts/descruzar.sh` la devuelve a PHP en el acto.
 

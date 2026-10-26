@@ -67,7 +67,8 @@
 19. **Cada cruce se mide con los k6 de agosto en el MSI** (PHP contra C#, misma maquina) y el numero queda anotado en
     el roadmap junto a la tarea. En el servidor real se mide en los hitos, no en cada cruce.
 20. **Criterio de cruce de una ruta:** snapshot igual contra los dos, orden explicito (regla 9), prueba cruzada de
-    escrituras si escribe (regla 7), medicion en el MSI anotada (regla 19) y `descruzar.ps1` probado.
+    escrituras si escribe (regla 7), medicion en el MSI anotada (regla 19), `descruzar.sh` probado y la ruta
+    probada detras del Nginx real del MSI (regla 29, decision D.9 del 2026-10-25).
 
 ## Proceso
 
@@ -109,6 +110,10 @@
     y los catalogos de `contratos/` que el codigo no puede dar (acciones del admin, claves de Redis, variables). Un
     documento a mano que repite lo que dice el codigo se borra. En la API admin nueva, ningun endpoint sin descripcion
     en su OpenAPI (M2.1.4).
+29. **Probar con la pieza real, no solo con el servidor de pruebas** (D.9, retro de la fase 1). Lo que toca HTTP,
+    proxy, servidor o despliegue pasa por Nginx, Kestrel y PHP-FPM de verdad antes de darse por bueno
+    (`scripts/probar-proxy-local.sh` en local, el entorno de `scripts/preparar-medicion-msi.sh` en el MSI). Cada
+    ruta cruzada se prueba detras del Nginx real del MSI (criterio de la regla 20). `TestServer` escondio BUG-465.
 
 ---
 
