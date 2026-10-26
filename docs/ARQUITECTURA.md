@@ -84,6 +84,22 @@ El admin nuevo (Next en `eventos-web` bajo `/admin`) habla con una API propia de
   y que el archivo este al dia. De ese archivo salen los tipos de Next: `pnpm tipos:admin` en `eventos-web` escribe
   `src/lib/admin/api-tipos.ts`, que se commitea (Next compila sin el servidor de C#; `--revisar` falla si quedo viejo).
 
+## Redis en el equipo de desarrollo (Windows)
+
+El servidor usa Redis 7; Laragon trae Redis 5.0.14 (sin `KEEPTTL` y otras de la 6 y la 7). Decision Kamilo 2026-10-25:
+en Windows, Redis 7 por apt dentro de WSL2 (ni Docker Desktop ni el Redis del MSI por Tailscale), escuchando en
+localhost:6379 como el de Laragon, asi PHP, C# y las pruebas no cambian de configuracion.
+
+1. Instalado: `wsl --install -d Ubuntu-24.04 --no-launch` y `wsl -d Ubuntu-24.04 -u root -- apt-get install redis-server`
+   (7.0.15, `bind 127.0.0.1 -::1`, servicio de systemd `redis-server` habilitado).
+2. Falta (pide administrador): apagar el servicio de Windows `Redis` de Laragon, que ocupa el 6379, en una PowerShell
+   de administrador: `Stop-Service Redis; Set-Service Redis -StartupType Disabled`.
+3. Falta: Ubuntu se apaga cuando no hay ninguna terminal abierta, y con el Redis. Para dejarlo encendido al iniciar
+   sesion, una tarea programada del usuario (no pide administrador):
+   `Register-ScheduledTask -TaskName "EventOS Redis 7 (WSL)" -Action (New-ScheduledTaskAction -Execute conhost.exe -Argument "--headless wsl.exe -d Ubuntu-24.04 -u root --exec sleep infinity") -Trigger (New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME) -Settings (New-ScheduledTaskSettingsSet -ExecutionTimeLimit 0)`.
+   Quitarla: `Unregister-ScheduledTask "EventOS Redis 7 (WSL)"`. Sin la tarea, basta abrir `wsl -d Ubuntu-24.04` antes de trabajar.
+4. Comprobar desde Windows: `C:\laragoninedisedis-x64-5.0.14.1edis-cli.exe INFO server` dice `redis_version:7.0.15`.
+
 ## Como se cruza una ruta (criterio de la regla 20)
 
 1. Su snapshot pasa contra C# (`scripts/contratos-contra-csharp.sh`) y su OpenAPI coincide con el de PHP
@@ -97,5 +113,6 @@ El admin nuevo (Next en `eventos-web` bajo `/admin`) habla con una API propia de
 
 | Version | Fecha | Que cambio |
 |---|---|---|
+| v3 | 2026-10-25 | Redis 7 en el equipo de desarrollo por WSL2 |
 | v2 | 2026-10-25 | La API del admin nuevo (M2.1.4): prefijo propio, evento en la ruta, limite propio, OpenAPI y tipos generados |
 | v1 | 2026-10-25 | Primera version, al cerrar el bloque 1.5: proxy en Nginx, primeras rutas de C# en la tabla, nada cruzado en produccion |
