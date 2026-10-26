@@ -17,13 +17,13 @@
 
 > **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
 > .NET; fases 0 y 1 hechas (la 1 en 31/33: faltan dos tareas del servidor). Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (78/204). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
+> (79/204). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
 > contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
 > es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
 
 | Area | Avance | Que falta |
 |---|---|---|
-| **Migracion a .NET** (roadmap 78/204) | Fase 0 hecha; fase 1 31/33; fase 2 6/47 | Fase 1: M1.2.5 y M1.5.6 (servidor). Fase 2: bloque 2.1 cerrado; M2.2.5 outbox y M2.2.2 token hechos; sigue M2.2.1 login del staff |
+| **Migracion a .NET** (roadmap 79/204) | Fase 0 hecha; fase 1 31/33; fase 2 7/47 | Fase 1: M1.2.5 y M1.5.6 (servidor). Fase 2: bloque 2.1 cerrado; M2.2.5 outbox, M2.2.2 token y M2.2.1 login hechos; sigue M2.2.3 (evento en la ruta), M2.2.4 (roles) y M2.2.6 (rol Organizador, con lab) |
 
 | Area | Avance | Que falta |
 |---|---|---|
