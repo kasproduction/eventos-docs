@@ -234,6 +234,11 @@ server {
     # (event-pulse, mission-control) se sirven como carpetas con index.html.
     # Solo con `index index.php` nginx intenta listar el directorio y responde
     # 403 — los tableros no cargan (verificado 2026-08-02).
+    # Migracion a .NET (M1.5.1): reparto por ruta entre PHP y C#. Sin archivos en /etc/nginx/eventos/ (C# todavia no
+    # desplegado) no incluye nada y todo sigue en PHP. Al desplegar C#: copiar eventos-api-dotnet/proxy/nginx-api.conf
+    # a /etc/nginx/eventos/ y correr scripts/cruzar.sh ... --nginx (instala el mapa en conf.d y recarga).
+    include /etc/nginx/eventos/*.conf;
+
     location / {
         index index.php index.html;
         try_files \$uri \$uri/ \$uri/index.html /index.php?\$query_string;
