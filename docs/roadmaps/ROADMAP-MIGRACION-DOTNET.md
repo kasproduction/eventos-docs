@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 76/204
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 77/204
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -276,9 +276,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 ---
 
 <details>
-<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 4/47</b></summary>
+<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 5/47</b></summary>
 
-## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 4/47
+## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 5/47
 
 > Next sirve la interfaz; C# sirve la API admin y reproduce los efectos secundarios que hoy hacen los observers de
 > Laravel. Filament se apaga modulo por modulo. La API publica, Node y los correos siguen en PHP y no se enteran.
@@ -294,13 +294,13 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M2.1.3 Decision de donde vive: `eventos-web` bajo `/admin` con su propio layout, o repo aparte. Recomendado: mismo repo, layout propio, para compartir tokens y auth **[local]** — **Decidido 2026-10-25 (Kamilo): dentro de la webapp**, Next bajo `/admin` con layout propio; base de diseño: Lumina admin y `design/` (ver `decisiones.md`)
 - [x] M2.1.4 Contrato de la API admin: OpenAPI nuevo (no hereda rutas de Filament, que no tiene API) con DTOs explicitos desde el dia uno **[local]** — **Hecho 2026-10-25**: `/api/admin/v1` entero de C# (Nginx por prefijo), evento en la ruta, forma de la API publica, limite `admin` propio (1.200/min), OpenAPI `admin` aparte con `ApiDelAdminTest` y `openapi/admin.json`, tipos con `pnpm tipos:admin` en eventos-web. Ver `ARQUITECTURA.md` y `decisiones.md`
 
-### 2.2 Entrar al admin (1 semana) — 0/6
+### 2.2 Entrar al admin (1 semana) — 1/6
 - [ ] M2.2.1 Login del staff en C# con contraseña bcrypt `$2y$` + TOTP (Otp.NET) + codigos de recuperacion; bloqueo por fallos (`StaffLockout`), dispositivos de confianza (`trusted_devices`), sesiones abiertas (`staff_sessions`), bitacora (`staff_security_events`) **[local]** — Kamilo 2026-10-25: el equipo de confianza en la cookie va firmado con HMAC y con su vencimiento adentro, nunca como bandera plana (o, como hoy, solo un identificador que se valida contra `trusted_devices`)
 - [ ] M2.2.2 Token de staff para la API admin: Sanctum con ability `admin` en la misma tabla (Laravel no lo emite; C# si) o cookie propia. Recomendado: bearer con ability, para que el Data Center tambien lo use **[local]** — Kamilo 2026-10-25: cada token tiene su fila en `staff_sessions` y nunca vive mas que ella; se renueva con el uso igual que hoy (inactividad de `SESSION_LIFETIME`, actividad anotada cada 60 s). Asi el rescate de 2FA, el cambio de contraseña y "cerrar sesiones" de PHP tambien sacan a quien entro por C#
 - [ ] M2.2.3 Contexto de evento (hoy en sesion de Filament, `SetFilamentEventContext`) pasa a la ruta: `/api/admin/v1/events/{eventId}/...` con `DelEvento()`, validado por rol y organizacion (corregido en M2.1.4: antes decia cabecera `X-Event-Id`) **[local]**
 - [ ] M2.2.4 Roles y permisos de plataforma (`Roles.php`: super_admin, org_admin, event_admin, moderator, staff_checkin) como policies de C# **[local]**
 - [ ] M2.2.6 Rol **Organizador** (el cliente): ve Data Center, estadisticas y datos del evento, sin editar nada; el staff edita. Rol de plataforma nuevo en las policies de M2.2.4, con lab de pantallas antes de codear (decision Kamilo 2026-10-25; hoy no existe: BUG-462) **[local]**
-- [ ] M2.2.5 Correos del staff (2FA activado, cuenta bloqueada, reset) los sigue mandando PHP: C# inserta en una tabla `outbox` que `SendEmailJob` drena. Es el puente de correo hasta la fase 4c **[local]** — Kamilo 2026-10-25: lo drena un job de PHP idempotente que marca cada fila enviada; desaparece en la fase 4c (M4c.5)
+- [x] M2.2.5 Correos del staff (2FA activado, cuenta bloqueada, reset) los sigue mandando PHP: C# inserta en una tabla `outbox` que `SendEmailJob` drena. Es el puente de correo hasta la fase 4c **[local]** — Kamilo 2026-10-25: lo drena un job de PHP idempotente que marca cada fila enviada; desaparece en la fase 4c (M4c.5) — **Hecho 2026-10-25**: tabla `outbox_emails` (backend `c17a482`), `DrenarOutboxDeCorreoJob` cada minuto (reclama con `UPDATE` condicional; solo `staff_account_locked` y `staff_2fa_enabled` por ahora; a lo sumo una vez), `OutboxDeCorreo` en C# (`bb4a93e`). PHP 1.262/1.262 en SQLite; outbox 5/5 en MySQL; C# 132/132 con MySQL local
 
 ### 2.3 Contenido del evento (2 semanas) — 0/8
 - [ ] M2.3.1 Eventos y organizaciones: CRUD, wizard de primer ingreso (`PrimerIngresoWizardTest` como referencia), estado `is_active`, `pulse_token`, `registration_*`; ajustes de registro (`RegistrationSettingsResource`) y landing y widget (`LandingWidget`), subidos al hito 1 en M2.1.1 **[local]**
