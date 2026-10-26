@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 65/203
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 66/203
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -197,7 +197,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 1: Cimientos en C# (3 semanas) — 24/33
+## Fase 1: Cimientos en C# (3 semanas) — 25/33
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
 > errores. Sin trafico real. Al terminar, `GET /auth/me` pasa su snapshot contra los dos backends.
@@ -233,10 +233,10 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M1.4.3 Limitador de tasa en Redis (INCR + EXPIRE o ventana deslizante en Lua) con las 12 claves de `AppServiceProvider::configureRateLimiting` (por correo, token, usuario, IP) y `TrustProxies` equivalente (`ForwardedHeaders` con la misma lista) **[local]** — **Hecho 2026-10-25** (C# `54178fa`): `ConLimite("nombre")` con los 12 limitadores HTTP (el 13, `mail`, es de jobs y va con el Worker), script Lua de ventana fija, 429 y cabeceras como Laravel; `ProxiesDeConfianza` con `App:TrustedProxies`. **Diferencia de la convivencia:** los contadores de C# van aparte de los de PHP (no se leen claves de PHP), asi que mientras una persona use rutas de los dos, cada backend le cuenta su propio cupo (el de `api`, 300 por minuto, puede sumar hasta el doble). **Hallazgo:** con la lista de proxies vacia ASP.NET confiaba en todos; corregido a ninguno, como PHP. Variables en `contratos/variables.md`
 - [x] M1.4.4 Cache con prefijo `dotnet:` sobre Redis y suscriptor del canal `eventos:invalidate` (M0.4.5) que borra lo suyo **[local]** — **Hecho 2026-10-25** (C# `f5c71bc`): `CacheDelEvento` (version por evento y entidad: invalidar es subirla) y `SuscriptorDeInvalidaciones` (mensaje real de PHP comprobado). Claves en `contratos/claves-redis.md`. Pendiente al portar escrituras en C#: avisar como `InvalidationService` (webapp y socket) y borrar la cache de PHP de lo que cambie (punto 2 de claves-redis.md)
 
-### 1.5 Proxy y primera medicion (2 dias) — 2/9
+### 1.5 Proxy y primera medicion (2 dias) — 3/9
 - [x] M1.5.1 Nginx (o YARP) con tabla de rutas por ruta exacta: todo a PHP salvo `/api/v1/health`, `/version` y `/auth/me` a C#. Cabecera `X-Backend`. Script `cruzar.ps1 <ruta>` que cambia el dueño de una ruta **[local]** — **Hecho 2026-10-25** (C# `90d30bd`; decision: Nginx, no YARP): mapa `$dueno_api` por metodo y ruta exacta (`proxy/rutas-csharp.conf`, generado), bloque `proxy/nginx-api.conf` (lo de C# sale por `@dotnet` a 127.0.0.1:8080), `include /etc/nginx/eventos/*.conf` dormido en `infra/deploy.sh` hasta desplegar C#. `X-Backend: dotnet`. **Scripts en bash y no `.ps1`** (`scripts/cruzar.sh`, `descruzar.sh`): el servidor es Linux. Probado con Nginx real (`scripts/probar-proxy-local.sh`, 7 casos y control). **Hallazgo:** ASP.NET no respondia HEAD en las rutas GET (Laravel si): corregido con `HeadComoLaravel`. C# escucha solo en 127.0.0.1. Las 3 rutas estan en la tabla; en produccion se activan al desplegar C#
 - [ ] M1.5.2 **La medicion que faltaba:** `e3-agenda-storm.js` contra `/auth/me` y `/events/by-slug` servidos por PHP y por C# en la misma maquina. Es el numero real de "cuanto menos consume" **[local+medir]**
-- [ ] M1.5.3 `descruzar.ps1 <ruta>` (devuelve la ruta a PHP en un despliegue) y `mysqldump` automatico dentro de `cruzar.ps1` para rutas que escriben; los dos probados antes del primer cruce real **[local]**
+- [x] M1.5.3 `descruzar.ps1 <ruta>` (devuelve la ruta a PHP en un despliegue) y `mysqldump` automatico dentro de `cruzar.ps1` para rutas que escriben; los dos probados antes del primer cruce real **[local]** — **Hecho 2026-10-25** (C# `90f401a`): `descruzar.sh` (probado contra Nginx real: la ruta vuelve a PHP) y respaldo automatico en `cruzar.sh` para todo metodo que no es GET (mysqldump comprimido en `/var/backups/eventos`; si falla no se cruza). Probado bien, con falla y con GET. Como volver atras, en el encabezado de `cruzar.sh`
 - [ ] M1.5.4 Panel por ruta y por `X-Backend` (p95, errores, req/s) desde los logs de M1.1.3; despues de cada cruce, la ruta contra su propio numero en PHP **[local]**
 - [ ] M1.5.5 `medir-cruce.ps1 <ruta>`: k6 de agosto contra PHP y contra C# en el MSI, deja el numero para anotar en el roadmap. Criterio de cruce completo (regla 20): snapshot igual, orden explicito, prueba cruzada si escribe, medicion anotada, `descruzar.ps1` probado. En el servidor real se mide por hito **[local+medir]**
 - [ ] M1.5.6 Medir en el servidor real, con 300 personas, lo hecho en octubre para bajar pedidos por pantalla: agenda partida (B3.7), Social por pestañas (B3.8) y "lo mio" en un pedido (B3.9). Venia de M0.6.3 (servidor en pausa). Es la primera medicion de la fase 1 en servidor; pedirle a Kamilo que lo prenda **[servidor]**
