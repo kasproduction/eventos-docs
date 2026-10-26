@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 71/203
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 72/203
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -199,7 +199,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 1: Cimientos en C# (3 semanas) — 30/33
+## Fase 1: Cimientos en C# (3 semanas) — 31/33 (local HECHO 2026-10-25; faltan M1.2.5 y M1.5.6, servidor)
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
 > errores. Sin trafico real. Al terminar, `GET /auth/me` pasa su snapshot contra los dos backends.
@@ -213,7 +213,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x ] M1.1.6 Analizador de async en CI (`Microsoft.VisualStudio.Threading.Analyzers`, avisos como error): falla el build con `.Result` o `.Wait()` **[local]** — **Hecho 2026-10-25**: `Microsoft.VisualStudio.Threading.Analyzers` 18.12.1 en `Directory.Build.props`; Redis pasa a un solo `IConnectionMultiplexer` creado al arrancar (VSTHRD011); control: un `.Result` rompe el build (VSTHRD103)
 - [x ] M1.1.7 `dotnet list package --vulnerable` en CI (falla si hay altos o criticos) y versiones fijas en los `.csproj` **[local]** — **Hecho 2026-10-25**: `NuGetAudit` (todos los paquetes, nivel alto) rompe la restauracion y `verificar.sh` corre `dotnet list package --vulnerable --include-transitive`; versiones fijas en `Directory.Packages.props`; control: System.Text.Json 8.0.4 da NU1903
 
-### 1.2 Datos (3 dias) — 5/6
+### 1.2 Datos (3 dias) — 5/6 (falta M1.2.5, servidor)
 - [x] M1.2.1 Scaffold de las 105 tablas con Pomelo; script repetible `scaffold.ps1` que se corre despues de cada migracion Laravel **[local]** — **Hecho 2026-10-25** (`348620e`): con `Microting.EntityFrameworkCore.MySql` 10.0.13, no Pomelo (no tiene version para EF Core 10; prueba de B y C y decision en `decisiones.md`). 114 tablas (no 105): 112 entidades y 2 tablas puente como muchos a muchos, en `src/Contracts/Datos`. `scaffold.ps1` migra con PHP una base `eventos_esquema_pruebas` y genera desde ahi; prueba en MySQL: cada entidad se lee de la base sembrada (control: un mapeo roto falla)
 - [x] M1.2.2 Conversor de fechas: columnas `DATETIME` guardadas en hora de Bogota (`APP_TIMEZONE`), leidas como `Unspecified` y convertidas a UTC; serializadas con el formato decidido en M0.3.2 **[local]** — **Hecho 2026-10-25** (`0f2f638`): `ZonaDeLaApp` en `Contracts` (sale `App:Timezone`), conversion en todas las `DateTime` fuera del archivo generado; escribir una fecha que no es UTC es error. En MySQL: Apertura sale `2026-12-06T08:30:00-05:00`, igual al snapshot; escritura en transaccion; control sin conversion: `Unspecified`
 - [x] M1.2.3 Los 38 casts `array` como `JsonDocument` o tipos propios; los 69 `boolean` desde `tinyint`; los 3 `encrypted` (2FA) con el descifrado AES-256-CBC + MAC de Laravel portado y probado contra valores reales **[local]** — **Hecho 2026-10-25** (`9e6f43f`, `43c949f`): 38 json a `JsonDocument` (UseMicrosoftJson); 77 `tinyint(1)` a `bool` sin default en el modelo y con `= true` en C# los 41 que en la base valen 1 (control: sin el ajuste un `false` insertado se guardaba `true`). `casts-de-laravel.json` generado: marca 8 `tinyint(1)` que PHP devuelve 0/1 sin cast, 2 json sin cast y 3 `array` sobre texto (lo que sale lo decide el snapshot de cada ruta). **Los 3 `encrypted` van en M1.3.5** (el mismo lector del cifrado). Pendiente al portar escrituras: columnas numericas con default (ej. `rate_limit` 100) siguen con el default de EF: un 0 explicito se guardaria como el default; la prueba cruzada de escrituras (regla 7) lo atrapa
@@ -235,7 +235,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M1.4.3 Limitador de tasa en Redis (INCR + EXPIRE o ventana deslizante en Lua) con las 12 claves de `AppServiceProvider::configureRateLimiting` (por correo, token, usuario, IP) y `TrustProxies` equivalente (`ForwardedHeaders` con la misma lista) **[local]** — **Hecho 2026-10-25** (C# `54178fa`): `ConLimite("nombre")` con los 12 limitadores HTTP (el 13, `mail`, es de jobs y va con el Worker), script Lua de ventana fija, 429 y cabeceras como Laravel; `ProxiesDeConfianza` con `App:TrustedProxies`. **Diferencia de la convivencia:** los contadores de C# van aparte de los de PHP (no se leen claves de PHP), asi que mientras una persona use rutas de los dos, cada backend le cuenta su propio cupo (el de `api`, 300 por minuto, puede sumar hasta el doble). **Hallazgo:** con la lista de proxies vacia ASP.NET confiaba en todos; corregido a ninguno, como PHP. Variables en `contratos/variables.md`
 - [x] M1.4.4 Cache con prefijo `dotnet:` sobre Redis y suscriptor del canal `eventos:invalidate` (M0.4.5) que borra lo suyo **[local]** — **Hecho 2026-10-25** (C# `f5c71bc`): `CacheDelEvento` (version por evento y entidad: invalidar es subirla) y `SuscriptorDeInvalidaciones` (mensaje real de PHP comprobado). Claves en `contratos/claves-redis.md`. Pendiente al portar escrituras en C#: avisar como `InvalidationService` (webapp y socket) y borrar la cache de PHP de lo que cambie (punto 2 de claves-redis.md)
 
-### 1.5 Proxy y primera medicion (2 dias) — 8/9
+### 1.5 Proxy y primera medicion (2 dias) — 8/9 (falta M1.5.6, servidor)
 - [x] M1.5.1 Nginx (o YARP) con tabla de rutas por ruta exacta: todo a PHP salvo `/api/v1/health`, `/version` y `/auth/me` a C#. Cabecera `X-Backend`. Script `cruzar.ps1 <ruta>` que cambia el dueño de una ruta **[local]** — **Hecho 2026-10-25** (C# `90d30bd`; decision: Nginx, no YARP): mapa `$dueno_api` por metodo y ruta exacta (`proxy/rutas-csharp.conf`, generado), bloque `proxy/nginx-api.conf` (lo de C# sale por `@dotnet` a 127.0.0.1:8080), `include /etc/nginx/eventos/*.conf` dormido en `infra/deploy.sh` hasta desplegar C#. `X-Backend: dotnet`. **Scripts en bash y no `.ps1`** (`scripts/cruzar.sh`, `descruzar.sh`): el servidor es Linux. Probado con Nginx real (`scripts/probar-proxy-local.sh`, 7 casos y control). **Hallazgo:** ASP.NET no respondia HEAD en las rutas GET (Laravel si): corregido con `HeadComoLaravel`. C# escucha solo en 127.0.0.1. Las 3 rutas estan en la tabla; en produccion se activan al desplegar C#
 - [x] M1.5.2 **La medicion que faltaba:** `e3-agenda-storm.js` contra `/auth/me` y `/events/by-slug` servidos por PHP y por C# en la misma maquina. Es el numero real de "cuanto menos consume" **[local+medir]** — **Hecho 2026-10-25** en el MSI con `/auth/me` (la unica ruta pesada ya en C#; `/events/by-slug` se mide cuando se porte): p95 sostenida PHP 6.246 ms / C# 6 ms; **CPU por pedido PHP 36,1 ms / C# 5,3 ms (7 veces menos)**; MySQL 8,4 / 5,1 ms. PHP-FPM como produccion. Detalle y metodo en `infra/MEDICION-PHP-VS-CSHARP.md`. La rafaga HTTP de e3 se hace con k6 (e3 necesita el socket). **Decision de Kamilo:** la comparacion contra agosto, en el servidor, cuando esten las rutas pesadas (fase 4)
 - [x] M1.5.3 `descruzar.ps1 <ruta>` (devuelve la ruta a PHP en un despliegue) y `mysqldump` automatico dentro de `cruzar.ps1` para rutas que escriben; los dos probados antes del primer cruce real **[local]** — **Hecho 2026-10-25** (C# `90f401a`): `descruzar.sh` (probado contra Nginx real: la ruta vuelve a PHP) y respaldo automatico en `cruzar.sh` para todo metodo que no es GET (mysqldump comprimido en `/var/backups/eventos`; si falla no se cruza). Probado bien, con falla y con GET. Como volver atras, en el encabezado de `cruzar.sh`
@@ -246,8 +246,32 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M1.5.8 Tabla de dueños de ruta `docs/contratos/rutas-duenos.md` (ruta exacta, metodo, PHP o C#, fecha del cruce, numero medido), generada por `cruzar.ps1` y `descruzar.ps1` desde la tabla del proxy; nunca editada a mano (regla 28) **[local]** — **Hecho 2026-10-25** (C# `90d30bd`): `contratos/rutas-duenos.md` generado por `cruzar.sh` y `descruzar.sh --docs` desde `proxy/rutas-csharp.tsv`
 - [x] M1.5.9 `docs/ARQUITECTURA.md` v1: estado actual de la convivencia (proxy, quien atiende que, base y Redis compartidos, colas, tiempo real en Node), enlazando a `rutas-duenos.md` en vez de copiarla. Se actualiza en la retro de cada fase (regla 25) **[local]** — **Hecho 2026-10-25**: `docs/ARQUITECTURA.md` v1 (como llega un pedido, que se comparte, que sigue en un solo lado, filtro por evento, como se cruza una ruta); enlaza a `rutas-duenos.md`, `claves-redis.md` y `variables.md` en vez de copiarlos
 
-### 1.6 Cierre de la fase — 0/1
-- [ ] M1.6.1 Retro de la fase 1 (incluye actualizar `ARQUITECTURA.md`, regla 25) **[local]**
+### 1.6 Cierre de la fase — 1/1 (HECHO 2026-10-25)
+- [x] M1.6.1 Retro de la fase 1 (incluye actualizar `ARQUITECTURA.md`, regla 25) **[local]**
+  **Hecho 2026-10-25. Retro:**
+  1. **Estimado contra real:** 3 semanas estimadas; las 31 tareas locales costaron un dia (25 de octubre, Kamilo pidio
+     trabajar hasta cerrar la fase: excepcion a la regla 21 de un bloque por sesion). Quedan 2 que necesitan el
+     servidor real, que esta en pausa (M1.2.5 zona horaria de MySQL y M1.5.6 medicion con 300 personas): la fase queda
+     en 31/33 y se cierra del todo cuando se prenda. C# termina con 126 pruebas (las de MySQL, Redis y OpenAPI corren en
+     `verificar.sh`) y 6 contratos de PHP pasando contra C#.
+  2. **Por que no se recalcula el resto con este ritmo:** la fase 1 fue infraestructura sobre rieles que puso la fase 0
+     (contratos, MySQL como verdad, base sembrada) y casi sin rutas (health, version, `/auth/me`). Las fases 2 y 4
+     portan modulos enteros con escrituras, pruebas cruzadas y de cruce por modulo. Se mide el primer modulo de la fase
+     2 y con eso se ajustan las fechas.
+  3. **Bugs de la fase:** BUG-456 a BUG-468 (13). Resueltos 11; abiertos BUG-457 (PHP2Shell en el servidor, al prenderlo)
+     y BUG-468 (BAJA, el `api.json` de PHP describe mal `/health`). Dos de seguridad (BUG-466 proxies, BUG-467 C#
+     abierto hacia afuera) se encontraron antes de desplegar nada.
+  4. **Regla que falto (propuesta, abierta en `decisiones.md` como D.9):** probar con la pieza real y no solo con el
+     servidor de pruebas. `TestServer` escondia dos diferencias con Laravel que salieron con Nginx y Kestrel de verdad
+     (HEAD con cuerpo y 405, BUG-465) y con PHP-FPM real (orden del `.env` contra Telescope, permisos del home). Y los
+     controles (romper a proposito) encontraron BUG-466: cada pieza nueva con su control, como pide la regla 27.
+  5. **Que se corrige del roadmap:** M1.3.1 no escribe `last_used_at` (PHP lo tiene apagado); los scripts son `.sh` y
+     no `.ps1` (el servidor es Linux); M1.5.2 midio `/auth/me` (por-slug cuando se porte); la comparacion contra las
+     pruebas de agosto queda en M4f.1 (servidor, rutas pesadas), decision de Kamilo del 2026-10-25. Primera cifra: CPU
+     por pedido de `/auth/me` 36,1 ms en PHP contra 5,3 ms en C# (`infra/MEDICION-PHP-VS-CSHARP.md`).
+  6. **Arquitectura:** `docs/ARQUITECTURA.md` v1 escrita en M1.5.9; al cerrar la fase no cambia nada mas.
+  7. **Antes de la fase 2:** decidir D.2 a D.4 (orden de fases, alcance del admin del hito 1, torre de control) y D.9.
+     Al prender el servidor: BUG-457 primero, despues M1.2.5 y M1.5.6.
 
 ---
 

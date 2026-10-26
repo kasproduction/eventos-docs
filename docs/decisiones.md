@@ -77,6 +77,7 @@
 - **D.3** Alcance del admin del hito 1: modulos de demo (eventos, agenda, speakers, sponsors, asistentes, branding, modulos, anuncios, login con 2FA) y el resto despues (M2b), o los 45 resources antes de mostrar nada. Recomendado: demo primero.
 - **D.4** Torre de control: version minima en C# dentro del admin nuevo (M2.9) y nada en Filament. Recomendado: si.
 - **D.5** App en tiendas: no publicar build antes de la fase 3 (cada build congela el cliente de Socket.IO semanas). Si un cliente la pide antes, la fase 3 se adelanta.
+- **D.9** (retro de la fase 1) Regla 29 propuesta: **probar con la pieza real, no solo con el servidor de pruebas.** Antes de dar por buena una pieza que toca HTTP, proxy, servidor o despliegue, pasarla por Nginx, Kestrel y PHP-FPM de verdad (`scripts/probar-proxy-local.sh`, la medicion en el MSI). `TestServer` escondio BUG-465 (HEAD) y la preparacion real encontro el orden del `.env` contra Telescope y los permisos del home. Recomendado: si.
 - Zona horaria por evento (hoy toda la API usa la de la app): se decide despues de la fase 5.
 
 ### Producto (venian de `PENDIENTES.md` §2)

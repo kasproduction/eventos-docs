@@ -129,6 +129,13 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 
 - [ ] BUG-345 Correo sin ritmo: codigo hecho en B3.1, se cierra al medirlo
 
+**Del 2026-10-25** (fase 1 en C#, detalle en BUG-LOG):
+  - [x] BUG-464 PHP elegia el registro o ban mas nuevo solo por fecha: RESUELTO 2026-10-25 (backend `28f9daa`)
+  - [x] BUG-465 Las rutas GET de C# no respondian HEAD: RESUELTO 2026-10-25 (C# `90d30bd`)
+  - [x] BUG-466 C# confiaba en cualquier proxy con la lista vacia: RESUELTO 2026-10-25 (C# `54178fa`)
+  - [x] BUG-467 C# escuchaba en todas las interfaces: RESUELTO 2026-10-25 (C# `90d30bd`)
+  - [ ] BUG-468 El `api.json` de PHP describe `/health` como texto (BAJA; cuando se toque `HealthController`)
+
 **Abiertos el 2026-10-23** (auditoria M0.8.1, **las 65 confirmadas con prueba el mismo dia**; prioridad A en M0.8.6, B en M0.8.7, C en M0.8.8):
   - [x] BUG-396 El reto 2FA del panel no cuenta para el bloqueo un codigo TOTP incorrecto repetido en intervalos distintos (M0.8.7): RESUELTO 2026-10-23 (M0.8.7)
   - [x] BUG-397 check-email anonimo rota el codigo de activacion y reenvia la invitacion en cada llamada (M0.8.8): RESUELTO 2026-10-24 (M0.8.8)

@@ -3,6 +3,45 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-25 — Encontrados al construir la fase 1 en C# (bloques 1.3 a 1.5)
+
+### BUG-468: El `api.json` de PHP describe `/health` como texto (ABIERTO)
+- **Severidad propuesta:** BAJA (documentacion generada; la respuesta real esta bien y la fija el snapshot)
+- **Que pasa:** Scramble infiere `{"type": "string"}` para la respuesta 200 de `GET /api/v1/health`; la real es
+  `{status, checks: {database, redis, queue}, timestamp}` (snapshot `PublicoTest/GET__api_v1_health`). Tampoco documenta el 503.
+- **Verificado a mano:** si, al armar M1.5.7 (`OpenApiContraPhpTest` lo tiene como excepcion con motivo).
+- **Archivos:** `app/Http/Controllers/Api/V1/HealthController.php`, `docs/api.json`.
+- **Cuando se arregla:** cuando se toque `HealthController` (un tipo de retorno o anotacion para Scramble) o al apagar PHP
+  (fase 5); hasta entonces la excepcion queda en la prueba.
+
+### BUG-467: C# escuchaba en todas las interfaces con la red de la maquina (RESUELTO 2026-10-25, antes de desplegar)
+- **Severidad propuesta:** ALTA (seguridad; no llego a ningun servidor)
+- **Que pasa:** `docker-compose.yml` usaba `ASPNETCORE_HTTP_PORTS: 8080` con `network_mode: host`: C# quedaba abierto en
+  0.0.0.0:8080 y se podia llegar sin pasar por Nginx (sin el reparto por ruta ni la IP real de Cloudflare).
+- **Resuelto:** `ASPNETCORE_URLS=http://127.0.0.1:8080`, como PHP-FPM detras de su socket. C# `90d30bd` (M1.5.1).
+
+### BUG-466: Con `TRUSTED_PROXIES` vacio, C# confiaba en cualquier proxy (RESUELTO 2026-10-25, antes de desplegar)
+- **Severidad propuesta:** ALTA (seguridad; no llego a ningun servidor)
+- **Que pasa:** en ASP.NET, `ForwardedHeadersOptions` con las listas de proxies y redes vacias confia en todos: cualquier
+  cliente podia inventar su IP con `X-Forwarded-For` y saltarse los limites por red. PHP con la lista vacia no confia en nadie.
+- **Como se encontro:** un control de M1.4.3 (romper la lista de rangos) dejo pasar un `X-Forwarded-For` de afuera.
+- **Resuelto:** lista vacia = no se leen esos encabezados, con su prueba (`Sin_lista_no_se_confia_en_ningun_proxy`) y
+  control. C# `54178fa`.
+
+### BUG-465: Las rutas GET de C# respondian 405 a HEAD; en Laravel responden (RESUELTO 2026-10-25, antes de desplegar)
+- **Severidad propuesta:** MEDIA (monitores de salud y algunos clientes usan HEAD)
+- **Que pasa:** `MapGet` de ASP.NET no atiende HEAD; `Route::get` de Laravel registra GET y HEAD.
+- **Como se encontro:** la prueba con Nginx real de M1.5.1 (`scripts/probar-proxy-local.sh`).
+- **Resuelto:** `HeadComoLaravel` (cada GET suma HEAD, sin cuerpo) y su prueba. C# `90d30bd`.
+
+### BUG-464: PHP elegia "el registro mas nuevo" solo por fecha: con empate, cualquiera (RESUELTO 2026-10-25)
+- **Severidad propuesta:** MEDIA (con dos registros de la persona creados el mismo segundo, el ban o la aprobacion se
+  podian revisar sobre el evento equivocado)
+- **Que pasa:** `SocketAuthCache::asistenteDe`, `EventoDeLaPeticion::asistente` y `Attendee::activeBan` ordenaban solo con
+  `latest()` (`created_at`); MySQL elige cualquiera entre empates (regla 9).
+- **Como se encontro:** al portar `/auth/me` y `check.ban` a C# (M1.3.4), que necesitan el mismo orden en los dos lados.
+- **Resuelto:** `->latest()->latest('id')` en los tres; C# ordena igual. Backend `28f9daa`; suite PHP 1.257 en verde.
+
 ## 2026-10-25 — Encontrados al arrancar la fase 1 (M1.1.4 y parche de PHP)
 
 ### BUG-463: Pruebas de PHP con datos que MySQL rechaza (RESUELTO 2026-10-25)
