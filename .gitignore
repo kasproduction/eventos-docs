@@ -1,3 +1,6 @@
 node_modules/
 *.zip
 design/system/gsap-skills/
+
+# Plantillas de terceros compradas (ThemeForest): referencia local, con licencia, no van al repo
+New folder/

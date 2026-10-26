@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventOS — Prototipo Interactivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#080808;--bg2:#101010;--bg3:#161616;--bg4:#1e1e1e;--bg5:#252525;
+  --b:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.11);
+  --t:#f2f2f2;--t2:rgba(242,242,242,0.45);--t3:rgba(242,242,242,0.2);
+  --a:#E8FF47;--ar:232,255,71;
+  --a2:rgba(232,255,71,0.12);--a3:rgba(232,255,71,0.05);
+  --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;
+  --r:18px;--rsm:12px;--rlg:26px;--rxl:40px;
+}
+
+body{
+  background:#030303;font-family:var(--fb);color:var(--t);
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:24px 16px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* OUTER WRAPPER */
+.demo-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:20px;
+  width:100%;max-width:400px;
+}
+
+.demo-title{
+  text-align:center;
+  font-family:var(--fd);font-size:13px;font-weight:600;
+  letter-spacing:0.06em;text-transform:uppercase;
+  color:rgba(242,242,242,0.2);
+}
+
+/* ACCENT SWITCHER */
+.acc-bar{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:100px;padding:6px 14px;
+}
+.acc-bar span{font-size:9px;color:var(--t3);font-family:var(--fd);letter-spacing:0.06em}
+.sw{
+  width:18px;height:18px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:transform .2s,border-color .2s;flex-shrink:0;
+}
+.sw:hover{transform:scale(1.2)}
+.sw.on{border-color:rgba(255,255,255,0.7);transform:scale(1.15)}
+
+/* PHONE FRAME */
+.phone{
+  width:100%;max-width:375px;
+  background:var(--bg);
+  border-radius:var(--rxl);
+  border:1px solid rgba(255,255,255,0.1);
+  overflow:hidden;
+  box-shadow:0 60px 120px -20px rgba(0,0,0,0.9),
+             inset 0 1px 0 rgba(255,255,255,0.07),
+             0 0 0 1px rgba(255,255,255,0.03);
+  position:relative;
+  height:760px;
+  display:flex;flex-direction:column;
+}
+
+/* NOTCH */
+.notch{
+  width:100px;height:26px;background:#000;
+  border-radius:0 0 20px 20px;margin:0 auto;
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  z-index:100;
+}
+
+/* STATUS BAR */
+.sbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 22px 4px;font-size:11px;font-weight:500;color:var(--t2);
+  flex-shrink:0;position:relative;z-index:99;
+}
+
+/* SCREEN CONTAINER */
+.screens{
+  flex:1;position:relative;overflow:hidden;
+}
+
+.screen{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  overflow-y:auto;overflow-x:hidden;
+  opacity:0;pointer-events:none;
+  transform:translateX(30px);
+  transition:opacity .3s cubic-bezier(0.16,1,0.3,1),
+             transform .3s cubic-bezier(0.16,1,0.3,1);
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{
+  opacity:1;pointer-events:all;transform:translateX(0);
+}
+.screen.back{transform:translateX(-30px)}
+.screen-inner{padding:14px 18px 24px;}
+
+/* BOTTOM NAV */
+.bnav{
+  display:flex;border-top:1px solid var(--b);
+  padding:10px 8px 16px;flex-shrink:0;background:var(--bg);
+  position:relative;z-index:99;
+}
+.bi{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;gap:3px;cursor:pointer;
+  transition:opacity .15s;padding:2px 0;
+}
+.bi:active{opacity:0.7}
+.bico{
+  width:24px;height:24px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;
+}
+.bi.on .bico{background:var(--a)}
+.blbl{font-size:8px;color:var(--t3);font-family:var(--fd);font-weight:600}
+.bi.on .blbl{color:var(--a)}
+
+/* ──────────────────────────────────
+   SPLASH SCREEN
+────────────────────────────────── */
+.splash{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:40px 28px;min-height:100%;
+  position:relative;overflow:hidden;
+  background:var(--bg);
+}
+.splash-glow{
+  position:absolute;width:200px;height:200px;border-radius:50%;
+  background:var(--a);opacity:0.04;top:-60px;right:-60px;
+}
+.splash-glow2{
+  position:absolute;width:120px;height:120px;border-radius:50%;
+  background:var(--a);opacity:0.02;bottom:-20px;left:-20px;
+}
+.splash-ico{
+  width:64px;height:64px;border-radius:20px;background:var(--a);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:18px;
+  box-shadow:0 0 48px rgba(var(--ar),0.4);
+  animation:popIn .6s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes popIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+.splash-name{
+  font-family:var(--fd);font-size:28px;font-weight:800;
+  letter-spacing:-0.03em;margin-bottom:4px;
+  animation:fadeUp .6s .1s ease both;
+}
+.splash-name em{font-style:normal;color:var(--a)}
+.splash-evt{
+  font-size:12px;color:var(--t2);margin-bottom:36px;
+  animation:fadeUp .6s .2s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.lbar-wrap{width:100%;animation:fadeUp .6s .3s ease both}
+.lbar-header{
+  display:flex;justify-content:space-between;
+  font-size:10px;color:var(--t3);margin-bottom:8px;
+  font-family:var(--fd);
+}
+.ltrack{
+  width:100%;height:3px;background:var(--bg4);
+  border-radius:100px;overflow:hidden;margin-bottom:16px;
+}
+.lfill{
+  height:100%;border-radius:100px;background:var(--a);
+  width:0;transition:width .4s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 0 10px rgba(var(--ar),0.6);
+}
+.lsteps{display:flex;flex-direction:column;gap:7px}
+.lstep{
+  display:flex;align-items:center;gap:8px;
+  font-size:10px;color:var(--t3);
+  opacity:0;transform:translateX(-6px);
+  transition:opacity .3s,transform .3s;
+}
+.lstep.show{opacity:1;transform:translateX(0)}
+.ldot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--a);flex-shrink:0;
+}
+.splash-btn{
+  margin-top:28px;width:100%;padding:14px;
+  background:var(--a);border:none;border-radius:14px;
+  font-family:var(--fd);font-size:13px;font-weight:700;
+  color:#000;cursor:pointer;letter-spacing:0.02em;
+  opacity:0;transition:opacity .4s,transform .15s;
+  transform:translateY(6px);
+}
+.splash-btn.show{opacity:1;transform:translateY(0)}
+.splash-btn:active{transform:scale(0.98)}
+
+/* ──────────────────────────────────
+   HOME SCREEN
+────────────────────────────────── */
+.page-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:16px;
+}
+.page-title{
+  font-family:var(--fd);font-size:22px;font-weight:800;
+  letter-spacing:-0.03em;
+}
+.notif-btn{
+  width:36px;height:36px;border-radius:12px;
+  background:var(--bg3);border:1px solid var(--b2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;
+}
+.notif-btn .badge{
+  position:absolute;top:6px;right:6px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--a);border:1.5px solid var(--bg);
+}
+
+.hero-card{
+  background:var(--bg3);border:1px solid var(--b);
+  border-radius:var(--r);padding:18px;margin-bottom:12px;
+  position:relative;overflow:hidden;cursor:pointer;
+  transition:border-color .2s;
+}
+.hero-card:active{transform:scale(0.99)}
+.hero-card::after{
+  content:'';position:absolute;top:-30px;right:-30px;
+  width:100px;height:100px;border-radius:50%;
+  background:var(--a);opacity:0.05;pointer-events:none;
+}
+.live-dot{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:9px;font-family:var(--fd);letter-spacing:0.08em;
+  color:var(--a);text-transform:uppercase;margin-bottom:8px;
+}
+.live-dot::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--a);animation:blink 1.5s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero-title{
+  font-family:var(--fd);font-size:20px;font-weight:700;
+  letter-spacing:-0.02em;line-height:1.15;margin-bottom:12px;
+}
+.chip-row{display:flex;gap:5px;flex-wrap:wrap}
+.chip{
+  padding:3px 10px;border-radius:100px;font-size:9px;
+  border:1px solid var(--b2);color:var(--t2);
+}
+.chip.a{background:var(--a2);border-color:rgba(var(--ar),.25);color:var(--a)}
+
+.next-card{
+  background:var(--a);border-radius:var(--r);
+  padding:16px;margin-bottom:14px;cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:transform .15s;
+}
+.next-card:active{transform:scale(0.98)}
+.next-card::before{
+  content:'';position:absolute;bottom:-20px;right:-20px;
+  width:80px;height:80px;border-radius:50%;background:rgba(0,0,0,0.08);
+}
+.nlbl{
+  font-size:9px;font-family:var(--fd);letter-spacing:0.08em;
+  text-transform:uppercase;color:rgba(0,0,0,0.4);margin-bottom:5px;
+}
+.ntitle{
+  font-family:var(--fd);font-size:15px;font-weight:700;
+  color:#000;line-height:1.2;margin-bottom:10px;
+}
+.nbottom{display:flex;justify-content:space-between;align-items:center}
+.ntime{font-size:10px;font-weight:500;color:rgba(0,0,0,0.5)}
+.nbtn{
+  background:#000;color:var(--a);
+  font-size:9px;font-weight:700;padding:6px 14px;
+  border-radius:100px;font-family:var(--fd);
+}
+
+.section-lbl{
+  font-size:10px;font-family:var(--fd);font-weight:600;
+  letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--t3);margin-bottom:10px;
+}
+
+.mod-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:8px;margin-bottom:14px;
+}
+.mod{
+  background:var(--bg3);border:1px solid var(--b);
+  border-radius:14px;padding:12px 8px 10px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;transition:border-color .2s,background .2s;
+}
+.mod:active{transform:scale(0.96)}
+.mod.on{border-color:rgba(var(--ar),.3);background:var(--a3)}
+.mod-ico{
+  width:32px;height:32px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.mod span{font-size:8px;color:var(--t2);text-align:center;line-height:1.2}
+.mod.on span{color:var(--a)}
+
+.sponsor-strip{
+  background:var(--bg3);border:1px solid var(--b);
+  border-radius:14px;padding:10px 14px;overflow:hidden;
+}
+.sp-lbl{
+  font-size:8px;font-family:var(--fd);letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--t3);
+  margin-bottom:8px;text-align:center;
+}
+.sp-track-wrap{overflow:hidden}
+.sp-track{
+  display:flex;gap:18px;align-items:center;
+  animation:spScroll 14s linear infinite;width:max-content;
+}
+@keyframes spScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.sp-logo{
+  font-family:var(--fd);font-weight:700;font-size:11px;
+  color:var(--t3);white-space:nowrap;letter-spacing:-0.01em;
+}
+.sp-sep{color:rgba(242,242,242,0.15);font-size:10px}
+
+/* ──────────────────────────────────
+   AGENDA SCREEN
+────────────────────────────────── */
+.dtabs{display:flex;gap:6px;margin-bottom:14px}
+.dtab{
+  flex:1;text-align:center;padding:7px;
+  border-radius:11px;font-size:10px;font-family:var(--fd);
+  font-weight:600;border:1px solid var(--b);color:var(--t2);
+  cursor:pointer;transition:all .2s;
+}
+.dtab:active{transform:scale(0.97)}
+.dtab.on{background:var(--a);color:#000;border-color:var(--a)}
+
+.sess-list{display:flex;flex-direction:column;gap:0}
+.sess{display:flex;gap:10px;cursor:pointer}
+.sess:active .sess-body{transform:scale(0.99)}
+.stime{
+  font-size:9px;color:var(--t3);padding-top:14px;
+  min-width:30px;font-family:var(--fd);font-weight:600;
+}
+.sline{
+  display:flex;flex-direction:column;align-items:center;padding-top:14px;
+}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--bg5);flex-shrink:0}
+.sdot.on{background:var(--a);box-shadow:0 0 10px rgba(var(--ar),.6)}
+.scon{width:1px;flex:1;background:var(--b);min-height:28px;margin-top:3px}
+.sess-body{
+  flex:1;background:var(--bg3);border:1px solid var(--b);
+  border-radius:12px;padding:12px;margin-bottom:8px;
+  transition:transform .15s,border-color .2s;
+}
+.sess-body.on{border-color:rgba(var(--ar),.25);background:var(--a3)}
+.stype{
+  font-size:8px;font-family:var(--fd);letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--t3);margin-bottom:3px;
+}
+.stype.on{color:var(--a)}
+.stitle{font-family:var(--fd);font-size:12px;font-weight:600;line-height:1.3;margin-bottom:6px}
+.sspeaker{display:flex;align-items:center;gap:6px}
+.sav{
+  width:18px;height:18px;border-radius:50%;background:var(--bg5);
+  border:1px solid var(--b2);font-size:7px;font-weight:700;
+  color:var(--a);display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);flex-shrink:0;
+}
+.sn{font-size:9px;color:var(--t2)}
+.sfav{
+  margin-left:auto;width:22px;height:22px;
+  border-radius:7px;border:1px solid var(--b2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:background .2s;
+}
+.sfav:active{background:var(--a2)}
+
+/* ──────────────────────────────────
+   QR SCREEN
+────────────────────────────────── */
+.qr-profile{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.qr-av{
+  width:52px;height:52px;border-radius:50%;background:var(--a);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:17px;font-weight:800;color:#000;
+  flex-shrink:0;box-shadow:0 0 24px rgba(var(--ar),.35);
+}
+.qr-pn{font-family:var(--fd);font-size:16px;font-weight:700;letter-spacing:-0.02em}
+.qr-pr{font-size:10px;color:var(--t2);margin-top:2px}
+
+.qr-box{
+  background:var(--bg3);border:1px solid var(--b);
+  border-radius:var(--r);padding:20px;margin-bottom:12px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+.qr-g{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:3px;width:110px;
+}
+.qc{aspect-ratio:1;border-radius:2px}
+.qr-hint{
+  font-size:9px;font-family:var(--fd);letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--t3);
+}
+
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sbox{
+  background:var(--bg3);border:1px solid var(--b);
+  border-radius:14px;padding:14px 12px;
+}
+.sn-big{
+  font-family:var(--fd);font-size:30px;font-weight:800;
+  letter-spacing:-0.04em;color:var(--a);line-height:1;
+}
+.sl{font-size:9px;color:var(--t2);margin-top:4px}
+
+.share-btn{
+  width:100%;padding:14px;background:var(--bg3);
+  border:1px solid var(--b2);border-radius:14px;
+  font-family:var(--fd);font-size:12px;font-weight:700;
+  color:var(--t);cursor:pointer;letter-spacing:0.02em;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:border-color .2s;
+}
+.share-btn:active{transform:scale(0.98);border-color:rgba(var(--ar),.3)}
+
+/* ──────────────────────────────────
+   NOTIFICATIONS SCREEN
+────────────────────────────────── */
+.notif-item{
+  display:flex;gap:10px;padding:12px;
+  background:var(--bg3);border:1px solid var(--b);
+  border-radius:14px;margin-bottom:8px;
+  cursor:pointer;transition:border-color .2s;
+  align-items:flex-start;
+}
+.notif-item:active{transform:scale(0.99)}
+.notif-item.feat{
+  border-color:rgba(var(--ar),.25);background:var(--a3);
+}
+.nf-ico{
+  width:36px;height:36px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.nf-content{flex:1}
+.nf-text{font-size:12px;line-height:1.4;margin-bottom:5px}
+.notif-item.feat .nf-text{color:var(--a)}
+.nf-meta{display:flex;align-items:center;gap:6px}
+.nf-time{font-size:9px;color:var(--t3)}
+.nf-badge{
+  font-size:8px;padding:2px 8px;border-radius:100px;
+  background:var(--a2);color:var(--a);
+  border:1px solid rgba(var(--ar),.2);
+  font-family:var(--fd);
+}
+
+/* ──────────────────────────────────
+   SCANNER SCREEN
+────────────────────────────────── */
+.scanner-wrap{
+  background:#000;border-radius:var(--r);height:200px;
+  margin-bottom:14px;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.sc-corner{
+  position:absolute;width:22px;height:22px;
+  border-color:var(--a);border-style:solid;border-width:0;
+}
+.sc-corner.tl{top:14px;left:14px;border-top-width:3px;border-left-width:3px;border-radius:4px 0 0 0}
+.sc-corner.tr{top:14px;right:14px;border-top-width:3px;border-right-width:3px;border-radius:0 4px 0 0}
+.sc-corner.bl{bottom:14px;left:14px;border-bottom-width:3px;border-left-width:3px;border-radius:0 0 0 4px}
+.sc-corner.br{bottom:14px;right:14px;border-bottom-width:3px;border-right-width:3px;border-radius:0 0 4px 0}
+.sc-beam{
+  position:absolute;width:70%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--a),transparent);
+  animation:beam 2s ease-in-out infinite;
+  box-shadow:0 0 12px rgba(var(--ar),.8);
+}
+@keyframes beam{0%,100%{top:20%}50%{top:76%}}
+.sc-label{
+  position:absolute;bottom:12px;left:0;right:0;
+  text-align:center;font-size:9px;color:rgba(255,255,255,0.3);
+  font-family:var(--fd);letter-spacing:0.06em;
+}
+
+.leads-hero{
+  background:var(--a);border-radius:var(--r);
+  padding:16px 18px;margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.lh-n{
+  font-family:var(--fd);font-size:44px;font-weight:800;
+  color:#000;letter-spacing:-0.05em;line-height:1;
+}
+.lh-r{text-align:right}
+.lh-l{font-size:10px;color:rgba(0,0,0,0.45);font-weight:500}
+.lh-s{
+  font-size:9px;color:rgba(0,0,0,0.35);margin-top:3px;
+  text-decoration:underline;cursor:pointer;
+}
+
+.lead-row{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 12px;background:var(--bg3);
+  border:1px solid var(--b);border-radius:12px;margin-bottom:6px;
+  cursor:pointer;transition:border-color .2s;
+}
+.lead-row:active{transform:scale(0.99)}
+.lav{
+  width:34px;height:34px;border-radius:50%;background:var(--bg5);
+  font-size:11px;font-weight:700;color:var(--a);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);flex-shrink:0;
+}
+.lin{flex:1}
+.lname{font-size:11px;font-weight:500}
+.lco{font-size:9px;color:var(--t2)}
+.ltime{font-size:9px;color:var(--t3)}
+
+/* ──────────────────────────────────
+   SESSION DETAIL (sub-screen)
+────────────────────────────────── */
+.back-btn{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;color:var(--a);font-family:var(--fd);font-weight:600;
+  cursor:pointer;margin-bottom:16px;
+}
+.back-btn:active{opacity:0.7}
+.detail-hero{
+  background:var(--bg3);border:1px solid var(--b);
+  border-radius:var(--r);padding:20px;margin-bottom:14px;
+  position:relative;overflow:hidden;
+}
+.detail-hero::after{
+  content:'';position:absolute;top:-20px;right:-20px;
+  width:80px;height:80px;border-radius:50%;
+  background:var(--a);opacity:0.06;
+}
+.d-type{
+  font-size:9px;font-family:var(--fd);letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--a);margin-bottom:8px;
+}
+.d-title{
+  font-family:var(--fd);font-size:18px;font-weight:700;
+  letter-spacing:-0.02em;line-height:1.2;margin-bottom:12px;
+}
+.d-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.d-chip{
+  padding:4px 11px;border-radius:100px;font-size:9px;
+  background:var(--bg4);border:1px solid var(--b2);color:var(--t2);
+}
+.d-speaker{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg4);border-radius:12px;padding:12px;
+}
+.d-sav{
+  width:40px;height:40px;border-radius:50%;background:var(--bg5);
+  border:1px solid var(--b2);font-size:13px;font-weight:700;
+  color:var(--a);display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);flex-shrink:0;
+}
+.d-sname{font-family:var(--fd);font-size:13px;font-weight:600}
+.d-srole{font-size:10px;color:var(--t2);margin-top:2px}
+.d-desc{
+  font-size:13px;line-height:1.7;color:var(--t2);
+  margin-bottom:16px;
+}
+.d-btn{
+  width:100%;padding:15px;background:var(--a);border:none;
+  border-radius:14px;font-family:var(--fd);font-size:13px;
+  font-weight:700;color:#000;cursor:pointer;letter-spacing:0.02em;
+}
+.d-btn:active{transform:scale(0.98)}
+.d-btn-out{
+  width:100%;padding:14px;background:transparent;
+  border:1px solid var(--b2);border-radius:14px;
+  font-family:var(--fd);font-size:13px;font-weight:600;
+  color:var(--t);cursor:pointer;margin-top:8px;
+}
+.d-btn-out:active{transform:scale(0.98)}
+</style>
+</head>
+<body>
+<div class="demo-wrap">
+
+  <div class="demo-title">EventOS — Prototipo</div>
+
+  <!-- ACCENT BAR -->
+  <div class="acc-bar">
+    <span>Acento →</span>
+    <div class="sw on" style="background:#E8FF47" onclick="setA('#E8FF47','232,255,71',this)"></div>
+    <div class="sw" style="background:#FF4D4D" onclick="setA('#FF4D4D','255,77,77',this)"></div>
+    <div class="sw" style="background:#40C4FF" onclick="setA('#40C4FF','64,196,255',this)"></div>
+    <div class="sw" style="background:#FF8F00" onclick="setA('#FF8F00','255,143,0',this)"></div>
+    <div class="sw" style="background:#D500F9" onclick="setA('#D500F9','213,0,249',this)"></div>
+    <div class="sw" style="background:#00E676" onclick="setA('#00E676','0,230,118',this)"></div>
+  </div>
+
+  <!-- PHONE -->
+  <div class="phone" id="phone">
+
+    <div class="notch"></div>
+    <div class="sbar">
+      <span>9:41</span>
+      <div style="display:flex;gap:5px;align-items:center">
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+          <rect x="0" y="5" width="2" height="5" rx="0.5" fill="rgba(242,242,242,0.4)"/>
+          <rect x="3.5" y="3.5" width="2" height="6.5" rx="0.5" fill="rgba(242,242,242,0.5)"/>
+          <rect x="7" y="1.5" width="2" height="8.5" rx="0.5" fill="rgba(242,242,242,0.7)"/>
+          <rect x="10.5" y="0" width="2" height="10" rx="0.5" fill="rgba(242,242,242,0.9)"/>
+        </svg>
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+          <rect x="0.5" y="0.5" width="13" height="9" rx="2" stroke="rgba(242,242,242,0.4)" stroke-width="1"/>
+          <rect x="2" y="2" width="8" height="6" rx="1" fill="rgba(242,242,242,0.5)"/>
+          <rect x="13.5" y="3" width="2" height="4" rx="1" fill="rgba(242,242,242,0.4)"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="screens">
+
+      <!-- SPLASH -->
+      <div class="screen active" id="s-splash">
+        <div class="splash">
+          <div class="splash-glow"></div>
+          <div class="splash-glow2"></div>
+          <div class="splash-ico">
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+              <path d="M6 16L16 6L26 16V28H20V21H12V28H6V16Z" fill="#000"/>
+            </svg>
+          </div>
+          <div class="splash-name">Event<em>OS</em></div>
+          <div class="splash-evt">Claro Tech Summit 2025</div>
+          <div class="lbar-wrap">
+            <div class="lbar-header">
+              <span id="lbl-status">Iniciando sesión...</span>
+              <span id="lbl-pct">0%</span>
+            </div>
+            <div class="ltrack"><div class="lfill" id="lfill"></div></div>
+            <div class="lsteps">
+              <div class="lstep" id="ls0"><div class="ldot"></div>Verificando credenciales</div>
+              <div class="lstep" id="ls1"><div class="ldot"></div>Cargando agenda del evento</div>
+              <div class="lstep" id="ls2"><div class="ldot"></div>Sincronizando contenido offline</div>
+              <div class="lstep" id="ls3"><div class="ldot"></div>¡Todo listo!</div>
+            </div>
+          </div>
+          <button class="splash-btn" id="splash-btn" onclick="goTo('home')">Entrar al evento →</button>
+        </div>
+      </div>
+
+      <!-- HOME -->
+      <div class="screen" id="s-home">
+        <div class="screen-inner">
+          <div class="page-header">
+            <div class="page-title">Hola, Ana 👋</div>
+            <div class="notif-btn" onclick="goTo('notifs')">
+              <div class="badge"></div>
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                <path d="M10 2C7.2 2 5 4.2 5 7v5l-1.5 1.5h13L15 12V7C15 4.2 12.8 2 10 2Z" stroke="rgba(242,242,242,0.6)" stroke-width="1.3" fill="none"/>
+                <path d="M8 16c0 1.1.9 2 2 2s2-.9 2-2" stroke="rgba(242,242,242,0.6)" stroke-width="1.3" fill="none"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="hero-card" onclick="goTo('home')">
+            <div class="live-dot">En vivo</div>
+            <div class="hero-title">Claro Tech<br>Summit 2025</div>
+            <div class="chip-row">
+              <span class="chip a">847 asistentes</span>
+              <span class="chip">Mar 13–14</span>
+              <span class="chip">Bogotá</span>
+            </div>
+          </div>
+
+          <div class="next-card" onclick="goTo('detail')">
+            <div class="nlbl">Próxima sesión — en 12 min</div>
+            <div class="ntitle">IA en Telecom &amp; Redes del Futuro</div>
+            <div class="nbottom">
+              <span class="ntime">10:30 · Sala A</span>
+              <span class="nbtn">Ver →</span>
+            </div>
+          </div>
+
+          <div class="section-lbl">Módulos</div>
+          <div class="mod-grid">
+            <div class="mod on" onclick="goTo('agenda')">
+              <div class="mod-ico" style="background:var(--a2)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="var(--a)" stroke-width="1.2"/><line x1="5" y1="6" x2="11" y2="6" stroke="var(--a)" stroke-width="1"/><line x1="5" y1="9" x2="9" y2="9" stroke="var(--a)" stroke-width="1"/></svg>
+              </div>
+              <span>Agenda</span>
+            </div>
+            <div class="mod">
+              <div class="mod-ico" style="background:rgba(255,255,255,0.05)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/><polygon points="6.5,5.5 11.5,8 6.5,10.5" fill="rgba(242,242,242,0.3)"/></svg>
+              </div>
+              <span>Streaming</span>
+            </div>
+            <div class="mod">
+              <div class="mod-ico" style="background:rgba(255,255,255,0.05)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/><path d="M2 14c0-3 2.7-5 6-5s6 2 6 5" stroke="rgba(242,242,242,0.3)" stroke-width="1.2" fill="none"/></svg>
+              </div>
+              <span>Speakers</span>
+            </div>
+            <div class="mod" onclick="goTo('qr')">
+              <div class="mod-ico" style="background:rgba(255,255,255,0.05)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/><line x1="10" y1="10" x2="14" y2="10" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/></svg>
+              </div>
+              <span>Mi QR</span>
+            </div>
+            <div class="mod">
+              <div class="mod-ico" style="background:rgba(255,255,255,0.05)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 11C13 11.55 12.55 12 12 12H4.5L2 14V4C2 3.45 2.45 3 3 3H12C12.55 3 13 3.45 13 4V11Z" stroke="rgba(242,242,242,0.3)" stroke-width="1.2" fill="none"/></svg>
+              </div>
+              <span>Chat</span>
+            </div>
+            <div class="mod">
+              <div class="mod-ico" style="background:rgba(255,255,255,0.05)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h5" stroke="rgba(242,242,242,0.3)" stroke-width="1.2" stroke-linecap="round"/></svg>
+              </div>
+              <span>Docs</span>
+            </div>
+          </div>
+
+          <div class="section-lbl">Patrocinadores</div>
+          <div class="sponsor-strip">
+            <div class="sp-track-wrap">
+              <div class="sp-track">
+                <span class="sp-logo">Microsoft</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Samsung</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Avaya</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Bitdefender</span><span class="sp-sep">·</span>
+                <span class="sp-logo">ZTE</span><span class="sp-sep">·</span>
+                <span class="sp-logo">BMC</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Five9</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Microsoft</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Samsung</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Avaya</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Bitdefender</span><span class="sp-sep">·</span>
+                <span class="sp-logo">ZTE</span><span class="sp-sep">·</span>
+                <span class="sp-logo">BMC</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Five9</span><span class="sp-sep">·</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGENDA -->
+      <div class="screen" id="s-agenda">
+        <div class="screen-inner">
+          <div class="page-header">
+            <div class="page-title">Agenda</div>
+          </div>
+          <div style="font-size:11px;color:var(--t2);margin-bottom:14px">12 sesiones · Bogotá, Mar 13–14</div>
+          <div class="dtabs">
+            <div class="dtab on">Día 1 · Mar 13</div>
+            <div class="dtab">Día 2 · Mar 14</div>
+          </div>
+          <div class="sess-list">
+            <div class="sess" onclick="goTo('detail')">
+              <div class="stime">9:00</div>
+              <div class="sline"><div class="sdot"></div><div class="scon"></div></div>
+              <div class="sess-body">
+                <div class="stype">Apertura</div>
+                <div class="stitle">Bienvenida e inauguración oficial</div>
+                <div style="font-size:9px;color:var(--t3)">Auditorio Principal</div>
+              </div>
+            </div>
+            <div class="sess" onclick="goTo('detail')">
+              <div class="stime">10:30</div>
+              <div class="sline"><div class="sdot on"></div><div class="scon"></div></div>
+              <div class="sess-body on">
+                <div class="stype on">Ahora · Keynote</div>
+                <div class="stitle">IA en Telecom &amp; Redes del Futuro</div>
+                <div class="sspeaker">
+                  <div class="sav">CM</div>
+                  <span class="sn">Dr. Carlos Mejía</span>
+                  <div class="sfav">
+                    <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 13L3 8.5C1.5 7 1.5 4.5 3 3C4.5 1.5 6.5 1.5 8 3C9.5 1.5 11.5 1.5 13 3C14.5 4.5 14.5 7 13 8.5L8 13Z" stroke="var(--a)" stroke-width="1.2" fill="var(--a2)"/></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="sess">
+              <div class="stime">12:00</div>
+              <div class="sline"><div class="sdot"></div><div class="scon"></div></div>
+              <div class="sess-body">
+                <div class="stype">Break</div>
+                <div class="stitle">Almuerzo · Zona Networking</div>
+                <div style="font-size:9px;color:var(--t3)">Nivel 2 — solo presenciales</div>
+              </div>
+            </div>
+            <div class="sess" onclick="goTo('detail')">
+              <div class="stime">14:00</div>
+              <div class="sline"><div class="sdot"></div><div class="scon"></div></div>
+              <div class="sess-body">
+                <div class="stype">Panel</div>
+                <div class="stitle">Cloud, Seguridad &amp; Transformación Digital</div>
+                <div class="sspeaker">
+                  <div class="sav">MR</div>
+                  <span class="sn">María Restrepo</span>
+                </div>
+              </div>
+            </div>
+            <div class="sess" onclick="goTo('detail')">
+              <div class="stime">16:00</div>
+              <div class="sline"><div class="sdot"></div><div class="scon"></div></div>
+              <div class="sess-body">
+                <div class="stype">Workshop</div>
+                <div class="stitle">Automatización con IA: casos reales en Colombia</div>
+                <div class="sspeaker">
+                  <div class="sav">JP</div>
+                  <span class="sn">Juan Pablo Vargas</span>
+                </div>
+              </div>
+            </div>
+            <div class="sess">
+              <div class="stime">18:00</div>
+              <div class="sline"><div class="sdot"></div></div>
+              <div class="sess-body">
+                <div class="stype">Cierre</div>
+                <div class="stitle">Cóctel de networking y cierre día 1</div>
+                <div style="font-size:9px;color:var(--t3)">Terraza principal</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESSION DETAIL -->
+      <div class="screen" id="s-detail">
+        <div class="screen-inner">
+          <div class="back-btn" onclick="goBack()">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="var(--a)" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Volver
+          </div>
+          <div class="detail-hero">
+            <div class="d-type">Ahora · Keynote · Sala A</div>
+            <div class="d-title">IA en Telecomunicaciones y Redes del Futuro</div>
+            <div class="d-meta">
+              <span class="d-chip">10:30 — 12:00</span>
+              <span class="d-chip">90 min</span>
+              <span class="d-chip">247 asistentes</span>
+            </div>
+            <div class="d-speaker">
+              <div class="d-sav">CM</div>
+              <div>
+                <div class="d-sname">Dr. Carlos Mejía</div>
+                <div class="d-srole">CTO · Claro Colombia</div>
+              </div>
+            </div>
+          </div>
+          <div class="d-desc">
+            Una exploración profunda del impacto de la inteligencia artificial en las redes de telecomunicaciones modernas. Desde la optimización de redes hasta la predicción de fallos en tiempo real, esta sesión muestra casos de uso reales implementados en Colombia.
+          </div>
+          <button class="d-btn">Ver transmisión en vivo →</button>
+          <button class="d-btn-out">Agregar a mis favoritos</button>
+        </div>
+      </div>
+
+      <!-- QR -->
+      <div class="screen" id="s-qr">
+        <div class="screen-inner">
+          <div class="page-header">
+            <div class="page-title">Mi QR</div>
+          </div>
+          <div class="qr-profile">
+            <div class="qr-av">AG</div>
+            <div>
+              <div class="qr-pn">Ana Gómez</div>
+              <div class="qr-pr">Bancolombia · Marketing Director</div>
+            </div>
+          </div>
+          <div class="qr-box">
+            <div class="qr-g">
+              <div class="qc" style="background:var(--a)"></div><div class="qc" style="background:var(--a)"></div><div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div><div class="qc" style="background:var(--a)"></div><div class="qc" style="background:var(--a)"></div>
+              <div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div>
+              <div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div>
+              <div class="qc"></div><div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div><div class="qc"></div>
+              <div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div><div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div>
+              <div class="qc" style="background:var(--a)"></div><div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div>
+              <div class="qc" style="background:var(--a)"></div><div class="qc" style="background:var(--a)"></div><div class="qc" style="background:var(--a)"></div><div class="qc"></div><div class="qc" style="background:var(--a)"></div><div class="qc" style="background:var(--a)"></div><div class="qc" style="background:var(--a)"></div>
+            </div>
+            <div class="qr-hint">Presentar en stands para captura de leads</div>
+          </div>
+          <div class="stat-row">
+            <div class="sbox"><div class="sn-big">3</div><div class="sl">Stands visitados</div></div>
+            <div class="sbox"><div class="sn-big">340</div><div class="sl">Puntos acumulados</div></div>
+          </div>
+          <button class="share-btn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="4" r="2" stroke="rgba(242,242,242,0.5)" stroke-width="1.2"/><circle cx="4" cy="8" r="2" stroke="rgba(242,242,242,0.5)" stroke-width="1.2"/><circle cx="12" cy="12" r="2" stroke="rgba(242,242,242,0.5)" stroke-width="1.2"/><line x1="6" y1="7" x2="10" y2="5" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/><line x1="6" y1="9" x2="10" y2="11" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/></svg>
+            Compartir mi perfil
+          </button>
+        </div>
+      </div>
+
+      <!-- NOTIFS -->
+      <div class="screen" id="s-notifs">
+        <div class="screen-inner">
+          <div class="page-header">
+            <div class="page-title">Avisos</div>
+          </div>
+          <div style="font-size:11px;color:var(--t2);margin-bottom:16px">3 nuevos hoy</div>
+          <div class="notif-item feat">
+            <div class="nf-ico" style="background:var(--a2)">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2C7.2 2 5 4.2 5 7v5l-1.5 1.5h13L15 12V7C15 4.2 12.8 2 10 2Z" stroke="var(--a)" stroke-width="1.3" fill="none"/><path d="M8 16c0 1.1.9 2 2 2s2-.9 2-2" stroke="var(--a)" stroke-width="1.3" fill="none"/></svg>
+            </div>
+            <div class="nf-content">
+              <div class="nf-text">El almuerzo está listo · Zona networking nivel 2</div>
+              <div class="nf-meta">
+                <span class="nf-time">hace 2 min</span>
+                <span class="nf-badge">Solo presenciales</span>
+              </div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="nf-ico" style="background:rgba(255,255,255,0.04)">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="rgba(242,242,242,0.3)" stroke-width="1.3"/><line x1="10" y1="7" x2="10" y2="11" stroke="rgba(242,242,242,0.3)" stroke-width="1.3"/><circle cx="10" cy="13.5" r="0.8" fill="rgba(242,242,242,0.3)"/></svg>
+            </div>
+            <div class="nf-content">
+              <div class="nf-text" style="color:var(--t2)">Panel de Cloud arranca en 10 min · Sala B</div>
+              <div class="nf-meta">
+                <span class="nf-time">hace 8 min</span>
+                <span class="nf-badge">Todos</span>
+              </div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="nf-ico" style="background:rgba(255,255,255,0.04)">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12" rx="2" stroke="rgba(242,242,242,0.3)" stroke-width="1.3"/><line x1="6" y1="9" x2="14" y2="9" stroke="rgba(242,242,242,0.3)" stroke-width="1.1"/><line x1="6" y1="12" x2="11" y2="12" stroke="rgba(242,242,242,0.3)" stroke-width="1.1"/></svg>
+            </div>
+            <div class="nf-content">
+              <div class="nf-text" style="color:var(--t2)">Nueva encuesta disponible: ¿Qué sesión te interesa mañana?</div>
+              <div class="nf-meta"><span class="nf-time">hace 1 hora</span></div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="nf-ico" style="background:rgba(255,255,255,0.04)">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M5 10l4 4 6-8" stroke="rgba(242,242,242,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div class="nf-content">
+              <div class="nf-text" style="color:var(--t2)">Tu registro fue confirmado. Bienvenida al evento.</div>
+              <div class="nf-meta"><span class="nf-time">Ayer, 5:30 PM</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /screens -->
+
+    <!-- BOTTOM NAV (hidden on splash/detail) -->
+    <div class="bnav" id="bnav">
+      <div class="bi on" id="bn-home" onclick="goTo('home')">
+        <div class="bico">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 6L8 2L14 6V14H10V10H6V14H2V6Z" fill="#000"/></svg>
+        </div>
+        <span class="blbl">Inicio</span>
+      </div>
+      <div class="bi" id="bn-agenda" onclick="goTo('agenda')">
+        <div class="bico">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/><line x1="5" y1="6" x2="11" y2="6" stroke="rgba(242,242,242,0.3)" stroke-width="1"/></svg>
+        </div>
+        <span class="blbl">Agenda</span>
+      </div>
+      <div class="bi" id="bn-qr" onclick="goTo('qr')">
+        <div class="bico">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="rgba(242,242,242,0.3)" stroke-width="1.2"/></svg>
+        </div>
+        <span class="blbl">Mi QR</span>
+      </div>
+      <div class="bi" id="bn-notifs" onclick="goTo('notifs')">
+        <div class="bico">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2C5.8 2 4 3.8 4 6v4l-1 1h10l-1-1V6C12 3.8 10.2 2 8 2Z" stroke="rgba(242,242,242,0.3)" stroke-width="1.2" fill="none"/><path d="M6.5 13c0 .8.7 1.5 1.5 1.5s1.5-.7 1.5-1.5" stroke="rgba(242,242,242,0.3)" stroke-width="1.2" fill="none"/></svg>
+        </div>
+        <span class="blbl">Avisos</span>
+      </div>
+    </div>
+
+  </div><!-- /phone -->
+
+</div><!-- /demo-wrap -->
+
+<script>
+// ── NAV STATE ──
+let current = 'splash';
+let prev = null;
+const noNav = ['splash','detail'];
+const navMap = {home:'bn-home',agenda:'bn-agenda',qr:'bn-qr',notifs:'bn-notifs'};
+
+function goTo(id){
+  const from = document.getElementById('s-'+current);
+  const to   = document.getElementById('s-'+id);
+  if(!to || id === current) return;
+
+  // direction
+  const isBack = id !== 'detail' && current === 'detail';
+  from.classList.remove('active');
+  from.classList.add(isBack ? '' : 'back');
+  to.classList.remove('back');
+  to.classList.add('active');
+
+  setTimeout(()=>{ from.classList.remove('back'); }, 350);
+
+  prev = current;
+  current = id;
+
+  // nav bar visibility
+  const bnav = document.getElementById('bnav');
+  bnav.style.display = noNav.includes(id) ? 'none' : 'flex';
+
+  // active tab
+  document.querySelectorAll('.bi').forEach(b=>b.classList.remove('on'));
+  if(navMap[id]) document.getElementById(navMap[id])?.classList.add('on');
+
+  // scroll to top
+  to.scrollTop = 0;
+}
+
+function goBack(){
+  goTo(prev || 'agenda');
+}
+
+// ── LOADING ANIMATION ──
+(function(){
+  const fill = document.getElementById('lfill');
+  const pct  = document.getElementById('lbl-pct');
+  const steps= [
+    {delay:400,  pct:35,  step:0, label:'Cargando agenda...'},
+    {delay:900,  pct:65,  step:1, label:'Sincronizando...'},
+    {delay:1500, pct:88,  step:2, label:'Casi listo...'},
+    {delay:2200, pct:100, step:3, label:'¡Listo!'},
+  ];
+  steps.forEach(s=>{
+    setTimeout(()=>{
+      fill.style.width = s.pct+'%';
+      pct.textContent  = s.pct+'%';
+      const el = document.getElementById('ls'+s.step);
+      if(el) el.classList.add('show');
+      if(s.label) document.getElementById('lbl-status').textContent = s.label;
+    }, s.delay);
+  });
+  // show button
+  setTimeout(()=>{
+    document.getElementById('splash-btn').classList.add('show');
+  }, 2600);
+})();
+
+// ── ACCENT SWITCHER ──
+function setA(color, rgb, el){
+  const r = document.documentElement;
+  r.style.setProperty('--a',   color);
+  r.style.setProperty('--ar',  rgb);
+  r.style.setProperty('--a2',  'rgba('+rgb+',.12)');
+  r.style.setProperty('--a3',  'rgba('+rgb+',.05)');
+  document.querySelectorAll('.sw').forEach(s=>s.classList.remove('on'));
+  if(el) el.classList.add('on');
+}
+
+// ── HIDE NAV INITIALLY ──
+document.getElementById('bnav').style.display = 'none';
+</script>
+</body>
+</html>

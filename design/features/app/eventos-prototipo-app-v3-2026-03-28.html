@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventOS — Nuevo Diseño</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  /* CORE */
+  --ink:#0a0a0a;
+  --ink2:rgba(10,10,10,0.5);
+  --ink3:rgba(10,10,10,0.2);
+  --paper:#f5f2ec;
+  --paper2:#ede9e0;
+  --paper3:#e4e0d5;
+  --white:#ffffff;
+  /* ACCENT — configurable */
+  --a:#ff3d00;
+  --ar:255,61,0;
+  --a-light:rgba(255,61,0,0.08);
+  --a-mid:rgba(255,61,0,0.15);
+  /* TYPE */
+  --serif:'DM Serif Display',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'Space Mono',monospace;
+  /* LAYOUT */
+  --r:16px;
+  --r-sm:10px;
+  --r-lg:24px;
+}
+
+body{
+  background:#e8e4db;
+  font-family:var(--sans);
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:32px 16px 60px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── WRAPPER ── */
+.wrap{
+  display:flex;flex-direction:column;
+  align-items:center;gap:20px;width:100%;max-width:390px;
+}
+
+.demo-eyebrow{
+  font-family:var(--mono);font-size:10px;letter-spacing:0.1em;
+  color:rgba(10,10,10,0.3);text-transform:uppercase;
+}
+
+/* ── ACCENT SWITCHER ── */
+.acc{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.5);
+  border:1px solid rgba(10,10,10,0.1);
+  border-radius:100px;padding:6px 14px;
+  backdrop-filter:blur(10px);
+}
+.acc span{font-size:9px;color:var(--ink2);font-family:var(--mono)}
+.sw{
+  width:18px;height:18px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:transform .2s,border-color .2s;
+}
+.sw:hover{transform:scale(1.2)}
+.sw.on{border-color:var(--ink);transform:scale(1.1)}
+
+/* ── PHONE ── */
+.phone{
+  width:100%;max-width:375px;
+  background:var(--paper);
+  border-radius:44px;
+  border:1px solid rgba(10,10,10,0.12);
+  overflow:hidden;
+  height:780px;
+  display:flex;flex-direction:column;
+  position:relative;
+  box-shadow:
+    0 0 0 6px rgba(10,10,10,0.04),
+    0 40px 80px -16px rgba(10,10,10,0.25),
+    0 2px 0 rgba(255,255,255,0.8) inset;
+}
+
+/* NOTCH */
+.notch{
+  width:110px;height:28px;background:var(--ink);
+  border-radius:0 0 22px 22px;margin:0 auto;
+  position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:100;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.notch-cam{
+  width:10px;height:10px;border-radius:50%;background:#1a1a1a;
+  border:1px solid rgba(255,255,255,0.1);
+}
+.notch-speaker{
+  width:32px;height:4px;border-radius:2px;background:#1a1a1a;
+}
+
+/* STATUS */
+.sbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 24px 4px;
+  font-family:var(--mono);font-size:10px;color:var(--ink2);
+  position:relative;z-index:99;flex-shrink:0;
+}
+
+/* SCREENS */
+.screens{
+  flex:1;position:relative;overflow:hidden;
+}
+.screen{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  overflow-y:auto;overflow-x:hidden;
+  opacity:0;pointer-events:none;
+  transform:translateY(20px) scale(0.98);
+  transition:opacity .35s cubic-bezier(0.16,1,0.3,1),
+             transform .35s cubic-bezier(0.16,1,0.3,1);
+  scrollbar-width:none;
+}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{
+  opacity:1;pointer-events:all;
+  transform:translateY(0) scale(1);
+}
+.screen.exit{
+  transform:translateY(-10px) scale(1.01);
+  opacity:0;
+}
+
+/* ── NAV DOCK ── */
+.dock{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(245,242,236,0.92);
+  backdrop-filter:blur(20px);
+  border-top:1px solid rgba(10,10,10,0.08);
+  padding:12px 24px 20px;
+  display:flex;justify-content:space-between;align-items:center;
+  z-index:200;flex-shrink:0;
+}
+.dock-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;padding:4px 8px;border-radius:12px;
+  transition:background .2s;min-width:48px;
+}
+.dock-item:active{background:var(--paper3)}
+.dock-ico{
+  width:28px;height:28px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s,transform .2s;
+}
+.dock-item.on .dock-ico{
+  background:var(--ink);
+  transform:scale(1.05);
+}
+.dock-lbl{
+  font-size:8px;font-family:var(--mono);letter-spacing:0.04em;
+  color:var(--ink3);text-transform:uppercase;
+}
+.dock-item.on .dock-lbl{color:var(--ink)}
+
+/* ── SPLASH ── */
+.splash{
+  min-height:100%;background:var(--ink);
+  display:flex;flex-direction:column;
+  align-items:flex-start;justify-content:flex-end;
+  padding:0 0 48px;overflow:hidden;position:relative;
+}
+.splash-bg{
+  position:absolute;top:0;left:0;right:0;
+  height:65%;overflow:hidden;
+}
+.splash-bg-fill{
+  width:100%;height:100%;
+  background:var(--a);
+  clip-path:polygon(0 0, 100% 0, 100% 70%, 60% 100%, 0 85%);
+  animation:splashReveal .8s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes splashReveal{
+  from{clip-path:polygon(0 0,100% 0,100% 0,100% 0,0 0)}
+  to{clip-path:polygon(0 0,100% 0,100% 70%,60% 100%,0 85%)}
+}
+.splash-event-name{
+  position:absolute;top:40px;left:28px;right:28px;
+  font-family:var(--serif);font-size:36px;color:rgba(0,0,0,0.15);
+  line-height:1.05;letter-spacing:-0.02em;
+  animation:fadeIn .6s .2s ease both;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.splash-content{
+  position:relative;z-index:2;padding:0 28px;width:100%;
+}
+.splash-logo-row{
+  display:flex;align-items:center;gap:10px;margin-bottom:24px;
+  animation:fadeIn .5s .3s ease both;
+}
+.splash-logo-sq{
+  width:36px;height:36px;border-radius:10px;background:var(--a);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.splash-logo-name{
+  font-family:var(--serif);font-size:18px;color:var(--paper);
+  letter-spacing:-0.01em;
+}
+
+.splash-event{
+  animation:fadeIn .5s .4s ease both;
+  margin-bottom:10px;
+}
+.splash-event-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:0.1em;
+  color:rgba(245,242,236,0.4);text-transform:uppercase;margin-bottom:6px;
+}
+.splash-event-title{
+  font-family:var(--serif);font-size:28px;color:var(--paper);
+  line-height:1.1;letter-spacing:-0.02em;
+}
+.splash-event-title em{font-style:italic;color:var(--a)}
+
+.splash-meta{
+  display:flex;gap:8px;margin-bottom:28px;
+  animation:fadeIn .5s .5s ease both;
+}
+.smeta{
+  padding:4px 12px;border-radius:100px;font-family:var(--mono);
+  font-size:9px;letter-spacing:0.06em;color:rgba(245,242,236,0.5);
+  border:1px solid rgba(245,242,236,0.15);
+}
+.smeta.hi{border-color:var(--a);color:var(--a)}
+
+/* LOADING */
+.splash-load{
+  animation:fadeIn .5s .6s ease both;width:100%;
+}
+.sl-header{
+  display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:9px;
+  color:rgba(245,242,236,0.3);margin-bottom:8px;
+}
+.sl-track{
+  width:100%;height:2px;background:rgba(245,242,236,0.1);
+  border-radius:100px;overflow:hidden;margin-bottom:14px;
+}
+.sl-fill{
+  height:100%;border-radius:100px;background:var(--a);
+  width:0;transition:width .5s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 0 8px rgba(var(--ar),.6);
+}
+.sl-steps{display:flex;flex-direction:column;gap:5px;margin-bottom:20px}
+.sl-step{
+  font-family:var(--mono);font-size:9px;letter-spacing:0.04em;
+  color:rgba(245,242,236,0.25);
+  display:flex;align-items:center;gap:8px;
+  opacity:0;transform:translateX(-6px);
+  transition:opacity .3s,transform .3s,color .3s;
+}
+.sl-step.on{opacity:1;transform:translateX(0)}
+.sl-step.done{color:rgba(245,242,236,0.5)}
+.sl-dot{
+  width:4px;height:4px;border-radius:50%;
+  background:var(--a);flex-shrink:0;opacity:0;
+  transition:opacity .3s;
+}
+.sl-step.on .sl-dot,.sl-step.done .sl-dot{opacity:1}
+
+.splash-btn{
+  width:100%;padding:16px;
+  background:var(--paper);border:none;border-radius:14px;
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  color:var(--ink);cursor:pointer;letter-spacing:0.06em;
+  text-transform:uppercase;
+  display:flex;align-items:center;justify-content:space-between;
+  opacity:0;transform:translateY(8px);
+  transition:opacity .4s,transform .4s,background .15s;
+}
+.splash-btn.on{opacity:1;transform:translateY(0)}
+.splash-btn:active{background:var(--paper3)}
+.splash-btn-arrow{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--a);display:flex;align-items:center;justify-content:center;
+}
+
+/* ── HOME ── */
+.home-inner{padding:16px 0 100px}
+
+/* HEADER */
+.home-hdr{
+  padding:0 20px 20px;
+  display:flex;justify-content:space-between;align-items:flex-start;
+}
+.home-greeting{
+  font-family:var(--serif);font-size:28px;color:var(--ink);
+  letter-spacing:-0.02em;line-height:1.1;
+}
+.home-greeting em{font-style:italic;color:var(--a)}
+.notif-bubble{
+  width:38px;height:38px;border-radius:12px;
+  background:var(--white);border:1px solid rgba(10,10,10,0.1);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(10,10,10,0.06);
+}
+.notif-bubble::after{
+  content:'';position:absolute;top:7px;right:7px;
+  width:7px;height:7px;border-radius:50%;background:var(--a);
+  border:1.5px solid var(--paper);
+}
+
+/* NOW PLAYING — big editorial card */
+.now-card{
+  margin:0 20px 16px;
+  background:var(--ink);border-radius:var(--r-lg);
+  padding:20px;position:relative;overflow:hidden;
+  cursor:pointer;
+  transition:transform .2s;
+}
+.now-card:active{transform:scale(0.99)}
+.now-card-bg{
+  position:absolute;top:0;right:0;
+  width:120px;height:120px;
+  background:var(--a);opacity:0.08;
+  border-radius:0 var(--r-lg) 0 100%;
+}
+.now-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:8px;letter-spacing:0.1em;
+  color:var(--a);text-transform:uppercase;margin-bottom:10px;
+}
+.now-tag::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--a);animation:blink 1.5s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.now-title{
+  font-family:var(--serif);font-size:22px;color:var(--paper);
+  letter-spacing:-0.02em;line-height:1.15;margin-bottom:16px;
+}
+.now-title em{font-style:italic;color:var(--a)}
+.now-bottom{
+  display:flex;justify-content:space-between;align-items:center;
+}
+.now-speaker{
+  display:flex;align-items:center;gap:8px;
+}
+.now-av{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--a);display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:9px;font-weight:700;color:#000;
+  flex-shrink:0;
+}
+.now-sname{font-size:11px;color:rgba(245,242,236,0.6)}
+.now-time{
+  font-family:var(--mono);font-size:9px;color:var(--a);
+  letter-spacing:0.06em;
+}
+.now-enter{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:9px;color:var(--paper);
+  letter-spacing:0.06em;text-transform:uppercase;
+}
+.now-enter-arrow{
+  width:24px;height:24px;border-radius:8px;
+  background:var(--a);display:flex;align-items:center;justify-content:center;
+}
+
+/* SECTION HDR */
+.sec-hdr{
+  padding:0 20px;margin-bottom:10px;
+  display:flex;justify-content:space-between;align-items:baseline;
+}
+.sec-title{
+  font-family:var(--mono);font-size:9px;letter-spacing:0.1em;
+  color:var(--ink3);text-transform:uppercase;
+}
+.sec-more{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.06em;
+  color:var(--a);text-transform:uppercase;cursor:pointer;
+}
+
+/* UPCOMING SESSIONS — horizontal scroll */
+.sessions-scroll{
+  display:flex;gap:10px;overflow-x:auto;
+  padding:0 20px 4px;scrollbar-width:none;
+  margin-bottom:20px;
+}
+.sessions-scroll::-webkit-scrollbar{display:none}
+.sess-mini{
+  flex:0 0 160px;background:var(--white);
+  border-radius:var(--r);padding:14px;
+  border:1px solid rgba(10,10,10,0.07);
+  cursor:pointer;transition:transform .15s;
+  box-shadow:0 2px 10px rgba(10,10,10,0.06);
+}
+.sess-mini:active{transform:scale(0.97)}
+.sess-mini-time{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.06em;
+  color:var(--ink3);margin-bottom:6px;
+}
+.sess-mini-title{
+  font-family:var(--serif);font-size:14px;color:var(--ink);
+  letter-spacing:-0.01em;line-height:1.25;margin-bottom:10px;
+}
+.sess-mini-tag{
+  display:inline-block;padding:2px 8px;border-radius:100px;
+  font-family:var(--mono);font-size:7px;letter-spacing:0.06em;
+  background:var(--paper2);color:var(--ink2);text-transform:uppercase;
+}
+.sess-mini.live .sess-mini-tag{
+  background:var(--a-light);color:var(--a);
+  border:1px solid rgba(var(--ar),.2);
+}
+
+/* STATS ROW */
+.stats-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  padding:0 20px;margin-bottom:20px;
+}
+.stat-box{
+  background:var(--white);border-radius:var(--r);
+  padding:14px;border:1px solid rgba(10,10,10,0.07);
+  box-shadow:0 2px 8px rgba(10,10,10,0.04);
+}
+.stat-n{
+  font-family:var(--serif);font-size:32px;color:var(--ink);
+  letter-spacing:-0.03em;line-height:1;margin-bottom:2px;
+}
+.stat-n em{font-style:normal;color:var(--a)}
+.stat-l{font-size:10px;color:var(--ink2)}
+
+/* SPONSOR STRIP */
+.sponsor-wrap{
+  margin:0 20px;background:var(--white);
+  border-radius:var(--r);padding:12px 16px;
+  border:1px solid rgba(10,10,10,0.07);
+  overflow:hidden;
+}
+.sp-label{
+  font-family:var(--mono);font-size:7px;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:8px;
+}
+.sp-track-w{overflow:hidden}
+.sp-track{
+  display:flex;gap:20px;align-items:center;
+  animation:spScroll 16s linear infinite;width:max-content;
+}
+@keyframes spScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.sp-logo{
+  font-family:var(--mono);font-weight:700;font-size:10px;
+  color:rgba(10,10,10,0.25);white-space:nowrap;letter-spacing:0.04em;
+}
+.sp-sep{color:rgba(10,10,10,0.12);font-size:10px}
+
+/* ── AGENDA ── */
+.agenda-inner{padding:16px 0 100px}
+.agenda-hdr{
+  padding:0 20px 20px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+}
+.agenda-title{
+  font-family:var(--serif);font-size:32px;color:var(--ink);
+  letter-spacing:-0.03em;line-height:1;
+}
+.day-pills{
+  display:flex;gap:5px;padding:0 20px;margin-bottom:20px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.day-pills::-webkit-scrollbar{display:none}
+.dpill{
+  flex-shrink:0;padding:7px 16px;border-radius:100px;
+  font-family:var(--mono);font-size:9px;letter-spacing:0.06em;
+  text-transform:uppercase;border:1px solid rgba(10,10,10,0.12);
+  color:var(--ink2);cursor:pointer;transition:all .2s;
+  background:transparent;
+}
+.dpill.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* AGENDA ITEMS — big editorial style */
+.ag-list{padding:0 20px}
+.ag-item{
+  margin-bottom:10px;cursor:pointer;
+  transition:transform .15s;
+}
+.ag-item:active{transform:scale(0.99)}
+.ag-item-inner{
+  background:var(--white);border-radius:var(--r);
+  padding:16px;border:1px solid rgba(10,10,10,0.07);
+  box-shadow:0 2px 8px rgba(10,10,10,0.04);
+  position:relative;overflow:hidden;
+}
+.ag-item.live .ag-item-inner{
+  background:var(--ink);
+  border-color:transparent;
+}
+.ag-item-accent{
+  position:absolute;top:0;left:0;bottom:0;width:3px;
+  background:var(--paper3);border-radius:2px 0 0 2px;
+}
+.ag-item.live .ag-item-accent{background:var(--a)}
+.ag-time{
+  font-family:var(--mono);font-size:9px;letter-spacing:0.06em;
+  color:var(--ink3);margin-bottom:5px;
+}
+.ag-item.live .ag-time{color:var(--a)}
+.ag-title{
+  font-family:var(--serif);font-size:16px;color:var(--ink);
+  letter-spacing:-0.01em;line-height:1.25;margin-bottom:8px;
+}
+.ag-item.live .ag-title{color:var(--paper)}
+.ag-meta{display:flex;justify-content:space-between;align-items:center}
+.ag-speaker{display:flex;align-items:center;gap:6px}
+.ag-av{
+  width:20px;height:20px;border-radius:50%;
+  background:var(--paper2);border:1px solid rgba(10,10,10,0.1);
+  font-size:7px;font-weight:600;color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);flex-shrink:0;
+}
+.ag-item.live .ag-av{background:var(--a);color:#000;border-color:transparent}
+.ag-sname{font-size:10px;color:var(--ink2)}
+.ag-item.live .ag-sname{color:rgba(245,242,236,0.6)}
+.ag-room{
+  font-family:var(--mono);font-size:8px;color:var(--ink3);
+  letter-spacing:0.04em;
+}
+.ag-item.live .ag-room{color:rgba(245,242,236,0.3)}
+.ag-live-badge{
+  display:flex;align-items:center;gap:4px;
+  font-family:var(--mono);font-size:8px;color:var(--a);
+  letter-spacing:0.06em;text-transform:uppercase;
+}
+.ag-live-badge::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--a);animation:blink 1.5s infinite;
+}
+
+/* ── SESSION DETAIL ── */
+.detail-inner{padding:16px 0 100px}
+.back-row{
+  padding:0 20px 16px;
+  display:flex;align-items:center;gap:8px;
+  cursor:pointer;
+}
+.back-row:active{opacity:.7}
+.back-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:0.06em;
+  color:var(--a);text-transform:uppercase;
+}
+.detail-head{
+  padding:0 20px 20px;
+  border-bottom:1px solid rgba(10,10,10,0.08);margin-bottom:20px;
+}
+.detail-type{
+  font-family:var(--mono);font-size:9px;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--a);margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.detail-type::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--a);animation:blink 1.5s infinite;
+}
+.detail-title{
+  font-family:var(--serif);font-size:26px;color:var(--ink);
+  letter-spacing:-0.02em;line-height:1.15;margin-bottom:14px;
+}
+.detail-chips{display:flex;gap:6px;flex-wrap:wrap}
+.dchip{
+  padding:4px 12px;border-radius:100px;
+  font-family:var(--mono);font-size:8px;letter-spacing:0.06em;
+  background:var(--paper2);color:var(--ink2);text-transform:uppercase;
+}
+.detail-speaker-card{
+  margin:0 20px 20px;background:var(--white);
+  border-radius:var(--r);padding:16px;
+  border:1px solid rgba(10,10,10,0.07);
+  display:flex;align-items:center;gap:12px;
+}
+.detail-sav{
+  width:48px;height:48px;border-radius:50%;
+  background:var(--a);display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:16px;color:#000;
+  font-weight:400;flex-shrink:0;
+}
+.detail-sname{
+  font-family:var(--serif);font-size:15px;color:var(--ink);
+  letter-spacing:-0.01em;margin-bottom:2px;
+}
+.detail-srole{font-size:11px;color:var(--ink2)}
+.detail-desc{
+  padding:0 20px;font-size:14px;line-height:1.7;
+  color:var(--ink2);margin-bottom:24px;
+}
+.detail-btn{
+  margin:0 20px 10px;width:calc(100% - 40px);
+  padding:16px;background:var(--ink);border:none;border-radius:var(--r);
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  color:var(--paper);cursor:pointer;letter-spacing:0.08em;
+  text-transform:uppercase;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.detail-btn:active{opacity:.9}
+.detail-btn-arr{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--a);display:flex;align-items:center;justify-content:center;
+}
+.detail-btn-out{
+  margin:0 20px;width:calc(100% - 40px);
+  padding:14px;background:transparent;
+  border:1px solid rgba(10,10,10,0.15);border-radius:var(--r);
+  font-family:var(--mono);font-size:10px;color:var(--ink);
+  cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;
+}
+.detail-btn-out:active{background:var(--paper2)}
+
+/* ── QR SCREEN ── */
+.qr-inner{padding:16px 0 100px}
+.qr-hdr{padding:0 20px 24px}
+.qr-hdr-title{
+  font-family:var(--serif);font-size:32px;color:var(--ink);
+  letter-spacing:-0.03em;line-height:1;margin-bottom:4px;
+}
+.qr-hdr-sub{font-size:11px;color:var(--ink2)}
+
+/* QR IDENTITY CARD — the signature moment */
+.qr-card{
+  margin:0 20px 16px;
+  background:var(--ink);border-radius:24px;
+  padding:24px;position:relative;overflow:hidden;
+}
+.qr-card-noise{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:0.4;pointer-events:none;
+}
+.qr-card-accent{
+  position:absolute;bottom:-40px;right:-40px;
+  width:140px;height:140px;border-radius:50%;
+  background:var(--a);opacity:0.12;
+}
+.qr-profile-row{
+  display:flex;align-items:center;gap:12px;margin-bottom:20px;
+  position:relative;z-index:2;
+}
+.qr-profile-av{
+  width:48px;height:48px;border-radius:50%;
+  background:var(--a);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:16px;color:#000;
+  flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(var(--ar),.3);
+}
+.qr-pname{
+  font-family:var(--serif);font-size:18px;color:var(--paper);
+  letter-spacing:-0.01em;
+}
+.qr-prole{font-size:10px;color:rgba(245,242,236,0.45);margin-top:2px}
+
+/* QR CODE — accent colored */
+.qr-code-wrap{
+  position:relative;z-index:2;
+  background:rgba(245,242,236,0.05);
+  border-radius:16px;padding:16px;
+  display:flex;flex-direction:column;align-items:center;
+  margin-bottom:16px;
+  border:1px solid rgba(245,242,236,0.08);
+}
+.qr-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:3px;
+  width:112px;margin-bottom:10px;
+}
+.qc{aspect-ratio:1;border-radius:2px;transition:background .4s}
+.qr-hint{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.08em;
+  text-transform:uppercase;color:rgba(245,242,236,0.3);
+}
+
+.qr-stats{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  position:relative;z-index:2;
+}
+.qr-stat{
+  background:rgba(245,242,236,0.06);border-radius:12px;
+  padding:12px;border:1px solid rgba(245,242,236,0.06);
+}
+.qrs-n{
+  font-family:var(--serif);font-size:28px;color:var(--a);
+  letter-spacing:-0.03em;line-height:1;
+}
+.qrs-l{font-size:9px;color:rgba(245,242,236,0.4);margin-top:3px}
+
+.qr-share{
+  margin:0 20px;width:calc(100% - 40px);
+  padding:14px;background:var(--white);
+  border:1px solid rgba(10,10,10,0.1);border-radius:var(--r);
+  font-family:var(--mono);font-size:10px;color:var(--ink);
+  cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.qr-share:active{background:var(--paper2)}
+
+/* ── NOTIFICATIONS ── */
+.notifs-inner{padding:16px 0 100px}
+.notifs-hdr{padding:0 20px 20px}
+.notifs-title{
+  font-family:var(--serif);font-size:32px;color:var(--ink);
+  letter-spacing:-0.03em;line-height:1;margin-bottom:4px;
+}
+.notifs-sub{font-size:11px;color:var(--ink2)}
+
+.nf-list{padding:0 20px;display:flex;flex-direction:column;gap:8px}
+.nf-item{
+  background:var(--white);border-radius:var(--r);
+  padding:14px;border:1px solid rgba(10,10,10,0.07);
+  cursor:pointer;transition:transform .15s;
+  display:flex;gap:12px;align-items:flex-start;
+  box-shadow:0 2px 8px rgba(10,10,10,0.04);
+}
+.nf-item:active{transform:scale(0.99)}
+.nf-item.feat{
+  background:var(--ink);border-color:transparent;
+}
+.nf-ico-wrap{
+  width:36px;height:36px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--paper2);
+}
+.nf-item.feat .nf-ico-wrap{background:rgba(245,242,236,0.08)}
+.nf-body{flex:1}
+.nf-text{font-size:12px;color:var(--ink);line-height:1.5;margin-bottom:6px}
+.nf-item.feat .nf-text{color:var(--paper)}
+.nf-bottom{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nf-time{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.04em;
+  color:var(--ink3);
+}
+.nf-item.feat .nf-time{color:rgba(245,242,236,0.3)}
+.nf-badge{
+  font-family:var(--mono);font-size:7px;letter-spacing:0.06em;
+  padding:2px 8px;border-radius:100px;text-transform:uppercase;
+  background:var(--a-light);color:var(--a);
+  border:1px solid rgba(var(--ar),.2);
+}
+.nf-item.feat .nf-badge{
+  background:rgba(var(--ar),.2);border-color:rgba(var(--ar),.3);
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="demo-eyebrow">EventOS — Prototipo v3</div>
+
+  <!-- ACCENT -->
+  <div class="acc">
+    <span>Acento →</span>
+    <div class="sw on" style="background:#ff3d00" onclick="setA('#ff3d00','255,61,0',this)"></div>
+    <div class="sw" style="background:#0066ff" onclick="setA('#0066ff','0,102,255',this)"></div>
+    <div class="sw" style="background:#00c853" onclick="setA('#00c853','0,200,83',this)"></div>
+    <div class="sw" style="background:#aa00ff" onclick="setA('#aa00ff','170,0,255',this)"></div>
+    <div class="sw" style="background:#ffab00" onclick="setA('#ffab00','255,171,0',this)"></div>
+    <div class="sw" style="background:#000000" onclick="setA('#000000','0,0,0',this)"></div>
+  </div>
+
+  <!-- PHONE -->
+  <div class="phone" id="phone">
+    <div class="notch">
+      <div class="notch-speaker"></div>
+      <div class="notch-cam"></div>
+    </div>
+    <div class="sbar">
+      <span>9:41</span>
+      <div style="display:flex;gap:5px;align-items:center">
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+          <rect x="0" y="5" width="2" height="5" rx="0.5" fill="rgba(10,10,10,0.3)"/>
+          <rect x="3.5" y="3" width="2" height="7" rx="0.5" fill="rgba(10,10,10,0.4)"/>
+          <rect x="7" y="1" width="2" height="9" rx="0.5" fill="rgba(10,10,10,0.6)"/>
+          <rect x="10.5" y="0" width="2" height="10" rx="0.5" fill="rgba(10,10,10,0.8)"/>
+        </svg>
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+          <rect x=".5" y=".5" width="13" height="9" rx="2" stroke="rgba(10,10,10,0.3)" stroke-width="1"/>
+          <rect x="2" y="2" width="8" height="6" rx="1" fill="rgba(10,10,10,0.4)"/>
+          <rect x="13.5" y="3" width="2" height="4" rx="1" fill="rgba(10,10,10,0.3)"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="screens">
+
+      <!-- SPLASH -->
+      <div class="screen active" id="s-splash">
+        <div class="splash">
+          <div class="splash-bg">
+            <div class="splash-bg-fill"></div>
+          </div>
+          <div class="splash-event-name">Claro<br>Tech<br>Summit</div>
+          <div class="splash-content">
+            <div class="splash-logo-row">
+              <div class="splash-logo-sq">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 11L12 3L21 11V21H15V16H9V21H3V11Z" fill="#000"/>
+                </svg>
+              </div>
+              <div class="splash-logo-name">EventOS</div>
+            </div>
+            <div class="splash-event">
+              <div class="splash-event-label">Bienvenido al evento</div>
+              <div class="splash-event-title">Claro Tech<br><em>Summit 2025</em></div>
+            </div>
+            <div class="splash-meta">
+              <span class="smeta hi">En vivo</span>
+              <span class="smeta">Mar 13–14</span>
+              <span class="smeta">Bogotá</span>
+            </div>
+            <div class="splash-load">
+              <div class="sl-header">
+                <span id="sl-label">Iniciando...</span>
+                <span id="sl-pct">0%</span>
+              </div>
+              <div class="sl-track"><div class="sl-fill" id="sl-fill"></div></div>
+              <div class="sl-steps">
+                <div class="sl-step" id="sl0"><div class="sl-dot"></div>Verificando acceso</div>
+                <div class="sl-step" id="sl1"><div class="sl-dot"></div>Cargando agenda</div>
+                <div class="sl-step" id="sl2"><div class="sl-dot"></div>Sincronizando offline</div>
+                <div class="sl-step" id="sl3"><div class="sl-dot"></div>Listo</div>
+              </div>
+            </div>
+            <button class="splash-btn" id="splash-btn" onclick="goTo('home')">
+              <span>Entrar al evento</span>
+              <div class="splash-btn-arrow">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOME -->
+      <div class="screen" id="s-home">
+        <div class="home-inner">
+          <div class="home-hdr">
+            <div class="home-greeting">Hola,<br><em>Ana</em></div>
+            <div class="notif-bubble" onclick="goTo('notifs')">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                <path d="M10 2C7.2 2 5 4.2 5 7v5l-1.5 1.5h13L15 12V7C15 4.2 12.8 2 10 2Z" stroke="rgba(10,10,10,0.6)" stroke-width="1.3" fill="none"/>
+                <path d="M8 16c0 1.1.9 2 2 2s2-.9 2-2" stroke="rgba(10,10,10,0.6)" stroke-width="1.3" fill="none"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="now-card" onclick="goTo('detail')">
+            <div class="now-card-bg"></div>
+            <div class="now-tag">Ahora en Sala A</div>
+            <div class="now-title">IA en Telecom<br>&amp; <em>Redes del Futuro</em></div>
+            <div class="now-bottom">
+              <div class="now-speaker">
+                <div class="now-av">CM</div>
+                <span class="now-sname">Dr. Carlos Mejía</span>
+              </div>
+              <div class="now-enter">
+                <span>Ver</span>
+                <div class="now-enter-arrow">
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sec-hdr">
+            <span class="sec-title">Próximas sesiones</span>
+            <span class="sec-more" onclick="goTo('agenda')">Ver agenda →</span>
+          </div>
+
+          <div class="sessions-scroll">
+            <div class="sess-mini live" onclick="goTo('detail')">
+              <div class="sess-mini-time">10:30 — 12:00</div>
+              <div class="sess-mini-title">IA en Telecom</div>
+              <span class="sess-mini-tag">En vivo</span>
+            </div>
+            <div class="sess-mini" onclick="goTo('detail')">
+              <div class="sess-mini-time">14:00 — 15:30</div>
+              <div class="sess-mini-title">Cloud &amp; Seguridad Digital</div>
+              <span class="sess-mini-tag">Panel</span>
+            </div>
+            <div class="sess-mini" onclick="goTo('detail')">
+              <div class="sess-mini-time">16:00 — 17:00</div>
+              <div class="sess-mini-title">Automatización con IA</div>
+              <span class="sess-mini-tag">Workshop</span>
+            </div>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-n">8<em>47</em></div>
+              <div class="stat-l">Asistentes hoy</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-n"><em>3</em>/8</div>
+              <div class="stat-l">Stands visitados</div>
+            </div>
+          </div>
+
+          <div class="sec-hdr" style="margin-bottom:10px">
+            <span class="sec-title">Patrocinadores</span>
+          </div>
+          <div class="sponsor-wrap">
+            <div class="sp-track-w">
+              <div class="sp-track">
+                <span class="sp-logo">Microsoft</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Samsung</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Avaya</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Bitdefender</span><span class="sp-sep">·</span>
+                <span class="sp-logo">ZTE</span><span class="sp-sep">·</span>
+                <span class="sp-logo">BMC</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Five9</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Microsoft</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Samsung</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Avaya</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Bitdefender</span><span class="sp-sep">·</span>
+                <span class="sp-logo">ZTE</span><span class="sp-sep">·</span>
+                <span class="sp-logo">BMC</span><span class="sp-sep">·</span>
+                <span class="sp-logo">Five9</span><span class="sp-sep">·</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGENDA -->
+      <div class="screen" id="s-agenda">
+        <div class="agenda-inner">
+          <div class="agenda-hdr">
+            <div class="agenda-title">Agenda</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:0.04em">12 sesiones</div>
+          </div>
+          <div class="day-pills">
+            <div class="dpill on">Hoy · Mar 13</div>
+            <div class="dpill">Mañana · Mar 14</div>
+          </div>
+          <div class="ag-list">
+            <div class="ag-item">
+              <div class="ag-item-inner">
+                <div class="ag-item-accent"></div>
+                <div class="ag-time">09:00 — 10:00</div>
+                <div class="ag-title">Bienvenida e inauguración oficial</div>
+                <div class="ag-meta">
+                  <div class="ag-speaker">
+                    <div class="ag-av" style="background:var(--paper2)"></div>
+                    <span class="ag-sname">Organización</span>
+                  </div>
+                  <span class="ag-room">Auditorio</span>
+                </div>
+              </div>
+            </div>
+            <div class="ag-item live" onclick="goTo('detail')">
+              <div class="ag-item-inner">
+                <div class="ag-item-accent"></div>
+                <div class="ag-time">10:30 — 12:00</div>
+                <div class="ag-title">IA en Telecomunicaciones y Redes del Futuro</div>
+                <div class="ag-meta">
+                  <div class="ag-speaker">
+                    <div class="ag-av">CM</div>
+                    <span class="ag-sname">Dr. Carlos Mejía</span>
+                  </div>
+                  <div class="ag-live-badge">En vivo</div>
+                </div>
+              </div>
+            </div>
+            <div class="ag-item">
+              <div class="ag-item-inner">
+                <div class="ag-item-accent"></div>
+                <div class="ag-time">12:00 — 14:00</div>
+                <div class="ag-title">Almuerzo y zona de networking</div>
+                <div class="ag-meta">
+                  <div class="ag-speaker"></div>
+                  <span class="ag-room">Nivel 2 · Presenciales</span>
+                </div>
+              </div>
+            </div>
+            <div class="ag-item" onclick="goTo('detail')">
+              <div class="ag-item-inner">
+                <div class="ag-item-accent"></div>
+                <div class="ag-time">14:00 — 15:30</div>
+                <div class="ag-title">Cloud, Seguridad &amp; Transformación Digital</div>
+                <div class="ag-meta">
+                  <div class="ag-speaker">
+                    <div class="ag-av">MR</div>
+                    <span class="ag-sname">María Restrepo</span>
+                  </div>
+                  <span class="ag-room">Sala B</span>
+                </div>
+              </div>
+            </div>
+            <div class="ag-item" onclick="goTo('detail')">
+              <div class="ag-item-inner">
+                <div class="ag-item-accent"></div>
+                <div class="ag-time">16:00 — 17:00</div>
+                <div class="ag-title">Automatización con IA: casos reales en Colombia</div>
+                <div class="ag-meta">
+                  <div class="ag-speaker">
+                    <div class="ag-av">JP</div>
+                    <span class="ag-sname">Juan Pablo Vargas</span>
+                  </div>
+                  <span class="ag-room">Sala A</span>
+                </div>
+              </div>
+            </div>
+            <div class="ag-item">
+              <div class="ag-item-inner">
+                <div class="ag-item-accent"></div>
+                <div class="ag-time">18:00 — 20:00</div>
+                <div class="ag-title">Cóctel de networking y cierre día 1</div>
+                <div class="ag-meta">
+                  <div class="ag-speaker"></div>
+                  <span class="ag-room">Terraza</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DETAIL -->
+      <div class="screen" id="s-detail">
+        <div class="detail-inner">
+          <div class="back-row" onclick="goBack()">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="var(--a)" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span class="back-label">Volver</span>
+          </div>
+          <div class="detail-head">
+            <div class="detail-type">Ahora · Keynote · Sala A</div>
+            <div class="detail-title">IA en Telecomunicaciones y Redes del Futuro</div>
+            <div class="detail-chips">
+              <span class="dchip">10:30 — 12:00</span>
+              <span class="dchip">90 min</span>
+              <span class="dchip">247 asistentes</span>
+            </div>
+          </div>
+          <div class="detail-speaker-card">
+            <div class="detail-sav">CM</div>
+            <div>
+              <div class="detail-sname">Dr. Carlos Mejía</div>
+              <div class="detail-srole">CTO · Claro Colombia</div>
+            </div>
+          </div>
+          <div class="detail-desc">
+            Una exploración profunda del impacto de la inteligencia artificial en las redes de telecomunicaciones modernas. Desde la optimización de redes hasta la predicción de fallos en tiempo real, esta sesión muestra casos de uso reales implementados en Colombia.
+          </div>
+          <button class="detail-btn">
+            <span>Ver transmisión en vivo</span>
+            <div class="detail-btn-arr">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+          </button>
+          <button class="detail-btn-out">Agregar a favoritos</button>
+        </div>
+      </div>
+
+      <!-- QR -->
+      <div class="screen" id="s-qr">
+        <div class="qr-inner">
+          <div class="qr-hdr">
+            <div class="qr-hdr-title">Mi<br>identificación</div>
+            <div class="qr-hdr-sub">Presentar en stands y entrada</div>
+          </div>
+          <div class="qr-card">
+            <div class="qr-card-noise"></div>
+            <div class="qr-card-accent"></div>
+            <div class="qr-profile-row">
+              <div class="qr-profile-av">AG</div>
+              <div>
+                <div class="qr-pname">Ana Gómez</div>
+                <div class="qr-prole">Bancolombia · Marketing Director</div>
+              </div>
+            </div>
+            <div class="qr-code-wrap">
+              <div class="qr-grid" id="qr-grid">
+                <div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div>
+                <div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div>
+                <div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div>
+                <div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div>
+                <div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div>
+                <div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div>
+                <div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div><div class="qc"></div>
+              </div>
+              <div class="qr-hint">Presentar en cada stand</div>
+            </div>
+            <div class="qr-stats">
+              <div class="qr-stat"><div class="qrs-n">3</div><div class="qrs-l">Stands visitados</div></div>
+              <div class="qr-stat"><div class="qrs-n">340</div><div class="qrs-l">Puntos</div></div>
+            </div>
+          </div>
+          <button class="qr-share">
+            <span>Compartir perfil</span>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="4" r="2" stroke="rgba(10,10,10,0.5)" stroke-width="1.2"/><circle cx="4" cy="8" r="2" stroke="rgba(10,10,10,0.5)" stroke-width="1.2"/><circle cx="12" cy="12" r="2" stroke="rgba(10,10,10,0.5)" stroke-width="1.2"/><line x1="6" y1="7" x2="10" y2="5" stroke="rgba(10,10,10,0.25)" stroke-width="1.2"/><line x1="6" y1="9" x2="10" y2="11" stroke="rgba(10,10,10,0.25)" stroke-width="1.2"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- NOTIFS -->
+      <div class="screen" id="s-notifs">
+        <div class="notifs-inner">
+          <div class="notifs-hdr">
+            <div class="notifs-title">Avisos</div>
+            <div class="notifs-sub">3 nuevos hoy</div>
+          </div>
+          <div class="nf-list">
+            <div class="nf-item feat">
+              <div class="nf-ico-wrap">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2C7.2 2 5 4.2 5 7v5l-1.5 1.5h13L15 12V7C15 4.2 12.8 2 10 2Z" stroke="var(--a)" stroke-width="1.3" fill="none"/><path d="M8 16c0 1.1.9 2 2 2s2-.9 2-2" stroke="var(--a)" stroke-width="1.3" fill="none"/></svg>
+              </div>
+              <div class="nf-body">
+                <div class="nf-text">El almuerzo está listo en la zona de networking — nivel 2</div>
+                <div class="nf-bottom">
+                  <span class="nf-time">Hace 2 min</span>
+                  <span class="nf-badge">Solo presenciales</span>
+                </div>
+              </div>
+            </div>
+            <div class="nf-item">
+              <div class="nf-ico-wrap" style="background:var(--paper2)">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="rgba(10,10,10,0.3)" stroke-width="1.3"/><line x1="10" y1="7" x2="10" y2="11" stroke="rgba(10,10,10,0.3)" stroke-width="1.3"/><circle cx="10" cy="13.5" r=".8" fill="rgba(10,10,10,0.3)"/></svg>
+              </div>
+              <div class="nf-body">
+                <div class="nf-text" style="color:var(--ink2)">Panel de Cloud arranca en 10 minutos · Sala B</div>
+                <div class="nf-bottom">
+                  <span class="nf-time">Hace 8 min</span>
+                  <span class="nf-badge">Todos</span>
+                </div>
+              </div>
+            </div>
+            <div class="nf-item">
+              <div class="nf-ico-wrap" style="background:var(--paper2)">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12" rx="2" stroke="rgba(10,10,10,0.3)" stroke-width="1.3"/><line x1="6" y1="9" x2="14" y2="9" stroke="rgba(10,10,10,0.2)" stroke-width="1.1"/><line x1="6" y1="12" x2="11" y2="12" stroke="rgba(10,10,10,0.2)" stroke-width="1.1"/></svg>
+              </div>
+              <div class="nf-body">
+                <div class="nf-text" style="color:var(--ink2)">Nueva encuesta disponible: ¿Qué sesión te interesa mañana?</div>
+                <div class="nf-bottom"><span class="nf-time">Hace 1 hora</span></div>
+              </div>
+            </div>
+            <div class="nf-item">
+              <div class="nf-ico-wrap" style="background:var(--paper2)">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M5 10l4 4 6-8" stroke="rgba(10,10,10,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div class="nf-body">
+                <div class="nf-text" style="color:var(--ink2)">Tu registro fue confirmado. Bienvenida al evento.</div>
+                <div class="nf-bottom"><span class="nf-time">Ayer 5:30 PM</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /screens -->
+
+    <!-- DOCK -->
+    <div class="dock" id="dock" style="display:none">
+      <div class="dock-item on" id="dn-home" onclick="goTo('home')">
+        <div class="dock-ico">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+            <path d="M2 6L8 2L14 6V14H10V10H6V14H2V6Z" fill="white"/>
+          </svg>
+        </div>
+        <span class="dock-lbl">Inicio</span>
+      </div>
+      <div class="dock-item" id="dn-agenda" onclick="goTo('agenda')">
+        <div class="dock-ico">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="2" width="12" height="12" rx="2" stroke="rgba(10,10,10,0.35)" stroke-width="1.3"/>
+            <line x1="5" y1="6" x2="11" y2="6" stroke="rgba(10,10,10,0.35)" stroke-width="1.1"/>
+            <line x1="5" y1="9" x2="9" y2="9" stroke="rgba(10,10,10,0.35)" stroke-width="1.1"/>
+          </svg>
+        </div>
+        <span class="dock-lbl">Agenda</span>
+      </div>
+      <div class="dock-item" id="dn-qr" onclick="goTo('qr')">
+        <div class="dock-ico">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="2" width="5" height="5" rx="1" stroke="rgba(10,10,10,0.35)" stroke-width="1.3"/>
+            <rect x="9" y="2" width="5" height="5" rx="1" stroke="rgba(10,10,10,0.35)" stroke-width="1.3"/>
+            <rect x="2" y="9" width="5" height="5" rx="1" stroke="rgba(10,10,10,0.35)" stroke-width="1.3"/>
+            <path d="M10 10h2v2h-2zM12 12h2v2h-2z" fill="rgba(10,10,10,0.35)"/>
+          </svg>
+        </div>
+        <span class="dock-lbl">Mi QR</span>
+      </div>
+      <div class="dock-item" id="dn-notifs" onclick="goTo('notifs')">
+        <div class="dock-ico">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+            <path d="M8 2C5.8 2 4 3.8 4 6v4l-1 1h10l-1-1V6C12 3.8 10.2 2 8 2Z" stroke="rgba(10,10,10,0.35)" stroke-width="1.3" fill="none"/>
+            <path d="M6.5 13c0 .8.7 1.5 1.5 1.5s1.5-.7 1.5-1.5" stroke="rgba(10,10,10,0.35)" stroke-width="1.3" fill="none"/>
+          </svg>
+        </div>
+        <span class="dock-lbl">Avisos</span>
+      </div>
+    </div>
+
+  </div><!-- /phone -->
+
+</div>
+
+<script>
+// ── QR PATTERN ──
+const QR_PATTERN = [
+  1,1,1,0,1,1,1,
+  1,0,0,1,0,0,1,
+  1,0,1,0,1,0,1,
+  0,1,0,1,0,1,0,
+  1,0,1,1,0,0,1,
+  1,1,0,0,1,0,1,
+  1,1,1,0,1,1,1
+];
+
+function renderQR(accent){
+  const cells = document.querySelectorAll('#qr-grid .qc');
+  cells.forEach((c,i)=>{
+    c.style.background = QR_PATTERN[i]
+      ? accent
+      : 'rgba(245,242,236,0.04)';
+  });
+}
+
+// ── NAV ──
+let current='splash', prev=null;
+const noNav=['splash','detail'];
+const navMap={home:'dn-home',agenda:'dn-agenda',qr:'dn-qr',notifs:'dn-notifs'};
+
+function goTo(id){
+  if(id===current) return;
+  const from=document.getElementById('s-'+current);
+  const to=document.getElementById('s-'+id);
+  if(!to) return;
+
+  from.classList.remove('active');
+  from.classList.add('exit');
+  setTimeout(()=>from.classList.remove('exit'),400);
+
+  to.classList.add('active');
+  to.scrollTop=0;
+
+  prev=current;
+  current=id;
+
+  const dock=document.getElementById('dock');
+  dock.style.display=noNav.includes(id)?'none':'flex';
+
+  document.querySelectorAll('.dock-item').forEach(b=>b.classList.remove('on'));
+  if(navMap[id]) document.getElementById(navMap[id])?.classList.add('on');
+}
+
+function goBack(){
+  goTo(prev||'agenda');
+}
+
+// ── LOADING ──
+(function(){
+  const fill=document.getElementById('sl-fill');
+  const pct=document.getElementById('sl-pct');
+  const lbl=document.getElementById('sl-label');
+  const steps=[
+    {t:400, p:35, i:0, l:'Cargando agenda...'},
+    {t:900, p:65, i:1, l:'Sincronizando...'},
+    {t:1500,p:88, i:2, l:'Casi listo...'},
+    {t:2200,p:100,i:3, l:'¡Listo!'},
+  ];
+  steps.forEach(s=>{
+    setTimeout(()=>{
+      fill.style.width=s.p+'%';
+      pct.textContent=s.p+'%';
+      lbl.textContent=s.l;
+      const el=document.getElementById('sl'+s.i);
+      if(el){ el.classList.add('on'); if(s.i>0) document.getElementById('sl'+(s.i-1))?.classList.add('done'); }
+    },s.t);
+  });
+  setTimeout(()=>{
+    document.getElementById('splash-btn').classList.add('on');
+  },2600);
+})();
+
+// ── ACCENT ──
+function setA(color,rgb,el){
+  const r=document.documentElement;
+  r.style.setProperty('--a',color);
+  r.style.setProperty('--ar',rgb);
+  r.style.setProperty('--a-light',`rgba(${rgb},0.08)`);
+  r.style.setProperty('--a-mid',`rgba(${rgb},0.15)`);
+  document.querySelectorAll('.sw').forEach(s=>s.classList.remove('on'));
+  if(el) el.classList.add('on');
+  renderQR(color);
+}
+
+// init QR
+renderQR(getComputedStyle(document.documentElement).getPropertyValue('--a').trim()||'#ff3d00');
+document.getElementById('dock').style.display='none';
+</script>
+</body>
+</html>
