@@ -106,6 +106,11 @@
     tiene que seguir funcionando). Si el arreglo rompe una prueba vieja que fija una regla de producto, no se reescribe
     la prueba: se adapta el arreglo o se pregunta a Kamilo (BUG-397 contra BUG-363, retro de la fase 0).
 
+30. **Cookies del admin nuevo y lo que el navegador guarda** (Kamilo 2026-10-26, M2.2.7). Toda cookie que pone el
+    admin (token del staff, equipo de confianza) va `HttpOnly`, `Secure` y `SameSite=Lax`, con su vencimiento escrito.
+    El token nunca llega al JavaScript del navegador: las llamadas a C# salen del servidor de Next. Lo que se conserva
+    al vencer la sesion (lo que se estaba escribiendo) va en memoria o `sessionStorage`, nunca en `localStorage`.
+
 ## Documentacion
 
 28. **La documentacion tecnica se genera desde el codigo cuando se puede; lo escrito a mano es solo decisiones y el
