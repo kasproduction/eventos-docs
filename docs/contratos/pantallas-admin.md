@@ -88,6 +88,24 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | CustomPageResource | Contenido | H1 | 2.3.3 | Se queda (Kamilo, 2026-10-25): carga contenido del cliente en un iframe (`iframe_url`) o un cuerpo propio, con roles. Por verificar en M2.3.3 por donde llega el asistente: la app de Expo registra `app/(app)/pages/[id].tsx` y la webapp no llama `/pages` |
 | Banners | | Ya demolido | | Se borro el 2026-07-04 (`2026_07_04_230000_drop_banners_feature.php`). Hoy son Highlights |
 
+## Avisos genericos del navegador en el admin actual (no copiar)
+
+Regla de M2.8.5 (Kamilo, 2026-10-25): en el admin nuevo no hay `alert()`, `confirm()`, `prompt()` ni avisos genericos
+del navegador. Revisado el 2026-10-25 en `eventos-backend` (Filament, vistas, `public/`):
+
+| Donde | Que sale hoy | En el admin nuevo |
+|---|---|---|
+| Todo el panel de Filament, al vencer la sesion o el token CSRF (419) | `confirm("This page has expired. Would you like to refresh the page?")` de Livewire, en ingles (`vendor/livewire/livewire/dist/livewire.js:4486`, `handlePageExpiry`; no esta sobreescrito) | Pantalla propia de sesion vencida |
+| Todo el panel, cuando una peticion de Livewire falla (403 de `RequireTwoFactor` sin segundo factor, 500) | El HTML crudo de la respuesta en un modal de Livewire (`showFailureModal`, misma linea 4486 y siguientes) | 403 sin segundo factor: la pantalla de sesion vencida. Otros errores: toast de Lumina con el mensaje, sin HTML crudo |
+| Formularios con cambios sin guardar, al cerrar la pestaña o recargar | Dialogo nativo de `beforeunload` (`app/Providers/Filament/AdminPanelProvider.php:308`). Al navegar dentro del panel ya sale el modal propio `lum-leave` | Borrador guardado mientras se escribe; nada de `beforeunload` |
+| Data Center, borrar un embed | `confirm('Borrar este embed?')` (`public/data-center/assets/app.js:1738`) | Modal de confirmacion (cuando el Data Center pase al admin nuevo, M2.7.2) |
+| Data Center, borrar una exportacion programada | `confirm('Borrar este programado?')` (`public/data-center/assets/app.js:1824`) | Modal de confirmacion |
+| Monitor de chat, banear | `confirm('Banear a ...?')` (`public/chat-monitor.html:515`) | Modal de confirmacion (M2.7.3) |
+| Campos obligatorios de Filament | Probable: la burbuja nativa "Completa este campo" (los campos llevan `required` y los formularios no tienen `novalidate`). Por verificar en el navegador al construir M2.3 | Error en linea bajo el campo, con el texto de la validacion de la API |
+
+Lo que Filament ya hace bien y se copia: las acciones con `requiresConfirmation()` (37 en `app/Filament`) abren un modal
+propio, y los avisos salen como notificaciones del panel (el toast de Lumina).
+
 ## Cuentas
 
 - Total: 48 (42 resources y 6 paginas).
