@@ -61,7 +61,7 @@
 | `DB_USERNAME` | database | **si** | Idealmente un usuario propio de C# |
 | `DB_PASSWORD` | database | **si** | |
 | `SESSION_DRIVER` | session | no | Sesion web de Filament |
-| `SESSION_LIFETIME` | session | no | |
+| `SESSION_LIFETIME` | session | **si** | Desde M2.2.2 (2026-10-25): minutos sin actividad que vive el token del staff, igual que la sesion web del panel. En C#: `Sesion:Minutos` (`Sesion__Minutos`), mismo valor (120) |
 | `SESSION_ENCRYPT` | session | no | |
 | `SESSION_PATH` | session | no | |
 | `SESSION_DOMAIN` | session | no | |
