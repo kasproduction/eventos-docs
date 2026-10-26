@@ -102,10 +102,7 @@ localhost:6379 como el de Laragon, asi PHP, C# y las pruebas no cambian de confi
    iniciar sesion una tarea programada del usuario (no pide administrador):
    `Register-ScheduledTask -TaskName "EventOS Redis 7 (WSL)" -Action (New-ScheduledTaskAction -Execute conhost.exe -Argument "--headless wsl.exe -d Ubuntu-24.04 -u root --exec sleep infinity") -Trigger (New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME) -Settings (New-ScheduledTaskSettingsSet -ExecutionTimeLimit 0)`.
    Quitarla: `Unregister-ScheduledTask "EventOS Redis 7 (WSL)"`. Sin la tarea, basta abrir `wsl -d Ubuntu-24.04` antes de trabajar.
-4. Comprobado 2026-10-26 desde Windows: `C:\laragonin
-edis
-edis-x64-5.0.14.1
-edis-cli.exe INFO server` dice `redis_version:7.0.15`.
+4. Comprobado 2026-10-26 desde Windows: `C:/laragon/bin/redis/redis-x64-5.0.14.1/redis-cli.exe INFO server` dice `redis_version:7.0.15`.
 
 ## Como se cruza una ruta (criterio de la regla 20)
 
