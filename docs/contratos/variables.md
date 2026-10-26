@@ -21,6 +21,11 @@
    valor por defecto en codigo, sin estar en ningun `.env`: `TRUSTED_PROXIES`, `RESEND_KEY`, `FRONTEND_URL`,
    `KIOSK_URL`, `LANDING_URL`, `REDIS_SOCKET_DB`, `HASH_DRIVER` y los limites `CUENTA_*`, `ENTRY_CHECK_PER_MINUTE`,
    `LOGIN_IP_FAILURES_PER_MINUTE`, `PUBLIC_READ_PER_MINUTE`. Anotado para la auditoria de seguridad.
+   **En C# (M1.4.3, mismos valores por defecto):** `TRUSTED_PROXIES` es `App:TrustedProxies` (vacio: no confia en
+   ningun proxy, como PHP); `PUBLIC_READ_PER_MINUTE`, `ENTRY_CHECK_PER_MINUTE`, `CUENTA_CORREO_PER_HOUR`,
+   `CUENTA_RED_PER_HOUR`, `CUENTA_ENLACE_PER_HOUR` y `CUENTA_ENLACE_RED_PER_MINUTE` son `Puerta:PublicReadPorMinuto`,
+   `Puerta:EntryCheckPorMinuto`, `Puerta:CuentaCorreoPorHora`, `Puerta:CuentaRedPorHora`, `Puerta:CuentaEnlacePorHora`
+   y `Puerta:CuentaEnlaceRedPorMinuto`. `LOGIN_IP_FAILURES_PER_MINUTE` llega con el login (cuenta fallos en el controlador).
 5. **En `.env` pero sin uso en el codigo de la app:** `BROADCAST_CONNECTION`, `HORIZON_ENABLED`,
    `PHP_CLI_SERVER_WORKERS`, `VITE_APP_NAME` (sobras de la plantilla). `SENTRY_LARAVEL_DSN` y
    `SENTRY_TRACES_SAMPLE_RATE` las lee el paquete de Sentry por dentro.
