@@ -87,7 +87,17 @@ cache de palabras bloqueadas y el slow mode por sesion. `/internal/session/viewe
 | `invalidate:{eventId}:{entity}` | 1 s | — | Un aviso de invalidacion por segundo por entidad (`InvalidationService:51`) |
 | `RateLimiter` de Laravel (`throttle:*`) | por ventana | — | 429 de la API; C# usa su propio limitador |
 
-## Claves de C# (prefijo `dotnet:`, base por defecto de C#; 15 en modo contratos)| Clave | Vida | Que ||---|---|---|| `dotnet:limite:{limitador}:{sha256 de la clave}` | la ventana del limite | Contador de `ConLimite` (M1.4.3). Correos y tokens van en hash || `dotnet:evento:{eventId}:{entidad}:v{version}:{clave}` | la que pida cada uso | Valor en cache (`CacheDelEvento`, M1.4.4), JSON || `dotnet:version:evento:{eventId}:{entidad}` | no vence | Version de la cache de esa entidad; subirla la invalida. Si venciera, volver a 0 reviviria valores viejos |PHP no lee ninguna de estas. Un aviso de `eventos:invalidate` que llegue mientras C# no esta suscrito se pierde: locubre la vida de cada valor.
+## Claves de C# (prefijo `dotnet:`, base por defecto de C#; 15 en modo contratos)
+
+| Clave | Vida | Que |
+|---|---|---|
+| `dotnet:limite:{limitador}:{sha256 de la clave}` | la ventana del limite | Contador de `ConLimite` (M1.4.3). Correos y tokens van en hash |
+| `dotnet:evento:{eventId}:{entidad}:v{version}:{clave}` | la que pida cada uso | Valor en cache (`CacheDelEvento`, M1.4.4), JSON |
+| `dotnet:version:evento:{eventId}:{entidad}` | no vence | Version de la cache de esa entidad; subirla la invalida. Si venciera, volver a 0 reviviria valores viejos |
+
+PHP no lee ninguna de estas. Un aviso de `eventos:invalidate` que llegue mientras C# no esta suscrito se pierde: lo
+cubre la vida de cada valor.
+
 ## Lo que esto le dice a C#
 
 1. Base 2 se comparte tal cual: mismas claves, JSON, sin prefijo. Cuando el hub de SignalR reemplace a Node (fase 3),
