@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 60/203
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 61/203
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -197,7 +197,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
-## Fase 1: Cimientos en C# (3 semanas) — 19/33
+## Fase 1: Cimientos en C# (3 semanas) — 20/33
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
 > errores. Sin trafico real. Al terminar, `GET /auth/me` pasa su snapshot contra los dos backends.
@@ -227,9 +227,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M1.3.5 Lector del cifrado de Laravel (`APP_KEY`, AES-256-CBC + HMAC, carga JSON base64) en `Contracts`: `users.two_factor_secret`, `organization_email_settings.password`, `staff_sessions.session_id`. Prueba contra valores cifrados por PHP; escribir en el mismo formato mientras conviven (`contratos/variables.md`, M0.5.4) **[local]** — **Hecho 2026-10-25** (C# `cf0952c`): `Contracts/Cifrado/CifradoDeLaravel` descifra y cifra en el formato de Laravel 12 (cast `encrypted`, sin serializar), con `APP_PREVIOUS_KEYS` para la rotacion. Probado contra valores cifrados por PHP con una llave de prueba, y al reves: PHP descifra lo que cifra C# (`Encrypter::decrypt`, con MAC). Config `App:Key` y `App:PreviousKeys` (`contratos/variables.md`, se sumo `APP_PREVIOUS_KEYS`, que faltaba). Las 3 columnas siguen como texto cifrado en el modelo: se descifran con este servicio al portar 2FA (M2.2), SMTP por organizacion y sesiones del staff. Tres controles
 - [x] M1.3.6 Filtro por evento de raiz (regla 26): filtro global de EF Core por `EventId` en las entidades del evento y membresia exigida en la ruta; un id de otro evento es 404 y no escribe. Prueba de cruce por modulo: alguien de otro evento no ve ni toca nada (retro M0.7.1) **[local]** — **Hecho 2026-10-25** (C# `c4c4ba8`, decision del mismo dia): cerrado por defecto; 86 tablas filtradas (50 por `event_id`, 3 opcionales con las globales visibles, 33 por su padre, caminos sacados del modelo y fijados por una prueba); `events` sin filtro; escrituras de otro evento frenadas en `SaveChangesAsync` con el 404 de modelo de Laravel; excepciones con nombre en `CruceDeEventos` (acceso de la peticion, perfil, org_admin, super_admin) y una prueba de arquitectura contra `IgnoreQueryFilters`; filtro `DelEvento()` en las rutas del evento; contextos del pool sin evento al entregarlos. `FiltroPorEventoTest` corre en `verificar.sh` (Categoria=MySql). Siete controles. **Pendiente al portar rutas:** medir con k6 el join de las tablas hijas; cada modulo suma su prueba de cruce
 
-### 1.4 Forma de las respuestas y limites (3 dias) — 1/4
+### 1.4 Forma de las respuestas y limites (3 dias) — 2/4
 - [x] M1.4.1 `JsonNamingPolicy.SnakeCaseLower` global, nulos incluidos, campos condicionales omitidos (no `null`) donde el Resource usa `when()`; excepciones en lista cerrada `Contracts/ExcepcionesJson.cs` (los 24 del Anexo A de BUENAS-PRACTICAS, confirmados en M0.4.1; nada entra sin decision) **[local]** — **Hecho 2026-10-25** (C# `ca47dfe`): `Contracts/Json/PoliticaJson` (la Api la aplica en `ConfigureHttpJsonOptions`); lo condicional es `Condicional<T>` (ausente: la llave no sale; presente null: sale null); `Contracts/Json/ExcepcionesJson` con los 24 nombres, unico `[JsonPropertyName]` permitido (prueba de arquitectura, tambien contra `JsonIgnore`). Contratos de health, version y /auth/me siguen pasando contra C#. Tres controles. Nuevo `scripts/contratos-contra-csharp.sh`
-- [ ] M1.4.2 Formas de error de Laravel en vez de `ProblemDetails`: 401 `Unauthenticated.`, 422 `{message, errors}` con los textos de `lang/es`, 429 con `Retry-After`; snapshots de M0.3.4 pasan **[local]**
+- [x] M1.4.2 Formas de error de Laravel en vez de `ProblemDetails`: 401 `Unauthenticated.`, 422 `{message, errors}` con los textos de `lang/es`, 429 con `Retry-After`; snapshots de M0.3.4 pasan **[local]** — **Hecho 2026-10-25** (C# `b359d8a`): textos de `lang/es` generados a `Contracts/Validacion/mensajes-es.json` (`scripts/mensajes-de-validacion.php`, se vuelve a correr si cambian); `ErroresDeValidacion` (422 con el resumen "(y N errores más)"), `ErroresDeLaravel` (404 de modelo, 429 con `Retry-After` y `X-RateLimit-*`, middleware para 404 sin ruta, 405 en el orden de `Router::$verbs` y 500 "Server Error"). Textos comparados contra Laravel real. Los contratos 404 de ruta y 405 pasan contra C#; los 422, 429 y 404 de modelo de M0.3.4 pasan cuando se porten sus rutas (la forma ya esta probada). Pendiente anotado: nombre del campo con reglas comodin
 - [ ] M1.4.3 Limitador de tasa en Redis (INCR + EXPIRE o ventana deslizante en Lua) con las 12 claves de `AppServiceProvider::configureRateLimiting` (por correo, token, usuario, IP) y `TrustProxies` equivalente (`ForwardedHeaders` con la misma lista) **[local]**
 - [ ] M1.4.4 Cache con prefijo `dotnet:` sobre Redis y suscriptor del canal `eventos:invalidate` (M0.4.5) que borra lo suyo **[local]**
 
