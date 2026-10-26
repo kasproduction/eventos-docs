@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 79/204
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 78/204
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -276,9 +276,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 ---
 
 <details>
-<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 7/47</b></summary>
+<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 6/47</b></summary>
 
-## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 7/47
+## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 6/47
 
 > Next sirve la interfaz; C# sirve la API admin y reproduce los efectos secundarios que hoy hacen los observers de
 > Laravel. Filament se apaga modulo por modulo. La API publica, Node y los correos siguen en PHP y no se enteran.
@@ -294,9 +294,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M2.1.3 Decision de donde vive: `eventos-web` bajo `/admin` con su propio layout, o repo aparte. Recomendado: mismo repo, layout propio, para compartir tokens y auth **[local]** — **Decidido 2026-10-25 (Kamilo): dentro de la webapp**, Next bajo `/admin` con layout propio; base de diseño: Lumina admin y `design/` (ver `decisiones.md`)
 - [x] M2.1.4 Contrato de la API admin: OpenAPI nuevo (no hereda rutas de Filament, que no tiene API) con DTOs explicitos desde el dia uno **[local]** — **Hecho 2026-10-25**: `/api/admin/v1` entero de C# (Nginx por prefijo), evento en la ruta, forma de la API publica, limite `admin` propio (1.200/min), OpenAPI `admin` aparte con `ApiDelAdminTest` y `openapi/admin.json`, tipos con `pnpm tipos:admin` en eventos-web. Ver `ARQUITECTURA.md` y `decisiones.md`
 
-### 2.2 Entrar al admin (1 semana) — 3/6
+### 2.2 Entrar al admin (1 semana) — 2/6
 > Antes de cerrar el bloque: suite completa de PHP en MySQL (Kamilo 2026-10-25: entraron migraciones).
-- [x] M2.2.1 Login del staff en C# con contraseña bcrypt `$2y$` + TOTP (Otp.NET) + codigos de recuperacion; bloqueo por fallos (`StaffLockout`), dispositivos de confianza (`trusted_devices`), sesiones abiertas (`staff_sessions`), bitacora (`staff_security_events`) **[local]** — Kamilo 2026-10-25: el equipo de confianza en la cookie va firmado con HMAC y con su vencimiento adentro, nunca como bandera plana (o, como hoy, solo un identificador que se valida contra `trusted_devices`) — **Hecho 2026-10-25** (C# `5b0e2ac`): `/auth/login` (pendiente de 10 min en Redis; con equipo de confianza vigente entra directo), `/auth/two-factor` (codigo o recuperacion; `trust_device`), `/auth/two-factor/setup` y `/confirm` (activacion obligatoria, 8 codigos), `/auth/cancel`; cuenta bloqueada = 423; limitador `admin_login` 5/min por red y 5 codigos/min por persona; BCrypt.Net-Next y Otp.NET. `IngresoDelStaffTest` 7/7 en MySQL; C# 147/147. Hallazgo: el Redis de Laragon es 5.0.14 y no tiene `KEEPTTL` (el servidor usa 7): el codigo no lo usa
+- [ ] M2.2.1 Login del staff en C# con contraseña bcrypt `$2y$` + TOTP (Otp.NET) + codigos de recuperacion; bloqueo por fallos (`StaffLockout`), dispositivos de confianza (`trusted_devices`), sesiones abiertas (`staff_sessions`), bitacora (`staff_security_events`) **[local]** — Kamilo 2026-10-25: el equipo de confianza en la cookie va firmado con HMAC y con su vencimiento adentro, nunca como bandera plana (o, como hoy, solo un identificador que se valida contra `trusted_devices`) — **Reabierta 2026-10-25 (criterio de hecho de la regla 7):** falta la prueba cruzada: C# activa el 2FA y escribe la bitacora; PHP entra con ese secreto y con un codigo de recuperacion y lee la bitacora. Construido (C# `5b0e2ac`): `/auth/login` (pendiente de 10 min en Redis; con equipo de confianza vigente entra directo), `/auth/two-factor` (codigo o recuperacion; `trust_device`), `/auth/two-factor/setup` y `/confirm` (activacion obligatoria, 8 codigos), `/auth/cancel`; cuenta bloqueada = 423; limitador `admin_login` 5/min por red y 5 codigos/min por persona; BCrypt.Net-Next y Otp.NET. `IngresoDelStaffTest` 7/7 en MySQL; C# 147/147. Hallazgo: el Redis de Laragon es 5.0.14 y no tiene `KEEPTTL` (el servidor usa 7): el codigo no lo usa
 - [x] M2.2.2 Token de staff para la API admin: Sanctum con ability `admin` en la misma tabla (Laravel no lo emite; C# si) o cookie propia. Recomendado: bearer con ability, para que el Data Center tambien lo use **[local]** — Kamilo 2026-10-25: cada token tiene su fila en `staff_sessions` y nunca vive mas que ella; se renueva con el uso igual que hoy (inactividad de `SESSION_LIFETIME`, actividad anotada cada 60 s). Asi el rescate de 2FA, el cambio de contraseña y "cerrar sesiones" de PHP tambien sacan a quien entro por C# — **Hecho 2026-10-25**: bearer de Sanctum con permiso unico `admin` (`SesionesDelStaff`, esquema `TokenDelStaff`, `.ConStaff()`), fila en `staff_sessions` con `session_id` = `admin-api:{token}` cifrado con APP_KEY (PHP la lista y la cierra), 7 dias de tope de Sanctum, fuera del admin se borra como en D.1. Rutas `GET /api/admin/v1/me` y `POST /api/admin/v1/auth/logout`. `TokenDelStaffTest` 8/8 en MySQL; C# 140/140
 - [ ] M2.2.3 Contexto de evento (hoy en sesion de Filament, `SetFilamentEventContext`) pasa a la ruta: `/api/admin/v1/events/{eventId}/...` con `DelEvento()`, validado por rol y organizacion (corregido en M2.1.4: antes decia cabecera `X-Event-Id`) **[local]**
 - [ ] M2.2.4 Roles y permisos de plataforma (`Roles.php`: super_admin, org_admin, event_admin, moderator, staff_checkin) como policies de C# **[local]**
