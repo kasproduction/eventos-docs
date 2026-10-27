@@ -10,6 +10,16 @@
 
 ---
 
+## SESION 2026-10-27 (tarde, Opus 5.5) — M2.3.9, M2.3.2a Y M2.3.2b HECHAS; REGLA 6 REFORZADA
+
+- Decision Kamilo (regla 6 reforzada): ni una linea mas de PHP de producto (ni puentes, jobs ni excepciones); lo que C# necesite se adelanta a C# aunque sea de la fase 4. Pruebas y escenarios en PHP si; un ORDER BY que falte lo define C#. Escrito en BUENAS-PRACTICAS, los dos CLAUDE.md, decisiones.md y el roadmap.
+- M2.3.9 Personas, Entrada (registro, landing y widget): C# `85e0cce`, web `3fdbd01`, backend `6528ef9`.
+- M2.3.2a tracks y tipos de sesion: C# `506d0d8`, web `bff464a`, backend `f8bfc74`. BUG-477 (PHP no refresca la agenda al guardar tipos ni al reordenar).
+- M2.3.2b salones y kioskos de la puerta (capturas 67 y 68): conectar tablet con QR; la tablet que crea C# entra al check-in de PHP y apagada desde C# queda afuera. BUG-478 (capacidad negativa da 500 en Filament, verificado) y BUG-479 (celda de tabla en bloque, corregido). El "aviso al socket al crear" del roadmap no existia en PHP.
+- Ojo: el e2e del admin usa el C# compilado en Release; despues de un control de prueba cruzada hay que volver a compilar (el e2e lo detecto con el token del control).
+- Pruebas al cierre: C# 182/182, cruzadas 11/11 con control, web 708/708, e2e admin 18/18.
+- Sigue: M2.3.2c sesiones (lista, formulario con 3 tiempos, speakers, Mission Control) con el job de cambio de sesion y el push minimo en C# con Hangfire, retraso y cancelacion de Mission Control a C#, y apagar la edicion de sesiones en Filament en el mismo despliegue. Roadmap 87/208.
+
 ## SESION 2026-10-27 (Opus 5.5) — M2.3.1 HECHA: LISTA DE EVENTOS Y ASISTENTE DE EVENTO NUEVO
 
 - Decision Kamilo: una instalacion por cliente (hardware dedicado). El multievento se queda en los datos (sandbox de ensayo, evento del año siguiente) y se esconde en la interfaz: sin pantalla de organizaciones, el asistente no pregunta organizacion, el selector de evento solo con dos o mas eventos. M2.3.1 se partio: registro, landing y widget pasan a M2.3.9.

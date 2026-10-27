@@ -3,7 +3,18 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
-## 2026-10-27 — Encontrados al portar el asistente de evento nuevo (M2.3.1) y la agenda (M2.3.2a)
+## 2026-10-27 — Encontrados al portar el asistente de evento nuevo (M2.3.1), la agenda (M2.3.2a) y los salones (M2.3.2b)
+
+### BUG-479: En el admin nuevo, la columna slug de Tipos de sesion desalineaba su fila (CORREGIDO)
+- **Severidad propuesta:** BAJA (visual)
+- **Que pasa:** la celda usaba `adm-tabla-nota`, que es `display: block`; una celda de tabla en bloque se sale de la grilla y su borde no coincide con el de la fila. Se vio al revisar Salones (la columna Puertas tenia lo mismo antes de salir).
+- **Corregido:** clase `adm-tenue` (solo color) para celdas; `CatalogoDeAgenda` y las tablas de Salones la usan (web, M2.3.2b).
+
+### BUG-478: En Filament, una capacidad negativa de salon da error 500 (ABIERTO en PHP; C# no lo tiene)
+- **Severidad propuesta:** BAJA (solo staff, al escribir mal)
+- **Que pasa:** el campo Capacidad de `EventRoomResource` y `ListEventRooms` solo pide `numeric`; con -1 MySQL rechaza la fila (`SQLSTATE[22003] Out of range value for column capacity`, la columna es sin signo) y Filament muestra error de servidor.
+- **Verificado:** si, 2026-10-27, con una prueba temporal contra MySQL (`callAction(create, capacity: -1)` lanza `QueryException`); no se dejo en el repo (regla 6).
+- **En C#:** la capacidad es entera de 0 en adelante (422 con el texto de Laravel); `SalonesTest`. En PHP queda abierto hasta que Filament se apague (M2.7).
 
 ### BUG-477: Cambiar un tipo de sesion o reordenar tracks y tipos en Filament no refresca la agenda (ABIERTO en PHP; C# no lo tiene)
 - **Severidad propuesta:** BAJA (la agenda muestra el nombre y color viejos del tipo hasta que vence su cache)
