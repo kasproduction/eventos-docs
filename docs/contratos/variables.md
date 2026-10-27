@@ -40,13 +40,13 @@
 | `APP_PREVIOUS_KEYS` | app | **si** | Llaves anteriores separadas por coma (rotacion de `APP_KEY`). En C#: `App:PreviousKeys`. Agregada 2026-10-25 (M1.3.5): faltaba en la lista |
 | `APP_DEBUG` | app | equiv | |
 | `APP_TIMEZONE` | app | **si** | Offset de las fechas de la API (decision 2026-10-21) |
-| `APP_URL` | app, filesystems, mail | **si** | URLs absolutas en respuestas y correos |
+| `APP_URL` | app, filesystems, mail | **si** | URLs absolutas en respuestas y correos. En C#: `App:Url` (`App__Url`), mismo valor: el enlace de Mission Control y la miniatura de la sesion se arman sobre PHP (M2.3.2c1) |
 | `WEBAPP_URL` | app | **si** | Enlaces a la webapp en correos |
 | `APP_DEEP_LINK_SCHEME` | app | **si** | `eventos://` en enlaces de correo |
 | `APP_LOCALE` | app | equiv | |
 | `APP_FALLBACK_LOCALE` | app | equiv | |
 | `APP_FAKER_LOCALE` | app | no | Solo seeders |
-| `APP_QR_SECRET` | app | **si** | Ver punto 2 |
+| `APP_QR_SECRET` | app | **si** | Ver punto 2. En C#: `App:QrSecret` (`App__QrSecret`), mismo valor: C# firma el enlace de Mission Control que valida PHP (M2.3.2c1). Sin ella, la lista y la edicion de sesiones del admin nuevo dan 500 |
 | `APP_MAINTENANCE_DRIVER` | app | no | |
 | `PHP_CLI_SERVER_WORKERS` | - | no | Sin uso |
 | `BCRYPT_ROUNDS` | hashing | **si** | C# verifica contraseñas bcrypt de PHP (`$2y$`) |

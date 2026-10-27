@@ -138,7 +138,7 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   - [ ] BUG-377 "Marcar reclamado" del Golden Ticket sin quien, sin bloqueo, sin vencimiento
   - [ ] BUG-378 Fotos: aprobar da resultados distintos; aprobar seleccionadas puede romper
   - [ ] BUG-379 Muro: seis caminos con efectos distintos
-  - [ ] BUG-380 Asignar speakers no avisa a la app ni a la webapp
+  - [ ] BUG-380 Asignar speakers no avisa a la app ni a la webapp (C# ya avisa desde M2.3.2c1; se cierra al apagar Filament en c3)
   - [ ] BUG-381 `QuestionsRelationManager` de sesiones es codigo muerto
   - [ ] BUG-382 Activar o cerrar encuestas desde el admin no avisa por socket
   - [ ] BUG-383 Abrir dos paginas del admin ya cambia datos

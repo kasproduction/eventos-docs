@@ -3,6 +3,18 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-27 (noche) — Encontrados al portar las sesiones (M2.3.2c1)
+
+### BUG-480: En C#, los conteos de sesiones de tracks, tipos y salones contaban las que estan en la papelera (CORREGIDO)
+- **Severidad propuesta:** BAJA (un numero de mas en la tabla)
+- **Que pasa:** `event_sessions` tiene borrado suave y Laravel cuenta sin las borradas (`withCount`); C# contaba todas (`EventSessions.Count`) en Tracks, Tipos de sesion y en "sesiones que quedan sin salon" al eliminar un salon. No se veia porque el seeder no tiene sesiones borradas.
+- **Corregido:** `Count(s => s.DeletedAt == null)` en `TracksYTipos` y `Salones` (C#, M2.3.2c1). Ojo para lo que siga: C# no tiene filtro global de papelera; toda consulta de sesiones pide `DeletedAt == null` a mano.
+
+### BUG-481: En el admin nuevo, la lista de sesiones perdia filtros o clics si se actuaba rapido (CORREGIDO antes de desplegar)
+- **Severidad propuesta:** MEDIA (UX)
+- **Que pasa:** la busqueda armaba la direccion con los filtros que todavia se veian, no con los ultimos pedidos (filtrar y escribir enseguida volvia al filtro viejo y no salia nada), y al cargar la lista disparaba una navegacion de mas que cancelaba un clic en una pestaña o en "Crear sesion". Lo encontro el e2e.
+- **Corregido:** la lista parte de la ultima direccion pedida y la busqueda solo navega si cambio lo que se busca (web, `ListaDeSesiones`).
+
 ## 2026-10-27 — Encontrados al portar el asistente de evento nuevo (M2.3.1), la agenda (M2.3.2a) y los salones (M2.3.2b)
 
 ### BUG-479: En el admin nuevo, la columna slug de Tipos de sesion desalineaba su fila (CORREGIDO)
@@ -792,7 +804,7 @@
 - **Archivos:** `EventSessionResource/RelationManagers/QuestionsRelationManager.php`, `EventSessionResource.php:393-399`
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
-### BUG-380: Asignar speakers a una sesion no avisa a la app ni a la webapp (ABIERTO 2026-10-22)
+### BUG-380: Asignar speakers a una sesion no avisa a la app ni a la webapp (ABIERTO en PHP; C# no lo tiene)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** `speakers()->sync` cambia la tabla intermedia sin pasar por `EventSessionObserver`: nadie se entera hasta que otra cosa invalide la agenda.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
@@ -800,6 +812,8 @@
 - **Archivos:** `EventSessionResource.php:130`
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
+- **En C#:** asignar o quitar speakers (`PUT /sessions/{id}/speakers`) borra la agenda y la lista de speakers de la cache, manda la sesion con sus speakers (`session.updated`) y avisa `speakers` (M2.3.2c1, `SesionesTest` y la cruzada). En PHP queda hasta que se apague la edicion de sesiones en Filament (M2.3.2c3).
+
 ### BUG-379: Muro: seis caminos para publicar u ocultar, cada uno con efectos distintos (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Fila: puntos y socket, sin webapp. Masivo: puntos, sin socket ni webapp. Detalle: solo webapp. Ocultar (fila o masivo) no avisa a nadie. `WallPost` no tiene observer propio.

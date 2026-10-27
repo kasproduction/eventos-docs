@@ -184,6 +184,16 @@ de los 330 snapshots y del codigo PHP:
   - 2026-10-27 (M2.3.2c, retrasar un salon desde Mission Control): un solo aviso. En PHP quien tiene en favoritos la
     sesion siguiente recibe "Agenda actualizada" y ademas "Cambio de horario" (el retraso mueve su hora y dispara el
     observer); C# manda solo "Agenda actualizada".
+  - 2026-10-27 (M2.3.2c1, sesiones; Kamilo): el fin no puede ser antes del inicio (422 en `end_datetime`, "El fin no
+    puede ser antes del inicio."; igual al inicio si vale). Filament no lo frenaba. La base de demo no tiene ninguna
+    sesion asi (consulta del 2026-10-27, 186 sesiones), no hay nada que corregir antes de c3.
+  - 2026-10-27 (M2.3.2c1, sesiones; Kamilo): aforo y grupo de Silent Disco enteros de 0 en adelante. Filament solo pedia
+    `numeric` y el grupo negativo daba 500 en la columna sin signo (como BUG-478).
+  - 2026-10-27 (M2.3.2c1): las URLs del stream y de la grabacion tienen que ser http(s); si no, 422. La regla `url` de
+    Filament dejaba pasar otros esquemas (ftp:) y el modelo los guardaba vacios sin decir nada.
+  - 2026-10-27 (M2.3.2c1): los mensajes de validacion de sesiones son textos claros propios ("Escribe el titulo.",
+    "Elige el estado de la lista."), no los de Laravel con el nombre tecnico del campo.
+  - 2026-10-27 (M2.3.2c1, BUG-380): asignar speakers avisa (pieza de la sesion, cache de agenda y de speakers).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
