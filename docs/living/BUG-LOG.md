@@ -3,7 +3,14 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
-## 2026-10-27 (noche) — Encontrados al portar las sesiones (M2.3.2c1)
+## 2026-10-27 (noche) — Encontrados al portar las sesiones (M2.3.2c1 y c2)
+
+### BUG-482: El ingreso del staff en C# solo verificaba claves bcrypt y PHP las guarda con argon2id (CORREGIDO 2026-10-27, antes de desplegar)
+- **Severidad propuesta:** ALTA (con argon2id en el servidor, ningun staff entra al admin nuevo)
+- **Que pasa:** `IngresoDelStaff.ContrasenaValida` solo usa BCrypt (`$2y$`). PHP hashea con `config/hashing.php` = `env('HASH_DRIVER', 'argon2id')`; el `.env` local no define `HASH_DRIVER` y las claves de `eventos_db` son `$argon2id$`. `superadmin@eventos.test` recibe "Estas credenciales no coinciden" en el admin nuevo con su clave buena (Kamilo, 2026-10-27, prueba manual de c2).
+- **Por que no salio antes:** `phpunit.xml` pone `HASH_DRIVER=bcrypt` y ContratoSeeder siembra bcrypt: cruzadas y e2e del ingreso pasaban. `contratos/variables.md` asumio bcrypt.
+- **Por confirmar:** el `HASH_DRIVER` del servidor (la memoria del proyecto dice argon2id en produccion).
+- **Corregido:** `Comun/ClaveDeLaravel` verifica argon2id y argon2i con los parametros de cada hash (Konscious 1.3.1) y bcrypt como antes; `ClaveDeLaravelTest` con hashes hechos por PHP y la cruzada `ClavesDelStaffTest` (PHP le pone una clave argon2id a un staff y entra por C#), con control. La prueba encontro de paso que una clave vacia daba 500 (Konscious no la acepta): ahora no coincide.
 
 ### BUG-480: En C#, los conteos de sesiones de tracks, tipos y salones contaban las que estan en la papelera (CORREGIDO)
 - **Severidad propuesta:** BAJA (un numero de mas en la tabla)

@@ -50,6 +50,7 @@
 | `APP_MAINTENANCE_DRIVER` | app | no | |
 | `PHP_CLI_SERVER_WORKERS` | - | no | Sin uso |
 | `BCRYPT_ROUNDS` | hashing | **si** | C# verifica contraseñas bcrypt de PHP (`$2y$`) |
+| `HASH_DRIVER` | hashing | **si** (sin `.env`: argon2id) | **Correccion 2026-10-27 (BUG-482):** fuera de las pruebas PHP guarda las claves en argon2id (`config/hashing.php`, 64 MB, 4 pasadas, 1 hilo); solo `phpunit.xml` usa bcrypt. C# verifica los dos leyendo el hash (`Comun/ClaveDeLaravel`); las claves nuevas de C# van en argon2id |
 | `LOG_CHANNEL` | logging | equiv | |
 | `LOG_STACK` | logging | equiv | |
 | `LOG_DEPRECATIONS_CHANNEL` | logging | no | |
