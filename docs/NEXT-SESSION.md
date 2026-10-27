@@ -10,6 +10,16 @@
 
 ---
 
+## SESION 2026-10-27 (Opus 5.5) — M2.3.1 HECHA: LISTA DE EVENTOS Y ASISTENTE DE EVENTO NUEVO
+
+- Decision Kamilo: una instalacion por cliente (hardware dedicado). El multievento se queda en los datos (sandbox de ensayo, evento del año siguiente) y se esconde en la interfaz: sin pantalla de organizaciones, el asistente no pregunta organizacion, el selector de evento solo con dos o mas eventos. M2.3.1 se partio: registro, landing y widget pasan a M2.3.9.
+- C# `4dcb926`: `POST /api/admin/v1/events` y `GET /events/options` (EventoNuevo, espejo de CreateEvent), `AvisosDeCambios` (el broadcast de PHP, base de M2.3.7), `SlugDeLaravel`, escenario de contratos `staff-org-admin`.
+- Web `cbbe691`: Sistema, Eventos (lista, captura 76) y asistente de 4 pasos (captura 77) con borrador en sessionStorage; `/admin` sin eventos lleva al asistente. Logo y keyvisual se suben en Identidad hasta M2.3.5.
+- Backend `b7a4110`: prueba cruzada `tests/Cruzadas/EventoNuevoTest` (C# y Filament crean el mismo evento y PHP lee lo mismo; control: Empresa opcional en C# la hace fallar) y el escenario `staff-org-admin`.
+- BUG-475 y BUG-476 (slug largo y slug vacio en el asistente de Filament), abiertos en PHP, resueltos en C#.
+- Pruebas al cierre: C# 170/170, PHP 1.273/1.273 (SQLite), cruzadas 8/8, web 708/708, e2e admin 11/11. Revisado en Noir y Lux a 1440 y 412 px.
+- Sigue: M2.3.9 (ajustes de registro, landing y widget) o M2.3.2 (agenda). Roadmap 84/206.
+
 ## SESION 2026-10-25/26 (madrugada y dia, Opus 5.5) — BLOQUE 2.2 CERRADO: ENTRADA DEL STAFF EN C# Y ADMIN NUEVO EN NEXT
 
 - M2.2.5 outbox de correo (PHP manda lo que deja C#; estado "enviando" que se retoma a los 5 min), M2.2.2 token del staff amarrado a staff_sessions, M2.2.1 login en C# (contraseña, codigo o recuperacion, activacion, equipo de confianza contra trusted_devices, bloqueo 423), M2.2.3 evento en la ruta y M2.2.4 permisos de Spatie (motivo de cruce StaffAsignado).

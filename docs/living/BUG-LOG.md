@@ -3,6 +3,20 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-27 — Encontrados al portar el asistente de evento nuevo (M2.3.1)
+
+### BUG-476: En el asistente de Filament, un nombre sin letras latinas deja el evento con slug vacio (ABIERTO en PHP; C# no lo tiene)
+- **Severidad propuesta:** BAJA (nombres en japones, chino, arabe; ningun cliente hoy)
+- **Que pasa:** `Str::slug('日本')` da `""` (con idioma `en` no translitera), y `CreateEvent` guarda el evento con slug vacio; el segundo queda `-2`. La landing `/e/{slug}` no tiene a donde ir.
+- **Verificado:** si, `Str::slug` corrido en PHP el 2026-10-27 (caso en `SlugDeLaravelTest` de C#).
+- **En C#:** un slug vacio pasa a `evento` (`EventoNuevo.SlugLibreAsync`), diferencia anotada en M2.3.1. En PHP queda abierto hasta que Filament se apague (M2.7).
+
+### BUG-475: En el asistente de Filament, un nombre largo da error 500 al crear el evento (ABIERTO en PHP; C# no lo tiene)
+- **Severidad propuesta:** BAJA (hace falta un nombre de mas de ~100 caracteres)
+- **Que pasa:** el nombre acepta 255 caracteres, pero el slug sale del nombre sin cortar y la columna `events.slug` es de 100. MySQL en modo estricto lo rechaza ("Data too long for column 'slug'") y el asistente se cae.
+- **Verificado:** si, MySQL 8.4 de Laragon con el `sql_mode` de Laravel rechaza un slug de 101 caracteres (2026-10-27).
+- **En C#:** la base del slug se corta para que el slug y su sufijo `-N` quepan en 100 (`EventoNuevoTest`). En PHP queda abierto hasta M2.7.
+
 ## 2026-10-25 — Encontrados al armar el bloque 2.1 (admin nuevo)
 
 ### BUG-474: En el admin nuevo, un evento ajeno mostraba la pagina de "no existe" con estado 200 (RESUELTO 2026-10-26, antes de desplegar)
