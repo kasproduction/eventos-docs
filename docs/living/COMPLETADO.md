@@ -4,9 +4,16 @@
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
 > **NOTA:** Los numeros BUG-XXX en este archivo son historicos. La numeracion fue reorganizada el 2026-04-23.
 > Fuente de verdad para bugs: `docs/BUG-LOG.md` (numeracion secuencial BUG-001 a BUG-232).
-> Actualizado: 2026-10-25
+> Actualizado: 2026-10-27
 
 ---
+
+## 2026-10-27: sesiones y push en C# (M2.3.2c1 y c2)
+
+- **M2.3.2c1** sesiones en el admin nuevo con los efectos de `SessionEffects` (C# `b87cd76`, web `1dd6128`, backend `c9ce3ce`).
+- **M2.3.2c2** Hangfire en el Worker y aviso de cambio de horario por Expo y Web Push; borrado de PHP (C# `b38f965`,
+  backend `e3ab3c3`). Probado en telefono y en Chrome real.
+- **BUG-480, BUG-481, BUG-482** corregidos (conteos con la papelera, carrera de filtros, claves argon2id en el ingreso).
 
 ## 2026-10-25: fase 1 en C# (31/33; solo faltan las dos tareas del servidor)
 

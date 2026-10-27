@@ -127,6 +127,10 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 
 - [ ] BUG-345 Correo sin ritmo: codigo hecho en B3.1, se cierra al medirlo
 
+**Del 2026-10-27** (sesiones y push en C#, detalle en BUG-LOG):
+  - [ ] BUG-483 Con el admin nuevo enfocado, ese navegador no muestra los push de la webapp (BAJA; M2.8.5)
+  - [ ] Confirmar el `HASH_DRIVER` del servidor (BUG-482 ya corregido en C#; solo verificar que sea argon2id)
+
 **Del 2026-10-25** (fase 1 en C#, detalle en BUG-LOG):
   - [ ] BUG-468 El `api.json` de PHP describe `/health` como texto (BAJA; cuando se toque `HealthController`)
 

@@ -10,6 +10,16 @@
 
 ---
 
+## SESION 2026-10-27 (noche, Opus 5.5) — M2.3.2c1 Y c2 HECHAS; BUG-482 (CLAVES ARGON2ID) CORREGIDO
+
+- Decisiones Kamilo: fin no antes del inicio y aforo/grupo de Silent Disco de 0 en adelante (Anexo B; la demo no tiene sesiones que lo incumplan). Hangfire sobre Redis con el almacenamiento comunitario en versiones fijas (Core/NetCore 1.8.25, Hangfire.Redis.StackExchange 1.12.0; plan B MySQL). Web Push escrito a mano. Hora del aviso "4:00 p. m." (Anexo B). Claves: se queda argon2id (C# lo verifica con Konscious 1.3.1).
+- c1 sesiones en el admin nuevo: C# `b87cd76`, web `1dd6128`, backend `c9ce3ce` (lista, formulario 2+1, speakers al instante con aviso, Mission Control y regenerar enlaces, efectos de `SessionEffects`). BUG-480 (conteos con la papelera) y BUG-481 (carrera de filtros) corregidos.
+- c2 cola y aviso de cambio de horario: C# `b38f965`, backend `e3ab3c3` (proyecto `src/Trabajos`, Worker con Hangfire, Expo en lotes y Web Push aes128gcm + VAPID; en PHP se borraron el job y `notificarCambioDeHora`). Prueba manual: el aviso le llego a Kamilo al telefono por Expo y un Chrome real descifro el Web Push. BUG-483 (el service worker oculta el push con el admin enfocado, mismo origen).
+- BUG-482: el ingreso del staff en C# solo sabia bcrypt y PHP guarda argon2id (solo phpunit usa bcrypt): C# `175fec8`, backend `b6312b2`. Por confirmar el `HASH_DRIVER` del servidor.
+- Scripts nuevos para probar en local: `scripts/api-local.sh` y `scripts/worker-local.sh` (leen los secretos del .env de PHP sin mostrarlos).
+- Pruebas al cierre: C# 221, PHP 1270, cruzadas 23/23 con controles, web 708, e2e admin 20/20.
+- Sigue: c3 (delay y cancel de Mission Control en C#, `rutas-duenos.md`, apagar la edicion de sesiones en Filament). Proponer por /davinci. Roadmap 87/208 (M2.3.2c se marca entera con c3).
+
 ## SESION 2026-10-27 (tarde, Opus 5.5) — M2.3.9, M2.3.2a Y M2.3.2b HECHAS; REGLA 6 REFORZADA
 
 - Decision Kamilo (regla 6 reforzada): ni una linea mas de PHP de producto (ni puentes, jobs ni excepciones); lo que C# necesite se adelanta a C# aunque sea de la fase 4. Pruebas y escenarios en PHP si; un ORDER BY que falte lo define C#. Escrito en BUENAS-PRACTICAS, los dos CLAUDE.md, decisiones.md y el roadmap.
