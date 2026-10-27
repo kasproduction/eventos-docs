@@ -5,6 +5,11 @@
 
 ## 2026-10-27 (noche) — Encontrados al portar las sesiones (M2.3.2c1 y c2)
 
+### BUG-483: Con el admin nuevo abierto, ese navegador no muestra los push de la webapp (ABIERTO)
+- **Severidad propuesta:** BAJA (solo le pasa a quien tiene el admin y la app en el mismo navegador)
+- **Que pasa:** `public/sw.js` no muestra la notificacion si hay una ventana enfocada del mismo origen (asume que la persona esta mirando la app y la campana ya avisa). El admin nuevo vive en `/admin` del mismo origen que la webapp, asi que una pestaña del admin al frente tambien descarta el push. Se vio en la prueba manual de c2 (Kamilo, 2026-10-27): el servicio de Mozilla acepto el aviso (201) y Firefox no lo mostro con el admin enfocado.
+- **Arreglo posible:** que el service worker solo cuente ventanas de la webapp (no las de `/admin`). No toca a los asistentes; queda para el pulido del admin (M2.8.5).
+
 ### BUG-482: El ingreso del staff en C# solo verificaba claves bcrypt y PHP las guarda con argon2id (CORREGIDO 2026-10-27, antes de desplegar)
 - **Severidad propuesta:** ALTA (con argon2id en el servidor, ningun staff entra al admin nuevo)
 - **Que pasa:** `IngresoDelStaff.ContrasenaValida` solo usa BCrypt (`$2y$`). PHP hashea con `config/hashing.php` = `env('HASH_DRIVER', 'argon2id')`; el `.env` local no define `HASH_DRIVER` y las claves de `eventos_db` son `$argon2id$`. `superadmin@eventos.test` recibe "Estas credenciales no coinciden" en el admin nuevo con su clave buena (Kamilo, 2026-10-27, prueba manual de c2).
