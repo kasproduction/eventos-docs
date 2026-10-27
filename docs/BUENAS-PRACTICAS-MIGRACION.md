@@ -5,6 +5,19 @@
 > 247 rutas (backend `90e61f8`), con sus correcciones aprobadas. Una regla que no se pueda vigilar en CI dice como se
 > vigila. La version operativa para Claude es `docs/plantillas/CLAUDE-dotnet.md`. Decisiones: `docs/decisiones.md`.
 
+
+## PHP congelado (regla 6 del roadmap, reforzada por Kamilo 2026-10-27)
+
+**No se escribe ni una linea mas de PHP, ni puentes, ni jobs, ni excepciones.** Lo que C# necesite de PHP se adelanta
+a C#, aunque sea de la fase 4 (un job, un envio de push, un correo). Las dos excepciones ya hechas, el outbox de correos
+(M2.2.5) y el rol organizador (M2.2.6), son las ultimas; el outbox se reemplaza en cuanto C# mande correo, no en la 4c.
+PHP solo sigue sirviendo lo que todavia no se ha portado. Cuando un trabajo pasa a C#, sale de PHP en el mismo
+despliegue (regla 4).
+
+Las pruebas si se siguen escribiendo en PHP (pruebas cruzadas, escenarios de `ContratoSeeder`): son la forma de
+comprobar que PHP lee lo que C# escribe. El producto nunca. Un `ORDER BY` que falte en PHP ya no se agrega alla: lo
+define C# y se anota como diferencia en `decisiones.md` (Kamilo 2026-10-27).
+
 ## Portar comportamiento, no forma
 
 1. **El snapshot define que hace el endpoint; el codigo PHP solo explica por que.** PHP se lee para entender reglas, no
@@ -39,7 +52,8 @@
      registrada en `decisiones.md` permite. Sin esa decision es trabajo pendiente de la misma tarea, que sigue abierta.
 8. **`mysqldump` automatico dentro del script de cruce** para las rutas que escriben.
 9. **Toda lista con orden explicito y el mismo que PHP.** Donde PHP no pone `ORDER BY`, MySQL decide y C# puede
-   devolver otro orden; se agrega el orden en PHP antes de cruzar la ruta.
+   devolver otro orden; C# define el orden y se anota como diferencia en `decisiones.md` (PHP ya no se toca: regla 6
+   reforzada, Kamilo 2026-10-27).
 
 ## .NET
 

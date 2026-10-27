@@ -5,12 +5,25 @@
 > C# responde exactamente lo que respondia PHP: el contrato son los snapshots de `eventos-backend/tests/Contratos/`.
 > `Api`, `Worker`, `Hub`, `Contracts`, `Tests` son procesos que se despliegan, no capas; dentro de cada uno, por modulo.
 
+
+## PHP congelado (regla 6 del roadmap, reforzada por Kamilo 2026-10-27)
+
+**No se escribe ni una linea mas de PHP, ni puentes, ni jobs, ni excepciones.** Lo que C# necesite de PHP se adelanta
+a C#, aunque sea de la fase 4 (un job, un envio de push, un correo). Las dos excepciones ya hechas, el outbox de correos
+(M2.2.5) y el rol organizador (M2.2.6), son las ultimas; el outbox se reemplaza en cuanto C# mande correo, no en la 4c.
+PHP solo sigue sirviendo lo que todavia no se ha portado. Cuando un trabajo pasa a C#, sale de PHP en el mismo
+despliegue (regla 4).
+
+Las pruebas si se siguen escribiendo en PHP (pruebas cruzadas, escenarios de `ContratoSeeder`): son la forma de
+comprobar que PHP lee lo que C# escribe. El producto nunca. Un `ORDER BY` que falte en PHP ya no se agrega alla: lo
+define C# y se anota como diferencia en `decisiones.md` (Kamilo 2026-10-27).
+
 ## Portar un endpoint (en este orden)
 
 1. **Leer el snapshot** de la ruta (`tests/.pest/snapshots/Contratos/`): estado, cabeceras, cuerpo, errores.
 2. **Leer el PHP y sus comentarios largos** para entender reglas y efectos (cache, socket, jobs), no para traducir linea a linea.
 3. **Escribir en el modulo:** endpoint fino, servicio con nombre, DTO con `Select` + `AsNoTracking()`, efectos en `XxxEffects`.
-4. **`ORDER BY` explicito** en toda lista, igual al de PHP (si PHP no lo tiene, se agrega primero en PHP).
+4. **`ORDER BY` explicito** en toda lista, igual al de PHP (si PHP no lo tiene, lo define C# y se anota como diferencia: PHP no se toca).
 5. **Correr el snapshot contra C#** (`CONTRATO_BASE_URL`); si escribe, prueba cruzada: escribe C#, lee PHP.
 6. **Medir en el MSI** (k6 de agosto, PHP contra C#) y anotar el numero en el roadmap. Recien ahi se cruza.
 

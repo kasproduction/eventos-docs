@@ -3,7 +3,14 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
-## 2026-10-27 — Encontrados al portar el asistente de evento nuevo (M2.3.1)
+## 2026-10-27 — Encontrados al portar el asistente de evento nuevo (M2.3.1) y la agenda (M2.3.2a)
+
+### BUG-477: Cambiar un tipo de sesion o reordenar tracks y tipos en Filament no refresca la agenda (ABIERTO en PHP; C# no lo tiene)
+- **Severidad propuesta:** BAJA (la agenda muestra el nombre y color viejos del tipo hasta que vence su cache)
+- **Que pasa:** `SessionType` no tiene observer (AppServiceProvider solo observa `SessionTrack` y `EventRoom`), asi que guardar o borrar un tipo no borra `event:{id}:agenda` ni avisa. Y el "Ordenar" de las tablas de Filament guarda con un UPDATE directo (`CanReorderRecords::reorderTable`), que no dispara observers: reordenar tracks o tipos tampoco refresca.
+- **Verificado:** leyendo el codigo (AppServiceProvider lineas 176-177 y `vendor/filament/tables/src/Concerns/CanReorderRecords.php`); sin prueba que falle en PHP (regla 6: PHP no se toca).
+- **En C#:** `EfectosDeLaAgenda` corre al guardar, borrar y reordenar tracks y tipos (M2.3.2a, `TracksYTiposTest`).
+
 
 ### BUG-476: En el asistente de Filament, un nombre sin letras latinas deja el evento con slug vacio (ABIERTO en PHP; C# no lo tiene)
 - **Severidad propuesta:** BAJA (nombres en japones, chino, arabe; ningun cliente hoy)
