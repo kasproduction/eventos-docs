@@ -18,7 +18,8 @@
 - M2.3.2b salones y kioskos de la puerta (capturas 67 y 68): conectar tablet con QR; la tablet que crea C# entra al check-in de PHP y apagada desde C# queda afuera. BUG-478 (capacidad negativa da 500 en Filament, verificado) y BUG-479 (celda de tabla en bloque, corregido). El "aviso al socket al crear" del roadmap no existia en PHP.
 - Ojo: el e2e del admin usa el C# compilado en Release; despues de un control de prueba cruzada hay que volver a compilar (el e2e lo detecto con el token del control).
 - Pruebas al cierre: C# 182/182, cruzadas 11/11 con control, web 708/708, e2e admin 18/18.
-- Sigue: M2.3.2c sesiones (lista, formulario con 3 tiempos, speakers, Mission Control) con el job de cambio de sesion y el push minimo en C# con Hangfire, retraso y cancelacion de Mission Control a C#, y apagar la edicion de sesiones en Filament en el mismo despliegue. Roadmap 87/208.
+- M2.3.2c partida y aprobada (Kamilo): c1 sesiones en el admin nuevo + efectos de SessionEffects; c2 Hangfire (Redis) + push Expo y Web Push + job de cambio de horario, quitandolo de PHP; c3 delay y cancel de Mission Control en C# y Filament sin edicion de sesiones. Las tres se despliegan juntas. Decisiones del push en decisiones.md: sin log como PHP (entra en M4c.6), C# lee push_session_reminders (sin fila manda), texto sin emoji ni punto medio, un solo aviso al retrasar; las dos ultimas en el Anexo B (docs `a792cb9`).
+- Sigue: proponer c1 (ya leido EventSessionResource de Filament; falta ver capturas de sesiones y la vista de speaker-chips) y esperar dale. Roadmap 87/208.
 
 ## SESION 2026-10-27 (Opus 5.5) — M2.3.1 HECHA: LISTA DE EVENTOS Y ASISTENTE DE EVENTO NUEVO
 
