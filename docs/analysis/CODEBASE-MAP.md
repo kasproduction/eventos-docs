@@ -596,7 +596,7 @@ El payload de ChatMessagePayload (types.ts:117-126) incluye:
 | SendEventRemindersJob | Recordatorio pre-evento |
 | SendSessionRemindersJob | Recordatorio pre-sesion |
 | SendAgendaRemindersJob | Recordatorios agenda |
-| SendSessionChangedNotificationJob | Notif cambio horario sesion |
+| SendSessionChangedNotificationJob | Notif cambio horario sesion (borrado de PHP en M2.3.2c2: lo hace C#, `AvisoDeCambioDeHorario`) |
 | CheckExpoReceiptsJob | Verificar delivery push Expo |
 | DispatchScheduledNotificationsJob | Notificaciones programadas |
 | ExpireAttendeeBansJob | Auto-unban expirado |

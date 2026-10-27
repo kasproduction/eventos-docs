@@ -89,7 +89,7 @@ Jobs por familia:
 - **Exportaciones (50):** 45 `Jobs/Exports/*` heredan de `BaseExportJob` (CSV con `fputcsv` o XLSX con maatwebsite/excel, suben a disco publico o R2, mandan correo opcional), mas `ExportMasterZipJob` (ZIP con todo), `ExportPollResponsesJob`, `ExportRoomAttendanceJob`, `ExportSessionStatsJob`.
 - **Correo (3):** `SendEmailJob` (generico, elige mailer por organizacion, middleware `RateLimited('mail')`, cola `mail-priority` o `mail` segun si el correo es esencial, `retryUntil`), `SendRecapReadyEmailJob`, `CsvImportCompletedMail` lo dispara la importacion.
 - **Push (4):** `SendPushToAttendeeJob` (Expo + Web Push, un log por asistente), `SendWebPushJob` (VAPID), `SendSilentPushJob` (push silencioso al cambiar modulos), `CheckExpoReceiptsJob`.
-- **Recordatorios y notificaciones (6):** `DispatchScheduledNotificationsJob`, `SendEventRemindersJob`, `SendSessionRemindersJob`, `SendAgendaRemindersJob`, `SendSessionChangedNotificationJob`, `ExpireAttendeeBansJob`.
+- **Recordatorios y notificaciones (6):** `DispatchScheduledNotificationsJob`, `SendEventRemindersJob`, `SendSessionRemindersJob`, `SendAgendaRemindersJob`, `SendSessionChangedNotificationJob` (en C# desde M2.3.2c2: `AvisoDeCambioDeHorario` en Hangfire; ya no existe en PHP), `ExpireAttendeeBansJob`.
 - **Asistencia y salas (4):** `FlushSessionAttendanceJob` (lee los sets `session:{id}:viewers/joined/left` que escribe Node en Redis y los vuelca a MySQL), `AwardSessionAttendancePointsJob`, `AutoCheckoutEndOfDayJob`, `SmartAutoCheckoutJob`.
 - **Juegos y premios (4):** `ProcessSpinRewardsJob`, `ProcessTriviaRewardsJob`, `ExpireRedemptionsJob`, `DispatchWebhookJob` (3 intentos con backoff 60/300/1800 s, respeta `Retry-After`).
 - **Documentos y recap (4):** `RegenerateDocumentsZipJob` (unico, `ShouldBeUnique`, cola `documents`), `GenerateRecapImageJob` (cola `pdf`, Browsershot), `GenerateRecapsForEventJob`, `RecapReady`.
@@ -100,7 +100,7 @@ No hay clases en `app/Events` ni `app/Listeners`. Toda la reaccion a cambios viv
 
 | Observer | Modelos | Que hace ademas de guardar |
 |---|---|---|
-| EventSessionObserver | EventSession | borra cache de agenda, emite `data:sync` con la sesion, `data:invalidate agenda`; si cambia la hora dispara `SendSessionChangedNotificationJob`; si cambia `interactive_mode` o `stream_url` hace POST al socket `/internal/session/mode_changed`; si el admin edita `end_datetime` limpia `adjusted_end_at` |
+| EventSessionObserver | EventSession | borra cache de agenda, emite `data:sync` con la sesion, `data:invalidate agenda`; si cambia la hora dispara `SendSessionChangedNotificationJob` (desde M2.3.2c2 lo hace C#, `AvisoDeCambioDeHorario`); si cambia `interactive_mode` o `stream_url` hace POST al socket `/internal/session/mode_changed`; si el admin edita `end_datetime` limpia `adjusted_end_at` |
 | AnnouncementObserver | Announcement | `data:sync` + `data:invalidate announcements`, borra cache por rol |
 | DocumentObserver | Document | dispara `RegenerateDocumentsZipJob` y `data:invalidate documents` en created, updated, deleted, restored y forceDeleted |
 | EventObserver | Event | borra cache de branding y modulos por rol, `data:invalidate branding`, dispara `GenerateRecapsForEventJob` cuando el evento termina |
