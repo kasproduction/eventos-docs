@@ -179,6 +179,11 @@ de los 330 snapshots y del codigo PHP:
   - D.7: token de staff rechazado con Redis caido. PHP responde 500; C# borra el token en MySQL (obligatorio), deja un
     aviso en el log por la ficha del socket y responde el 401 de arriba.
   - D.8: C# no acepta la sesion por cookie en `/api` (solo bearer). Las rutas del Data Center siguen en PHP hasta M2.7.2.
+  - 2026-10-27 (M2.3.2c, push de cambio de horario): el texto va limpio. PHP manda "🔄 Cambio de horario" y separa el
+    lugar con "·"; C# manda "Cambio de horario" y el lugar separado con coma (reglas de interfaz de Kamilo).
+  - 2026-10-27 (M2.3.2c, retrasar un salon desde Mission Control): un solo aviso. En PHP quien tiene en favoritos la
+    sesion siguiente recibe "Agenda actualizada" y ademas "Cambio de horario" (el retraso mueve su hora y dispara el
+    observer); C# manda solo "Agenda actualizada".
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
