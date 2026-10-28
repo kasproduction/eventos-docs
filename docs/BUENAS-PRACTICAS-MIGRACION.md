@@ -196,6 +196,10 @@ de los 330 snapshots y del codigo PHP:
   - 2026-10-27 (M2.3.2c1, BUG-380): asignar speakers avisa (pieza de la sesion, cache de agenda y de speakers).
   - 2026-10-27 (M2.3.2c2, push de cambio de horario; Kamilo): la hora va como en Colombia, "4:00 p. m." (sin cero
     adelante; "12:30 a. m." a media noche). PHP mandaba "04:00 PM" (`h:i A` de Carbon).
+  - 2026-10-27 (M2.3.2c3, "Agenda actualizada" al retrasar un salon; Kamilo): respeta `push_session_reminders` (sin fila
+    manda), como "Cambio de horario"; PHP no miraba ninguna preferencia. Y el salon sin nombre es "el salón" (PHP: "el salon").
+  - 2026-10-27 (M2.3.2c3, forma): al finalizar una sesion retrasada PHP la guardaba dos veces y mandaba la pieza
+    `session.updated` cada vez; C# la guarda y la manda una vez, con el estado final.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

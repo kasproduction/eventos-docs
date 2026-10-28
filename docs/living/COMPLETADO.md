@@ -13,6 +13,8 @@
 - **M2.3.2c1** sesiones en el admin nuevo con los efectos de `SessionEffects` (C# `b87cd76`, web `1dd6128`, backend `c9ce3ce`).
 - **M2.3.2c2** Hangfire en el Worker y aviso de cambio de horario por Expo y Web Push; borrado de PHP (C# `b38f965`,
   backend `e3ab3c3`). Probado en telefono y en Chrome real.
+- **M2.3.2c3** el ciclo de Mission Control (start, end, cancel, delay) en C#, las cuatro rutas cruzadas con ida y vuelta
+  probada en el Nginx local, y Sesiones de Filament en solo lectura. M2.3.2c cerrada; BUG-380 cerrado.
 - **BUG-480, BUG-481, BUG-482** corregidos (conteos con la papelera, carrera de filtros, claves argon2id en el ingreso).
 
 ## 2026-10-25: fase 1 en C# (31/33; solo faltan las dos tareas del servidor)

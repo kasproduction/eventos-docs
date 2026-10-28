@@ -816,7 +816,7 @@
 - **Archivos:** `EventSessionResource/RelationManagers/QuestionsRelationManager.php`, `EventSessionResource.php:393-399`
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
-### BUG-380: Asignar speakers a una sesion no avisa a la app ni a la webapp (ABIERTO en PHP; C# no lo tiene)
+### BUG-380: Asignar speakers a una sesion no avisa a la app ni a la webapp (CORREGIDO 2026-10-27, M2.3.2c)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** `speakers()->sync` cambia la tabla intermedia sin pasar por `EventSessionObserver`: nadie se entera hasta que otra cosa invalide la agenda.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
@@ -824,7 +824,7 @@
 - **Archivos:** `EventSessionResource.php:130`
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
-- **En C#:** asignar o quitar speakers (`PUT /sessions/{id}/speakers`) borra la agenda y la lista de speakers de la cache, manda la sesion con sus speakers (`session.updated`) y avisa `speakers` (M2.3.2c1, `SesionesTest` y la cruzada). En PHP queda hasta que se apague la edicion de sesiones en Filament (M2.3.2c3).
+- **En C#:** asignar o quitar speakers (`PUT /sessions/{id}/speakers`) borra la agenda y la lista de speakers de la cache, manda la sesion con sus speakers (`session.updated`) y avisa `speakers` (M2.3.2c1, `SesionesTest` y la cruzada). Cerrado en M2.3.2c3: Filament ya no edita sesiones ni asigna speakers; la prueba de `tests/Auditoria` pasa.
 
 ### BUG-379: Muro: seis caminos para publicar u ocultar, cada uno con efectos distintos (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA
