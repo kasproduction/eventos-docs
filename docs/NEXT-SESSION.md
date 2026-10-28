@@ -18,7 +18,10 @@
 - BUG-482: el ingreso del staff en C# solo sabia bcrypt y PHP guarda argon2id (solo phpunit usa bcrypt): C# `175fec8`, backend `b6312b2`. Por confirmar el `HASH_DRIVER` del servidor.
 - Scripts nuevos para probar en local: `scripts/api-local.sh` y `scripts/worker-local.sh` (leen los secretos del .env de PHP sin mostrarlos).
 - Pruebas al cierre: C# 221, PHP 1270, cruzadas 23/23 con controles, web 708, e2e admin 20/20.
-- Sigue: c3 (delay y cancel de Mission Control en C#, `rutas-duenos.md`, apagar la edicion de sesiones en Filament). Proponer por /davinci. Roadmap 87/208 (M2.3.2c se marca entera con c3).
+- c3 hecha, **M2.3.2c cerrada (roadmap 88/208)**: C# `670e83d`, backend `7ef9341`, docs `e6f8327`. Pasan a C# start, end, cancel y delay de Mission Control (end tambien mueve horas, correccion de lo pedido; start para un solo dueño del ciclo). "Agenda actualizada" respeta `push_session_reminders` (Anexo B). Primeras rutas de la API publica cruzadas por ruta exacta, con ida y vuelta probada en el Nginx local (`scripts/probar-cruce-local.sh`). Filament: Sesiones de solo lectura; BUG-380 cerrado.
+- Pruebas al cierre de c3: C# 230 (OpenAPI contra PHP incluido), contratos 10/10 contra C#, cruzadas 25/25 con control, PHP 1270, e2e 20/20.
+- Para desplegar (cuando el servidor vuelva): c1, c2 y c3 juntas; en el servidor `App:QrSecret`, `App:Url`, las VAPID en el Worker, el Worker corriendo, `cruzar.sh --nginx` de las cuatro rutas con su medicion, y confirmar el `HASH_DRIVER`.
+- Sigue: M2.3.3 (speakers, sponsors, highlights, slides de login, FAQ, documentos con `RegenerateDocumentsZipJob` en Hangfire, paginas personalizadas). Partirla y proponer por /davinci.
 
 ## SESION 2026-10-27 (tarde, Opus 5.5) — M2.3.9, M2.3.2a Y M2.3.2b HECHAS; REGLA 6 REFORZADA
 
