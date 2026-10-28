@@ -10,6 +10,17 @@
 
 ---
 
+## SESION 2026-10-28 (Fable 5.1) — M2.3.3a HECHA: SPEAKERS E IDENTIDAD EN C# Y EN EL ADMIN NUEVO
+
+- Decisiones Kamilo: M2.3.3 partida en tres (a speakers, destacados, slides del login y FAQ; b sponsors; c documentos y paginas); las imagenes del admin nuevo son URLs hasta M2.3.5, que va justo despues de 3a; "Highlights" se llama Destacados en el admin nuevo desde ya (`decisiones.md`).
+- C# `d729f4c`: `Admin/Contenido/Speakers` (con `PUT /speakers/{id}/sessions`, cada sesion que entra o sale va como `session.updated`), `Admin/Identidad/IdentidadDelEvento` (`login-slides`, `highlights`, `faqs`: lista, crear, una, editar, borrar, `reorder`) con `EfectosDeLaIdentidad` exactos a PHP, `Admin/Campos` compartido con Sesiones, OpenAPI del admin regenerado.
+- Web `975437d`: Contenido, Speakers (lista y formulario 2+1 con sus sesiones al instante) y Experiencia, Identidad con pestañas por permiso (Branding y Recap al admin actual; Slides del login con vista previa, Destacados y Preguntas con interruptor en la fila, ordenar y borrar). El menu acepta varios permisos por entrada.
+- Backend `a7c9697`: cruzadas `SpeakersTest` e `IdentidadTest` (filas iguales a Filament, pivote y pieza por el socket simulado, slides y FAQ publicas, reorden igual al arrastre).
+- BUG-484 (reordenar en Filament no corre efectos, como BUG-477) y BUG-485 (imagen o destino del destacado de mas de 255 da 500), los dos confirmados con prueba temporal contra MySQL; C# no los tiene.
+- Gotchas: el staff del seeder es event_admin sin `manage-events` (Identidad le abre en los slides); Laragon tenia MySQL apagado (se arranca `mysqld --defaults-file=my.ini`); un control de cruzadas tiene que compilar (las advertencias son errores) y tras restaurar con `mv` hay que `touch` el archivo o MSBuild reusa la DLL vieja; en Playwright un interruptor con input oculto se prende con el texto de la etiqueta y su `aria-label` no puede cambiar con el estado; `getByLabel("Título")` tambien encuentra "Subtítulo".
+- Pruebas al cierre: C# 236, cruzadas 27/27 con control, vitest 708, e2e admin 24/24, PHP sin cambios de producto. Roadmap 89/210.
+- Sigue: M2.3.5 (subidas a R2 con AWSSDK.S3, mismo esquema de URLs que `StorageService`) antes de M2.3.3b sponsors y M2.3.3c documentos y paginas. Proponer por /davinci (leer `StorageService`, `ImageUploadField` y como c1 dejo la miniatura).
+
 ## SESION 2026-10-27 (noche, Opus 5.5) — M2.3.2c1 Y c2 HECHAS; BUG-482 (CLAVES ARGON2ID) CORREGIDO
 
 - Decisiones Kamilo: fin no antes del inicio y aforo/grupo de Silent Disco de 0 en adelante (Anexo B; la demo no tiene sesiones que lo incumplan). Hangfire sobre Redis con el almacenamiento comunitario en versiones fijas (Core/NetCore 1.8.25, Hangfire.Redis.StackExchange 1.12.0; plan B MySQL). Web Push escrito a mano. Hora del aviso "4:00 p. m." (Anexo B). Claves: se queda argon2id (C# lo verifica con Konscious 1.3.1).

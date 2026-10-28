@@ -4,9 +4,16 @@
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
 > **NOTA:** Los numeros BUG-XXX en este archivo son historicos. La numeracion fue reorganizada el 2026-04-23.
 > Fuente de verdad para bugs: `docs/BUG-LOG.md` (numeracion secuencial BUG-001 a BUG-232).
-> Actualizado: 2026-10-27
+> Actualizado: 2026-10-28
 
 ---
+
+## 2026-10-28: speakers e Identidad en C# y en el admin nuevo (M2.3.3a)
+
+- **M2.3.3a** speakers (con sus sesiones), slides del login, destacados y preguntas frecuentes en la API del admin de C#
+  con los efectos exactos de PHP, y sus pantallas en el admin nuevo (Contenido, Speakers; Experiencia, Identidad con
+  pestañas por permiso). C# `d729f4c`, web `975437d`, backend `a7c9697`. Cruzadas 27/27 con control, e2e admin 24/24.
+- **BUG-484 y BUG-485** anotados y confirmados (PHP; C# no los tiene).
 
 ## 2026-10-27: sesiones y push en C# (M2.3.2c1 y c2)
 

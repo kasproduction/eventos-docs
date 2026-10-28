@@ -3,6 +3,20 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-28 — Encontrados al portar Identidad (M2.3.3a)
+
+### BUG-485: En Filament, un destacado con imagen o destino de mas de 255 caracteres da error 500 (ABIERTO en PHP; C# no lo tiene)
+- **Severidad propuesta:** BAJA (solo staff, con una URL muy larga)
+- **Que pasa:** `HighlightResource` acepta hasta 500 caracteres en la imagen (`ImageUploadField`) y en la URL de destino, pero las columnas `image_url` y `link_url` de `event_highlights` son `string` de 255: MySQL rechaza la fila (`Data too long`) y Filament muestra error de servidor. Los slides del login y las preguntas si tienen columnas de 500.
+- **Verificado:** si, 2026-10-28, con una prueba temporal contra MySQL (`CreateHighlight` con una URL de 272 caracteres lanza `QueryException`); no se dejo en el repo (regla 6).
+- **En C#:** el tope es el de la columna (255) con el mensaje de Laravel (422); `IdentidadTest`. En PHP queda abierto hasta que Filament se apague (M2.7).
+
+### BUG-484: Reordenar slides del login, destacados o preguntas en Filament no corre sus efectos (ABIERTO en PHP; C# no lo tiene)
+- **Severidad propuesta:** BAJA (el orden nuevo se ve a los 5 minutos o al siguiente arranque)
+- **Que pasa:** el arrastre de la tabla (`reorderable`) hace un `UPDATE` directo sin eventos del modelo, como en BUG-477: reordenar preguntas no suelta `event:{id}:faqs`, reordenar slides no suelta `login-slides:event:{id}` y reordenar destacados no avisa `highlights` al socket. La app sigue mostrando el orden viejo mientras dure la cache.
+- **Verificado:** si, 2026-10-28, con una prueba temporal contra MySQL (`reorderTable` en las tres listas deja la cache y no llama al socket); no se dejo en el repo (regla 6).
+- **En C#:** `POST .../reorder` corre los mismos efectos que guardar (`EfectosDeLaIdentidad`); `IdentidadTest`. En PHP queda abierto hasta que Filament se apague (M2.7).
+
 ## 2026-10-27 (noche) — Encontrados al portar las sesiones (M2.3.2c1 y c2)
 
 ### BUG-483: Con el admin nuevo abierto, ese navegador no muestra los push de la webapp (ABIERTO)
