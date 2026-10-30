@@ -210,6 +210,15 @@ de los 330 snapshots y del codigo PHP:
   - 2026-10-29 (M2.3.3b, forma): topes de la columna con mensaje (logo, banner y sitio web hasta 255; puntos hasta 65535;
     colaboradores de 1 a 20) en vez del 500 de Filament (BUG-486 y 487); reordenar sponsors avisa `sponsors` (BUG-488);
     el lider del stand no se quita del equipo desde la lista de miembros (Filament podia dejar al lider sin acceso).
+  - 2026-10-29 (M2.3.3c1, documentos; Kamilo): Word y PowerPoint viejos (`.doc`, `.ppt`) no se pueden subir. Filament los
+    aceptaba; C# solo reconoce por el contenido los modernos (`.docx`, `.pptx`), el PDF, JPG y PNG, y a un archivo viejo le
+    dice "guárdalo como .docx o .pptx". Un documento viejo que ya existe se puede editar sin volver a subirlo.
+  - 2026-10-29 (M2.3.3c1; Kamilo): un documento nuevo queda de ultimo (`sort_order` mayor + 1); Filament lo dejaba en 0, o
+    sea primero. Reordenar, crear, editar y borrar corren todos los efectos de `DocumentObserver` y `ContentObserver`
+    (olvidar `event:{id}:documents`, el ZIP y el aviso `documents`); Filament no los corria al reordenar (BUG-489).
+  - 2026-10-29 (M2.3.3c1; Kamilo): el ZIP de documentos se arma 10 segundos despues del primer cambio y los cambios que
+    llegan en ese tiempo no programan otro (PHP: un trabajo unico mientras hubiera uno esperando, que corria al instante).
+    Al empezar, el trabajo suelta la marca: un cambio durante la corrida programa la siguiente y ninguno se pierde.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

@@ -8,6 +8,13 @@
 
 ---
 
+## 2026-10-29: documentos en C# y en el admin nuevo (M2.3.3c1), y M2.3.7 y M2.3.8 cerradas
+
+- **M2.3.3c1** documentos: lista, crear, editar, borrar y reordenar en C# con los efectos de `DocumentObserver` y `ContentObserver`, subida de PDF, Word y PowerPoint modernos, JPG y PNG (un `.doc` o `.ppt` viejo se rechaza diciendo "guárdalo como .docx o .pptx"), pantalla en el admin nuevo y Filament de solo lectura. El ZIP lo arma `RegenerarZipDeDocumentos` en Hangfire (M4e.6 adelantada) y `GET /events/{eventId}/documents/zip` se cruzo a C# con `cruzar.sh`; el job de PHP se apago. BUG-489 (Filament, reordenar documentos).
+- **M2.3.7 y M2.3.8** cerradas como verificacion: `CoberturaDelBloqueTest` recorre las escrituras del admin y exige efectos, prueba de C# y cruzada por recurso. Los contadores del roadmap se recalculan con `scripts/contadores-del-roadmap.sh` (quedaron en 95/211).
+
+---
+
 ## 2026-10-29: sponsors en C# y en el admin nuevo (M2.3.3b)
 
 - **M2.3.3b** sponsors con servicios, trivias del stand, lider y equipo, y el buscador de asistentes comun (tope de 20) para cualquier selector del admin. Una trivia con respuestas no se borra, se apaga. Pruebas: C# 248, cruzadas 31/31, vitest 709, e2e admin 27/27. Roadmap 91/210.

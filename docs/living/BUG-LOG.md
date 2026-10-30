@@ -3,6 +3,14 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-29 — Encontrado al portar Documentos (M2.3.3c1)
+
+### BUG-489: Reordenar documentos en Filament no arma el ZIP, no borra la cache y no avisa a los clientes (ABIERTO en PHP; C# no lo tiene)
+- **Severidad propuesta:** BAJA (el orden nuevo llega a los asistentes cuando vence la cache de 5 minutos; el ZIP queda con el orden anterior hasta el siguiente cambio)
+- **Que pasa:** el arrastre de la tabla de `DocumentResource` (`reorderable('sort_order')`) hace un `UPDATE` directo sin eventos del modelo, asi que `DocumentObserver` y `ContentObserver` no corren: no se programa el ZIP, `event:{id}:documents` sigue en cache y no se avisa `documents`. Misma causa que BUG-484 y BUG-488.
+- **Verificado:** si, 2026-10-29, con una prueba temporal contra el codigo anterior de `DocumentResource` (`ListDocuments` con `reorderTable([b, a])`): el orden cambia, pero `RegenerateDocumentsZipJob` no se despacha y la cache vieja sigue; de control, `$documento->update(...)` si despacha el job y borra la cache. No se dejo en el repo (regla 6).
+- **En C#:** `POST /documents/reorder` corre los mismos efectos que guardar; `DocumentosTest`. En PHP queda abierto hasta que Filament se apague (M2.7); la lista de Documentos de Filament ya es de solo lectura, sin ordenar.
+
 ## 2026-10-28 — Encontrados al portar Identidad (M2.3.3a)
 
 ### BUG-488: Reordenar sponsors en Filament no avisa a los clientes (ABIERTO en PHP; C# no lo tiene)
