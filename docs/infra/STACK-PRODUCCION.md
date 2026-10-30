@@ -117,6 +117,7 @@ El combo minimo que **no sufre**: cada rol por duplicado, datos fuera.
 > plan pagado del orden de USD 20/mes (50.000 correos) mientras dure el evento. **Verificar precio y
 > limite de envios por segundo en el panel de Resend antes de cotizar**, y pedir la ampliacion del limite
 > con semanas de anticipacion. Va dentro de la fila "R2 · Resend · Sentry".
+> El ritmo de envio (`MAIL_RATE_PER_SECOND`, hoy 8 en `config/mail.php`) se sube cuando Resend amplie el limite.
 
 ### 3.1 Lo que se midio (2026-08-17/18: 300 sinteticos por la webapp, 10 min, apagones a proposito)
 

@@ -92,8 +92,11 @@ define C# y se anota como diferencia en `decisiones.md` (Kamilo 2026-10-27).
 
 ## Proceso
 
-21. **Un bloque del roadmap por sesion, un commit por tarea.** Nada de "aprovecho y tambien": un bug que aparece se
-    registra en BUG-LOG y se arregla solo si bloquea o si Kamilo lo decide.
+21. **Contexto por sesion, un commit por tarea** (ajustada por Kamilo 2026-10-29; antes era "un bloque por sesion").
+    Se sigue en la misma sesion mientras el contexto aguante y el trabajo sea del mismo tipo; bloques cortos encadenados
+    estan bien. `/guardar` + `/clear` se piden solo cuando el contexto se esta llenando o cuando cambia el tipo de
+    trabajo (por ejemplo, de construir a revisar, o de C# a infraestructura). Nada de "aprovecho y tambien": un bug que
+    aparece se registra en BUG-LOG y se arregla solo si bloquea o si Kamilo lo decide.
 22. **Segunda pasada de revision por modulo**, en sesion aparte, con una pregunta: que hace PHP que esto no hace.
 23. **Solo la fase activa visible en el roadmap;** las demas plegadas.
 24. **Un hallazgo corrige un numero, no abre un documento.** Las decisiones van solo en `docs/decisiones.md`, una
@@ -219,6 +222,16 @@ de los 330 snapshots y del codigo PHP:
   - 2026-10-29 (M2.3.3c1; Kamilo): el ZIP de documentos se arma 10 segundos despues del primer cambio y los cambios que
     llegan en ese tiempo no programan otro (PHP: un trabajo unico mientras hubiera uno esperando, que corria al instante).
     Al empezar, el trabajo suelta la marca: un cambio durante la corrida programa la siguiente y ninguno se pierde.
+  - 2026-10-30 (M2.3.3c2, paginas; Kamilo): el cuerpo se limpia con HtmlSanitizer y la misma lista de etiquetas que PHP, copiando las
+    costumbres de HTMLPurifier (parrafos automaticos, `<br />`, `target="_blank" rel="noreferrer noopener"` en enlaces externos,
+    `style` solo en span con `propiedad:valor;`, alt de la imagen con el nombre del archivo). Medido contra 58 casos reales de
+    HTMLPurifier: 57 iguales y una pagina ya guardada no cambia al pasar por C#. Diferencias aceptadas: HTMLPurifier arregla el HTML
+    roto con reglas propias que no se copian (por ejemplo un `<hr>` en medio de un texto); los saltos de linea son `\n` (el servidor es
+    Linux; PHP usa PHP_EOL, que en Windows da `\r\n`); el cuerpo solo se limpia si cambio (como `isDirty` de PHP).
+  - 2026-10-30 (M2.3.3c2): una pagina externa (`iframe`) pide su URL (Filament dejaba una pagina externa sin pagina); una pagina nueva
+    queda de ultima; "quien la ve" sin marcar se guarda null (la ven todos); borrar es suave como el `SoftDeletes` del modelo.
+  - 2026-10-30 (M2.3.3c2): el admin nuevo avisa `pages` a los clientes al guardar, olvidar la lista y reordenar; PHP solo olvidaba
+    `event:{id}:pages:{rol}` porque nadie leia las paginas. Ahora la webapp las lee y su boton del menu se actualiza al instante.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

@@ -136,16 +136,24 @@
 - **Verificado a mano:** si, lo atrapo `ApiDelAdminTest.Cada_documento_lleva_solo_sus_rutas` antes del commit.
 - **Resuelto:** `ShouldInclude` explicito en los dos documentos (`OpenApiDeLaApi.cs`). C# `304b993` (M2.1.4).
 
-### BUG-469: No se encontro por donde llega el asistente a una pagina personalizada (POR VERIFICAR)
-- **Severidad propuesta:** MEDIA si se confirma (el cliente las usa para cargar su contenido en un iframe, segun Kamilo)
-- **Que pasa:** la app de Expo registra `app/(app)/pages/[id].tsx` y tiene `hooks/usePages.ts`, pero ninguna pantalla
-  enlaza a `/pages/`; la webapp no llama `GET /api/v1/events/{eventId}/pages`. Puede que llegue por un modulo o un
-  deeplink que la busqueda no vio.
-- **Verificado a mano:** no. Busqueda de texto en eventos-app (app, components, hooks, lib) y eventos-web/src, 2026-10-25.
-- **Archivos:** `eventos-app/app/(app)/pages/[id].tsx`, `eventos-app/hooks/usePages.ts`,
-  `eventos-backend/app/Http/Controllers/Api/V1/CustomPageController.php`.
-- **Cuando se verifica:** en M2.3.3, al construir la pantalla de paginas del admin nuevo (abrir una pagina con iframe
-  desde la app y la webapp).
+### BUG-469: El asistente no tenia por donde llegar a una pagina personalizada (CONFIRMADO 2026-10-30; webapp RESUELTO, Expo con la siguiente publicacion)
+- **Severidad:** MEDIA (el cliente las usa para cargar su contenido en un iframe, segun Kamilo)
+- **Que pasaba:** la app de Expo registra `app/(app)/pages/[id].tsx` y tiene `hooks/usePages.ts`, pero ninguna pantalla enlaza a
+  `/pages/`; la webapp no llamaba `GET /api/v1/events/{eventId}/pages`; `ModuleCatalog` no tiene un modulo de paginas y el backend
+  no genera ningun deeplink hacia ellas (`app/` entero sin `pages/` ni `'page'`).
+- **Verificado:** si, 2026-10-30, leyendo `eventos-app` (app, components, hooks, lib, stores), `eventos-web/src` y `eventos-backend/app`:
+  la pantalla de Expo y su hook existen y nadie navega a ellos. No se corrio la app en un telefono: la ausencia de cualquier enlace
+  en el codigo es la prueba.
+- **Arreglo en la webapp (M2.3.3c2):** el rail suma una entrada que se adapta (decision de Kamilo): ninguna pagina visible para esa
+  persona = sin entrada; una sola = su titulo y abre directo (`/paginas/{id}`); varias = "Paginas" con la lista (`/paginas`). El
+  backend ya filtra por rol (`CustomPageController`: `enabled` y "Quien la ve"), asi que el boton solo existe para quien puede
+  verla y abrir una por id que no le toca da 404. No es un modulo del panel (no se toca PHP): sale del layout con `fetchPaginas`.
+  El admin nuevo avisa `pages` al guardar y el boton se actualiza al instante (`lib/marco.ts`, `useGlobalSocket`).
+- **Pendiente en Expo (siguiente publicacion, D.5):** la misma regla: una entrada que se adapta (ninguna / una con su titulo / varias
+  con lista) usando `usePages` y la pantalla `pages/[id]` que ya existen, visible solo si `GET /events/{id}/pages` devuelve algo para
+  esa persona. En `PENDIENTES.md` (Tiendas y build).
+- **Archivos:** `eventos-web/src/lib/paginas.ts`, `src/components/shell/paginasEnElRail.ts`, `src/components/app/paginas/`,
+  `src/app/[locale]/(app)/paginas/`; Expo: `eventos-app/app/(app)/pages/[id].tsx`, `hooks/usePages.ts`.
 
 ## 2026-10-25 — Encontrados al construir la fase 1 en C# (bloques 1.3 a 1.5)
 

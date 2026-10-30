@@ -8,6 +8,12 @@
 
 ---
 
+## 2026-10-30: paginas personalizadas en C#, en el admin nuevo y en el menu de la webapp (M2.3.3c2, BUG-469)
+
+- **M2.3.3c2** paginas: CRUD en C# con el cuerpo limpio por HtmlSanitizer (misma lista de etiquetas que PHP, medido contra HTMLPurifier), pantalla en el admin nuevo y Filament de solo lectura. La webapp suma `/paginas` y `/paginas/[id]` y una entrada del menu que se adapta (ninguna, una con su titulo, o "Paginas" con lista) y solo existe para quien puede ver alguna. BUG-469 confirmado y resuelto en la webapp; Expo con la misma regla en la siguiente publicacion (`PENDIENTES.md`).
+
+---
+
 ## 2026-10-29: documentos en C# y en el admin nuevo (M2.3.3c1), y M2.3.7 y M2.3.8 cerradas
 
 - **M2.3.3c1** documentos: lista, crear, editar, borrar y reordenar en C# con los efectos de `DocumentObserver` y `ContentObserver`, subida de PDF, Word y PowerPoint modernos, JPG y PNG (un `.doc` o `.ppt` viejo se rechaza diciendo "guárdalo como .docx o .pptx"), pantalla en el admin nuevo y Filament de solo lectura. El ZIP lo arma `RegenerarZipDeDocumentos` en Hangfire (M4e.6 adelantada) y `GET /events/{eventId}/documents/zip` se cruzo a C# con `cruzar.sh`; el job de PHP se apago. BUG-489 (Filament, reordenar documentos).
@@ -157,6 +163,12 @@
   `lib/transicionModulo.ts`): dentro de un detalle se conserva la clave del modulo de origen, entrar y volver no
   disparan la transicion. Verificado con Playwright (0 transiciones al abrir y volver, push y pop intactos)
 - [x] Tokens de prueba del asistente sembrado (277, 278, 279) borrados 2026-10-21 con permiso de Kamilo
+- Detalle tecnico de la navegacion inmediata (pasado desde la memoria el 2026-10-29):
+  - **Menu y precarga:** sin `loading.tsx` en los modulos del menu (los detalles `[id]` lo conservan); `useDestinoOptimista` marca el menu en el toque, en el rail y en la barra movil; `lib/precarga.ts` precarga la pagina COMPLETA al pasar el mouse, al apoyar el dedo y en reposo. La sesion `/auth/me` dura 30 s en `serverCache` con huella SHA-256 y se suelta en cualquier escritura con el token (`apiFetch`); ver BUG-356.
+  - **Camara sobre el espacio** (lab C2): se implemento y se REVIRTIO (eventos-web `0360591`) porque mareaba.
+  - **Cambio de modulo:** React `<ViewTransition key={clave} name="modulo" update="none">`; la foto del wrapper `modulo` (marco incluido) no anima, lo que sale y entra es `.canvas-card-contenido` (`view-transition-name: contenido`): sale en 120 ms y entra con zoom de 2%, resorte sin rebote muestreado a `linear()`, 395 ms y delay de 120 ms; en celular, sin tarjeta, la misma secuencia sobre `modulo` (media query). `mix-blend-mode: normal` en old/new. Los refrescos del tiempo real NO animan.
+  - **Detalles con clave estable** (`lib/transicionModulo.ts`): speaker, session, sponsor, attendee, session-stream, join-team y leads/[id]; en celular manda el push/pop de `MobileGate`.
+  - **Gotchas:** las paginas abren con `display: contents` y las View Transitions necesitan una caja real; con Chrome tapado no hay cuadros, asi que se mide con `getAnimations()` en `startViewTransition().ready`; mientras dura una View Transition el navegador no recibe clics (hoy 515 ms = 120 + 395; si se siente lento, el preset "Rapido" del lab baja la salida a 100 ms).
 
 ### De "Sueltos de la webapp (inventario 2026-10-16)"
 
@@ -1600,6 +1612,13 @@ Volver: `docs/infra/COMO-VOLVER.md` — **apagar NO detiene el cobro, hay que de
   (y el del servidor): `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. Agregar el dominio real de la landing en el panel de Turnstile.
 - [x] Tema del widget: color del evento, Noir/Lux del evento o forzado con data-tema
 - [x] Config en admin: Entrada > Landing y widget (dominios, tema, codigo, vista previa) — falta que Kamilo la revise
+- Decisiones de Kamilo 2026-10-11 y como esta armado (pasado desde la memoria el 2026-10-29):
+  - **Integracion A:** el widget es la tarjeta (boleto) con elevacion, SIN el nombre del evento ("si ya tienen branding de marca, lo de nosotros sobra"). Lab: `design/features/landing/lab-widget.html`. Cambios del boleto se hacen en `RegistroTicket` (lo usan la landing y el widget).
+  - **Al registrarse NO hay mensaje en el widget:** redirige a nuestra confirmacion con la escarapela. Como el navegador bloquea la cookie dentro del iframe, el registro entrega un pase de un solo uso (`App\Services\RegistrationHandoff`: 10 min, solo se guarda el hash en cache, se canjea con `Cache::pull`) y la confirmacion lo canjea con `POST /api/v1/public/handoff` (en la webapp, `/api/public/handoff`). Si la persona ya existia o queda pendiente (existing/pending): sin sesion.
+  - **Seguridad:** `eventos-web/src/lib/csp.ts`. Toda la webapp lleva `frame-ancestors 'self'`; solo `/[locale]/e/[slug]/widget` recibe en `proxy.ts` los dominios del evento (`allowed_embed_domains`, que el evento publico entrega como `embed_domains`) mas el host del admin (para la vista previa).
+  - **Admin:** Personas > Entrada > "Landing y widget", composicion B (config a la izquierda, vista previa en vivo fija a la derecha): `app/Filament/Pages/LandingWidget.php`, estilos `lum-lw-*` en `theme.css` (tras tocarlos: `npm run build` y `filament:clear-cached-components`). En C# lo reemplaza `Admin/Personas/EntradaDelEvento` (M2.3.9).
+  - **Para probarlo:** desde otro origen con `design/features/landing/widget-cliente.html` (simula la pagina del cliente que embebe `widget.js`).
+  - **Por que:** cuando el cliente hace su propia landing necesita poner nuestro registro ahi (`PENDIENTES.md` §4).
 - [ ] **Toggle de tema para el demo** (idea Kamilo 2026-10-16): pildora Noir/Lux flotante que cambia `?tema=` en la misma URL,
   visible SOLO con `?demo` (una landing real no deja al asistente cambiar la plantilla del admin); el parametro viaja a la
   confirmacion y al widget. Minilab A (pildora abajo a la derecha) / B (barra fina arriba, con color del cliente como el lab v3)

@@ -285,6 +285,16 @@ PiP en `eventos-web/src` (grep 2026-09-07). En `/live`, `LiveHubView.tsx:53-58` 
   → volver (full) → /live (preview) → otra sala; desktop + tablet + mobile; y con socket
   apagado (degradacion sin errores). Medir que el iframe NO se recargue en ningun paso.
 
+**Prioridad (2026-09-13):** W.19 pasa a SEGUNDO PLANO, etapa 6 de la ruta a noviembre. Kamilo: es una mejora y lo actual
+funciona; primero "evento mañana sin improvisar".
+
+**Propuesta de arquitectura (2026-09-13, SIN aprobar; pendiente en `decisiones.md` → Abiertas):**
+- Una capa fija de reproduccion en el layout `(app)` y un hueco por pantalla: el iframe nunca se mueve (moverlo lo recarga y
+  Safari/iOS no soportan `moveBefore()`). El modo (`full`, `split`, `mini`, `closed`) se deriva de la ruta.
+- `useChat` hoy emite `leave:session` al desmontar: el chat, el Q&A y la config suben al provider para no re-unirse a rooms.
+- 8.1 y 8.3 se hacen juntos. El mini hace snap a la esquina (leccion de YouTube web); sus controles de play/pausa solo
+  para YouTube y Vimeo (por `postMessage`); un embed propio solo tiene volver y cerrar.
+
 **Fuera de scope (por ahora):** PiP nativo del browser (`requestPictureInPicture`) solo
 aplica a `<video>`, no a iframes de YouTube/Vimeo — el flotante tiene que ser DOM propio.
 Multi-stream simultaneo (dos salas a la vez) → Fase 2.
@@ -416,9 +426,11 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
       semanas; si el cliente pide app en tiendas, dejar margen
 - [ ] SHA-1 del keystore de produccion en Firebase + dominio/DNS (`EventOS_Roadmap.md:568`)
 - [ ] Alinear `documentos.tsx` (legacy huerfano previo al tema) (`NEXT-SESSION.md:2344`)
-- [ ] Enlace a las paginas personalizadas en Expo **con la siguiente publicacion** (Kamilo 2026-10-29): solo si M2.3.3c2
-      confirma BUG-469 (hoy ninguna pantalla enlaza a `app/(app)/pages/[id].tsx`). La webapp lleva su enlace en el menu
-      en la misma tarea M2.3.3c2; Expo espera la publicacion (D.5: no publicar antes de la fase 3 salvo que un cliente lo pida).
+- [ ] **Enlace a las paginas personalizadas en Expo, con la siguiente publicacion** (Kamilo 2026-10-30; BUG-469 confirmado). La misma
+      regla que ya tiene la webapp: una entrada en el menu que se adapta a lo que ve ESA persona (el backend ya filtra por rol con
+      `GET /events/{id}/pages`): ninguna pagina = sin entrada; una sola = su titulo y abre `app/(app)/pages/[id].tsx` directo; varias =
+      "Paginas" con la lista. Solo aparece a quien puede verla. Usa `hooks/usePages.ts` (la pantalla y el hook ya existen); refrescar
+      cuando llegue el aviso `pages` del socket. Expo espera la publicacion (D.5: no publicar antes de la fase 3 salvo que un cliente lo pida).
 
 ### Backlog Expo (sesion Expo futura)
 - [ ] Borrar `banners.tsx` + `BannerCarousel` + `bannersApi` del Expo (feature legacy muerta)
