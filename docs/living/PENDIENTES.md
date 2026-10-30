@@ -463,8 +463,8 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
       EN PAUSA visible+deshabilitado en el admin (`4cd43d4`+`52f4522`). Al
       retomar: construir el acceso (Filament reactivar + lista Expo + modulo
       webapp ~1 sesion) o demoler entero. Costo mapeado, git preserva todo.
-- [ ] **Keyvisual por superficie**: `keyvisual_desktop` + `keyvisual_mobile` en branding. Decidido 2026-10-30 (Kamilo): columnas nuevas por migracion de Laravel + re-scaffold (regla 1), las escribe C# en M2.3.4b y la app y la webapp las muestran cuando branding pase a C# (fase 4a); la pantalla lo avisa con un texto corto.
-- [ ] **Hero modo texto**: contrato unico de branding (type image|text) a escala en las 3 superficies.
+- [ ] **Keyvisual por superficie**: `keyvisual_desktop` + `keyvisual_mobile` en branding. Decidido 2026-10-30 (Kamilo): columnas nuevas por migracion de Laravel + re-scaffold (regla 1). **Hecho en M2.3.4b:** migracion `2026_10_30_120000` y C# las escribe; la pantalla del admin nuevo avisa con un texto corto. **Falta:** que la app y la webapp las muestren cuando branding pase a C# (fase 4a), y correr la migracion en `eventos_db` y en el despliegue antes del C# nuevo.
+- [ ] **Hero modo texto**: contrato unico de branding (type image|text) a escala en las 3 superficies. Decidido 2026-10-30 (Kamilo): el admin nuevo ya guarda `hero_type` text, image o video (M2.3.4b); que la app, la webapp y el kiosco lo pinten igual es tarea aparte.
 
 > `/encuestas` fuera del rail (resuelto: canon 'aviso' + anuncio con targeting) ·
 

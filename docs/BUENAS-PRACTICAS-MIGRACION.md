@@ -237,6 +237,9 @@ de los 330 snapshots y del codigo PHP:
     version. Reordenar y cambiar la audiencia solo suben la version y avisan (sin push silencioso ni olvidar claves), como el panel; el push
     silencioso (`module_update`) va solo al prender o apagar y a los asistentes con token de Expo (no respeta `push_session_reminders`: no muestra nada).
     Un modulo de un catalogo viejo (que `ModuleCatalog` ya no conoce) no se lista ni se edita (404).
+  - 2026-10-30 (M2.3.4b, branding; Kamilo): al pasar el evento a `ended` C# activa la encuesta post-evento que estaba en borrador (estado `active` y `activated_at`),
+    como `EventObserver`; los recaps no, siguen en PHP hasta M2.6.4. `organizer_name` topa en 120 (la columna) en vez de 255 (BUG-490). Lo escondido en
+    Filament no se guarda: About solo en borrador o registro con About prendido, imagen y oscurecer del hero solo con image o video, el video solo con video.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

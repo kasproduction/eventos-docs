@@ -8,6 +8,12 @@
 
 ---
 
+## 2026-10-30: branding en C# y en el admin nuevo (M2.3.4b)
+
+- **M2.3.4b** branding: `GET` y `PUT /events/{eventId}/branding` en C# con las reglas del formulario de Filament (lo escondido no se guarda), migracion de `keyvisual_desktop` y `keyvisual_mobile` y re-scaffold. Pantalla de cuatro pestanas con vistas previas en `/admin/eventos/{id}/identidad`. Al pasar a Finalizado C# activa la encuesta post-evento; los recaps siguen en M2.6.4. BUG-490 encontrado.
+
+---
+
 ## 2026-10-30: panel de modulos en C# y en el admin nuevo (M2.3.4a)
 
 - **M2.3.4a** modulos: `GET /events/{eventId}/modules`, `PUT /modules/{id}` y `POST /modules/reorder` en C# con los efectos del panel de Filament (version de la cache de PHP, aviso `modules`, y al prender o apagar el push silencioso a las apps). Pantalla en el admin nuevo copiada de la captura 55, con vista previa de la webapp y la app. M2.3.4 se parte en a (esta), b (branding) y c (onboarding de la app).

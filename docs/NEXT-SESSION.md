@@ -10,6 +10,16 @@
 
 ---
 
+## SESION 2026-10-30 (Sonnet 5.5, 3) — M2.3.4b HECHA: BRANDING EN C# Y EN EL ADMIN NUEVO
+
+- Decisiones Kamilo: keyvisual como columnas nuevas (migracion + re-scaffold); `ended` NO se rechaza: C# activa la encuesta post-evento (un `UPDATE`) y los recaps siguen en M2.6.4; hero en modo texto solo del lado del admin (las 3 superficies, tarea aparte en PENDIENTES §8). Todo en `decisiones.md` 2026-10-30 y el Anexo B.
+- C# (`528f7a5`): `Admin/Identidad/Branding` + `BrandingEndpoints` (`GET`/`PUT /events/{eventId}/branding`, `manage-events`), `BrandingDelAdmin` (contratos), `EfectosDelEvento.AlGuardarAsync(evento, terminoElEvento)` con `ActivarLaEncuestaPostEventoAsync`, seis carpetas `event-*` en `Archivos`, `FILTRO_CRUZADAS` en `cruzadas-contra-csharp.sh`, fila `branding` en `CoberturaDelBloqueTest`.
+- Web (`83b1fad`): `FormularioDeBranding` (cuatro pestanas, borrador, vistas previas), `identidad/{page,datos,acciones}`, ruta `identidad/onboarding` hacia Filament hasta 4c, `e2e-admin/branding.spec.ts` (escenario `staff-org-admin`: el staff por defecto no tiene `manage-events`). Backend (`27fc61c`): migracion `2026_10_30_120000` y `tests/Cruzadas/BrandingTest.php`.
+- Pruebas: C# 306, cruzadas 36/36 con dos controles, vitest 714, e2e admin 31/31, PHP Feature 558. Roadmap 98/213.
+- Gotchas: Filament `FileUpload` nulea una URL como estado en Livewire (las imagenes del gemelo entran por el modelo despues del `save`); `Events.SingleAsync()` en pruebas pide `e.Id == 1`; `about_links` va con claves `label`/`url`/`icon` y el icono vacio vale `link`; en e2e `getByLabel(/^URL/)` por el asterisco.
+- **Despliegue pendiente:** correr la migracion de keyvisual antes del C# nuevo; tampoco se aplico a `eventos_db` (solo a `eventos_contratos_base`). Push silencioso contra Expo real sigue sin probar.
+- **Sigue: M2.3.4c** Onboarding de la app. Leer primero la pestana Onboarding de `EventBrandingResource.php` (~linea 309) y `EditEventBranding.php` (afterSave avisa `onboarding`), `onboarding_steps_config` (merge profundo del JSON), `FormularioDeBranding.tsx` y `identidad/onboarding/page.tsx` (hoy manda a Filament). Despues M2.3.6. Proponer por /davinci y esperar
+
 ## SESION 2026-10-30 (Sonnet 5.5, 2) — M2.3.4a HECHA: PANEL DE MODULOS EN C# Y EN EL ADMIN NUEVO; M2.3.4 PARTIDA EN a, b y c
 
 - Decisiones Kamilo (dale a la propuesta): M2.3.4 se parte en a modulos, b branding (Lo esencial, Identidad comun, App movil, Webapp) y c onboarding de la app; `keyvisual_desktop` y `keyvisual_mobile` como columnas nuevas (migracion de Laravel + re-scaffold, regla 1), las escribe C# y la app y la webapp las muestran cuando branding pase a C# (fase 4a), con un texto corto en la tarea y en la pantalla; los recaps NO entran en 4b (siguen en M2.6.4); "un aviso en vez de dos" al Anexo B (hecho). Todo en `decisiones.md` 2026-10-30 y el Anexo B.

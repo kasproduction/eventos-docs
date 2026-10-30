@@ -3,6 +3,14 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-30 — Encontrado al portar Branding (M2.3.4b)
+
+### BUG-490: `organizer_name` admite 255 en Filament pero la columna es de 120 y un nombre largo da error 500 (ABIERTO en PHP; C# no lo tiene)
+- **Severidad propuesta:** BAJA (hay que escribir un nombre de organizador de mas de 120 caracteres)
+- **Que pasa:** `EventBrandingResource` deja `maxLength(255)` pero `events.organizer_name` es `varchar(120)`; con mas de 120 MySQL responde `Data too long for column` y Filament muestra un 500 en vez de un error del campo.
+- **Verificado:** si, 2026-10-30, con tinker contra MySQL: un valor de 121 caracteres da `Data too long`.
+- **En C#:** el tope es 120 y devuelve 422 (`BrandingTest`). En PHP queda abierto hasta que Filament se apague (M2.7).
+
 ## 2026-10-29 — Encontrado al portar Documentos (M2.3.3c1)
 
 ### BUG-489: Reordenar documentos en Filament no arma el ZIP, no borra la cache y no avisa a los clientes (ABIERTO en PHP; C# no lo tiene)
