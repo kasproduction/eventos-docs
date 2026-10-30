@@ -18,6 +18,27 @@ Las pruebas si se siguen escribiendo en PHP (pruebas cruzadas, escenarios de `Co
 comprobar que PHP lee lo que C# escribe. El producto nunca. Un `ORDER BY` que falte en PHP ya no se agrega alla: lo
 define C# y se anota como diferencia en `decisiones.md` (Kamilo 2026-10-27).
 
+## Idéntico o arreglado (Kamilo 2026-10-30)
+
+La regla de "C# responde exactamente lo que respondía PHP" vale solo para lo que lee un cliente que ya existe. Antes de copiar un
+comportamiento que, mirado solo, parece un defecto (un campo que sale siempre vacío, algo que no se reintenta, un texto que no se
+puede borrar, una validación que falta, un efecto que PHP no dispara), se pregunta quién lo consume:
+
+1. **Idéntico, defectos incluidos:** los contratos que consumen la webapp (`eventos-web` fuera de `src/app/admin`), la app Expo
+   (`eventos-app`) y el kiosko (`eventos-kiosko`): las rutas de `/api/v1`, sus formas de error y los efectos que esos clientes leen
+   (cache de PHP, avisos al socket). Se confirma con un grep en esos tres repos; "creo que lo usan" no vale.
+2. **Se arregla en C# y se anota:** los contratos externos sin consumidor (webhooks salientes, exportaciones para clientes, API para
+   terceros) y los del admin nuevo (`/api/admin/v1`, que escribimos nosotros: tiene que ser igual de seguro, no igual de torpe).
+   Cada arreglo lleva un BUG-NNN "resuelto en C#" en `BUG-LOG.md` y una línea en el Anexo B con el motivo: "sin consumidores externos
+   al momento del cambio".
+3. **Siempre idéntico, aunque sea externo, lo que un tercero verifica o parsea:** la firma, las cabeceras, el orden y el escape del
+   JSON, el formato del ULID y la forma del log de un webhook. Eso solo cambia con aviso a quien lo consuma.
+4. **Arreglar lo interno nunca toca el contrato:** reintentar, anotar un log que faltaba, limpiar archivos huérfanos o sumar un aviso
+   al socket no cambian lo que lee el cliente; se hace sin consultar, y se anota.
+5. **En duda, se anota como "por decidir" en el Anexo B y se pregunta a Kamilo;** no se copia por inercia.
+6. **Pruebas:** la cruzada compara contra PHP normalizando los campos arreglados, y otra aserción fija el valor arreglado. Si el primer
+   cliente externo llega a consumir un contrato arreglado, ese contrato pasa a la regla 3 (cambiarlo exige aviso).
+
 ## Portar comportamiento, no forma
 
 1. **El snapshot define que hace el endpoint; el codigo PHP solo explica por que.** PHP se lee para entender reglas, no
@@ -248,6 +269,16 @@ de los 330 snapshots y del codigo PHP:
     misma transaccion, asi que si el proceso se cae entre guardar y encolar el aviso se pierde; para la persona que se bloquea o activa el 2FA es menor que mandar un aviso de algo que no se guardo); el reintento es el de
     Hangfire (10, 30, 60, 120 y 300 s) en vez del `retryUntil` de 12 horas de PHP; el limitador por segundo se hace esperando dentro del trabajo, no devolviendolo a la cola. El correo del sistema va por el SMTP de Resend
     (un solo camino con el SMTP de cada organizacion, MailKit) y no por la API de Resend; los rebotes y entregas no se leen (mejora posible por webhook, PENDIENTES §12).
+  - 2026-10-30 (M2.3.6b, webhooks; Kamilo): sin consumidores externos de webhooks al momento del cambio, C# NO copia dos defectos de PHP.
+    BUG-492: PHP mandaba `phone`, `company`, `job_title` y `photo_url` siempre null (los lee del asistente y viven en `users`) y
+    `attendee.updated` solo saltaba por las etiquetas; C# manda los valores reales de la persona y `attendee.updated` salta tambien por su
+    nombre, telefono, empresa o cargo. BUG-493: un 5xx del sistema del cliente no se reintentaba (PHP solo reintentaba errores de red y
+    429); C# lo reintenta a los 60 y 300 s, hasta 3 intentos. IDENTICO a PHP, byte a byte (la cruzada recalcula el HMAC como el cliente y
+    compara contra el DispatchWebhookJob real): la firma HMAC-SHA256 en hex, las cabeceras (Host, Content-Type sin charset,
+    X-EventOS-Signature, X-EventOS-Event, User-Agent y Content-Length), el orden y el escape del JSON (`\/`, `\uXXXX` en minusculas,
+    `[]` para un data vacio), el ULID en mayusculas, el log y el estado del endpoint. NO puede ser identico: el texto del error de una
+    conexion caida (cURL en PHP, .NET en C#). Un tercer intento fallido queda solo en el log (PHP lo dejaba en failed_jobs). Los
+    reintentos son trabajos nuevos con el numero de intento, no los reintentos de Hangfire.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

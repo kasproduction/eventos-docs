@@ -505,6 +505,8 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 11. DEUDA TECNICA
 
+- [ ] **Revisión de lo copiado de PHP que parece defecto** (Kamilo 2026-10-30): `docs/living/AUDITORIA-IDENTICO-2026-10-30.md` lista 26 comportamientos con quién los consume y qué hacer. Esperan decisión: las 8 "dudosas" (cancelar una sesión sin cambiar `status`, avisos al socket con freno de 1 s, cache que no se reintenta, retraso de agenda, avisos que faltan) y cuáles de las demás se arreglan ya. Una está en el roadmap: desbloquear cuentas bloqueadas (M2.4.4).
+
 ### TODO escritos en el codigo que no estaban en ninguna lista (revisados 2026-10-22)
 
 - [ ] `eventos-backend` `HappeningNowController.php:45` y `:97`: "lo que pasa ahora" elige la sesion destacada sin

@@ -2,7 +2,8 @@
 
 > Va a la raiz del repo cuando exista (M1.1.1). Reglas completas, excepciones JSON, formas de Laravel y comandos:
 > `APP EVENTOS/docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Plan: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`.
-> C# responde exactamente lo que respondia PHP: el contrato son los snapshots de `eventos-backend/tests/Contratos/`.
+> C# responde lo que respondia PHP donde lo lee la webapp, la app o el kiosko: ese contrato son los snapshots de `eventos-backend/tests/Contratos/`.
+> Lo externo sin consumidor (webhooks, exportaciones, API de terceros) y el admin nuevo se arreglan en C# y se anotan (ver "Idéntico o arreglado").
 > `Api`, `Worker`, `Hub`, `Contracts`, `Tests` son procesos que se despliegan, no capas; dentro de cada uno, por modulo.
 
 
@@ -18,6 +19,18 @@ Las pruebas si se siguen escribiendo en PHP (pruebas cruzadas, escenarios de `Co
 comprobar que PHP lee lo que C# escribe. El producto nunca. Un `ORDER BY` que falte en PHP ya no se agrega alla: lo
 define C# y se anota como diferencia en `decisiones.md` (Kamilo 2026-10-27).
 
+## Idéntico o arreglado (Kamilo 2026-10-30)
+
+Antes de copiar de PHP algo que parece un defecto, pregunta quién lo consume (grep en `eventos-web` fuera de `src/app/admin`, `eventos-app`
+y `eventos-kiosko`; lo que no confirmes no cuenta como consumido):
+
+- **Lo consume la webapp, la app o el kiosko:** idéntico, defectos incluidos. Cambiarlo lo decide Kamilo.
+- **Es externo sin consumidor (webhooks, exportaciones, API de terceros) o es del admin nuevo:** se arregla en C#, con un BUG-NNN "resuelto
+  en C#" y una línea en el Anexo B ("sin consumidores externos al momento del cambio").
+- **Lo que un tercero verifica o parsea** (firma, cabeceras, orden y escape del JSON, ULID, forma del log de un webhook): siempre idéntico.
+- Arreglar lo interno (reintentos, logs que faltaban, avisos al socket que PHP olvidó) no cambia el contrato: se hace y se anota.
+- En duda, anótalo como "por decidir" y pregunta; no lo copies por inercia.
+
 ## Portar un endpoint (en este orden)
 
 1. **Leer el snapshot** de la ruta (`tests/.pest/snapshots/Contratos/`): estado, cabeceras, cuerpo, errores.
@@ -32,8 +45,7 @@ define C# y se anota como diferencia en `decisiones.md` (Kamilo 2026-10-27).
 - `.Result` y `.Wait()`.
 - `DateTime.Now`: fechas con `DateTimeOffset` en el offset de la zona de la app, sin fracciones.
 - Abstracciones nuevas: repositorios, unit of work, mediadores, capas, interfaces de una sola implementacion.
-- Mejorar el contrato: renombrar campos, quitar duplicados, corregir textos o codigos. Si esta mal, lo decide Kamilo y
-  se cambia primero en PHP.
+- Mejorar un contrato que consume la webapp, la app o el kiosko (renombrar campos, quitar duplicados, corregir textos o codigos): si esta mal, lo decide Kamilo y se anota en `decisiones.md` y se cambia en C# (PHP esta congelado).
 - Migraciones de EF Core antes de la fase 5 (el esquema lo manda Laravel).
 - Tocar Next o Expo fuera de la capa `realtime` (fase 3) y del admin nuevo (fase 2).
 - Sobreescribir la politica JSON en un endpoint, o sumar una excepcion sin decision en `decisiones.md`.

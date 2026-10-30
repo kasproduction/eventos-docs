@@ -3,6 +3,20 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-30 — Encontrados al portar los webhooks (M2.3.6b)
+
+### BUG-493: Un 5xx del sistema del cliente no se reintenta en un webhook y el evento se pierde (RESUELTO en C#; ABIERTO en PHP)
+- **Severidad propuesta:** MEDIA (un cliente caido un minuto, o un 503 de mantenimiento, pierde ese evento para siempre y su endpoint pasa a `needs_attention` con 3)
+- **Que pasa:** `DispatchWebhookJob` solo reintenta los errores de red (la excepcion) y el 429; con cualquier otro codigo que no sea 2xx llama a `fail()` en el primer intento.
+- **Verificado:** si, 2026-10-30, leyendo `DispatchWebhookJob::handle` (el `$this->fail(...)` de la rama `! $response->successful()`).
+- **En C#:** un 5xx se reintenta a los 60 y 300 s, hasta 3 intentos, igual que un error de red (`EnviarWebhookTest`). Un 4xx y un 3xx no (reintentar no los arregla). Decidido por Kamilo: sin consumidores externos de webhooks al momento del cambio (Anexo B).
+
+### BUG-492: Los webhooks de asistente mandan `phone`, `company`, `job_title` y `photo_url` siempre en null, y `attendee.updated` no salta cuando cambian los datos de la persona (RESUELTO en C#; ABIERTO en PHP)
+- **Severidad propuesta:** MEDIA (el CRM del cliente recibe el registro sin telefono, empresa, cargo ni foto, y no se entera de que la persona editó su perfil)
+- **Que pasa:** `AttendeeWebhookEffects::enviar` lee `$attendee->phone`, `->company`, `->job_title` y `->photo_url`, pero esas columnas son de `users`, no de `attendees`; Eloquent devuelve null. `CAMPOS_RELEVANTES` mira `name`, `phone`, `company` y `job_title` en el asistente, que tampoco los tiene: solo las etiquetas disparan `attendee.updated`.
+- **Verificado:** si, 2026-10-30, con tinker contra la base sembrada: un asistente cuya persona tiene `company` "Empresa Ana" y `job_title` "Cargo Ana" devuelve null en `$attendee->company` y `->job_title`; `attendees` no tiene esas columnas. Y en la cruzada `WebhooksTest`: el job real de PHP manda los cuatro campos en null.
+- **En C#:** los cuatro salen con el valor real de la persona, escritos como los escribe `json_encode`, y `attendee.updated` salta tambien por su nombre, telefono, empresa o cargo (`DespachoYAsistenteTest`, `WebhooksTest`). Decidido por Kamilo: sin consumidores externos de webhooks al momento del cambio (Anexo B). Una edicion de perfil que cambie esos datos tiene que llamar al despacho por cada asistente de la persona (uno por evento) cuando se porte la edicion de perfil (M4b).
+
 ## 2026-10-30 — Encontrado al portar Onboarding de la app (M2.3.4c)
 
 ### BUG-491: Vaciar un texto del onboarding en Filament no lo borra (ABIERTO en PHP; C# lo hace distinto a proposito)
