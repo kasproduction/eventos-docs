@@ -463,8 +463,9 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
       EN PAUSA visible+deshabilitado en el admin (`4cd43d4`+`52f4522`). Al
       retomar: construir el acceso (Filament reactivar + lista Expo + modulo
       webapp ~1 sesion) o demoler entero. Costo mapeado, git preserva todo.
-- [ ] **Keyvisual por superficie**: `keyvisual_desktop` + `keyvisual_mobile` en branding. Decidido 2026-10-30 (Kamilo): columnas nuevas por migracion de Laravel + re-scaffold (regla 1). **Hecho en M2.3.4b:** migracion `2026_10_30_120000` y C# las escribe; la pantalla del admin nuevo avisa con un texto corto. **Falta:** que la app y la webapp las muestren cuando branding pase a C# (fase 4a), y correr la migracion en `eventos_db` y en el despliegue antes del C# nuevo.
+- [ ] **Keyvisual por superficie**: `keyvisual_desktop` + `keyvisual_mobile` en branding. Decidido 2026-10-30 (Kamilo): columnas nuevas por migracion de Laravel + re-scaffold (regla 1). **Hecho en M2.3.4b:** migracion `2026_10_30_120000` y C# las escribe; la pantalla del admin nuevo avisa con un texto corto. **Migracion aplicada en `eventos_db` local (2026-10-30, Kamilo).** **Falta:** que la app y la webapp las muestren cuando branding pase a C# (fase 4a), y en el despliegue la migracion va antes del C# nuevo.
 - [ ] **Hero modo texto**: contrato unico de branding (type image|text) a escala en las 3 superficies. Decidido 2026-10-30 (Kamilo): el admin nuevo ya guarda `hero_type` text, image o video (M2.3.4b); que la app, la webapp y el kiosco lo pinten igual es tarea aparte.
+- [ ] **Sin emoji en las opciones de Intereses**: decidido 2026-10-30 (Kamilo, M2.3.4c), decision de diseno. El admin nuevo ya no tiene el campo emoji y C# lo deja vacio al guardar las opciones (las viejas se limpian al editarlas). Falta que la app (`InterestsStep.tsx`, `chipEmoji`) y la webapp (`InterestOption.emoji` en `profile.ts`) dejen de pintarlo en la proxima publicacion; mientras tanto una opcion vieja sin editar sigue mostrando su emoji.
 
 > `/encuestas` fuera del rail (resuelto: canon 'aviso' + anuncio con targeting) ·
 

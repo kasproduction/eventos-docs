@@ -8,6 +8,12 @@
 
 ---
 
+## 2026-10-30: onboarding de la app en C# y en el admin nuevo (M2.3.4c)
+
+- **M2.3.4c** onboarding: `GET` y `PUT /events/{eventId}/onboarding` en C# con las reglas del formulario de Filament (lo escondido no se guarda, el merge del JSON por secciones y las opciones de la encuesta). Pantalla de siete pasos con vista previa en `/admin/eventos/{id}/identidad/onboarding`. Las opciones de la encuesta ya no llevan emoji. BUG-491 encontrado. Con esto M2.3.4 queda completa.
+
+---
+
 ## 2026-10-30: branding en C# y en el admin nuevo (M2.3.4b)
 
 - **M2.3.4b** branding: `GET` y `PUT /events/{eventId}/branding` en C# con las reglas del formulario de Filament (lo escondido no se guarda), migracion de `keyvisual_desktop` y `keyvisual_mobile` y re-scaffold. Pantalla de cuatro pestanas con vistas previas en `/admin/eventos/{id}/identidad`. Al pasar a Finalizado C# activa la encuesta post-evento; los recaps siguen en M2.6.4. BUG-490 encontrado.

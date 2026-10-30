@@ -240,6 +240,10 @@ de los 330 snapshots y del codigo PHP:
   - 2026-10-30 (M2.3.4b, branding; Kamilo): al pasar el evento a `ended` C# activa la encuesta post-evento que estaba en borrador (estado `active` y `activated_at`),
     como `EventObserver`; los recaps no, siguen en PHP hasta M2.6.4. `organizer_name` topa en 120 (la columna) en vez de 255 (BUG-490). Lo escondido en
     Filament no se guarda: About solo en borrador o registro con About prendido, imagen y oscurecer del hero solo con image o video, el video solo con video.
+  - 2026-10-30 (M2.3.4c, onboarding de la app; Kamilo): las opciones de la encuesta de Intereses ya no llevan emoji (decision de diseno): el admin nuevo no tiene el campo y C# guarda
+    `emoji` vacio en cada opcion que escribe, asi las viejas se limpian al editarlas. La app y la webapp dejan de pintarlo en la proxima publicacion (PENDIENTES §8). Vaciar un texto del
+    onboarding lo quita del JSON y la app vuelve a su texto de siempre; en Filament el merge ignora los null y el texto queda como estaba (BUG-491).
+    Diferencia decidida por Kamilo (2026-10-30): C# no copia ese merge; la unica otra diferencia con Filament en esta pestana es el emoji vacio. Lo escondido se comporta igual (cruzada con control).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-10-30 (Sonnet 5.5, 4) — M2.3.4c HECHA: ONBOARDING DE LA APP EN C# Y EN EL ADMIN NUEVO; M2.3.4 COMPLETA
+
+- Decisiones Kamilo: las opciones de la encuesta ya no llevan emoji (decision de diseno; C# guarda vacio, la app y la webapp dejan de pintarlo en la proxima publicacion, PENDIENTES §8); vista previa simple y fiel; BUG-491 como diferencia decidida en el Anexo B; migracion de keyvisual aplicada en `eventos_db` local (solo esa, con `--path`) y anotada para el despliegue antes del C# nuevo.
+- C# (`f6163fe`): `Admin/Identidad/Onboarding` + `OnboardingEndpoints`, `Contracts/Admin/OnboardingDelAdmin`, `EntradaDeLaPeticion.Objeto`, carpeta `event-onboarding`, fila `onboarding` en `CoberturaDelBloqueTest`. Web (`fac62d1`): `FormularioDeOnboarding`, `CamposDeFormulario` (compartido con Branding), `identidad/onboarding/page.tsx`, `e2e-admin/onboarding.spec.ts`. Backend (`e71a05e`): `tests/Cruzadas/OnboardingTest.php`.
+- Pruebas: C# 311, cruzadas 38/38 con dos controles, vitest 714, e2e admin 32/32; PHP Feature no se corrio (no cambio codigo de PHP). Roadmap 99/213.
+- Gotchas: en una cruzada `fillForm` MEZCLA el estado de un Repeater con relacion (para quitar filas usar `->set('data.onboardingSurveyOptions', [...])` con las llaves `record-ID`); en `expect($a)->toEqual($b)` de Pest el 'Expected' del diff es `$b`; las etiquetas con asterisco de obligatorio se buscan con regex (`getByLabel(/^Texto/)`) y acotadas a la fila; tras un control hay que recompilar Release antes del e2e; en Bash cada llamada pierde las variables (`EVENTOS_MYSQL_PRUEBAS`, `EVENTOS_BACKEND`): definirlas en el mismo comando.
+- **Despliegue pendiente:** la migracion de keyvisual va antes del C# nuevo. Ojo: en `eventos_db` local siguen sin aplicar `create_outbox_emails_table`, `add_claimed_at_to_outbox_emails` y `create_organizer_role` (no se tocaron). Push silencioso contra Expo real sigue sin probar.
+- **Sigue: M2.3.6** Importacion CSV de asistentes (`AttendeesImport`) con ClosedXML/CsvHelper y correo de importacion terminada por el outbox. Leer primero `app/Imports/AttendeesImport.php` y su pantalla en Filament, el outbox de correos de C# y la regla 6. Proponer por /davinci y esperar
+
 ## SESION 2026-10-30 (Sonnet 5.5, 3) — M2.3.4b HECHA: BRANDING EN C# Y EN EL ADMIN NUEVO
 
 - Decisiones Kamilo: keyvisual como columnas nuevas (migracion + re-scaffold); `ended` NO se rechaza: C# activa la encuesta post-evento (un `UPDATE`) y los recaps siguen en M2.6.4; hero en modo texto solo del lado del admin (las 3 superficies, tarea aparte en PENDIENTES §8). Todo en `decisiones.md` 2026-10-30 y el Anexo B.

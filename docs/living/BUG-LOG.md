@@ -3,6 +3,14 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-30 — Encontrado al portar Onboarding de la app (M2.3.4c)
+
+### BUG-491: Vaciar un texto del onboarding en Filament no lo borra (ABIERTO en PHP; C# lo hace distinto a proposito)
+- **Severidad propuesta:** BAJA (el organizador no puede quitar un titulo ya escrito; solo cambiarlo por otro)
+- **Que pasa:** `EditEventBranding::deepMergeConfig` solo copia un valor si `$value !== null`; Laravel convierte el texto vacio en `null`, asi que al vaciar un campo del onboarding (titulo, subtitulo, botones, hints) el valor guardado queda como estaba.
+- **Verificado:** si, 2026-10-30, con la prueba cruzada `tests/Cruzadas/OnboardingTest` (segunda prueba): `title_line1` guardado como `Hola` y vaciado en el formulario de Filament sigue siendo `Hola`.
+- **En C#:** vaciar un texto lo quita del JSON y la app vuelve a su texto de siempre. Diferencia decidida (Anexo B); la cruzada la fija. En PHP queda abierto hasta que Filament se apague (M2.7).
+
 ## 2026-10-30 — Encontrado al portar Branding (M2.3.4b)
 
 ### BUG-490: `organizer_name` admite 255 en Filament pero la columna es de 120 y un nombre largo da error 500 (ABIERTO en PHP; C# no lo tiene)
