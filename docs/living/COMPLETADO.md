@@ -8,6 +8,12 @@
 
 ---
 
+## 2026-10-30: panel de modulos en C# y en el admin nuevo (M2.3.4a)
+
+- **M2.3.4a** modulos: `GET /events/{eventId}/modules`, `PUT /modules/{id}` y `POST /modules/reorder` en C# con los efectos del panel de Filament (version de la cache de PHP, aviso `modules`, y al prender o apagar el push silencioso a las apps). Pantalla en el admin nuevo copiada de la captura 55, con vista previa de la webapp y la app. M2.3.4 se parte en a (esta), b (branding) y c (onboarding de la app).
+
+---
+
 ## 2026-10-30: paginas personalizadas en C#, en el admin nuevo y en el menu de la webapp (M2.3.3c2, BUG-469)
 
 - **M2.3.3c2** paginas: CRUD en C# con el cuerpo limpio por HtmlSanitizer (misma lista de etiquetas que PHP, medido contra HTMLPurifier), pantalla en el admin nuevo y Filament de solo lectura. La webapp suma `/paginas` y `/paginas/[id]` y una entrada del menu que se adapta (ninguna, una con su titulo, o "Paginas" con lista) y solo existe para quien puede ver alguna. BUG-469 confirmado y resuelto en la webapp; Expo con la misma regla en la siguiente publicacion (`PENDIENTES.md`).

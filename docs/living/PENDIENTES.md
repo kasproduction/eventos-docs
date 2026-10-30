@@ -463,7 +463,7 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
       EN PAUSA visible+deshabilitado en el admin (`4cd43d4`+`52f4522`). Al
       retomar: construir el acceso (Filament reactivar + lista Expo + modulo
       webapp ~1 sesion) o demoler entero. Costo mapeado, git preserva todo.
-- [ ] **Keyvisual por superficie**: `keyvisual_desktop` + `keyvisual_mobile` en branding + 2 uploads Filament con preview.
+- [ ] **Keyvisual por superficie**: `keyvisual_desktop` + `keyvisual_mobile` en branding. Decidido 2026-10-30 (Kamilo): columnas nuevas por migracion de Laravel + re-scaffold (regla 1), las escribe C# en M2.3.4b y la app y la webapp las muestran cuando branding pase a C# (fase 4a); la pantalla lo avisa con un texto corto.
 - [ ] **Hero modo texto**: contrato unico de branding (type image|text) a escala en las 3 superficies.
 
 > `/encuestas` fuera del rail (resuelto: canon 'aviso' + anuncio con targeting) ·

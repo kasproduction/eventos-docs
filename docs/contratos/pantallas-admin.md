@@ -59,7 +59,7 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | EventFaqResource | Experiencia / Identidad | H1 | 2.3.3 | |
 | DocumentResource | Contenido | H1 si cabe | 2.3.3 | D.3: "si caben" |
 | EventBrandingResource | Experiencia / Identidad | H1 | 2.3.4 | Ya trae la pestana Onboarding app (INT.2) |
-| ModulosPanel | Experiencia | H1 | 2.3.4 | |
+| ModulosPanel | Experiencia | H1 | 2.3.4a (hecha 2026-10-30) | Ya en el admin nuevo; Filament lo sigue mostrando hasta M2.7 |
 | AttendeeAdminResource | Personas / Asistentes | H1 | 2.4.1, 2.3.6 | Lista, perfil, tags, aprobacion, check-in manual, importar y exportar |
 | RegistrationFieldResource | Personas / Entrada | H1 | 2.4.1 | Los campos de registro estan en 2.4.1 |
 | AttendeeBanResource | Personas / Asistentes | H1 | 2.4.2 | Con expulsion del socket (BUG-373) |

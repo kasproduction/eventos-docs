@@ -232,6 +232,11 @@ de los 330 snapshots y del codigo PHP:
     queda de ultima; "quien la ve" sin marcar se guarda null (la ven todos); borrar es suave como el `SoftDeletes` del modelo.
   - 2026-10-30 (M2.3.3c2): el admin nuevo avisa `pages` a los clientes al guardar, olvidar la lista y reordenar; PHP solo olvidaba
     `event:{id}:pages:{rol}` porque nadie leia las paginas. Ahora la webapp las lee y su boton del menu se actualiza al instante.
+  - 2026-10-30 (M2.3.4a, modulos; Kamilo): al prender o apagar un modulo C# avisa `modules` una vez, despues de subir la version de la cache de
+    `event:{id}:modules:ver`; PHP lo avisaba dos veces (el observer y `invalidate()` del panel) y el primer aviso llegaba antes de subir la
+    version. Reordenar y cambiar la audiencia solo suben la version y avisan (sin push silencioso ni olvidar claves), como el panel; el push
+    silencioso (`module_update`) va solo al prender o apagar y a los asistentes con token de Expo (no respeta `push_session_reminders`: no muestra nada).
+    Un modulo de un catalogo viejo (que `ModuleCatalog` ya no conoce) no se lista ni se edita (404).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
