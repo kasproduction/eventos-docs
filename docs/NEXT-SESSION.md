@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-10-29 (Sonnet 5.5, 2) — M2.3.3b HECHA: SPONSORS EN C# Y EN EL ADMIN NUEVO
+
+- Decisiones Kamilo: buscador de lideres desde el servidor con tope de 20 y componente comun para cualquier selector de asistentes; trivia con respuestas no se borra (boton apagado con el motivo, se apaga); las dos en el Anexo B.
+- C# `b2252f1`: `Admin/Contenido/Sponsors(+Endpoints)`, `Admin/Personas/BuscadorDeAsistentes` (`GET /attendees/lookup`, `ConAlgunPermiso`), `EntradaDeLaPeticion.Objetos`, `ErroresDeValidacion.AgregarDe`, `AvisosDeCambios.AvisarAlAsistenteAsync`, destinos de subida `sponsor-logos` y `sponsor-banners`. Web `d47c80d`: `sponsors/`, `ListaDeSponsors`, `FormularioDeSponsor`, `BuscadorDeAsistente`, `CampoDeEtiquetas`. Backend `01bb474`: cruzada `SponsorsTest` (fila, servicios, trivias, cambio de lider y quitar del equipo iguales a Filament; el aviso al socket igual).
+- BUG-486 (logo, banner o sitio web de mas de 255 dan 500), BUG-487 (puntos de mas de 65535 dan 500) y BUG-488 (reordenar no avisa), de Filament, confirmados con prueba temporal contra MySQL; C# no los tiene.
+- Gotchas: los `<details>` con `open` ligado a errores se cierran al corregirlos (estado controlado en `CamposDelSponsor`); el formulario de Filament nace con un servicio y una trivia vacios que piden datos (en pruebas pasar `services => []` y `trivias => []`); `entrada.spec` ahora usa Asistentes como seccion en Filament (cambiar de nuevo cuando se porte); en e2e esperar a que termine una Server Action antes de recargar.
+- Pruebas: C# 248, cruzadas 31/31 con control, vitest 709, e2e admin 27/27. Roadmap 91/210.
+- **Sigue: M2.3.3c** documentos (PDF con `kind=document`, `RegenerateDocumentsZipJob` en Hangfire) y paginas personalizadas (cuerpo o `iframe_url` con roles; cerrar BUG-469). Leer primero `DocumentResource`, `CustomPageResource`, `app/Jobs/RegenerateDocumentsZipJob.php` y `Admin/Contenido/Sponsors.cs` como molde. Proponer por /davinci. `entrada.spec` hay que moverlo a otra seccion de Filament cuando Documentos salga.
+
 ## SESION 2026-10-29 (Sonnet 5.5) — M2.3.5 HECHA: SUBIDAS A R2 (O AL DISCO PUBLICO) EN C# Y EN EL ADMIN NUEVO
 
 - Decisiones Kamilo: la miniatura de sesion queda en el disco publico local (limitacion conocida con varios nodos de API, ya existia en PHP) y pasa a R2 cuando la ruta publica de sesiones sea de C# (4a); el barrido de archivos huerfanos queda para despues de la fase 5 sin tarea nueva; el SVG fuera del todo; C# no borra el archivo viejo al reemplazar.

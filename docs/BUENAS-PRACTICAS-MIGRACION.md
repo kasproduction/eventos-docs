@@ -204,6 +204,12 @@ de los 330 snapshots y del codigo PHP:
     puede traer scripts. El tipo sale del contenido (JPG, PNG, WebP, GIF; PDF en documentos) y el destino es una lista
     cerrada. La miniatura de sesion va siempre al disco publico como ruta relativa (`thumbnail_path`), no a R2, mientras PHP
     siga leyendo la agenda; pasa a R2 cuando la ruta publica de sesiones sea de C# (4a).
+  - 2026-10-29 (M2.3.3b, sponsors; Kamilo): el lider del stand se elige con un buscador del servidor (tope de 20) y C#
+    valida que sea un asistente del evento que no sea del staff (Filament solo lo filtraba en el formulario). Una trivia
+    de stand con respuestas no se borra (se apaga): Filament la borraba y se llevaba las respuestas en cascada.
+  - 2026-10-29 (M2.3.3b, forma): topes de la columna con mensaje (logo, banner y sitio web hasta 255; puntos hasta 65535;
+    colaboradores de 1 a 20) en vez del 500 de Filament (BUG-486 y 487); reordenar sponsors avisa `sponsors` (BUG-488);
+    el lider del stand no se quita del equipo desde la lista de miembros (Filament podia dejar al lider sin acceso).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

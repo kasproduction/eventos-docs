@@ -8,6 +8,12 @@
 
 ---
 
+## 2026-10-29: sponsors en C# y en el admin nuevo (M2.3.3b)
+
+- **M2.3.3b** sponsors con servicios, trivias del stand, lider y equipo, y el buscador de asistentes comun (tope de 20) para cualquier selector del admin. Una trivia con respuestas no se borra, se apaga. Pruebas: C# 248, cruzadas 31/31, vitest 709, e2e admin 27/27. Roadmap 91/210.
+
+---
+
 ## 2026-10-29: subidas de archivos (M2.3.5)
 
 - **M2.3.5** boton "Subir archivo" en el admin nuevo (foto del speaker, slides del login, destacados, preguntas y miniatura de sesion) sobre `POST /api/admin/v1/events/{eventId}/uploads` de C#: R2 con AWSSDK.S3 y disco publico de respaldo, mismo esquema de nombres y URL que `StorageService`; tipo leido del contenido, SVG fuera. La miniatura de sesion queda en el disco publico (decision de Kamilo). Pruebas: C# 241, cruzadas 29/29, vitest 708, e2e admin 25/25. Roadmap 90/210.

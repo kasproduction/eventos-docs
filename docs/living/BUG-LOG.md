@@ -5,6 +5,23 @@
 
 ## 2026-10-28 — Encontrados al portar Identidad (M2.3.3a)
 
+### BUG-488: Reordenar sponsors en Filament no avisa a los clientes (ABIERTO en PHP; C# no lo tiene)
+- **Severidad propuesta:** BAJA (el orden nuevo se ve al siguiente arranque o refresco)
+- **Que pasa:** el arrastre de la tabla de `SponsorResource` (`reorderable`) hace un `UPDATE` directo sin eventos del modelo, por lo que `SponsorObserver` no corre y no se avisa `sponsors` al socket. Misma causa que BUG-484 (confirmado en Identidad con prueba contra MySQL); en Sponsors no se probo aparte.
+- **En C#:** `POST /sponsors/reorder` avisa `sponsors`; `SponsorsTest`. En PHP queda abierto hasta que Filament se apague (M2.7).
+
+### BUG-487: En Filament, puntos por visitar o puntos bonus de mas de 65535 dan error 500 (ABIERTO en PHP; C# no lo tiene)
+- **Severidad propuesta:** BAJA (solo staff, con un numero absurdo)
+- **Que pasa:** `visit_points` de `sponsors` y `bonus_points` de `stand_trivias` son `smallint unsigned` y los campos de Filament solo piden `minValue(0)`, sin tope: MySQL rechaza la fila (`Out of range value`) y sale error de servidor.
+- **Verificado:** si, 2026-10-29, con una prueba temporal contra MySQL (`CreateSponsor` con `visit_points` 70000 lanza `QueryException` 1264); no se dejo en el repo (regla 6).
+- **En C#:** tope de 65535 con su mensaje (422); `SponsorsTest`.
+
+### BUG-486: En Filament, logo, banner o sitio web de mas de 255 caracteres dan error 500 (ABIERTO en PHP; C# no lo tiene)
+- **Severidad propuesta:** BAJA (solo staff, con una URL muy larga)
+- **Que pasa:** `SponsorResource` acepta hasta 500 caracteres en logo y banner (`ImageUploadField`) y en el sitio web, pero `logo_url`, `banner_url` y `website_url` de `sponsors` son `string` de 255: MySQL rechaza la fila (`Data too long`) y sale error de servidor. Misma familia que BUG-485.
+- **Verificado:** si, 2026-10-29, con una prueba temporal contra MySQL (`CreateSponsor` con un logo de 300 caracteres lanza `QueryException` 1406); no se dejo en el repo (regla 6).
+- **En C#:** el tope es el de la columna (255) con el mensaje de Laravel (422); `SponsorsTest`.
+
 ### BUG-485: En Filament, un destacado con imagen o destino de mas de 255 caracteres da error 500 (ABIERTO en PHP; C# no lo tiene)
 - **Severidad propuesta:** BAJA (solo staff, con una URL muy larga)
 - **Que pasa:** `HighlightResource` acepta hasta 500 caracteres en la imagen (`ImageUploadField`) y en la URL de destino, pero las columnas `image_url` y `link_url` de `event_highlights` son `string` de 255: MySQL rechaza la fila (`Data too long`) y Filament muestra error de servidor. Los slides del login y las preguntas si tienen columnas de 500.
