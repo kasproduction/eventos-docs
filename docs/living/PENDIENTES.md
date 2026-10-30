@@ -547,6 +547,8 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 12. DIFERIDO A FASE 2 Y NICE TO HAVE (no antes del 6 de diciembre salvo que un cliente lo pida)
 
+- [ ] **Rebotes y entregas de Resend por webhook** (mejora posible, sin tarea; Kamilo 2026-10-30): C# manda por el SMTP de Resend y solo sabe si el servidor acepto el correo, no si rebota ni si llega. Un webhook de Resend a C# dejaria el estado de entrega en `email_logs` y avisaria de direcciones que rebotan.
+
 - [ ] **Aforo por sala en vivo** (idea Kamilo 2026-10-22, para el admin nuevo): personas dentro de cada sala en el totem de sala y en el admin. Hoy solo el Event Pulse lo muestra (pide a la API). `room:occupancy` se quito porque nadie lo escuchaba (BUG-369).
 - [ ] Cartel de anuncio sobre el video en celular: solo existe en escritorio (BUG-368).
 

@@ -244,6 +244,10 @@ de los 330 snapshots y del codigo PHP:
     `emoji` vacio en cada opcion que escribe, asi las viejas se limpian al editarlas. La app y la webapp dejan de pintarlo en la proxima publicacion (PENDIENTES §8). Vaciar un texto del
     onboarding lo quita del JSON y la app vuelve a su texto de siempre; en Filament el merge ignora los null y el texto queda como estaba (BUG-491).
     Diferencia decidida por Kamilo (2026-10-30): C# no copia ese merge; la unica otra diferencia con Filament en esta pestana es el emoji vacio. Lo escondido se comporta igual (cruzada con control).
+  - 2026-10-30 (M2.3.6a, correo base; Kamilo): los dos avisos de seguridad del staff salen directo de C# y ya no por el outbox de PHP. Diferencias con PHP: el aviso se pide DESPUES de guardar (el outbox lo escribia en la
+    misma transaccion, asi que si el proceso se cae entre guardar y encolar el aviso se pierde; para la persona que se bloquea o activa el 2FA es menor que mandar un aviso de algo que no se guardo); el reintento es el de
+    Hangfire (10, 30, 60, 120 y 300 s) en vez del `retryUntil` de 12 horas de PHP; el limitador por segundo se hace esperando dentro del trabajo, no devolviendolo a la cola. El correo del sistema va por el SMTP de Resend
+    (un solo camino con el SMTP de cada organizacion, MailKit) y no por la API de Resend; los rebotes y entregas no se leen (mejora posible por webhook, PENDIENTES §12).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
