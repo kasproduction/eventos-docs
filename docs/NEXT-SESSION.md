@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-10-29 (Sonnet 5.5) — M2.3.5 HECHA: SUBIDAS A R2 (O AL DISCO PUBLICO) EN C# Y EN EL ADMIN NUEVO
+
+- Decisiones Kamilo: la miniatura de sesion queda en el disco publico local (limitacion conocida con varios nodos de API, ya existia en PHP) y pasa a R2 cuando la ruta publica de sesiones sea de C# (4a); el barrido de archivos huerfanos queda para despues de la fase 5 sin tarea nueva; el SVG fuera del todo; C# no borra el archivo viejo al reemplazar.
+- C# `cbf7721`: `Admin/Archivos` (`AlmacenDeArchivos`, `Archivos`, `ArchivosEndpoints`), paquete AWSSDK.S3 4.0.104.8, `thumbnail_path`/`thumbnail_url` en sesiones; scripts `api-local.sh` y `cruzadas-contra-csharp.sh` con la carpeta publica comun. Web `5bfed0b`: `CampoDeArchivo`, `lib/admin/subidas.ts` (Server Action), `serverActions.bodySizeLimit` 6 MB. Backend `45f5c01`: cruzada `SubidasTest`.
+- Gotchas: AWSSDK con `DisablePayloadSigning` exige https (se quito); R2 pide checksums `WHEN_REQUIRED`; el `IHttpMaxRequestBodySizeFeature` es nulo en TestServer (usar `RequestSizeLimitAttribute`); en bash los `node -e` comen las barras invertidas (usar Edit para regex); el anunciador de rutas de Next es un `role=alert` (en e2e buscar por clase, no por rol); tras un control hay que recompilar Release antes del e2e.
+- Pruebas: C# 241, cruzadas 29/29 con control, vitest 708, e2e admin 25/25. Roadmap 90/210.
+- **Pendiente de despliegue:** `Almacen:R2:*` y `Almacen:RutaPublica` en el servidor de C# (junto a lo de c1+c2+c3) y una subida real al bucket de R2; no se probo contra R2 de verdad.
+- **Sigue: M2.3.3b sponsors** (tiers, servicios, stand, equipo; logo y banner con el boton de subir: sumar los destinos `sponsors/logos` y `sponsors/banners` a `Archivos.Carpetas`), despues M2.3.3c documentos (PDF, `kind=document` ya existe) y paginas. Leer primero `SponsorResource` y sus relation managers en Filament, las capturas de `design/features/admin/filament-actual/` y `Admin/Identidad/IdentidadDelEvento.cs` como molde. Proponer por /davinci.
+
 ## SESION 2026-10-28 (Fable 5.1) — M2.3.3a HECHA: SPEAKERS E IDENTIDAD EN C# Y EN EL ADMIN NUEVO
 
 - Decisiones Kamilo: M2.3.3 partida en tres (a speakers, destacados, slides del login y FAQ; b sponsors; c documentos y paginas); las imagenes del admin nuevo son URLs hasta M2.3.5, que va justo despues de 3a; "Highlights" se llama Destacados en el admin nuevo desde ya (`decisiones.md`).

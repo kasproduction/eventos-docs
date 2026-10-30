@@ -8,6 +8,12 @@
 
 ---
 
+## 2026-10-29: subidas de archivos (M2.3.5)
+
+- **M2.3.5** boton "Subir archivo" en el admin nuevo (foto del speaker, slides del login, destacados, preguntas y miniatura de sesion) sobre `POST /api/admin/v1/events/{eventId}/uploads` de C#: R2 con AWSSDK.S3 y disco publico de respaldo, mismo esquema de nombres y URL que `StorageService`; tipo leido del contenido, SVG fuera. La miniatura de sesion queda en el disco publico (decision de Kamilo). Pruebas: C# 241, cruzadas 29/29, vitest 708, e2e admin 25/25. Roadmap 90/210.
+
+---
+
 ## 2026-10-28: speakers e Identidad en C# y en el admin nuevo (M2.3.3a)
 
 - **M2.3.3a** speakers (con sus sesiones), slides del login, destacados y preguntas frecuentes en la API del admin de C#

@@ -200,6 +200,10 @@ de los 330 snapshots y del codigo PHP:
     manda), como "Cambio de horario"; PHP no miraba ninguna preferencia. Y el salon sin nombre es "el salón" (PHP: "el salon").
   - 2026-10-27 (M2.3.2c3, forma): al finalizar una sesion retrasada PHP la guardaba dos veces y mandaba la pieza
     `session.updated` cada vez; C# la guarda y la manda una vez, con el estado final.
+  - 2026-10-29 (M2.3.5, subidas; Kamilo): el SVG no se acepta (Filament si): se serviria desde el mismo origen que la Api y
+    puede traer scripts. El tipo sale del contenido (JPG, PNG, WebP, GIF; PDF en documentos) y el destino es una lista
+    cerrada. La miniatura de sesion va siempre al disco publico como ruta relativa (`thumbnail_path`), no a R2, mientras PHP
+    siga leyendo la agenda; pasa a R2 cuando la ruta publica de sesiones sea de C# (4a).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
