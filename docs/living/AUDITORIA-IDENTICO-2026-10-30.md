@@ -2,7 +2,28 @@
 
 > Pedida por Kamilo al fijar la regla "idéntico o arreglado" (`BUENAS-PRACTICAS-MIGRACION.md`). La armó un revisor de solo lectura sobre
 > todo lo portado a C# hasta M2.3.6a; yo verifiqué contra el código las filas marcadas "verificada". Lo que dice "sin confirmar" no lo
-> confirmó nadie. Nada de esto se ha cambiado todavía: cada fila espera la decisión de Kamilo o su propia tarea.
+> confirmó nadie. Decididas por Kamilo el 2026-10-30; el estado de cada fila está en la sección siguiente.
+
+## Estado tras la decisión de Kamilo (2026-10-30)
+
+| Estado | Filas |
+|---|---|
+| Arregladas en C# con su prueba y su control (tarea M2.3.10) | 1, 2, 6, 8, 9, 10, 11, 12, 16, 17, 18, 21, 22, 24, 25 |
+| A su propia tarea | 15 en M2.4.4 (desbloquear cuenta), 7 en M4c.6 (log de push de cambio de horario y agenda retrasada) |
+| Aceptadas en el Anexo B | 3, 4, 5, 13, 19, 20, 23, 26 |
+| Idénticas por contrato | A a E |
+| Descartada | 14 |
+
+La fila 8 ya validaba 1 a 120 en PHP y en C#; solo faltaba el desempate por id. La fila 1 no tiene acción de "revertir": ver `decisiones.md`.
+
+## Segunda revisión: los seis archivos que faltaban (2026-10-30)
+
+Revisor de solo lectura sobre `Onboarding`, `TracksYTipos`, `HtmlDePaginas`, `DosPasos`, `IngresoDelStaff` y `SesionesDelStaff`. Sin verificar contra PHP, salvo la longitud UTF-16 (ya cubierta por la fila 22). Esperan decisión de Kamilo.
+
+- Ingreso del staff: el bloqueo remoto no tiene desbloqueo (ver fila 15, M2.4.4); la ventana de 5 códigos tiene una carrera y su llave de Redis no vence; `setup` y `confirm` del 2FA no miran el bloqueo; los tokens pendientes y `staff_sessions` no se limpian; con un correo inexistente la respuesta tarda distinto.
+- Onboarding: un hero relativo no se puede volver a guardar (422); borrar una opción de Intereses borra en cascada las respuestas de los asistentes; carrera al editar el JSON; `forms[].id` repetido; números null en vez de los defaults; listas `null` que vacían; sin tope de opciones.
+- TracksYTipos: reordenar es parcial y sin transacción; los tracks nuevos nacen con orden 0; el slug de un tipo tiene una carrera; el color es obligatorio.
+- HtmlDePaginas: `!important` dentro de `span` que HTMLPurifier quita; un `>` dentro de un atributo.
 
 ## Resumen
 

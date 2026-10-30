@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-10-30 (Sonnet 5.5, 8) — M2.3.10 HECHA (SIN COMMIT): 15 ARREGLOS DE LA REVISION DE LO COPIADO DE PHP
+
+- Decisiones Kamilo: una sola tarea de cierre con los arreglos 1, 2, 6, 8, 9, 10, 11, 12, 16, 17, 18, 21, 22, 24 y 25; la 15 va a M2.4.4 y la 7 a M4c.6; aceptados en el Anexo B 3, 4, 5, 13, 19, 20, 23 y 26; A a E identicos. Detalle y motivos: roadmap (M2.3.10), `decisiones.md`, Anexo B, `docs/living/AUDITORIA-IDENTICO-2026-10-30.md`.
+- Pruebas: C# 396, cruzadas 43/43 (tres ajustadas a lo decidido: ciclo de la sesion, correo apagado, iframe), contratos 12/12, e2e admin 32/32, vitest 714, tsc limpio. Cada arreglo con su control. Roadmap 102/216.
+- Interpretacion mia a confirmar: "revertir" la cancelacion = cambiar el estado desde Cancelada en la edicion del admin limpia `cancelled_at` (no existe una accion de revertir).
+- **Despliegue:** migracion `2026_10_31_100000_add_skipped_to_email_logs_status` (PHP) ANTES del C# nuevo; es no-op en SQLite. Opcional: `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`. Falta la migracion de keyvisual y lo de M2.3.6a que ya estaba pendiente.
+- **Falta:** `/guardar` (commit y push de C#, web, backend y docs; todo esta sin commit). Y la decision de Kamilo sobre los hallazgos de la segunda revision (ingreso del staff, onboarding, tracks y tipos, HTML de paginas), listados en la auditoria.
+- **Sigue: PROPONER M2.3.6c** (importacion de asistentes).
+
 ## SESION 2026-10-30 (Sonnet 5.5, 7) — M2.3.6b HECHA: WEBHOOKS BASE EN C#; REGLA "IDENTICO O ARREGLADO"; REVISION DE LO COPIADO DE PHP
 
 - Decisiones Kamilo: (1) NO portar identicos dos defectos de los webhooks: BUG-492 (phone, company, job_title y photo_url reales desde `users`; `attendee.updated` tambien por esos datos) y BUG-493 (un 5xx se reintenta a 60 y 300 s), porque no hay clientes consumiendo webhooks; todo lo demas byte a byte (firma, cabeceras, orden y escape del JSON, ULID, log). (2) REGLA nueva: identico solo para contratos que consumen la webapp, la app y el kiosko; los externos sin consumidor y el admin nuevo se arreglan en C# y se anotan. Escrita en `BUENAS-PRACTICAS-MIGRACION.md` (seccion "Idéntico o arreglado" y Anexo B), en el `CLAUDE.md` de C# y en `docs/plantillas/CLAUDE-dotnet.md`. (3) Revision de "idéntico": `docs/living/AUDITORIA-IDENTICO-2026-10-30.md`.

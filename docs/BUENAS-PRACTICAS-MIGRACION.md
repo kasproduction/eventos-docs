@@ -279,6 +279,19 @@ de los 330 snapshots y del codigo PHP:
     `[]` para un data vacio), el ULID en mayusculas, el log y el estado del endpoint. NO puede ser identico: el texto del error de una
     conexion caida (cURL en PHP, .NET en C#). Un tercer intento fallido queda solo en el log (PHP lo dejaba en failed_jobs). Los
     reintentos son trabajos nuevos con el numero de intento, no los reintentos de Hangfire.
+  - 2026-10-30 (M2.3.10, cierre de la revision de lo copiado; Kamilo): sin consumidores externos al momento del cambio, C# ARREGLA estos
+    comportamientos de PHP (webapp, app y kiosko no los leen): push con 3 intentos por lote y borrado de tokens muertos; ZIP de documentos
+    con reintentos y URL en null si no entra ninguno; borrar un sponsor retira el acceso de vendedor de su equipo; correo con plantilla
+    apagada deja fila `skipped` y un reintento no duplica; marcadores de plantilla en una sola pasada; documento propio con mime y tamano del
+    archivo y sin `msword`/`ms-powerpoint` nuevos; `stream_iframe` invalido da 422 en vez de guardarse vacio; aforo 0 = sin limite tambien al
+    editar; restaurar una sesion borrada; textos por caracteres y no por UTF-16; cualquier zona IANA; avisos de FAQ y de la encuesta
+    post-evento; modulo de catalogo viejo visible solo para apagarlo; desempate por id al correr la siguiente sesion.
+    Sesion cancelada: C# deja `status=cancelled` (PHP solo ponia `cancelled_at` y la webapp y la app, que leen `status`, la veian
+    programada o en vivo). No hay accion de revertir; el estado y `cancelled_at` van juntos al editar (salir de Cancelada la limpia).
+  - 2026-10-30 (M2.3.10, aceptados): 3 (el socket deja pasar un aviso por segundo y entidad), 4 (si Redis falla, el guardado sigue y la cache
+    vieja dura hasta que venza), 5 (sin outbox: si el proceso cae entre guardar y pedir el efecto, se pierde), 13 (borrar un documento,
+    speaker o sponsor no borra su archivo), 19 (lo escondido en el formulario no se guarda), 20 (cada guardado del evento avisa `branding`),
+    23 (fechas del admin truncadas al minuto) y 26 (limitadores propios de cada backend mientras convivan: el cupo real se duplica).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
