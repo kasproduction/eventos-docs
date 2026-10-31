@@ -292,6 +292,22 @@ de los 330 snapshots y del codigo PHP:
     vieja dura hasta que venza), 5 (sin outbox: si el proceso cae entre guardar y pedir el efecto, se pierde), 13 (borrar un documento,
     speaker o sponsor no borra su archivo), 19 (lo escondido en el formulario no se guarda), 20 (cada guardado del evento avisa `branding`),
     23 (fechas del admin truncadas al minuto) y 26 (limitadores propios de cada backend mientras convivan: el cupo real se duplica).
+  - 2026-10-31 (M2.3.10b, segunda revision; Kamilo): C# ARREGLA. Ingreso del staff: un fallo de contraseña tarda al menos 200 ms (el
+    Timebox de `SessionGuard::validate`, que C# no tenia: sin persona la respuesta salia en pocos ms y decia si el correo existe);
+    activar y confirmar el segundo factor miran el bloqueo (PHP tampoco lo miraba en `TwoFactorSetup`) y descartan el pendiente; el
+    limite de 5 codigos por minuto suma y pone su vencimiento en un solo paso de Redis (Lua) y pasado el cupo no sigue sumando.
+    Onboarding: la imagen hero relativa que guardo el FileUpload de Filament se acepta si vuelve sin cambios (antes 422); dos
+    formularios no pueden tener el mismo `id` (la app busca cada paso por id y el segundo nunca se veia); una opcion de Intereses que
+    ya eligieron asistentes no se quita: 422 que pide desactivarla (Filament la borraba y la cascada se llevaba las respuestas; mismo
+    criterio que la trivia del stand). Tracks y tipos: reordenar pide la lista completa y se guarda en una transaccion; un track o un
+    tipo nuevo va al final (Filament lo dejaba en 0). Sesion cancelada: `status` y `cancelled_at` nunca se contradicen; entrar a
+    Cancelada escribe la fecha (la que habia se conserva), salir la limpia, y la que cancelo Mission Control de PHP (solo
+    `cancelled_at`) el admin la lee como Cancelada, asi guardarla sin tocar el estado no la revierte.
+  - 2026-10-31 (M2.3.10b, aceptados, PHP hace lo mismo): dos personas que guardan el onboarding a la vez, gana la ultima; la carrera al
+    crear el slug de un tipo (el indice unico `event_id, slug` frena el segundo con un error); el color obligatorio de tracks y tipos; las opciones de Intereses
+    sin tope; una lista `null` en el onboarding la vacia; los numeros vacios de un formulario quedan null en vez de los valores por
+    defecto; en el HTML de las paginas, el `!important` dentro de `span` que HTMLPurifier quita y un `>` dentro de un atributo.
+    La limpieza de `staff_sessions` y `trusted_devices` vencidos va a M2.4.4.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

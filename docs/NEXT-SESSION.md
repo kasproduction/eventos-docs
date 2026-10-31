@@ -10,7 +10,17 @@
 
 ---
 
-## SESION 2026-10-30 (Sonnet 5.5, 8) — M2.3.10 HECHA (SIN COMMIT): 15 ARREGLOS DE LA REVISION DE LO COPIADO DE PHP
+## SESION 2026-10-31 (Opus 5.5, 9) — M2.3.10b HECHA: SEGUNDA REVISION DE LO COPIADO (6 ARREGLOS, INTERESES Y CANCELACION)
+
+- Commits de M2.3.10 (sesion anterior) ya estaban subidos: C# `b4a6cb5`, backend `2d25292`, web `3f90220`, docs `4e58b44`.
+- Decisiones Kamilo: los 6 arreglos en un bloque corto antes de M2.3.6c; opcion de Intereses con respuestas no se borra, 422 que pide desactivarla (como la trivia del stand); revertir la cancelacion: salir de Cancelada limpia `cancelled_at` y entrar la escribe, nunca se contradicen; limpieza de sesiones y equipos vencidos a M2.4.4; lo demas al Anexo B.
+- C# `141d467`, backend `8b40916` (cruzada de tracks), web `9ee1f07` (mensaje de Intereses, e2e de tracks). Pruebas: C# 401, cruzadas 43/43, contratos 12/12, e2e admin 32/32, vitest 714, tsc limpio. 11 controles fallan como deben (la transaccion del reordenar no tiene control). Roadmap 103/217.
+- Verificado contra PHP: el Timebox de 200 ms existe en `SessionGuard::validate` (C# no lo tenia); `TwoFactorSetup` tampoco miraba el bloqueo; PHP no limpia `staff_sessions` ni `trusted_devices`; el indice unico `event_id, slug` de `session_types` existe.
+- Gotchas: la primera peticion de una prueba con WebApplicationFactory tarda ~1,7 s (arranque en frio): medir tiempos despues de un calentamiento. El "401 en speakers" del log del e2e es la prueba de sesion vencida, a proposito. Si MySQL de Laragon esta apagado y lo arranco a mano, Laragon abierto despues traba un segundo `mysqld` sobre los mismos archivos: arrancar desde Laragon. En el 6379 contesta el Redis de WSL.
+- Despliegue: nada nuevo. La cancelada por Mission Control de PHP ya se lee como Cancelada en el admin; el `UPDATE` opcional de la sesion anterior sigue siendo opcional.
+- **Sigue: PROPONER M2.3.6c** (importacion de asistentes).
+
+## SESION 2026-10-30 (Sonnet 5.5, 8) — M2.3.10 HECHA (subida en la sesion 9): 15 ARREGLOS DE LA REVISION DE LO COPIADO DE PHP
 
 - Decisiones Kamilo: una sola tarea de cierre con los arreglos 1, 2, 6, 8, 9, 10, 11, 12, 16, 17, 18, 21, 22, 24 y 25; la 15 va a M2.4.4 y la 7 a M4c.6; aceptados en el Anexo B 3, 4, 5, 13, 19, 20, 23 y 26; A a E identicos. Detalle y motivos: roadmap (M2.3.10), `decisiones.md`, Anexo B, `docs/living/AUDITORIA-IDENTICO-2026-10-30.md`.
 - Pruebas: C# 396, cruzadas 43/43 (tres ajustadas a lo decidido: ciclo de la sesion, correo apagado, iframe), contratos 12/12, e2e admin 32/32, vitest 714, tsc limpio. Cada arreglo con su control. Roadmap 102/216.

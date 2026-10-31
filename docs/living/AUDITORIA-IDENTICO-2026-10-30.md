@@ -18,7 +18,9 @@ La fila 8 ya validaba 1 a 120 en PHP y en C#; solo faltaba el desempate por id. 
 
 ## Segunda revisión: los seis archivos que faltaban (2026-10-30)
 
-Revisor de solo lectura sobre `Onboarding`, `TracksYTipos`, `HtmlDePaginas`, `DosPasos`, `IngresoDelStaff` y `SesionesDelStaff`. Sin verificar contra PHP, salvo la longitud UTF-16 (ya cubierta por la fila 22). Esperan decisión de Kamilo.
+Revisor de solo lectura sobre `Onboarding`, `TracksYTipos`, `HtmlDePaginas`, `DosPasos`, `IngresoDelStaff` y `SesionesDelStaff`.
+
+**Estado (2026-10-31, decidido por Kamilo y hecho en M2.3.10b):** verificado contra el código de C# y, donde importa, contra PHP. Arreglados: la espera mínima del ingreso fallido (PHP la tiene con el Timebox de `SessionGuard::validate` y C# no), el bloqueo al activar y confirmar el 2FA, el límite de códigos atómico, el hero relativo, `forms[].id` único, la opción de Intereses con respuestas (no se quita, se desactiva), reordenar tracks y tipos completo y en transacción con lo nuevo al final, y `status` con `cancelled_at` siempre juntos. A M2.4.4: la limpieza de sesiones y equipos vencidos (los tokens pendientes viven en Redis con 10 minutos y ya vencen solos). Al Anexo B: lo demás. Detalle en el roadmap (M2.3.10b) y en el Anexo B.
 
 - Ingreso del staff: el bloqueo remoto no tiene desbloqueo (ver fila 15, M2.4.4); la ventana de 5 códigos tiene una carrera y su llave de Redis no vence; `setup` y `confirm` del 2FA no miran el bloqueo; los tokens pendientes y `staff_sessions` no se limpian; con un correo inexistente la respuesta tarda distinto.
 - Onboarding: un hero relativo no se puede volver a guardar (422); borrar una opción de Intereses borra en cascada las respuestas de los asistentes; carrera al editar el JSON; `forms[].id` repetido; números null en vez de los defaults; listas `null` que vacían; sin tope de opciones.
