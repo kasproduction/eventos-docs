@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-11-01 (Opus 5.5, 14) — MSI PRENDIDO: RUNNER DE VERIFICAR.SH DESTAPADO; M2.5.2 CORREGIDA; CIERRE DEL DIA
+
+- MSI: base desechable creada (`eventos_desechable_pruebas`, permiso para `eventos_contratos`; 192 llaves). verificar.sh le pasa las credenciales explicitas (el archivo del MSI no las exporta; C# `11d290a`).
+- El runner fallaba desde M2.3.3c1 sin que nadie lo viera (MSI apagado, corridas canceladas). Arreglados en el camino: BUG-496 (cuatro clases de C# abrian MySQL sin base; C# `3aa2d1a`), BUG-495 (ContratoSeeder ponia el id de la persona en `assigned_by`; backend `95370b7`), y el C# de los contratos ya no queda vivo durante las cruzadas (compartian la cola de Hangfire en Redis base 15; C# `62b4cc2`).
+- Ultima corrida del MSI (41274882799): C# 241/191 sin base, contratos PHP 302 y 302, suite PHP 1262 con 1 falla por la hora: BUG-497 (ping del totem y su prueba entre 00:00 y 00:10 de Bogota). Las cruzadas no llegaron a correr en esa vuelta (el paso de PHP fallo antes). **Primero la proxima sesion:** relanzar la verificacion del MSI a otra hora y confirmar cruzadas en verde.
+- M2.5.2 corregida por Kamilo antes de llegar: C# escribe y despacha (inmediato y programadas con el push existente); `DispatchScheduledNotifications` sale de PHP en el mismo despliegue y de M4c.7 (docs `08fb3a3`).
+- Seguridad del MSI: MySQL deja entrar como root sin clave por 127.0.0.1 (no se toco; conviene ponerle clave).
+- **Sigue:** confirmar el MSI en verde; decidir BUG-497 (a congelar la hora en la prueba, b arreglar tambien en C#); PROPONER M2.4.2 (baneos).
+
 ## SESION 2026-10-31 (Opus 5.5, 13) — BUG-494 RESUELTO: LLAVES FORANEAS EN LAS BASES DE TRABAJO; BASE DESECHABLE PARA CONTROLES DESTRUCTIVOS
 
 - Decisiones Kamilo: bloque corto antes de M2.4.2; las bases de trabajo de contratos y cruzadas recrean las 192 llaves de la referencia, con prueba de conteo; contratos y cruzadas completas por si alguna dependia de su ausencia; regla: los controles destructivos corren contra una copia desechable, no contra la base compartida.
