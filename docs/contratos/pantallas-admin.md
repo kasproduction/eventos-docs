@@ -63,7 +63,7 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | AttendeeAdminResource | Personas / Asistentes | H1 | 2.4.1, 2.3.6 | Lista, perfil, tags, aprobacion, check-in manual, importar y exportar |
 | RegistrationFieldResource | Personas / Entrada | H1 | 2.4.1 | Los campos de registro estan en 2.4.1 |
 | AttendeeBanResource | Personas / Asistentes | H1 | 2.4.2 | Con expulsion del socket (BUG-373) |
-| WebhookEndpointResource, WebhookApiKeyResource, WebhookLogResource | Sistema / Webhooks | H1 | 2.4.3 | Los secretos no se muestran (BUG-385) |
+| WebhookEndpointResource, WebhookApiKeyResource, WebhookLogResource | Sistema / Webhooks | H1 | 2.4.3 (endpoints hechos en 2.4.3a; llaves 2.4.3b; historial 2.4.3c) | Los secretos no se muestran (BUG-385); el del endpoint se copia sin mostrarse |
 | GoldenTicketResource, RewardResource, PrizeRedemptions | Experiencia / Gamificacion | H1 | 2.4.5 | Marcar como reclamado con `RewardService::confirm` (BUG-377) |
 | AccessCodeResource | Personas / Entrada | H1 | 2.4.5 | |
 | SupportRequestResource | En vivo | H1 | 2.4.6 | Abrir una solicitud no la marca como leida (BUG-383) |

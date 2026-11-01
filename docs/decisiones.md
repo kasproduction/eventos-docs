@@ -111,6 +111,7 @@
 | 2026-10-22 | Auditoria de seguridad del backend a proposito, aparte del roadmap (permisos ruta por ruta, inyeccion, limites, datos de mas) | Las pruebas de contrato congelan lo que hay, aunque este mal; BUG-363 aparecio de rebote. Va al cierre de la fase 0, antes de pasar rutas a C# |
 | 2026-11-01 | M2.4.2 baneos: vencimiento cada 5 minutos en Hangfire; fichas del socket borradas tambien al desbanear; los canales de push se siguen borrando al banear hasta el ultimo punto de M4c.6, y desde ya los envios de C# saltan a los baneados | Los envios de push que siguen en PHP no filtran a los baneados: conservar los canales antes de mudarlos todos dejaria pushes llegando a gente baneada |
 | 2026-11-01 | BUG-497: la prueba del ping fija la hora ahora; el ping de C# incluye la sesion en curso aunque haya empezado ayer (M4d.2) | PHP congelado; el borde de la medianoche se arregla al portar |
+| 2026-11-01 | Admin nuevo, webhooks: el secreto HMAC no se muestra en pantalla, se copia al portapapeles (propuesta aprobada con el "dale" a M2.4.3a; como mostrar la llave regenerada se decide en M2.4.3b) | Que el secreto no quede a la vista en pantallas ni capturas. M2.4.3 se parte en a (endpoints), b (llaves) y c (historial) |
 
 ## Abiertas
 

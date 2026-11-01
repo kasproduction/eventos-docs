@@ -365,6 +365,14 @@ de los 330 snapshots y del codigo PHP:
     vencia su copia de 60 s); los envios de push de C# saltan a los baneados. POR ETAPAS: al banear C# sigue borrando el token
     de Expo y las suscripciones de Web Push como PHP, porque los envios de push que siguen en PHP no filtran a los baneados;
     mientras tanto el "Acceso restaurado" no llega (igual que hoy). Deja de borrarlos en el ultimo punto de M4c.6.
+  - 2026-11-01 (M2.4.3a, webhooks del admin; Kamilo): IDENTICO a `WebhookEndpointResource` en lo que recibe el partner (el ping
+    `test.ping` con su cuerpo y su firma, el reenvio con el mismo cuerpo del log, la simulacion como prueba, la especificacion con
+    la llave de ese partner) y en la fila que lee PHP. C# ARREGLA (admin nuevo, sin consumidor): el secreto no viaja en la fila y
+    se copia al portapapeles sin mostrarse (decision de Kamilo); probar un webhook inactivo no manda nada y lo dice, y una caida
+    de red responde "no respondio" (BUG-502); eventos y campos se validan contra la lista y quedan en su orden (el CheckboxList
+    los guardaba en el orden en que se marcaban); el resumen cuenta solo el evento (BUG-501); la especificacion dice los
+    reintentos reales (3 intentos: al minuto y a los 5 minutos; PHP decia 1, 5 y 30); en la lista la URL va debajo del partner y
+    copiar el secreto y la especificacion estan en la pagina del webhook (la fila de Filament no cabia y escondia el partner).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

@@ -3,7 +3,27 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-01 — Encontrados al portar los webhooks del admin (M2.4.3a)
+
+### BUG-501: El resumen de Webhooks de Filament cuenta los envios de todos los eventos (ABIERTO en PHP; resuelto en el admin nuevo, C# `8382bd6`)
+- **Severidad propuesta:** MEDIA (cruce de eventos: el staff de un evento ve cifras de envios de otros eventos y organizaciones)
+- **Que pasa:** `WebhookStatsWidget` cuenta `webhook_logs` sin filtrar por evento ("Enviados hoy", "Check-ins recibidos hoy", "Tasa de exito"). Ademas la tasa dice "Outbound ultimas 24h" y cuenta desde la medianoche.
+- **Verificado:** si, 2026-11-01, leyendo `ListWebhookEndpoints.php` (las tres consultas no tienen `event_id` ni pasan por el endpoint).
+- **Arreglo:** el resumen del admin nuevo cuenta solo los logs que cuelgan de un webhook o una llave del evento (el filtro de raiz de C#) y dice "de hoy". PHP congelado: muere con Filament (M2.8.3).
+
+### BUG-502: "Enviar prueba" de Filament muestra un resultado viejo con el webhook inactivo y rompe con una caida de red (ABIERTO en PHP; resuelto en el admin nuevo, C# `8382bd6`)
+- **Severidad propuesta:** BAJA (solo el staff, en Filament)
+- **Que pasa:** con el webhook inactivo `DispatchWebhookJob` no manda nada, pero la accion lee el ultimo log del endpoint y avisa ese resultado (de otro envio). Con una caida de red el job lanza la excepcion dentro del `dispatchSync` y la accion se rompe sin aviso.
+- **Verificado:** si, 2026-11-01, leyendo `WebhookEndpointResource.php` (send_test) y `DispatchWebhookJob::handle`.
+- **Arreglo:** en el admin nuevo, inactivo responde 422 "El webhook esta inactivo" sin mandar nada, y sin respuesta dice "no respondio". `Admin/WebhooksTest` lo cubre.
+
 ## 2026-11-01 — Encontrados al portar los baneos (M2.4.2)
+
+### BUG-500: La cruzada de aprobar tomaba el primer correo de C# y no esperaba el de Gina (RESUELTO 2026-11-01, backend `22c722f`; infraestructura de pruebas)
+- **Severidad propuesta:** MEDIA (la corrida 41280391361 del MSI, la de `dac82ab`, fallo en `Cruzadas\AsistentesTest` igual que la anterior, sin un error de producto)
+- **Que pasa:** `activarDosPasosPorCSharp` encola el correo "Activaste la verificacion en dos pasos" del staff. `correosDeCSharp(1)` terminaba la espera con cualquier correo y la prueba buscaba el de Gina, que llegaba segundos despues ("Trying to access array offset on null"). BUG-498 era real, pero no era la causa de este fallo. `BaneosTest` tenia el mismo patron.
+- **Verificado:** si, 2026-11-01, en el MSI: al fallar, el registro de C# solo tenia el correo del staff; 5 segundos despues ya estaba el de Gina. Fallaba 3 de 3.
+- **Arreglo:** `correosDeCSharp` recibe `para:` y espera los correos de esa direccion (como `webhooksDeCSharp` con `$solo`); `AsistentesTest` y `BaneosTest` lo usan. Control: sin el arreglo, 3 de 3 en rojo; con el arreglo, 3 de 3 en verde, y las cruzadas completas 50/50.
 
 ### BUG-498: Restos de corridas anteriores en la cola de Hangfire de las pruebas se colaban en las cruzadas (RESUELTO 2026-11-01, C# `dac82ab`; infraestructura de pruebas)
 - **Severidad propuesta:** MEDIA (la corrida 41274882799 del MSI fallo en `Cruzadas\AsistentesTest` sin un error de producto)
