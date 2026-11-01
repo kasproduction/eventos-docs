@@ -3,6 +3,15 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-10-31 — Encontrado al portar el perfil del asistente (M2.4.1b)
+
+### BUG-494: Las bases de trabajo de contratos y cruzadas no tienen llaves foraneas (ABIERTO, infraestructura de pruebas de C#)
+- **Severidad propuesta:** MEDIA (no rompe produccion, pero las pruebas contra esas bases no ven las cascadas ni las violaciones de llave: una escritura de C# con una referencia invalida pasaria ahi y fallaria en produccion)
+- **Que pasa:** `ReinicioDeContratos.CopiarEsquemaAsync` copia cada tabla de `eventos_contratos_base` con `CREATE TABLE ... LIKE`, y MySQL no copia las llaves foraneas con LIKE. La de referencia tiene 192; `eventos_contratos` y `eventos_cruzadas_pruebas`, 0.
+- **Verificado:** si, 2026-10-31: en la cruzada `PerfilDeAsistenteTest`, borrar un asistente desde C# dejaba su `points_log` (sin la cascada); `information_schema.REFERENTIAL_CONSTRAINTS` da 192 en la referencia y 0 en las de trabajo.
+- **Mientras tanto:** lo que depende de una cascada se comprueba en las pruebas de C# contra la base de referencia (`PerfilDeAsistenteTest` comprueba que se borran los puntos).
+- **Arreglo propuesto:** despues de copiar las tablas, recrear las llaves foraneas leyendolas de `information_schema` de la referencia (o copiar con `SHOW CREATE TABLE`), y una prueba que compare el numero de llaves de las dos bases. Espera decision de Kamilo.
+
 ## 2026-10-30 — Encontrados al portar los webhooks (M2.3.6b)
 
 ### BUG-493: Un 5xx del sistema del cliente no se reintenta en un webhook y el evento se pierde (RESUELTO en C#; ABIERTO en PHP)

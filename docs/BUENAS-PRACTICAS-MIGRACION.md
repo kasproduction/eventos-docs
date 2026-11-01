@@ -342,6 +342,17 @@ de los 330 snapshots y del codigo PHP:
     el apostrofo queda literal, como PHP). Identico aunque no sirve, sin consumidor: `staff_room_assignments.assigned_by` es
     obligatorio y apunta a un asistente; quien asigna desde el panel casi nunca lo es y PHP pone ahi al mismo staff de check-in (C#
     hara lo mismo en M2.4.1b). Cambiarlo pide una migracion y nadie lee la columna.
+  - 2026-10-31 (M2.4.1b, perfil del asistente; Kamilo): IDENTICO a AttendeeAdminResource (la cruzada lo lee con los modelos de PHP y
+    abre el formulario de Filament): etiquetas al instante con attendee.updated, cambiar rol (Asistente o Staff Check-in) con
+    attendee_role_changes y la bitacora `change_role` y las fichas del socket, asignar salon activo al momento (sin aceptacion),
+    eliminar con attendee.cancelled, y las estadisticas del Data Center. C# ARREGLA (admin nuevo, sin consumidor): eliminar no se
+    puede si la persona tiene leads de sponsors o lidera un stand (la base se llevaba en cascada los datos de los sponsors y el
+    stand quedaba sin lider); la confirmacion muestra lo que se perderia (puntos, publicaciones, mensajes, fotos) y sugiere banear;
+    al eliminar se borran tambien sus fichas del socket (PHP la dejaba conectada hasta 24 h); dejar de ser Staff Check-in desactiva
+    sus salones y borra `staff_attendee:` y `staff_assigned:` (como el retiro de la API de PHP; Filament no lo hacia y podia seguir
+    escaneando); asignar salon borra la cache de la asignacion. Privacidad: el avatar sin foto es la inicial; PHP lo pedia a
+    `hostedboringavatars.vercel.app` mandandole el nombre de la persona. `assigned_by` sigue identico, con una precision: C# busca
+    al asistente de quien asigna en este evento (PHP lo buscaba en cualquier evento, cruce sin motivo); si no tiene, el mismo staff.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

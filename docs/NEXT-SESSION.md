@@ -10,6 +10,14 @@
 
 ---
 
+## SESION 2026-10-31 (Opus 5.5, 12) — M2.4.1b HECHA: PERFIL DEL ASISTENTE; BUG-494 ENCONTRADO
+
+- Decisiones Kamilo: eliminar no se puede con leads de sponsors o liderando un stand (la confirmacion muestra lo que se perderia y sugiere banear) y borra las fichas del socket; dejar Staff Check-in desactiva salones y caches; asignar salon borra la cache; avatar con la inicial (privacidad). Ley 1581: por decidir, se resuelve anonimizando (decisiones, Abiertas).
+- C# `ccfb5ca`, backend `ae74039`, web `825b10c`. Pruebas: C# 431, cruzadas 48/48, contratos 12/12, e2e admin 35/35, vitest 714; 11 controles. Roadmap 106/218.
+- BUG-494: las bases de trabajo de contratos y cruzadas no tienen llaves foraneas (CREATE TABLE LIKE no las copia; la referencia tiene 192). Kamilo lo aprobo como bloque corto antes de M2.4.2, con la regla de que los controles destructivos corren contra una copia desechable.
+- Gotcha: dos controles (quitar "no eliminar") borraron de verdad a Bruno y Carla en eventos_contratos_base; se resembro con el tinker de verificar.sh.
+- **Sigue: BUG-494** (recrear las 192 llaves al copiar, prueba de conteo, contratos y cruzadas completas, controles destructivos contra una copia desechable) y despues PROPONER M2.4.2 (baneos).
+
 ## SESION 2026-10-31 (Opus 5.5, 11) — M2.4.1a HECHA: LISTA DE ASISTENTES, APROBAR Y EXPORTAR
 
 - Decisiones Kamilo: M2.4.1 partida en a (lista, aprobar, exportar) y b (perfil); banear en M2.4.2 y el recap en M2.6.4; el check-in manual va a M4d.1 como boton del perfil sobre el servicio portado; arreglos: codigos solo del evento (cruce, regla 26), exportar sin el staff, lote hasta 500; `assigned_by` identico (Anexo B); el rol en la exportacion con su nombre (Asistente, Vendedor, Staff Check-in) y la cruzada normaliza esa columna. Pidio "Staff de puerta" y despues lo retiro: queda "Staff Check-in".
