@@ -330,6 +330,18 @@ de los 330 snapshots y del codigo PHP:
     plantilla y el CSV de errores salen con punto y coma y BOM. Una sola contraseña de descarte (argon2id, como Hash::make) por
     importacion en vez de una por fila: nadie la conoce, se reemplaza al activar, y un argon2id por fila costaria mas de 30
     minutos en un archivo grande. Igual que PHP: no se mira el cupo del evento (`max_attendees`) ni la ventana de registro.
+  - 2026-10-31 (M2.4.1a, lista de asistentes; Kamilo): IDENTICO a AttendeeAdminResource y AttendeesExport (las cruzadas lo comparan):
+    la lista sin el staff del evento, aprobar (la fecha, la bitacora, el correo `registration_approval` con el HTML de
+    RegistrationApprovalMail, el webhook attendee.approved, las fichas del socket de BUG-428 y las estadisticas del Data Center) y
+    las columnas de la exportacion. C# ARREGLA (admin nuevo, sin consumidor): el filtro de codigos
+    de acceso trae solo los del evento (Filament listaba los de todos los eventos: cruce entre eventos, regla 26); la exportacion deja
+    fuera al staff del evento, como la lista (AttendeesExport lo incluia), y el rol sale con su nombre, como en la lista
+    (Asistente, Vendedor, Staff Check-in; AttendeesExport lo dejaba como esta guardado); aprobar en lote acepta hasta 500 por vez; la bitacora anota
+    la IP de quien aprueba (Filament la dejaba vacia); la exportacion CSV sale con punto y coma y BOM; en el Excel exportado una celda
+    que parece formula queda como texto con el prefijo de texto de Excel (quotePrefix) en vez del apostrofo visible de PHP (en el CSV
+    el apostrofo queda literal, como PHP). Identico aunque no sirve, sin consumidor: `staff_room_assignments.assigned_by` es
+    obligatorio y apunta a un asistente; quien asigna desde el panel casi nunca lo es y PHP pone ahi al mismo staff de check-in (C#
+    hara lo mismo en M2.4.1b). Cambiarlo pide una migracion y nadie lee la columna.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

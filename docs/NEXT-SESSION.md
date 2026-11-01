@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-10-31 (Opus 5.5, 11) — M2.4.1a HECHA: LISTA DE ASISTENTES, APROBAR Y EXPORTAR
+
+- Decisiones Kamilo: M2.4.1 partida en a (lista, aprobar, exportar) y b (perfil); banear en M2.4.2 y el recap en M2.6.4; el check-in manual va a M4d.1 como boton del perfil sobre el servicio portado; arreglos: codigos solo del evento (cruce, regla 26), exportar sin el staff, lote hasta 500; `assigned_by` identico (Anexo B); el rol en la exportacion con su nombre (Asistente, Vendedor, Staff Check-in) y la cruzada normaliza esa columna. Pidio "Staff de puerta" y despues lo retiro: queda "Staff Check-in".
+- C# `e690d68`, backend `1470d78`, web `9a4ea61`. Pruebas: C# 425, cruzadas 46/46 (aprobar contra approveRegistration y exportar contra AttendeesExport), contratos 12/12, e2e admin 34/34, vitest 714; 9 controles. Roadmap 105/218.
+- Piezas nuevas reusables en C#: `FichasDelSocket` (SocketAuthCache::forgetUser) y `CeldaDeExporte` (Exportes::celda, BUG-409). Tipo de correo `registration_approval`.
+- Gotchas: `admin_audit_log` tiene filtro por evento (en pruebas, `IgnoreQueryFilters()`); el CRM sembrado no escucha `attendee.approved` (la prueba crea su endpoint); ClosedXML convierte un apostrofo inicial en quotePrefix (la celda queda como texto, sin apostrofo visible).
+- Despliegue: nada nuevo.
+- **Sigue: PROPONER M2.4.1b** (el perfil: encabezado, datos de registro, etiquetas, networking, stand, historial, estado, aprobar, cambiar rol con sus efectos, asignar salon, eliminar).
+
 ## SESION 2026-10-31 (Opus 5.5, 10) — M2.3.6c HECHA: IMPORTACION DE ASISTENTES DESDE CSV O EXCEL (BLOQUE 2.3 COMPLETO)
 
 - Decisiones Kamilo: a quien ya activo su cuenta la invitacion lo lleva a la webapp (`App:WebappUrl`/login); cada fila se valida como el registro y ademas las listas contra sus opciones (el registro no lo cotejaba); la pantalla pregunta el estado cada 3 s mientras corre; CSV con las filas que no entraron; sin lab; arreglos al Anexo B. Pidio tambien el control de la transaccion por fila con un fallo inyectado.
