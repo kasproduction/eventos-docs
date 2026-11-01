@@ -113,6 +113,7 @@
 | 2026-11-01 | BUG-497: la prueba del ping fija la hora ahora; el ping de C# incluye la sesion en curso aunque haya empezado ayer (M4d.2) | PHP congelado; el borde de la medianoche se arregla al portar |
 | 2026-11-01 | Admin nuevo, webhooks: el secreto HMAC no se muestra en pantalla, se copia al portapapeles (propuesta aprobada con el "dale" a M2.4.3a; como mostrar la llave regenerada se decide en M2.4.3b) | Que el secreto no quede a la vista en pantallas ni capturas. M2.4.3 se parte en a (endpoints), b (llaves) y c (historial) |
 | 2026-11-01 | Llaves de entrada de los partners (M2.4.3b): la llave se muestra una sola vez al crearla o regenerarla, con boton Copiar; regenerar pide confirmacion y avisa que la anterior deja de servir al instante; en la lista solo los ultimos 4 caracteres y la fecha. El hash entra en M4d.9 (BUG-503, deuda de seguridad con fecha) | Guardarla como hash ya rompia los check-ins de los partners: los recibe PHP (congelado) y compara la llave en texto. Por etapas, como el push en M2.4.2 |
+| 2026-11-01 | Historial de webhooks (M2.4.3c): detalle en pagina propia con URL; vista legible sin monospace; "Copiar JSON exacto" (cabeceras y cuerpo que salieron, con la firma) y "Copiar respuesta"; nuevas columnas `request_body` y `request_headers` en `webhook_logs` que llena C#; sin cabeceras de la respuesta | El payload de MySQL no guarda los bytes que se firmaron (reordena las claves) y no habia cabeceras: sin las columnas, el boton habria mentido. Lo que manda PHP (congelado) queda sin bytes exactos y se dice |
 
 ## Abiertas
 

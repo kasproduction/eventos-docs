@@ -3,7 +3,13 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
-## 2026-11-01 — Encontrados al portar los webhooks del admin (M2.4.3a y M2.4.3b)
+## 2026-11-01 — Encontrados al portar los webhooks del admin (M2.4.3a, M2.4.3b y M2.4.3c)
+
+### BUG-504: El historial de webhooks de Filament muestra los envios de todos los eventos (CRUCE ENTRE EVENTOS, regla 26; ABIERTO en PHP; resuelto en el admin nuevo)
+- **Severidad propuesta:** ALTA (cruce entre eventos: el staff de un evento ve los envios y check-ins de partners de otros eventos y organizaciones, con sus datos de personas en el payload)
+- **Que pasa:** `WebhookLogResource` no tiene `getEloquentQuery` por evento (los otros dos recursos del cluster si). La tabla y el detalle muestran cualquier `webhook_logs`. Esta fuera del menu desde julio, pero la URL `/admin/webhooks/webhook-logs` abre igual.
+- **Verificado:** si, 2026-11-01, leyendo `WebhookLogResource.php` (sin filtro por evento) frente a `WebhookEndpointResource` y `WebhookApiKeyResource` (con `where('event_id', EventContext::id())`).
+- **Arreglo:** el historial del admin nuevo (M2.4.3c) pasa por el filtro de raiz de C#: solo los logs que cuelgan de un webhook o una llave del evento; los que quedaron sin ninguno de los dos no se pueden atribuir y no salen. `Admin/HistorialDeWebhooksTest` lo cubre (control: sin el filtro, falla). PHP congelado: muere con Filament (M2.8.3).
 
 ### BUG-503: Llaves de entrada de los partners en texto plano hasta M4d.9 (ABIERTO 2026-11-01; deuda de seguridad aceptada por Kamilo)
 - **Severidad propuesta:** MEDIA (quien lea la tabla `webhook_api_keys`, un respaldo o un volcado de la base, puede marcar check-ins como cualquier partner)

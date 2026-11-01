@@ -380,6 +380,12 @@ de los 330 snapshots y del codigo PHP:
     ultimos 4 caracteres y la fecha; la API nunca la vuelve a devolver. POR ETAPAS: en la base sigue en texto plano hasta M4d.9
     (BUG-503): el check-in de partners sigue en PHP y la compara asi; ahi entran el hash, la columna de los ultimos 4 y el texto
     nuevo de la especificacion.
+  - 2026-11-01 (M2.4.3c, historial de webhooks; Kamilo): IDENTICO a `WebhookLogResource` en columnas, filtros y orden. C# ARREGLA
+    (admin nuevo, sin consumidor): solo los envios del evento (BUG-504, cruce entre eventos); el detalle en su propia pagina con
+    URL (Filament: modal); lo que se mando legible, sin monospace (Filament: JSON en <pre>); "Copiar JSON exacto" con las
+    cabeceras y el cuerpo que salieron, firma incluida, gracias a `request_body` y `request_headers` (migracion nueva; los llena
+    C#; lo que manda PHP queda en null y se dice); "Copiar respuesta" (lo guardado, recortado a 2000 como en PHP; sin
+    cabeceras de la respuesta, decision de Kamilo). Filtros extra: partner y llave, para llegar desde Webhooks y Llaves.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

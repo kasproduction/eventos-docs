@@ -10,6 +10,17 @@
 
 ---
 
+## SESION 2026-11-01 (Opus 5.5, 16) — M2.4.3 COMPLETA: WEBHOOKS DEL ADMIN (ENDPOINTS, LLAVES E HISTORIAL); BUG-500 A BUG-504
+
+- La corrida del MSI de `dac82ab` habia salido roja: BUG-500, la cruzada de aprobar tomaba el primer correo de C# (el de los dos pasos del staff) y no esperaba el de Gina. Arreglo: `correosDeCSharp(..., para:)` (backend `22c722f`, control 3 de 3 rojo y 3 de 3 verde). BUG-498 era real pero no era la causa.
+- M2.4.3 partida por Kamilo en a, b y c (el envio ya estaba desde M2.3.6b).
+- M2.4.3a endpoints (C# `8382bd6`, backend `adc29c3`, web `6b2633b`): crear, editar, borrar, enviar prueba, reenviar fallidos, simular, especificacion y resumen de hoy. Decision: el secreto se copia sin mostrarse. La fila de Filament no cabia: URL debajo del partner, copiar secreto y especificacion en la pagina del webhook. BUG-501 (resumen de Filament cuenta todos los eventos) y BUG-502 (probar inactivo muestra un resultado viejo).
+- M2.4.3b llaves (C# `49e462a`, backend `8d2dff9`, web `9850a0b`): decisiones Kamilo: la llave se ve una sola vez al crear o regenerar, con Copiar; regenerar confirma y avisa que la anterior deja de servir al instante; la lista solo los ultimos 4 y la fecha. El hash rompia el check-in de partners (PHP congelado compara en texto): POR ETAPAS, BUG-503 (deuda de seguridad con fecha) y M4d.9 suma hash, columna de ultimos 4 y texto nuevo de la especificacion.
+- M2.4.3c historial (C# `69a1163`, backend `ae29ba1`, web `4f2e1c5`): decisiones Kamilo: detalle en pagina propia con URL, vista legible sin monospace, "Copiar JSON exacto" (cabeceras y cuerpo, firma incluida) y "Copiar respuesta"; migracion `request_body` y `request_headers` en `webhook_logs` (las llena C#; lo de PHP queda en null con nota); sin cabeceras de la respuesta. BUG-504 cruce entre eventos (regla 26): el historial de Filament muestra todos los eventos.
+- Pruebas: C# 450, cruzadas 54/54 (MSI 41335449626), contratos 12/12, PHP 1262, e2e admin 40/40, vitest 714. Controles de cada parte en rojo. Roadmap 110/220.
+- Gotchas: `scaffold.ps1` pone BOM en ~40 archivos (quedarse solo con los cambios reales); el repo web NO usa Prettier (no formatear); `git checkout` deja CRLF y los reemplazos multilinea con perl dejan de coincidir; `EntradaDeLaPeticion.Booleano` solo lee el cuerpo (en la query usar `Texto`); next-intl lee los puntos de las claves como anidacion; el portapapeles de Windows devuelve CR LF; el `JsonDocument` guarda el texto crudo (re-armar desde ahi no es una falla para un control).
+- **Sigue: PROPONER M2.4.4** (staff del panel: usuarios, roles, invitaciones, reset del 2FA, desbloquear cuentas, limpieza de `staff_sessions` y `trusted_devices`). Grande: leer primero lo de Filament y proponer partirla.
+
 ## SESION 2026-11-01 (Opus 5.5, 15) — M2.4.2 HECHA: BANEOS; BUG-497 DECIDIDO; BUG-498 RESUELTO (COLA DE PRUEBAS)
 
 - BUG-497, decision Kamilo (b): la prueba del ping fija la hora a mediodia (backend `f8f6110`, control a las 00:05 falla); el ping de C# incluye la sesion en curso aunque haya empezado ayer al portarlo en M4d.2 (anotado en el roadmap).
