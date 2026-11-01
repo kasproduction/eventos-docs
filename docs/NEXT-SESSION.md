@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-10-31 (Opus 5.5, 10) — M2.3.6c HECHA: IMPORTACION DE ASISTENTES DESDE CSV O EXCEL (BLOQUE 2.3 COMPLETO)
+
+- Decisiones Kamilo: a quien ya activo su cuenta la invitacion lo lleva a la webapp (`App:WebappUrl`/login); cada fila se valida como el registro y ademas las listas contra sus opciones (el registro no lo cotejaba); la pantalla pregunta el estado cada 3 s mientras corre; CSV con las filas que no entraron; sin lab; arreglos al Anexo B. Pidio tambien el control de la transaccion por fila con un fallo inyectado.
+- C# `9eed077`, backend `b13b989` (cruzada contra el `AttendeesImport` real), web `e2cc72a` (Personas > Asistentes). Pruebas: C# 409, cruzadas 44/44, contratos 12/12, e2e admin 33/33, vitest 714; 16 controles (la transaccion por fila con un interceptor de EF que falla al guardar el asistente). Roadmap 104/217; el bloque 2.3 queda 20/20.
+- Diseno: la Api lee y valida el archivo al subirlo (ClosedXML 0.105.1, CsvHelper 33.1.0; separador y codificacion detectados) y deja las filas en Redis 7 dias; el Worker escribe con una transaccion por fila. Una contraseña de descarte argon2id por importacion (no una por fila). countries y cities_co embebidas en C# (una prueba vigila que sean las de PHP).
+- Gotchas: (1) un script de controles que devuelve el archivo con `shutil.move` conserva la fecha vieja y la compilacion incremental deja la DLL con el control puesto: restaurar escribiendo el archivo, y en la verificacion final compilar con `--no-incremental`. (2) Un control que rompe la lectura puede dejar personas en `eventos_contratos_base` (paso con juan@empresa.com); la prueba ahora borra toda persona con id mayor al de antes. (3) Un `route.ts` de Next solo puede exportar los manejadores HTTP.
+- Despliegue: variable nueva `App__WebappUrl` (la URL de la webapp; sin ella, `App__Url`). El Worker necesita `App__QrSecret`, `App__Url` y `Php__Cache__*` (el mismo `.env` que la Api). El enlace `/join/{token}` lo sigue sirviendo PHP hasta M4e.7.
+- **Sigue: PROPONER el siguiente bloque** (2.4 Personas: M2.4.1 lista de asistentes, M2.4.2 baneos, M2.4.3 webhooks CRUD, M2.4.4 staff con desbloqueo y limpieza de sesiones).
+
 ## SESION 2026-10-31 (Opus 5.5, 9) — M2.3.10b HECHA: SEGUNDA REVISION DE LO COPIADO (6 ARREGLOS, INTERESES Y CANCELACION)
 
 - Commits de M2.3.10 (sesion anterior) ya estaban subidos: C# `b4a6cb5`, backend `2d25292`, web `3f90220`, docs `4e58b44`.

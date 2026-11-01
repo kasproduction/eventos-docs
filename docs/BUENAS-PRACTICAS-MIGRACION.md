@@ -308,6 +308,28 @@ de los 330 snapshots y del codigo PHP:
     sin tope; una lista `null` en el onboarding la vacia; los numeros vacios de un formulario quedan null en vez de los valores por
     defecto; en el HTML de las paginas, el `!important` dentro de `span` que HTMLPurifier quita y un `>` dentro de un atributo.
     La limpieza de `staff_sessions` y `trusted_devices` vencidos va a M2.4.4.
+  - 2026-10-31 (M2.3.6c, importacion de asistentes; Kamilo): IDENTICO a `AttendeesImport`, porque lo leen la app, la webapp, el
+    correo y los webhooks (la cruzada compara contra el import real de PHP): las columnas de la persona (nombre, correo en
+    minusculas, telefono, sin activar, activa), el token de invitacion de 64 letras y numeros, el rol de asistente, el asistente
+    (role attendee, etiquetas, invited_via csv, aprobado desde ya), el QR (HMAC de "id|evento|segundos" con APP_QR_SECRET), las
+    respuestas por campo, el enlace `/join/{token}` con APP_URL, el webhook attendee.registered por asistente, la version de las
+    estadisticas del Data Center y las columnas de la plantilla. C# ARREGLA (admin nuevo, sin consumidor): corre en segundo plano
+    (la Api lee y valida al subir; el Worker escribe) y el archivo no queda en disco (PHP lo dejaba en storage/app/imports); lee
+    CSV con punto y coma o tabulador y en la codificacion de Windows (PHP solo coma y UTF-8: un CSV de Excel en espanol quedaba
+    en una columna); cada fila se valida como el registro (`RegisterRequest`: nombre 255, correo valido 255, telefono 30 y cada
+    respuesta por el tipo de su campo) y ademas las listas desplegables y de casillas solo aceptan sus opciones o las de su
+    lista precargada (countries, cities_co; el registro no lo cotejaba): se comparan sin mayusculas ni tildes y se guarda la
+    opcion como esta escrita en el campo; la que no vale sale en el CSV de errores con su motivo; las casillas se guardan como el registro (1/0 y las multiples como JSON;
+    PHP guardaba el texto de la celda); las fechas se aceptan AAAA-MM-DD o DD/MM/AAAA y se guardan AAAA-MM-DD; Si/No/X para una
+    casilla; transaccion por fila; quien ya estaba inscrito sale en la lista (PHP lo omitia sin decir); a quien ya activo su
+    cuenta la invitacion lo lleva a entrar a la webapp (`App:WebappUrl`/login; PHP le mandaba un token que nunca guardaba); el
+    alias `e-mail` coincide (en PHP el encabezado pasa a `e_mail` y nunca coincidia); los alias fijos no se toman como campos;
+    la fila de ejemplo de la plantilla no se importa; etiquetas sin vacias ni repetidas; un "0" es un valor (PHP lo descartaba
+    con empty()); las filas vacias se saltan; sin columna de nombre o de correo, 422 al subir; una importacion a la vez por
+    evento; hasta 10.000 filas y 10 MB; el correo "importacion terminada" se manda a quien importo (PHP nunca lo mandaba); la
+    plantilla y el CSV de errores salen con punto y coma y BOM. Una sola contraseña de descarte (argon2id, como Hash::make) por
+    importacion en vez de una por fila: nadie la conoce, se reemplaza al activar, y un argon2id por fila costaria mas de 30
+    minutos en un archivo grande. Igual que PHP: no se mira el cupo del evento (`max_attendees`) ni la ventana de registro.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
