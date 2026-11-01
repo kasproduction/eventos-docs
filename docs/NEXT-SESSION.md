@@ -10,6 +10,16 @@
 
 ---
 
+## SESION 2026-11-01 (Opus 5.5, 19) — M2.4.4c HECHA: LIMPIEZA DIARIA DEL STAFF; BUG-507 RESUELTO; M2.4.4 COMPLETA
+
+- Al arrancar: la corrida del MSI de M2.4.4b (41346929524) estaba verde.
+- Al leer el codigo: cerrar una sesion o quitar un equipo ya borra la fila (PHP y C#); lo que se acumula son sesiones abandonadas (mueren a los 120 minutos sin uso; PHP solo las borra si la persona vuelve a entrar) y equipos vencidos (nunca se borraban). Kamilo aprobo la propuesta con ese ajuste.
+- Hecho: C# `5957a5f` (`Trabajos/Staff/LimpiarAccesosDelStaff`, recurrente 3:15 a. m. en Bogota; endpoint de contratos), backend `1cd4986` (cruzada). La web no cambio.
+- BUG-507 (encontrado de paso): `CierreDeAccesos` solo atrapaba `CryptographicException` y `CifradoDeLaravel.Descifrar` lanza `CifradoInvalidoException` o `FormatException`: una fila ilegible daba 500 al cambiar la clave, desactivar o restablecer el 2FA. Kamilo pidio arreglarlo en el mismo bloque: resuelto con prueba y control.
+- Pruebas en local: C# 471, cruzadas 60/60, e2e admin 42/42. 8 controles en rojo. Falta la corrida del MSI de este push.
+- Gotchas: `IRecurringJobManager.AddOrUpdate` con `RecurringJobOptions { TimeZone = ZonaDeLaApp.Zona }` para que el cron sea en hora de Bogota; `PersonaAsync` de `StaffTest` ya abre una sesion (cuenta en los `count` de `sessions_closed`).
+- **Sigue: proponer M2.4.5** (golden tickets, premios, canjes `PrizeRedemptions` y codigos de acceso `AccessCode`). Grande: leer primero lo de Filament y proponer partirla.
+
 ## SESION 2026-11-01 (Opus 5.5, 18) — M2.4.4b HECHA: DESBLOQUEAR, RESTABLECER EL SEGUNDO FACTOR Y ACTIVIDAD DE ACCESO
 
 - Hecho con el "dale" de Kamilo a la propuesta: C# `fd15af4` (`Admin/Sistema/Staff` con `DesbloquearAsync`, `RestablecerDosPasosAsync` y `ActividadAsync`; `Admin/Entrada/ActividadDeSeguridad`; `CorreosDelStaff.DosPasosRestablecido`), backend `503e961` (cruzada `StaffTest` +3 y escenario `staff-bloqueada`), web `f2905dd` (aviso rojo, Desbloquear, Restablecer confirmado en la pagina, Actividad de acceso).

@@ -5,6 +5,12 @@
 
 ## 2026-11-01 — Encontrados al portar el staff del panel (M2.4.4)
 
+### BUG-507: Una sesion del staff con `session_id` ilegible rompe cerrar sesiones en C# (RESUELTO 2026-11-01 en M2.4.4c; solo C#)
+- **Severidad propuesta:** BAJA (hace falta una fila danada o cifrada con una llave que ya no esta; hoy no deberia pasar)
+- **Que pasa:** `CierreDeAccesos.CerrarSesionesAsync` (cambiar la clave, desactivar, restablecer el segundo factor) solo atrapa `CryptographicException` al descifrar `staff_sessions.session_id`, pero `CifradoDeLaravel.Descifrar` lanza `CifradoInvalidoException` (MAC invalida, carga invalida) o `FormatException` (base64 roto). Con una fila asi la peticion responde 500 y no se cierra nada.
+- **Verificado:** si, 2026-11-01, leyendo `CifradoDeLaravel.Descifrar` (lineas 61, 82 y 119) al escribir la limpieza de M2.4.4c, que ya atrapa las tres (con prueba de una fila ilegible).
+- **Arreglo (Kamilo pidio arreglarlo en el mismo bloque, 2026-11-01):** `CierreDeAccesos` atrapa las tres y cierra igual la fila (C# `5957a5f`) (borra `staff_sessions`; no se sabe de que sesion o token era). Prueba `Admin/StaffTest.Una_sesion_ilegible_no_rompe_el_cierre_y_se_borra_igual` (base64 roto y MAC invalida); control: volver a atrapar solo `CryptographicException` la hace fallar.
+
 ### BUG-506: Borrar a un miembro del staff con acciones en la bitacora rompe "Eliminar" en Filament (ABIERTO en PHP; resuelto en el admin nuevo)
 - **Severidad propuesta:** MEDIA (la accion falla con un error de base de datos en vez de explicar que pasa)
 - **Que pasa:** `admin_audit_log.user_id` es `restrictOnDelete`. Si la persona aprobo, baneo o hizo cualquier accion que deja bitacora, `DeleteAction` de `EditUser` lanza la violacion de llave foranea.

@@ -398,6 +398,9 @@ de los 330 snapshots y del codigo PHP:
     (borra el 2FA, `2fa_reset`, quita equipos, cierra sesiones, correo `staff_2fa_reset`) y a SecurityActivity (mismas frases y
     fechas, ultimas 20 de 90 dias). C# ARREGLA (admin nuevo): pedir una de las dos acciones cuando ya no aplica responde 422 con el
     motivo (Filament solo escondia el boton); la actividad la ve quien puede abrir la ficha (403 si no).
+  - 2026-11-01 (M2.4.4c, limpieza del staff; Kamilo): NUEVO en C# (PHP no lo tiene): cada dia se borran las sesiones del staff sin
+    uso hace mas de 30 dias (con su token si son del admin nuevo) y los equipos de confianza vencidos hace mas de 30 dias. PHP solo
+    borraba las sesiones vencidas de quien volvia a entrar y nunca los equipos. No cambia lo que se ve: PHP ya no las listaba.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
