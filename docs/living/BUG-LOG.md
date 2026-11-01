@@ -3,7 +3,14 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
-## 2026-11-01 — Encontrados al portar los webhooks del admin (M2.4.3a)
+## 2026-11-01 — Encontrados al portar los webhooks del admin (M2.4.3a y M2.4.3b)
+
+### BUG-503: Llaves de entrada de los partners en texto plano hasta M4d.9 (ABIERTO 2026-11-01; deuda de seguridad aceptada por Kamilo)
+- **Severidad propuesta:** MEDIA (quien lea la tabla `webhook_api_keys`, un respaldo o un volcado de la base, puede marcar check-ins como cualquier partner)
+- **Que pasa:** la columna `key` de `webhook_api_keys` guarda la llave `wh_live_...` tal cual. El check-in de partners (`WebhookInboundController`, PHP hasta M4d.9) la busca comparando el texto (`where('key', $key)`), asi que no se puede pasar a hash sin romperlo, y PHP esta congelado.
+- **Verificado:** si, 2026-11-01, leyendo `WebhookInboundController::authenticate` y la migracion `create_webhook_api_keys_table` (`string('key', 64)->unique()`).
+- **Mientras tanto (M2.4.3b, C# `49e462a`):** la llave completa se entrega una sola vez (al crear o regenerar) y la API del admin nunca la vuelve a devolver; la lista y el detalle solo muestran los ultimos 4 caracteres.
+- **Cuando se cierra (decision de Kamilo, 2026-11-01):** en M4d.9, cuando el check-in de partners pase a C#: (1) migracion que pasa las llaves existentes a hash (el partner no nota nada: su llave sigue siendo la misma), (2) columna con los ultimos 4 caracteres (un hash no los guarda), (3) texto nuevo de la especificacion (ya no puede traer la llave completa: "la que se mostro al crearla, termina en abcd").
 
 ### BUG-501: El resumen de Webhooks de Filament cuenta los envios de todos los eventos (ABIERTO en PHP; resuelto en el admin nuevo, C# `8382bd6`)
 - **Severidad propuesta:** MEDIA (cruce de eventos: el staff de un evento ve cifras de envios de otros eventos y organizaciones)

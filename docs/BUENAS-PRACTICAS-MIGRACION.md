@@ -373,6 +373,13 @@ de los 330 snapshots y del codigo PHP:
     los guardaba en el orden en que se marcaban); el resumen cuenta solo el evento (BUG-501); la especificacion dice los
     reintentos reales (3 intentos: al minuto y a los 5 minutos; PHP decia 1, 5 y 30); en la lista la URL va debajo del partner y
     copiar el secreto y la especificacion estan en la pagina del webhook (la fila de Filament no cabia y escondia el partner).
+  - 2026-11-01 (M2.4.3b, llaves de entrada; Kamilo): IDENTICO a `WebhookApiKeyResource` en la fila que lee PHP y en la llave
+    (`wh_live_` y 40 letras o numeros; el check-in de PHP la acepta). C# ARREGLA (admin nuevo, sin consumidor): la llave completa
+    se muestra una sola vez al crearla o regenerarla, con boton Copiar (Filament mostraba los primeros 12 y la dejaba copiar
+    entera siempre); regenerar pide confirmacion y avisa que la anterior deja de servir al instante; la lista solo muestra los
+    ultimos 4 caracteres y la fecha; la API nunca la vuelve a devolver. POR ETAPAS: en la base sigue en texto plano hasta M4d.9
+    (BUG-503): el check-in de partners sigue en PHP y la compara asi; ahi entran el hash, la columna de los ultimos 4 y el texto
+    nuevo de la especificacion.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

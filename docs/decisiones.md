@@ -112,6 +112,7 @@
 | 2026-11-01 | M2.4.2 baneos: vencimiento cada 5 minutos en Hangfire; fichas del socket borradas tambien al desbanear; los canales de push se siguen borrando al banear hasta el ultimo punto de M4c.6, y desde ya los envios de C# saltan a los baneados | Los envios de push que siguen en PHP no filtran a los baneados: conservar los canales antes de mudarlos todos dejaria pushes llegando a gente baneada |
 | 2026-11-01 | BUG-497: la prueba del ping fija la hora ahora; el ping de C# incluye la sesion en curso aunque haya empezado ayer (M4d.2) | PHP congelado; el borde de la medianoche se arregla al portar |
 | 2026-11-01 | Admin nuevo, webhooks: el secreto HMAC no se muestra en pantalla, se copia al portapapeles (propuesta aprobada con el "dale" a M2.4.3a; como mostrar la llave regenerada se decide en M2.4.3b) | Que el secreto no quede a la vista en pantallas ni capturas. M2.4.3 se parte en a (endpoints), b (llaves) y c (historial) |
+| 2026-11-01 | Llaves de entrada de los partners (M2.4.3b): la llave se muestra una sola vez al crearla o regenerarla, con boton Copiar; regenerar pide confirmacion y avisa que la anterior deja de servir al instante; en la lista solo los ultimos 4 caracteres y la fecha. El hash entra en M4d.9 (BUG-503, deuda de seguridad con fecha) | Guardarla como hash ya rompia los check-ins de los partners: los recibe PHP (congelado) y compara la llave en texto. Por etapas, como el push en M2.4.2 |
 
 ## Abiertas
 
