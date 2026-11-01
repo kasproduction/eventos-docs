@@ -386,6 +386,13 @@ de los 330 snapshots y del codigo PHP:
     cabeceras y el cuerpo que salieron, firma incluida, gracias a `request_body` y `request_headers` (migracion nueva; los llena
     C#; lo que manda PHP queda en null y se dice); "Copiar respuesta" (lo guardado, recortado a 2000 como en PHP; sin
     cabeceras de la respuesta, decision de Kamilo). Filtros extra: partner y llave, para llegar desde Webhooks y Llaves.
+  - 2026-11-01 (M2.4.4a, Staff y permisos; Kamilo): IDENTICO a `UserResource` en la jerarquia (BUG-406), el ultimo super_admin
+    (StaffGuard), la organizacion (BUG-374), la clave en argon2id y lo que hace `User::booted` al cambiar la clave o desactivar
+    (cerrar sesiones y quitar equipos de confianza). C# ARREGLA (admin nuevo): no lista a los admins antiguos de `attendees`
+    (no entran al panel; revisar en M2.4.4b si esos roles aun significan algo para la app); borrar a quien tiene bitacora responde
+    422 y ofrece desactivar (BUG-506; Filament rompia); un evento fuera de lo que ve quien edita es un error y las asignaciones
+    que no ve se conservan (Filament descartaba lo primero y borraba lo segundo). POR DECISION: la contrasena la sigue fijando
+    quien crea la cuenta (BUG-505, al cerrar el hito 1).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

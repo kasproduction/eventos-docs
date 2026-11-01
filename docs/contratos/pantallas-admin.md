@@ -47,7 +47,7 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | Dashboard | Escritorio | H1 | 2.1 | Pagina de entrada del admin. Las cifras del evento son del Data Center (enlace) |
 | AccountSecurity | Cuenta | H1 | 2.2.1 | 2FA, codigos de recuperacion, dispositivos y sesiones del staff |
 | EventResource | Sistema | H1 | 2.3.1 | Con filtro por organizacion (BUG-374) y el asistente de primer ingreso (`CreateEvent`) |
-| UserResource | Sistema | H1 | 2.4.4 | Staff, roles, invitaciones, reset de 2FA. No deja borrar al ultimo super_admin |
+| UserResource | Sistema | H1 | 2.4.4 (staff en 2.4.4a: hecho; seguridad 2.4.4b; limpieza 2.4.4c) | Staff, roles y reset de 2FA (las invitaciones de stand van en M4e.7). No deja borrar al ultimo super_admin |
 | EventSessionResource (+ Speakers por sesion) | Contenido / Agenda | H1 | 2.3.2 | Asignar speakers tiene que avisar (BUG-380) |
 | SessionTrackResource | Contenido / Agenda | H1 | 2.3.2 | |
 | SessionTypeResource | Contenido / Agenda | H1 | 2.3.2 | |

@@ -3,6 +3,21 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-01 — Encontrados al portar el staff del panel (M2.4.4)
+
+### BUG-506: Borrar a un miembro del staff con acciones en la bitacora rompe "Eliminar" en Filament (ABIERTO en PHP; resuelto en el admin nuevo)
+- **Severidad propuesta:** MEDIA (la accion falla con un error de base de datos en vez de explicar que pasa)
+- **Que pasa:** `admin_audit_log.user_id` es `restrictOnDelete`. Si la persona aprobo, baneo o hizo cualquier accion que deja bitacora, `DeleteAction` de `EditUser` lanza la violacion de llave foranea.
+- **Verificado:** si, 2026-11-01, leyendo la migracion `create_moderation_tables` (`foreignId('user_id')->constrained()->restrictOnDelete()`) y `EditUser::getHeaderActions` (borra sin revisar).
+- **Arreglo (decision de Kamilo, 2026-11-01):** el admin nuevo responde 422 con "Tiene acciones en la bitacora: desactivala en vez de eliminarla" y la pantalla ofrece desactivar. La bitacora no se toca.
+
+### BUG-505: La contrasena de un miembro del staff la fija quien crea la cuenta (ABIERTO 2026-11-01; deuda de seguridad aceptada por Kamilo)
+- **Severidad propuesta:** MEDIA (quien crea la cuenta conoce la contrasena de otra persona; mitigado porque el segundo factor es obligatorio en el primer ingreso y sin el no se entra)
+- **Que pasa:** en "Staff y permisos" (Filament, y el admin nuevo desde M2.4.4a, igual que hoy por decision de Kamilo) quien crea a la persona escribe su contrasena y se la tiene que pasar.
+- **Verificado:** si, 2026-11-01, leyendo `UserResource` (campo `password` obligatorio al crear).
+- **Flujo correcto:** crear la cuenta sin contrasena y mandarle a la persona un correo con un enlace para fijar la propia.
+- **Cuando se cierra (decision de Kamilo, 2026-11-01):** al cerrar el hito 1, o antes si un cliente lo pide.
+
 ## 2026-11-01 — Encontrados al portar los webhooks del admin (M2.4.3a, M2.4.3b y M2.4.3c)
 
 ### BUG-504: El historial de webhooks de Filament muestra los envios de todos los eventos (CRUCE ENTRE EVENTOS, regla 26; ABIERTO en PHP; resuelto en el admin nuevo)
