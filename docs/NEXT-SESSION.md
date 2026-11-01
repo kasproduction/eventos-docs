@@ -10,6 +10,17 @@
 
 ---
 
+## SESION 2026-11-01 (Opus 5.5, 15) — M2.4.2 HECHA: BANEOS; BUG-497 DECIDIDO; BUG-498 RESUELTO (COLA DE PRUEBAS)
+
+- BUG-497, decision Kamilo (b): la prueba del ping fija la hora a mediodia (backend `f8f6110`, control a las 00:05 falla); el ping de C# incluye la sesion en curso aunque haya empezado ayer al portarlo en M4d.2 (anotado en el roadmap).
+- Relanzada la corrida 41274882799 del MSI: todo verde salvo `Cruzadas\AsistentesTest`. Causa: BUG-498, restos de corridas anteriores en la cola de Hangfire de las pruebas (Redis base 15) se ejecutaban y un correo viejo caia despues del reinicio. Arreglo: el modo contratos vacia la base 15 antes de arrancar Hangfire (C# `dac82ab`, con control).
+- ARQUITECTURA: el backend del runner del MSI no va amarrado a commit (clona la cabeza de `main` en cada corrida; un rerun usa el C# viejo con el backend de hoy).
+- M2.4.2, decisiones Kamilo: vencimiento cada 5 minutos en Hangfire y `ExpireAttendeeBansJob` sale de PHP en el mismo despliegue; fichas del socket borradas tambien al desbanear (y al vencer); canales de push POR ETAPAS: al banear se siguen borrando como PHP (los envios de PHP no filtran baneados) y los de C# ya saltan a los baneados; el paso final es el ultimo punto de M4c.6.
+- Hecho: C# `dac82ab`, backend `baf7056`, web `26990a1`, docs `c862cf7` y `2762569`. Pruebas: C# 438, cruzadas 50/50, contratos 12/12, PHP 1263, e2e admin 36/36, vitest 714; 7 controles. Roadmap 107/218.
+- BUG-499 (abierto, PHP, sin consumidor): BanService guarda `expires_at` con zona sin convertir (5 h de mas); C# lo hace bien.
+- Gotcha: un control que se corre con las cruzadas deja la compilacion Release con el codigo del control; la e2e del admin usa ese Release. Despues de un control, `dotnet build src/Api -c Release --no-incremental`.
+- **Sigue:** confirmar en verde la corrida del MSI del commit `dac82ab`; PROPONER M2.4.3 (webhooks de asistente y endpoints/llaves de webhook).
+
 ## SESION 2026-11-01 (Opus 5.5, 14) — MSI PRENDIDO: RUNNER DE VERIFICAR.SH DESTAPADO; M2.5.2 CORREGIDA; CIERRE DEL DIA
 
 - MSI: base desechable creada (`eventos_desechable_pruebas`, permiso para `eventos_contratos`; 192 llaves). verificar.sh le pasa las credenciales explicitas (el archivo del MSI no las exporta; C# `11d290a`).
