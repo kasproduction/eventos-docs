@@ -10,6 +10,16 @@
 
 ---
 
+## SESION 2026-11-01 (Opus 5.5, 17) — M2.4.4a HECHA: STAFF Y PERMISOS; BUG-505 Y BUG-506; STAFFASIGNADO AMPLIADO
+
+- M2.4.4 partida por Kamilo en a (staff), b (seguridad de cada persona) y c (limpieza diaria, 30 dias). Las "invitaciones" (`StaffInvitationController`, `/join-team`) eran del equipo de stand, no del panel: van en M4e.7.
+- Decisiones Kamilo: contrasena igual que hoy (la fija quien crea la cuenta) y BUG-505 como deuda de seguridad (correo con enlace al cerrar el hito 1 o antes si un cliente lo pide); `CruceDeEventos.StaffAsignado` ampliado a administrar asignaciones, limitado a los eventos de la organizacion que quien edita ve, con prueba de cruce; no listar los admins antiguos de `attendees`; borrar con bitacora: 422 y desactivar (BUG-506).
+- Hecho: C# `c76dcc3` (`Admin/Sistema/Staff`, `Admin/Entrada/CierreDeAccesos`), backend `2dc1966` (cruzada `StaffTest`), web `272583c`, docs `511cef7`. Arreglado tambien: evento fuera de lo que ve quien edita = error; asignaciones que no ve se conservan.
+- Pruebas: C# 456, cruzadas 56/56 (MSI 41340835565), contratos 12/12, PHP 1262, e2e admin 41 (una falla de arranque en frio de `agenda.spec.ts`, sola pasa 2/2), vitest 714. Cinco controles en rojo.
+- Visto para M2.4.4b: los roles antiguos de `attendees` SIGUEN VIVOS para la app (`admin` y `admin_content` operan el check-in; premios y avisos de la API; C# `FiltrosDeAcceso` y `CicloDeLaSesion`). Son roles de la persona en el evento, no del panel: no listarlos en Staff sigue bien. Ninguna pantalla los asigna hoy (Filament solo ofrece Asistente y Staff de check-in).
+- Gotchas: una etiqueta con el asterisco de obligatorio no coincide con `getByLabel(..., { exact: true })` (usar el id); la primera e2e de una corrida completa puede fallar en frio.
+- **Sigue (propuesto, sin "dale"):** M2.4.4b. Desbloquear (super_admin, si esta bloqueada; `account_unlocked`; aviso rojo arriba), restablecer segundo factor (super_admin, no a si mismo; `2fa_reset`, `CierreDeAccesos` con motivo `2fa_reset`, correo `staff_2fa_reset` a portar como el de 2FA activado) y actividad de acceso (ultimas 20 de 90 dias, `SecurityActivity::rows`). Leer primero `StaffLockout::unlock`, `TwoFactorService::resetFor`, `SecurityActivity` y la vista `filament.staff.lock-banner`.
+
 ## SESION 2026-11-01 (Opus 5.5, 16) — M2.4.3 COMPLETA: WEBHOOKS DEL ADMIN (ENDPOINTS, LLAVES E HISTORIAL); BUG-500 A BUG-504
 
 - La corrida del MSI de `dac82ab` habia salido roja: BUG-500, la cruzada de aprobar tomaba el primer correo de C# (el de los dos pasos del staff) y no esperaba el de Gina. Arreglo: `correosDeCSharp(..., para:)` (backend `22c722f`, control 3 de 3 rojo y 3 de 3 verde). BUG-498 era real pero no era la causa.
