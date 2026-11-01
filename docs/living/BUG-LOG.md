@@ -5,11 +5,11 @@
 
 ## 2026-11-01 — Encontrados al prender el MSI (runner de verificar.sh)
 
-### BUG-497: El ping del totem de sala no ve una sesion que empezo antes de la medianoche, y su prueba falla entre las 00:00 y las 00:10 (ABIERTO en PHP; espera decision de Kamilo)
+### BUG-497: El ping del totem de sala no ve una sesion que empezo antes de la medianoche, y su prueba falla entre las 00:00 y las 00:10 (PRUEBA ARREGLADA 2026-11-01, backend `f8f6110`; el arreglo del ping queda para C# en M4d.2)
 - **Severidad propuesta:** BAJA en producto (una sesion que cruza la medianoche desaparece del totem) y MEDIA en la verificacion (la suite falla segun la hora a la que corre)
 - **Que pasa:** `RoomCheckinController::ping` busca las sesiones del salon con `start_datetime >= hoy 00:00`. `test_ping_returns_active_session` crea una sesion que empezo hace 10 minutos: corrida entre las 00:00 y las 00:10 de Bogota, la sesion queda en el dia anterior y el ping no la devuelve.
-- **Verificado:** si, 2026-11-01: el runner del MSI corrio la suite a las 00:0x de Bogota y fallo solo esa prueba ("null is identical to 'Active Talk'"); en la corrida anterior, a otra hora, la misma suite paso entera.
-- **Para decidir:** (a) congelar la hora en la prueba (no cambia la regla de PHP congelado) y anotar el borde de la medianoche para cuando el totem pase a C# (M4d); (b) arreglarlo tambien en C# al portar el ping (incluir la sesion en curso aunque haya empezado ayer).
+- **Verificado:** si, 2026-11-01: el runner del MSI corrio la suite a las 00:0x de Bogota y fallo solo esa prueba ("null is identical to 'Active Talk'"); en la corrida an- **Decision (Kamilo, 2026-11-01): opcion (b).** Ahora se congela la hora en la prueba y PHP no se toca (sigue congelado). Al portar el ping en M4d.2, C# lo arregla: devuelve tambien la sesion en curso aunque haya empezado ayer. Se anota como diferencia con PHP.
+- **Arreglo en la prueba:** `test_ping_returns_active_session` fija la hora a las 12:00 con `travelTo`. Control: con la hora a las 00:05 falla igual que en el MSI ("null is identical to 'Active Talk'"); a mediodia pasa, y `RoomCheckinTest` pasa entera (23).ir la sesion en curso aunque haya empezado ayer).
 
 ### BUG-496: Cuatro clases de prueba de C# abrian MySQL en el paso sin base de verificar.sh (RESUELTO 2026-11-01, C# `3aa2d1a`)
 - **Severidad propuesta:** MEDIA (el runner del MSI fallaba siempre desde M2.3.3c1 y nadie lo veia: el MSI estaba apagado y las corridas se cancelaban)
