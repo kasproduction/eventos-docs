@@ -3,6 +3,20 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-01 — Encontrados al portar los baneos (M2.4.2)
+
+### BUG-498: Restos de corridas anteriores en la cola de Hangfire de las pruebas se colaban en las cruzadas (RESUELTO 2026-11-01, C# `dac82ab`; infraestructura de pruebas)
+- **Severidad propuesta:** MEDIA (la corrida 41274882799 del MSI fallo en `Cruzadas\AsistentesTest` sin un error de producto)
+- **Que pasa:** la base 15 de Redis guarda la cola de Hangfire del modo contratos. Quedaban trabajos de corridas anteriores (correos que el C# de los contratos encolo antes de apagarse, reintentos de webhooks programados). El C# de las cruzadas los ejecutaba al arrancar o a mitad de una prueba, el correo caia en el registro despues del reinicio y la prueba de aprobar tomaba un correo que no era el de Gina ("Trying to access array offset on null").
+- **Verificado:** si, 2026-11-01: en el MSI, el log del C# de las cruzadas corre un correo antes de la primera prueba y la base 15 conservaba un `EnviarWebhook` programado.
+- **Arreglo:** en modo contratos, C# vacia la base 15 antes de que arranque el servidor de Hangfire (como cada reinicio; con Redis caido deja un aviso y sigue). `ModoContratosTest` deja un reintento programado y comprueba que no sobrevive; su control (sin el vaciado) falla. Lo que queda: un trabajo que esta corriendo justo cuando una prueba reinicia puede caer despues del reinicio (no se vio).
+
+### BUG-499: BanService guarda la fecha de fin sin convertirla si llega con zona (ABIERTO en PHP; sin consumidor, C# lo hace bien)
+- **Severidad propuesta:** BAJA (solo la ruta `/api/v1/admin/attendees/{id}/ban`, que no usan la webapp, la app ni el kiosko; Filament manda la hora local)
+- **Que pasa:** `expires_at` = `2027-01-15T04:00:00Z` queda en la base como `2027-01-15 04:00:00` (la hora UTC escrita como si fuera de Bogota: 5 horas de mas). C# la guarda en la hora de la base (`2027-01-14 23:00:00`). La bitacora de PHP guarda el texto tal como llego; la de C#, la fecha en ISO con la zona de la app.
+- **Verificado:** si, 2026-11-01: lo destapo la cruzada `Cruzadas\BaneosTest` (la fila de PHP y la de C# no coincidian); con la hora local las dos quedan iguales.
+- **Para decidir:** nada que hacer en PHP (congelado y sin consumidor); la ruta muere cuando el admin nuevo reemplace a Filament.
+
 ## 2026-11-01 — Encontrados al prender el MSI (runner de verificar.sh)
 
 ### BUG-497: El ping del totem de sala no ve una sesion que empezo antes de la medianoche, y su prueba falla entre las 00:00 y las 00:10 (PRUEBA ARREGLADA 2026-11-01, backend `f8f6110`; el arreglo del ping queda para C# en M4d.2)

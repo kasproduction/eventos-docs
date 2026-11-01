@@ -70,7 +70,7 @@
 | `FILESYSTEM_DISK` | filesystems | **si** | Donde viven fotos y documentos |
 | `QUEUE_CONNECTION` | queue | no | Hangfire tiene la suya |
 | `CACHE_STORE` | cache | no | C# usa su prefijo `dotnet:` (M1.4.4) |
-| `CACHE_PREFIX` | cache | **si** | Para leer o borrar claves de PHP mientras conviven |
+| `CACHE_PREFIX` | cache | **si** | Para leer o borrar claves de PHP mientras conviven. Desde M2.4.2 el Worker de C# tambien las toca (vencer baneos: `dc:stats` y fichas del socket): si la Api tiene `Php:Cache:Prefijo`, `Php:Cache:BaseDeRedis` o `Redis:BaseSocket` distintos de los de por defecto, el Worker lleva los mismos |
 | `HORIZON_ENABLED` | - | no | Sin uso |
 | `TELESCOPE_ENABLED` | telescope | no | |
 | `SENTRY_LARAVEL_DSN` | paquete Sentry | equiv | DSN propio del servicio C# |
