@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-11-01 (Opus 5.5, 18) — M2.4.4b HECHA: DESBLOQUEAR, RESTABLECER EL SEGUNDO FACTOR Y ACTIVIDAD DE ACCESO
+
+- Hecho con el "dale" de Kamilo a la propuesta: C# `fd15af4` (`Admin/Sistema/Staff` con `DesbloquearAsync`, `RestablecerDosPasosAsync` y `ActividadAsync`; `Admin/Entrada/ActividadDeSeguridad`; `CorreosDelStaff.DosPasosRestablecido`), backend `503e961` (cruzada `StaffTest` +3 y escenario `staff-bloqueada`), web `f2905dd` (aviso rojo, Desbloquear, Restablecer confirmado en la pagina, Actividad de acceso).
+- Diferencia con Filament (Anexo B): pedir una accion que ya no aplica responde 422 con el motivo. El correo `staff_2fa_reset` sale directo de C# (esencial), como el de la cuenta bloqueada.
+- Pruebas en local: C# 468 (con la base al dia), cruzadas 59/59, e2e admin 42/42 (agenda paso en frio esta vez), vitest 714. 16 controles en rojo. Falta la corrida del MSI de este push.
+- Kamilo pidio dejar la suite de C# en verde tambien en local: a `eventos_contratos_pruebas` le faltaba la migracion `2026_11_01_120000` (`request_body` de M2.4.3c); aplicada con `DB_DATABASE=eventos_contratos_pruebas php artisan migrate`. Tras cada migracion nueva del backend, aplicarla tambien a esa base local.
+- Gotchas: `locked_until` es TIMESTAMP (tope 2038: el escenario usa 2037-12-31); MySqlConnector no acepta variables de usuario (`@x`) sin `AllowUserVariables`; meses cortos de Carbon en espanol con punto (`sep.`, `may.`); diffForHumans redondea hacia abajo; un script de controles tiene que restaurar tambien cuando el control no compila.
+- **Sigue: proponer M2.4.4c** (limpieza diaria de `staff_sessions` y `trusted_devices` vencidos, cerrados o revocados hace mas de 30 dias, en Hangfire). Despues M2.4.5 (golden tickets, premios, canjes, codigos de acceso).
+
 ## SESION 2026-11-01 (Opus 5.5, 17) — M2.4.4a HECHA: STAFF Y PERMISOS; BUG-505 Y BUG-506; STAFFASIGNADO AMPLIADO
 
 - M2.4.4 partida por Kamilo en a (staff), b (seguridad de cada persona) y c (limpieza diaria, 30 dias). Las "invitaciones" (`StaffInvitationController`, `/join-team`) eran del equipo de stand, no del panel: van en M4e.7.

@@ -393,6 +393,11 @@ de los 330 snapshots y del codigo PHP:
     422 y ofrece desactivar (BUG-506; Filament rompia); un evento fuera de lo que ve quien edita es un error y las asignaciones
     que no ve se conservan (Filament descartaba lo primero y borraba lo segundo). POR DECISION: la contrasena la sigue fijando
     quien crea la cuenta (BUG-505, al cerrar el hito 1).
+  - 2026-11-01 (M2.4.4b, seguridad de cada persona; Kamilo): IDENTICO a EditUser en quien puede desbloquear (super_admin, solo
+    bloqueada) y restablecer el segundo factor (super_admin, nunca a si mismo, solo con segundo factor), a TwoFactorService::resetFor
+    (borra el 2FA, `2fa_reset`, quita equipos, cierra sesiones, correo `staff_2fa_reset`) y a SecurityActivity (mismas frases y
+    fechas, ultimas 20 de 90 dias). C# ARREGLA (admin nuevo): pedir una de las dos acciones cuando ya no aplica responde 422 con el
+    motivo (Filament solo escondia el boton); la actividad la ve quien puede abrir la ficha (403 si no).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
