@@ -341,7 +341,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ### 2.5 Comunicacion (1 semana) — 0/4
 - [ ] M2.5.1 Anuncios con targeting y "lleva a" (deeplink a encuestas), con `data:sync` al socket y cache por rol borrada **[local]**
-- [ ] M2.5.2 Notificaciones programadas y envio inmediato (push Expo + Web Push): C# escribe `scheduled_notifications` y `push_notification_logs`; el despacho lo sigue haciendo PHP hasta la fase 4c **[local]**
+- [ ] M2.5.2 Notificaciones programadas y envio inmediato (push Expo + Web Push): C# escribe `scheduled_notifications` y `push_notification_logs` y tambien despacha, con el push que ya existe en C# (`EnvioDePush`, `PushALosAsistentes`): el envio inmediato al guardar y las programadas con un trabajo recurrente de Hangfire cada minuto. `DispatchScheduledNotifications` se quita de PHP (`routes/console.php`) en el mismo despliegue (regla 4; decision de Kamilo 2026-11-01: nada de "PHP despacha hasta 4c") **[local]**
 - [ ] M2.5.3 Plantillas de correo por evento (16 tipos de `EmailCatalog`, fork por evento, vista previa con `EmailLayout` portado) y SMTP por organizacion **[local]**
 - [ ] M2.5.4 Log de correos (`email_logs`) y de push para leer **[local]**
 
@@ -463,7 +463,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [ ] M4c.4 Registro publico de la landing y el widget: Turnstile, cupo y codigo con lock, limitador `public_register`, handoff de un solo uso (`reg-handoff:*`), un solo correo `welcome_access` **[local]**
 - [ ] M4c.5 Correo en C#: MailKit, 20 mailables con plantillas por evento y `{{placeholders}}`, `EmailLayout`, SMTP por organizacion, dos colas (`mail-priority`, `mail`) en Hangfire con limitador por segundo compartido, `retryUntil`, `email_logs`. El outbox de M2.2.5 y su job de PHP desaparecen aqui: C# manda directo y PHP deja de mandar correo **[local]**
 - [ ] M4c.6 Push: Expo (`exp.host`) con recibos cada 5 min, Web Push con VAPID, preferencias por tipo, push silencioso al cambiar modulos **[local]** — **Parcialmente adelantada a M2.3.2c** (Kamilo 2026-10-27, regla 6 reforzada): envio por Expo y Web Push con VAPID, preferencias por persona y los mismos logs, para el aviso de cambio de hora de una sesion. Aqui queda el resto (recibos, recordatorios, programadas, push silencioso). Al portar el push completo, el aviso de cambio de horario (`session_changed`) entra a `push_notification_logs` (hoy PHP no lo registra: la tabla no acepta ese tipo; en M2.3.2c C# lo deja igual). Tambien entra aqui (auditoria 7, Kamilo 2026-10-30): el aviso de agenda retrasada escribe `push_notification_logs`
-- [ ] M4c.7 Recordatorios y notificaciones programadas: `DispatchScheduledNotifications` (1 min), `SendAgendaReminders` (1 min), `SendSessionReminders` (5 min), `SendEventReminders` (08:00), `SendSessionChangedNotification`; cada una se quita de `routes/console.php` al pasar **[local]**
+- [ ] M4c.7 Recordatorios: `SendAgendaReminders` (1 min), `SendSessionReminders` (5 min), `SendEventReminders` (08:00), `SendSessionChangedNotification`; cada una se quita de `routes/console.php` al pasar. `DispatchScheduledNotifications` ya no esta aqui: pasa a C# en M2.5.2 **[local]**
 - [ ] M4c.8 Web Push subscription y Expo token (3 + 1 rutas) **[local]**
 - [ ] M4c.9 Cruce de rutas; medir `entrar-por-la-puerta.js` y `e1-puertas-abiertas.js` (ola de login, 1.000 detras de una IP) **[local+medir]**
 - [ ] M4c.10 Quitar PHP del modulo **[local]**

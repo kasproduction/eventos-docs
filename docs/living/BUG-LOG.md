@@ -3,6 +3,19 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-01 — Encontrados al prender el MSI (runner de verificar.sh)
+
+### BUG-496: Cuatro clases de prueba de C# abrian MySQL en el paso sin base de verificar.sh (RESUELTO 2026-11-01, C# `3aa2d1a`)
+- **Severidad propuesta:** MEDIA (el runner del MSI fallaba siempre desde M2.3.3c1 y nadie lo veia: el MSI estaba apagado y las corridas se cancelaban)
+- **Que pasa:** `DocumentosTest`, `SesionesTest`, `RegenerarZipDeDocumentosTest` y `DespachoYAsistenteTest` mezclan pruebas con y sin base y limpiaban la base en `DisposeAsync` (el ZIP tambien en `InitializeAsync`) aunque la prueba no la usara; el primer paso de verificar.sh corre sin `EVENTOS_MYSQL_PRUEBAS` y daba 39 errores. En Windows no se veia porque siempre se corre con la base.
+- **Arreglo:** sin la variable no se abre la base (como ya hacian `TokenDeSanctumTest`, `FiltroPorEventoTest` y `FiltrosDeAccesoTest`). Sin MySQL: 241 pasan y 191 se omiten.
+
+### BUG-495: ContratoSeeder pone en `staff_room_assignments.assigned_by` el id de la persona y no el del asistente (RESUELTO 2026-11-01 en el seeder, backend)
+- **Severidad propuesta:** MEDIA (solo datos de prueba: la suite de PHP contra MySQL fallaba en `ActivacionImportadoTest` segun el orden)
+- **Que pasa:** `'assigned_by' => $u['dario']->id` usa el id de `users`, pero la llave apunta a `attendees`. En una base recien creada los dos valen 4 y pasa; con `RefreshDatabase` en MySQL los contadores no vuelven a 1 y la llave falla.
+- **Verificado:** si, 2026-11-01: la suite completa contra MySQL fallaba igual en Windows y en el MSI (1452 sobre `staff_room_assignments_assigned_by_foreign`); sola pasaba.
+- **Arreglo:** `$a['dario']->id`. En una base nueva deja los mismos datos (los contratos no cambian). Suite de PHP contra MySQL: 1264 pasan.
+
 ## 2026-10-31 — Encontrado al portar el perfil del asistente (M2.4.1b)
 
 ### BUG-494: Las bases de trabajo de contratos y cruzadas no tienen llaves foraneas (RESUELTO 2026-10-31 en C# `87621ac` y `39a1537`, backend `d923deb`; infraestructura de pruebas)
