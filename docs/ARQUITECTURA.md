@@ -128,6 +128,16 @@ localhost:6379 como el de Laragon, asi PHP, C# y las pruebas no cambian de confi
 4. `scripts/cruzar.sh "METODO /ruta" --docs ... --nginx`: si escribe, antes respalda la base; si algo sale mal,
    `scripts/descruzar.sh` la devuelve a PHP en el acto.
 
+## El runner de verificacion del MSI
+
+`eventos-api-dotnet/.github/workflows/verificar.yml` corre `scripts/verificar.sh` en el MSI (runner propio) en cada push.
+
+- C#: `actions/checkout` del commit que disparo la corrida. Un `gh run rerun` vuelve a usar ese mismo commit, no el ultimo.
+- Backend: **no va amarrado a un commit.** Cada corrida borra la copia anterior y clona la cabeza de `main` de
+  `eventos-backend` (`git clone --depth 1`). Una corrida de C# se verifica contra el backend que exista en ese momento:
+  si se relanza una corrida vieja, usa el backend de hoy, y un cambio en el backend sin push no lo ve. Para reproducir
+  una corrida pasada hay que mirar que commit del backend estaba en `main` a esa hora (comprobado 2026-11-01).
+
 ## Historial
 
 | Version | Fecha | Que cambio |

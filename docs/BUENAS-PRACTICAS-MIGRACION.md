@@ -357,6 +357,14 @@ de los 330 snapshots y del codigo PHP:
     escaneando); asignar salon borra la cache de la asignacion. Privacidad: el avatar sin foto es la inicial; PHP lo pedia a
     `hostedboringavatars.vercel.app` mandandole el nombre de la persona. `assigned_by` sigue identico, con una precision: C# busca
     al asistente de quien asigna en este evento (PHP lo buscaba en cualquier evento, cruce sin motivo); si no tiene, el mismo staff.
+  - 2026-11-01 (M2.4.2, baneos; Kamilo): IDENTICO a `BanService` (bitacora `ban_attendee` y `unban_attendee` con la IP,
+    `BannedMail`, push "Acceso suspendido" solo si la cuenta esta activada, `/internal/ban/enforce` al socket sin esperar
+    respuesta, fichas del socket al banear, estadisticas del Data Center). C# ARREGLA (admin nuevo, sin consumidor): el
+    vencimiento corre cada 5 minutos (PHP cada hora: el acceso volvia a tiempo pero el push "tu suspension expiro" llegaba
+    hasta una hora tarde); al desbanear tambien se borran las fichas del socket (PHP no: lo seguia viendo baneado hasta que
+    vencia su copia de 60 s); los envios de push de C# saltan a los baneados. POR ETAPAS: al banear C# sigue borrando el token
+    de Expo y las suscripciones de Web Push como PHP, porque los envios de push que siguen en PHP no filtran a los baneados;
+    mientras tanto el "Acceso restaurado" no llega (igual que hoy). Deja de borrarlos en el ultimo punto de M4c.6.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

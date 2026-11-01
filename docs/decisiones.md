@@ -109,6 +109,8 @@
 | 2026-10-22 | Auditoria: los 56 candidatos se verifican por grupos de subsistema (un verificador independiente por grupo y una segunda revision por grupo) dentro de los 50 agentes, en vez de uno por uno (habrian sido ~115) | Mismo doble control para todos sin multiplicar el gasto; el informe lo declara |
 | 2026-10-22 | Auditoria de seguridad (M0.8.1): tamaño estandar con presupuesto de ~50 agentes (completa: cada hallazgo con sus dos verificaciones), backend + socket, solo lectura de codigo (sin entorno aislado: Docker apagado y sin imagen PHP local); la confirmacion con prueba que falla va en M0.8.6 | El estimado inicial de 25 no alcanzaba para verificar todo |
 | 2026-10-22 | Auditoria de seguridad del backend a proposito, aparte del roadmap (permisos ruta por ruta, inyeccion, limites, datos de mas) | Las pruebas de contrato congelan lo que hay, aunque este mal; BUG-363 aparecio de rebote. Va al cierre de la fase 0, antes de pasar rutas a C# |
+| 2026-11-01 | M2.4.2 baneos: vencimiento cada 5 minutos en Hangfire; fichas del socket borradas tambien al desbanear; los canales de push se siguen borrando al banear hasta el ultimo punto de M4c.6, y desde ya los envios de C# saltan a los baneados | Los envios de push que siguen en PHP no filtran a los baneados: conservar los canales antes de mudarlos todos dejaria pushes llegando a gente baneada |
+| 2026-11-01 | BUG-497: la prueba del ping fija la hora ahora; el ping de C# incluye la sesion en curso aunque haya empezado ayer (M4d.2) | PHP congelado; el borde de la medianoche se arregla al portar |
 
 ## Abiertas
 
