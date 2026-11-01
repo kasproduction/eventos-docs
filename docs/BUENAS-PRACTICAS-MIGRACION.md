@@ -143,6 +143,10 @@ puede borrar, una validación que falta, un efecto que PHP no dispara), se pregu
 27. **Un hallazgo se confirma con una prueba roja antes de arreglarlo, y el arreglo trae su control** (el caso bueno que
     tiene que seguir funcionando). Si el arreglo rompe una prueba vieja que fija una regla de producto, no se reescribe
     la prueba: se adapta el arreglo o se pregunta a Kamilo (BUG-397 contra BUG-363, retro de la fase 0).
+    Un control destructivo (quitar una proteccion que impide borrar o dañar) corre contra la base desechable
+    (`scripts/base-desechable.sh`, copia con llaves foraneas de la referencia), nunca contra la base compartida de las pruebas
+    (Kamilo 2026-10-31: dos controles de M2.4.1b borraron asistentes sembrados con su cascada). Las bases de trabajo de
+    contratos y cruzadas tienen las mismas llaves foraneas que la referencia (BUG-494, `ReinicioDeContratosTest`).
 
 30. **Cookies del admin nuevo y lo que el navegador guarda** (Kamilo 2026-10-26, M2.2.7). Toda cookie que pone el
     admin (token del staff, equipo de confianza) va `HttpOnly`, `Secure` y `SameSite=Lax`, con su vencimiento escrito.

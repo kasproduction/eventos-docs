@@ -10,6 +10,14 @@
 
 ---
 
+## SESION 2026-10-31 (Opus 5.5, 13) — BUG-494 RESUELTO: LLAVES FORANEAS EN LAS BASES DE TRABAJO; BASE DESECHABLE PARA CONTROLES DESTRUCTIVOS
+
+- Decisiones Kamilo: bloque corto antes de M2.4.2; las bases de trabajo de contratos y cruzadas recrean las 192 llaves de la referencia, con prueba de conteo; contratos y cruzadas completas por si alguna dependia de su ausencia; regla: los controles destructivos corren contra una copia desechable, no contra la base compartida.
+- C# `87621ac` y `39a1537` (ReinicioDeContratos recrea las llaves; ReinicioDeContratosTest; scripts/base-desechable.sh con mysqldump; verificar.sh la arma; CLAUDE.md), backend `d923deb` (la cruzada del perfil vuelve a comprobar la cascada). Pruebas con llaves: C# 432, contratos 12/12, cruzadas 48/48, e2e admin 35/35; control: sin recrear las llaves, la prueba falla.
+- **MSI (cuando se prenda, sin apuro):** crear una vez `eventos_desechable_pruebas` y darle permiso al usuario de contratos (`sudo mysql -e "CREATE DATABASE IF NOT EXISTS eventos_desechable_pruebas; GRANT ALL ON eventos_desechable_pruebas.* TO '<usuario>'@'localhost'"`). Sin eso, el paso nuevo de verificar.sh falla y el script lo dice.
+- Visto: `eventos_db` local tiene 191 llaves (le falta una migracion por aplicar).
+- **Sigue: PROPONER M2.4.2** (baneos).
+
 ## SESION 2026-10-31 (Opus 5.5, 12) — M2.4.1b HECHA: PERFIL DEL ASISTENTE; BUG-494 ENCONTRADO
 
 - Decisiones Kamilo: eliminar no se puede con leads de sponsors o liderando un stand (la confirmacion muestra lo que se perderia y sugiere banear) y borra las fichas del socket; dejar Staff Check-in desactiva salones y caches; asignar salon borra la cache; avatar con la inicial (privacidad). Ley 1581: por decidir, se resuelve anonimizando (decisiones, Abiertas).

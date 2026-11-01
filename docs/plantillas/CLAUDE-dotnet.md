@@ -40,6 +40,13 @@ y `eventos-kiosko`; lo que no confirmes no cuenta como consumido):
 5. **Correr el snapshot contra C#** (`CONTRATO_BASE_URL`); si escribe, prueba cruzada: escribe C#, lee PHP.
 6. **Medir en el MSI** (k6 de agosto, PHP contra C#) y anotar el numero en el roadmap. Recien ahi se cruza.
 
+## Controles destructivos (Kamilo 2026-10-31, BUG-494)
+
+Cada arreglo trae su control: deshacerlo hace fallar su prueba. Un control que quita una proteccion (no dejar eliminar,
+no dejar sobrescribir) corre contra la base desechable, nunca contra la compartida:
+`EVENTOS_MYSQL_PRUEBAS="$(scripts/base-desechable.sh --cadena)"`. Al restaurar el archivo del control, escribirlo (no
+moverlo) y compilar con `--no-incremental` antes de la verificacion final.
+
 ## Prohibido
 
 - `.Result` y `.Wait()`.
