@@ -425,6 +425,12 @@ de los 330 snapshots y del codigo PHP:
     las etiquetas es un error. La imagen se guarda como URL (la de la subida, R2 o disco publico) y no como ruta relativa: la app la lee
     igual (V1\AnnouncementResource deja pasar una URL). Decidido por Kamilo: los privados en la lista solo para leer, "Solo generales" por
     defecto; partida en a (sin push) y b (push con sus logs).
+  - 2026-11-02 (M2.5.1b, el push de anuncios; Kamilo): IDENTICO a sendPush y dispatchToAttendees en los logs (`pending` con el ticket de
+    Expo, `failed` con el motivo, `delivered` en el navegador de quien no tiene app), el `log_id` en los datos, el titulo y el texto. C#
+    ARREGLA: la audiencia incluye a quien solo tiene el navegador suscrito (BUG-511), salta a los baneados (como los demas push de C#) y
+    "Enviar push" solo con el anuncio publicado (Filament lo mandaba de un programado). Decidido por Kamilo: un solo "Publicar ahora" con la
+    casilla "Enviar push a N personas" marcada por defecto (Filament publicaba siempre con push) y "Enviar push" aparte. `CheckExpoReceiptsJob`
+    sigue en PHP y procesa tambien los tickets de C# hasta M4c.6.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

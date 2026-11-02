@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-11-02 (Opus 5.5, 23) — M2.5.1b HECHA: EL PUSH DE ANUNCIOS CON SUS LOGS; BUG-511 RESUELTO; M2.5.1 COMPLETA
+
+- Al arrancar: la corrida del MSI de M2.5.1a (41520189560) seguia en curso; esta sesion no la reviso (mirarla junto con la de este push).
+- Decisiones Kamilo: un solo "Publicar ahora" con la casilla "Enviar push a N personas" marcada por defecto y "Enviar push" aparte para el publicado; mostrar a cuantas personas llega; `CheckExpoReceiptsJob` pasa a C# en M4c.6 (anotado en el roadmap).
+- Hecho: C# `302f568` (`Trabajos/Push/PushConRegistro`, `EnvioDePush` con resultado por mensaje, Anuncios con `send_push` y `/push`, Expo del modo contratos con tickets), backend `88ad5f4` (cruzada del push), web `487cbb7` (la casilla y Enviar push).
+- Pruebas en local: C# 512, cruzadas 73/73, contratos 12/12, e2e admin 50/50, vitest 715. 7 controles en rojo. Falta la corrida del MSI.
+- Gotchas: en Pest, `Http::fake` no le gana a la simulacion que `TestCase` ya registro para exp.host (`Http::swap(new Factory)` antes); el seeder de contratos no deja canales de push (en la e2e la audiencia es 0); un trabajo de Hangfire corre sin evento de ruta: `db.FijarEvento(evento)` al empezar.
+- **Sigue: proponer M2.5.2** (notificaciones programadas y envio inmediato, reusa `PushConRegistro`; `DispatchScheduledNotifications` sale de PHP en el mismo despliegue). Antes: mirar las corridas del MSI de M2.5.1a y M2.5.1b.
+
 ## SESION 2026-11-02 (Opus 5.5, 22) — M2.5.1a HECHA: ANUNCIOS SIN PUSH EN EL ADMIN NUEVO; BUG-510 RESUELTO; BUG-511 ANOTADO
 
 - Al arrancar: la corrida del MSI de M2.4.6 (41508220289) estaba verde.
