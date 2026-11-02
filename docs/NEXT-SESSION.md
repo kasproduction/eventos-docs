@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-11-02 (Opus 5.5, 22) — M2.5.1a HECHA: ANUNCIOS SIN PUSH EN EL ADMIN NUEVO; BUG-510 RESUELTO; BUG-511 ANOTADO
+
+- Al arrancar: la corrida del MSI de M2.4.6 (41508220289) estaba verde.
+- Decisiones Kamilo: M2.5.1 partida en a (sin push) y b (push con `push_notification_logs`); los privados en la lista con "Para: {persona}", solo para leer, "Solo generales" activo por defecto; BUG-510 (audiencia vacia = null) y BUG-511 (push tambien al navegador, en b).
+- Hecho: C# `6440d83` (`Admin/Comunicacion/Anuncios`, `Comun/EtiquetasDePhp` = strip_tags de PHP 8), backend `3b97b96` (cruzada `AnunciosTest`), web `539767a` (`/anuncios` con compositor 2+1; Push programadas y Recordatorios llevan al admin actual).
+- Pruebas en local: C# 509, cruzadas 72/72, e2e admin 50/50, vitest 715. 6 controles en rojo. Falta la corrida del MSI de este push.
+- Gotchas: la cache de PHP en las cruzadas es `array` (C# no la alcanza: la cruzada lee con `Cache::flush()`; el borrado real lo prueba C# en Redis); la e2e usa reloj real y el seeder fecha "Bienvenidos" el 6 de diciembre (sale Programado); `dotnet run archivo.cs` necesita `#:property JsonSerializerIsReflectionEnabledByDefault=true` para serializar.
+- **Sigue: M2.5.1b** (push de anuncios con `push_notification_logs`). Antes: mirar la corrida del MSI. Leer `SendPushToAttendeeJob` (dispatchToAttendees, handle), `SendWebPushJob`, `CheckExpoReceiptsJob`, `TrackController` (log_id) y `EnvioDePush` de C#.
+
 ## SESION 2026-11-02 (Opus 5.5, 21) — M2.4.6 HECHA: SOPORTE EN EL ADMIN NUEVO; BUG-509 RESUELTO; 2.4 PERSONAS COMPLETA
 
 - Al arrancar: la corrida del MSI de M2.4.5 (41368518691) estaba verde, incluida `agenda` tracks (no hizo falta subirle el tiempo).

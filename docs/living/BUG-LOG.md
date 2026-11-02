@@ -3,6 +3,21 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-02 — Encontrados al portar Anuncios (M2.5.1)
+
+### BUG-510: Un anuncio con la audiencia vacia no lo ve nadie en la app, pero el socket se lo reparte a todos (RESUELTO 2026-11-02 en M2.5.1a, admin nuevo; Filament sigue igual hasta apagarse)
+- **Severidad propuesta:** MEDIA (un anuncio "para todos" que nadie ve en su lista)
+- **Que pasa:** el CheckboxList de Filament sin casillas guarda `roles = []`. La lista de la app (`AnnouncementController@index`) pide `roles IS NULL` o que contenga el rol: con `[]` no sale para nadie. `AnnouncementObserver` usa `empty($roles)` y lo trata como para todos: lo manda con el dato por el socket. La ayuda del formulario dice "Sin marcar ninguno = todos".
+- **Verificado:** si, 2026-11-02: en `eventos_db` hay un anuncio con `roles = []`.
+- **Arreglado en:** admin nuevo: una audiencia vacia (o desmarcada) se guarda null. Los `[]` que ya existen siguen ocultos hasta editarlos (anotar si aparece uno en un cliente).
+- **Prueba:** `AnunciosTest.Crear_valida...` (null en la base) y la cruzada `AnunciosTest` (la ven Ana y Carla). Control: guardando `[]` falla.
+
+### BUG-511: El push de un anuncio no le llega a quien solo usa la webapp (ABIERTO 2026-11-02; se arregla en M2.5.1b)
+- **Severidad propuesta:** MEDIA (quien no tiene la app movil nunca recibe el push de un anuncio)
+- **Que pasa:** `AnnouncementResource::sendPush` elige a los asistentes con `whereNotNull('expo_push_token')`; `dispatchToAttendees` despues manda tambien a los navegadores suscritos, pero solo de esos. Quien tiene solo suscripcion del navegador queda fuera.
+- **Verificado:** leyendo el codigo (`AnnouncementResource.php`, `sendPush`), 2026-11-02.
+- **Arreglo:** M2.5.1b, decision de Kamilo: la audiencia del push es quien tenga token de Expo o una suscripcion del navegador.
+
 ## 2026-11-02 — Encontrados al portar Soporte (M2.4.6)
 
 ### BUG-509: Quienes operan el evento no ven Soporte (RESUELTO 2026-11-02 en M2.4.6, admin nuevo; Filament sigue igual hasta apagarse)

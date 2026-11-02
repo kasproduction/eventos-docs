@@ -418,6 +418,13 @@ de los 330 snapshots y del codigo PHP:
     dos anuncios) y pide texto (Filament guardaba vacio sin decir nada), y Soporte entra con `view-content` o `manage-content`
     (BUG-509: org_admin y event_admin no lo veian). Decidido por Kamilo: el contador de abiertas del menu sale de la misma consulta
     que la lista (`open_count`, `count_only=1`).
+  - 2026-11-02 (M2.5.1a, Anuncios; Kamilo): IDENTICO a AnnouncementResource y AnnouncementObserver en campos, `action_url` (compose y
+    parseActionUrl), estados, el contenido con `trim(strip_tags)` de PHP 8 y los efectos (cache por rol, data:sync del nuevo para todos,
+    avisar lo demas). C# ARREGLA (admin nuevo): una audiencia vacia se guarda null (BUG-510), "Lleva a" una sesion o URL sin elegirla es un
+    error (Filament lo guardaba sin destino), la sesion y la encuesta tienen que ser del evento y un contenido que queda vacio al quitarle
+    las etiquetas es un error. La imagen se guarda como URL (la de la subida, R2 o disco publico) y no como ruta relativa: la app la lee
+    igual (V1\AnnouncementResource deja pasar una URL). Decidido por Kamilo: los privados en la lista solo para leer, "Solo generales" por
+    defecto; partida en a (sin push) y b (push con sus logs).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
