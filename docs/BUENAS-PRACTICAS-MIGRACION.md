@@ -401,6 +401,17 @@ de los 330 snapshots y del codigo PHP:
   - 2026-11-01 (M2.4.4c, limpieza del staff; Kamilo): NUEVO en C# (PHP no lo tiene): cada dia se borran las sesiones del staff sin
     uso hace mas de 30 dias (con su token si son del admin nuevo) y los equipos de confianza vencidos hace mas de 30 dias. PHP solo
     borraba las sesiones vencidas de quien volvia a entrar y nunca los equipos. No cambia lo que se ve: PHP ya no las listaba.
+  - 2026-11-01 (M2.4.5a, codigos de acceso; Kamilo): IDENTICO a AccessCodeResource en campos, filtros y en que el registro gasta
+    el uso. C# ARREGLA (admin nuevo): el codigo se guarda normalizado (sin espacios y en mayusculas, `AccessCode::normalizar`; en
+    Filament uno con un espacio adentro nunca servia), un codigo repetido de cualquier evento responde 422 "Ya existe ese codigo"
+    (Filament rompia con el indice unico) y `max_uses` minimo 1.
+  - 2026-11-01 (M2.4.5b y c, Golden Tickets y Premios Ganados; Kamilo): IDENTICO a GoldenTicketResource y RewardService en el
+    premio, el canje, el token HMAC, el codigo de 6 letras y el anuncio privado. Decidido por Kamilo: una sola accion de confirmar
+    reclamo para las dos pantallas (M2.8.5), que guarda quien confirmo tambien en Golden Tickets. C# ARREGLA: no confirma dos veces
+    ni uno vencido (actualizacion condicionada), reenviar o confirmar cuando ya no aplica responde 422 con el motivo, y otorgar
+    valida que la persona sea asistente del evento y no del equipo.
+  - 2026-11-01 (BUG-508, fechas; Kamilo): C# corta las fracciones de segundo al escribir, como Laravel (MySQL las redondeaba y la
+    hora quedaba en el segundo siguiente); las columnas con milesimas (`timestamp(3)`) conservan las suyas.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

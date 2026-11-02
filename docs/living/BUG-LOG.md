@@ -3,7 +3,14 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
-## 2026-11-01 — Encontrados al portar el staff del panel (M2.4.4)
+## 2026-11-01 — Encontrados al portar los premios (M2.4.5)
+
+### BUG-508: Las horas que guarda C# pueden quedar hasta medio segundo en el futuro (MySQL redondea las fracciones) (RESUELTO 2026-11-01 en M2.4.5; solo C#)
+- **Severidad propuesta:** MEDIA donde la hora se compara con `now()` (lo que se publica o se programa); BAJA en el resto
+- **Que pasa:** C# escribe las fechas con fracciones de segundo (`hora.Ahora().UtcDateTime`) y las columnas `timestamp` de MySQL las REDONDEAN, no las cortan: 10:00:00,6 queda 10:00:01. Laravel escribe sin fracciones. Un anuncio privado con `published_at` un segundo en el futuro no sale en `AnnouncementController@index` de PHP (`published_at <= now()`), y la app lo pide justo en ese segundo porque C# avisa por el socket al instante: no lo ve hasta el siguiente refresco.
+- **Verificado:** si, 2026-11-01, en la cruzada de Golden Tickets (`published_at` 17:46:29 con `now()` de PHP en 17:46:28).
+- **Arreglado en:** primero en Premios (M2.4.5b) y despues, por decision de Kamilo, en general: el conversor de fechas de `EventosDb` corta las fracciones al escribir (`ZonaDeLaApp.HaciaLaBase`) a los decimales de la columna; `room_movements.scanned_at` y `device_timestamp` (`timestamp(3)`) conservan las milesimas. Premios ya no corta por su cuenta.
+- **Prueba:** `FechasTest.Hacia_la_base_corta_las_fracciones_sin_redondear`, `FechasTest.Una_hora_con_fracciones_queda_en_su_segundo...` (MySQL) y `GoldenTicketsTest.El_anuncio_privado_se_guarda_sin_fracciones_de_segundo` (reloj fijo en x,9 s). Controles: sin cortar fallan las tres; sin la excepcion de `timestamp(3)` falla la de milesimas.
 
 ### BUG-507: Una sesion del staff con `session_id` ilegible rompe cerrar sesiones en C# (RESUELTO 2026-11-01 en M2.4.4c; solo C#)
 - **Severidad propuesta:** BAJA (hace falta una fila danada o cifrada con una llave que ya no esta; hoy no deberia pasar)

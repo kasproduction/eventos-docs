@@ -10,6 +10,16 @@
 
 ---
 
+## SESION 2026-11-01 (Opus 5.5, 20) — M2.4.5 HECHA EN A, B Y C: CODIGOS DE ACCESO, GOLDEN TICKETS Y PREMIOS GANADOS; BUG-508 RESUELTO
+
+- Al arrancar: la corrida del MSI de M2.4.4c (41353889347) estaba verde.
+- M2.4.5 partida en a, b y c. Decisiones Kamilo: dos pantallas pero una sola accion de confirmar reclamo (mismo servicio, mismos efectos, guarda quien confirmo; regla de M2.8.5); Marcar reclamado en Golden Tickets tambien guarda quien.
+- Hecho: C# `77fd7fe` (`Admin/Personas/CodigosDeAcceso`, `Admin/Gamificacion/Premios`), backend `d8d63d3` (cruzadas `CodigosDeAccesoTest` y `GoldenTicketsTest`), web `a9038e0` (Entrada > Codigos; Gamificacion > Golden Tickets y Premios Ganados).
+- BUG-508 (encontrado en la cruzada): MySQL REDONDEA las fracciones de segundo; el anuncio privado quedaba en el segundo siguiente y la app no lo veia. Kamilo pidio el arreglo general: C# `369d5ee` (el conversor de fechas corta a los decimales de la columna; `timestamp(3)` de room_movements conserva milesimas).
+- Pruebas en local: C# 486, cruzadas 65/65, e2e admin 45/46 (`agenda` tracks: la pagina de crear no termino de compilar en frio en 30 s; ya anotada, sin relacion), vitest 714. 20 controles en rojo. Falta la corrida del MSI de este push.
+- Gotchas: `staff_checkin` no entra al panel (usar moderator en las pruebas); en Pest, Sanctum se queda con el primer usuario entre peticiones (`app('auth')->forgetGuards()`); el registro en las cruzadas necesita `Http::fake` (webhook del CRM); un `ValueConverter` usado en `ConfigureConventions` necesita constructor sin parametros (un parametro opcional no cuenta).
+- **Sigue: proponer M2.4.6** (Soporte). Antes: mirar la corrida del MSI y, si `agenda` tracks vuelve a fallar en frio, subirle el tiempo de espera a esa prueba.
+
 ## SESION 2026-11-01 (Opus 5.5, 19) — M2.4.4c HECHA: LIMPIEZA DIARIA DEL STAFF; BUG-507 RESUELTO; M2.4.4 COMPLETA
 
 - Al arrancar: la corrida del MSI de M2.4.4b (41346929524) estaba verde.
