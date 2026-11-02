@@ -3,6 +3,15 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-02 — Encontrados al darle canales de push a Iris en el seeder de contratos
+
+### BUG-512: Las pruebas de documentos de C# borraban los documentos del seeder de la base compartida, y la e2e de documentos dependia de eso (RESUELTO 2026-11-02; solo pruebas)
+- **Severidad propuesta:** MEDIA (pruebas que dependen del orden: la e2e pasaba en el MSI solo porque antes corrian las pruebas de C# que vaciaban la base)
+- **Que pasa:** el evento 1 de `ContratoSeeder` trae dos documentos ("Programa del evento" y "Diapositivas de la apertura"). `DocumentosTest` y `RegenerarZipDeDocumentosTest` decian "vuelve al mundo del seeder: sin documentos" y al terminar borraban TODOS los documentos del evento 1 de `eventos_contratos_base`. `documentos.spec` (e2e) esperaba la lista vacia.
+- **Visto:** 2026-11-02, al sembrar de nuevo la base local para darle canales a Iris: los documentos volvieron y la e2e fallo.
+- **Arreglado en:** C# `cbdf779` (`DocumentosSembrados`: las dos pruebas apartan los documentos del seeder al empezar y los devuelven con sus ids al terminar) y web `096ed7a` (la e2e empieza con los dos del seeder y los borra desde la fila).
+- **Prueba:** la suite de C# deja los 2 documentos del evento 1 en la base; la e2e completa pasa con la base intacta. Control: sin devolverlos, la base queda sin ellos (detectado).
+
 ## 2026-11-02 — Encontrados al portar Anuncios (M2.5.1)
 
 ### BUG-510: Un anuncio con la audiencia vacia no lo ve nadie en la app, pero el socket se lo reparte a todos (RESUELTO 2026-11-02 en M2.5.1a, admin nuevo; Filament sigue igual hasta apagarse)

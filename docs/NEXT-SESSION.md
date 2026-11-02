@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-11-02 (Opus 5.5, 24) — IRIS CON CANALES DE PUSH EN EL SEEDER DE CONTRATOS; BUG-512 RESUELTO
+
+- Pedido de Kamilo: una persona del seeder con token de Expo falso y navegador suscrito, para que la e2e de push pruebe el caso real (sirve tambien para M2.5.2).
+- Hecho: backend `6fb1935` (`ContratoSeeder::EXPO_IRIS` y `NAVEGADOR_IRIS` para Iris; el contrato `POST admin/events/{id}/notifications/send` pasa de `sent_count` 0 a 1, snapshot regenerado solo ese), web `096ed7a` (`anuncios.spec` con la casilla "Enviar push a 1 persona", el mensaje que llega al Expo de mentira con su `log_id` y Enviar push otra vez; `mensajesAExpo` en `apoyo.ts`).
+- BUG-512 (salio al resembrar la base): las pruebas de documentos de C# borraban los dos documentos del seeder de la base compartida y la e2e de documentos dependia de eso. C# `cbdf779` (`DocumentosSembrados` los aparta y los devuelve) y la e2e los borra desde la fila.
+- Pruebas en local (bases resembradas): PHP 1263, contratos PHP 302 (MySQL y orden inverso), C# 512, cruzadas 73/73, contratos contra C# 12/12, e2e admin 50/50. Sin llaves VAPID en contratos, el navegador de Iris queda `failed` ("sin llaves") sin salir a la red.
+- Gotcha: en local hay que volver a sembrar `eventos_contratos_base` y `eventos_contratos_pruebas` cuando cambia el seeder (el tinker de `verificar.sh`); el MSI lo hace solo en cada corrida.
+- **Sigue: proponer M2.5.2** (notificaciones programadas). Antes: mirar las corridas del MSI de M2.5.1b y de este push.
+
 ## SESION 2026-11-02 (Opus 5.5, 23) — M2.5.1b HECHA: EL PUSH DE ANUNCIOS CON SUS LOGS; BUG-511 RESUELTO; M2.5.1 COMPLETA
 
 - Al arrancar: la corrida del MSI de M2.5.1a (41520189560) seguia en curso; esta sesion no la reviso (mirarla junto con la de este push).
