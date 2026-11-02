@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-11-02 (Opus 5.5, 21) — M2.4.6 HECHA: SOPORTE EN EL ADMIN NUEVO; BUG-509 RESUELTO; 2.4 PERSONAS COMPLETA
+
+- Al arrancar: la corrida del MSI de M2.4.5 (41368518691) estaba verde, incluida `agenda` tracks (no hizo falta subirle el tiempo).
+- Decisiones Kamilo: el contador de abiertas del menu sale de la MISMA consulta que la lista (no un conteo aparte) y se ve en todas las paginas; Soporte entra con `view-content` o `manage-content` (BUG-509). Regla nueva: con suites en verde, controles hechos y sin decision suya pendiente, commit y /guardar sin preguntar.
+- Hecho: C# `480f7f9` (`Admin/EnVivo/Soporte`), backend `980df3f` (cruzada `SoporteTest`), web `0be92c5` (`/soporte`, contador rojo en el menu: `Marco` recibe `contadores`).
+- Pruebas en local: C# 493, cruzadas 68/68, e2e admin 48/48, vitest 715. 5 controles en rojo. Corrida del MSI de este push: 41508220289.
+- Gotchas: `EntradaDeLaPeticion.Booleano` solo lee el cuerpo (un `?count_only=1` daba null: leer con `Texto`); el staff del seeder es `event_admin` (sin `view-content`); `Assert.Equal` de tuplas con listas compara por referencia.
+- **Sigue: proponer M2.5.1** (Anuncios con targeting y "lleva a"). Antes: mirar la corrida del MSI 41508220289.
+
 ## SESION 2026-11-01 (Opus 5.5, 20) — M2.4.5 HECHA EN A, B Y C: CODIGOS DE ACCESO, GOLDEN TICKETS Y PREMIOS GANADOS; BUG-508 RESUELTO
 
 - Al arrancar: la corrida del MSI de M2.4.4c (41353889347) estaba verde.

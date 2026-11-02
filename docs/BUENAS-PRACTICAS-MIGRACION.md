@@ -412,6 +412,12 @@ de los 330 snapshots y del codigo PHP:
     valida que la persona sea asistente del evento y no del equipo.
   - 2026-11-01 (BUG-508, fechas; Kamilo): C# corta las fracciones de segundo al escribir, como Laravel (MySQL las redondeaba y la
     hora quedaba en el segundo siguiente); las columnas con milesimas (`timestamp(3)`) conservan las suyas.
+  - 2026-11-02 (M2.4.6, Soporte; Kamilo): IDENTICO a SupportRequestResource y EditSupportRequest en estados, textos del push y del
+    anuncio privado, `action_url` y lo que lee la app en `/support/mine`. C# ARREGLA (admin nuevo): ver la solicitud no la marca
+    leida (BUG-383: la pantalla manda `POST /read`), responder es una sola vez (422 la segunda; un doble clic no manda dos push ni
+    dos anuncios) y pide texto (Filament guardaba vacio sin decir nada), y Soporte entra con `view-content` o `manage-content`
+    (BUG-509: org_admin y event_admin no lo veian). Decidido por Kamilo: el contador de abiertas del menu sale de la misma consulta
+    que la lista (`open_count`, `count_only=1`).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

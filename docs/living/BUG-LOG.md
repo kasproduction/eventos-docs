@@ -3,6 +3,15 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-02 — Encontrados al portar Soporte (M2.4.6)
+
+### BUG-509: Quienes operan el evento no ven Soporte (RESUELTO 2026-11-02 en M2.4.6, admin nuevo; Filament sigue igual hasta apagarse)
+- **Severidad propuesta:** ALTA (las preguntas de los asistentes no las ve quien opera el evento)
+- **Que pasa:** `SupportRequestResource` pide `view-content`, y en `RoleSeeder` ese permiso lo tienen moderator, attendee y speaker, no `org_admin` ni `event_admin`. En Filament solo el moderador y el super_admin ven Soporte.
+- **Verificado:** si, 2026-11-02: la e2e del admin nuevo entra como `event_admin` (staff del seeder) y Soporte daba 404.
+- **Arreglado en:** admin nuevo, por decision de Kamilo: Soporte entra con `view-content` o `manage-content` (C# `ConAlgunPermiso`, menu y paginas de la web). Anexo B.
+- **Prueba:** `SoporteTest.La_lista_filtra...` (event_admin y org_admin listan; organizer 403) y vitest del menu. Control: con solo `view-content` falla.
+
 ## 2026-11-01 — Encontrados al portar los premios (M2.4.5)
 
 ### BUG-508: Las horas que guarda C# pueden quedar hasta medio segundo en el futuro (MySQL redondea las fracciones) (RESUELTO 2026-11-01 en M2.4.5; solo C#)
@@ -982,6 +991,7 @@
 - **Archivos:** `ListEventSurveys.php:32-53`, `EditSupportRequest.php:33-40`
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
+- **2026-11-02 (M2.4.6): la mitad de Soporte no se repite en el admin nuevo:** el GET de la solicitud no cambia nada; la pantalla manda `POST /read` al mostrarla (`SoporteTest.Ver_no_cambia_nada...`, con control). Falta la mitad de encuestas (M2.6.1).
 ### BUG-382: Activar o cerrar encuestas desde el admin no avisa por socket (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** La API emite `poll:new` y `poll:closed`; Filament no: los asistentes no ven la encuesta hasta refrescar.

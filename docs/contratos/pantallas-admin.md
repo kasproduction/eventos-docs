@@ -66,7 +66,7 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | WebhookEndpointResource, WebhookApiKeyResource, WebhookLogResource | Sistema / Webhooks | H1 | 2.4.3 (endpoints 2.4.3a, llaves 2.4.3b e historial 2.4.3c: hechos) | Los secretos no se muestran (BUG-385); el del endpoint se copia sin mostrarse |
 | GoldenTicketResource, RewardResource, PrizeRedemptions | Experiencia / Gamificacion | H1 | 2.4.5 | Marcar como reclamado con `RewardService::confirm` (BUG-377) |
 | AccessCodeResource | Personas / Entrada | H1 | 2.4.5 | |
-| SupportRequestResource | En vivo | H1 | 2.4.6 | Abrir una solicitud no la marca como leida (BUG-383) |
+| SupportRequestResource | En vivo | H1 | 2.4.6 (hecha 2026-11-02) | Abrir una solicitud no la marca como leida (BUG-383); entra con view-content o manage-content (BUG-509); contador de abiertas en el menu |
 | AnnouncementResource | Comunicacion / Anuncios | H1 | 2.5.1 | La push de un anuncio privado no sale a todos (BUG-372) |
 | ScheduledNotificationResource | Comunicacion / Anuncios | H1 | 2.5.2 | Un solo publico para la push (BUG-375) |
 | EmailTemplateResource, OrganizationEmailSettingsResource | Comunicacion / Emails | H1 si cabe | 2.5.3 | D.3: "si caben" |
