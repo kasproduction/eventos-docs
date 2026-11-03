@@ -28,11 +28,11 @@
 
 ## 2026-11-03 — Encontrados al portar los Ajustes de Gamificacion (M2.6.3a)
 
-### BUG-513: Filament no guarda la asistencia a sesiones de Gamificacion (RESUELTO 2026-11-03 en M2.6.3a, admin nuevo; Filament sigue igual hasta apagarse)
+### BUG-513: Filament no guarda la asistencia a sesiones de Gamificacion (RESUELTO POR REEMPLAZO 2026-11-03: el admin nuevo la guarda desde M2.6.3a; PHP no se arregla, la pantalla de Filament se oculta o queda de solo lectura en M2.7.1)
 - **Severidad propuesta:** ALTA (el organizador cambia los puntos por asistir o el criterio del certificado, Filament dice guardado y no cambia nada)
 - **Que pasa:** la seccion "Asistencia a sesiones" de `GamificationSettingsResource` edita `attendance_min_minutes`, `attendance_points`, `attendance_bonus_full`, `certificate_min_sessions` y `certificate_min_duration_pct`, pero ninguna esta en `$fillable` de `Event`: `update()` las descarta sin avisar. `AwardSessionAttendancePointsJob` y `RecapService` siguen leyendo los valores por defecto de la migracion.
 - **Visto:** 2026-11-03, en la cruzada `tests/Cruzadas/GamificacionTest`: el gemelo guardado por Filament quedo con 10, 25, 50, 1 y 60.
-- **Arreglado en:** admin nuevo (C#): `PUT /events/{e}/gamification` las guarda con los topes de Filament. PHP congelado: el `$fillable` no se toca.
+- **Arreglado en:** admin nuevo (C#): `PUT /events/{e}/gamification` las guarda con los topes de Filament. **Decidido por Kamilo (2026-11-03): no se arregla en PHP** (el `$fillable` no se toca); `GamificationSettingsResource` se oculta del panel o queda de solo lectura en M2.7.1, para que nadie guarde ahi creyendo que cambio la asistencia.
 - **Prueba:** `GamificacionTest` (C#) y la cruzada (C# las guarda y PHP las lee; Filament no, queda escrito en la prueba).
 
 ### BUG-514: Apagar "Tiene premio al completar" del pasaporte no borra el premio (RESUELTO 2026-11-03 en M2.6.3a, admin nuevo; Filament sigue igual hasta apagarse)
