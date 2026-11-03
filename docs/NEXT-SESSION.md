@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-11-03 (Opus 5.5, 28) — M2.6.3b HECHA: CHAT, RECORDATORIOS Y LIMITES DE USO EN EL ADMIN NUEVO; M2.6.3 COMPLETA; BUG-515 A 517
+
+- MSI de M2.6.3a (41677767415) en verde.
+- Una sonda de Livewire contra Filament real (borrada al terminar) encontro tres fallos; Kamilo aprobo arreglarlos en el admin nuevo: BUG-515 (ALTA: guardar Limites de uso apagaba los 7 frenos de un evento que nunca los guardo), BUG-516 (Recordatorios borraba en silencio los minutos que no valen, aceptaba repetidos y los quitaba al apagar), BUG-517 (modo lento vacio = 500).
+- Hecho: C# `e89f7af` (`Admin/Eventos/AjustesDelEvento`, `AvisosDeCambios.RecargarElChatAsync`, `EntradaDeLaPeticion.Valores`), backend `f650b1f` (cruzada `AjustesDelEventoTest.php`), web `dcc260e` (paginas `chat`, `limites` y `anuncios/recordatorios`, `AjustesDelEvento.tsx`, `ajustes-del-evento.spec`).
+- Pruebas en local: C# 530 (+1 saltada), cruzadas 83/83, e2e admin 55/55, vitest 716; 6 controles en rojo.
+- Gotchas: los heredocs de bash con comillas simples dentro se rompen en esta terminal (usar el editor para archivos largos); `messages/es.json` tiene finales de linea de Windows (buscar lineas con `trim()`).
+- **Sigue: proponer M2.6.1 Encuestas** (CRUD con preguntas y opciones, importar plantilla, moderacion de votos; lanzar y cerrar siguen en PHP). Antes: mirar la corrida del MSI de estos push. Pendiente de Kamilo: arreglar BUG-513 tambien en Filament (una linea en `$fillable`).
+
 ## SESION 2026-11-03 (Opus 5.5, 27) — M2.6.3a HECHA: AJUSTES DE GAMIFICACION EN EL ADMIN NUEVO; BUG-513 Y BUG-514 RESUELTOS
 
 - Decisiones Kamilo: M2.6.3 partida en a (Gamificacion) y b (Chat, Recordatorios, Limites de uso); el resumen dice que los cambios de puntos aplican desde ahora y no recalculan lo otorgado; cada accion se edita en una ventana encima como en Filament (no dentro de la lista: se volvia un scroll infinito).

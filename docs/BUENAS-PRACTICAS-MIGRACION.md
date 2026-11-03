@@ -452,6 +452,12 @@ de los 330 snapshots y del codigo PHP:
     los numeros vacios dan 422 (Filament mandaba null a columnas que no lo aceptan). Decidido por Kamilo: el resumen dice que los cambios de puntos
     aplican desde ahora y no recalculan lo otorgado, y cada accion se edita en una ventana encima como en Filament (`Ventana`, la primera del
     admin nuevo; las confirmaciones de otras pantallas siguen siendo una caja en la pagina).
+  - 2026-11-03 (M2.6.3b, Chat, Recordatorios y Limites de uso; Kamilo): IDENTICO a ChatSettingsResource (columnas, modo lento de 0 a 300, el
+    POST a Node `/internal/chat/invalidate-config` con `eventId` al guardar), ReminderSettingsResource (`reminder_config` con enabled, windows
+    y notify_on_change, que lee SendAgendaRemindersJob::resolveConfig) y RateLimitSettingsResource (`rate_limits` por limite con enabled y limit,
+    los topes del formulario, ChecksRateLimit para leer); cada guardado corre EventObserver::saved. C# ARREGLA (decidido por Kamilo): los
+    limites abren con lo que de verdad aplica y guardar no apaga los que estaban por defecto (BUG-515); un minuto fuera de 1 a 60 da 422, sin
+    repetidos, al menos uno si estan activos y apagarlos conserva los minutos (BUG-516); el modo lento vacio da 422 (BUG-517, Filament 500).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

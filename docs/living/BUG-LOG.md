@@ -3,6 +3,29 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-03 — Encontrados al portar Chat, Recordatorios y Limites de uso (M2.6.3b)
+
+### BUG-515: Guardar "Limites de uso" en Filament apaga los 7 frenos anti-abuso de un evento que nunca los guardo (RESUELTO 2026-11-03 en M2.6.3b, admin nuevo; Filament sigue igual hasta apagarse)
+- **Severidad propuesta:** ALTA (posts, comentarios, preguntas, fotos, momentos, soporte y leads quedan sin limite sin que nadie lo decida)
+- **Que pasa:** sin `rate_limits` guardado, ChecksRateLimit aplica sus valores por defecto (todos encendidos: 10, 30, 10, 20, 10, 5 y 200 por dia), pero el formulario abre con los 7 interruptores apagados (el `default()` de Filament solo sirve al crear). Al cambiar cualquier cosa y guardar, se guardan los 7 como `enabled: false`.
+- **Visto:** 2026-11-03, con una sonda de Livewire sobre EditRateLimitSettings y en la cruzada `tests/Cruzadas/AjustesDelEventoTest` (con 5 solicitudes de hoy, el freno de soporte deja de frenar en el evento guardado por Filament).
+- **Arreglado en:** admin nuevo (C#): la lectura es la efectiva de ChecksRateLimit y cada limite que viene se guarda completo; apagar uno conserva su tope.
+- **Prueba:** `AjustesDelEventoTest` (C#), la cruzada (ChecksRateLimit frena en C# y no en Filament, queda escrito) y la e2e `ajustes-del-evento.spec`.
+
+### BUG-516: Recordatorios de Filament borra en silencio los minutos que no valen, acepta repetidos y quita los minutos al apagarlos (RESUELTO 2026-11-03 en M2.6.3b, admin nuevo; Filament sigue igual hasta apagarse)
+- **Severidad propuesta:** MEDIA (el organizador escribe 90 y el recordatorio desaparece sin aviso; activados sin minutos no sale ninguno)
+- **Que pasa:** `mutateFormDataBeforeSave` filtra lo que no esta entre 1 y 60 sin avisar, no quita repetidos (15, 5, 5) y deja guardar activados con la lista vacia. Al apagarlos el campo se esconde y `windows` desaparece del JSON: al volver a prenderlos salen 15 y 5.
+- **Visto:** 2026-11-03, con la sonda y en la cruzada.
+- **Arreglado en:** admin nuevo: 422 con el minuto que no vale, sin repetidos, al menos uno si estan activos, y apagarlos conserva los minutos.
+- **Prueba:** `AjustesDelEventoTest` (C#), la cruzada (SendAgendaRemindersJob::resolveConfig igual; el 90 de Filament queda escrito) y la e2e.
+
+### BUG-517: El modo lento del chat vacio tumba Filament con un 500 (RESUELTO 2026-11-03 en M2.6.3b, admin nuevo; Filament sigue igual hasta apagarse)
+- **Severidad propuesta:** BAJA (error de servidor en vez de un aviso en el campo)
+- **Que pasa:** `chat_slow_mode_seconds` no es obligatorio en el formulario; vacio manda null a una columna NOT NULL y MySQL responde con error.
+- **Visto:** 2026-11-03, con la sonda.
+- **Arreglado en:** admin nuevo: 422 en el campo ("El modo lento: escribe un número.").
+- **Prueba:** `AjustesDelEventoTest` (C#) y la e2e. Control: aceptar vacio como 0 hace fallar la prueba de C#.
+
 ## 2026-11-03 — Encontrados al portar los Ajustes de Gamificacion (M2.6.3a)
 
 ### BUG-513: Filament no guarda la asistencia a sesiones de Gamificacion (RESUELTO 2026-11-03 en M2.6.3a, admin nuevo; Filament sigue igual hasta apagarse)

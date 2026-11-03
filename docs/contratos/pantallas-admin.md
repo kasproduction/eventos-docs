@@ -74,9 +74,9 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | EventSurveyResource | En vivo | M2b | 2.6.1 | |
 | LiveGameResults | En vivo | M2b | 2.6.2 | |
 | GamificationSettingsResource | Experiencia / Gamificacion | M2b | 2.6.3a (hecha 2026-11-03) | La asistencia a sesiones se guarda (BUG-513); apagar el premio del pasaporte lo borra (BUG-514); cada accion se edita en una ventana encima, como Filament |
-| ReminderSettingsResource | Comunicacion / Anuncios | M2b | 2.6.3 | |
-| ChatSettingsResource | En vivo | M2b | 2.6.3 | |
-| RateLimitSettingsResource | Sistema | M2b | 2.6.3 | |
+| ReminderSettingsResource | Comunicacion / Anuncios | M2b | 2.6.3b (hecha 2026-11-03) | Un minuto que no vale da error, sin repetidos, apagar conserva los minutos (BUG-516) |
+| ChatSettingsResource | En vivo | M2b | 2.6.3b (hecha 2026-11-03) | Modo lento vacio da error (BUG-517); al guardar, Node recarga la configuracion del chat |
+| RateLimitSettingsResource | Sistema | M2b | 2.6.3b (hecha 2026-11-03) | Abre con los limites que de verdad aplican; guardar no los apaga (BUG-515) |
 | RegistrationSettingsResource | Personas / Entrada | H1 | 2.3.1 | Subida desde M2b (Kamilo, 2026-10-25): sin ella no se monta un evento nuevo |
 | EventRecapResource | Experiencia / Identidad | M2b | 2.6.4 | |
 | WallPostResource, WallSettingsResource | Experiencia / Social | M2b | 2.6.5 | Bloque nuevo (Kamilo, 2026-10-25). Un solo camino para publicar y ocultar (BUG-379) |
