@@ -10,6 +10,16 @@
 
 ---
 
+## SESION 2026-11-02 (Opus 5.5, 25) — M2.5.2 HECHA: LAS PUSH PROGRAMADAS EN C# Y EL DESPACHO DE CADA MINUTO; BUG-375 RESUELTO EN EL ADMIN NUEVO
+
+- Al arrancar: MSI en verde para M2.4.6, M2.5.1a, M2.5.1b y el seeder de Iris (41532144296).
+- Decisiones Kamilo: una sola tarea; (a) la audiencia de los anuncios en los tres caminos; (b) la carta en los tres; el job de PHP sale de `routes/console.php` en el mismo despliegue.
+- Hecho: C# `d996d28` (`EnvioDeProgramadas`, `DespacharPushProgramadas` cada minuto, `AudienciaDelPush`, `/events/{e}/scheduled-notifications`; `AvisosDeCambios` y `EtiquetasDePhp` a `Trabajos/Comun`, `EfectosDeLosAnuncios` en `Trabajos/Comunicacion`), backend `e50170b` (job borrado, cruzada `PushProgramadasTest.php`), web `41a55a9` (lista y Nueva push).
+- Pruebas en local: PHP 1261 (las dos del job salieron), contratos PHP 302 (MySQL y orden inverso), C# 514, cruzadas 75/75, contratos contra C# 12/12, e2e admin 51/51, vitest 715. 13 controles en rojo.
+- Despliegue: el Worker ahora avisa a la webapp y al socket (`Servicios__Socket__Url` y `__SecretoInterno`, `Servicios__Webapp__UrlsInternas` y `__SecretoInterno`, `App__Url`); el C# nuevo y el PHP sin el job van juntos (si no, nadie despacha o despachan los dos; la toma condicionada evita el doble envio pero no la doble carta del PHP viejo).
+- Gotchas: el C# de las cruzadas y el de la e2e corren con el reloj real (`Contratos:RelojReal`, por el TOTP): las horas de una cruzada salen de `now()`, no de `ContratoSeeder::ahora()`; `send_at` es TIMESTAMP (hasta 2038): una fecha "muy lejana" en pruebas es 2037.
+- **Sigue: proponer M2.5.3** (plantillas de correo por evento y SMTP por organizacion). Antes: mirar la corrida del MSI de este push.
+
 ## SESION 2026-11-02 (Opus 5.5, 24) — IRIS CON CANALES DE PUSH EN EL SEEDER DE CONTRATOS; BUG-512 RESUELTO
 
 - Pedido de Kamilo: una persona del seeder con token de Expo falso y navegador suscrito, para que la e2e de push pruebe el caso real (sirve tambien para M2.5.2).

@@ -1076,7 +1076,9 @@
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #31 (`eventos-backend:admin-api:update-role-sub-admin-self-escalation`); prioridad sugerida A. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/StaffYAdminApiTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
 
 - **Resuelto 2026-10-23 (M0.8.4):** solo el admin completo cambia roles por la API y nadie el suyo. Prueba `tests/Feature/Security/PanelAdminSeguridadTest.php`. Backend `8b99911`.
-### BUG-375: Cuatro formas de mandar push "ya", cada una con otro publico (ABIERTO 2026-10-22)
+### BUG-375: Cuatro formas de mandar push "ya", cada una con otro publico (RESUELTO 2026-11-02 en el admin nuevo: M2.5.1b y M2.5.2; Filament y /api/v1/admin/.../notifications/send siguen igual hasta apagarse)
+- **Arreglo (admin nuevo, decision de Kamilo 2026-11-02):** una sola audiencia para todo push de C# (`Trabajos/Push/AudienciaDelPush`: app o navegador, sus roles, sin baneados) y el anuncio carta en los tres caminos de las programadas (`EnvioDeProgramadas`). El despacho de cada minuto ya es de C# (`DespacharPushProgramadas`).
+- **Prueba:** `PushProgramadasTest.cs` y la cruzada `PushProgramadasTest.php` (Enviar ahora sin la persona baneada, la carta en los tres). Controles: sin filtro de baneos, solo Expo y sin carta fallan.
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Filament (`sendPush`, `send_now`, `resend`) solo usa Expo (deja fuera a quien solo tiene web push) y no excluye baneados. La API excluye baneados pero tambien solo usa Expo. El job programado si incluye web push y ademas crea un anuncio; `send_now` no.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.

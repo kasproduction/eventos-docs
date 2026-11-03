@@ -99,11 +99,11 @@
 | `CLOUDFLARE_R2_ENDPOINT` | filesystems | **si** | |
 | `CLOUDFLARE_R2_PUBLIC_URL` | filesystems | **si** | URLs publicas en las respuestas |
 | `VITE_APP_NAME` | - | no | Sin uso |
-| `SOCKET_SERVER_URL` | services | **si** hasta la fase 3 | Despues el hub es parte de C# |
-| `SOCKET_INTERNAL_SECRET` | services | **si** hasta la fase 3 | Ver punto 3 |
+| `SOCKET_SERVER_URL` | services | **si** hasta la fase 3 | Despues el hub es parte de C#. En C#: `Servicios:Socket:Url`, en la Api y desde M2.5.2 tambien en el Worker (el despacho de las push programadas publica la carta) |
+| `SOCKET_INTERNAL_SECRET` | services | **si** hasta la fase 3 | Ver punto 3. En C#: `Servicios:Socket:SecretoInterno`, en la Api y el Worker (M2.5.2) |
 | `VAPID_PUBLIC_KEY` | services | **si** | Web push: las suscripciones ya guardadas dependen de esta llave. En el Worker de C#: `Servicios:WebPush:LlavePublica`, mismo valor (M2.3.2c2) |
 | `VAPID_PRIVATE_KEY` | services | **si** | En el Worker de C#: `Servicios:WebPush:LlavePrivada`, mismo valor. Sin las dos llaves el Worker no manda al navegador (queda en el log) |
 | `VAPID_SUBJECT` | services | **si** | En el Worker de C#: `Servicios:WebPush:Asunto` (el `mailto:` de PHP) |
-| `WEBAPP_INTERNAL_URLS` | services | **si** | Soltar el marco de la webapp (`InvalidationService`) |
-| `WEBAPP_INTERNAL_SECRET` | services | **si** | Ver punto 3 |
+| `WEBAPP_INTERNAL_URLS` | services | **si** | Soltar el marco de la webapp (`InvalidationService`). En C#: `Servicios:Webapp:UrlsInternas`, en la Api y el Worker (M2.5.2) |
+| `WEBAPP_INTERNAL_SECRET` | services | **si** | Ver punto 3. En C#: `Servicios:Webapp:SecretoInterno`, en la Api y el Worker (M2.5.2) |
 | `TURNSTILE_SECRET_KEY` | services | **si** | Registro publico (hoy llaves de prueba, PENDIENTES §3) |

@@ -431,6 +431,13 @@ de los 330 snapshots y del codigo PHP:
     "Enviar push" solo con el anuncio publicado (Filament lo mandaba de un programado). Decidido por Kamilo: un solo "Publicar ahora" con la
     casilla "Enviar push a N personas" marcada por defecto (Filament publicaba siempre con push) y "Enviar push" aparte. `CheckExpoReceiptsJob`
     sigue en PHP y procesa tambien los tickets de C# hasta M4c.6.
+  - 2026-11-02 (M2.5.2, las push programadas; Kamilo): IDENTICO a DispatchScheduledNotificationsJob en los logs (`scheduled`, con el `log_id`),
+    los datos (`event_id`, `type` scheduled, `notification_id`), la carta (anuncio publicado, texto sin etiquetas, sus roles, push_sent) y el
+    aviso de los anuncios programados que llegaron (BUG-423); Reenviar es una copia nueva como en Filament. C# ARREGLA (decision de Kamilo):
+    Enviar ahora y Reenviar llegan tambien a quien solo tiene navegador, saltan a los baneados y dejan la carta (BUG-375: en Filament solo Expo,
+    con baneados y sin carta); crear con la hora ya llegada la manda en el mismo paso (Filament esperaba al minuto siguiente aunque decia
+    "deja la hora actual para enviar inmediatamente"); la toma condicionada evita mandarla dos veces (PHP: withoutOverlapping, que no frena el
+    boton); los roles son Asistente y Vendedor, los de los anuncios (Filament ofrecia tambien "Admin", un rol viejo que ninguna pantalla asigna).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
