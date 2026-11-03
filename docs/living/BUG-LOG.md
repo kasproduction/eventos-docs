@@ -1123,7 +1123,7 @@
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 - **RESUELTO 2026-11-03 (M2.6.5a, decidido por Kamilo):** en C# la fila, el detalle y el masivo llaman la misma funcion (`Muro.CambiarAsync`): publicar da los puntos de `wall_post` una sola vez (aunque lleguen diez a la vez), avisa `wall:post` con la forma de la API y suelta el muro de la webapp; ocultar suelta el muro de la webapp y no avisa al socket (como PHP; `wall:hidden` anotado en M3.4.1). Pruebas: `MuroTest` (C#) y la cruzada `tests/Cruzadas/MuroTest` (el detalle de Filament sin puntos queda escrito).
-### BUG-378: Fotos: aprobar da resultados distintos y "aprobar seleccionadas" puede romper (ABIERTO 2026-10-22)
+### BUG-378: Fotos: aprobar da resultados distintos y "aprobar seleccionadas" puede romper (RESUELTO 2026-11-03 en M2.6.5b, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Aprobar en la fila da puntos; en el detalle no. `bulk_approve` no filtra por estado y vuelve a aprobar rechazadas. Si la seleccion incluye una foto oficial (`attendee_id` nulo) llama `tryAward` con null en un `int`: TypeError.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
@@ -1131,6 +1131,7 @@
 - **Archivos:** `EventPhotoResource.php:176-179, 255-260`, `ViewEventPhoto.php:24`, `PointsService.php:120-122`
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
+- **RESUELTO 2026-11-03 (M2.6.5b, decidido por Kamilo):** en C# la fila, el detalle y el masivo llaman la misma funcion (`Fotos.CambiarAsync`): aprobar solo cambia una pendiente y da los puntos de `upload_photo` una vez y solo si la foto tiene autor (la oficial no rompe ni da puntos); rechazar baja una pendiente o una aprobada (antes solo el masivo bajaba una aprobada) y los puntos ya dados se quedan. Sonda 2026-11-03: `tests/Auditoria/InventarioAdminTest` sigue en rojo en Filament. Pruebas: `FotosTest` (C#) y la cruzada `tests/Cruzadas/FotosTest` (el detalle de Filament sin puntos queda escrito).
 ### BUG-377: "Marcar reclamado" del Golden Ticket no registra quien, no bloquea y no mira vencimiento (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA (premios)
 - **Que pasa:** GoldenTicket actualiza directo; PrizeRedemptions usa `RewardService::confirm`, que guarda `confirmed_by`, bloquea la fila y revisa el vencimiento. Dos clics a la vez o un premio vencido pasan igual.

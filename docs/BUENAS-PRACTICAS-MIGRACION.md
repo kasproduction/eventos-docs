@@ -483,6 +483,12 @@ de los 330 snapshots y del codigo PHP:
     indice unico points_log_unique_award frena el doble, asi dos aprobaciones a la vez dan los puntos una vez; el cambio de estado es un UPDATE
     condicionado, asi `wall:post` sale una vez; el maximo vacio es 422 (Filament daba 500); la webapp suelta `sponsors` y `wall` (BUG-521).
     Ocultar sigue sin aviso al socket, como PHP (`wall:hidden` en M3.4.1).
+  - 2026-11-03 (M2.6.5b, Social, Fotos; Kamilo): IDENTICO a EventPhotoResource en columnas, filtros (estado, tipo, concurso), busqueda por
+    asistente, detalle y "Subir foto oficial" (aprobada, oficial, sin asistente, en events/{evento}/photos como StorageService); manage-content.
+    Ninguna accion avisa a nadie, como PHP (la galeria se lee de la base). C# ARREGLA (decidido por Kamilo): un solo camino para aprobar y
+    rechazar desde la fila, el detalle y el masivo (BUG-378): aprobar solo una pendiente y con puntos solo si tiene autor; rechazar tambien una
+    aprobada, con confirmacion, y los puntos se quedan (quitarlos va despues de la fase 5). Las fotos de la galeria pesan hasta 10 MB, como el
+    FileUpload de Filament; el resto de imagenes sigue en 5. Una foto por pedido. El contador de pendientes vuelve al menu (count_only=1).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
