@@ -475,6 +475,14 @@ de los 330 snapshots y del codigo PHP:
     aplica y guarda la configuracion entera, asi guardar no apaga el recap ni sus bloques (BUG-520); Insider menor que Activo; vaciar un texto
     vuelve al de fabrica. La imagen sube por `POST /uploads` con destino event-recap (sin SVG, como el resto). Generar y regenerar quedan en
     PHP hasta M4e.5 (huecos aceptados en decisiones.md).
+  - 2026-11-03 (M2.6.5a, Social, el Muro y los puntos; Kamilo): IDENTICO a WallPostResource y WallSettingsResource en columnas, filtro de
+    estado, busqueda por autor, campos y "El social hoy" (sin el punto medio); manage-content. Los puntos en C# (`Puntos.IntentarAsync`, M4b.3
+    adelantado) con las reglas de PointsService::tryAward: puntos por accion y rol, tope diario en el dia de Bogota, sin repetir por referencia,
+    fila en points_log y avisos `gamification` a la persona y `leaderboard` al evento; cruzada contra PHP. C# ARREGLA (decidido por Kamilo):
+    un solo camino para publicar y ocultar desde la fila, el detalle y el masivo (BUG-379); la persona queda bloqueada en una transaccion y el
+    indice unico points_log_unique_award frena el doble, asi dos aprobaciones a la vez dan los puntos una vez; el cambio de estado es un UPDATE
+    condicionado, asi `wall:post` sale una vez; el maximo vacio es 422 (Filament daba 500); la webapp suelta `sponsors` y `wall` (BUG-521).
+    Ocultar sigue sin aviso al socket, como PHP (`wall:hidden` en M3.4.1).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

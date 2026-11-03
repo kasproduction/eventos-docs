@@ -3,6 +3,15 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-03 — Encontrados al portar el Muro (M2.6.5a)
+
+### BUG-521: El C# no le pedia a la webapp soltar su copia de sponsors ni del muro (RESUELTO 2026-11-03 en M2.6.5a)
+- **Severidad propuesta:** MEDIA (la webapp mostraba sponsors viejos hasta que vencia su copia)
+- **Que pasa:** la lista de entidades que C# manda a `/api/internal/invalidate` de la webapp (`AvisosDeCambios.EntidadesDelMarco`) no tenia `sponsors` ni `wall`, que si estan en `ENTIDADES_MARCO_WEBAPP` de PHP. Cambiar sponsors desde el admin nuevo no refrescaba el directorio de la webapp.
+- **Visto:** 2026-11-03, al portar el muro, comparando la lista de C# con la de PHP.
+- **Arreglado en:** C# agrega `sponsors` y `wall`; una prueba compara la lista de C# con la de PHP (`AvisosDeCambiosTest`) para que no se vuelvan a separar.
+- **Prueba:** `AvisosDeCambiosTest` (C#) y la cruzada `tests/Cruzadas/MuroTest` (reordenar sponsors desde C# pide soltar `sponsors`), con su control (sin `sponsors` las dos fallan).
+
 ## 2026-11-03 — Encontrados al portar la configuracion del Recap (M2.6.4a)
 
 ### BUG-520: Guardar el Recap en Filament de un evento sin configuracion apaga el recap y todos sus bloques (RESUELTO 2026-11-03 en M2.6.4a, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
@@ -1105,7 +1114,7 @@
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 - **En C#:** asignar o quitar speakers (`PUT /sessions/{id}/speakers`) borra la agenda y la lista de speakers de la cache, manda la sesion con sus speakers (`session.updated`) y avisa `speakers` (M2.3.2c1, `SesionesTest` y la cruzada). Cerrado en M2.3.2c3: Filament ya no edita sesiones ni asigna speakers; la prueba de `tests/Auditoria` pasa.
 
-### BUG-379: Muro: seis caminos para publicar u ocultar, cada uno con efectos distintos (ABIERTO 2026-10-22)
+### BUG-379: Muro: seis caminos para publicar u ocultar, cada uno con efectos distintos (RESUELTO 2026-11-03 en M2.6.5a, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Fila: puntos y socket, sin webapp. Masivo: puntos, sin socket ni webapp. Detalle: solo webapp. Ocultar (fila o masivo) no avisa a nadie. `WallPost` no tiene observer propio.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
@@ -1113,6 +1122,7 @@
 - **Archivos:** `WallPostResource.php:136-163, 174-175, 184-195, 222-224`, `ViewWallPost.php:23-38`
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
+- **RESUELTO 2026-11-03 (M2.6.5a, decidido por Kamilo):** en C# la fila, el detalle y el masivo llaman la misma funcion (`Muro.CambiarAsync`): publicar da los puntos de `wall_post` una sola vez (aunque lleguen diez a la vez), avisa `wall:post` con la forma de la API y suelta el muro de la webapp; ocultar suelta el muro de la webapp y no avisa al socket (como PHP; `wall:hidden` anotado en M3.4.1). Pruebas: `MuroTest` (C#) y la cruzada `tests/Cruzadas/MuroTest` (el detalle de Filament sin puntos queda escrito).
 ### BUG-378: Fotos: aprobar da resultados distintos y "aprobar seleccionadas" puede romper (ABIERTO 2026-10-22)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Aprobar en la fila da puntos; en el detalle no. `bulk_approve` no filtra por estado y vuelve a aprobar rechazadas. Si la seleccion incluye una foto oficial (`attendee_id` nulo) llama `tryAward` con null en un `int`: TypeError.
