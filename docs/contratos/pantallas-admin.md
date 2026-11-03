@@ -78,7 +78,7 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | ChatSettingsResource | En vivo | M2b | 2.6.3b (hecha 2026-11-03) | Modo lento vacio da error (BUG-517); al guardar, Node recarga la configuracion del chat |
 | RateLimitSettingsResource | Sistema | M2b | 2.6.3b (hecha 2026-11-03) | Abre con los limites que de verdad aplican; guardar no los apaga (BUG-515) |
 | RegistrationSettingsResource | Personas / Entrada | H1 | 2.3.1 | Subida desde M2b (Kamilo, 2026-10-25): sin ella no se monta un evento nuevo |
-| EventRecapResource | Experiencia / Identidad | M2b | 2.6.4 | |
+| EventRecapResource | Experiencia / Identidad | M2b | 2.6.4a (configuracion); generar y regenerar en M4e.5 | Abre con los valores que aplican y guardar no apaga nada (BUG-520). Hasta M4e.5: finalizar desde el admin nuevo no genera recaps y regenerar sigue en Filament |
 | WallPostResource, WallSettingsResource | Experiencia / Social | M2b | 2.6.5 | Bloque nuevo (Kamilo, 2026-10-25). Un solo camino para publicar y ocultar (BUG-379) |
 | EventPhotoResource | Experiencia / Social | M2b | 2.6.5 | Aprobar da los mismos puntos desde cualquier lado (BUG-378) |
 | LandingWidget | Personas / Entrada | H1 | 2.3.1 | No estaba en ningun bloque. Sube al hito 1 (Kamilo, 2026-10-25) |
