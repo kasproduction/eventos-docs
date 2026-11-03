@@ -464,6 +464,11 @@ de los 330 snapshots y del codigo PHP:
     y cerrar avisan `poll:new` y `poll:closed` como PollController (BUG-382), y la post-evento no se crea al abrir la lista (un GET no escribe):
     la lista avisa y un boton la crea. Ademas el organizador no entra (BUG-519). Diferencia menor: "Respuestas" de cada pregunta cuenta
     personas, no votos (Filament contaba votos: una de varias opciones sumaba de mas).
+  - 2026-11-03 (M2.6.1b, Encuestas, las preguntas; Kamilo): IDENTICO a QuestionsRelationManager en campos y topes (pregunta hasta 500, tres
+    tipos, al menos 2 opciones de hasta 200), la nueva de ultima, ordenar y eliminar con sus respuestas. C# ARREGLA (decidido por Kamilo): una
+    pregunta con respuestas no cambia de tipo y sin respuestas, al cambiarlo, se quitan sus opciones (Filament las dejaba pegadas); una opcion
+    con votos no se puede quitar, con el motivo y el conteo (Filament la quitaba y su voto quedaba sin opcion); cada cambio a una encuesta
+    activa avisa `poll:updated`. "Desactivar opcion" va en M4b.4: los lectores de PHP no la respetarian.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

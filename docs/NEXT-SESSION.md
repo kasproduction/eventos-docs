@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-11-03 (Opus 5.5, 30) — M2.6.1b HECHA: LAS PREGUNTAS DE LAS ENCUESTAS; M2.6.1 COMPLETA
+
+- MSI de M2.6.1a (41695575359) en verde.
+- Decision Kamilo: una opcion con votos NO se borra (motivo visible con el conteo); sin votos se borra. "Desactivar opcion" NO va ahora (los lectores de PHP no la respetarian y el boton mentiria): anotada en M4b.4 con la columna `active` en `live_poll_options` por migracion de Laravel.
+- Hecho: C# `39b2e91` (`PreguntasDeEncuesta`), backend `c3c6b6c` (cruzada), web `0b96ff9` (preguntas en la ventana, Ordenar, `Encuestas.test.tsx`).
+- Correccion: quitar una opcion en la base no borra sus votos, los deja sin opcion (`option_id` null por `nullOnDelete`); borrar una pregunta si se lleva sus votos (cascada).
+- Pruebas en local: C# 539 (+1), cruzadas 85/85, e2e admin 57/57, vitest 725.
+- **Sigue: proponer M2.6.2 Juegos en vivo** (LiveGame y LiveGameResults), con la sonda de Filament antes. Antes: mirar la corrida del MSI de estos push.
+
 ## SESION 2026-11-03 (Opus 5.5, 29) — M2.6.1a HECHA: ENCUESTAS EN EL ADMIN NUEVO; BUG-519 (ORGANIZADOR) Y BUG-483 (PUSH CON EL ADMIN ABIERTO) RESUELTOS
 
 - MSI de M2.6.3b fallo la primera vez: la cruzada del chat pegaba a `/internal/chat/blocked-words` y en el MSI PHP corre sin `SOCKET_INTERNAL_SECRET` (401). Backend `263a96d` fija el secreto en la prueba; relanzada 41685595382 en verde.
