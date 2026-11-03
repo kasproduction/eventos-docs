@@ -438,6 +438,13 @@ de los 330 snapshots y del codigo PHP:
     con baneados y sin carta); crear con la hora ya llegada la manda en el mismo paso (Filament esperaba al minuto siguiente aunque decia
     "deja la hora actual para enviar inmediatamente"); la toma condicionada evita mandarla dos veces (PHP: withoutOverlapping, que no frena el
     boton); los roles son Asistente y Vendedor, los de los anuncios (Filament ofrecia tambien "Admin", un rol viejo que ninguna pantalla asigna).
+  - 2026-11-02 (M2.5.3 y M2.5.4, Emails; Kamilo): IDENTICO a EmailCatalog (19 tipos, grupos, variables, esenciales), EditEmail (copia del evento
+    por idioma, idioma vacio no se guarda, Sistema solo super_admin y global, volver a la del sistema, prueba con "[PRUEBA]" por el SMTP del
+    sistema), EmailLayout y render (la cruzada compara el HTML) y OrganizationEmailSettings (cast `encrypted`, vacia no cambia, isReady). C# ARREGLA:
+    cambiar servidor, puerto, cifrado, usuario, clave o remitente deja la configuracion sin verificar (PHP seguia verificada con datos sin probar y
+    los correos salian por ahi); el historial no trae los correos sin evento de toda la plataforma; Emails pide send-notifications o
+    view-analytics en el menu (salia a todo el staff); los datos de muestra dicen "Chrome en Windows" (no el punto medio) y el correo de prueba de
+    la conexion va sin emojis. Decidido por Kamilo: el contenido en HTML con la vista previa, mientras llega el editor con formato (M2.8.6).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

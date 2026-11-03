@@ -69,8 +69,8 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | SupportRequestResource | En vivo | H1 | 2.4.6 (hecha 2026-11-02) | Abrir una solicitud no la marca como leida (BUG-383); entra con view-content o manage-content (BUG-509); contador de abiertas en el menu |
 | AnnouncementResource | Comunicacion / Anuncios | H1 | 2.5.1a y 2.5.1b (hechas 2026-11-02) | La push de un anuncio privado no sale a todos (BUG-372); audiencia vacia = todos (BUG-510); privados solo para leer; push tambien al navegador (BUG-511) |
 | ScheduledNotificationResource | Comunicacion / Anuncios | H1 | 2.5.2 (hecha 2026-11-02) | Un solo publico para la push (BUG-375, resuelto) |
-| EmailTemplateResource, OrganizationEmailSettingsResource | Comunicacion / Emails | H1 si cabe | 2.5.3 | D.3: "si caben" |
-| EmailLogResource | Comunicacion / Emails | H1 si cabe | 2.5.4 | Solo lectura |
+| EmailTemplateResource, OrganizationEmailSettingsResource | Comunicacion / Emails | H1 | 2.5.3 (hecha 2026-11-02) | Editor con formato en M2.8.6 |
+| EmailLogResource | Comunicacion / Emails | H1 | 2.5.4 (hecha 2026-11-02) | Solo lectura; tambien el push por notificacion |
 | EventSurveyResource | En vivo | M2b | 2.6.1 | |
 | LiveGameResults | En vivo | M2b | 2.6.2 | |
 | GamificationSettingsResource | Experiencia / Gamificacion | M2b | 2.6.3 | |

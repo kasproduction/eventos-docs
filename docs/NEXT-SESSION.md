@@ -10,6 +10,14 @@
 
 ---
 
+## SESION 2026-11-02 (Opus 5.5, 26) — M2.5.3 Y M2.5.4 HECHAS: EMAILS EN EL ADMIN NUEVO; 2.5 COMUNICACION COMPLETA
+
+- Pedido de Kamilo: terminar Comunicacion hoy. Decidido: el contenido en HTML con la vista previa; el editor con formato es M2.8.6 (paridad, con lab, correos y paginas a la vez, antes de apagar Filament).
+- Hecho: C# `9663491` (`CatalogoDeCorreos`, `PlantillasDeCorreoDelEvento`, `EnvioDeLaOrganizacion`, `HistorialDeEnvios`, `EnviarCorreo.PruebaAsync`; rutas `email-templates`, `email-settings`, `email-logs`, `push-logs`), backend `8a68927` (cruzada `EmailsDelAdminTest.php`), web `4576f24` (Emails: Plantillas, editor, Envio, Historial; menu con permiso).
+- Pruebas en local: C# 522, PHP 1261, cruzadas 78/78 (`EmailsDelAdminTest.php`), contratos contra C# 12/12, e2e admin 53/53 (`emails.spec`), vitest 716. 15 controles en rojo (14 en C#, 1 en la cruzada) y 1 en vitest (el permiso del menu).
+- Son 19 tipos de correo (el roadmap decia 16). El grupo Sistema solo lo ve super_admin.
+- **Sigue: proponer el bloque 2.6** (Operacion en vivo desde el admin). Antes: mirar las corridas del MSI de M2.5.2 y de este push.
+
 ## SESION 2026-11-02 (Opus 5.5, 25) — M2.5.2 HECHA: LAS PUSH PROGRAMADAS EN C# Y EL DESPACHO DE CADA MINUTO; BUG-375 RESUELTO EN EL ADMIN NUEVO
 
 - Al arrancar: MSI en verde para M2.4.6, M2.5.1a, M2.5.1b y el seeder de Iris (41532144296).
