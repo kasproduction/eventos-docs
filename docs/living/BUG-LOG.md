@@ -3,6 +3,17 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-03 — Encontrados al portar Encuestas (M2.6.1a)
+
+### BUG-518: Duplicado de BUG-382 (anotado por error el 2026-11-03 al portar Encuestas; se cerro en BUG-382)
+
+### BUG-519: El organizador (el cliente) puede usar la API del admin aunque el panel no lo deja entrar (RESUELTO 2026-11-03 en toda /api/admin/v1)
+- **Severidad propuesta:** ALTA (seguridad: el cliente, que solo deberia mirar el Data Center, puede escribir con su token)
+- **Que pasa:** M2.2.6 hizo que el rol `organizer` caiga directo en el Data Center y no abra el panel (en Filament `SoloDataCenter`, en la web `lib/admin/sesion.ts`). Pero su token de C# es un token del admin y su rol tiene `view-analytics`: toda ruta de la API del admin que pide solo `view-analytics` le responde. Probado con su token: `POST /events/1/surveys/2/activate` dio 200 y `GET /events/1/email-logs` dio 200.
+- **Visto:** 2026-11-03, al portar Encuestas (piden `view-analytics`, como su resource de Filament).
+- **Arreglado en (decidido por Kamilo):** un filtro global, `UseSinElOrganizador` (middleware despues de UseAuthorization, antes de leer cuerpo y parametros): con su token, toda ruta de /api/admin/v1 responde 403 menos `/me` (la web la usa para mandarlo al Data Center) y salir, marcadas con `AlOrganizadorTambien()`. Quien ademas tiene otro rol del panel entra normal. Cuando el Data Center pase a C# (M2.7.2), sus rutas se marcan igual.
+- **Prueba:** `OrganizadorEnElAdminTest` recorre todas las operaciones del OpenAPI que sirve la API (205), con el tipo de contenido que declara cada una, y exige 403 en todas menos `/me`, salir y las del ingreso; mas `EncuestasTest`. Control: sin el filtro, 6 rutas le respondian 2xx (eventos, el evento, historial de correos y de push, encuestas y crear la post-evento).
+
 ## 2026-11-03 — Encontrados al portar Chat, Recordatorios y Limites de uso (M2.6.3b)
 
 ### BUG-515: Guardar "Limites de uso" en Filament apaga los 7 frenos anti-abuso de un evento que nunca los guardo (RESUELTO 2026-11-03 en M2.6.3b, admin nuevo; Filament sigue igual hasta apagarse)
@@ -28,7 +39,7 @@
 
 ## 2026-11-03 — Encontrados al portar los Ajustes de Gamificacion (M2.6.3a)
 
-### BUG-513: Filament no guarda la asistencia a sesiones de Gamificacion (RESUELTO POR REEMPLAZO 2026-11-03: el admin nuevo la guarda desde M2.6.3a; PHP no se arregla, la pantalla de Filament se oculta o queda de solo lectura en M2.7.1)
+### BUG-513: Filament no guarda la asistencia a sesiones de Gamificacion (ABIERTO en PHP; C# no lo tiene: el admin nuevo la guarda desde M2.6.3a. Pendiente de M2.7.1: pasa a RESUELTO POR REEMPLAZO con la fecha en que Ajustes de Gamificacion de Filament quede de solo lectura u oculta; PHP no se arregla)
 - **Severidad propuesta:** ALTA (el organizador cambia los puntos por asistir o el criterio del certificado, Filament dice guardado y no cambia nada)
 - **Que pasa:** la seccion "Asistencia a sesiones" de `GamificationSettingsResource` edita `attendance_min_minutes`, `attendance_points`, `attendance_bonus_full`, `certificate_min_sessions` y `certificate_min_duration_pct`, pero ninguna esta en `$fillable` de `Event`: `update()` las descarta sin avisar. `AwardSessionAttendancePointsJob` y `RecapService` siguen leyendo los valores por defecto de la migracion.
 - **Visto:** 2026-11-03, en la cruzada `tests/Cruzadas/GamificacionTest`: el gemelo guardado por Filament quedo con 10, 25, 50, 1 y 60.
@@ -213,7 +224,7 @@
 
 ## 2026-10-29 — Encontrado al portar Documentos (M2.3.3c1)
 
-### BUG-489: Reordenar documentos en Filament no arma el ZIP, no borra la cache y no avisa a los clientes (ABIERTO en PHP; C# no lo tiene)
+### BUG-489: Reordenar documentos en Filament no arma el ZIP, no borra la cache y no avisa a los clientes (RESUELTO POR REEMPLAZO 2026-10-29: la lista de Documentos de Filament quedo de solo lectura, sin ordenar, en M2.3.3c1; C# ordena con sus efectos)
 - **Severidad propuesta:** BAJA (el orden nuevo llega a los asistentes cuando vence la cache de 5 minutos; el ZIP queda con el orden anterior hasta el siguiente cambio)
 - **Que pasa:** el arrastre de la tabla de `DocumentResource` (`reorderable('sort_order')`) hace un `UPDATE` directo sin eventos del modelo, asi que `DocumentObserver` y `ContentObserver` no corren: no se programa el ZIP, `event:{id}:documents` sigue en cache y no se avisa `documents`. Misma causa que BUG-484 y BUG-488.
 - **Verificado:** si, 2026-10-29, con una prueba temporal contra el codigo anterior de `DocumentResource` (`ListDocuments` con `reorderTable([b, a])`): el orden cambia, pero `RegenerateDocumentsZipJob` no se despacha y la cache vieja sigue; de control, `$documento->update(...)` si despacha el job y borra la cache. No se dejo en el repo (regla 6).
@@ -252,10 +263,12 @@
 
 ## 2026-10-27 (noche) — Encontrados al portar las sesiones (M2.3.2c1 y c2)
 
-### BUG-483: Con el admin nuevo abierto, ese navegador no muestra los push de la webapp (ABIERTO)
+### BUG-483: Con el admin nuevo abierto, ese navegador no muestra los push de la webapp (RESUELTO 2026-11-03)
 - **Severidad propuesta:** BAJA (solo le pasa a quien tiene el admin y la app en el mismo navegador)
 - **Que pasa:** `public/sw.js` no muestra la notificacion si hay una ventana enfocada del mismo origen (asume que la persona esta mirando la app y la campana ya avisa). El admin nuevo vive en `/admin` del mismo origen que la webapp, asi que una pestaña del admin al frente tambien descarta el push. Se vio en la prueba manual de c2 (Kamilo, 2026-10-27): el servicio de Mozilla acepto el aviso (201) y Firefox no lo mostro con el admin enfocado.
 - **Arreglo posible:** que el service worker solo cuente ventanas de la webapp (no las de `/admin`). No toca a los asistentes; queda para el pulido del admin (M2.8.5).
+- **Visto ademas (2026-11-03):** tocar una notificacion tomaba la primera pestana del origen y la navegaba a la ruta del push: si era la del admin, la sacaba del admin en medio del trabajo. Y las navegaciones de `/admin` usaban el fallback offline de la webapp.
+- **Resuelto 2026-11-03 (Kamilo, antes del hito 1):** `public/sw.js` ignora las pestanas de `/admin` (`esDelAdmin`, `ventanasDeLaWebapp`): no silencian un push, un click nunca las navega (enfoca una de la webapp o abre una nueva) y sus navegaciones no usan el fallback. Prueba: `tests/lib/serviceWorker.test.ts` (6, carga el SW real con pestanas falsas; con el SW viejo fallan 4). Prueba manual en Chrome real (banco de Web Push con FCM, una pestana a la vez porque Playwright le da el foco a todas): con el SW viejo y solo el admin al frente no se mostro nada; con el nuevo si, y con la webapp al frente no, en los dos.
 
 ### BUG-482: El ingreso del staff en C# solo verificaba claves bcrypt y PHP las guarda con argon2id (CORREGIDO 2026-10-27, antes de desplegar)
 - **Severidad propuesta:** ALTA (con argon2id en el servidor, ningun staff entra al admin nuevo)
@@ -1012,6 +1025,7 @@
 - **Archivos:** `EditEmail.php:258`
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
+- **Resuelto 2026-11-03 (M2.6.1a):** `POST /events/{e}/surveys/{id}/activate` y `/close` de C# avisan `poll:new` y `poll:closed` con la forma de PollController::formatPoll; cambiar el titulo de una activa avisa `poll:updated`. Prueba: la cruzada `tests/Cruzadas/EncuestasTest` (un aviso de cada uno desde C#, ninguno desde Filament), con control. Se volvio a anotar por error como BUG-518 (duplicado).
 ### BUG-387: Paginas del admin sin permiso propio y sin permisos por accion (RESUELTO 2026-10-23)
 - **Severidad propuesta:** ALTA
 - **Que pasa:** No hay Policies ni `->authorize` en ninguna accion: el acceso es por recurso completo. `LiveGameResults` y `PrizeRedemptions` no definen permiso, entra cualquier usuario del panel.
@@ -1056,7 +1070,7 @@
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 - **2026-11-02 (M2.4.6): la mitad de Soporte no se repite en el admin nuevo:** el GET de la solicitud no cambia nada; la pantalla manda `POST /read` al mostrarla (`SoporteTest.Ver_no_cambia_nada...`, con control). Falta la mitad de encuestas (M2.6.1).
-### BUG-382: Activar o cerrar encuestas desde el admin no avisa por socket (ABIERTO 2026-10-22)
+### BUG-382: Activar o cerrar encuestas desde el admin no avisa por socket (RESUELTO 2026-11-03 en M2.6.1a, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** La API emite `poll:new` y `poll:closed`; Filament no: los asistentes no ven la encuesta hasta refrescar.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.

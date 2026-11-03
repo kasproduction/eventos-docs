@@ -458,6 +458,12 @@ de los 330 snapshots y del codigo PHP:
     los topes del formulario, ChecksRateLimit para leer); cada guardado corre EventObserver::saved. C# ARREGLA (decidido por Kamilo): los
     limites abren con lo que de verdad aplica y guardar no apaga los que estaban por defecto (BUG-515); un minuto fuera de 1 a 60 da 422, sin
     repetidos, al menos uno si estan activos y apagarlos conserva los minutos (BUG-516); el modo lento vacio da 422 (BUG-517, Filament 500).
+  - 2026-11-03 (M2.6.1a, Encuestas: lista, crear, titulo, activar y cerrar; Kamilo): IDENTICO a EventSurveyResource y ListEventSurveys en
+    alcance (generales y post-evento, las de sesion no), orden, columnas, "Nueva encuesta" (general en borrador), las 3 preguntas base de la
+    post-evento, activar solo en borrador y cerrar solo activa, sin borrar encuestas; view-analytics. C# ARREGLA (decidido por Kamilo): activar
+    y cerrar avisan `poll:new` y `poll:closed` como PollController (BUG-382), y la post-evento no se crea al abrir la lista (un GET no escribe):
+    la lista avisa y un boton la crea. Ademas el organizador no entra (BUG-519). Diferencia menor: "Respuestas" de cada pregunta cuenta
+    personas, no votos (Filament contaba votos: una de varias opciones sumaba de mas).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

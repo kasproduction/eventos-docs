@@ -10,6 +10,16 @@
 
 ---
 
+## SESION 2026-11-03 (Opus 5.5, 29) — M2.6.1a HECHA: ENCUESTAS EN EL ADMIN NUEVO; BUG-519 (ORGANIZADOR) Y BUG-483 (PUSH CON EL ADMIN ABIERTO) RESUELTOS
+
+- MSI de M2.6.3b fallo la primera vez: la cruzada del chat pegaba a `/internal/chat/blocked-words` y en el MSI PHP corre sin `SOCKET_INTERNAL_SECRET` (401). Backend `263a96d` fija el secreto en la prueba; relanzada 41685595382 en verde.
+- Decisiones Kamilo: BUG-513 no se arregla en PHP y queda pendiente de M2.7.1 como los diez "ABIERTO en PHP; C# no lo tiene" (pasan a RESUELTO POR REEMPLAZO con la fecha en que su pantalla de Filament quede de solo lectura; ya: BUG-489, Documentos, 2026-10-29; lista por pantalla en M2.7.1). M2.6.1 partida en a y b con los arreglos de la sonda (avisos al activar y cerrar, tipo bloqueado con respuestas, opcion con votos se desactiva, post-evento con boton porque un GET no escribe). BUG-519: el organizador fuera de toda /api/admin/v1. BUG-483: antes del hito 1.
+- BUG-382 resuelto (lo habia vuelto a anotar como BUG-518: marcado duplicado).
+- Hecho: C# `8db0f35`, backend `207054d`, web `8457c27`.
+- Pruebas en local: C# 536 (+1 saltada), cruzadas 84/84 (sin el secreto del socket, como el MSI), e2e admin 56/56, vitest 722; prueba manual de BUG-483 en Chrome real con FCM.
+- Intermitente visto una vez: `identidad.spec` "destacados" (el interruptor de la lista no quedo apagado); sola paso 3/3. Vigilar.
+- **Sigue: M2.6.1b** (preguntas y opciones; ya aprobada, ver el roadmap). Empieza por la migracion `active` en `live_poll_options` y por ver como leen las opciones la app (Expo), la webapp, PollController y el Data Center. Antes: mirar la corrida del MSI de estos push.
+
 ## SESION 2026-11-03 (Opus 5.5, 28) — M2.6.3b HECHA: CHAT, RECORDATORIOS Y LIMITES DE USO EN EL ADMIN NUEVO; M2.6.3 COMPLETA; BUG-515 A 517
 
 - MSI de M2.6.3a (41677767415) en verde.
