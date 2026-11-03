@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-11-03 (Opus 5.5, 27) — M2.6.3a HECHA: AJUSTES DE GAMIFICACION EN EL ADMIN NUEVO; BUG-513 Y BUG-514 RESUELTOS
+
+- Decisiones Kamilo: M2.6.3 partida en a (Gamificacion) y b (Chat, Recordatorios, Limites de uso); el resumen dice que los cambios de puntos aplican desde ahora y no recalculan lo otorgado; cada accion se edita en una ventana encima como en Filament (no dentro de la lista: se volvia un scroll infinito).
+- Hecho: C# `a5c2115` (`Admin/Gamificacion/AjustesDeGamificacion`, rutas `gamification` y `gamification/actions/{key}`), backend `37b7fb9` (cruzada `GamificacionTest.php`), web `45df591` (pestana Ajustes, `Ventana` reusable, la ayuda de las secciones ya no en negrita; `gamificacion.spec`).
+- BUG-513 (ALTA): Filament no guarda la asistencia a sesiones (no esta en `$fillable` de Event). BUG-514: apagar el premio del pasaporte no lo borra. Los dos resueltos en el admin nuevo; PHP congelado sin tocar.
+- Pruebas en local: C# 526 (+1 saltada), cruzadas 80/80, e2e admin 54/54, vitest 716; 7 controles en rojo (5 en C#, 2 en la cruzada). PHP y contratos sin cambios de codigo.
+- Gotcha: `setFormComponentActionData` de Filament mezcla las listas por posicion (un CheckboxList queda `['vendedor','vendedor']`); poner la lista entera con `set(...)`. Un `<dialog>` del admin necesita `position: fixed; inset: 0; margin: auto` (el reset global le quita el centrado).
+- **Sigue: M2.6.3b** (Chat, Recordatorios, Limites de uso), ya propuesta y aprobada en la partida. Antes: mirar la corrida del MSI de estos push.
+
 ## SESION 2026-11-02 (Opus 5.5, 26) — M2.5.3 Y M2.5.4 HECHAS: EMAILS EN EL ADMIN NUEVO; 2.5 COMUNICACION COMPLETA
 
 - Pedido de Kamilo: terminar Comunicacion hoy. Decidido: el contenido en HTML con la vista previa; el editor con formato es M2.8.6 (paridad, con lab, correos y paginas a la vez, antes de apagar Filament).

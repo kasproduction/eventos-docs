@@ -73,7 +73,7 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | EmailLogResource | Comunicacion / Emails | H1 | 2.5.4 (hecha 2026-11-02) | Solo lectura; tambien el push por notificacion |
 | EventSurveyResource | En vivo | M2b | 2.6.1 | |
 | LiveGameResults | En vivo | M2b | 2.6.2 | |
-| GamificationSettingsResource | Experiencia / Gamificacion | M2b | 2.6.3 | |
+| GamificationSettingsResource | Experiencia / Gamificacion | M2b | 2.6.3a (hecha 2026-11-03) | La asistencia a sesiones se guarda (BUG-513); apagar el premio del pasaporte lo borra (BUG-514); cada accion se edita en una ventana encima, como Filament |
 | ReminderSettingsResource | Comunicacion / Anuncios | M2b | 2.6.3 | |
 | ChatSettingsResource | En vivo | M2b | 2.6.3 | |
 | RateLimitSettingsResource | Sistema | M2b | 2.6.3 | |

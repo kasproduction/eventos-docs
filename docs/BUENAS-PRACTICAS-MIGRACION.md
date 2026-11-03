@@ -445,6 +445,13 @@ de los 330 snapshots y del codigo PHP:
     los correos salian por ahi); el historial no trae los correos sin evento de toda la plataforma; Emails pide send-notifications o
     view-analytics en el menu (salia a todo el staff); los datos de muestra dicen "Chrome en Windows" (no el punto medio) y el correo de prueba de
     la conexion va sin emojis. Decidido por Kamilo: el contenido en HTML con la vista previa, mientras llega el editor con formato (M2.8.6).
+  - 2026-11-03 (M2.6.3a, Gamificacion, Ajustes; Kamilo): IDENTICO a GamificationSettingsResource en columnas, topes de Filament, campos del
+    concurso solo con el concurso activo, puntos por posicion como textos (KeyValue), la ventana de cada accion (se mezcla con lo que ya tenia,
+    `daily_max` solo en las repetibles, sin roles = nadie) y PointsService::getConfig para leer; cada guardado corre EventObserver::saved. C#
+    ARREGLA: la asistencia a sesiones se guarda (BUG-513: Filament la descartaba), apagar "Tiene premio al completar" borra el premio (BUG-514) y
+    los numeros vacios dan 422 (Filament mandaba null a columnas que no lo aceptan). Decidido por Kamilo: el resumen dice que los cambios de puntos
+    aplican desde ahora y no recalculan lo otorgado, y cada accion se edita en una ventana encima como en Filament (`Ventana`, la primera del
+    admin nuevo; las confirmaciones de otras pantallas siguen siendo una caja en la pagina).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

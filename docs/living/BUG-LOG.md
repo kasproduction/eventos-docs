@@ -3,6 +3,22 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-03 — Encontrados al portar los Ajustes de Gamificacion (M2.6.3a)
+
+### BUG-513: Filament no guarda la asistencia a sesiones de Gamificacion (RESUELTO 2026-11-03 en M2.6.3a, admin nuevo; Filament sigue igual hasta apagarse)
+- **Severidad propuesta:** ALTA (el organizador cambia los puntos por asistir o el criterio del certificado, Filament dice guardado y no cambia nada)
+- **Que pasa:** la seccion "Asistencia a sesiones" de `GamificationSettingsResource` edita `attendance_min_minutes`, `attendance_points`, `attendance_bonus_full`, `certificate_min_sessions` y `certificate_min_duration_pct`, pero ninguna esta en `$fillable` de `Event`: `update()` las descarta sin avisar. `AwardSessionAttendancePointsJob` y `RecapService` siguen leyendo los valores por defecto de la migracion.
+- **Visto:** 2026-11-03, en la cruzada `tests/Cruzadas/GamificacionTest`: el gemelo guardado por Filament quedo con 10, 25, 50, 1 y 60.
+- **Arreglado en:** admin nuevo (C#): `PUT /events/{e}/gamification` las guarda con los topes de Filament. PHP congelado: el `$fillable` no se toca.
+- **Prueba:** `GamificacionTest` (C#) y la cruzada (C# las guarda y PHP las lee; Filament no, queda escrito en la prueba).
+
+### BUG-514: Apagar "Tiene premio al completar" del pasaporte no borra el premio (RESUELTO 2026-11-03 en M2.6.3a, admin nuevo; Filament sigue igual hasta apagarse)
+- **Severidad propuesta:** MEDIA (la app sigue mostrando un premio del pasaporte que el organizador quito)
+- **Que pasa:** el interruptor no se guarda (`dehydrated(false)`) y esconde el campo `passport_prize`; un campo escondido no se guarda, asi que el premio queda en la base y `PassportController` lo sigue devolviendo como `prize`.
+- **Visto:** 2026-11-03, en la cruzada `tests/Cruzadas/GamificacionTest`.
+- **Arreglado en:** admin nuevo: apagar el interruptor manda `passport_prize` vacio y queda null.
+- **Prueba:** la cruzada (C# deja null; Filament deja "Cena VIP", queda escrito en la prueba) y la e2e `gamificacion.spec`.
+
 ## 2026-11-02 — Encontrados al darle canales de push a Iris en el seeder de contratos
 
 ### BUG-512: Las pruebas de documentos de C# borraban los documentos del seeder de la base compartida, y la e2e de documentos dependia de eso (RESUELTO 2026-11-02; solo pruebas)
