@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-11-03 (Opus 5.5, 31) — M2.6.2 ABSORBIDA; M2.6.4a HECHA (CONFIGURACION DEL RECAP); BUG-520 RESUELTO
+
+- MSI de M2.6.1b (41702723632) en verde.
+- Decisiones Kamilo: M2.6.2 Juegos en vivo absorbida sin codigo (configurar y lanzar es de Mission Control con la API de PHP, va en M4d.6; los resultados ya los exporta el Data Center, M2.7.2; la pagina LiveGameResults estaba oculta). M2.6.4 partida: a = configuracion del Recap; b = generar y regenerar, movida a M4e.5 sin adelantarla (regla 6). Huecos aceptados (decisiones.md): finalizar desde el admin nuevo no genera recaps (se finaliza desde Filament; Branding ya lo avisa) y "Regenerar recap" sigue en Filament. Antes de M4e.5: decidir si el recap se porta o se redisena (Expo archivada desde julio).
+- BUG-520 (ALTA): guardar el Recap en Filament de un evento sin configuracion lo apagaba (enabled false y todos los bloques en false). Resuelto en el admin nuevo.
+- Hecho: C# `158b591` (`Admin/Identidad/Recap`, destino `event-recap`), backend `375c6bc` (cruzada), web `45acdf2` (`FormularioDeRecap`).
+- Pruebas en local: C# 542 (+1), cruzadas 87/87, e2e admin 58/58, vitest 725.
+- **Sigue: proponer M2.6.5 Social** (moderacion del muro y de fotos con un solo camino por accion: BUG-378, BUG-379), con la sonda de Filament antes. Antes: mirar la corrida del MSI de estos push.
+
 ## SESION 2026-11-03 (Opus 5.5, 30) — M2.6.1b HECHA: LAS PREGUNTAS DE LAS ENCUESTAS; M2.6.1 COMPLETA
 
 - MSI de M2.6.1a (41695575359) en verde.

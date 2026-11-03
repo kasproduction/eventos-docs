@@ -3,6 +3,15 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-03 — Encontrados al portar la configuracion del Recap (M2.6.4a)
+
+### BUG-520: Guardar el Recap en Filament de un evento sin configuracion apaga el recap y todos sus bloques (RESUELTO 2026-11-03 en M2.6.4a, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+- **Severidad propuesta:** ALTA (el evento deja de generar recaps sin que nadie lo decida)
+- **Que pasa:** sin `recap_config`, RecapConfigResolver aplica sus valores de fabrica (todo encendido), pero `EventRecapResource` abre con los interruptores apagados y los textos y umbrales vacios (el `default()` de Filament solo sirve al crear). Al cambiar cualquier texto y guardar, se guardan `enabled: false`, todos los bloques en false y nulls que pisan los textos y umbrales de fabrica (RecapConfigResolver::deepMerge deja pasar el null). `GenerateRecapsForEventJob` mira `enabled ?? true` y no genera nada. Ademas: acepta "Insider hasta 10 h" con "Activo hasta 5 h" y no deja vaciar un texto (el deepMerge de la pagina salta los null).
+- **Visto:** 2026-11-03, con una sonda de Livewire sobre EditEventRecapSettings y en la cruzada `tests/Cruzadas/RecapTest`.
+- **Arreglado en (decidido por Kamilo):** admin nuevo (C#): la lectura es la configuracion que aplica (un null guardado no pisa el de fabrica) y se guarda la configuracion entera y efectiva; Insider menor que Activo; vaciar un texto vuelve al de fabrica.
+- **Prueba:** `RecapTest` (C#, 3) y la cruzada (C# deja el recap encendido para RecapConfigResolver y el job; Filament lo apaga, queda escrito), con 4 controles.
+
 ## 2026-11-03 — Encontrados al portar Encuestas (M2.6.1a)
 
 ### BUG-518: Duplicado de BUG-382 (anotado por error el 2026-11-03 al portar Encuestas; se cerro en BUG-382)

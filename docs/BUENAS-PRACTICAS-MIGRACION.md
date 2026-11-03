@@ -469,6 +469,12 @@ de los 330 snapshots y del codigo PHP:
     pregunta con respuestas no cambia de tipo y sin respuestas, al cambiarlo, se quitan sus opciones (Filament las dejaba pegadas); una opcion
     con votos no se puede quitar, con el motivo y el conteo (Filament la quitaba y su voto quedaba sin opcion); cada cambio a una encuesta
     activa avisa `poll:updated`. "Desactivar opcion" va en M4b.4: los lectores de PHP no la respetarian.
+  - 2026-11-03 (M2.6.4a, Recap, la configuracion; Kamilo): IDENTICO a EventRecapResource en campos, topes y forma de `recap_config` (la de
+    RecapConfigResolver), lo escondido no se guarda (imagen del titulo solo en imagen, texto y stats del certificado solo con el certificado) y
+    al guardar se borra `recap:{evento}:{asistente}` de quien ya tiene recap; manage-events. C# ARREGLA (decidido por Kamilo): lee lo que
+    aplica y guarda la configuracion entera, asi guardar no apaga el recap ni sus bloques (BUG-520); Insider menor que Activo; vaciar un texto
+    vuelve al de fabrica. La imagen sube por `POST /uploads` con destino event-recap (sin SVG, como el resto). Generar y regenerar quedan en
+    PHP hasta M4e.5 (huecos aceptados en decisiones.md).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
