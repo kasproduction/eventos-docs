@@ -645,6 +645,8 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ---
 
+- [ ] **Mejoras de producto de los puntos (despues de la fase 5, decision Kamilo 2026-11-03).** Al portar `PointsService::tryAward` a C# (M2.6.5a) las reglas quedan identicas a PHP; cualquier cambio de producto (que hacer con acciones sin referencia que hoy no se deduplican, topes por semana, devolver puntos al ocultar un post, etc.) se discute despues de la fase 5.
+
 ## 13. DESPUES DEL 6 DE DICIEMBRE — infraestructura (`ROADMAP-INFRAESTRUCTURA.md:260`)
 
 - [ ] Cache de `auth/me` en Next · precarga completa · `data:sync` en vez de `data:invalidate` (refrescar solo lo que cambio) **[congelado hasta SignalR: cambia el protocolo del socket]**
