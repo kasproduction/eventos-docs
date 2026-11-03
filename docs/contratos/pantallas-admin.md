@@ -72,7 +72,7 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | EmailTemplateResource, OrganizationEmailSettingsResource | Comunicacion / Emails | H1 | 2.5.3 (hecha 2026-11-02) | Editor con formato en M2.8.6 |
 | EmailLogResource | Comunicacion / Emails | H1 | 2.5.4 (hecha 2026-11-02) | Solo lectura; tambien el push por notificacion |
 | EventSurveyResource | En vivo | M2b | 2.6.1a y 2.6.1b (hechas 2026-11-03) | Activar y cerrar avisan al socket (BUG-382); la post-evento sale de un boton, la lista no la crea; el organizador no entra (BUG-519); una opcion con votos no se quita y una pregunta con respuestas no cambia de tipo |
-| LiveGameResults | En vivo | M2b | 2.6.2 | |
+| LiveGameResults | En vivo | M2b | 2.6.2 (absorbida 2026-11-03, sin codigo) | Oculta desde 2026-07-18; los resultados los exporta el Data Center (M2.7.2). Configurar y lanzar juegos es de Mission Control con la API de PHP (M4d.6) |
 | GamificationSettingsResource | Experiencia / Gamificacion | M2b | 2.6.3a (hecha 2026-11-03) | La asistencia a sesiones se guarda (BUG-513, pendiente de M2.7.1: Filament se oculta o queda de solo lectura); apagar el premio del pasaporte lo borra (BUG-514); cada accion se edita en una ventana encima, como Filament |
 | ReminderSettingsResource | Comunicacion / Anuncios | M2b | 2.6.3b (hecha 2026-11-03) | Un minuto que no vale da error, sin repetidos, apagar conserva los minutos (BUG-516) |
 | ChatSettingsResource | En vivo | M2b | 2.6.3b (hecha 2026-11-03) | Modo lento vacio da error (BUG-517); al guardar, Node recarga la configuracion del chat |
