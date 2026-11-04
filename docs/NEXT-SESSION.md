@@ -10,7 +10,7 @@
 
 ---
 
-## SESION 2026-11-04 (Opus 5.5, 33) — M2.7.1 HECHA: FILAMENT DE SOLO LECTURA EN LAS 35 PANTALLAS CUBIERTAS; CINCO HUECOS AL ROADMAP
+## SESION 2026-11-04 (Opus 5.5, 33) — M2.7.1 Y M2.2.8 HECHAS: FILAMENT DE SOLO LECTURA EN 35 PANTALLAS; SEGURIDAD DE TU CUENTA EN EL ADMIN NUEVO; CINCO HUECOS AL ROADMAP
 
 - Decisiones Kamilo: regla unica de 2.7 (cada pantalla cubierta de solo lectura, sin crear, editar ni borrar, con el aviso "Esta pantalla ahora se administra en el admin nuevo" arriba y el enlace a su equivalente; oculta solo si no queda nada que mirar; bugs "abierto en PHP" cerrados por reemplazo). Excepcion: Modulos y Landing y widget se ocultan con redireccion. Historial de webhooks oculto y resumen fuera (BUG-504 y 501). Huecos de tareas aprobadas entran al roadmap y se hacen antes de cerrar 2.7. Las cruzadas que comparan con Filament usan una llave solo de pruebas (`LlaveDeFilament`, por el camino del modo contratos, nunca en produccion).
 - Hecho: backend `4073da3` (traits de solo lectura, aviso por render hook, llave, Escritorio al admin nuevo, Encuestas y Soporte ya no escriben al abrir), C# `545df03` (las cruzadas prenden la llave). Siguen vivas en Filament: Regenerar recap (M4e.5), Generar en lote (M2.4.5e), Ajustes de equipos (M2.3.3d).
@@ -21,6 +21,8 @@
 - Despliegue: compilar el tema de Filament (`npm run build` en eventos-backend: estilos del aviso). `CONTRATOS_FILAMENT_ESCRIBE` NUNCA en el servidor (igual no abre en produccion). Sigue pendiente de la 32: `php artisan migrate` (`2026_11_03_120000`).
 - Correspondencia de las 18 pruebas de PHP que salieron con su cobertura: `BUG-LOG.md`, seccion del 2026-11-04 (las dos que C# cubria en parte, 1 y 9, ya tienen su prueba en `StaffTest`, C# `c3ac832`; C# 561).
 - **Despues del cierre, M2.2.8 hecha** (C# `bb5b5f0`, web `f61253d`, backend `5dab5c3`): Seguridad de tu cuenta en `/admin/cuenta/seguridad`; decision Kamilo: los codigos malos al pedir codigos nuevos cuentan para el bloqueo del login y al bloquear se cierra esa sesion (BUG-523). `AccountSecurity` de Filament se oculta y lleva alla; correspondencia de sus 21 pruebas en el BUG-LOG. Pruebas: C# 569, PHP 1364, cruzadas 99/99, vitest 733, e2e admin 63/63.
+- E2e intermitente: `entrada-del-evento` fallo en la primera prueba de la corrida y paso sola; con el de Destacados (sesion 29) son 2 de 3. BUG-524: a la tercera se investiga la causa, no se repite (decision Kamilo).
+- Estimado para cerrar la fase 2 (hablado con Kamilo): 18 tareas abiertas, unos 3 a 5 dias al ritmo del 1 al 3 de noviembre; M2.9.3 y M2.10.1 necesitan el servidor prendido.
 - **Sigue: proponer M2.4.5d Premios (sonda de Livewire contra `RewardResource` antes de proponer); despues M2.4.1c, M2.4.5e y M2.3.3d; luego M2.7.2 (Data Center con bearer).**
 
 ## SESION 2026-11-03 (Opus 5.5, 32) — M2.6.5 SOCIAL COMPLETA (MURO, PUNTOS EN C#, FOTOS, PREMIAR); SECCION 2.6 10/10

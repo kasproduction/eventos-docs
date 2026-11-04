@@ -3,6 +3,16 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-04 — De las pruebas
+
+### BUG-524: e2e del admin intermitentes en la primera prueba de la corrida (ABIERTO, vigilando: 2 de 3)
+- **Severidad propuesta:** BAJA (solo pruebas; el producto no cambia)
+- **Que pasa:** una e2e de `pnpm e2e:admin` falla en la primera prueba de la corrida y pasa al repetirla sola. Sospecha: el arranque en frio (C# recien levantado, Next compilando en dev) o el seeder de los contratos (`reiniciar`) todavia trabajando cuando la prueba empieza.
+- **Conteo (regla de Kamilo 2026-11-04: a la tercera se investiga la causa, no se vuelve a repetir la corrida):**
+  1. 2026-11-03 (sesion 29): `identidad.spec` "destacados": el interruptor de la lista no quedo apagado; sola paso 3/3.
+  2. 2026-11-04 (sesion 33): `entrada-del-evento.spec` "registro: guardar solo con cambios...": en `primerIngreso`, "Continuar al admin" no se habilito a tiempo tras marcar "Los guarde" (30 s); sola paso 3/3 y la corrida completa siguiente paso 63/63.
+- **Al tercer caso:** no se repite la corrida; se investiga con la traza de Playwright (`test-results/.../trace.zip`) el arranque de C# (`webServer` de `playwright.admin.config.ts`, espera a `/api/v1/version`) y el reinicio del seeder (`apoyo.reiniciar`), y se arregla la causa con su control.
+
 ## 2026-11-04 — Encontrados al portar Seguridad de tu cuenta (M2.2.8)
 
 ### BUG-523: Generar codigos de recuperacion nuevos no cuenta los codigos malos para el bloqueo de la cuenta (RESUELTO 2026-11-04 en M2.2.8, admin nuevo; RESUELTO POR REEMPLAZO en Filament: la pagina se oculto y lleva al admin nuevo)
