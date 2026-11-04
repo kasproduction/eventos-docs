@@ -3,6 +3,15 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-03 — Encontrados al portar Premiar fotos (M2.6.5c)
+
+### BUG-522: Los puntos por posicion del concurso de fotos nunca se dan (RESUELTO 2026-11-03 en M2.6.5c, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+- **Severidad propuesta:** MEDIA (lo que el admin configura en "Puntos por posicion" no llega a nadie, sin aviso)
+- **Que pasa:** "Premiar top fotos" pide los puntos con `PointsService::tryAward(..., 'top_photo_bonus', ..., $bonusPoints)`. `top_photo_bonus` no esta en DEFAULT_CONFIG ni se puede configurar en Gamificacion, asi que `isEnabled` da falso y tryAward devuelve null siempre.
+- **Visto:** 2026-11-03, leyendo EventPhotoResource y PointsService al portar Premiar; confirmado en la cruzada.
+- **Arreglado en (decidido por Kamilo):** C# da los puntos del puesto (`Puntos.BonoDelConcursoAsync`, accion `top_photo_bonus`, una vez por foto, con los avisos de gamification y leaderboard), sin depender de la configuracion de acciones.
+- **Prueba:** `PremiosDeFotosTest` (C#) y la cruzada `tests/Cruzadas/PremiosDeFotosTest` (el leaderboard de PHP cuenta los puntos que da C#; tryAward de PHP sigue en null, queda escrito), con su control (el bono pedido como PHP no da nada).
+
 ## 2026-11-03 — Encontrados al portar el Muro (M2.6.5a)
 
 ### BUG-521: El C# no le pedia a la webapp soltar su copia de sponsors ni del muro (RESUELTO 2026-11-03 en M2.6.5a)

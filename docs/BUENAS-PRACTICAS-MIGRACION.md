@@ -489,6 +489,13 @@ de los 330 snapshots y del codigo PHP:
     rechazar desde la fila, el detalle y el masivo (BUG-378): aprobar solo una pendiente y con puntos solo si tiene autor; rechazar tambien una
     aprobada, con confirmacion, y los puntos se quedan (quitarlos va despues de la fase 5). Las fotos de la galeria pesan hasta 10 MB, como el
     FileUpload de Filament; el resto de imagenes sigue en 5. Una foto por pedido. El contador de pendientes vuelve al menu (count_only=1).
+  - 2026-11-03 (M2.6.5c, Social, Premiar; Kamilo): IDENTICO a "Premiar" y "Premiar top fotos" de EventPhotoResource en quien se premia
+    (aprobada y con autor; top: aprobadas, del concurso, no oficiales y sin premio, por likes y la mas vieja primero), el Golden Ticket de
+    RewardService::createGoldenTicket (el mismo de Golden Tickets, M2.4.5b), sus titulos y motivos, el anuncio privado y manage-content.
+    C# ARREGLA (decidido por Kamilo): una foto se premia una sola vez y lo frena la base (migracion de Laravel: columna generada
+    event_photo_prize_id con indice unico, solo para los premios de fotos), no solo la pantalla; los puestos siguen desde el ultimo dado y
+    "Premiar top" se frena al llegar al maximo de ganadores (Filament numeraba desde 1 cada vez); los puntos por posicion se dan (BUG-522).
+    La prueba de PHP que afirmaba "se pueden crear 2" se actualizo. El reinicio de los contratos copia solo las columnas normales.
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 
