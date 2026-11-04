@@ -45,7 +45,7 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | Pantalla (Filament) | Grupo | Destino | Bloque | Nota |
 |---|---|---|---|---|
 | Dashboard | Escritorio | H1 | 2.1 | Pagina de entrada del admin. Las cifras del evento son del Data Center (enlace) |
-| AccountSecurity | Cuenta | H1 | 2.2.1 | 2FA, codigos de recuperacion, dispositivos y sesiones del staff |
+| AccountSecurity | Cuenta | H1 | 2.2.1 (login en C#); la pantalla en M2.2.8 | 2FA, codigos de recuperacion, dispositivos y sesiones del staff. **Hueco (2026-11-04):** la pantalla no se porto; el menu de cuenta del admin nuevo lleva a la de Filament |
 | EventResource | Sistema | H1 | 2.3.1 | Con filtro por organizacion (BUG-374) y el asistente de primer ingreso (`CreateEvent`) |
 | UserResource | Sistema | H1 | 2.4.4 (staff en 2.4.4a: hecho; seguridad 2.4.4b; limpieza 2.4.4c) | Staff, roles y reset de 2FA (las invitaciones de stand van en M4e.7). No deja borrar al ultimo super_admin |
 | EventSessionResource (+ Speakers por sesion) | Contenido / Agenda | H1 | 2.3.2 | Asignar speakers tiene que avisar (BUG-380) |
@@ -61,11 +61,11 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | EventBrandingResource | Experiencia / Identidad | H1 | 2.3.4b y 2.3.4c (hechas 2026-10-30) | Lo esencial, Identidad comun, App movil, Webapp y Onboarding app (siete pantallas) ya en el admin nuevo; Filament lo sigue mostrando hasta M2.7 (INT.2) |
 | ModulosPanel | Experiencia | H1 | 2.3.4a (hecha 2026-10-30) | Ya en el admin nuevo; Filament lo sigue mostrando hasta M2.7 |
 | AttendeeAdminResource | Personas / Asistentes | H1 | 2.4.1, 2.3.6 | Lista, perfil, tags, aprobacion, check-in manual, importar y exportar |
-| RegistrationFieldResource | Personas / Entrada | H1 | 2.4.1 | Los campos de registro estan en 2.4.1 |
+| RegistrationFieldResource | Personas / Entrada | H1 | M2.4.1c | **Hueco (2026-11-04):** ni M2.4.1a ni M2.4.1b la portaron; la pestana Campos del admin nuevo lleva a Filament |
 | AttendeeBanResource | Personas / Asistentes | H1 | 2.4.2 | Con expulsion del socket (BUG-373) |
 | WebhookEndpointResource, WebhookApiKeyResource, WebhookLogResource | Sistema / Webhooks | H1 | 2.4.3 (endpoints 2.4.3a, llaves 2.4.3b e historial 2.4.3c: hechos) | Los secretos no se muestran (BUG-385); el del endpoint se copia sin mostrarse |
-| GoldenTicketResource, RewardResource, PrizeRedemptions | Experiencia / Gamificacion | H1 | 2.4.5 | Marcar como reclamado con `RewardService::confirm` (BUG-377) |
-| AccessCodeResource | Personas / Entrada | H1 | 2.4.5 | |
+| GoldenTicketResource, RewardResource, PrizeRedemptions | Experiencia / Gamificacion | H1 | 2.4.5 (Premios, `RewardResource`, en M2.4.5d: hueco 2026-11-04) | Marcar como reclamado con `RewardService::confirm` (BUG-377) |
+| AccessCodeResource | Personas / Entrada | H1 | 2.4.5 (Generar en lote en M2.4.5e: hueco 2026-11-04) | |
 | SupportRequestResource | En vivo | H1 | 2.4.6 (hecha 2026-11-02) | Abrir una solicitud no la marca como leida (BUG-383); entra con view-content o manage-content (BUG-509); contador de abiertas en el menu |
 | AnnouncementResource | Comunicacion / Anuncios | H1 | 2.5.1a y 2.5.1b (hechas 2026-11-02) | La push de un anuncio privado no sale a todos (BUG-372); audiencia vacia = todos (BUG-510); privados solo para leer; push tambien al navegador (BUG-511) |
 | ScheduledNotificationResource | Comunicacion / Anuncios | H1 | 2.5.2 (hecha 2026-11-02) | Un solo publico para la push (BUG-375, resuelto) |
@@ -87,6 +87,19 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | EventOnboardingResource | (oculta) | Se demuele | 2.8.3 | Sus secciones ya viven en Branding (INT.2, EventBrandingResource.php:309). La app de Expo si usa el onboarding (`lib/onboardingApi.ts`); lo que se quita es solo el resource duplicado |
 | CustomPageResource | Contenido | H1 | 2.3.3 | Se queda (Kamilo, 2026-10-25): carga contenido del cliente en un iframe (`iframe_url`) o un cuerpo propio, con roles. Por verificar en M2.3.3 por donde llega el asistente: la app de Expo registra `app/(app)/pages/[id].tsx` y la webapp no llama `/pages` |
 | Banners | | Ya demolido | | Se borro el 2026-07-04 (`2026_07_04_230000_drop_banners_feature.php`). Hoy son Highlights |
+
+## Filament tras M2.7.1 (2026-11-04)
+
+Regla de Kamilo (2026-11-04, `decisiones.md`): cada pantalla que el admin nuevo cubre queda de solo lectura en Filament (sin
+crear, editar ni borrar) con el aviso "Esta pantalla ahora se administra en el admin nuevo" arriba y el enlace directo a su
+equivalente; se oculta del todo solo si no queda nada que mirar. Prueba: `eventos-backend/tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest.php`.
+
+| Estado en Filament | Pantallas |
+|---|---|
+| Solo lectura con el aviso (35) | Escritorio (sus accesos van al admin nuevo), Eventos (el asistente de evento nuevo se cerro), Staff, Sesiones, Tracks, Tipos de sesion, Speakers, Sponsors, Documentos, Paginas, Branding (con Onboarding), Slides del login, Destacados, Preguntas, Recap, Asistentes, Bloqueos, Registro, Codigos de acceso, Anuncios, Push programadas, Recordatorios, Plantillas de correo, Envio (SMTP), Historial de correos, Publicaciones del muro, Ajustes del muro, Fotos, Gamificacion, Golden Tickets, Premios Ganados, Chat, Encuestas, Salones, Soporte, Limites de uso, Webhooks y Llaves de entrada |
+| Acciones que siguen vivas dentro de una pantalla de solo lectura | Regenerar recap en Asistentes (hasta M4e.5), Generar en lote en Codigos de acceso (M2.4.5e), Ajustes de equipos en Sponsors (M2.3.3d) |
+| Ocultas, su direccion lleva al admin nuevo | Modulos y Landing y widget (todo lo que muestran son controles); Historial de webhooks (mostraba envios de todos los eventos, BUG-504). El resumen de webhooks se quito (BUG-501) |
+| Siguen en Filament sin aviso | Premios (M2.4.5d), Campos del formulario (M2.4.1c), Seguridad de tu cuenta (M2.2.8), Event Pulse (M2.7.3); ocultas de antes: Evaluaciones y Resultados de juegos |
 
 ## Avisos genericos del navegador en el admin actual (no copiar)
 

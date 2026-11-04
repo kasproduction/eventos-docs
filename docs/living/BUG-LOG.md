@@ -5,7 +5,8 @@
 
 ## 2026-11-03 — Encontrados al portar Premiar fotos (M2.6.5c)
 
-### BUG-522: Los puntos por posicion del concurso de fotos nunca se dan (RESUELTO 2026-11-03 en M2.6.5c, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+### BUG-522: Los puntos por posicion del concurso de fotos nunca se dan (RESUELTO POR REEMPLAZO 2026-11-04: Fotos de Filament quedo de solo lectura (sin "Premiar top fotos"), M2.7.1. Antes: RESUELTO 2026-11-03 en M2.6.5c, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Fotos de Filament quedo de solo lectura (sin "Premiar top fotos"); lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** MEDIA (lo que el admin configura en "Puntos por posicion" no llega a nadie, sin aviso)
 - **Que pasa:** "Premiar top fotos" pide los puntos con `PointsService::tryAward(..., 'top_photo_bonus', ..., $bonusPoints)`. `top_photo_bonus` no esta en DEFAULT_CONFIG ni se puede configurar en Gamificacion, asi que `isEnabled` da falso y tryAward devuelve null siempre.
 - **Visto:** 2026-11-03, leyendo EventPhotoResource y PointsService al portar Premiar; confirmado en la cruzada.
@@ -23,7 +24,8 @@
 
 ## 2026-11-03 — Encontrados al portar la configuracion del Recap (M2.6.4a)
 
-### BUG-520: Guardar el Recap en Filament de un evento sin configuracion apaga el recap y todos sus bloques (RESUELTO 2026-11-03 en M2.6.4a, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+### BUG-520: Guardar el Recap en Filament de un evento sin configuracion apaga el recap y todos sus bloques (RESUELTO POR REEMPLAZO 2026-11-04: Recap de Filament quedo de solo lectura, M2.7.1. Antes: RESUELTO 2026-11-03 en M2.6.4a, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Recap de Filament quedo de solo lectura; lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** ALTA (el evento deja de generar recaps sin que nadie lo decida)
 - **Que pasa:** sin `recap_config`, RecapConfigResolver aplica sus valores de fabrica (todo encendido), pero `EventRecapResource` abre con los interruptores apagados y los textos y umbrales vacios (el `default()` de Filament solo sirve al crear). Al cambiar cualquier texto y guardar, se guardan `enabled: false`, todos los bloques en false y nulls que pisan los textos y umbrales de fabrica (RecapConfigResolver::deepMerge deja pasar el null). `GenerateRecapsForEventJob` mira `enabled ?? true` y no genera nada. Ademas: acepta "Insider hasta 10 h" con "Activo hasta 5 h" y no deja vaciar un texto (el deepMerge de la pagina salta los null).
 - **Visto:** 2026-11-03, con una sonda de Livewire sobre EditEventRecapSettings y en la cruzada `tests/Cruzadas/RecapTest`.
@@ -66,7 +68,8 @@
 
 ## 2026-11-03 — Encontrados al portar los Ajustes de Gamificacion (M2.6.3a)
 
-### BUG-513: Filament no guarda la asistencia a sesiones de Gamificacion (ABIERTO en PHP; C# no lo tiene: el admin nuevo la guarda desde M2.6.3a. Pendiente de M2.7.1: pasa a RESUELTO POR REEMPLAZO con la fecha en que Ajustes de Gamificacion de Filament quede de solo lectura u oculta; PHP no se arregla)
+### BUG-513: Filament no guarda la asistencia a sesiones de Gamificacion (RESUELTO POR REEMPLAZO 2026-11-04: Ajustes de Gamificacion de Filament quedo de solo lectura, M2.7.1. Antes: ABIERTO en PHP; C# no lo tiene: el admin nuevo la guarda desde M2.6.3a. Pendiente de M2.7.1: pasa a RESUELTO POR REEMPLAZO con la fecha en que Ajustes de Gamificacion de Filament quede de solo lectura u oculta; PHP no se arregla)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Ajustes de Gamificacion de Filament quedo de solo lectura; lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** ALTA (el organizador cambia los puntos por asistir o el criterio del certificado, Filament dice guardado y no cambia nada)
 - **Que pasa:** la seccion "Asistencia a sesiones" de `GamificationSettingsResource` edita `attendance_min_minutes`, `attendance_points`, `attendance_bonus_full`, `certificate_min_sessions` y `certificate_min_duration_pct`, pero ninguna esta en `$fillable` de `Event`: `update()` las descarta sin avisar. `AwardSessionAttendancePointsJob` y `RecapService` siguen leyendo los valores por defecto de la migracion.
 - **Visto:** 2026-11-03, en la cruzada `tests/Cruzadas/GamificacionTest`: el gemelo guardado por Filament quedo con 10, 25, 50, 1 y 60.
@@ -129,7 +132,8 @@
 - **Verificado:** si, 2026-11-01, leyendo `CifradoDeLaravel.Descifrar` (lineas 61, 82 y 119) al escribir la limpieza de M2.4.4c, que ya atrapa las tres (con prueba de una fila ilegible).
 - **Arreglo (Kamilo pidio arreglarlo en el mismo bloque, 2026-11-01):** `CierreDeAccesos` atrapa las tres y cierra igual la fila (C# `5957a5f`) (borra `staff_sessions`; no se sabe de que sesion o token era). Prueba `Admin/StaffTest.Una_sesion_ilegible_no_rompe_el_cierre_y_se_borra_igual` (base64 roto y MAC invalida); control: volver a atrapar solo `CryptographicException` la hace fallar.
 
-### BUG-506: Borrar a un miembro del staff con acciones en la bitacora rompe "Eliminar" en Filament (ABIERTO en PHP; resuelto en el admin nuevo)
+### BUG-506: Borrar a un miembro del staff con acciones en la bitacora rompe "Eliminar" en Filament (RESUELTO POR REEMPLAZO 2026-11-04: Staff de Filament quedo de solo lectura (sin "Eliminar"), M2.7.1. Antes: ABIERTO en PHP; resuelto en el admin nuevo)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Staff de Filament quedo de solo lectura (sin "Eliminar"); lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** MEDIA (la accion falla con un error de base de datos en vez de explicar que pasa)
 - **Que pasa:** `admin_audit_log.user_id` es `restrictOnDelete`. Si la persona aprobo, baneo o hizo cualquier accion que deja bitacora, `DeleteAction` de `EditUser` lanza la violacion de llave foranea.
 - **Verificado:** si, 2026-11-01, leyendo la migracion `create_moderation_tables` (`foreignId('user_id')->constrained()->restrictOnDelete()`) y `EditUser::getHeaderActions` (borra sin revisar).
@@ -144,7 +148,8 @@
 
 ## 2026-11-01 — Encontrados al portar los webhooks del admin (M2.4.3a, M2.4.3b y M2.4.3c)
 
-### BUG-504: El historial de webhooks de Filament muestra los envios de todos los eventos (CRUCE ENTRE EVENTOS, regla 26; ABIERTO en PHP; resuelto en el admin nuevo)
+### BUG-504: El historial de webhooks de Filament muestra los envios de todos los eventos (RESUELTO POR REEMPLAZO 2026-11-04: el historial de webhooks de Filament se oculto y su direccion lleva al admin nuevo, M2.7.1. Antes: CRUCE ENTRE EVENTOS, regla 26; ABIERTO en PHP; resuelto en el admin nuevo)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** el historial de webhooks de Filament se oculto y su direccion lleva al admin nuevo; lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** ALTA (cruce entre eventos: el staff de un evento ve los envios y check-ins de partners de otros eventos y organizaciones, con sus datos de personas en el payload)
 - **Que pasa:** `WebhookLogResource` no tiene `getEloquentQuery` por evento (los otros dos recursos del cluster si). La tabla y el detalle muestran cualquier `webhook_logs`. Esta fuera del menu desde julio, pero la URL `/admin/webhooks/webhook-logs` abre igual.
 - **Verificado:** si, 2026-11-01, leyendo `WebhookLogResource.php` (sin filtro por evento) frente a `WebhookEndpointResource` y `WebhookApiKeyResource` (con `where('event_id', EventContext::id())`).
@@ -157,13 +162,15 @@
 - **Mientras tanto (M2.4.3b, C# `49e462a`):** la llave completa se entrega una sola vez (al crear o regenerar) y la API del admin nunca la vuelve a devolver; la lista y el detalle solo muestran los ultimos 4 caracteres.
 - **Cuando se cierra (decision de Kamilo, 2026-11-01):** en M4d.9, cuando el check-in de partners pase a C#: (1) migracion que pasa las llaves existentes a hash (el partner no nota nada: su llave sigue siendo la misma), (2) columna con los ultimos 4 caracteres (un hash no los guarda), (3) texto nuevo de la especificacion (ya no puede traer la llave completa: "la que se mostro al crearla, termina en abcd").
 
-### BUG-501: El resumen de Webhooks de Filament cuenta los envios de todos los eventos (ABIERTO en PHP; resuelto en el admin nuevo, C# `8382bd6`)
+### BUG-501: El resumen de Webhooks de Filament cuenta los envios de todos los eventos (RESUELTO POR REEMPLAZO 2026-11-04: el resumen de Webhooks de Filament se quito, M2.7.1. Antes: ABIERTO en PHP; resuelto en el admin nuevo, C# `8382bd6`)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** el resumen de Webhooks de Filament se quito; lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** MEDIA (cruce de eventos: el staff de un evento ve cifras de envios de otros eventos y organizaciones)
 - **Que pasa:** `WebhookStatsWidget` cuenta `webhook_logs` sin filtrar por evento ("Enviados hoy", "Check-ins recibidos hoy", "Tasa de exito"). Ademas la tasa dice "Outbound ultimas 24h" y cuenta desde la medianoche.
 - **Verificado:** si, 2026-11-01, leyendo `ListWebhookEndpoints.php` (las tres consultas no tienen `event_id` ni pasan por el endpoint).
 - **Arreglo:** el resumen del admin nuevo cuenta solo los logs que cuelgan de un webhook o una llave del evento (el filtro de raiz de C#) y dice "de hoy". PHP congelado: muere con Filament (M2.8.3).
 
-### BUG-502: "Enviar prueba" de Filament muestra un resultado viejo con el webhook inactivo y rompe con una caida de red (ABIERTO en PHP; resuelto en el admin nuevo, C# `8382bd6`)
+### BUG-502: "Enviar prueba" de Filament muestra un resultado viejo con el webhook inactivo y rompe con una caida de red (RESUELTO POR REEMPLAZO 2026-11-04: Webhooks de Filament quedo de solo lectura (sin "Enviar prueba"), M2.7.1. Antes: ABIERTO en PHP; resuelto en el admin nuevo, C# `8382bd6`)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Webhooks de Filament quedo de solo lectura (sin "Enviar prueba"); lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (solo el staff, en Filament)
 - **Que pasa:** con el webhook inactivo `DispatchWebhookJob` no manda nada, pero la accion lee el ultimo log del endpoint y avisa ese resultado (de otro envio). Con una caida de red el job lanza la excepcion dentro del `dispatchSync` y la accion se rompe sin aviso.
 - **Verificado:** si, 2026-11-01, leyendo `WebhookEndpointResource.php` (send_test) y `DispatchWebhookJob::handle`.
@@ -235,7 +242,8 @@
 
 ## 2026-10-30 — Encontrado al portar Onboarding de la app (M2.3.4c)
 
-### BUG-491: Vaciar un texto del onboarding en Filament no lo borra (ABIERTO en PHP; C# lo hace distinto a proposito)
+### BUG-491: Vaciar un texto del onboarding en Filament no lo borra (RESUELTO POR REEMPLAZO 2026-11-04: el Onboarding de Filament (resource oculto y pestana de Branding) quedo de solo lectura, M2.7.1. Antes: ABIERTO en PHP; C# lo hace distinto a proposito)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** el Onboarding de Filament (resource oculto y pestana de Branding) quedo de solo lectura; lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (el organizador no puede quitar un titulo ya escrito; solo cambiarlo por otro)
 - **Que pasa:** `EditEventBranding::deepMergeConfig` solo copia un valor si `$value !== null`; Laravel convierte el texto vacio en `null`, asi que al vaciar un campo del onboarding (titulo, subtitulo, botones, hints) el valor guardado queda como estaba.
 - **Verificado:** si, 2026-10-30, con la prueba cruzada `tests/Cruzadas/OnboardingTest` (segunda prueba): `title_line1` guardado como `Hola` y vaciado en el formulario de Filament sigue siendo `Hola`.
@@ -243,7 +251,8 @@
 
 ## 2026-10-30 — Encontrado al portar Branding (M2.3.4b)
 
-### BUG-490: `organizer_name` admite 255 en Filament pero la columna es de 120 y un nombre largo da error 500 (ABIERTO en PHP; C# no lo tiene)
+### BUG-490: `organizer_name` admite 255 en Filament pero la columna es de 120 y un nombre largo da error 500 (RESUELTO POR REEMPLAZO 2026-11-04: Branding de Filament quedo de solo lectura, M2.7.1. Antes: ABIERTO en PHP; C# no lo tiene)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Branding de Filament quedo de solo lectura; lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (hay que escribir un nombre de organizador de mas de 120 caracteres)
 - **Que pasa:** `EventBrandingResource` deja `maxLength(255)` pero `events.organizer_name` es `varchar(120)`; con mas de 120 MySQL responde `Data too long for column` y Filament muestra un 500 en vez de un error del campo.
 - **Verificado:** si, 2026-10-30, con tinker contra MySQL: un valor de 121 caracteres da `Data too long`.
@@ -259,30 +268,35 @@
 
 ## 2026-10-28 — Encontrados al portar Identidad (M2.3.3a)
 
-### BUG-488: Reordenar sponsors en Filament no avisa a los clientes (ABIERTO en PHP; C# no lo tiene)
+### BUG-488: Reordenar sponsors en Filament no avisa a los clientes (RESUELTO POR REEMPLAZO 2026-11-04: Sponsors de Filament quedo de solo lectura (sin reordenar), M2.7.1. Antes: ABIERTO en PHP; C# no lo tiene)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Sponsors de Filament quedo de solo lectura (sin reordenar); lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (el orden nuevo se ve al siguiente arranque o refresco)
 - **Que pasa:** el arrastre de la tabla de `SponsorResource` (`reorderable`) hace un `UPDATE` directo sin eventos del modelo, por lo que `SponsorObserver` no corre y no se avisa `sponsors` al socket. Misma causa que BUG-484 (confirmado en Identidad con prueba contra MySQL); en Sponsors no se probo aparte.
 - **En C#:** `POST /sponsors/reorder` avisa `sponsors`; `SponsorsTest`. En PHP queda abierto hasta que Filament se apague (M2.7).
 
-### BUG-487: En Filament, puntos por visitar o puntos bonus de mas de 65535 dan error 500 (ABIERTO en PHP; C# no lo tiene)
+### BUG-487: En Filament, puntos por visitar o puntos bonus de mas de 65535 dan error 500 (RESUELTO POR REEMPLAZO 2026-11-04: Sponsors de Filament quedo de solo lectura, M2.7.1. Antes: ABIERTO en PHP; C# no lo tiene)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Sponsors de Filament quedo de solo lectura; lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (solo staff, con un numero absurdo)
 - **Que pasa:** `visit_points` de `sponsors` y `bonus_points` de `stand_trivias` son `smallint unsigned` y los campos de Filament solo piden `minValue(0)`, sin tope: MySQL rechaza la fila (`Out of range value`) y sale error de servidor.
 - **Verificado:** si, 2026-10-29, con una prueba temporal contra MySQL (`CreateSponsor` con `visit_points` 70000 lanza `QueryException` 1264); no se dejo en el repo (regla 6).
 - **En C#:** tope de 65535 con su mensaje (422); `SponsorsTest`.
 
-### BUG-486: En Filament, logo, banner o sitio web de mas de 255 caracteres dan error 500 (ABIERTO en PHP; C# no lo tiene)
+### BUG-486: En Filament, logo, banner o sitio web de mas de 255 caracteres dan error 500 (RESUELTO POR REEMPLAZO 2026-11-04: Sponsors de Filament quedo de solo lectura, M2.7.1. Antes: ABIERTO en PHP; C# no lo tiene)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Sponsors de Filament quedo de solo lectura; lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (solo staff, con una URL muy larga)
 - **Que pasa:** `SponsorResource` acepta hasta 500 caracteres en logo y banner (`ImageUploadField`) y en el sitio web, pero `logo_url`, `banner_url` y `website_url` de `sponsors` son `string` de 255: MySQL rechaza la fila (`Data too long`) y sale error de servidor. Misma familia que BUG-485.
 - **Verificado:** si, 2026-10-29, con una prueba temporal contra MySQL (`CreateSponsor` con un logo de 300 caracteres lanza `QueryException` 1406); no se dejo en el repo (regla 6).
 - **En C#:** el tope es el de la columna (255) con el mensaje de Laravel (422); `SponsorsTest`.
 
-### BUG-485: En Filament, un destacado con imagen o destino de mas de 255 caracteres da error 500 (ABIERTO en PHP; C# no lo tiene)
+### BUG-485: En Filament, un destacado con imagen o destino de mas de 255 caracteres da error 500 (RESUELTO POR REEMPLAZO 2026-11-04: Destacados de Filament quedo de solo lectura, M2.7.1. Antes: ABIERTO en PHP; C# no lo tiene)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Destacados de Filament quedo de solo lectura; lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (solo staff, con una URL muy larga)
 - **Que pasa:** `HighlightResource` acepta hasta 500 caracteres en la imagen (`ImageUploadField`) y en la URL de destino, pero las columnas `image_url` y `link_url` de `event_highlights` son `string` de 255: MySQL rechaza la fila (`Data too long`) y Filament muestra error de servidor. Los slides del login y las preguntas si tienen columnas de 500.
 - **Verificado:** si, 2026-10-28, con una prueba temporal contra MySQL (`CreateHighlight` con una URL de 272 caracteres lanza `QueryException`); no se dejo en el repo (regla 6).
 - **En C#:** el tope es el de la columna (255) con el mensaje de Laravel (422); `IdentidadTest`. En PHP queda abierto hasta que Filament se apague (M2.7).
 
-### BUG-484: Reordenar slides del login, destacados o preguntas en Filament no corre sus efectos (ABIERTO en PHP; C# no lo tiene)
+### BUG-484: Reordenar slides del login, destacados o preguntas en Filament no corre sus efectos (RESUELTO POR REEMPLAZO 2026-11-04: Slides del login, Destacados y Preguntas de Filament quedaron de solo lectura (sin reordenar), M2.7.1. Antes: ABIERTO en PHP; C# no lo tiene)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Slides del login, Destacados y Preguntas de Filament quedaron de solo lectura (sin reordenar); lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (el orden nuevo se ve a los 5 minutos o al siguiente arranque)
 - **Que pasa:** el arrastre de la tabla (`reorderable`) hace un `UPDATE` directo sin eventos del modelo, como en BUG-477: reordenar preguntas no suelta `event:{id}:faqs`, reordenar slides no suelta `login-slides:event:{id}` y reordenar destacados no avisa `highlights` al socket. La app sigue mostrando el orden viejo mientras dure la cache.
 - **Verificado:** si, 2026-10-28, con una prueba temporal contra MySQL (`reorderTable` en las tres listas deja la cache y no llama al socket); no se dejo en el repo (regla 6).
@@ -321,26 +335,30 @@
 - **Que pasa:** la celda usaba `adm-tabla-nota`, que es `display: block`; una celda de tabla en bloque se sale de la grilla y su borde no coincide con el de la fila. Se vio al revisar Salones (la columna Puertas tenia lo mismo antes de salir).
 - **Corregido:** clase `adm-tenue` (solo color) para celdas; `CatalogoDeAgenda` y las tablas de Salones la usan (web, M2.3.2b).
 
-### BUG-478: En Filament, una capacidad negativa de salon da error 500 (ABIERTO en PHP; C# no lo tiene)
+### BUG-478: En Filament, una capacidad negativa de salon da error 500 (RESUELTO POR REEMPLAZO 2026-11-04: Salones de Filament quedo de solo lectura, M2.7.1. Antes: ABIERTO en PHP; C# no lo tiene)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Salones de Filament quedo de solo lectura; lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (solo staff, al escribir mal)
 - **Que pasa:** el campo Capacidad de `EventRoomResource` y `ListEventRooms` solo pide `numeric`; con -1 MySQL rechaza la fila (`SQLSTATE[22003] Out of range value for column capacity`, la columna es sin signo) y Filament muestra error de servidor.
 - **Verificado:** si, 2026-10-27, con una prueba temporal contra MySQL (`callAction(create, capacity: -1)` lanza `QueryException`); no se dejo en el repo (regla 6).
 - **En C#:** la capacidad es entera de 0 en adelante (422 con el texto de Laravel); `SalonesTest`. En PHP queda abierto hasta que Filament se apague (M2.7).
 
-### BUG-477: Cambiar un tipo de sesion o reordenar tracks y tipos en Filament no refresca la agenda (ABIERTO en PHP; C# no lo tiene)
+### BUG-477: Cambiar un tipo de sesion o reordenar tracks y tipos en Filament no refresca la agenda (RESUELTO POR REEMPLAZO 2026-11-04: Tracks y Tipos de sesion de Filament quedaron de solo lectura (sin editar ni reordenar), M2.7.1. Antes: ABIERTO en PHP; C# no lo tiene)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Tracks y Tipos de sesion de Filament quedaron de solo lectura (sin editar ni reordenar); lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (la agenda muestra el nombre y color viejos del tipo hasta que vence su cache)
 - **Que pasa:** `SessionType` no tiene observer (AppServiceProvider solo observa `SessionTrack` y `EventRoom`), asi que guardar o borrar un tipo no borra `event:{id}:agenda` ni avisa. Y el "Ordenar" de las tablas de Filament guarda con un UPDATE directo (`CanReorderRecords::reorderTable`), que no dispara observers: reordenar tracks o tipos tampoco refresca.
 - **Verificado:** leyendo el codigo (AppServiceProvider lineas 176-177 y `vendor/filament/tables/src/Concerns/CanReorderRecords.php`); sin prueba que falle en PHP (regla 6: PHP no se toca).
 - **En C#:** `EfectosDeLaAgenda` corre al guardar, borrar y reordenar tracks y tipos (M2.3.2a, `TracksYTiposTest`).
 
 
-### BUG-476: En el asistente de Filament, un nombre sin letras latinas deja el evento con slug vacio (ABIERTO en PHP; C# no lo tiene)
+### BUG-476: En el asistente de Filament, un nombre sin letras latinas deja el evento con slug vacio (RESUELTO POR REEMPLAZO 2026-11-04: el asistente de evento nuevo de Filament se cerro (crear eventos es del admin nuevo; el Escritorio lleva alla), M2.7.1. Antes: ABIERTO en PHP; C# no lo tiene)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** el asistente de evento nuevo de Filament se cerro (crear eventos es del admin nuevo; el Escritorio lleva alla); lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (nombres en japones, chino, arabe; ningun cliente hoy)
 - **Que pasa:** `Str::slug('日本')` da `""` (con idioma `en` no translitera), y `CreateEvent` guarda el evento con slug vacio; el segundo queda `-2`. La landing `/e/{slug}` no tiene a donde ir.
 - **Verificado:** si, `Str::slug` corrido en PHP el 2026-10-27 (caso en `SlugDeLaravelTest` de C#).
 - **En C#:** un slug vacio pasa a `evento` (`EventoNuevo.SlugLibreAsync`), diferencia anotada en M2.3.1. En PHP queda abierto hasta que Filament se apague (M2.7).
 
-### BUG-475: En el asistente de Filament, un nombre largo da error 500 al crear el evento (ABIERTO en PHP; C# no lo tiene)
+### BUG-475: En el asistente de Filament, un nombre largo da error 500 al crear el evento (RESUELTO POR REEMPLAZO 2026-11-04: el asistente de evento nuevo de Filament se cerro (crear eventos es del admin nuevo; el Escritorio lleva alla), M2.7.1. Antes: ABIERTO en PHP; C# no lo tiene)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** el asistente de evento nuevo de Filament se cerro (crear eventos es del admin nuevo; el Escritorio lleva alla); lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA (hace falta un nombre de mas de ~100 caracteres)
 - **Que pasa:** el nombre acepta 255 caracteres, pero el slug sale del nombre sin cortar y la columna `events.slug` es de 100. MySQL en modo estricto lo rechaza ("Data too long for column 'slug'") y el asistente se cae.
 - **Verificado:** si, MySQL 8.4 de Laragon con el `sql_mode` de Laravel rechaza un slug de 101 caracteres (2026-10-27).
@@ -1088,7 +1106,8 @@
 - **Archivos:** `WebhookDispatchService.php:24`, `WebhookEndpointResource.php:195-204, 315-336`, `DispatchWebhookJob`
 
 - **Resuelto 2026-10-23 (M0.8.4):** Simular evento sale como prueba; Reenviar fallidos una vez por envio e incluye caidas de red. Prueba `tests/Feature/Security/PanelAdminSeguridadTest.php`. Backend `8b99911`.
-### BUG-383: Abrir dos paginas del admin ya cambia datos (ABIERTO 2026-10-22)
+### BUG-383: Abrir dos paginas del admin ya cambia datos (RESUELTO POR REEMPLAZO 2026-11-04: abrir Encuestas ya no crea la post-evento y abrir una solicitud de Soporte ya no la marca leida; las dos pantallas quedaron de solo lectura, M2.7.1. Antes: ABIERTO 2026-10-22)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** abrir Encuestas ya no crea la post-evento y abrir una solicitud de Soporte ya no la marca leida; las dos pantallas quedaron de solo lectura; lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** BAJA
 - **Que pasa:** La lista de encuestas crea la encuesta post-evento con 3 preguntas al montarse; abrir una solicitud de soporte la pasa de `open` a `read` aunque nadie la lea.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
@@ -1097,7 +1116,8 @@
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 - **2026-11-02 (M2.4.6): la mitad de Soporte no se repite en el admin nuevo:** el GET de la solicitud no cambia nada; la pantalla manda `POST /read` al mostrarla (`SoporteTest.Ver_no_cambia_nada...`, con control). Falta la mitad de encuestas (M2.6.1).
-### BUG-382: Activar o cerrar encuestas desde el admin no avisa por socket (RESUELTO 2026-11-03 en M2.6.1a, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+### BUG-382: Activar o cerrar encuestas desde el admin no avisa por socket (RESUELTO POR REEMPLAZO 2026-11-04: Encuestas de Filament quedo de solo lectura (sin activar ni cerrar), M2.7.1. Antes: RESUELTO 2026-11-03 en M2.6.1a, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Encuestas de Filament quedo de solo lectura (sin activar ni cerrar); lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** La API emite `poll:new` y `poll:closed`; Filament no: los asistentes no ven la encuesta hasta refrescar.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
@@ -1123,7 +1143,8 @@
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 - **En C#:** asignar o quitar speakers (`PUT /sessions/{id}/speakers`) borra la agenda y la lista de speakers de la cache, manda la sesion con sus speakers (`session.updated`) y avisa `speakers` (M2.3.2c1, `SesionesTest` y la cruzada). Cerrado en M2.3.2c3: Filament ya no edita sesiones ni asigna speakers; la prueba de `tests/Auditoria` pasa.
 
-### BUG-379: Muro: seis caminos para publicar u ocultar, cada uno con efectos distintos (RESUELTO 2026-11-03 en M2.6.5a, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+### BUG-379: Muro: seis caminos para publicar u ocultar, cada uno con efectos distintos (RESUELTO POR REEMPLAZO 2026-11-04: el Muro de Filament quedo de solo lectura (sin publicar ni ocultar), M2.7.1. Antes: RESUELTO 2026-11-03 en M2.6.5a, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** el Muro de Filament quedo de solo lectura (sin publicar ni ocultar); lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Fila: puntos y socket, sin webapp. Masivo: puntos, sin socket ni webapp. Detalle: solo webapp. Ocultar (fila o masivo) no avisa a nadie. `WallPost` no tiene observer propio.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
@@ -1132,7 +1153,8 @@
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 - **RESUELTO 2026-11-03 (M2.6.5a, decidido por Kamilo):** en C# la fila, el detalle y el masivo llaman la misma funcion (`Muro.CambiarAsync`): publicar da los puntos de `wall_post` una sola vez (aunque lleguen diez a la vez), avisa `wall:post` con la forma de la API y suelta el muro de la webapp; ocultar suelta el muro de la webapp y no avisa al socket (como PHP; `wall:hidden` anotado en M3.4.1). Pruebas: `MuroTest` (C#) y la cruzada `tests/Cruzadas/MuroTest` (el detalle de Filament sin puntos queda escrito).
-### BUG-378: Fotos: aprobar da resultados distintos y "aprobar seleccionadas" puede romper (RESUELTO 2026-11-03 en M2.6.5b, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+### BUG-378: Fotos: aprobar da resultados distintos y "aprobar seleccionadas" puede romper (RESUELTO POR REEMPLAZO 2026-11-04: Fotos de Filament quedo de solo lectura (sin aprobar, rechazar ni acciones masivas), M2.7.1. Antes: RESUELTO 2026-11-03 en M2.6.5b, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
+- **Cierre por reemplazo (M2.7.1, 2026-11-04):** Fotos de Filament quedo de solo lectura (sin aprobar, rechazar ni acciones masivas); lo prueba `tests/Feature/Filament/SoloLecturaEnElAdminNuevoTest`. PHP no se arregla (regla 6).
 - **Severidad propuesta:** MEDIA
 - **Que pasa:** Aprobar en la fila da puntos; en el detalle no. `bulk_approve` no filtra por estado y vuelve a aprobar rechazadas. Si la seleccion incluye una foto oficial (`attendee_id` nulo) llama `tryAward` con null en un `int`: TypeError.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.

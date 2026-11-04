@@ -17,6 +17,8 @@ Convenciones:
 - `SendEmailJob` solo envia si la plantilla del correo esta activa; usa el SMTP de la organizacion si esta listo (`EmailService::mailerFor`).
 - `AdminAuditLog::record` crea una fila en `admin_audit_logs`. Desde Filament nunca se le pasa la IP (la API si).
 
+> **M2.7.1 (2026-11-04):** de este inventario, en Filament solo siguen vivas las acciones de Premios (`RewardResource`), Campos del formulario, Event Pulse (`copiar`, `regenerar_token`) y tres sueltas: `regenerar_recap` (cabecera del perfil del asistente, hasta M4e.5), `generate_batch` (M2.4.5e) y `ajustes_equipos` (M2.3.3d). Todas las demas estan en pantallas de solo lectura y ya no se pintan ni se pueden llamar. Detalle en `pantallas-admin.md`, "Filament tras M2.7.1".
+
 ## Paginas sueltas (LiveGameResults, PrizeRedemptions)
 
 | Accion | Donde | Que hace | Efectos | Condiciones |

@@ -10,6 +10,17 @@
 
 ---
 
+## SESION 2026-11-04 (Opus 5.5, 33) — M2.7.1 HECHA: FILAMENT DE SOLO LECTURA EN LAS 35 PANTALLAS CUBIERTAS; CINCO HUECOS AL ROADMAP
+
+- Decisiones Kamilo: regla unica de 2.7 (cada pantalla cubierta de solo lectura, sin crear, editar ni borrar, con el aviso "Esta pantalla ahora se administra en el admin nuevo" arriba y el enlace a su equivalente; oculta solo si no queda nada que mirar; bugs "abierto en PHP" cerrados por reemplazo). Excepcion: Modulos y Landing y widget se ocultan con redireccion. Historial de webhooks oculto y resumen fuera (BUG-504 y 501). Huecos de tareas aprobadas entran al roadmap y se hacen antes de cerrar 2.7. Las cruzadas que comparan con Filament usan una llave solo de pruebas (`LlaveDeFilament`, por el camino del modo contratos, nunca en produccion).
+- Hecho: backend `4073da3` (traits de solo lectura, aviso por render hook, llave, Escritorio al admin nuevo, Encuestas y Soporte ya no escriben al abrir), C# `545df03` (las cruzadas prenden la llave). Siguen vivas en Filament: Regenerar recap (M4e.5), Generar en lote (M2.4.5e), Ajustes de equipos (M2.3.3d).
+- Huecos nuevos en el roadmap: M2.2.8 Seguridad de tu cuenta, M2.3.3d Ajustes de equipos de Sponsors, M2.4.1c Campos del formulario, M2.4.5d Premios, M2.4.5e Codigos en lote. Roadmap 133/236.
+- Bugs cerrados por reemplazo (22): 378, 379, 382, 383, 475, 476, 477, 478, 484, 485, 486, 487, 488, 490, 491, 501, 502, 504, 506, 513, 520, 522.
+- Pruebas viejas de PHP que manejaban desde Filament lo que ahora esta cerrado salieron; su decision la cubre C# (StaffTest, WebhooksTest, SponsorsTest, EntradaDelEventoTest y la e2e de Entrada).
+- Pruebas en local: `SoloLecturaEnElAdminNuevoTest` 136 con 10 controles en rojo, PHP 1381, cruzadas 96/96, C# 559 (1 saltada). Web sin cambios (vitest y e2e admin no se corrieron).
+- Despliegue: compilar el tema de Filament (`npm run build` en eventos-backend: estilos del aviso). `CONTRATOS_FILAMENT_ESCRIBE` NUNCA en el servidor (igual no abre en produccion). Sigue pendiente de la 32: `php artisan migrate` (`2026_11_03_120000`).
+- **Sigue: proponer los huecos de la fase 2 antes de cerrar 2.7, empezando por M2.4.5d Premios (sonda de Livewire contra Filament antes de proponer); despues M2.4.1c, M2.4.5e, M2.3.3d y M2.2.8; luego M2.7.2 (Data Center con bearer).**
+
 ## SESION 2026-11-03 (Opus 5.5, 32) — M2.6.5 SOCIAL COMPLETA (MURO, PUNTOS EN C#, FOTOS, PREMIAR); SECCION 2.6 10/10
 
 - MSI de M2.6.4a, M2.6.5a y M2.6.5b en verde; el de M2.6.5c (41744133317) tambien en verde.
