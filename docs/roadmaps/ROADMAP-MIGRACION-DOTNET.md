@@ -93,7 +93,7 @@ Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta e
 
 ## DECISIONES DE KAMILO
 
-Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
+Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue abierta).
 
 ---
 
@@ -203,6 +203,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 
 ---
 
+<details>
+<summary><b>Fase 1: Cimientos en C# (3 semanas) — 31/33 (local HECHO 2026-10-25; faltan M1.2.5 y M1.5.6, servidor)</b></summary>
+
 ## Fase 1: Cimientos en C# (3 semanas) — 31/33 (local HECHO 2026-10-25; faltan M1.2.5 y M1.5.6, servidor)
 
 > C# arranca con lo invisible: lee la misma base, acepta los mismos tokens, responde con el mismo JSON y los mismos
@@ -277,10 +280,9 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
   7. **Antes de la fase 2:** D.2 a D.4 y D.9 decididas por Kamilo el mismo 2026-10-25 (`decisiones.md`; D.9 es la regla 29).
      Al prender el servidor: BUG-457 primero, despues M1.2.5 y M1.5.6.
 
----
+</details>
 
-<details>
-<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 59/74</b></summary>
+---
 
 ## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 59/74
 
@@ -365,7 +367,7 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 - [x] M2.6.5c Social, premiar: una foto y "Premiar top fotos" del concurso, con el Golden Ticket de C# (M2.4.5b), su anuncio privado y los puntos por posicion **[local]** — **Hecho 2026-11-03** (C# `cf42ae1`, backend `9d39e4a`, web `8458a16`). Decidido por Kamilo: una foto se premia una sola vez y lo frena la base (migracion de Laravel, columna generada `event_photo_prize_id` con indice unico solo para premios de fotos); los puestos siguen desde el ultimo dado y "Premiar top" se frena en el maximo de ganadores; los puntos por posicion se dan (BUG-522, PHP nunca los daba). En C# `POST /events/{eventId}/event-photos/{id}/award`, `GET /event-photos/contest` y `POST /event-photos/award-top` (`Admin/Social/PremiosDeFotos`, `manage-content`), con `Premios.CrearGoldenTicketAsync` comun y `Puntos.BonoDelConcursoAsync`. Web: Premiar en la fila y el detalle, Premiar top fotos con la ventana del concurso. Pruebas: C# 559 (`PremiosDeFotosTest`), cruzadas 96/96 (`tests/Cruzadas/PremiosDeFotosTest`), PHP 1261 (`PhotoContestTest` actualizada), e2e admin 62/62, vitest 725; 3 controles en rojo (sin el indice, puestos desde 1, bono como PHP). **Despliegue: migracion nueva de Laravel** (`php artisan migrate`; se detiene con aviso si ya hay fotos premiadas dos veces).
 
 ### 2.7 Apagar Filament modulo por modulo (continuo) — 0/4
-- [ ] M2.7.1 Por cada modulo que el admin nuevo cubre, el resource de Filament se oculta del panel (no se borra) y se anota en el inventario de M0.5.3 **[local]** — **Anotado 2026-11-03 (Kamilo):** `GamificationSettingsResource` (Ajustes de Gamificacion) va primero: oculta o de solo lectura, porque Filament no guarda la asistencia a sesiones (BUG-513, pendiente de esta tarea; PHP no se arregla). **Regla (Kamilo 2026-11-03):** al dejar una pantalla de solo lectura, sus BUG "ABIERTO en PHP; C# no lo tiene" pasan a "RESUELTO POR REEMPLAZO" con esa fecha (ya: BUG-489, Documentos, 2026-10-29). Pendientes por pantalla: Gamificacion (BUG-513), Identidad (BUG-484 slides, destacados y preguntas; BUG-485 destacados; BUG-490 Branding), Sponsors (BUG-486, 487, 488), Salones (BUG-478), Tracks y tipos (BUG-477), Asistente de evento nuevo (BUG-475, 476).
+- [ ] M2.7.1 Por cada modulo que el admin nuevo cubre, el resource de Filament se oculta del panel (no se borra) y se anota en el inventario de M0.5.3 **[local]** — **Anotado 2026-11-03 (Kamilo):** `GamificationSettingsResource` (Ajustes de Gamificacion) va primero: oculta o de solo lectura, porque Filament no guarda la asistencia a sesiones (BUG-513, pendiente de esta tarea; PHP no se arregla). **Regla (Kamilo 2026-11-03):** al dejar una pantalla de solo lectura, sus BUG "ABIERTO en PHP; C# no lo tiene" pasan a "RESUELTO POR REEMPLAZO" con esa fecha (ya: BUG-489, Documentos, 2026-10-29). Pendientes por pantalla: Gamificacion (BUG-513), Identidad (BUG-484 slides, destacados y preguntas; BUG-485 destacados; BUG-490 Branding), Sponsors (BUG-486, 487, 488), Salones (BUG-478), Tracks y tipos (BUG-477), Asistente de evento nuevo (BUG-475, 476), Muro (BUG-379), Fotos (BUG-378, 522).
 - [ ] M2.7.2 El SPA del Data Center (`public/data-center`) pasa a bearer del staff (M2.2.2) y se enlaza desde el admin nuevo; deja de depender de la sesion web de Laravel **[local]** (D.8: hasta aqui sus 19 rutas siguen en PHP con cookie; despues quedan listas para M4e)
 - [ ] M2.7.3 Mission Control, Event Pulse, display, chat-monitor y attendance-check se enlazan desde el admin nuevo con el mismo token; su unificacion (PENDIENTES §11) se hace aqui o se absorben como paginas del admin **[local]**
 - [ ] M2.7.4 Cuando el ultimo modulo del hito 1 este cubierto: Filament solo queda para lo de M2b, con un aviso en el panel **[local]**
@@ -386,8 +388,6 @@ Viven en **`docs/decisiones.md`** (D.1 dada 2026-10-21; D.2 a D.6 abiertas).
 ### 2.10 Cierre de la fase (hito 1) — 0/2
 - [ ] M2.10.1 Medicion del hito 1 en el servidor real (admin nuevo + API PHP) con los k6 de agosto; numero anotado aqui **[servidor]**
 - [ ] M2.10.2 Retro de la fase 2 **[local]**
-
-</details>
 
 ---
 
