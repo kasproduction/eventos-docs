@@ -3,6 +3,36 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-04 — Pruebas de PHP que salieron en M2.7.1 y que las cubre (backend `4073da3`)
+
+Al dejar Filament de solo lectura, 18 pruebas de PHP que manejaban desde Filament lo que ahora esta cerrado fallaron: 16 salieron,
+una se recorto y una cambio de destino. Cada una con la prueba que hoy cubre lo que fijaba. C# = `eventos-api-dotnet/tests/Tests/Admin`;
+e2e = `eventos-web/e2e-admin`. "En parte" = la regla esta en C#, pero su prueba no repite el mismo caso.
+
+| # | Prueba de PHP (archivo) | Que fijaba | Quien la cubre ahora |
+|---|---|---|---|
+| 1 | BUG-406: un event_admin no le da un rol de su nivel o mayor a otro; uno menor si (`Security/JerarquiaDelStaffTest`, salio) | Editar a otro con roles altos deja solo el menor | **En parte.** C# `StaffTest.Crear_valida_como_el_formulario_da_solo_roles_menores_y_guarda_la_clave_en_argon2id` (al crear) y `La_lista_es_de_la_organizacion_y_cada_fila_dice_que_se_puede_hacer_segun_la_jerarquia` (opciones por nivel). La regla al editar esta en `Api/Admin/Sistema/Staff.cs:22`, sin prueba de editar a otro con roles altos |
+| 2 | BUG-406: un org_admin no crea otro org_admin; el super_admin da cualquier rol (`JerarquiaDelStaffTest`, salio) | Un org_admin no da org_admin; super_admin si | C# `StaffTest.La_lista_es_de_la_organizacion_y_cada_fila_dice_que_se_puede_hacer_segun_la_jerarquia` (las opciones del org_admin no traen org_admin ni super_admin) y `Crear_valida_como_el_formulario_da_solo_roles_menores_...` |
+| 3 | El super_admin ve el aviso, la actividad en tercera persona y puede desbloquear (`Security/StaffLockoutTest`, salio) | Desbloquear deja la cuenta libre y anota quien | C# `StaffTest.Desbloquear_es_de_super_admin_deja_los_contadores_en_cero_y_lo_anota` y `La_actividad_cuenta_la_bitacora_de_90_dias_...`; e2e `staff.spec.ts` "staff: desbloquear, restablecer el segundo factor y ver la actividad de acceso" |
+| 4 | Sin bloqueo no aparece Desbloquear, y alguien que no es super_admin nunca lo ve (`StaffLockoutTest`, salio) | Solo super_admin y solo con bloqueo | C# `StaffTest.Desbloquear_es_de_super_admin_...` (sin bloqueo da `NoEstaBloqueada`, `can_unlock` falso y 403 para quien no es super_admin) |
+| 5 | Tambien se restablece desde la pagina de edicion (`Security/TwoFactorRescueTest`, salio) | Restablecer el 2FA de otro | C# `StaffTest.Restablecer_el_segundo_factor_lo_borra_lo_saca_de_todos_lados_y_le_avisa`; e2e `staff.spec.ts` (desbloquear y restablecer) |
+| 6 | Crear un miembro del staff vuelve a la lista con el aviso (`TwoFactorRescueTest`, salio) | Tras crear se vuelve a la lista (QA Kamilo 2026-09-29) | e2e `staff.spec.ts` "staff: crear con rol menor y evento, editar, ...". C# `StaffTest.Crear_valida_...` para lo que se guarda |
+| 7 | El unico super_admin no puede quitarse el rol (`TwoFactorRescueTest`, salio) | Nunca sin super_admin | C# `StaffTest.Nunca_queda_el_panel_sin_un_super_admin_activo` (`UltimoSuperAdmin` al quitarse el rol) |
+| 8 | Nadie puede desactivar al unico super_admin (`TwoFactorRescueTest`, salio) | Ni desactivarlo ni que un event_admin lo abra | C# `StaffTest.Nunca_queda_el_panel_sin_un_super_admin_activo` (desactivar da `UltimoSuperAdmin`) y `La_lista_..._segun_la_jerarquia` (un nivel menor no lo administra) |
+| 9 | Con otro super_admin activo si se puede desactivar a uno (`TwoFactorRescueTest`, salio) | Control: con dos, si se desactiva | **En parte.** C# `StaffTest.Nunca_queda_el_panel_sin_un_super_admin_activo` tiene el control con dos super_admin, pero borrando, no desactivando |
+| 10 | BUG-437: elegir a alguien en el selector no da acceso; guardar se lo da al nuevo y se lo quita al anterior (`Security/StandsYCheckinTest`, salio) | Cambiar de lider pasa el acceso de vendedor | C# `SponsorsTest.Se_crea_edita_y_borra_con_servicios_trivias_y_cambio_de_lider` (el nuevo lo recibe y el anterior lo pierde). "Elegir sin guardar" era del selector reactivo de Filament; el admin nuevo solo escribe al guardar. Sigue en PHP la de control "si el lider anterior sigue en el equipo, conserva su acceso" |
+| 11 | BUG-385: la especificacion de un partner trae solo su llave de entrada (`Security/PanelAdminSeguridadTest`, salio) | Ninguna llave de otro partner en la especificacion | C# `WebhooksTest.La_especificacion_lleva_el_secreto_y_solo_la_llave_de_ese_partner` |
+| 12 | BUG-384: simular manda prueba aunque el endpoint este en modo real, y reenviar no duplica (`PanelAdminSeguridadTest`, recortada) | Simular siempre es prueba; reenviar no duplica | Lo de PHP (`WebhookDispatchService` con `test: true`) sigue en la misma prueba. Reenviar: C# `WebhooksTest.Reenviar_fallidos_vuelve_a_encolar_una_vez_cada_envio_real_de_24_horas_que_nunca_salio_bien` y `Simular_encola_cinco_registros_y_tres_check_ins_como_prueba` |
+| 13 | La pagina abre en Entrada con la landing, el codigo y la vista previa (`Admin/LandingWidgetPageTest`, archivo borrado) | La pantalla y su codigo para pegar | e2e `entrada-del-evento.spec.ts` "landing y widget: los dominios se normalizan y se guardan al instante" (abre desde Entrada y revisa el codigo) |
+| 14 | Agregar un dominio lo limpia y lo guarda al instante (`LandingWidgetPageTest`) | Normalizar y guardar al agregar | C# `EntradaDelEventoTest.Los_dominios_del_widget_se_normalizan_como_en_PHP`; e2e "landing y widget: ..." |
+| 15 | Lo que no es un dominio no se guarda (`LandingWidgetPageTest`) | `localhost` y similares no entran | C# `EntradaDelEventoTest.Los_dominios_del_widget_se_normalizan_como_en_PHP` (`localhost` da error); e2e "Ese no parece un dominio" |
+| 16 | Quitar un dominio lo borra del evento (`LandingWidgetPageTest`) | Quitar al instante | C# `EntradaDelEventoTest.Los_dominios_del_widget_se_normalizan_como_en_PHP` (`DELETE /embed-domains/empresa.com`); e2e "Quitar empresa.com" |
+| 17 | El tema cambia el codigo para pegar (`LandingWidgetPageTest`) | `data-tema` en el codigo | e2e "landing y widget: ..." (`data-tema="noir"` en el codigo) |
+| 18 | Sin eventos el Escritorio lleva al wizard de crear evento (`Admin/PrimerIngresoWizardTest`, cambio de destino) | Una instalacion vacia arranca por crear el evento | La misma prueba de PHP, ahora hacia `/admin/eventos/nuevo` del admin nuevo; el asistente lo cubren C# `EventoNuevoTest` y la e2e `eventos.spec.ts` |
+
+Huecos de prueba (la regla esta en C#, falta el caso): **1** (editar a otro con roles de su nivel o mayor) y **9** (desactivar
+con otro super_admin activo). Se agregan a `StaffTest` cuando Kamilo lo apruebe.
+
 ## 2026-11-03 — Encontrados al portar Premiar fotos (M2.6.5c)
 
 ### BUG-522: Los puntos por posicion del concurso de fotos nunca se dan (RESUELTO POR REEMPLAZO 2026-11-04: Fotos de Filament quedo de solo lectura (sin "Premiar top fotos"), M2.7.1. Antes: RESUELTO 2026-11-03 en M2.6.5c, admin nuevo; Filament sigue igual hasta su solo lectura en M2.7.1)
