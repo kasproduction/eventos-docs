@@ -3,6 +3,45 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-04 — Encontrados al portar Seguridad de tu cuenta (M2.2.8)
+
+### BUG-523: Generar codigos de recuperacion nuevos no cuenta los codigos malos para el bloqueo de la cuenta (RESUELTO 2026-11-04 en M2.2.8, admin nuevo; RESUELTO POR REEMPLAZO en Filament: la pagina se oculto y lleva al admin nuevo)
+- **Severidad propuesta:** ALTA (con una sesion robada se pueden probar codigos de la app hasta tener codigos de recuperacion propios)
+- **Que pasa:** `AccountSecurity::regenerate` solo frena 5 codigos por minuto (`TwoFactorLogin::rateLimitKey`); los fallidos no suman a `StaffLockout`, asi que nunca bloquea. Unos 7.200 intentos al dia.
+- **Visto:** 2026-11-04, sonda de Livewire contra Filament: seis codigos malos dan el freno de 60 s y `two_factor_failed_attempts` queda en 0.
+- **Arreglado en:** C# (`TuCuenta.CodigosNuevosAsync`): cada codigo malo cuenta para el bloqueo del login (5 seguidos = 30 minutos y correo) y al bloquear se cierra la sesion desde la que se intento; con la cuenta ya bloqueada, 423 y esa sesion se cierra. Decidido por Kamilo (2026-11-04).
+- **Prueba:** `TuCuentaTest.Cinco_codigos_malos_seguidos_sumados_a_los_del_login_bloquean_avisan_y_cierran_esta_sesion` y `Codigos_nuevos_..._el_doble_envio_cuenta_una_vez`; controles: sin contar el codigo malo, sin cerrar la sesion al bloquear y ya bloqueada sin cerrar la sesion, los tres en rojo.
+
+### Pruebas de PHP que salieron con la pagina de Filament (M2.2.8) y que las cubre
+
+Al ocultar `AccountSecurity` (su direccion lleva a `/admin/cuenta/seguridad`) fallaron 21 pruebas de PHP: 17 salieron y 4 se adaptaron al
+nuevo destino. C# = `eventos-api-dotnet/tests/Tests/Admin/TuCuentaTest`; pantalla = `eventos-web/tests/components/admin/SeguridadDeTuCuenta.test.tsx`;
+e2e = `eventos-web/e2e-admin/seguridad-de-tu-cuenta.spec.ts`; cruzada = `eventos-backend/tests/Cruzadas/SeguridadDeTuCuentaTest`.
+
+| # | Prueba de PHP (archivo) | Quien la cubre ahora |
+|---|---|---|
+| 1 | La pagina abre desde el panel con el 2FA pasado (`AccountSecurityTest`, adaptada) | La misma prueba: ahora lleva al admin nuevo. El acceso con token tras el 2FA: `TokenDelStaffTest` |
+| 2 | El menu del avatar lleva a la pagina (`AccountSecurityTest`, adaptada) | La misma prueba, con la URL del admin nuevo; en el admin nuevo, la e2e entra por el menu de la cuenta |
+| 3 | Muestra solo mis equipos vigentes y marca este equipo (`AccountSecurityTest`) | C# `Ve_lo_suyo_la_sesion_actual_primero_los_equipos_vigentes_y_su_actividad_en_segunda_persona`; "Este equipo": pantalla, "marca este equipo por la cookie..." |
+| 4 | Sin equipos muestra el estado vacio y no ofrece quitar todos (`AccountSecurityTest`) | Pantalla, "sin equipos muestra el estado vacio y no ofrece quitar todos" |
+| 5 | Quitar un equipo lo revoca y queda en la bitacora (`AccountSecurityTest`) | C# `Quita_un_equipo_suyo_o_todos_y_nunca_el_de_otra_persona`; la frase en la bitacora: cruzada, "la bitacora que deja C#..." |
+| 6 | No se puede quitar el equipo de otra persona (`AccountSecurityTest`) | C# `Quita_un_equipo_suyo_o_todos_y_nunca_el_de_otra_persona` |
+| 7 | Quitar todos revoca solo los mios (`AccountSecurityTest`) | C# `Quita_un_equipo_suyo_o_todos_y_nunca_el_de_otra_persona` |
+| 8 | Muestra cuantos codigos quedan y avisa cuando son pocos (`AccountSecurityTest`) | C# `Ve_lo_suyo_...` (recovery_left); el aviso: pantalla, "dice desde cuando tiene el segundo factor y cuantos codigos quedan; con pocos, avisa" |
+| 9 | Con el codigo de la app genera 8 codigos nuevos y los viejos mueren (`AccountSecurityTest`) | C# `Codigos_nuevos_con_el_codigo_de_la_app_invalidan_los_anteriores_y_el_doble_envio_cuenta_una_vez`; cruzada "los codigos nuevos que genera C# sirven para entrar al panel y los viejos ya no"; e2e |
+| 10 | Un segundo envio con el mismo codigo no tapa los codigos recien generados (`AccountSecurityTest`) | C# `Codigos_nuevos_..._el_doble_envio_cuenta_una_vez` (el repetido no cuenta) y la pantalla deja de enviar mientras espera |
+| 11 | Sin el codigo correcto no genera nada (`AccountSecurityTest`) | C# `Codigos_nuevos_...` (codigo malo: 422 y los codigos siguen); e2e |
+| 12 | Despues de 5 intentos fallidos ni el codigo correcto genera durante un minuto (`AccountSecurityTest`) | C# `Con_el_cupo_de_codigos_del_login_lleno_ni_el_codigo_bueno_genera_y_no_cuenta_como_fallido` |
+| 13 | La pagina lista mis sesiones con la actual primero y sin boton Cerrar (`StaffSessionTest`) | C# `Ve_lo_suyo_...` (la actual primero); "sin Cerrar": pantalla, "la sesion actual va marcada y sin Cerrar..." |
+| 14 | Cerrar una sesion la destruye de verdad y queda en la bitacora (`StaffSessionTest`) | C# `Cierra_una_sesion_suya_pero_no_la_actual_ni_la_de_otra_persona` (token del admin nuevo); cruzada "una sesion del panel de PHP que se cierra desde C# queda afuera" |
+| 15 | No se puede cerrar la sesion actual ni la de otra persona desde la lista (`StaffSessionTest`) | C# `Cierra_una_sesion_suya_pero_no_la_actual_ni_la_de_otra_persona` |
+| 16 | Cerrar las demas deja solo la actual (`StaffSessionTest`) | C# `Cierra_las_demas_y_deja_la_actual` |
+| 17 | Una sesion de un equipo de confianza avisa y ofrece quitar la confianza (`StaffSessionTest`) | Pantalla, "la sesion actual va marcada y sin Cerrar; la otra ofrece Cerrar y quitar la confianza con un boton, no un enlace" |
+| 18 | La persona ve su actividad en segunda persona, con lo fallido (`StaffLockoutTest`) | C# `Ve_lo_suyo_...` ("Entraste"); cruzada "la bitacora que deja C# la cuenta SecurityActivity de PHP con las mismas frases"; pantalla, "la actividad en segunda persona con lo fallido marcado..." |
+| 19 | "Mostrar mas" aparece solo con mas de 10 y trae el resto (`StaffLockoutTest`) | C# `Ve_lo_suyo_...` (10 y activity_more; con activity=all, el resto); pantalla, "...Mostrar mas cuando hay mas" |
+| 20 | Ninguna pagina del panel le abre al organizador, salvo la seguridad de su cuenta (`OrganizadorTest`, adaptada) | La misma prueba: mi-seguridad lleva al admin nuevo; C# `El_organizador_tambien_ve_y_maneja_su_cuenta` |
+| 21 | Seguridad de tu cuenta sigue en Filament (`SoloLecturaEnElAdminNuevoTest`, adaptada) | La misma prueba, al reves: sale del menu y lleva al admin nuevo |
+
 ## 2026-11-04 — Pruebas de PHP que salieron en M2.7.1 y que las cubre (backend `4073da3`)
 
 Al dejar Filament de solo lectura, 18 pruebas de PHP que manejaban desde Filament lo que ahora esta cerrado fallaron: 16 salieron,

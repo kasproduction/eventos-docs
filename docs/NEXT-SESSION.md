@@ -20,7 +20,8 @@
 - Pruebas en local: `SoloLecturaEnElAdminNuevoTest` 136 con 10 controles en rojo, PHP 1381, cruzadas 96/96, C# 559 (1 saltada). Web sin cambios (vitest y e2e admin no se corrieron).
 - Despliegue: compilar el tema de Filament (`npm run build` en eventos-backend: estilos del aviso). `CONTRATOS_FILAMENT_ESCRIBE` NUNCA en el servidor (igual no abre en produccion). Sigue pendiente de la 32: `php artisan migrate` (`2026_11_03_120000`).
 - Correspondencia de las 18 pruebas de PHP que salieron con su cobertura: `BUG-LOG.md`, seccion del 2026-11-04 (las dos que C# cubria en parte, 1 y 9, ya tienen su prueba en `StaffTest`, C# `c3ac832`; C# 561).
-- **Sigue (orden de Kamilo 2026-11-04): proponer M2.2.8 Seguridad de tu cuenta primero (sonda de Livewire contra `AccountSecurity` antes de proponer); despues M2.4.5d, M2.4.1c, M2.4.5e y M2.3.3d; luego M2.7.2 (Data Center con bearer).**
+- **Despues del cierre, M2.2.8 hecha** (C# `bb5b5f0`, web `f61253d`, backend `5dab5c3`): Seguridad de tu cuenta en `/admin/cuenta/seguridad`; decision Kamilo: los codigos malos al pedir codigos nuevos cuentan para el bloqueo del login y al bloquear se cierra esa sesion (BUG-523). `AccountSecurity` de Filament se oculta y lleva alla; correspondencia de sus 21 pruebas en el BUG-LOG. Pruebas: C# 569, PHP 1364, cruzadas 99/99, vitest 733, e2e admin 63/63.
+- **Sigue: proponer M2.4.5d Premios (sonda de Livewire contra `RewardResource` antes de proponer); despues M2.4.1c, M2.4.5e y M2.3.3d; luego M2.7.2 (Data Center con bearer).**
 
 ## SESION 2026-11-03 (Opus 5.5, 32) — M2.6.5 SOCIAL COMPLETA (MURO, PUNTOS EN C#, FOTOS, PREMIAR); SECCION 2.6 10/10
 

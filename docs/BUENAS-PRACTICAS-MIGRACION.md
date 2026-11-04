@@ -496,6 +496,14 @@ de los 330 snapshots y del codigo PHP:
     event_photo_prize_id con indice unico, solo para los premios de fotos), no solo la pantalla; los puestos siguen desde el ultimo dado y
     "Premiar top" se frena al llegar al maximo de ganadores (Filament numeraba desde 1 cada vez); los puntos por posicion se dan (BUG-522).
     La prueba de PHP que afirmaba "se pueden crear 2" se actualizo. El reinicio de los contratos copia solo las columnas normales.
+  - 2026-11-04 (M2.2.8, Seguridad de tu cuenta; Kamilo): IDENTICO a AccountSecurity de Filament en lo que se ve y en lo que queda en la
+    bitacora (sessions_closed y trusted_devices_revoked con reason self/others/self_all, count y label; recovery_codes_regenerated), en que
+    solo se toca lo propio, en que la sesion actual no se cierra desde ahi, en el cupo de 5 codigos por minuto compartido con el login y en
+    las frases de cada fila. C# ARREGLA (decidido por Kamilo, BUG-523): un codigo malo al pedir codigos nuevos cuenta para el bloqueo del
+    login (5 seguidos = 30 minutos y correo staff_account_locked) y al bloquear se cierra la sesion desde la que se intento (Filament solo
+    frenaba 5 por minuto); con la cuenta ya bloqueada, 423 y esa sesion tambien se cierra; el mismo codigo repetido en la misma ventana de
+    30 s cuenta una vez; un codigo bueno deja los fallidos en cero. "Quitar la confianza" pasa de enlace subrayado a boton de texto.
+    Sin consumidores externos al momento del cambio (pantalla del admin nuevo).
 
 ## Anexo C. Comandos de los contratos (desde `eventos-backend`)
 

@@ -45,7 +45,7 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | Pantalla (Filament) | Grupo | Destino | Bloque | Nota |
 |---|---|---|---|---|
 | Dashboard | Escritorio | H1 | 2.1 | Pagina de entrada del admin. Las cifras del evento son del Data Center (enlace) |
-| AccountSecurity | Cuenta | H1 | 2.2.1 (login en C#); la pantalla en M2.2.8 | 2FA, codigos de recuperacion, dispositivos y sesiones del staff. **Hueco (2026-11-04):** la pantalla no se porto; el menu de cuenta del admin nuevo lleva a la de Filament |
+| AccountSecurity | Cuenta | H1 | 2.2.1 (login en C#); la pantalla en M2.2.8 (hecha 2026-11-04) | 2FA, codigos de recuperacion, dispositivos y sesiones del staff. En el admin nuevo: `/admin/cuenta/seguridad` (sin evento en la ruta; el organizador tambien entra). Los codigos malos al pedir codigos nuevos cuentan para el bloqueo (BUG-523) |
 | EventResource | Sistema | H1 | 2.3.1 | Con filtro por organizacion (BUG-374) y el asistente de primer ingreso (`CreateEvent`) |
 | UserResource | Sistema | H1 | 2.4.4 (staff en 2.4.4a: hecho; seguridad 2.4.4b; limpieza 2.4.4c) | Staff, roles y reset de 2FA (las invitaciones de stand van en M4e.7). No deja borrar al ultimo super_admin |
 | EventSessionResource (+ Speakers por sesion) | Contenido / Agenda | H1 | 2.3.2 | Asignar speakers tiene que avisar (BUG-380) |
@@ -98,8 +98,8 @@ equivalente; se oculta del todo solo si no queda nada que mirar. Prueba: `evento
 |---|---|
 | Solo lectura con el aviso (35) | Escritorio (sus accesos van al admin nuevo), Eventos (el asistente de evento nuevo se cerro), Staff, Sesiones, Tracks, Tipos de sesion, Speakers, Sponsors, Documentos, Paginas, Branding (con Onboarding), Slides del login, Destacados, Preguntas, Recap, Asistentes, Bloqueos, Registro, Codigos de acceso, Anuncios, Push programadas, Recordatorios, Plantillas de correo, Envio (SMTP), Historial de correos, Publicaciones del muro, Ajustes del muro, Fotos, Gamificacion, Golden Tickets, Premios Ganados, Chat, Encuestas, Salones, Soporte, Limites de uso, Webhooks y Llaves de entrada |
 | Acciones que siguen vivas dentro de una pantalla de solo lectura | Regenerar recap en Asistentes (hasta M4e.5), Generar en lote en Codigos de acceso (M2.4.5e), Ajustes de equipos en Sponsors (M2.3.3d) |
-| Ocultas, su direccion lleva al admin nuevo | Modulos y Landing y widget (todo lo que muestran son controles); Historial de webhooks (mostraba envios de todos los eventos, BUG-504). El resumen de webhooks se quito (BUG-501) |
-| Siguen en Filament sin aviso | Premios (M2.4.5d), Campos del formulario (M2.4.1c), Seguridad de tu cuenta (M2.2.8), Event Pulse (M2.7.3); ocultas de antes: Evaluaciones y Resultados de juegos |
+| Ocultas, su direccion lleva al admin nuevo | Modulos y Landing y widget (todo lo que muestran son controles); Historial de webhooks (mostraba envios de todos los eventos, BUG-504). El resumen de webhooks se quito (BUG-501). Seguridad de tu cuenta (M2.2.8, desde el 2026-11-04) |
+| Siguen en Filament sin aviso | Premios (M2.4.5d), Campos del formulario (M2.4.1c), Event Pulse (M2.7.3); ocultas de antes: Evaluaciones y Resultados de juegos |
 
 ## Avisos genericos del navegador en el admin actual (no copiar)
 
