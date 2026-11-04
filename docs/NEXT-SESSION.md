@@ -12,7 +12,7 @@
 
 ## SESION 2026-11-03 (Opus 5.5, 32) — M2.6.5 SOCIAL COMPLETA (MURO, PUNTOS EN C#, FOTOS, PREMIAR); SECCION 2.6 10/10
 
-- MSI de M2.6.4a, M2.6.5a y M2.6.5b en verde; el de M2.6.5c (41744133317) se miro al cerrar.
+- MSI de M2.6.4a, M2.6.5a y M2.6.5b en verde; el de M2.6.5c (41744133317) tambien en verde.
 - Decisiones Kamilo: tryAward completo en C# (M4b.3 adelantado) con reglas identicas y a prueba de concurrencia; un solo camino por accion (fila, detalle, masivo); rechazar tambien una foto aprobada (los puntos se quedan; quitarlos va despues de la fase 5, en PENDIENTES); 10 MB solo para fotos de la galeria; una foto se premia una vez y lo frena la base; puestos del concurso que siguen y se frenan en el maximo; los puntos por posicion se dan. Ocultar un post sigue sin aviso al socket (`wall:hidden` en M3.4.1).
 - Resueltos: BUG-379 (muro), BUG-521 (C# no soltaba sponsors ni wall de la webapp), BUG-378 (fotos), BUG-522 (nuevo: PHP nunca daba los puntos por posicion).
 - Hecho: a) C# `f750037`, backend `7e3b5c7`, web `22ff0d2`; b) C# `12ecccf`, backend `cc3cad1`, web `e603701`; c) C# `cf42ae1`, backend `9d39e4a` (migracion), web `8458a16`.
