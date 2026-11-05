@@ -3,6 +3,15 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-05 — Encontrados al portar Ajustes de equipos de Sponsors (M2.3.3d)
+
+### BUG-535: Apagar el vencimiento de las invitaciones borra las horas configuradas (RESUELTO 2026-11-05 en M2.3.3d, admin nuevo; RESUELTO POR REEMPLAZO en Filament: la accion salio)
+- **Severidad propuesta:** BAJA
+- **Que pasa:** en `ajustes_equipos` de `ListSponsors`, "Horas de vigencia" se esconde con el vencimiento apagado; lo escondido no llega a la accion y esta guarda `?? 48`. Con 72 horas, apagar el vencimiento las vuelve 48 y al prenderlo de nuevo aparecen 48. Ademas 1,5 horas se guarda 1 sin avisar y, prendido, el campo vacio se guarda 48.
+- **Visto:** 2026-11-05, sonda de Livewire.
+- **Arreglado en:** C# (`AjustesDeEquipos.GuardarAsync`, `PUT /events/{e}/sponsors/team-settings`): con el vencimiento apagado las horas se pueden omitir y se conservan; las horas son enteras de 1 a 720 y obligatorias con el vencimiento prendido. Decision de Kamilo (2026-11-05).
+- **Prueba:** `SponsorsTest.Los_ajustes_de_equipos_conservan_las_horas_al_apagar_el_vencimiento_y_validan`, la cruzada `SponsorsTest` (la invitacion de PHP vence en 72 horas y, apagado, no vence; las horas siguen en 72) y la e2e `sponsors`. Controles (por el arnes): volver a 48 al apagar, sin el rango y sin pedirlas con el vencimiento prendido, los tres en rojo.
+
 ## 2026-11-05 — Encontrados al portar Generar codigos en lote (M2.4.5e)
 
 Sonda de Livewire contra `generate_batch` de `ListAccessCodes` (2026-11-05). Arreglos decididos por Kamilo el mismo dia. En Filament la accion salio (la pantalla queda del todo de solo lectura): RESUELTOS POR REEMPLAZO.
@@ -87,12 +96,15 @@ Sonda de Livewire contra `RewardResource` de Filament (2026-11-05). Arreglos dec
 
 ## 2026-11-04 — De las pruebas
 
-### BUG-524: e2e del admin intermitentes en la primera prueba de la corrida (ABIERTO, vigilando: 2 de 3)
+### BUG-524: e2e del admin intermitentes (ABIERTO: 3 de 3, investigado sin reproducir; falta decidir el siguiente paso)
 - **Severidad propuesta:** BAJA (solo pruebas; el producto no cambia)
 - **Que pasa:** una e2e de `pnpm e2e:admin` falla en la primera prueba de la corrida y pasa al repetirla sola. Sospecha: el arranque en frio (C# recien levantado, Next compilando en dev) o el seeder de los contratos (`reiniciar`) todavia trabajando cuando la prueba empieza.
 - **Conteo (regla de Kamilo 2026-11-04: a la tercera se investiga la causa, no se vuelve a repetir la corrida):**
   1. 2026-11-03 (sesion 29): `identidad.spec` "destacados": el interruptor de la lista no quedo apagado; sola paso 3/3.
   2. 2026-11-04 (sesion 33): `entrada-del-evento.spec` "registro: guardar solo con cambios...": en `primerIngreso`, "Continuar al admin" no se habilito a tiempo tras marcar "Los guarde" (30 s); sola paso 3/3 y la corrida completa siguiente paso 63/63.
+  3. 2026-11-05 (sesion 34, corrida completa con M2.3.3d): `asistentes.spec` "importar: plantilla, archivo con una fila mala...": no salio "Importacion terminada." y la pantalla mostro "La importacion se corto" (el trabajo `ImportarAsistentes` de Hangfire quedo en failed: una falla real del servidor, no una espera de la prueba). No era la primera prueba de la corrida.
+- **Investigado (2026-11-05):** la excepcion se perdio: C# la registra en su consola (`ImportarAsistentes {Id}: la importacion se corto`), la e2e no guarda esa salida y el reinicio de la prueba siguiente vacia la base 15 de Redis, donde Hangfire guarda el trabajo fallido. Sola, `asistentes.spec` paso 4/4 con la salida de C# visible; la corrida completa con `DEBUG=pw:webserver` (registro de 52 MB) paso 67/67 y la importacion no se corto. Hipotesis sin confirmar: `/__contratos/reiniciar` vacia la base 15 de Redis (cola de Hangfire y estado de la importacion) y rehace las tablas mientras el servidor de Hangfire de la Api sigue corriendo; un trabajo de una prueba anterior (o el propio, si llega tarde) puede chocar con eso.
+- **Siguiente paso (para decidir con Kamilo):** que la e2e guarde siempre la salida de C# en un archivo, para que la proxima vez quede la excepcion; y probar la hipotesis del reinicio (esperar a que Hangfire no tenga trabajos corriendo antes de vaciar).
 - **Al tercer caso:** no se repite la corrida; se investiga con la traza de Playwright (`test-results/.../trace.zip`) el arranque de C# (`webServer` de `playwright.admin.config.ts`, espera a `/api/v1/version`) y el reinicio del seeder (`apoyo.reiniciar`), y se arregla la causa con su control.
 
 ## 2026-11-04 — Encontrados al portar Seguridad de tu cuenta (M2.2.8)

@@ -97,7 +97,7 @@ equivalente; se oculta del todo solo si no queda nada que mirar. Prueba: `evento
 | Estado en Filament | Pantallas |
 |---|---|
 | Solo lectura con el aviso (37) | Escritorio (sus accesos van al admin nuevo), Eventos (el asistente de evento nuevo se cerro), Staff, Sesiones, Tracks, Tipos de sesion, Speakers, Sponsors, Documentos, Paginas, Branding (con Onboarding), Slides del login, Destacados, Preguntas, Recap, Asistentes, Bloqueos, Registro, Campos del formulario (M2.4.1c, desde el 2026-11-05), Codigos de acceso, Anuncios, Push programadas, Recordatorios, Plantillas de correo, Envio (SMTP), Historial de correos, Publicaciones del muro, Ajustes del muro, Fotos, Gamificacion, Golden Tickets, Premios (M2.4.5d, desde el 2026-11-05), Premios Ganados, Chat, Encuestas, Salones, Soporte, Limites de uso, Webhooks y Llaves de entrada |
-| Acciones que siguen vivas dentro de una pantalla de solo lectura | Regenerar recap en Asistentes (hasta M4e.5), Ajustes de equipos en Sponsors (M2.3.3d). Generar en lote salio el 2026-11-05 (M2.4.5e) |
+| Acciones que siguen vivas dentro de una pantalla de solo lectura | Regenerar recap en Asistentes (hasta M4e.5). Salieron el 2026-11-05: Generar en lote (M2.4.5e) y Ajustes de equipos (M2.3.3d) |
 | Ocultas, su direccion lleva al admin nuevo | Modulos y Landing y widget (todo lo que muestran son controles); Historial de webhooks (mostraba envios de todos los eventos, BUG-504). El resumen de webhooks se quito (BUG-501). Seguridad de tu cuenta (M2.2.8, desde el 2026-11-04) |
 | Siguen en Filament sin aviso | Event Pulse (M2.7.3); ocultas de antes: Evaluaciones y Resultados de juegos |
 
