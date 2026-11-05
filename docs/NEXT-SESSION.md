@@ -10,6 +10,15 @@
 
 ---
 
+## SESION 2026-11-05 (Opus 5.5, 34) — M2.4.5d HECHA: PREMIOS, EL CATALOGO DE LA TIENDA, EN EL ADMIN NUEVO; BUG-525 A 528
+
+- Decisiones Kamilo (con la sonda de Livewire contra `RewardResource`): sin roles marcados un premio es para todos y se guarda null (BUG-525); una migracion de Laravel pasa a null los `[]` de premios y tambien de anuncios (BUG-510); la imagen es la URL completa de la subida (BUG-526); un premio con canjes no se borra, se apaga (BUG-527); puntos y stock enteros de 1 a 1.000.000, stock no menor a lo canjeado y patrocinador activo del evento (BUG-528).
+- Hecho: C# `9883c44` (`/events/{e}/rewards`, `CatalogoDePremios`, destino de subida `rewards`), backend `5c87acf` (Filament de Premios de solo lectura con el aviso, migracion `2026_11_05_120000_roles_vacios_son_para_todos`, cruzada `CatalogoDePremiosTest`), web `fcf4b72` (Gamificacion > Premios: lista, ordenar, crear y editar con imagen; sin Eliminar si tiene canjes).
+- Pruebas en local: C# 574, PHP 1367, cruzadas 101/101, vitest 733, e2e admin 64/64; 9 controles en rojo. Ninguna prueba vieja de PHP usaba el Premios de Filament (no hubo correspondencia que escribir). BUG-524 sigue 2 de 3 (la corrida completa paso sin fallas).
+- Tropiezo: el control de BUG-527 corrio primero contra la base compartida y borro la Camiseta sembrada con su canje; se resembro `eventos_contratos_base` y el control se repitio en la desechable (creada hoy en este equipo). Anotado en la memoria.
+- Despliegue: `php artisan migrate` (ahora dos: `2026_11_03_120000` de la 32 y `2026_11_05_120000`); sigue `npm run build` en eventos-backend (tema, de la 33). Los premios viejos con imagen guardada como ruta siguen rotos hasta subirla de nuevo.
+- **Sigue: proponer M2.4.1c Campos del formulario (sonda de Livewire contra `RegistrationFieldResource` antes de proponer); despues M2.4.5e Codigos en lote y M2.3.3d Ajustes de equipos; luego M2.7.2.**
+
 ## SESION 2026-11-04 (Opus 5.5, 33) — M2.7.1 Y M2.2.8 HECHAS: FILAMENT DE SOLO LECTURA EN 35 PANTALLAS; SEGURIDAD DE TU CUENTA EN EL ADMIN NUEVO; CINCO HUECOS AL ROADMAP
 
 - Decisiones Kamilo: regla unica de 2.7 (cada pantalla cubierta de solo lectura, sin crear, editar ni borrar, con el aviso "Esta pantalla ahora se administra en el admin nuevo" arriba y el enlace a su equivalente; oculta solo si no queda nada que mirar; bugs "abierto en PHP" cerrados por reemplazo). Excepcion: Modulos y Landing y widget se ocultan con redireccion. Historial de webhooks oculto y resumen fuera (BUG-504 y 501). Huecos de tareas aprobadas entran al roadmap y se hacen antes de cerrar 2.7. Las cruzadas que comparan con Filament usan una llave solo de pruebas (`LlaveDeFilament`, por el camino del modo contratos, nunca en produccion).
