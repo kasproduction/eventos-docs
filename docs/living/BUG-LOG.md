@@ -3,6 +3,24 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-05 — Encontrados al portar Generar codigos en lote (M2.4.5e)
+
+Sonda de Livewire contra `generate_batch` de `ListAccessCodes` (2026-11-05). Arreglos decididos por Kamilo el mismo dia. En Filament la accion salio (la pantalla queda del todo de solo lectura): RESUELTOS POR REEMPLAZO.
+
+### BUG-533: Los codigos del lote nacen sin fecha de creacion (RESUELTO 2026-11-05 en M2.4.5e, admin nuevo)
+- **Severidad propuesta:** MEDIA (el lote recien generado queda al final de la lista y sin "Creado")
+- **Que pasa:** `AccessCode` tiene `$timestamps = false` y `generate_batch` no pone `created_at`. La lista del admin nuevo ordena del mas nuevo al mas viejo por `created_at`.
+- **Visto:** 2026-11-05, sonda: los 10 codigos de un lote con `created_at` null.
+- **Arreglado en:** C# (`CodigosDeAcceso.LoteAsync`): cada codigo lleva la hora de creacion.
+- **Prueba:** `CodigosDeAccesoTest.El_lote_valida_crea_los_codigos_con_su_hora_y_notas_y_los_devuelve_para_copiar` (salen primero en la lista), la cruzada `CodigosDeAccesoTest` (PHP ve `created_at`) y la e2e `codigos`. Control: sin la hora, en rojo.
+
+### BUG-534: Validaciones flojas del lote (RESUELTO 2026-11-05 en M2.4.5e, admin nuevo)
+- **Severidad propuesta:** BAJA
+- **Que pasa:** cantidad 1,5 crea 2 codigos; maximo de usos 0 deja codigos que nunca sirven, -1 rompe en MySQL (columna sin signo) y 2,5 se guarda 2; un vencimiento en el pasado se acepta y los codigos nacen vencidos. Ademas los crea uno por uno sin transaccion.
+- **Visto:** 2026-11-05, sonda.
+- **Arreglado en:** C#: cantidad entera de 1 a 100, maximo de usos entero desde 1 (como crear uno solo desde M2.4.5a), vencimiento futuro; todos o ninguno en una transaccion; como al crear uno solo, no se leen otros eventos para saber si un codigo existe (regla 26): si el indice unico choca, se deshace y se reintenta con codigos nuevos.
+- **Prueba:** `CodigosDeAccesoTest.El_lote_valida...` y la e2e `codigos`. Controles: cantidad sin el rango, maximo 0 y vencimiento pasado, los tres en rojo. "Todos o ninguno" no tiene control propio: se guarda en un solo `SaveChanges` dentro de una transaccion y no se provoco una falla a mitad (haria falta un interceptor).
+
 ## 2026-11-05 — Encontrados al portar Campos del formulario (M2.4.1c)
 
 Sonda de Livewire contra `RegistrationFieldResource` de Filament (2026-11-05). Arreglos decididos por Kamilo el mismo dia. En Filament quedan RESUELTOS POR REEMPLAZO: la pantalla quedo de solo lectura con el aviso.
