@@ -18,8 +18,8 @@ Sonda de Livewire contra `RewardResource` de Filament (2026-11-05). Arreglos dec
 - **Severidad propuesta:** MEDIA (el premio se ve sin imagen)
 - **Que pasa:** `FileUpload` guarda la ruta del disco (`rewards/archivo.png`) y `RewardService::catalog` la devuelve tal cual; `RewardsSheetM` de la webapp la pone en `src` y se rompe.
 - **Visto:** 2026-11-05, en la base local: el premio 7 ("Camiseta") tiene `rewards/01KXSYDPA016XECDEQ1B74TPQ7.png`.
-- **Arreglado en:** C#: la imagen es una URL completa, la de la subida con el destino nuevo `rewards` (JPG, PNG, WebP o GIF hasta 5 MB). Una ruta vieja se deja si llega igual; el formulario avisa que hay que subirla de nuevo. Los premios viejos siguen rotos hasta que alguien suba la imagen otra vez.
-- **Prueba:** `CatalogoDePremiosTest.Las_reglas_frenan_lo_que_filament_dejaba_pasar` (una ruta no pasa en uno nuevo y la vieja se conserva al editar), la cruzada (PHP devuelve la URL completa) y la e2e `premios`. Control: aceptar el texto como viene, en rojo.
+- **Arreglado en:** C#: la imagen es una URL completa, la de la subida con el destino nuevo `rewards` (JPG, PNG, WebP o GIF hasta 5 MB). Una ruta vieja se deja si llega igual; el formulario avisa que hay que subirla de nuevo. Las viejas: la migracion `2026_11_05_120000` las pasa a `APP_URL/storage/<ruta>` si el archivo existe en el disco publico (Kamilo 2026-11-05, backend `f93aa65`); solo las que no estan en el disco quedan rotas.
+- **Prueba:** `CatalogoDePremiosTest.Las_reglas_frenan_lo_que_filament_dejaba_pasar` (una ruta no pasa en uno nuevo y la vieja se conserva al editar), la cruzada (PHP devuelve la URL completa), la e2e `premios` y `RolesVaciosSonParaTodosTest` (la migracion de las viejas). Controles: aceptar el texto como viene; en la migracion, sin mirar el disco, sin el update y sin APP_URL; todos en rojo.
 
 ### BUG-527: Borrar un premio con canjes se lleva los canjes sin devolver los puntos (RESUELTO 2026-11-05 en M2.4.5d, admin nuevo)
 - **Severidad propuesta:** ALTA (la persona pierde los puntos y el premio entregado desaparece)
