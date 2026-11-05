@@ -505,6 +505,8 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 11. DEUDA TECNICA
 
+- [ ] **E2e del admin con varios trabajadores** (tarea chica, Kamilo 2026-11-05): hoy `pnpm e2e:admin` corre en serie (~8 min, 67 pruebas) porque todas comparten una base (`eventos_cruzadas_pruebas`), una Api de C# (5092) y la base 15 de Redis. Dar a cada trabajador de Playwright su base, su puerto de C# y su base de Redis propios, reusando el aislamiento de `~/.claude/skills/metodo-kasproduction/scripts/crear-worktree.sh` (bases, puerto y prefijo por copia). Cuidar el registro de C# por trabajador (`REGISTRO_CSHARP`, BUG-524).
+
 - [ ] **Revisión de lo copiado de PHP que parece defecto** (Kamilo 2026-10-30): `docs/living/AUDITORIA-IDENTICO-2026-10-30.md` lista 26 comportamientos con quién los consume y qué hacer. Esperan decisión: las 8 "dudosas" (cancelar una sesión sin cambiar `status`, avisos al socket con freno de 1 s, cache que no se reintenta, retraso de agenda, avisos que faltan) y cuáles de las demás se arreglan ya. Una está en el roadmap: desbloquear cuentas bloqueadas (M2.4.4).
 
 ### TODO escritos en el codigo que no estaban en ninguna lista (revisados 2026-10-22)
