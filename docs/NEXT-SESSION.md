@@ -24,7 +24,8 @@
 - **BUG-524 llego a 3 de 3:** en la corrida completa `asistentes.spec` fallo porque la importacion se corto en el servidor (falla real de C#, no una espera). Investigado: la excepcion se pierde (C# la escribe en su consola, la e2e no la guarda y el reinicio vacia la cola de Hangfire); sola paso 4/4 y la completa con el registro de C#, 67/67. Hipotesis sin confirmar: el reinicio vacia Redis 15 y rehace tablas con Hangfire corriendo. Siguiente paso para decidir con Kamilo (BUG-LOG).
 - **BUG-524 cerrado** (decision Kamilo): la e2e guarda siempre la salida de C# (web `23e895c`) y el reinicio de contratos pausa Hangfire y espera a que termine lo que corre antes de borrar (C# `01cf8fd`, `ReinicioConHangfireTest` con su control); tres corridas completas 67/67 sin fallas.
 - **Regla nueva (Kamilo):** en local solo las pruebas del modulo tocado; las suites completas las corre el runner del MSI tras el push (`decisiones.md`). Tarea chica anotada: e2e con varios trabajadores (PENDIENTES §11).
-- **Sigue: M2.7.2 (Data Center con bearer): sonda de como entra hoy el SPA y propuesta.**
+- **M2.7.2 movida a la fase 4e como M4e.10** (decision Kamilo, sin codigo): la sonda mostro que PHP rechaza y borra el token del staff (D.1) y que hacerlo ahora pedia una excepcion en PHP (regla 6). Hasta 4e el Data Center entra por su login de Filament y el admin nuevo solo lo enlaza. Roadmap 139/237.
+- **Sigue: proponer M2.7.3 (Mission Control, Event Pulse, display, chat-monitor y attendance-check enlazados desde el admin nuevo con el mismo token), con la sonda antes; ojo con la misma trampa de D.1 (PHP borra el token del staff).**
 
 ## SESION 2026-11-04 (Opus 5.5, 33) — M2.7.1 Y M2.2.8 HECHAS: FILAMENT DE SOLO LECTURA EN 35 PANTALLAS; SEGURIDAD DE TU CUENTA EN EL ADMIN NUEVO; CINCO HUECOS AL ROADMAP
 
