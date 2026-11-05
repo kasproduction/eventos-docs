@@ -19,7 +19,7 @@ Sonda de Livewire contra `generate_batch` de `ListAccessCodes` (2026-11-05). Arr
 - **Que pasa:** cantidad 1,5 crea 2 codigos; maximo de usos 0 deja codigos que nunca sirven, -1 rompe en MySQL (columna sin signo) y 2,5 se guarda 2; un vencimiento en el pasado se acepta y los codigos nacen vencidos. Ademas los crea uno por uno sin transaccion.
 - **Visto:** 2026-11-05, sonda.
 - **Arreglado en:** C#: cantidad entera de 1 a 100, maximo de usos entero desde 1 (como crear uno solo desde M2.4.5a), vencimiento futuro; todos o ninguno en una transaccion; como al crear uno solo, no se leen otros eventos para saber si un codigo existe (regla 26): si el indice unico choca, se deshace y se reintenta con codigos nuevos.
-- **Prueba:** `CodigosDeAccesoTest.El_lote_valida...` y la e2e `codigos`. Controles: cantidad sin el rango, maximo 0 y vencimiento pasado, los tres en rojo. "Todos o ninguno" no tiene control propio: se guarda en un solo `SaveChanges` dentro de una transaccion y no se provoco una falla a mitad (haria falta un interceptor).
+- **Prueba:** `CodigosDeAccesoTest.El_lote_valida...` y la e2e `codigos`. Controles: cantidad sin el rango, maximo 0 y vencimiento pasado, los tres en rojo. "Todos o ninguno": `CodigosDeAccesoTest.Si_algo_falla_entre_el_primer_y_el_ultimo_codigo_del_lote_no_queda_ninguno` (como la importacion, decision de Kamilo 2026-11-05: un interceptor de EF falla despues del segundo INSERT y no queda ninguno); control, guardar uno por uno como Filament: queda uno, en rojo (C# `0815048`).
 
 ## 2026-11-05 — Encontrados al portar Campos del formulario (M2.4.1c)
 
