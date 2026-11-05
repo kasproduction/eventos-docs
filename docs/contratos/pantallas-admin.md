@@ -64,7 +64,7 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | RegistrationFieldResource | Personas / Entrada | H1 | M2.4.1c | **Hueco (2026-11-04):** ni M2.4.1a ni M2.4.1b la portaron; la pestana Campos del admin nuevo lleva a Filament |
 | AttendeeBanResource | Personas / Asistentes | H1 | 2.4.2 | Con expulsion del socket (BUG-373) |
 | WebhookEndpointResource, WebhookApiKeyResource, WebhookLogResource | Sistema / Webhooks | H1 | 2.4.3 (endpoints 2.4.3a, llaves 2.4.3b e historial 2.4.3c: hechos) | Los secretos no se muestran (BUG-385); el del endpoint se copia sin mostrarse |
-| GoldenTicketResource, RewardResource, PrizeRedemptions | Experiencia / Gamificacion | H1 | 2.4.5 (Premios, `RewardResource`, en M2.4.5d: hueco 2026-11-04) | Marcar como reclamado con `RewardService::confirm` (BUG-377) |
+| GoldenTicketResource, RewardResource, PrizeRedemptions | Experiencia / Gamificacion | H1 | 2.4.5 (Premios, `RewardResource`: M2.4.5d hecha 2026-11-05) | Marcar como reclamado con `RewardService::confirm` (BUG-377) |
 | AccessCodeResource | Personas / Entrada | H1 | 2.4.5 (Generar en lote en M2.4.5e: hueco 2026-11-04) | |
 | SupportRequestResource | En vivo | H1 | 2.4.6 (hecha 2026-11-02) | Abrir una solicitud no la marca como leida (BUG-383); entra con view-content o manage-content (BUG-509); contador de abiertas en el menu |
 | AnnouncementResource | Comunicacion / Anuncios | H1 | 2.5.1a y 2.5.1b (hechas 2026-11-02) | La push de un anuncio privado no sale a todos (BUG-372); audiencia vacia = todos (BUG-510); privados solo para leer; push tambien al navegador (BUG-511) |
@@ -96,10 +96,10 @@ equivalente; se oculta del todo solo si no queda nada que mirar. Prueba: `evento
 
 | Estado en Filament | Pantallas |
 |---|---|
-| Solo lectura con el aviso (35) | Escritorio (sus accesos van al admin nuevo), Eventos (el asistente de evento nuevo se cerro), Staff, Sesiones, Tracks, Tipos de sesion, Speakers, Sponsors, Documentos, Paginas, Branding (con Onboarding), Slides del login, Destacados, Preguntas, Recap, Asistentes, Bloqueos, Registro, Codigos de acceso, Anuncios, Push programadas, Recordatorios, Plantillas de correo, Envio (SMTP), Historial de correos, Publicaciones del muro, Ajustes del muro, Fotos, Gamificacion, Golden Tickets, Premios Ganados, Chat, Encuestas, Salones, Soporte, Limites de uso, Webhooks y Llaves de entrada |
+| Solo lectura con el aviso (36) | Escritorio (sus accesos van al admin nuevo), Eventos (el asistente de evento nuevo se cerro), Staff, Sesiones, Tracks, Tipos de sesion, Speakers, Sponsors, Documentos, Paginas, Branding (con Onboarding), Slides del login, Destacados, Preguntas, Recap, Asistentes, Bloqueos, Registro, Codigos de acceso, Anuncios, Push programadas, Recordatorios, Plantillas de correo, Envio (SMTP), Historial de correos, Publicaciones del muro, Ajustes del muro, Fotos, Gamificacion, Golden Tickets, Premios (M2.4.5d, desde el 2026-11-05), Premios Ganados, Chat, Encuestas, Salones, Soporte, Limites de uso, Webhooks y Llaves de entrada |
 | Acciones que siguen vivas dentro de una pantalla de solo lectura | Regenerar recap en Asistentes (hasta M4e.5), Generar en lote en Codigos de acceso (M2.4.5e), Ajustes de equipos en Sponsors (M2.3.3d) |
 | Ocultas, su direccion lleva al admin nuevo | Modulos y Landing y widget (todo lo que muestran son controles); Historial de webhooks (mostraba envios de todos los eventos, BUG-504). El resumen de webhooks se quito (BUG-501). Seguridad de tu cuenta (M2.2.8, desde el 2026-11-04) |
-| Siguen en Filament sin aviso | Premios (M2.4.5d), Campos del formulario (M2.4.1c), Event Pulse (M2.7.3); ocultas de antes: Evaluaciones y Resultados de juegos |
+| Siguen en Filament sin aviso | Campos del formulario (M2.4.1c), Event Pulse (M2.7.3); ocultas de antes: Evaluaciones y Resultados de juegos |
 
 ## Avisos genericos del navegador en el admin actual (no copiar)
 

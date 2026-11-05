@@ -3,6 +3,38 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-05 — Encontrados al portar Premios, el catalogo (M2.4.5d)
+
+Sonda de Livewire contra `RewardResource` de Filament (2026-11-05). Arreglos decididos por Kamilo el mismo dia. En Filament quedan RESUELTOS POR REEMPLAZO: la pantalla quedo de solo lectura con el aviso.
+
+### BUG-525: Un premio sin roles marcados no lo ve nadie en la tienda (RESUELTO 2026-11-05 en M2.4.5d, admin nuevo y migracion)
+- **Severidad propuesta:** ALTA (el catalogo entero puede quedar escondido)
+- **Que pasa:** el CheckboxList de Filament sin casillas guarda `roles = []` y `RewardService::catalog` solo deja pasar `null` o el rol del asistente: con `[]` no sale para nadie, aunque el campo dice "vacio = todos". Editar un premio viejo con `null` tambien lo deja en `[]`. Misma familia que BUG-510 (anuncios).
+- **Visto:** 2026-11-05, sonda: crear con lo minimo guarda `[]` y el catalogo de un asistente sale vacio; editar otro premio sin tocar los roles lo pasa a `[]`.
+- **Arreglado en:** C# (`CatalogoDePremios.LeerRoles`): sin roles se guarda null; un `[]` viejo se lee como null. Migracion de Laravel `2026_11_05_120000_roles_vacios_son_para_todos` (decision de Kamilo 2026-11-05): pasa a null los `[]` de premios y tambien de anuncios (BUG-510).
+- **Prueba:** `CatalogoDePremiosTest.Se_crea_edita_ordena_y_borra_un_premio_del_catalogo` (null en la base), la cruzada `CatalogoDePremiosTest` (Ana y Carla lo ven) y `tests/Feature/Rewards/RolesVaciosSonParaTodosTest` (la migracion). Controles: guardando `[]` y la migracion sin el update, los dos en rojo.
+
+### BUG-526: La imagen de un premio de Filament sale rota en la webapp (RESUELTO 2026-11-05 en M2.4.5d, admin nuevo)
+- **Severidad propuesta:** MEDIA (el premio se ve sin imagen)
+- **Que pasa:** `FileUpload` guarda la ruta del disco (`rewards/archivo.png`) y `RewardService::catalog` la devuelve tal cual; `RewardsSheetM` de la webapp la pone en `src` y se rompe.
+- **Visto:** 2026-11-05, en la base local: el premio 7 ("Camiseta") tiene `rewards/01KXSYDPA016XECDEQ1B74TPQ7.png`.
+- **Arreglado en:** C#: la imagen es una URL completa, la de la subida con el destino nuevo `rewards` (JPG, PNG, WebP o GIF hasta 5 MB). Una ruta vieja se deja si llega igual; el formulario avisa que hay que subirla de nuevo. Los premios viejos siguen rotos hasta que alguien suba la imagen otra vez.
+- **Prueba:** `CatalogoDePremiosTest.Las_reglas_frenan_lo_que_filament_dejaba_pasar` (una ruta no pasa en uno nuevo y la vieja se conserva al editar), la cruzada (PHP devuelve la URL completa) y la e2e `premios`. Control: aceptar el texto como viene, en rojo.
+
+### BUG-527: Borrar un premio con canjes se lleva los canjes sin devolver los puntos (RESUELTO 2026-11-05 en M2.4.5d, admin nuevo)
+- **Severidad propuesta:** ALTA (la persona pierde los puntos y el premio entregado desaparece)
+- **Que pasa:** `reward_redemptions.reward_id` borra en cascada. Borrar un premio en Filament se lleva el canje pendiente (los puntos descontados en `points_log` no vuelven) y los ya entregados salen de Premios Ganados.
+- **Visto:** 2026-11-05, sonda: saldo 50 antes y despues de borrar, canje borrado, el log del descuento sigue.
+- **Arreglado en:** C# (`CatalogoDePremios.BorrarAsync`): con algun canje (de cualquier estado) da 422 y no borra; se apaga con Activo. La lista y la pagina del premio no ofrecen Eliminar si tiene canjes. Decidido por Kamilo (2026-11-05).
+- **Prueba:** `CatalogoDePremiosTest.Un_premio_con_canjes_no_se_borra_y_se_puede_apagar`, la cruzada (el canje de Ana sigue tras el 422) y la e2e `premios`. Control (en la base desechable): sin mirar los canjes, en rojo.
+
+### BUG-528: Validaciones flojas del formulario de premios (RESUELTO 2026-11-05 en M2.4.5d, admin nuevo)
+- **Severidad propuesta:** BAJA
+- **Que pasa:** sin tope de peso en la imagen (entro una de 30 MB); 1,5 puntos se guarda como 1 y 2,5 de stock como 2, sin avisar; acepta 99.999.999.999 puntos (en MySQL, error de servidor); deja poner un stock menor a lo ya canjeado; acepta un patrocinador de otro evento si se arma el pedido a mano.
+- **Visto:** 2026-11-05, sonda.
+- **Arreglado en:** C#: puntos y stock enteros de 1 a 1.000.000 (tope de Kamilo, 2026-11-05), stock no menor a lo canjeado, patrocinador activo del evento (el que ya tenia se puede dejar aunque este apagado) e imagen de hasta 5 MB por la subida.
+- **Prueba:** `CatalogoDePremiosTest.Las_reglas_frenan_lo_que_filament_dejaba_pasar`. Controles: sin tope de puntos, sin el stock minimo y con patrocinadores apagados, los tres en rojo.
+
 ## 2026-11-04 — De las pruebas
 
 ### BUG-524: e2e del admin intermitentes en la primera prueba de la corrida (ABIERTO, vigilando: 2 de 3)
@@ -173,11 +205,11 @@ controles en rojo (roles sin filtrar por nivel; sin cuidar el ultimo super_admin
 
 ## 2026-11-02 — Encontrados al portar Anuncios (M2.5.1)
 
-### BUG-510: Un anuncio con la audiencia vacia no lo ve nadie en la app, pero el socket se lo reparte a todos (RESUELTO 2026-11-02 en M2.5.1a, admin nuevo; Filament sigue igual hasta apagarse)
+### BUG-510: Un anuncio con la audiencia vacia no lo ve nadie en la app, pero el socket se lo reparte a todos (RESUELTO 2026-11-02 en M2.5.1a, admin nuevo; los `[]` viejos pasan a null con la migracion de BUG-525, 2026-11-05)
 - **Severidad propuesta:** MEDIA (un anuncio "para todos" que nadie ve en su lista)
 - **Que pasa:** el CheckboxList de Filament sin casillas guarda `roles = []`. La lista de la app (`AnnouncementController@index`) pide `roles IS NULL` o que contenga el rol: con `[]` no sale para nadie. `AnnouncementObserver` usa `empty($roles)` y lo trata como para todos: lo manda con el dato por el socket. La ayuda del formulario dice "Sin marcar ninguno = todos".
 - **Verificado:** si, 2026-11-02: en `eventos_db` hay un anuncio con `roles = []`.
-- **Arreglado en:** admin nuevo: una audiencia vacia (o desmarcada) se guarda null. Los `[]` que ya existen siguen ocultos hasta editarlos (anotar si aparece uno en un cliente).
+- **Arreglado en:** admin nuevo: una audiencia vacia (o desmarcada) se guarda null. Los `[]` que ya existian los pasa a null la migracion `2026_11_05_120000_roles_vacios_son_para_todos` (decision de Kamilo 2026-11-05, con BUG-525).
 - **Prueba:** `AnunciosTest.Crear_valida...` (null en la base) y la cruzada `AnunciosTest` (la ven Ana y Carla). Control: guardando `[]` falla.
 
 ### BUG-511: El push de un anuncio no le llega a quien solo usa la webapp (RESUELTO 2026-11-02 en M2.5.1b, admin nuevo; Filament sigue igual hasta apagarse)
