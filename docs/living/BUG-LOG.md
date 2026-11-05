@@ -96,7 +96,7 @@ Sonda de Livewire contra `RewardResource` de Filament (2026-11-05). Arreglos dec
 
 ## 2026-11-04 — De las pruebas
 
-### BUG-524: e2e del admin intermitentes (ABIERTO: 3 de 3, investigado sin reproducir; falta decidir el siguiente paso)
+### BUG-524: e2e del admin intermitentes (RESUELTO 2026-11-05: el reinicio pausa Hangfire; tres corridas completas sin fallas)
 - **Severidad propuesta:** BAJA (solo pruebas; el producto no cambia)
 - **Que pasa:** una e2e de `pnpm e2e:admin` falla en la primera prueba de la corrida y pasa al repetirla sola. Sospecha: el arranque en frio (C# recien levantado, Next compilando en dev) o el seeder de los contratos (`reiniciar`) todavia trabajando cuando la prueba empieza.
 - **Conteo (regla de Kamilo 2026-11-04: a la tercera se investiga la causa, no se vuelve a repetir la corrida):**
@@ -104,7 +104,11 @@ Sonda de Livewire contra `RewardResource` de Filament (2026-11-05). Arreglos dec
   2. 2026-11-04 (sesion 33): `entrada-del-evento.spec` "registro: guardar solo con cambios...": en `primerIngreso`, "Continuar al admin" no se habilito a tiempo tras marcar "Los guarde" (30 s); sola paso 3/3 y la corrida completa siguiente paso 63/63.
   3. 2026-11-05 (sesion 34, corrida completa con M2.3.3d): `asistentes.spec` "importar: plantilla, archivo con una fila mala...": no salio "Importacion terminada." y la pantalla mostro "La importacion se corto" (el trabajo `ImportarAsistentes` de Hangfire quedo en failed: una falla real del servidor, no una espera de la prueba). No era la primera prueba de la corrida.
 - **Investigado (2026-11-05):** la excepcion se perdio: C# la registra en su consola (`ImportarAsistentes {Id}: la importacion se corto`), la e2e no guarda esa salida y el reinicio de la prueba siguiente vacia la base 15 de Redis, donde Hangfire guarda el trabajo fallido. Sola, `asistentes.spec` paso 4/4 con la salida de C# visible; la corrida completa con `DEBUG=pw:webserver` (registro de 52 MB) paso 67/67 y la importacion no se corto. Hipotesis sin confirmar: `/__contratos/reiniciar` vacia la base 15 de Redis (cola de Hangfire y estado de la importacion) y rehace las tablas mientras el servidor de Hangfire de la Api sigue corriendo; un trabajo de una prueba anterior (o el propio, si llega tarde) puede chocar con eso.
-- **Siguiente paso (para decidir con Kamilo):** que la e2e guarde siempre la salida de C# en un archivo, para que la proxima vez quede la excepcion; y probar la hipotesis del reinicio (esperar a que Hangfire no tenga trabajos corriendo antes de vaciar).
+- **Arreglado en (decision de Kamilo 2026-11-05):**
+  1. La e2e guarda siempre la salida de C# en un archivo (`REGISTRO_CSHARP` de `playwright.admin.config.ts`, tmp/eventos-e2e-admin-csharp.log, se reescribe en cada corrida), web `23e895c`.
+  2. El reinicio de contratos pausa Hangfire y espera a que no haya trabajos corriendo antes de vaciar Redis y rehacer las tablas (`PausaDeTrabajos`, filtro de servidor de Hangfire; si un trabajo pasa de 2 minutos, el reinicio falla con un error visible; los que se tomaron durante la pausa se cancelan al reanudar), C# `01cf8fd`.
+- **Prueba:** `ReinicioConHangfireTest.El_reinicio_espera_a_que_termine_el_trabajo_que_corre_antes_de_borrar` (un trabajo lento de verdad en el servidor de Hangfire de la Api en modo contratos, sobre la base desechable; el reinicio se pide a mitad y el trabajo termina antes del borrado). Control: sin la pausa, en rojo. Va en una coleccion sin paralelo: Hangfire guarda su registro en una variable global y otra fabrica en paralelo (`ModoContratosTest`) la dejaba apuntando a su servidor cerrado (`ObjectDisposedException`); se vio en la suite completa y se arreglo antes del commit.
+- **Cierre (regla de Kamilo 2026-11-05: tres corridas completas sin reproducirse):** 3 corridas de `pnpm e2e:admin`, 67/67 cada una, sin ninguna importacion cortada en el registro de C#.
 - **Al tercer caso:** no se repite la corrida; se investiga con la traza de Playwright (`test-results/.../trace.zip`) el arranque de C# (`webServer` de `playwright.admin.config.ts`, espera a `/api/v1/version`) y el reinicio del seeder (`apoyo.reiniciar`), y se arregla la causa con su control.
 
 ## 2026-11-04 — Encontrados al portar Seguridad de tu cuenta (M2.2.8)
