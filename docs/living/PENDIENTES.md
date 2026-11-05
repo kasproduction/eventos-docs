@@ -535,7 +535,7 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] Tests E2E flujos criticos: aprobar Q&A, lanzar game, cancelar sesion, scheduled export trigger
 - [ ] Revisar la autenticacion del admin: como funciona + cuando expiran los tokens (nota Kamilo; encaja con el frente Seguridad del Staff)
 
-### Unificacion SPAs (~10-12h) **[congelado hasta admin .NET: se absorben en el admin nuevo]**
+### Unificacion SPAs (~10-12h) **[congelado hasta M4e.7 o la fase 3 (Kamilo 2026-11-05): son paginas servidas por PHP; se reescriben cuando pasen a Next o a C#]**
 
 > Cada SPA usa toasts/modales/colores/fetch wrappers diferentes. Crear biblioteca compartida.
 

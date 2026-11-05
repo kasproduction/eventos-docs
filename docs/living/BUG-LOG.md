@@ -3,6 +3,19 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-05 — Encontrados al portar Event Pulse (M2.7.3)
+
+### BUG-536: Tras regenerar o apagar Event Pulse, el socket sigue aceptando el token viejo hasta 15 minutos (ABIERTO, para la fase 3; decision de Kamilo 2026-11-05)
+- **Severidad propuesta:** BAJA (un tablero ya abierto con el enlace viejo puede seguir recibiendo datos en vivo hasta 15 minutos)
+- **Que pasa:** `eventos-socket/src/auth.ts` guarda el token `ep_` validado en su memoria (`tokenCache`, `TOKEN_CACHE_TTL` = 15 minutos) y no hay forma de borrarlo desde afuera. PHP (`/api/v1/pulse/validate`) lee la base en cada pedido y deja de aceptarlo al instante.
+- **Visto:** 2026-11-05, sonda de M2.7.3 (PHP 403 al instante; el socket, leyendo el codigo).
+- **Arreglo:** cuando el socket pase a C# (fase 3); no se toca el socket ahora (decision de Kamilo). La pantalla de Event Pulse del admin nuevo lo avisa al regenerar.
+
+### Hueco de solo lectura en Event Pulse de Filament (RESUELTO 2026-11-05 en M2.7.3)
+- **Que pasa:** el interruptor "Activar Event Pulse" escribe el token apenas cambia (`afterStateUpdated`), sin pasar por guardar: con la pantalla de solo lectura (formulario bloqueado), empujarlo por Livewire igual activaba o apagaba el tablero.
+- **Arreglado en:** backend: el interruptor y "Regenerar token" se frenan con 403 si la llave de las cruzadas no esta abierta (`LlaveDeFilament`).
+- **Prueba:** `SoloLecturaEnElAdminNuevoTest` "en Event Pulse de solo lectura el interruptor no toca el token": fallo antes del arreglo (control).
+
 ## 2026-11-05 — Encontrados al portar Ajustes de equipos de Sponsors (M2.3.3d)
 
 ### BUG-535: Apagar el vencimiento de las invitaciones borra las horas configuradas (RESUELTO 2026-11-05 en M2.3.3d, admin nuevo; RESUELTO POR REEMPLAZO en Filament: la accion salio)
