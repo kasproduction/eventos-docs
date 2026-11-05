@@ -3,6 +3,38 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-05 — Encontrados al portar Campos del formulario (M2.4.1c)
+
+Sonda de Livewire contra `RegistrationFieldResource` de Filament (2026-11-05). Arreglos decididos por Kamilo el mismo dia. En Filament quedan RESUELTOS POR REEMPLAZO: la pantalla quedo de solo lectura con el aviso.
+
+### BUG-529: Renombrar un campo deja sin condicion a los que dependen de el (RESUELTO 2026-11-05 en M2.4.1c, admin nuevo)
+- **Severidad propuesta:** ALTA (un campo condicionado deja de salir en el registro y el onboarding)
+- **Que pasa:** "Mostrar solo si..." se guarda en `depends_on` con la ETIQUETA del otro campo (`campo:v1,v2`). Renombrar el padre deja al hijo apuntando al nombre viejo; `RegistrationFieldController@index` ya no lo resuelve a un id y la app no encuentra el padre.
+- **Visto:** 2026-11-05, sonda: tras renombrar "Tipo de asistente" a "Perfil", el formulario publico manda `Tipo de asistente:Empresarial` en vez de `<id>:Empresarial`.
+- **Arreglado en:** C# (`CamposDelFormulario.GuardarAsync`): al cambiar la etiqueta, los que dependian de ella pasan a la nueva en el mismo guardado. El formato de `depends_on` no cambia (lo leen la app y PHP).
+- **Prueba:** `CamposDelFormularioTest.Renombrar_un_campo_pasa_a_los_que_dependen_de_el_al_nombre_nuevo`, la cruzada `CamposDelFormularioTest` (PHP lo sigue resolviendo al id) y la e2e `campos`. Control: sin actualizar a los hijos, en rojo.
+
+### BUG-530: Borrar un campo se lleva las respuestas sin avisar y deja colgados a sus dependientes y al onboarding (RESUELTO 2026-11-05 en M2.4.1c, admin nuevo)
+- **Severidad propuesta:** ALTA (se pierden las respuestas de los asistentes; un campo condicionado queda oculto para siempre)
+- **Que pasa:** `registration_field_values.field_id` borra en cascada. Filament borra con un "¿Seguro?" sin decir que se pierden respuestas; los campos que dependian del borrado quedan con su condicion apuntando a nada (la app no los muestra nunca) y `onboarding_steps_config.forms[].field_ids` conserva el id.
+- **Visto:** 2026-11-05, sonda.
+- **Arreglado en:** C# (`CamposDelFormulario.BorrarAsync`), decision de Kamilo (2026-11-05): no se borra mientras otro campo dependa de este (422 que los nombra); con respuestas, la confirmacion dice cuantas respuestas y de cuantas personas se pierden y exige escribir la etiqueta tal cual (422 `confirm_label` si no); al borrar sale tambien de los formularios del onboarding (corre lo de guardar el evento y avisa `onboarding`). En la lista solo se elimina desde la fila un campo sin respuestas ni dependientes.
+- **Prueba:** `CamposDelFormularioTest.Borrar_se_frena_con_dependientes_pide_la_etiqueta_con_respuestas_y_sale_del_onboarding`, la cruzada (respuesta de Ana guardada por PHP) y la e2e `campos` (escenario `campos-con-respuestas`). Controles: sin el freno de dependientes, sin pedir la etiqueta y sin sacarlo del onboarding, los tres en rojo.
+
+### BUG-531: Caracteres que rompen la condicion y etiquetas repetidas (RESUELTO 2026-11-05 en M2.4.1c, admin nuevo)
+- **Severidad propuesta:** MEDIA
+- **Que pasa:** PHP y la app cortan `depends_on` en el primer `:` y las respuestas en `,`: una etiqueta como "Sede: ciudad" o una respuesta como "Bogota, centro" rompen la condicion. Filament deja crear "Cargo" y "cargo" y en "Depende del campo" no se distinguen (el formulario publico resuelve sin importar mayusculas).
+- **Visto:** 2026-11-05, sonda: se guardo `Sede: ciudad:Bogota, centro`; dos campos "Cargo" y "cargo".
+- **Arreglado en:** C#: la etiqueta no lleva `:` y es unica en el evento sin importar mayusculas; una respuesta de la condicion no lleva coma (una opcion de la lista si puede llevarla, pero no se puede usar como condicion). Las etiquetas viejas con `:` se siguen leyendo bien al editar.
+- **Prueba:** `CamposDelFormularioTest.Las_reglas_frenan_lo_que_rompia_la_condicion_y_lo_que_filament_dejaba_pasar`. Controles: con dos puntos, con repetidas y con coma, los tres en rojo.
+
+### BUG-532: Validaciones flojas del formulario de campos (RESUELTO 2026-11-05 en M2.4.1c, admin nuevo)
+- **Severidad propuesta:** BAJA
+- **Que pasa:** un tipo inventado llega a la base (en MySQL, error de servidor por el enum); una lista se crea sin opciones; un campo puede depender de si mismo o quedar en circulo con otro; al cambiar de tipo quedan guardadas las opciones, la lista predefinida y el texto de ayuda viejos (los campos escondidos de Filament no se guardan) y el formulario publico sigue mandando las opciones de un campo de texto.
+- **Visto:** 2026-11-05, sonda.
+- **Arreglado en:** C#: solo los tipos de la lista; las listas sin lista predefinida con al menos una opcion (sin vacias ni repetidas); sin depender de si mismo ni en circulo; lo que no aplica al tipo se guarda vacio.
+- **Prueba:** `CamposDelFormularioTest` (crear y editar, y las reglas) y la cruzada (PHP ya no manda las opciones viejas). Controles: tipo inventado, lista sin opciones, circulo y sin limpiar al cambiar de tipo, los cuatro en rojo.
+
 ## 2026-11-05 — Encontrados al portar Premios, el catalogo (M2.4.5d)
 
 Sonda de Livewire contra `RewardResource` de Filament (2026-11-05). Arreglos decididos por Kamilo el mismo dia. En Filament quedan RESUELTOS POR REEMPLAZO: la pantalla quedo de solo lectura con el aviso.

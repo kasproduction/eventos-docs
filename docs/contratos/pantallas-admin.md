@@ -61,7 +61,7 @@ no toca credenciales; se corre desde la raiz de `eventos-web`).
 | EventBrandingResource | Experiencia / Identidad | H1 | 2.3.4b y 2.3.4c (hechas 2026-10-30) | Lo esencial, Identidad comun, App movil, Webapp y Onboarding app (siete pantallas) ya en el admin nuevo; Filament lo sigue mostrando hasta M2.7 (INT.2) |
 | ModulosPanel | Experiencia | H1 | 2.3.4a (hecha 2026-10-30) | Ya en el admin nuevo; Filament lo sigue mostrando hasta M2.7 |
 | AttendeeAdminResource | Personas / Asistentes | H1 | 2.4.1, 2.3.6 | Lista, perfil, tags, aprobacion, check-in manual, importar y exportar |
-| RegistrationFieldResource | Personas / Entrada | H1 | M2.4.1c | **Hueco (2026-11-04):** ni M2.4.1a ni M2.4.1b la portaron; la pestana Campos del admin nuevo lleva a Filament |
+| RegistrationFieldResource | Personas / Entrada | H1 | M2.4.1c (hecha 2026-11-05) | Hueco de 2026-11-04, cubierto: `/entrada/campos` del admin nuevo; Filament de solo lectura |
 | AttendeeBanResource | Personas / Asistentes | H1 | 2.4.2 | Con expulsion del socket (BUG-373) |
 | WebhookEndpointResource, WebhookApiKeyResource, WebhookLogResource | Sistema / Webhooks | H1 | 2.4.3 (endpoints 2.4.3a, llaves 2.4.3b e historial 2.4.3c: hechos) | Los secretos no se muestran (BUG-385); el del endpoint se copia sin mostrarse |
 | GoldenTicketResource, RewardResource, PrizeRedemptions | Experiencia / Gamificacion | H1 | 2.4.5 (Premios, `RewardResource`: M2.4.5d hecha 2026-11-05) | Marcar como reclamado con `RewardService::confirm` (BUG-377) |
@@ -96,10 +96,10 @@ equivalente; se oculta del todo solo si no queda nada que mirar. Prueba: `evento
 
 | Estado en Filament | Pantallas |
 |---|---|
-| Solo lectura con el aviso (36) | Escritorio (sus accesos van al admin nuevo), Eventos (el asistente de evento nuevo se cerro), Staff, Sesiones, Tracks, Tipos de sesion, Speakers, Sponsors, Documentos, Paginas, Branding (con Onboarding), Slides del login, Destacados, Preguntas, Recap, Asistentes, Bloqueos, Registro, Codigos de acceso, Anuncios, Push programadas, Recordatorios, Plantillas de correo, Envio (SMTP), Historial de correos, Publicaciones del muro, Ajustes del muro, Fotos, Gamificacion, Golden Tickets, Premios (M2.4.5d, desde el 2026-11-05), Premios Ganados, Chat, Encuestas, Salones, Soporte, Limites de uso, Webhooks y Llaves de entrada |
+| Solo lectura con el aviso (37) | Escritorio (sus accesos van al admin nuevo), Eventos (el asistente de evento nuevo se cerro), Staff, Sesiones, Tracks, Tipos de sesion, Speakers, Sponsors, Documentos, Paginas, Branding (con Onboarding), Slides del login, Destacados, Preguntas, Recap, Asistentes, Bloqueos, Registro, Campos del formulario (M2.4.1c, desde el 2026-11-05), Codigos de acceso, Anuncios, Push programadas, Recordatorios, Plantillas de correo, Envio (SMTP), Historial de correos, Publicaciones del muro, Ajustes del muro, Fotos, Gamificacion, Golden Tickets, Premios (M2.4.5d, desde el 2026-11-05), Premios Ganados, Chat, Encuestas, Salones, Soporte, Limites de uso, Webhooks y Llaves de entrada |
 | Acciones que siguen vivas dentro de una pantalla de solo lectura | Regenerar recap en Asistentes (hasta M4e.5), Generar en lote en Codigos de acceso (M2.4.5e), Ajustes de equipos en Sponsors (M2.3.3d) |
 | Ocultas, su direccion lleva al admin nuevo | Modulos y Landing y widget (todo lo que muestran son controles); Historial de webhooks (mostraba envios de todos los eventos, BUG-504). El resumen de webhooks se quito (BUG-501). Seguridad de tu cuenta (M2.2.8, desde el 2026-11-04) |
-| Siguen en Filament sin aviso | Campos del formulario (M2.4.1c), Event Pulse (M2.7.3); ocultas de antes: Evaluaciones y Resultados de juegos |
+| Siguen en Filament sin aviso | Event Pulse (M2.7.3); ocultas de antes: Evaluaciones y Resultados de juegos |
 
 ## Avisos genericos del navegador en el admin actual (no copiar)
 
