@@ -5,11 +5,12 @@
 
 ## 2026-11-06 — Encontrados al revisar la escarapela (M2.8.2)
 
-### BUG-538: Mi QR usa "·" como separador en el pie de la tarjeta (ABIERTO)
+### BUG-538: Mi QR usa "·" como separador en el pie de la tarjeta (RESUELTO 2026-11-06)
 - **Severidad propuesta:** MEDIA (visual; rompe una regla dura de interfaz: nunca "·" como separador)
 - **Que pasa:** `eventos-web/src/components/app/mi-qr/MiQrView.tsx` pinta "QR dinamico · {countdown}s" debajo del QR (y sin tilde en "dinamico"). La escarapela de la confirmacion dice "Código dinámico, cambia en {n} s", sin separador.
 - **Visto:** 2026-11-06, leyendo el codigo para proponer M2.8.2 (no hay captura).
 - **Arreglo propuesto:** el mismo texto que la confirmacion. Va con M2.8.2 si se toca Mi QR; si no, aparte.
+- **Arreglado con M2.8.2** (web `ad61d94`): "Código dinámico, cambia en {n} s", y el subtitulo "cargo · empresa" (el mismo separador, encontrado al arreglar) pasa a "cargo en empresa". Prueba: vitest de Mi QR y la e2e del shell mobile buscan el texto nuevo. Expo tiene los mismos dos textos: van con su siguiente publicacion (`PENDIENTES.md`).
 
 ## 2026-11-05 — De las pruebas (runner del MSI)
 

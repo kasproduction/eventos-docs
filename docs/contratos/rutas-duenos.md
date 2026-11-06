@@ -14,6 +14,7 @@
 | POST | `/api/v1/admin/sessions/{sessionId}/cancel` | C# | 2026-10-27 | sin medir |
 | POST | `/api/v1/admin/sessions/{sessionId}/delay` | C# | 2026-10-27 | sin medir |
 | GET | `/api/v1/events/{eventId}/documents/zip` | C# | 2026-10-29 | sin medir |
+| GET | `/api/v1/events/{eventId}/badge` | C# | 2026-11-06 | solo C# (M2.8.2, PHP no la tiene) |
 
 Ademas, todo `/api/admin/v1/*` es de C# (API del admin nuevo, M2.1.4): Nginx manda el prefijo entero
 (`proxy/nginx-api.conf`), sin pasar por esta tabla.

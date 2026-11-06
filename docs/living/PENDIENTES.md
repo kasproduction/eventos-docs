@@ -434,8 +434,9 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] **Etiquetas en la escarapela de Mi QR en Expo, con la siguiente publicacion** (Kamilo 2026-11-06, M2.8.2). `MiQrScreen.tsx`
       consulta la misma ruta de C# que la webapp para saber que etiquetas de la persona salen en la tarjeta (las que el panel marco
       en Identidad, seccion Escarapela) y las pinta igual que la webapp (la forma que Kamilo escoja en el lab
-      `design/features/app/lab-escarapela-etiquetas.html`). De paso, el texto del contador: "Codigo dinamico, cambia en N s", sin "·"
-      (BUG-538). Expo espera la publicacion (D.5).
+      `design/features/app/lab-escarapela-etiquetas.html`): forma C, banda al pie en el `primary_color` del evento. La ruta es
+      `GET /api/v1/events/{id}/badge` (`data.tags`). De paso, el texto del contador: "Codigo dinamico, cambia en N s", y el subtitulo
+      "cargo en empresa", sin "·" (BUG-538). Expo espera la publicacion (D.5).
 
 ### Backlog Expo (sesion Expo futura)
 - [ ] Borrar `banners.tsx` + `BannerCarousel` + `bannersApi` del Expo (feature legacy muerta)
