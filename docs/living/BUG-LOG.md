@@ -5,7 +5,7 @@
 
 ## 2026-11-06 — Encontrado al preparar el lab de M2.8.6
 
-### BUG-539: El pie de todos los correos usa "·" como separador (ABIERTO)
+### BUG-539: El pie de todos los correos usa "·" como separador (RESUELTO 2026-11-06)
 - **Severidad propuesta:** MEDIA (visual; rompe una regla dura de interfaz: nunca "·" como separador, y lo ve cada asistente)
 - **Que pasa:** el marco de los correos dice "Este correo fue enviado por EventOS · Powered by Kasproduction". Esta en
   `eventos-api-dotnet/src/Trabajos/Correo/MarcoDeCorreo.cs:65` (el que manda hoy) y en `eventos-backend/app/Support/EmailLayout.php:59`
@@ -14,6 +14,11 @@
 - **Arreglo propuesto:** dos lineas o un texto corrido sin separador (por ejemplo "Enviado con EventOS, de Kasproduction"); decide
   Kamilo el texto. Va con M2.8.6, que toca la edicion de correos. Si PHP todavia arma algun correo, ese queda como esta (regla 6)
   hasta que salga.
+- **Arreglado 2026-11-06** (Kamilo: "y arreglalo", con el pie del lab): "Este correo fue enviado por EventOS<br>Powered by
+  Kasproduction", en C# (`MarcoDeCorreo`, C# `9990a8c`) y tambien en PHP (`EmailLayout`, backend `b0256a8`): PHP todavia manda correos
+  (registro publico, enlace magico) y cuatro cruzadas comparan el HTML entero con el de PHP; es solo el texto, como M2.8.3. Prueba:
+  `MarcoYPlantillasTest.El_pie_va_en_dos_lineas_sin_separador` (control: con el "·" falla) y cruzadas `CorreoTest`,
+  `EmailsDelAdminTest`, `AsistentesTest` y `BaneosTest` 11/11 (control: con el pie viejo solo en PHP, 5 fallan).
 
 ## 2026-11-06 — Encontrados al revisar la escarapela (M2.8.2)
 
