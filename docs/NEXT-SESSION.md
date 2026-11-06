@@ -26,7 +26,9 @@
 - **Regla nueva (Kamilo):** en local solo las pruebas del modulo tocado; las suites completas las corre el runner del MSI tras el push (`decisiones.md`). Tarea chica anotada: e2e con varios trabajadores (PENDIENTES §11).
 - **M2.7.2 movida a la fase 4e como M4e.10** (decision Kamilo, sin codigo): la sonda mostro que PHP rechaza y borra el token del staff (D.1) y que hacerlo ahora pedia una excepcion en PHP (regla 6). Hasta 4e el Data Center entra por su login de Filament y el admin nuevo solo lo enlaza. Roadmap 139/237.
 - **M2.7.3 hecha, reescrita** (C# `44070b5`, backend `bbe0d56`, web `a8dff57`): Event Pulse en el admin nuevo y su Filament de solo lectura (el interruptor escribia sin guardar: frenado); Mission Control y sus pantallas ya se enlazan con su token; unificacion congelada hasta M4e.7 o la fase 3; BUG-536 abierto (socket, 15 minutos). Pruebas solo del modulo; suites completas para el runner del MSI. Ya no queda ninguna pantalla de Filament sin aviso.
-- **Sigue: M2.7.4 (Filament solo para lo de M2b, con un aviso en el panel): revisar si con M2.7.1 a M2.7.3 ya se cumple y proponer lo que falte.**
+- **Runner del MSI (Kamilo lo prendio):** la corrida de M2.7.3 fallo por un contrato de PHP que fallaba al azar (BUG-537: el orden de dos encuestas sembradas a la hora real); arreglado en el seeder (backend `aafaf4e`), contratos 302/302 en local; la corrida se relanzo. Regla nueva en la memoria: avisar a Kamilo que prenda el MSI antes de cada push con codigo.
+- **M2.7.4 hecha** (backend `cb82049`): aviso arriba de todo Filament (tambien el login) con "Ir al panel de EventOS"; en los textos ya no se dice "admin nuevo" (decision Kamilo). Seccion 2.7 cerrada salvo nada: M2.7.1 a M2.7.4 hechas, M2.7.2 movida a M4e.10.
+- **Sigue: lo que quede abierto de la fase 2: M2.8.x (otorgar puntos manuales, credencial con etiqueta, renombres, manual, lista "no repetir", editor con formato), M2.9.x (torre de control) y M2.10.x (medicion y retro). Proponer el orden con Kamilo.**
 
 ## SESION 2026-11-04 (Opus 5.5, 33) — M2.7.1 Y M2.2.8 HECHAS: FILAMENT DE SOLO LECTURA EN 35 PANTALLAS; SEGURIDAD DE TU CUENTA EN EL ADMIN NUEVO; CINCO HUECOS AL ROADMAP
 
