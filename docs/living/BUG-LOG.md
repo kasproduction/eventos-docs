@@ -3,6 +3,32 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-06 — Encontrado al correr las e2e del panel en M2.8.4b
+
+### BUG-543: El Escritorio del panel dice "admin nuevo" y "admin actual" en pantalla (ABIERTO)
+- **Severidad propuesta:** MEDIA (va contra la regla de decir "el panel de EventOS"; sale en la captura del paso "Tu evento ya existe" de la Ayuda)
+- **Que pasa:** el Escritorio de un evento muestra "El admin nuevo se arma pantalla por pantalla. Mientras tanto, cada seccion del
+  menu te lleva a su pagina en el admin actual." Es un texto de M2.2.7, de antes de la regla, y hoy casi todas las secciones ya
+  tienen pagina propia.
+- **Visto:** 2026-11-06, en la captura `crear-evento/6-listo` de la Ayuda (M2.8.4b).
+- **Arreglo:** pendiente de decision de Kamilo (que dice el Escritorio mientras llega su pantalla, M2.2.x). Al cambiarlo, la Ayuda
+  pide volver a capturar `crear-evento` (pnpm ayuda:revisar lo marca).
+
+### BUG-542: e2e-admin/entrada.spec "una seccion que no esta hecha" quedo vieja desde M2.7.3 (ABIERTO)
+- **Severidad propuesta:** BAJA (pruebas: falla siempre, no es el panel)
+- **Que pasa:** la prueba usa Event Pulse como la seccion que sigue en Filament, pero Event Pulse tiene pagina propia desde M2.7.3;
+  ya no sale "Esta seccion todavia esta en el admin actual". La nota de NEXT-SESSION ya pedia moverla de seccion cuando se portara.
+- **Visto:** 2026-11-06, corriendo las e2e del panel para M2.8.4b; falla igual con los cambios de M2.8.4b guardados aparte (git stash).
+- **Arreglo:** pendiente: usar otra seccion que siga en Filament (o quitar la prueba si ya no queda ninguna).
+
+### BUG-541: e2e-admin/paginas.spec pierde la negrita al insertar la imagen (ABIERTO)
+- **Severidad propuesta:** MEDIA (la prueba de M2.8.6 esta roja; falta ver si es la prueba o el editor)
+- **Que pasa:** despues de poner "mundo" en negrita con la barra, la prueba baja con ArrowRight, Enter y sube una imagen con el "+".
+  Al reabrir la pagina, el texto es "Hola" y la imagen: "mundo" desaparecio. Lo mas probable es que la seleccion siguiera sobre
+  "mundo" (ArrowRight no la colapso porque el foco quedo en el boton de la barra) y la imagen la reemplazo.
+- **Visto:** 2026-11-06, 3 corridas seguidas en rojo (linea 81, `strong` "mundo"); igual con los cambios de M2.8.4b guardados aparte.
+- **Arreglo:** pendiente: revisar si al tocar un boton de la barra el foco vuelve al editor (si no, es del editor, no de la prueba).
+
 ## 2026-11-06 — Del runner del MSI
 
 ### BUG-540: M2.8.2 se marco hecha con dos pruebas de C# en rojo (RESUELTO 2026-11-06)

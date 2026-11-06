@@ -1,36 +1,40 @@
 # Manual del organizador — EventOS (inventario y reglas)
 
 > Knowledge base (decisión Kamilo 2026-07-19, PENDIENTES.md §2.5).
-> **La fuente única del contenido vive en el sitio Starlight:
-> `manual/src/content/docs/`** (este repo, carpeta `manual/` — `pnpm dev`
-> para verlo en HTML). Este archivo es solo el inventario/tracker y las
-> reglas de escritura. Al final, cada módulo del admin gana un link
-> contextual "¿Cómo funciona?" hacia su página.
+> **Desde M2.8.4 (Kamilo 2026-11-06) el manual es la Ayuda DENTRO del panel de EventOS**, con el modelo del manual de Masterlub:
+> por tareas, paso a paso, con capturas reales del panel y marcas numeradas (forma A del lab `design/features/admin/lab-ayuda.html`).
+> El sitio Starlight (`manual/`) se retiró en M2.8.4b; queda en git.
+> - Textos: `eventos-web/src/lib/admin/ayuda/capitulos/` (un archivo por capítulo; el índice en `capitulos.ts`).
+> - Capturas y marcas: las saca `pnpm ayuda:capturar` (`eventos-web/e2e-ayuda/`, contra el C# de verdad) y quedan en
+>   `public/admin/ayuda/{noir,lux}/` y `src/lib/admin/ayuda/capturas.json`.
+> - `pnpm ayuda:revisar` (también en el runner del MSI) falla si una pantalla cambió y el capítulo no se tocó.
+> Este archivo es el inventario y las reglas de escritura. Al final (M2.8.4d), cada pantalla del panel gana un "¿Cómo funciona?"
+> que abre la Ayuda en su paso.
 
 ## Reglas de escritura
 
-1. **Esqueleto fijo** — toda página de módulo usa las mismas 5 secciones:
+1. **Esqueleto (hasta M2.8.4a; desde M2.8.4b cada capítulo es una tarea con pasos, ver arriba)** — toda página de módulo usaba las mismas 5 secciones:
    - **Qué es** (2-3 líneas, lenguaje del organizador, cero jerga técnica)
    - **Cómo se configura (admin)** — pasos reales sobre el admin actual
    - **Qué ve el asistente** — app móvil y webapp, por separado si difieren
    - **Lo que se puede y lo que NO** — límites honestos, sin promesas falsas
    - **Gotchas y preguntas frecuentes**
 2. **Regla de procedencia**: toda afirmación sale del código o de una
-   decisión documentada. La fuente va en comentario HTML junto a la
-   afirmación (`<!-- fuente: archivo:línea -->`) — no se renderiza en el
-   sitio pero permite auditar y actualizar.
+   decisión documentada. En los capítulos de la Ayuda la fuente va en un
+   comentario `// Fuentes:` arriba del archivo (textos de la pantalla en
+   `messages/es.json` y la e2e que lo prueba).
 3. Español de Colombia, tuteo. Cero emojis.
    **Feedback Kamilo 2026-07-19 sobre el piloto: el lenguaje debe ser mas
    natural y humanizado, sin tecnicismos — que lo entienda cualquiera, pero
    sin ser infantil: como lo escribiria un hombre de 30 años. Re-escribir el
    piloto de Encuestas con este tono antes de producir en masa.**
-4. Las capturas del admin real se agregan en un pase final (v1 puede
-   salir sin capturas; el texto no depende de ellas).
+4. Las capturas son del panel real y las saca el script, nunca a mano. Cada marca del texto tiene su marca en el script, en el
+   mismo orden (si no coinciden, el script se detiene).
 5. **Reescritura sobre el panel de EventOS (M2.8.4, Kamilo 2026-11-06):** "Cómo se configura" describe el panel de EventOS
    (nunca Filament, nunca "admin nuevo"); las fuentes citan el código de C# (`eventos-api-dotnet`) y de la webapp
    (`eventos-web`), y lo de PHP solo donde PHP sigue siendo el dueño.
 6. **Marca de actualización:** una página (o sección) que describe algo que cambia en las fases 3 y 4 lleva arriba
-   `<!-- actualizar con: M4d.7 -->` (Mission Control), `M4d.8` (Event Pulse) o `M4e.10` (Data Center). La tarea del roadmap
+   `// actualizar con: M4d.7` (Mission Control), `M4d.8` (Event Pulse) o `M4e.10` (Data Center). La tarea del roadmap
    que haga ese cambio tiene que buscar su marca y actualizar la página.
 
 ## Inventario — 1/27
