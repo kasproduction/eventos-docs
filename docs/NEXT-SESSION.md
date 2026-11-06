@@ -77,7 +77,9 @@
 - Pruebas (solo del modulo, regla de Kamilo): M2.8.1 C# 8/8, cruzada 3/3, e2e perfil 3/3, 6 controles. M2.8.2 C# 3/3 mas rutas y OpenAPI 28/28, cruzada 1/1, vitest Mi QR 7/7, e2e Mi QR 1/1, e2e admin escarapela, identidad, recap y branding 6/6; 7 controles en rojo. Suites completas: el runner del MSI con los pushes de hoy (Kamilo lo prendio).
 - Tropiezo: el scaffold del modelo trae tambien la columna generada de premios por foto y un BOM; se deshizo y `badge_tags` se agrego a mano igual a lo generado.
 - Despliegue: pasos 4 (migracion `2026_11_06_120000`) y 11 (ruta `badge` en el mapa de Nginx) de la lista unica de arriba.
-- **Sigue: proponer M2.8.6 (editor con formato para correos y paginas personalizadas), con lab de 2 o 3 direcciones antes de codear.**
+- **Despues del cierre:** despliegue en una sola lista ordenada (arriba de todo, decision de Kamilo). BUG-539 (pie de los correos con "·") arreglado en C# `9990a8c` y en PHP `b0256a8`: **el cambio en PHP fue una excepcion a la regla 6, registrada en decisiones.md; la cuenta la retro M2.10.2; desde hoy todo toque a PHP se pregunta antes** (la opcion sin PHP era normalizar la linea en las cruzadas). BUG-540: M2.8.2 se habia subido con dos pruebas de C# en rojo (`CoberturaDelBloqueTest`, `TiposTest`); arreglado en C# `967e5e6` y la corrida completa del runner salio verde (17 min).
+- **M2.8.6 hecha** (web `bb57d99`, C# `37f5a79`): editor con formato en Emails y Paginas, forma B del lab, Tiptap 3.32.0 fijo; lo que no entiende abre como HTML. vitest 74/74, C# 47/47, e2e 6/6, 5 controles. Despliegue: nada nuevo. Roadmap 146/238. Corrida del runner de M2.8.6 en curso al cerrar (42282959886).
+- **Sigue: proponer M2.8.4 (manual del organizador reescrito sobre el panel de EventOS, ROADMAP-MANUAL M1 a M7). Antes: mirar la corrida 42282959886 del runner.**
 
 ## SESION 2026-11-05 (Opus 5.5, 34) — SEIS HUECOS Y LA SECCION 2.7 CERRADOS (PREMIOS, CAMPOS, CODIGOS EN LOTE, AJUSTES DE EQUIPOS, EVENT PULSE, AVISO GENERAL); M2.8.5 Y M2.8.3; BUG-524 CERRADO; SUITES COMPLETAS AL RUNNER DEL MSI
 
