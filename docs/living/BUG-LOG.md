@@ -3,6 +3,19 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-06 — Del runner del MSI
+
+### BUG-540: M2.8.2 se marco hecha con dos pruebas de C# en rojo (RESUELTO 2026-11-06)
+- **Severidad propuesta:** ALTA (proceso: el runner paro en C# y no corrio PHP, cruzadas ni e2e de los pushes de M2.8.2 y BUG-539)
+- **Que pasa:** la ruta nueva del panel `/events/{id}/badge` no tenia fila en `CoberturaDelBloqueTest` (toda escritura del admin
+  tiene que nombrar su servicio, sus efectos y sus pruebas) y `TiposTest` contaba 40 columnas json (con `badge_tags` son 41). Las
+  dos corren en segundos, pero no estaban en el filtro "solo del modulo" que use en local.
+- **Visto:** 2026-11-06, corridas del runner 42271398622 (M2.8.2) y 42277565108 (BUG-539), las dos en rojo en un minuto.
+- **Arreglado:** C# `967e5e6` (fila `badge` sin efectos, porque PHP no lee la columna; 41 columnas). Prueba: las dos en verde en
+  local. Control: son las mismas pruebas que lo atraparon.
+- **Leccion:** con una columna nueva o una escritura nueva del panel, el filtro local incluye `Eventos.Tests.Datos` y
+  `CoberturaDelBloqueTest` (memoria). M2.8.2 queda hecha cuando el runner pase en verde.
+
 ## 2026-11-06 — Encontrado al preparar el lab de M2.8.6
 
 ### BUG-539: El pie de todos los correos usa "·" como separador (RESUELTO 2026-11-06)
