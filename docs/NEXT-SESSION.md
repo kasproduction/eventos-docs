@@ -30,7 +30,8 @@
 - **M2.7.4 hecha** (backend `cb82049`): aviso arriba de todo Filament (tambien el login) con "Ir al panel de EventOS"; en los textos ya no se dice "admin nuevo" (decision Kamilo). Seccion 2.7 cerrada salvo nada: M2.7.1 a M2.7.4 hechas, M2.7.2 movida a M4e.10.
 - **Orden de lo que queda de la fase 2 (Kamilo):** M2.8.5, M2.8.3, M2.8.1, M2.8.2, M2.8.6 (con lab), M2.8.4, 2.9 y al final M2.9.3 y M2.10.1 con el servidor prendido. Decisiones: Destacados solo en pantalla; Silent Disco sin interruptor (columna huerfana a M5.1.5); puntos manuales en el perfil del asistente con motivo y registro.
 - **M2.8.5 hecha** (C# `ce2101b`, web `dca314f`): lista "no repetir" revisada; BUG-388 arreglado (prueba de plantillas por el SMTP real); BUG-377 y BUG-381 cerrados.
-- **Sigue: proponer M2.8.3 (Destacados en pantalla, borrar `EventOnboardingResource`, cerrar Silent Disco en el panel si hiciera falta).**
+- **M2.8.3 hecha** (backend `0fc6ab2`): Filament dice "Destacados"; `EventOnboardingResource` se queda hasta que se borre Filament entero (Branding usa sus secciones). Roadmap 143/238.
+- **Sigue: proponer M2.8.1 (otorgar puntos manuales en el perfil del asistente, motivo obligatorio y quien los dio), con sonda del motor de puntos antes.**
 
 ## SESION 2026-11-04 (Opus 5.5, 33) — M2.7.1 Y M2.2.8 HECHAS: FILAMENT DE SOLO LECTURA EN 35 PANTALLAS; SEGURIDAD DE TU CUENTA EN EL ADMIN NUEVO; CINCO HUECOS AL ROADMAP
 
