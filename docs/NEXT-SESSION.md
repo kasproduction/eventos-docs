@@ -10,6 +10,64 @@
 
 ---
 
+## DESPLIEGUE PENDIENTE (lista unica, en orden)
+
+> Decision de Kamilo 2026-11-06: todo lo que falta para desplegar vive SOLO aqui, en el orden en que se hace. Cada tarea
+> nueva que cambie el despliegue agrega o corrige su paso en esta lista en el mismo commit (la entrada de la sesion solo
+> dice "despliegue: paso N"). Se borra lo que ya quedo en el servidor. El servidor esta en pausa desde 2026-09-30: vuelve
+> desde los snapshots de agosto (PENDIENTES P.0 a P.2), asi que esto cubre todo lo acumulado desde entonces. Nunca valores
+> de secretos en este archivo: solo nombres.
+
+1. **Parche PHP2Shell, antes de todo** (BUG-457, CVE-2026-109618/9): `apt upgrade` (php8.3 a 8.3.36 o mas), `systemctl reload
+   php8.3-fpm` y reconstruir la imagen del worker de PHP (`php:8.3-cli-alpine` con el parche). Revisar `TRUSTED_PROXIES` (vino
+   quemado en el snapshot).
+2. **Secretos en el `.env` real** (nunca en git; los que faltan en `.env.example` caen a `change_this_secret_in_production`):
+   `APP_KEY` (el mismo en PHP y en C#: `App__Key`, mas `APP_PREVIOUS_KEYS` si se roto), `APP_QR_SECRET` (QR y enlaces ya
+   impresos dependen de ella), `SOCKET_INTERNAL_SECRET` y `WEBAPP_INTERNAL_SECRET` (el mismo valor en los dos lados de cada
+   canal, nunca el de ejemplo), `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`VAPID_SUBJECT` (las de siempre: las suscripciones
+   guardadas dependen de ellas), la API key de Resend (`MAIL_PASSWORD`/`RESEND_KEY`), `CLOUDFLARE_R2_*`, contraseñas de MySQL
+   y Redis, `MAGIC_LINK_SECRET` de la webapp, los DSN de Sentry y **las llaves reales de Turnstile** (`TURNSTILE_SECRET_KEY`
+   en el backend y `NEXT_PUBLIC_TURNSTILE_SITE_KEY` en la webapp; hoy van las de prueba, que aprueban a cualquiera).
+   `HASH_DRIVER` sin poner (argon2id). `CONTRATOS_FILAMENT_ESCRIBE` NUNCA en el servidor.
+3. **Antes de migrar:** `SELECT COUNT(*) FROM outbox_emails WHERE sent_at IS NULL` tiene que dar 0 (lo que quede se pierde al
+   salir el job de PHP; M2.3.6a).
+4. **Migraciones de Laravel** (`php artisan migrate --force`, con `APP_URL` ya bien puesto) y `php artisan db:seed
+   --class=EmailTemplateSeeder` (plantillas nuevas: 2FA del staff, bienvenida, aprobacion del registro). Son 21 desde agosto:
+   `2026_09_26_100000` a `2026_09_29_300001` (2FA del staff, 8), `2026_10_12_100000`, `2026_10_23_100000/110000/120000`,
+   `2026_10_25_120000/130000` (outbox), `2026_10_26_100000` (rol organizador), `2026_10_30_120000` (keyvisuals),
+   `2026_10_31_100000` (`skipped` en email_logs), `2026_11_01_120000` (cuerpo y cabeceras de webhook_logs),
+   `2026_11_03_120000` (premio unico por foto: se detiene con aviso si ya hay fotos premiadas dos veces),
+   `2026_11_05_120000` (roles vacios a null e imagenes de premios a `APP_URL/storage/...`: por eso `APP_URL` antes) y
+   `2026_11_06_120000` (`events.badge_tags`). Todas van ANTES del C# nuevo.
+5. **2FA del staff** (runbook D.3, ROADMAP-INFRAESTRUCTURA B2): vaciar TODAS las sesiones web de Redis, verificar con un token
+   viejo del staff que da 401 y correr `php artisan security:check` contra el `.env` real (S.7.2); confirmar que el super_admin
+   puede entrar.
+6. **`npm run build` en eventos-backend** (tema de Filament: estilos de los avisos de solo lectura).
+7. **Variables de la Api de C#** (doble guion bajo; tabla en `contratos/variables.md`): `ConnectionStrings__MySql`,
+   `ConnectionStrings__Redis`, `App__Key`, `App__PreviousKeys`, `App__QrSecret`, `App__Url`, `App__WebappUrl`,
+   `App__TrustedProxies`, `Sesion__Minutos` (120, como `SESSION_LIFETIME`), `Php__Cache__Prefijo` y `Php__Cache__BaseDeRedis`
+   (los de PHP), `Redis__BaseSocket`, `Servicios__Socket__Url` y `__SecretoInterno`, `Servicios__Webapp__UrlsInternas` y
+   `__SecretoInterno`, `Servicios__Kiosko__Url`, `Correo__Host` (smtp.resend.com), `Correo__Puerto` (465),
+   `Correo__Seguridad` (ssl), `Correo__Usuario` (resend), `Correo__Clave`, `Correo__DesdeCorreo`, `Correo__DesdeNombre`,
+   opcional `Correo__EnviosPorSegundo` (8), `Almacen__R2__Key/Secret/Bucket/Endpoint/PublicUrl`, `Almacen__RutaPublica`,
+   `Sentry__Dsn`, `ASPNETCORE_ENVIRONMENT=Production` y, si se cambian, los limites `Puerta__*`.
+8. **Variables del Worker de C#:** las mismas de conexion, `App__Key`, `App__QrSecret`, `App__Url`, `App__WebappUrl`,
+   `Php__Cache__*`, `Redis__BaseSocket`, `Servicios__Socket__*`, `Servicios__Webapp__*`, `Correo__*`, `Almacen__*`, y
+   `Servicios__WebPush__LlavePublica`, `__LlavePrivada` y `__Asunto` (las VAPID de PHP; sin ellas no manda al navegador).
+9. **Variables de la webapp:** `ADMIN_API_URL` (la API del panel de EventOS, `<C#>/api/admin/v1`; falta en `.env.example`),
+   `API_INTERNAL_URL`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SOCKET_URL`, `NEXT_PUBLIC_APP_URL`, `WEBAPP_INTERNAL_SECRET`,
+   `MAGIC_LINK_SECRET`, `CDN_HOSTNAME` (sin el, las imagenes de R2 no se ven), `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y Sentry.
+10. **PHP, Api y Worker de C# del mismo corte, juntos, con el Worker corriendo:** varios trabajos salieron de PHP y los hace
+    ahora el Worker (aviso de cambio de horario, vencer baneos, push programadas, correo directo sin outbox). Uno sin el otro
+    deja avisos sin mandar o mandados dos veces. Confirmar en el panel de Hangfire que estan los recurrentes.
+11. **Nginx:** el bloque `@dotnet` y el prefijo `/api/admin/v1` de `proxy/nginx-api.conf`, y el mapa `proxy/rutas-csharp.conf`
+    (9 rutas: health, version, auth/me, start/end/cancel/delay de sesiones, documents/zip y badge de Mi QR) instalado como
+    lo hace `instalar_en_nginx` de `scripts/rutas-lib.sh` (`nginx -t` y reload). Respaldar la base antes (rutas que escriben).
+    Mientras la ruta de `badge` no vaya a C#, Mi QR sale sin la banda de etiquetas.
+12. **Despues de prender:** medir las rutas cruzadas detras del Nginx real y anotarlas (`rutas-duenos.md`, regla 20; hoy
+    "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
+    `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
+
 ## SESION 2026-11-06 (Opus 5.5, 35) — M2.8.1 Y M2.8.2 HECHAS: PUNTOS A MANO EN EL PERFIL DEL ASISTENTE; ETIQUETAS EN LA ESCARAPELA DE MI QR (RUTA SOLO DE C#); BUG-538
 
 - Decisiones Kamilo (M2.8.1): solo sumar; de 1 a 10.000 por vez; la accion se llama `manual_award`; la etiqueta en español de Event Pulse va con todas cuando Pulse pase a C# (M4d.8, anotado). Confirmar dentro de la seccion, sin ventana encima.
@@ -18,7 +76,7 @@
 - Hecho M2.8.2: backend `e6dd176` (migracion `2026_11_06_120000`, `events.badge_tags`; cruzada), C# `750f821` (admin `GET`/`PUT /events/{id}/badge`; `GET /api/v1/events/{id}/badge` solo de C#, en la tabla de rutas y fuera de la comparacion con el OpenAPI de PHP), web `ad61d94` (pestaña Escarapela; banda en Mi QR; BUG-538: "Código dinámico, cambia en N s" y "cargo en empresa").
 - Pruebas (solo del modulo, regla de Kamilo): M2.8.1 C# 8/8, cruzada 3/3, e2e perfil 3/3, 6 controles. M2.8.2 C# 3/3 mas rutas y OpenAPI 28/28, cruzada 1/1, vitest Mi QR 7/7, e2e Mi QR 1/1, e2e admin escarapela, identidad, recap y branding 6/6; 7 controles en rojo. Suites completas: el runner del MSI con los pushes de hoy (Kamilo lo prendio).
 - Tropiezo: el scaffold del modelo trae tambien la columna generada de premios por foto y un BOM; se deshizo y `badge_tags` se agrego a mano igual a lo generado.
-- Despliegue (acumulado): `php artisan migrate` (`2026_11_03_120000`, `2026_11_05_120000` con `APP_URL` bien puesto, y `2026_11_06_120000` antes del C# nuevo); el mapa de Nginx con la ruta nueva (`cruzar.sh ... --nginx` en el servidor: mientras no, PHP da 404 y Mi QR sale sin banda); `npm run build` en eventos-backend (de la 33).
+- Despliegue: pasos 4 (migracion `2026_11_06_120000`) y 11 (ruta `badge` en el mapa de Nginx) de la lista unica de arriba.
 - **Sigue: proponer M2.8.6 (editor con formato para correos y paginas personalizadas), con lab de 2 o 3 direcciones antes de codear.**
 
 ## SESION 2026-11-05 (Opus 5.5, 34) — SEIS HUECOS Y LA SECCION 2.7 CERRADOS (PREMIOS, CAMPOS, CODIGOS EN LOTE, AJUSTES DE EQUIPOS, EVENT PULSE, AVISO GENERAL); M2.8.5 Y M2.8.3; BUG-524 CERRADO; SUITES COMPLETAS AL RUNNER DEL MSI
