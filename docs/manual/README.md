@@ -26,6 +26,12 @@
    piloto de Encuestas con este tono antes de producir en masa.**
 4. Las capturas del admin real se agregan en un pase final (v1 puede
    salir sin capturas; el texto no depende de ellas).
+5. **Reescritura sobre el panel de EventOS (M2.8.4, Kamilo 2026-11-06):** "Cómo se configura" describe el panel de EventOS
+   (nunca Filament, nunca "admin nuevo"); las fuentes citan el código de C# (`eventos-api-dotnet`) y de la webapp
+   (`eventos-web`), y lo de PHP solo donde PHP sigue siendo el dueño.
+6. **Marca de actualización:** una página (o sección) que describe algo que cambia en las fases 3 y 4 lleva arriba
+   `<!-- actualizar con: M4d.7 -->` (Mission Control), `M4d.8` (Event Pulse) o `M4e.10` (Data Center). La tarea del roadmap
+   que haga ese cambio tiene que buscar su marca y actualizar la página.
 
 ## Inventario — 1/27
 
