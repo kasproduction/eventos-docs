@@ -3,6 +3,18 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-06 — Encontrado al preparar el lab de M2.8.6
+
+### BUG-539: El pie de todos los correos usa "·" como separador (ABIERTO)
+- **Severidad propuesta:** MEDIA (visual; rompe una regla dura de interfaz: nunca "·" como separador, y lo ve cada asistente)
+- **Que pasa:** el marco de los correos dice "Este correo fue enviado por EventOS · Powered by Kasproduction". Esta en
+  `eventos-api-dotnet/src/Trabajos/Correo/MarcoDeCorreo.cs:65` (el que manda hoy) y en `eventos-backend/app/Support/EmailLayout.php:59`
+  (PHP, congelado; ya no arma correos que salgan si C# los manda todos).
+- **Visto:** 2026-11-06, en la vista previa de la plantilla Bienvenida del panel de EventOS (captura al preparar el lab de M2.8.6).
+- **Arreglo propuesto:** dos lineas o un texto corrido sin separador (por ejemplo "Enviado con EventOS, de Kasproduction"); decide
+  Kamilo el texto. Va con M2.8.6, que toca la edicion de correos. Si PHP todavia arma algun correo, ese queda como esta (regla 6)
+  hasta que salga.
+
 ## 2026-11-06 — Encontrados al revisar la escarapela (M2.8.2)
 
 ### BUG-538: Mi QR usa "·" como separador en el pie de la tarjeta (RESUELTO 2026-11-06)

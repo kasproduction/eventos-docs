@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor con formato para correos y páginas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Lab M2.8.6: el editor con formato (negrita, enlaces, titulos, listas, imagenes) que reemplaza el cuadro de HTML en los correos
+   y en las paginas personalizadas. Tres formas sobre la pantalla real de Emails > Bienvenida del panel de EventOS.
+   Las variables ({{nombre}}) van como piezas que no se rompen al escribir. */
+:root{
+  --bg:#0A0A0A;--bg-1:#0E0E0E;--bg-2:#141414;--card:rgba(255,255,255,.03);--card-hi:rgba(255,255,255,.05);--campo:rgba(255,255,255,.05);
+  --b:rgba(255,255,255,.06);--b-hi:rgba(255,255,255,.10);--b-st:rgba(255,255,255,.14);
+  --t:#FFFFFF;--t2:rgba(255,255,255,.6);--t3:rgba(255,255,255,.4);--t4:rgba(255,255,255,.25);
+  --ink:#FFFFFF;--ink-c:#101010;--sombra:none;--borde:1px solid var(--b);--pop:#1a1a1c;
+  --f:'Urbanist',ui-sans-serif,system-ui,sans-serif;--fh:'Plus Jakarta Sans',var(--f);
+  --r:8px;--r-l:12px;--r-xl:16px;--ev:#3B82F6;
+}
+body.lux{
+  --bg:#F6F8FA;--bg-1:#FAFBFC;--bg-2:#F0F2F5;--card:#FFFFFF;--card-hi:#F6F8FA;--campo:#F0F2F5;
+  --b:rgba(0,0,0,.08);--b-hi:rgba(0,0,0,.13);--b-st:rgba(0,0,0,.18);
+  --t:#131417;--t2:#3A3B40;--t3:#5C5D63;--t4:#85868C;
+  --ink:#1A1B1E;--ink-c:#FFFFFF;--sombra:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.06);--borde:1px solid transparent;--pop:#FFFFFF;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--t);font-family:var(--f);font-size:14px;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+
+/* barra del lab */
+.lab{position:sticky;top:0;z-index:40;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 16px;background:#0b0b0c;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+.lab h1{font:800 14px var(--fh);margin:0 6px 0 0}
+.lab .lb{color:rgba(255,255,255,.45);font-size:13px}
+.seg{display:flex;padding:3px;gap:2px;border-radius:10px;background:#1c1c1f}
+.seg button{border:0;background:none;color:rgba(255,255,255,.6);font-weight:600;font-size:12.5px;padding:6px 10px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.seg button.on{background:#fff;color:#111}
+.desc{padding:12px 24px;font-size:13.5px;line-height:1.45;color:var(--t2);border-bottom:var(--borde);border-bottom-color:var(--b)}
+.desc strong{color:var(--t);font-family:var(--fh)}
+
+/* pantalla */
+.pant{max-width:1180px;margin:0 auto;padding:28px 24px 80px}
+.miga{font-size:12.5px;color:var(--t3)}
+.pant h2.tit{font:800 28px var(--fh);letter-spacing:-.02em;margin:6px 0 2px}
+.sub{color:var(--t3);margin:0 0 24px}
+.rej{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start}
+.rej.una{grid-template-columns:minmax(0,760px);justify-content:center}
+.card{background:var(--card);border:var(--borde);border-color:var(--b);border-radius:var(--r-xl);box-shadow:var(--sombra)}
+.card .cu{padding:24px}
+.tabs{display:flex;gap:2px;padding:4px;border-radius:var(--r-l);background:var(--card-hi);margin-bottom:20px}
+.tabs span{padding:8px 14px;border-radius:var(--r);font-weight:600;color:var(--t2)}
+.tabs span.on{background:var(--ink);color:var(--ink-c)}
+label.et{display:block;font-weight:600;margin:0 0 8px}
+label.et i{color:#F26D6D;font-style:normal}
+.inp{width:100%;background:var(--campo);border:1px solid transparent;border-radius:var(--r-l);padding:13px 14px;font-size:16px;outline:none}
+.ayuda{display:block;margin-top:8px;font-size:12px;color:var(--t3)}
+.campo{margin-bottom:22px}
+.vars{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.vars button{border:1px solid var(--b-hi);background:none;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;color:var(--t2);cursor:pointer}
+.vars button:hover{border-color:var(--b-st);color:var(--t)}
+.botones{display:flex;gap:10px;margin-top:20px}
+.btn{border:0;border-radius:var(--r);padding:11px 16px;font-weight:700;cursor:pointer;background:var(--ink);color:var(--ink-c)}
+.btn.suave{background:var(--card-hi);color:var(--t);border:1px solid var(--b-hi)}
+
+/* el campo de edicion (comun) */
+.ed{min-height:300px;background:var(--campo);border-radius:var(--r-l);padding:16px 18px;outline:none;font-size:15px;line-height:1.6;color:var(--t)}
+.ed:focus{box-shadow:0 0 0 2px var(--b-st)}
+.ed h2{font:700 21px var(--fh);margin:4px 0 10px;letter-spacing:-.01em}
+.ed h3{font:700 17px var(--fh);margin:14px 0 6px}
+.ed p{margin:0 0 10px}
+.ed ul,.ed ol{margin:0 0 10px;padding-left:22px}
+.ed a{color:var(--ev);font-weight:600;text-decoration:none}
+.ed img{max-width:100%;border-radius:8px;display:block;margin:8px 0}
+.ed img.sel{outline:2px solid var(--ev)}
+.var{display:inline-block;padding:0 7px;margin:0 1px;border-radius:6px;background:color-mix(in srgb,var(--t) 10%,transparent);color:var(--t);font-weight:600;font-size:.92em;line-height:1.5;user-select:all}
+.ed:empty::before{content:"Escribe el correo...";color:var(--t4)}
+
+/* barra de herramientas (A y C) */
+.barra{display:flex;flex-wrap:wrap;align-items:center;gap:2px;padding:6px;border-radius:var(--r-l) var(--r-l) 0 0;background:var(--card-hi);border-bottom:1px solid var(--b)}
+.barra + .ed{border-radius:0 0 var(--r-l) var(--r-l)}
+.barra .sep{width:1px;height:20px;background:var(--b-hi);margin:0 6px}
+.hb{display:inline-grid;place-items:center;min-width:34px;height:34px;padding:0 8px;border:0;border-radius:7px;background:none;color:var(--t2);cursor:pointer;font-weight:700;font-size:13px}
+.hb:hover{background:color-mix(in srgb,var(--t) 8%,transparent);color:var(--t)}
+.hb.on{background:var(--ink);color:var(--ink-c)}
+.hb svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ventanita para enlace e imagen */
+.pop{position:absolute;z-index:30;display:flex;gap:6px;align-items:center;padding:8px;border-radius:var(--r-l);background:var(--pop);border:1px solid var(--b-hi);box-shadow:0 12px 32px rgba(0,0,0,.35)}
+.pop input{width:260px;background:var(--campo);border:0;border-radius:var(--r);padding:9px 10px;outline:none}
+.pop .btn{padding:9px 12px}
+.pop .btn.suave{padding:8px 12px}
+
+/* B: barra flotante y boton para bloques */
+.flota{position:absolute;z-index:25;display:none;gap:2px;padding:4px;border-radius:10px;background:var(--pop);border:1px solid var(--b-hi);box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.flota.ver{display:flex}
+.mas{position:absolute;z-index:20;display:none;width:28px;height:28px;border-radius:8px;border:1px solid var(--b-hi);background:var(--card);color:var(--t2);cursor:pointer;place-items:center}
+.mas.ver{display:grid}
+.mas svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+.menu{position:absolute;z-index:26;display:none;flex-direction:column;min-width:200px;padding:6px;border-radius:var(--r-l);background:var(--pop);border:1px solid var(--b-hi);box-shadow:0 12px 32px rgba(0,0,0,.35)}
+.menu.ver{display:flex}
+.menu button{display:flex;gap:10px;align-items:center;border:0;background:none;text-align:left;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--t)}
+.menu button:hover{background:color-mix(in srgb,var(--t) 8%,transparent)}
+.menu button small{color:var(--t3);margin-left:auto;font-size:12px}
+.ed.b{padding-left:44px}
+
+/* vista previa del correo (el marco real) */
+.vista h3{font:700 17px var(--fh);margin:0;padding:20px 24px;border-bottom:1px solid var(--b)}
+.vista .as{padding:16px 24px 18px}
+.vista .as small{display:block;color:var(--t3);font-size:12px;margin-bottom:4px}
+.vista .as b{font-weight:700}
+.correo{margin:0 24px 24px;border-radius:10px;overflow:hidden;background:#fff;color:#1f2937;font-family:Arial,Helvetica,sans-serif}
+.correo .cab{background:var(--ev);color:#fff;text-align:center;padding:26px 16px;font:700 20px Arial,sans-serif}
+.correo .cue{padding:26px 28px;font-size:15px;line-height:1.6}
+.correo .cue h2{font-size:24px;margin:0 0 14px;line-height:1.25}
+.correo .cue h3{font-size:18px;margin:16px 0 8px}
+.correo .cue p{margin:0 0 14px}
+.correo .cue a{color:var(--ev);font-weight:600;text-decoration:none}
+.correo .cue img{max-width:100%;border-radius:6px}
+.correo .cue ul,.correo .cue ol{padding-left:20px;margin:0 0 14px}
+.correo .pie{border-top:1px solid #eee;padding:14px;text-align:center;color:#9ca3af;font-size:12px;line-height:1.5}
+
+/* C: se escribe sobre el correo */
+.c-marco{border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--b)}
+.c-marco .barra{border-radius:0;background:var(--bg-2)}
+.c-fondo{background:#f3f4f6;padding:28px}
+.c-fondo .correo{margin:0 auto;max-width:600px;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.correo .cue.ed{background:none;color:#1f2937;border-radius:0;min-height:260px;font-family:Arial,Helvetica,sans-serif;font-size:15px}
+.correo .cue.ed:focus{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--ev) 40%,transparent)}
+.correo .cue.ed h2{font:700 24px Arial,sans-serif;margin:0 0 14px}
+.correo .cue.ed h3{font:700 18px Arial,sans-serif}
+.correo .cue.ed a{color:var(--ev)}
+.correo .var{background:#eef2ff;color:#3730a3}
+.correo .cue.ed:empty::before{color:#9ca3af}
+.c-nota{padding:10px 16px;font-size:12.5px;color:var(--t3);background:var(--card-hi);border-top:1px solid var(--b)}
+
+/* pagina personalizada: sin marco de correo */
+body.pagina .soloCorreo{display:none!important}
+</style>
+</head>
+<body>
+<div class="lab">
+  <h1>Editor con formato</h1>
+  <span class="lb">Forma</span>
+  <div class="seg" id="forma"><button data-v="A" class="on">A. Barra fija</button><button data-v="B">B. Barra al seleccionar</button><button data-v="C">C. Sobre el correo</button></div>
+  <span class="lb">Contenido</span>
+  <div class="seg" id="tipo"><button data-v="correo" class="on">Correo</button><button data-v="pagina">Página</button></div>
+  <span class="lb">Tema</span>
+  <div class="seg" id="tema"><button data-v="noir" class="on">Noir</button><button data-v="lux">Lux</button></div>
+</div>
+<div class="desc" id="desc"></div>
+
+<div class="pant">
+  <div class="miga" id="miga">Emails &gt; Bienvenida</div>
+  <h2 class="tit" id="titulo">Bienvenida</h2>
+  <p class="sub" id="subt">Confirma al asistente que su registro fue exitoso.</p>
+  <div id="zona"></div>
+</div>
+
+<script>
+const ICON = {
+  b:'<svg viewBox="0 0 24 24"><path d="M7 5h6a3.5 3.5 0 0 1 0 7H7zM7 12h7a3.5 3.5 0 0 1 0 7H7z"/></svg>',
+  i:'<svg viewBox="0 0 24 24"><path d="M14 5h-4M14 19h-4M14 5l-4 14"/></svg>',
+  ul:'<svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>',
+  ol:'<svg viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10M4 5h1v4M4 9h2M4 15h2l-2 3h2"/></svg>',
+  link:'<svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+  img:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>',
+  clear:'<svg viewBox="0 0 24 24"><path d="M5 6h11M10 6l-3 13M15 15l5 5M20 15l-5 5"/></svg>',
+  plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+};
+const MUESTRA = { nombre:'Staff Contrato', evento:'Contrato 2026', fecha:'6 de diciembre de 2026', venue:'Centro de Convenciones Agora, Bogota' };
+const VARS = ['nombre','evento','fecha','venue'];
+const pieza = v => `<span class="var" contenteditable="false" data-var="${v}">${v}</span>`;
+const INICIO = {
+  correo: `<h2>¡Bienvenido, ${pieza('nombre')}!</h2><p>Tu registro en <strong>${pieza('evento')}</strong> fue exitoso.</p><p><strong>Fecha:</strong> ${pieza('fecha')}<br><strong>Lugar:</strong> ${pieza('venue')}</p><p>Descarga la app EventOS para acceder al programa, conectarte con otros asistentes y mucho más.</p>`,
+  pagina: `<h2>Cómo llegar</h2><p>El evento es en el <strong>Centro de Convenciones Agora</strong>, en Bogotá.</p><h3>Parqueadero</h3><ul><li>Entrada por la calle 24</li><li>Tarifa plena del evento</li></ul><p>Más información en <a href="https://agora.example">la página del recinto</a>.</p>`,
+};
+const DESC = {
+  A: '<strong>A. Barra fija.</strong> Como el RichEditor de Filament: la barra está siempre arriba del campo y lo escrito ya se ve con formato. La vista previa del correo real sigue al lado.',
+  B: '<strong>B. Barra al seleccionar.</strong> El campo queda limpio. Al seleccionar texto aparece una barra pequeña (negrita, cursiva, enlace); en una línea vacía, el botón de la izquierda agrega título, lista o imagen. La vista previa sigue al lado.',
+  C: '<strong>C. Sobre el correo.</strong> No hay campo aparte: se escribe directamente dentro del correo como le va a llegar a la persona, con la barra arriba. En las páginas se escribe sobre la página.',
+};
+let forma='A', tipo='correo', contenido = { ...INICIO };
+
+// -------- comandos --------
+function cmd(c, v){ document.execCommand(c, false, v ?? null); }
+function bloque(tag){
+  const actual = (document.queryCommandValue('formatBlock')||'').toLowerCase();
+  cmd('formatBlock', actual === tag ? 'p' : tag);
+}
+function marcar(barra){
+  if(!barra) return;
+  barra.querySelectorAll('[data-c]').forEach(b=>{
+    const c=b.dataset.c; let on=false;
+    if(c==='bold'||c==='italic'||c==='insertUnorderedList'||c==='insertOrderedList') on=document.queryCommandState(c);
+    if(c==='h2'||c==='h3') on=(document.queryCommandValue('formatBlock')||'').toLowerCase()===c;
+    b.classList.toggle('on',on);
+  });
+}
+let guardada=null;
+function guardarSeleccion(){ const s=getSelection(); if(s.rangeCount) guardada=s.getRangeAt(0).cloneRange(); }
+function volverSeleccion(){ if(!guardada) return; const s=getSelection(); s.removeAllRanges(); s.addRange(guardada); }
+function cerrarPops(){ document.querySelectorAll('.pop').forEach(p=>p.remove()); }
+function pedir(ancla, placeholder, alPoner){
+  cerrarPops(); guardarSeleccion();
+  const r=ancla.getBoundingClientRect();
+  const p=document.createElement('div'); p.className='pop';
+  p.innerHTML=`<input placeholder="${placeholder}"><button class="btn">Poner</button><button class="btn suave">Cancelar</button>`;
+  p.style.left=(r.left+scrollX)+'px'; p.style.top=(r.bottom+scrollY+6)+'px';
+  document.body.appendChild(p);
+  const inp=p.querySelector('input'); inp.focus();
+  const poner=()=>{ const v=inp.value.trim(); p.remove(); volverSeleccion(); if(v) alPoner(v); refrescar(); };
+  p.querySelector('.btn').onclick=poner;
+  p.querySelector('.btn.suave').onclick=()=>{ p.remove(); volverSeleccion(); };
+  inp.onkeydown=e=>{ if(e.key==='Enter'){e.preventDefault();poner();} if(e.key==='Escape'){p.remove();volverSeleccion();} };
+}
+function enlace(ancla){ pedir(ancla,'Pega el enlace (https://...)',v=>cmd('createLink', /^https?:\/\//.test(v)?v:'https://'+v)); }
+function imagen(ancla){ pedir(ancla,'Pega la URL de la imagen o súbela',v=>cmd('insertHTML',`<img src="${v.replace(/"/g,'')}" alt="">`)); }
+function variable(v){ ed()?.focus(); volverSeleccion(); cmd('insertHTML', pieza(v)+'&nbsp;'); refrescar(); }
+
+function barraHTML(){
+  return `<div class="barra" role="toolbar" aria-label="Formato">
+    <button class="hb" data-c="bold" title="Negrita" aria-label="Negrita">${ICON.b}</button>
+    <button class="hb" data-c="italic" title="Cursiva" aria-label="Cursiva">${ICON.i}</button>
+    <span class="sep"></span>
+    <button class="hb" data-c="h2" title="Título">Título</button>
+    <button class="hb" data-c="h3" title="Subtítulo">Subtítulo</button>
+    <span class="sep"></span>
+    <button class="hb" data-c="insertUnorderedList" title="Lista" aria-label="Lista">${ICON.ul}</button>
+    <button class="hb" data-c="insertOrderedList" title="Lista numerada" aria-label="Lista numerada">${ICON.ol}</button>
+    <span class="sep"></span>
+    <button class="hb" data-c="link" title="Enlace" aria-label="Enlace">${ICON.link}</button>
+    <button class="hb" data-c="img" title="Imagen" aria-label="Imagen">${ICON.img}</button>
+    <span class="sep"></span>
+    <button class="hb" data-c="clear" title="Quitar formato" aria-label="Quitar formato">${ICON.clear}</button>
+  </div>`;
+}
+function conectarBarra(barra){
+  barra.addEventListener('mousedown',e=>{ if(e.target.closest('.hb')) e.preventDefault(); });
+  barra.addEventListener('click',e=>{
+    const b=e.target.closest('.hb'); if(!b) return; const c=b.dataset.c;
+    if(c==='h2'||c==='h3') bloque(c);
+    else if(c==='link') return enlace(b);
+    else if(c==='img') return imagen(b);
+    else if(c==='clear') { cmd('removeFormat'); cmd('formatBlock','p'); }
+    else cmd(c);
+    refrescar();
+  });
+}
+const ed = () => document.querySelector('.ed');
+function aTexto(html){ // lo que se guarda: las piezas vuelven a ser {{variable}}
+  const d=document.createElement('div'); d.innerHTML=html;
+  d.querySelectorAll('.var').forEach(s=>s.replaceWith(`{{${s.dataset.var}}}`));
+  return d.innerHTML;
+}
+function conMuestra(html){ return aTexto(html).replace(/\{\{(\w+)\}\}/g,(m,v)=>MUESTRA[v]??m); }
+function refrescar(){
+  const e=ed(); if(!e) return;
+  contenido[tipo]=e.innerHTML;
+  const cue=document.getElementById('vistaCue'); if(cue) cue.innerHTML=conMuestra(e.innerHTML);
+  marcar(document.querySelector('.barra'));
+}
+
+function vistaHTML(){
+  return `<aside class="card vista soloCorreo"><h3>Vista previa</h3>
+    <div class="as"><small>Asunto</small><b>Bienvenido a Contrato 2026</b></div>
+    <div class="correo"><div class="cab">Contrato 2026</div><div class="cue" id="vistaCue"></div>
+    <div class="pie">Este correo fue enviado por EventOS<br>Powered by Kasproduction</div></div></aside>`;
+}
+function camposHTML(editor){
+  return `<div class="card"><div class="cu">
+    <div class="tabs soloCorreo"><span class="on">Español</span><span>English</span></div>
+    <div class="campo soloCorreo"><label class="et">Asunto <i>*</i></label><input class="inp" value="Bienvenido a {{evento}}"></div>
+    <div class="campo"><label class="et">${tipo==='correo'?'Contenido <i>*</i>':'Texto de la página'}</label>${editor}
+      <small class="ayuda">${tipo==='correo'?'El encabezado con el logo y el pie se ponen solos.':'Lo ve quien tenga permiso para esta página, en la webapp y en la app.'}</small></div>
+    <div class="campo soloCorreo" style="margin-bottom:0"><label class="et">Variables</label>
+      <div class="vars">${VARS.map(v=>`<button data-var="${v}">${v}</button>`).join('')}</div>
+      <small class="ayuda">Se ponen donde está el cursor.</small></div>
+  </div></div>`;
+}
+
+function pintar(){
+  cerrarPops();
+  const z=document.getElementById('zona');
+  document.getElementById('desc').innerHTML=DESC[forma];
+  document.body.classList.toggle('pagina',tipo==='pagina');
+  document.getElementById('miga').innerHTML= tipo==='correo'?'Emails &gt; Bienvenida':'Páginas &gt; Cómo llegar';
+  document.getElementById('titulo').textContent= tipo==='correo'?'Bienvenida':'Cómo llegar';
+  document.getElementById('subt').textContent= tipo==='correo'?'Confirma al asistente que su registro fue exitoso.':'Página personalizada del evento.';
+  const botones=`<div class="botones"><button class="btn">Guardar cambios</button><button class="btn suave soloCorreo">Enviar prueba</button></div>`;
+  const zonaEd = `<div class="ed${forma==='B'?' b':''}" contenteditable="true">${contenido[tipo]}</div>`;
+
+  if(forma==='A'){
+    z.innerHTML=`<div class="rej${tipo==='pagina'?' una':''}"><div>${camposHTML(barraHTML()+zonaEd)}${botones}</div>${tipo==='correo'?vistaHTML():''}</div>`;
+    conectarBarra(z.querySelector('.barra'));
+  }
+  if(forma==='B'){
+    z.innerHTML=`<div class="rej${tipo==='pagina'?' una':''}"><div style="position:relative">${camposHTML(zonaEd)}${botones}</div>${tipo==='correo'?vistaHTML():''}</div>`;
+    montarFlotante();
+  }
+  if(forma==='C'){
+    const cuerpo = tipo==='correo'
+      ? `<div class="c-fondo"><div class="correo"><div class="cab">Contrato 2026</div><div class="cue ed" contenteditable="true">${contenido[tipo]}</div><div class="pie">Este correo fue enviado por EventOS<br>Powered by Kasproduction</div></div></div>`
+      : `<div style="background:var(--bg-1);padding:28px"><div class="ed" contenteditable="true" style="max-width:640px;margin:0 auto;background:none">${contenido[tipo]}</div></div>`;
+    z.innerHTML=`<div class="rej una"><div>
+      <div class="card"><div class="cu" style="padding-bottom:4px">
+        <div class="tabs soloCorreo"><span class="on">Español</span><span>English</span></div>
+        <div class="campo soloCorreo"><label class="et">Asunto <i>*</i></label><input class="inp" value="Bienvenido a {{evento}}"></div>
+        <div class="campo soloCorreo" style="margin-bottom:16px"><label class="et">Variables</label>
+          <div class="vars">${VARS.map(v=>`<button data-var="${v}">${v}</button>`).join('')}</div></div>
+      </div>
+      <div class="c-marco" style="margin:0 24px 24px">${barraHTML()}${cuerpo}
+        <div class="c-nota">${tipo==='correo'?'Las variables se ven como piezas; en la prueba y en el envío llevan el dato de cada persona.':'Se ve como en la webapp.'}</div></div>
+      </div>${botones}</div></div>`;
+    conectarBarra(z.querySelector('.barra'));
+  }
+  const e=ed();
+  e.addEventListener('input',refrescar);
+  e.addEventListener('keyup',()=>{guardarSeleccion();marcar(document.querySelector('.barra'));});
+  e.addEventListener('mouseup',()=>{guardarSeleccion();marcar(document.querySelector('.barra'));});
+  e.addEventListener('click',ev=>{ e.querySelectorAll('img.sel').forEach(i=>i.classList.remove('sel')); if(ev.target.tagName==='IMG') ev.target.classList.add('sel'); });
+  e.addEventListener('keydown',ev=>{ if((ev.key==='Backspace'||ev.key==='Delete')&&e.querySelector('img.sel')){ev.preventDefault();e.querySelector('img.sel').remove();refrescar();} });
+  z.querySelectorAll('.vars button').forEach(b=>{ b.addEventListener('mousedown',x=>x.preventDefault()); b.onclick=()=>variable(b.dataset.var); });
+  refrescar();
+}
+
+// -------- B: barra al seleccionar y boton de bloques --------
+function montarFlotante(){
+  const e=ed(); const caja=e.parentElement;
+  const flota=document.createElement('div'); flota.className='flota';
+  flota.innerHTML=`<button class="hb" data-c="bold" aria-label="Negrita" title="Negrita">${ICON.b}</button><button class="hb" data-c="italic" aria-label="Cursiva" title="Cursiva">${ICON.i}</button><button class="hb" data-c="link" aria-label="Enlace" title="Enlace">${ICON.link}</button><button class="hb" data-c="h2" title="Título">Título</button><button class="hb" data-c="clear" aria-label="Quitar formato" title="Quitar formato">${ICON.clear}</button>`;
+  const mas=document.createElement('button'); mas.className='mas'; mas.setAttribute('aria-label','Agregar un bloque'); mas.innerHTML=ICON.plus;
+  const menu=document.createElement('div'); menu.className='menu';
+  menu.innerHTML=`<button data-b="h2">Título</button><button data-b="h3">Subtítulo</button><button data-b="ul">Lista</button><button data-b="ol">Lista numerada</button><button data-b="img">Imagen</button>`;
+  [flota,mas,menu].forEach(x=>document.body.appendChild(x));
+  conectarBarra(flota);
+  const ocultar=()=>{flota.classList.remove('ver');};
+  document.addEventListener('selectionchange',()=>{
+    if(!document.body.contains(e)) return;
+    const s=getSelection(); if(!s.rangeCount){ocultar();return;}
+    const r=s.getRangeAt(0);
+    if(!e.contains(r.commonAncestorContainer)){ if(!flota.matches(':hover')) ocultar(); mas.classList.remove('ver'); return; }
+    guardarSeleccion();
+    if(!r.collapsed){
+      const b=r.getBoundingClientRect();
+      flota.classList.add('ver'); marcar(flota);
+      flota.style.left=(b.left+scrollX+b.width/2-flota.offsetWidth/2)+'px';
+      flota.style.top=(b.top+scrollY-flota.offsetHeight-8)+'px';
+      mas.classList.remove('ver'); menu.classList.remove('ver');
+    } else {
+      ocultar();
+      let n=r.startContainer; if(n.nodeType===3) n=n.parentElement;
+      const linea=n.closest('p,h2,h3,div,li');
+      const vacia = linea && linea!==e && linea.textContent.trim()==='' && !linea.querySelector('img');
+      if(vacia || e.textContent.trim()===''){
+        const b=(vacia?linea:e).getBoundingClientRect(), eb=e.getBoundingClientRect();
+        mas.classList.add('ver');
+        mas.style.left=(eb.left+scrollX+8)+'px'; mas.style.top=(b.top+scrollY+(b.height-28)/2)+'px';
+      } else { mas.classList.remove('ver'); menu.classList.remove('ver'); }
+    }
+  });
+  mas.addEventListener('mousedown',x=>x.preventDefault());
+  mas.onclick=()=>{ const b=mas.getBoundingClientRect(); menu.classList.toggle('ver'); menu.style.left=(b.right+scrollX+6)+'px'; menu.style.top=(b.top+scrollY)+'px'; };
+  menu.addEventListener('mousedown',x=>x.preventDefault());
+  menu.onclick=ev=>{
+    const b=ev.target.closest('button'); if(!b) return; volverSeleccion();
+    const k=b.dataset.b;
+    if(k==='h2'||k==='h3') cmd('formatBlock',k);
+    if(k==='ul') cmd('insertUnorderedList');
+    if(k==='ol') cmd('insertOrderedList');
+    menu.classList.remove('ver'); mas.classList.remove('ver');
+    if(k==='img') return imagen(mas);
+    refrescar();
+  };
+  pintar.limpiar=()=>[flota,mas,menu].forEach(x=>x.remove());
+}
+
+function seg(id,cb){ document.getElementById(id).onclick=e=>{ const b=e.target.closest('button'); if(!b) return; document.querySelectorAll(`#${id} button`).forEach(x=>x.classList.toggle('on',x===b)); cb(b.dataset.v); }; }
+seg('forma',v=>{ pintar.limpiar?.(); pintar.limpiar=null; forma=v; pintar(); });
+seg('tipo',v=>{ pintar.limpiar?.(); pintar.limpiar=null; tipo=v; pintar(); });
+seg('tema',v=>document.body.classList.toggle('lux',v==='lux'));
+document.addEventListener('mousedown',e=>{ if(!e.target.closest('.pop')) cerrarPops(); });
+pintar();
+</script>
+</body>
+</html>
