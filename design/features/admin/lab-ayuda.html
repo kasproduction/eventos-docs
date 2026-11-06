@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ayuda dentro del panel de EventOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Lab M2.8.4a: el manual como "Ayuda" dentro del panel de EventOS, con el modelo del manual de Masterlub (por tareas, paso a paso,
+   captura real con marcas numeradas). Capturas y marcas sacadas del panel real (carpeta lab-ayuda/). */
+:root{
+  --bg:#0A0A0A;--bg-1:#0E0E0E;--bg-2:#141414;--card:rgba(255,255,255,.03);--card-hi:rgba(255,255,255,.05);--campo:rgba(255,255,255,.05);
+  --b:rgba(255,255,255,.06);--b-hi:rgba(255,255,255,.10);--b-st:rgba(255,255,255,.14);
+  --t:#FFFFFF;--t2:rgba(255,255,255,.6);--t3:rgba(255,255,255,.4);--t4:rgba(255,255,255,.25);
+  --ink:#FFFFFF;--ink-c:#101010;--sombra:none;--borde:1px solid var(--b);
+  --marca:#FFFFFF;--marca-t:#0A0A0A;--marca-borde:rgba(255,255,255,.9);
+  --f:'Urbanist',ui-sans-serif,system-ui,sans-serif;--fh:'Plus Jakarta Sans',var(--f);--r:8px;--r-l:12px;--r-xl:16px;
+}
+body.lux{
+  --bg:#F6F8FA;--bg-1:#FAFBFC;--bg-2:#F0F2F5;--card:#FFFFFF;--card-hi:#F6F8FA;--campo:#F0F2F5;
+  --b:rgba(0,0,0,.08);--b-hi:rgba(0,0,0,.13);--b-st:rgba(0,0,0,.18);
+  --t:#131417;--t2:#3A3B40;--t3:#5C5D63;--t4:#85868C;--ink:#1A1B1E;--ink-c:#FFFFFF;
+  --sombra:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.06);--borde:1px solid transparent;
+  --marca:#FFFFFF;--marca-t:#0A0A0A;--marca-borde:rgba(255,255,255,.9);
+}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--t);font:500 14px/1.5 var(--f);-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+.lab{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 16px;background:#0b0b0c;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+.lab h1{font:800 14px var(--fh);margin:0 6px 0 0}.lab .lb{color:rgba(255,255,255,.45);font-size:13px}
+.seg{display:flex;padding:3px;gap:2px;border-radius:10px;background:#1c1c1f}
+.seg button{border:0;background:none;color:rgba(255,255,255,.6);font-weight:600;font-size:12.5px;padding:6px 10px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.seg button.on{background:#fff;color:#111}
+.desc{padding:12px 24px;font-size:13.5px;color:var(--t2);border-bottom:1px solid var(--b)}.desc strong{color:var(--t);font-family:var(--fh)}
+
+.app{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 100px)}
+.lado{border-right:1px solid var(--b);padding:20px 14px;background:var(--bg-1)}
+.lado .marca-ev{font:700 15px var(--fh);margin:0 0 18px 10px}
+.lado .gr{font-size:11px;color:var(--t3);margin:14px 0 4px 12px}
+.lado a{display:block;padding:7px 12px;border-radius:var(--r);color:var(--t2);font-size:14px}
+.lado a.on{background:var(--ink);color:var(--ink-c)}
+.cont{padding:28px 32px 60px;min-width:0}
+.miga{font-size:12.5px;color:var(--t3)}
+h2.tit{font:800 28px var(--fh);letter-spacing:-.02em;margin:4px 0 18px}
+
+/* la captura real con sus marcas */
+.cap{position:relative;border-radius:var(--r-l);overflow:hidden;border:1px solid var(--b-hi);background:#000;box-shadow:var(--sombra)}
+.cap img{display:block;width:100%;height:auto}
+.mk{position:absolute;border:2px solid var(--marca-borde);border-radius:8px;pointer-events:none;box-shadow:0 0 0 3px rgba(0,0,0,.35)}
+.mk b{position:absolute;left:-13px;top:-13px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--marca);color:var(--marca-t);font:800 13px var(--fh);box-shadow:0 2px 10px rgba(0,0,0,.5)}
+.lis{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:10px}
+.lis li{display:flex;gap:10px;align-items:flex-start}
+.lis b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--ink-c);font:800 12px var(--fh)}
+.txt p{margin:0 0 10px;color:var(--t2);font-size:15px}.txt p strong{color:var(--t)}
+.btn{border:0;border-radius:var(--r);padding:10px 16px;font-weight:700;cursor:pointer;background:var(--ink);color:var(--ink-c)}
+.btn.suave{background:var(--card-hi);color:var(--t);border:1px solid var(--b-hi)}
+.btn:disabled{opacity:.4;cursor:default}
+.buscar{width:100%;background:var(--campo);border:1px solid transparent;border-radius:var(--r);padding:10px 12px;margin-bottom:14px;outline:none}
+.caps{display:flex;flex-direction:column;gap:2px}
+.capi{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:var(--r);color:var(--t2)}
+.capi .n{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 11px var(--fh);border:1px solid var(--b-st)}
+.capi.on{background:var(--card-hi);color:var(--t);font-weight:700}.capi.on .n{background:var(--ink);color:var(--ink-c);border-color:var(--ink)}
+.capi.off{opacity:.5}
+.sub{margin:4px 0 8px 42px;display:flex;flex-direction:column;gap:2px}
+.sub span{padding:4px 0;color:var(--t3);cursor:pointer;font-size:13.5px}.sub span.on{color:var(--t);font-weight:700}
+.puntos{display:flex;gap:6px}.puntos i{width:7px;height:7px;border-radius:50%;background:var(--b-st)}.puntos i.on{background:var(--t)}
+.paso-de{font-size:12.5px;color:var(--t3)}
+.resumen{border:1px solid var(--b-hi);background:var(--card);border-radius:var(--r-l);padding:14px 16px;margin-bottom:22px;color:var(--t2);font-size:15px}
+.resumen strong{color:var(--t)}
+
+/* A: pagina de Ayuda (como Masterlub) */
+.a{display:grid;grid-template-columns:260px 1fr;gap:28px}
+.a .ind{position:sticky;top:70px;align-self:start}
+.a .cuerpo{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:26px;align-items:start}
+.a h3{font:800 24px var(--fh);letter-spacing:-.01em;margin:2px 0 14px}
+.nav{display:flex;gap:10px;align-items:center;margin-top:20px}.nav .puntos{margin-left:auto}
+
+/* B: panel lateral sobre la pantalla en la que estas */
+.b-cajon{position:fixed;top:100px;right:0;bottom:0;width:460px;background:var(--bg-1);border-left:1px solid var(--b-hi);box-shadow:-20px 0 50px rgba(0,0,0,.35);display:flex;flex-direction:column;z-index:20}
+.b-cajon header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--b)}
+.b-cajon header strong{font:700 16px var(--fh)}
+.b-cajon .scroll{overflow:auto;padding:18px 20px;flex:1}
+.b-cajon footer{display:flex;gap:10px;align-items:center;padding:14px 20px;border-top:1px solid var(--b)}
+.b-cajon footer .puntos{margin-left:auto}
+.b-cajon h3{font:800 19px var(--fh);margin:4px 0 12px}
+.cerrar{border:0;background:none;color:var(--t2);cursor:pointer;width:32px;height:32px;border-radius:8px}
+.cerrar:hover{background:var(--card-hi)}
+.ayuda-boton{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--b-st);background:var(--card-hi);border-radius:999px;padding:7px 14px;font-weight:700;color:var(--t)}
+.atenuada{opacity:.55}
+
+/* C: una pagina por tarea, de corrido */
+.c{display:grid;grid-template-columns:250px minmax(0,820px);gap:36px;justify-content:start}
+.c .ind{position:sticky;top:70px;align-self:start}
+.c .paso{margin-bottom:56px;scroll-margin-top:80px}
+.c .paso .num{font:700 13px var(--fh);color:var(--t3);margin-bottom:6px}
+.c .paso h3{font:800 22px var(--fh);margin:0 0 12px}
+.c .paso .dos{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:22px;margin-top:14px;align-items:start}
+</style>
+</head>
+<body>
+<div class="lab">
+  <h1>Ayuda en el panel</h1>
+  <span class="lb">Forma</span>
+  <div class="seg" id="forma"><button data-v="A" class="on">A. Página de Ayuda</button><button data-v="B">B. Panel lateral</button><button data-v="C">C. Una página por tarea</button></div>
+  <span class="lb">Tema</span>
+  <div class="seg" id="tema"><button data-v="noir" class="on">Noir</button><button data-v="lux">Lux</button></div>
+</div>
+<div class="desc" id="desc"></div>
+<div id="zona"></div>
+<script>
+const PASOS = [{"clave": "1-lista", "marcas": [{"n": 1, "texto": "En vivo > Encuestas, en el menú", "x": 16, "y": 725, "w": 223, "h": 37}, {"n": 2, "texto": "La post-evento, siempre arriba", "x": 297, "y": 247, "w": 1102, "h": 62}, {"n": 3, "texto": "Nueva encuesta", "x": 1245, "y": 124, "w": 155, "h": 40}], "titulo": "Entra a Encuestas", "texto": ["En el menú, en **En vivo**, toca **Encuestas**.", "Arriba siempre está la **post-evento**, la de satisfacción: se abre sola cuando el evento pasa a Finalizado. Debajo van las tuyas.", "Para una nueva, toca **Nueva encuesta**."]}, {"clave": "2-nueva", "marcas": [{"n": 1, "texto": "El título que verá la gente", "x": 489, "y": 474, "w": 462, "h": 40}, {"n": 2, "texto": "Crear encuesta", "x": 823, "y": 534, "w": 128, "h": 40}], "titulo": "Ponle un título", "texto": ["Escribe la pregunta grande o el tema: es lo que verá la gente.", "Toca **Crear encuesta**. Nace en **Borrador**, así que nadie la ve mientras la armas."]}, {"clave": "3-pregunta", "marcas": [{"n": 1, "texto": "La pregunta", "x": 489, "y": 277, "w": 462, "h": 40}, {"n": 2, "texto": "Opción múltiple, texto libre o estrellas", "x": 489, "y": 337, "w": 462, "h": 74}, {"n": 3, "texto": "Más opciones (mínimo dos)", "x": 489, "y": 574, "w": 144, "h": 36}, {"n": 4, "texto": "Crear pregunta", "x": 823, "y": 672, "w": 128, "h": 40}], "titulo": "Arma las preguntas", "texto": ["Toca **Nueva pregunta** y escribe lo que quieres saber.", "Escoge el tipo: **opción múltiple**, **texto libre** o **estrellas de 1 a 5**.", "Si es de opción múltiple, pon al menos dos opciones. Si quieres que puedan marcar varias, activa **Se pueden elegir varias**."]}, {"clave": "4-activar", "marcas": [{"n": 1, "texto": "Te dice qué va a pasar", "x": 464, "y": 359, "w": 512, "h": 182}, {"n": 2, "texto": "Activar", "x": 874, "y": 480, "w": 77, "h": 40}], "titulo": "Actívala", "texto": ["Cuando esté lista, toca **Activar ahora**. El panel te dice qué va a pasar antes de hacerlo.", "Desde ese momento la gente puede responderla, y a quien tenga la app o la webapp abierta le aparece sin refrescar."]}, {"clave": "5-anuncio", "marcas": [{"n": 1, "texto": "Lleva a: Encuestas", "x": 321, "y": 677, "w": 323, "h": 50}, {"n": 2, "texto": "La encuesta exacta", "x": 668, "y": 677, "w": 323, "h": 94}, {"n": 3, "texto": "Así lo verá la gente", "x": 1065, "y": 493, "w": 310, "h": 156}], "titulo": "Avísale a la gente", "texto": ["Encuestas no tiene ícono en el menú de la app: la gente llega por un anuncio.", "En **Anuncios**, crea uno y en **Lleva a** escoge **Encuestas**. En **¿Cuál encuesta?** eliges la tuya y quien toque el anuncio cae directo en ella.", "A la derecha ves cómo le llega."]}];
+const CAPITULOS = ["Crear tu evento", "Armar la agenda", "Abrir el registro", "Mandar un anuncio", "Preguntarle algo al público", "El día del evento", "Después del evento"];
+const ACTIVO = 4;
+const RESUMEN = "<strong>Lo más importante:</strong> una encuesta nace en Borrador y nadie la ve hasta que la activas. Como no tiene ícono en la app, mándale a la gente un anuncio que lleve a ella.";
+const DESC = {
+  A: "<strong>A. Página de Ayuda.</strong> Como el manual de Masterlub: Ayuda en el menú del panel abre esta página. A la izquierda las tareas y sus pasos; al centro la pantalla real con las marcas; a la derecha qué hacer. Anterior y Siguiente.",
+  B: "<strong>B. Panel lateral.</strong> El botón ¿Cómo funciona? de cada pantalla abre la guía a la derecha, sin salir de lo que estás haciendo. Los mismos pasos, más compactos.",
+  C: "<strong>C. Una página por tarea.</strong> Todos los pasos de la tarea seguidos, para leerla de corrido; el índice de la izquierda marca dónde vas. Sin Anterior y Siguiente.",
+};
+let forma = "A", paso = 0;
+const md = (s) => s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+// Recorte: solo la parte de la pantalla que importa en el paso (las marcas con aire alrededor), como el manual de Masterlub.
+function recorte(p) {
+  const W = 1440, H = 900;
+  if (!p.marcas.length) return { x: 0, y: 0, w: W, h: H };
+  let x1 = Math.min(...p.marcas.map((m) => m.x)) - 140, y1 = Math.min(...p.marcas.map((m) => m.y)) - 100;
+  let x2 = Math.max(...p.marcas.map((m) => m.x + m.w)) + 140, y2 = Math.max(...p.marcas.map((m) => m.y + m.h)) + 100;
+  if (x2 - x1 < 720) { const c = (x1 + x2) / 2; x1 = c - 360; x2 = c + 360; }
+  if ((y2 - y1) < (x2 - x1) * 0.5) { const c = (y1 + y2) / 2, h = (x2 - x1) * 0.5; y1 = c - h / 2; y2 = c + h / 2; }
+  x1 = Math.max(0, x1); y1 = Math.max(0, y1); x2 = Math.min(W, x2); y2 = Math.min(H, y2);
+  return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+}
+const captura = (p) => {
+  const r = recorte(p);
+  return `<div class="cap" style="aspect-ratio:${r.w}/${r.h}"><img src="lab-ayuda/${p.clave}.png" alt="" style="position:absolute;width:${1440 / r.w * 100}%;left:${-r.x / r.w * 100}%;top:${-r.y / r.h * 100}%;max-width:none">${p.marcas.map((m) => `<span class="mk" style="left:${(m.x - r.x) / r.w * 100}%;top:${(m.y - r.y) / r.h * 100}%;width:${m.w / r.w * 100}%;height:${m.h / r.h * 100}%"><b>${m.n}</b></span>`).join("")}</div>`;
+};
+const leyenda = (p) => `<ul class="lis">${p.marcas.map((m) => `<li><b>${m.n}</b><span>${m.texto}</span></li>`).join("")}</ul>`;
+const texto = (p) => p.texto.map((t) => `<p>${md(t)}</p>`).join("");
+const puntos = () => `<div class="puntos">${PASOS.map((_, i) => `<i class="${i === paso ? "on" : ""}"></i>`).join("")}</div>`;
+const navegar = () => `<button class="btn suave" id="ant" ${paso === 0 ? "disabled" : ""}>Anterior</button><button class="btn" id="sig" ${paso === PASOS.length - 1 ? "disabled" : ""}>Siguiente</button>${puntos()}`;
+function indice(marcarPaso) {
+  return `<input class="buscar" placeholder="¿Qué quieres hacer?">
+  <div class="caps">${CAPITULOS.map((c, i) => `<div class="capi ${i === ACTIVO ? "on" : "off"}"><span class="n">${i + 1}</span>${c}</div>${i === ACTIVO ? `<div class="sub">${PASOS.map((p, j) => `<span data-ir="${j}" class="${marcarPaso && j === paso ? "on" : ""}">${p.titulo}</span>`).join("")}</div>` : ""}`).join("")}</div>`;
+}
+function marco(contenido, activo) {
+  const menu = [["Contenido", ["Agenda", "Speakers", "Sponsors", "Documentos", "Páginas"]], ["Comunicación", ["Anuncios", "Emails"]], ["En vivo", ["Chat", "Encuestas", "Salones"]], ["Sistema", ["Staff y permisos", "Ayuda"]]];
+  return `<div class="app"><nav class="lado"><div class="marca-ev">EventOS</div>${menu.map(([g, items]) => `<div class="gr">${g}</div>${items.map((x) => `<a class="${x === activo ? "on" : ""}">${x}</a>`).join("")}`).join("")}</nav><main class="cont">${contenido}</main></div>`;
+}
+function pintar() {
+  document.getElementById("desc").innerHTML = DESC[forma];
+  const z = document.getElementById("zona"), p = PASOS[paso];
+  if (forma === "A") {
+    z.innerHTML = marco(`<div class="miga">Ayuda</div><h2 class="tit">Preguntarle algo al público</h2>
+      <div class="a"><aside class="ind">${indice(true)}</aside>
+      <section><div class="resumen">${RESUMEN}</div><div class="paso-de">Paso ${paso + 1} de ${PASOS.length}</div><h3>${p.titulo}</h3>
+        <div class="cuerpo"><div>${captura(p)}</div><div class="txt">${texto(p)}${leyenda(p)}</div></div>
+        <div class="nav">${navegar()}</div></section></div>`, "Ayuda");
+  }
+  if (forma === "B") {
+    z.innerHTML = marco(`<div class="miga">Encuestas</div><div style="display:flex;align-items:center;gap:16px;max-width:calc(100% - 440px)"><h2 class="tit" style="margin-right:auto">Encuestas</h2><span class="ayuda-boton">¿Cómo funciona?</span></div>
+      <div class="atenuada" style="max-width:calc(100% - 440px)">${captura({ clave: "1-lista", marcas: [] })}</div>
+      <aside class="b-cajon" aria-label="Ayuda"><header><strong>Preguntarle algo al público</strong><button class="cerrar" aria-label="Cerrar la ayuda">&#10005;</button></header>
+        <div class="scroll"><div class="paso-de">Paso ${paso + 1} de ${PASOS.length}</div><h3>${p.titulo}</h3>${captura(p)}<div class="txt" style="margin-top:14px">${texto(p)}${leyenda(p)}</div></div>
+        <footer>${navegar()}</footer></aside>`, "Encuestas");
+  }
+  if (forma === "C") {
+    z.innerHTML = marco(`<div class="miga">Ayuda</div><h2 class="tit">Preguntarle algo al público</h2>
+      <div class="c"><aside class="ind">${indice(true)}</aside><section><div class="resumen">${RESUMEN}</div>
+      ${PASOS.map((q, j) => `<article class="paso" id="p${j}"><div class="num">Paso ${j + 1} de ${PASOS.length}</div><h3>${q.titulo}</h3>${captura(q)}
+        <div class="dos"><div class="txt">${texto(q)}</div>${leyenda(q)}</div></article>`).join("")}
+      </section></div>`, "Ayuda");
+    const obs = new IntersectionObserver((es) => es.forEach((e) => {
+      if (e.isIntersecting) { const j = +e.target.id.slice(1); document.querySelectorAll(".sub span").forEach((s, k) => s.classList.toggle("on", k === j)); }
+    }), { rootMargin: "-40% 0px -55% 0px" });
+    document.querySelectorAll(".paso").forEach((a) => obs.observe(a));
+  }
+  document.getElementById("ant")?.addEventListener("click", () => { paso--; pintar(); });
+  document.getElementById("sig")?.addEventListener("click", () => { paso++; pintar(); });
+  document.querySelectorAll("[data-ir]").forEach((s) => (s.onclick = () => {
+    const j = +s.dataset.ir;
+    if (forma === "C") document.getElementById("p" + j).scrollIntoView({ behavior: "smooth" });
+    else { paso = j; pintar(); }
+  }));
+}
+function seg(id, cb) {
+  document.getElementById(id).onclick = (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    document.querySelectorAll(`#${id} button`).forEach((x) => x.classList.toggle("on", x === b));
+    cb(b.dataset.v);
+  };
+}
+seg("forma", (v) => { forma = v; paso = 0; scrollTo(0, 0); pintar(); });
+seg("tema", (v) => document.body.classList.toggle("lux", v === "lux"));
+pintar();
+</script>
+</body>
+</html>

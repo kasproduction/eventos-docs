@@ -1,0 +1,139 @@
+[
+ {
+  "clave": "1-lista",
+  "marcas": [
+   {
+    "n": 1,
+    "texto": "En vivo > Encuestas, en el menú",
+    "x": 16,
+    "y": 725,
+    "w": 223,
+    "h": 37
+   },
+   {
+    "n": 2,
+    "texto": "La post-evento, siempre arriba",
+    "x": 297,
+    "y": 247,
+    "w": 1102,
+    "h": 62
+   },
+   {
+    "n": 3,
+    "texto": "Nueva encuesta",
+    "x": 1245,
+    "y": 124,
+    "w": 155,
+    "h": 40
+   }
+  ]
+ },
+ {
+  "clave": "2-nueva",
+  "marcas": [
+   {
+    "n": 1,
+    "texto": "El título que verá la gente",
+    "x": 489,
+    "y": 474,
+    "w": 462,
+    "h": 40
+   },
+   {
+    "n": 2,
+    "texto": "Crear encuesta",
+    "x": 823,
+    "y": 534,
+    "w": 128,
+    "h": 40
+   }
+  ]
+ },
+ {
+  "clave": "3-pregunta",
+  "marcas": [
+   {
+    "n": 1,
+    "texto": "La pregunta",
+    "x": 489,
+    "y": 277,
+    "w": 462,
+    "h": 40
+   },
+   {
+    "n": 2,
+    "texto": "Opción múltiple, texto libre o estrellas",
+    "x": 489,
+    "y": 337,
+    "w": 462,
+    "h": 74
+   },
+   {
+    "n": 3,
+    "texto": "Más opciones (mínimo dos)",
+    "x": 489,
+    "y": 574,
+    "w": 144,
+    "h": 36
+   },
+   {
+    "n": 4,
+    "texto": "Crear pregunta",
+    "x": 823,
+    "y": 672,
+    "w": 128,
+    "h": 40
+   }
+  ]
+ },
+ {
+  "clave": "4-activar",
+  "marcas": [
+   {
+    "n": 1,
+    "texto": "Te dice qué va a pasar",
+    "x": 464,
+    "y": 359,
+    "w": 512,
+    "h": 182
+   },
+   {
+    "n": 2,
+    "texto": "Activar",
+    "x": 874,
+    "y": 480,
+    "w": 77,
+    "h": 40
+   }
+  ]
+ },
+ {
+  "clave": "5-anuncio",
+  "marcas": [
+   {
+    "n": 1,
+    "texto": "Lleva a: Encuestas",
+    "x": 321,
+    "y": 677,
+    "w": 323,
+    "h": 50
+   },
+   {
+    "n": 2,
+    "texto": "La encuesta exacta",
+    "x": 668,
+    "y": 677,
+    "w": 323,
+    "h": 94
+   },
+   {
+    "n": 3,
+    "texto": "Así lo verá la gente",
+    "x": 1065,
+    "y": 493,
+    "w": 310,
+    "h": 156
+   }
+  ]
+ }
+]

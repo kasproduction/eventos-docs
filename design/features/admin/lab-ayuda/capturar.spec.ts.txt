@@ -1,0 +1,85 @@
+import { writeFileSync } from "node:fs";
+import { expect, test, type Locator, type Page } from "@playwright/test";
+import { primerIngreso, reiniciar } from "./apoyo";
+
+// Lab de M2.8.4a: capturas del panel real (escenario staff-org-admin, evento 2) con la caja de cada marca.
+const DESTINO = "C:/laragon/www/APP EVENTOS/design/features/admin/lab-ayuda";
+type Marca = { n: number; texto: string; x: number; y: number; w: number; h: number };
+const pasos: { clave: string; marcas: Marca[] }[] = [];
+
+async function captura(page: Page, clave: string, marcas: [Locator, string][]) {
+  await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+  await page.waitForTimeout(500);
+  const lista: Marca[] = [];
+  for (const [i, [loc, texto]] of marcas.entries()) {
+    const b = (await loc.boundingBox())!;
+    lista.push({ n: i + 1, texto, x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height) });
+  }
+  await page.screenshot({ path: `${DESTINO}/${clave}.png` });
+  pasos.push({ clave, marcas: lista });
+}
+
+test("capturas de ayuda", async ({ page }) => {
+  test.setTimeout(180_000);
+  await reiniciar("staff-org-admin");
+  await primerIngreso(page, /\/admin\/eventos\/2$/);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/admin/eventos/2/encuestas");
+  await page.getByRole("button", { name: "Crear encuesta post-evento" }).click();
+  await expect(page.getByRole("cell", { name: "¿Qué fue lo que más disfrutaste?" })).toBeVisible({ timeout: 20_000 });
+  await page.goto("/admin/eventos/2/encuestas");
+  await expect(page.getByRole("heading", { name: "Encuestas", level: 1 })).toBeVisible({ timeout: 20_000 });
+  await captura(page, "1-lista", [
+    [page.locator(".adm-lado").getByRole("link", { name: "Encuestas", exact: true }), "En vivo > Encuestas, en el menú"],
+    [page.getByRole("row", { name: /Encuesta de satisfacción/ }), "La post-evento, siempre arriba"],
+    [page.getByRole("button", { name: "Nueva encuesta" }), "Nueva encuesta"],
+  ]);
+
+  await page.getByRole("button", { name: "Nueva encuesta" }).click();
+  const nueva = page.getByRole("dialog", { name: "Nueva encuesta" });
+  await nueva.getByLabel("Título de la encuesta").fill("¿Qué charla esperas más?");
+  await captura(page, "2-nueva", [
+    [nueva.getByLabel("Título de la encuesta"), "El título que verá la gente"],
+    [nueva.getByRole("button", { name: "Crear encuesta" }), "Crear encuesta"],
+  ]);
+  await nueva.getByRole("button", { name: "Crear encuesta" }).click();
+  await expect(page.getByText("Sin preguntas todavía")).toBeVisible({ timeout: 20_000 });
+
+  await page.getByRole("button", { name: "Nueva pregunta" }).click();
+  const pregunta = page.getByRole("dialog", { name: "Nueva pregunta" });
+  await pregunta.getByLabel(/^Pregunta/).fill("¿Cuál charla esperas más?");
+  const opciones = pregunta.getByPlaceholder("Escribe la opción");
+  await opciones.nth(0).fill("Inteligencia artificial en la banca");
+  await opciones.nth(1).fill("El futuro de los pagos");
+  await captura(page, "3-pregunta", [
+    [pregunta.getByLabel(/^Pregunta/), "La pregunta"],
+    [pregunta.getByText("Tipo de respuesta").locator(".."), "Opción múltiple, texto libre o estrellas"],
+    [pregunta.getByRole("button", { name: "Agregar opción" }), "Más opciones (mínimo dos)"],
+    [pregunta.getByRole("button", { name: "Crear pregunta" }), "Crear pregunta"],
+  ]);
+  await pregunta.getByRole("button", { name: "Crear pregunta" }).click();
+  await expect(page.getByText("Pregunta creada.")).toBeVisible({ timeout: 20_000 });
+
+  await page.getByRole("button", { name: "Activar ahora" }).click();
+  const activar = page.getByRole("dialog", { name: "¿Activar la encuesta ahora?" });
+  await captura(page, "4-activar", [
+    [activar, "Te dice qué va a pasar"],
+    [activar.getByRole("button", { name: "Activar" }), "Activar"],
+  ]);
+  await activar.getByRole("button", { name: "Activar" }).click();
+  await expect(page.getByText("Encuesta activa.")).toBeVisible({ timeout: 20_000 });
+
+  await page.goto("/admin/eventos/2/anuncios");
+  await page.getByRole("link", { name: "Nuevo anuncio" }).click();
+  await page.getByLabel(/^Título/).fill("Queremos saber qué charla esperas");
+  await page.getByLabel(/^Contenido/).fill("Responde en un minuto y ayúdanos a armar el día.");
+  await page.getByLabel("Lleva a").selectOption("encuestas");
+  await page.getByLabel("¿Cuál encuesta?").selectOption({ label: "¿Qué charla esperas más?" });
+  await page.getByLabel("Lleva a").scrollIntoViewIfNeeded();
+  await captura(page, "5-anuncio", [
+    [page.locator(".adm-campo").filter({ has: page.getByLabel("Lleva a") }), "Lleva a: Encuestas"],
+    [page.locator(".adm-campo").filter({ has: page.getByLabel("¿Cuál encuesta?") }), "La encuesta exacta"],
+    [page.locator(".adm-anuncio-vista"), "Así lo verá la gente"],
+  ]);
+  writeFileSync(`${DESTINO}/pasos.json`, JSON.stringify(pasos, null, 1));
+});
