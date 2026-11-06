@@ -1261,12 +1261,15 @@ controles en rojo (roles sin filtrar por nivel; sin cuidar el ultimo super_admin
 - **Auditoria M0.8.1 (2026-10-23):** el camino se sostiene en dos revisiones independientes, pista #26 (`eventos-backend:operator-pages:public-poll-display-without-token`); prioridad sugerida B. **CONFIRMADO con prueba 2026-10-23** (`tests/Auditoria/PaginasYOperadorTest.php`, rama `auditoria/validacion` de eventos-backend, en rojo).
 
 - **Resuelto 2026-10-23 (M0.8.4):** se borro `/display/polls/{id}`. Prueba `tests/Feature/Security/PanelAdminSeguridadTest.php`. Backend `8b99911`.
-### BUG-388: El correo de prueba de las plantillas sale por el mailer por defecto, no por el SMTP de la organizacion (ABIERTO 2026-10-22)
+### BUG-388: El correo de prueba de las plantillas sale por el mailer por defecto, no por el SMTP de la organizacion (RESUELTO 2026-11-05 en M2.8.5, panel nuevo)
 - **Severidad propuesta:** BAJA
 - **Que pasa:** La prueba no usa el remitente real (`EmailService::mailerFor`): puede salir bien y el correo real fallar.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `EditEmail.php:258`
+- **Visto en C# (2026-11-05, M2.8.5):** C# lo habia copiado igual (`EnviarCorreo.PruebaAsync` con `Salida(null)`).
+- **Arreglado en:** C# `ce2101b`: `CorreoDePrueba` lleva el evento y la prueba elige SMTP y remitente como el envio real (el de la organizacion si esta listo y verificado; si no, el del sistema). Decision de Kamilo 2026-11-05. Filament de Plantillas ya era de solo lectura.
+- **Prueba:** `EnviarCorreoTest.La_prueba_de_una_plantilla_sale_por_el_SMTP_y_el_remitente_de_la_organizacion_como_el_envio_real`. Control (por el arnes): sin el evento, sale por el del sistema y falla.
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 - **Resuelto 2026-11-03 (M2.6.1a):** `POST /events/{e}/surveys/{id}/activate` y `/close` de C# avisan `poll:new` y `poll:closed` con la forma de PollController::formatPoll; cambiar el titulo de una activa avisa `poll:updated`. Prueba: la cruzada `tests/Cruzadas/EncuestasTest` (un aviso de cada uno desde C#, ninguno desde Filament), con control. Se volvio a anotar por error como BUG-518 (duplicado).
@@ -1324,12 +1327,13 @@ controles en rojo (roles sin filtrar por nivel; sin cuidar el ultimo super_admin
 - **Archivos:** `EventSurveyResource.php:125-139`, `EditEventSurvey.php:40-56`, `Api/V1/PollController.php:104, 123`
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
-### BUG-381: `QuestionsRelationManager` de sesiones es codigo muerto (ABIERTO 2026-10-22)
+### BUG-381: `QuestionsRelationManager` de sesiones es codigo muerto (NO APLICA, cerrado 2026-11-05 en M2.8.5: se va con Filament)
 - **Severidad propuesta:** BAJA
 - **Que pasa:** 5 acciones con aviso al socket que nadie usa: no esta registrado (`getRelations()` devuelve vacio). La moderacion de preguntas vive en Mission Control.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `EventSessionResource/RelationManagers/QuestionsRelationManager.php`, `EventSessionResource.php:393-399`
+- **Cierre (decision de Kamilo 2026-11-05):** no aplica al panel nuevo (no existe ahi; la moderacion de preguntas sigue en Mission Control). No se toca PHP: el archivo se va cuando se borre Filament.
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 ### BUG-380: Asignar speakers a una sesion no avisa a la app ni a la webapp (CORREGIDO 2026-10-27, M2.3.2c)
@@ -1362,12 +1366,13 @@ controles en rojo (roles sin filtrar por nivel; sin cuidar el ultimo super_admin
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 - **RESUELTO 2026-11-03 (M2.6.5b, decidido por Kamilo):** en C# la fila, el detalle y el masivo llaman la misma funcion (`Fotos.CambiarAsync`): aprobar solo cambia una pendiente y da los puntos de `upload_photo` una vez y solo si la foto tiene autor (la oficial no rompe ni da puntos); rechazar baja una pendiente o una aprobada (antes solo el masivo bajaba una aprobada) y los puntos ya dados se quedan. Sonda 2026-11-03: `tests/Auditoria/InventarioAdminTest` sigue en rojo en Filament. Pruebas: `FotosTest` (C#) y la cruzada `tests/Cruzadas/FotosTest` (el detalle de Filament sin puntos queda escrito).
-### BUG-377: "Marcar reclamado" del Golden Ticket no registra quien, no bloquea y no mira vencimiento (ABIERTO 2026-10-22)
+### BUG-377: "Marcar reclamado" del Golden Ticket no registra quien, no bloquea y no mira vencimiento (RESUELTO en M2.4.5c, 2026-11-01; cerrado en M2.8.5 el 2026-11-05)
 - **Severidad propuesta:** MEDIA (premios)
 - **Que pasa:** GoldenTicket actualiza directo; PrizeRedemptions usa `RewardService::confirm`, que guarda `confirmed_by`, bloquea la fila y revisa el vencimiento. Dos clics a la vez o un premio vencido pasan igual.
 - **Fuente:** inventario de acciones del admin (`docs/contratos/acciones-admin.md`, M0.5.3), leido por un agente; **por verificar a mano**.
 - **Cuando se arregla:** lista no repetir del admin nuevo, M2.8.5 (antes, si aparece un cliente antes de la semana 12).
 - **Archivos:** `GoldenTicketResource.php:127-130`, `PrizeRedemptions.php:108`, `RewardService.php:102-121`
+- **Resuelto en (M2.4.5c, verificado en M2.8.5):** en el panel nuevo hay una sola accion de confirmar para Golden Tickets y Premios Ganados (`Premios.ConfirmarAsync`, `POST /prize-redemptions/{id}/confirm`): actualiza solo si esta sin reclamar y sin vencer (en una sola sentencia: dos clics no confirman dos veces), guarda quien confirmo y la fecha. Golden Tickets de Filament quedo de solo lectura (M2.7.1). Prueba: `GoldenTicketsTest` y la cruzada `GoldenTicketsTest`.
 
 - **CONFIRMADO con prueba 2026-10-23 (M0.8.4):** `tests/Auditoria/InventarioAdminTest.php`, en rojo. Sigue en la lista no repetir (M2.8.5).
 ### BUG-376: Cambiar el rol de un asistente tiene reglas distintas en el admin y en la API (RESUELTO 2026-10-23)
