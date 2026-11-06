@@ -10,6 +10,17 @@
 
 ---
 
+## SESION 2026-11-06 (Opus 5.5, 35) — M2.8.1 Y M2.8.2 HECHAS: PUNTOS A MANO EN EL PERFIL DEL ASISTENTE; ETIQUETAS EN LA ESCARAPELA DE MI QR (RUTA SOLO DE C#); BUG-538
+
+- Decisiones Kamilo (M2.8.1): solo sumar; de 1 a 10.000 por vez; la accion se llama `manual_award`; la etiqueta en español de Event Pulse va con todas cuando Pulse pase a C# (M4d.8, anotado). Confirmar dentro de la seccion, sin ventana encima.
+- Decisiones Kamilo (M2.8.2): se hace ahora con la lectura adelantada a C# (regla 6, sin tocar PHP); seccion "Escarapela" en Identidad; solo Mi QR (en la confirmacion del registro nadie tiene etiquetas aun); forma C del lab `design/features/app/lab-escarapela-etiquetas.html` (banda grande al pie en el color del evento, partida si hay dos); Expo usa la misma ruta con la siguiente publicacion (PENDIENTES).
+- Hecho M2.8.1: C# `1e48dd6`, backend `0cc2a9a`, web `d095a3b` (`POST /attendees/{id}/points`; `Puntos.ManualesAsync` deja la bitacora con el motivo y una fila de `points_log` por entrega; seccion Puntos en el perfil).
+- Hecho M2.8.2: backend `e6dd176` (migracion `2026_11_06_120000`, `events.badge_tags`; cruzada), C# `750f821` (admin `GET`/`PUT /events/{id}/badge`; `GET /api/v1/events/{id}/badge` solo de C#, en la tabla de rutas y fuera de la comparacion con el OpenAPI de PHP), web `ad61d94` (pestaña Escarapela; banda en Mi QR; BUG-538: "Código dinámico, cambia en N s" y "cargo en empresa").
+- Pruebas (solo del modulo, regla de Kamilo): M2.8.1 C# 8/8, cruzada 3/3, e2e perfil 3/3, 6 controles. M2.8.2 C# 3/3 mas rutas y OpenAPI 28/28, cruzada 1/1, vitest Mi QR 7/7, e2e Mi QR 1/1, e2e admin escarapela, identidad, recap y branding 6/6; 7 controles en rojo. Suites completas: el runner del MSI con los pushes de hoy (Kamilo lo prendio).
+- Tropiezo: el scaffold del modelo trae tambien la columna generada de premios por foto y un BOM; se deshizo y `badge_tags` se agrego a mano igual a lo generado.
+- Despliegue (acumulado): `php artisan migrate` (`2026_11_03_120000`, `2026_11_05_120000` con `APP_URL` bien puesto, y `2026_11_06_120000` antes del C# nuevo); el mapa de Nginx con la ruta nueva (`cruzar.sh ... --nginx` en el servidor: mientras no, PHP da 404 y Mi QR sale sin banda); `npm run build` en eventos-backend (de la 33).
+- **Sigue: proponer M2.8.6 (editor con formato para correos y paginas personalizadas), con lab de 2 o 3 direcciones antes de codear.**
+
 ## SESION 2026-11-05 (Opus 5.5, 34) — SEIS HUECOS Y LA SECCION 2.7 CERRADOS (PREMIOS, CAMPOS, CODIGOS EN LOTE, AJUSTES DE EQUIPOS, EVENT PULSE, AVISO GENERAL); M2.8.5 Y M2.8.3; BUG-524 CERRADO; SUITES COMPLETAS AL RUNNER DEL MSI
 
 - Decisiones Kamilo (con la sonda de Livewire contra `RewardResource`): sin roles marcados un premio es para todos y se guarda null (BUG-525); una migracion de Laravel pasa a null los `[]` de premios y tambien de anuncios (BUG-510); la imagen es la URL completa de la subida (BUG-526); un premio con canjes no se borra, se apaga (BUG-527); puntos y stock enteros de 1 a 1.000.000, stock no menor a lo canjeado y patrocinador activo del evento (BUG-528).
