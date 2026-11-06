@@ -431,6 +431,11 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
       `GET /events/{id}/pages`): ninguna pagina = sin entrada; una sola = su titulo y abre `app/(app)/pages/[id].tsx` directo; varias =
       "Paginas" con la lista. Solo aparece a quien puede verla. Usa `hooks/usePages.ts` (la pantalla y el hook ya existen); refrescar
       cuando llegue el aviso `pages` del socket. Expo espera la publicacion (D.5: no publicar antes de la fase 3 salvo que un cliente lo pida).
+- [ ] **Etiquetas en la escarapela de Mi QR en Expo, con la siguiente publicacion** (Kamilo 2026-11-06, M2.8.2). `MiQrScreen.tsx`
+      consulta la misma ruta de C# que la webapp para saber que etiquetas de la persona salen en la tarjeta (las que el panel marco
+      en Identidad, seccion Escarapela) y las pinta igual que la webapp (la forma que Kamilo escoja en el lab
+      `design/features/app/lab-escarapela-etiquetas.html`). De paso, el texto del contador: "Codigo dinamico, cambia en N s", sin "·"
+      (BUG-538). Expo espera la publicacion (D.5).
 
 ### Backlog Expo (sesion Expo futura)
 - [ ] Borrar `banners.tsx` + `BannerCarousel` + `bannersApi` del Expo (feature legacy muerta)

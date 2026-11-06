@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Etiquetas en la escarapela de Mi QR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Lab M2.8.2: como se ve la etiqueta del asistente (VIP, Prensa) en la tarjeta de Mi QR.
+   La tarjeta es la de MiQrView.tsx tal cual (siempre oscura, como la escarapela fisica).
+   Las etiquetas son solo texto: el color sale del color de marca del evento. */
+:root { --ease: cubic-bezier(.2,.8,.2,1); --acc: #3D6BFF; --on-acc: #fff; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: #050506; color: #fff; font-family: 'Urbanist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+body.light { background: #f2eee7; color: #141414; }
+button { font: inherit; color: inherit; }
+
+.bar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 10px 16px; background: #0b0b0c; color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 13px; }
+.bar b { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14px; margin-right: 4px; }
+.bar .lb { color: rgba(255,255,255,.45); }
+.seg { display: flex; padding: 3px; gap: 2px; border-radius: 10px; background: #1c1c1f; }
+.seg button { border: 0; background: none; color: rgba(255,255,255,.6); font-weight: 600; font-size: 12.5px; padding: 6px 10px; border-radius: 7px; cursor: pointer; white-space: nowrap; }
+.seg button.on { background: #fff; color: #111; }
+.sw { display: flex; gap: 6px; }
+.sw button { width: 18px; height: 18px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+.sw button.on { border-color: #fff; }
+
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 360px)); justify-content: center; gap: 32px; padding: 36px 20px 60px; }
+@media (max-width: 1180px) { .grid { grid-template-columns: minmax(0, 360px); } }
+.col h2 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 17px; letter-spacing: -.01em; margin: 0 0 4px; }
+.col p.d { margin: 0 0 18px; font-size: 13.5px; line-height: 1.45; opacity: .62; min-height: 58px; }
+
+/* ---- la tarjeta de Mi QR, igual que MiQrView ---- */
+.card { position: relative; width: 100%; max-width: 340px; border-radius: 20px; border: 1px solid rgba(255,255,255,.12); background: #0a0a0a; padding: 20px 18px; overflow: hidden; color: #fff; }
+body.light .card { box-shadow: 0 24px 60px rgba(60,45,25,.18); }
+.ev { display: flex; flex-direction: column; align-items: center; gap: 3px; margin-bottom: 14px; }
+.ev b { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 15px; letter-spacing: .5px; }
+.ev span { font-size: 12px; letter-spacing: .3px; color: rgba(255,255,255,.5); }
+.dash { display: flex; justify-content: center; gap: 4px; }
+.dash i { width: 6px; height: 1px; background: rgba(255,255,255,.18); }
+.qr { margin: 14px auto; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.wave { position: relative; width: 58%; aspect-ratio: 1; border-radius: 14px; overflow: hidden; }
+.wave::before { content: ""; position: absolute; width: 142%; height: 142%; top: -21%; left: -21%; background: linear-gradient(135deg,#a8edea,#fed6e3,#d4a5ff,#a8c0ff,#b8f0c0,#ffd6aa,#a8edea); animation: spin 6s linear infinite; }
+.wave .in { position: absolute; inset: 5px; border-radius: 11px; background: #fff; padding: 10px; }
+.wave svg { width: 100%; height: 100%; display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.hint { display: flex; align-items: center; gap: 4px; font-size: 10px; letter-spacing: .5px; color: rgba(255,255,255,.35); }
+.who { margin-top: 14px; display: flex; align-items: center; gap: 12px; }
+.av { width: 44px; height: 44px; border-radius: 50%; flex: none; background: linear-gradient(135deg,#2a2a30,#151518); border: 1.5px solid rgba(255,255,255,.08); display: grid; place-items: center; font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 15px; color: rgba(255,255,255,.7); }
+.nm { min-width: 0; flex: 1; }
+.nm b { display: block; font-weight: 600; font-size: 15px; letter-spacing: -.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nm small { display: block; font-size: 11px; color: rgba(255,255,255,.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---- A: franja arriba, en el color del evento ---- */
+.a-band { margin: -20px -18px 16px; padding: 11px 18px; background: var(--acc); color: var(--on-acc); display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 18px; }
+.a-band span { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 15px; letter-spacing: .14em; text-align: center; overflow-wrap: anywhere; }
+
+.a-band span + span { padding-left: 18px; border-left: 1px solid color-mix(in srgb, var(--on-acc) 35%, transparent); }
+
+/* ---- B: chips junto al nombre ---- */
+.b-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.b-tags span { font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--acc) 22%, transparent); color: color-mix(in srgb, var(--acc) 55%, #fff); border: 1px solid color-mix(in srgb, var(--acc) 45%, transparent); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---- C: banda grande al pie, como la escarapela impresa ---- */
+.card.c { padding-bottom: 0; }
+.c-foot { margin: 16px -18px 0; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
+.c-foot span { padding: 14px 12px 15px; background: var(--acc); color: var(--on-acc); font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 22px; letter-spacing: .06em; text-align: center; line-height: 1.05; overflow-wrap: anywhere; }
+.c-foot span + span { background: color-mix(in srgb, var(--acc) 72%, #0a0a0a); }
+.c-foot.many span { font-size: 17px; }
+.card.c.none { padding-bottom: 20px; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <b>Etiquetas en Mi QR</b>
+  <span class="lb">Caso</span>
+  <div class="seg" id="caso">
+    <button data-v="none">Sin etiqueta</button>
+    <button data-v="one" class="on">VIP</button>
+    <button data-v="two">VIP y Prensa</button>
+    <button data-v="long">Etiqueta larga</button>
+  </div>
+  <span class="lb">Color del evento</span>
+  <div class="sw" id="sw">
+    <button class="on" style="background:#3D6BFF" data-c="#3D6BFF" data-o="#fff" aria-label="Azul"></button>
+    <button style="background:#E8B04B" data-c="#E8B04B" data-o="#141414" aria-label="Dorado"></button>
+    <button style="background:#E5484D" data-c="#E5484D" data-o="#fff" aria-label="Rojo"></button>
+    <button style="background:#F2F2F2" data-c="#F2F2F2" data-o="#141414" aria-label="Blanco"></button>
+  </div>
+  <span class="lb">Fondo</span>
+  <div class="seg" id="tema">
+    <button data-v="dark" class="on">Oscuro</button>
+    <button data-v="light">Claro</button>
+  </div>
+</div>
+
+<div class="grid">
+  <section class="col">
+    <h2>A. Franja arriba</h2>
+    <p class="d">Una franja del color del evento encima del nombre del evento. Se ve de lejos y no mueve el QR.</p>
+    <div id="A"></div>
+  </section>
+  <section class="col">
+    <h2>B. Junto al nombre</h2>
+    <p class="d">Chips pequeños debajo del nombre de la persona. Discreto: se lee de cerca, no desde la puerta.</p>
+    <div id="B"></div>
+  </section>
+  <section class="col">
+    <h2>C. Banda al pie</h2>
+    <p class="d">Una banda grande abajo, como la escarapela impresa de los eventos. Con dos etiquetas se parte en dos.</p>
+    <div id="C"></div>
+  </section>
+</div>
+
+<script>
+const CASOS = { none: [], one: ['VIP'], two: ['VIP', 'Prensa'], long: ['Patrocinador principal'] };
+let caso = 'one';
+const qr = (() => { // QR de mentira, fijo, solo para el lab
+  let s = 7, r = () => (s = (s * 9301 + 49297) % 233280) / 233280, c = '';
+  for (let y = 0; y < 25; y++) for (let x = 0; x < 25; x++) {
+    const f = (x < 7 && y < 7) || (x > 17 && y < 7) || (x < 7 && y > 17);
+    const on = f ? ((x % 6 === 0 || y % 6 === 0 || (x > 17 && (x - 18) % 6 === 0) || (y > 17 && (y - 18) % 6 === 0)) || ((x % 18 > 1 && x % 18 < 5) && (y % 18 > 1 && y % 18 < 5))) : r() > .52;
+    if (on) c += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
+  }
+  return `<svg viewBox="0 0 25 25" shape-rendering="crispEdges" fill="#0a0a0a">${c}</svg>`;
+})();
+const dash = '<div class="dash">' + '<i></i>'.repeat(22) + '</div>';
+const esc = t => t.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+function card(op, tags) {
+  const t = tags.map(x => `<span>${esc(x)}</span>`).join('');
+  const top = op === 'A' && tags.length ? `<div class="a-band">${t}</div>` : '';
+  const chips = op === 'B' && tags.length ? `<div class="b-tags">${t}</div>` : '';
+  const foot = op === 'C' && tags.length ? `<div class="c-foot${tags.length > 1 ? ' many' : ''}">${t}</div>` : '';
+  return `<div class="card ${op === 'C' ? 'c' : ''} ${tags.length ? '' : 'none'}">
+    ${top}
+    <div class="ev"><b>BINTEC 2026</b><span>6 y 7 de diciembre</span></div>
+    ${dash}
+    <div class="qr"><div class="wave"><div class="in">${qr}</div></div>
+      <span class="hint"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Código dinámico, cambia en 42 s</span></div>
+    ${dash}
+    <div class="who"><div class="av">MR</div><div class="nm"><b>María Fernanda Restrepo</b><small>Directora de innovación en Bancolombia</small>${chips}</div></div>
+    ${foot}
+  </div>`;
+}
+function pintar() { ['A', 'B', 'C'].forEach(op => document.getElementById(op).innerHTML = card(op, CASOS[caso])); }
+document.getElementById('caso').onclick = e => { const b = e.target.closest('button'); if (!b) return; caso = b.dataset.v; document.querySelectorAll('#caso button').forEach(x => x.classList.toggle('on', x === b)); pintar(); };
+document.getElementById('sw').onclick = e => { const b = e.target.closest('button'); if (!b) return; document.documentElement.style.setProperty('--acc', b.dataset.c); document.documentElement.style.setProperty('--on-acc', b.dataset.o); document.querySelectorAll('#sw button').forEach(x => x.classList.toggle('on', x === b)); };
+document.getElementById('tema').onclick = e => { const b = e.target.closest('button'); if (!b) return; document.body.classList.toggle('light', b.dataset.v === 'light'); document.querySelectorAll('#tema button').forEach(x => x.classList.toggle('on', x === b)); };
+pintar();
+</script>
+</body>
+</html>
