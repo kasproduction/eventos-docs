@@ -3,6 +3,15 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-05 — De las pruebas (runner del MSI)
+
+### BUG-537: El contrato GET admin/polls fallaba al azar por el orden de las encuestas (RESUELTO 2026-11-05)
+- **Severidad propuesta:** BAJA (solo pruebas)
+- **Que pasa:** `PollController@index` ordena por `created_at` descendente. En `ContratoSeeder` las dos encuestas tomaban la hora REAL de la base (`live_polls` no lleva timestamps de Eloquent): casi siempre el mismo segundo (empate: sale primero la de arriba, como la foto) y a veces la de cierre un segundo despues (sale primero y el contrato no coincide).
+- **Visto:** 2026-11-05, corrida del runner del MSI `42126635659` (la ultima verde, la del 2026-11-04, tenia el mismo seeder). En local paso 3 de 3.
+- **Arreglado en:** backend: el seeder fija las dos a la hora congelada (la de cierre un minuto antes). Solo datos de prueba; nada de codigo de PHP.
+- **Prueba:** `tests/Contratos/JuegosTest` "GET admin/polls" y los 302 contratos contra MySQL en verde. Control: con la de cierre un minuto despues, el contrato falla.
+
 ## 2026-11-05 — Encontrados al portar Event Pulse (M2.7.3)
 
 ### BUG-536: Tras regenerar o apagar Event Pulse, el socket sigue aceptando el token viejo hasta 15 minutos (ABIERTO, para la fase 3; decision de Kamilo 2026-11-05)
