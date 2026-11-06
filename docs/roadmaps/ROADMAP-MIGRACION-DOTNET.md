@@ -392,7 +392,7 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 
 ### 2.10 Cierre de la fase (hito 1) — 0/2
 - [ ] M2.10.1 Medicion del hito 1 en el servidor real (admin nuevo + API PHP) con los k6 de agosto; numero anotado aqui **[servidor]**
-- [ ] M2.10.2 Retro de la fase 2 **[local]**
+- [ ] M2.10.2 Retro de la fase 2 **[local]** — **Contar (Kamilo 2026-11-06):** la excepcion a la regla 6 de BUG-539 (pie de `EmailLayout.php` cambiado sin preguntar; la opcion sin PHP era normalizar la linea en las cruzadas), en `decisiones.md`.
 
 ---
 
