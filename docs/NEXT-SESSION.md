@@ -10,7 +10,7 @@
 
 ---
 
-## SESION 2026-11-05 (Opus 5.5, 34) — M2.4.5d HECHA: PREMIOS, EL CATALOGO DE LA TIENDA, EN EL ADMIN NUEVO; BUG-525 A 528
+## SESION 2026-11-05 (Opus 5.5, 34) — SEIS HUECOS Y LA SECCION 2.7 CERRADOS (PREMIOS, CAMPOS, CODIGOS EN LOTE, AJUSTES DE EQUIPOS, EVENT PULSE, AVISO GENERAL); M2.8.5 Y M2.8.3; BUG-524 CERRADO; SUITES COMPLETAS AL RUNNER DEL MSI
 
 - Decisiones Kamilo (con la sonda de Livewire contra `RewardResource`): sin roles marcados un premio es para todos y se guarda null (BUG-525); una migracion de Laravel pasa a null los `[]` de premios y tambien de anuncios (BUG-510); la imagen es la URL completa de la subida (BUG-526); un premio con canjes no se borra, se apaga (BUG-527); puntos y stock enteros de 1 a 1.000.000, stock no menor a lo canjeado y patrocinador activo del evento (BUG-528).
 - Hecho: C# `9883c44` (`/events/{e}/rewards`, `CatalogoDePremios`, destino de subida `rewards`), backend `5c87acf` (Filament de Premios de solo lectura con el aviso, migracion `2026_11_05_120000_roles_vacios_son_para_todos`, cruzada `CatalogoDePremiosTest`), web `fcf4b72` (Gamificacion > Premios: lista, ordenar, crear y editar con imagen; sin Eliminar si tiene canjes).
@@ -31,6 +31,8 @@
 - **Orden de lo que queda de la fase 2 (Kamilo):** M2.8.5, M2.8.3, M2.8.1, M2.8.2, M2.8.6 (con lab), M2.8.4, 2.9 y al final M2.9.3 y M2.10.1 con el servidor prendido. Decisiones: Destacados solo en pantalla; Silent Disco sin interruptor (columna huerfana a M5.1.5); puntos manuales en el perfil del asistente con motivo y registro.
 - **M2.8.5 hecha** (C# `ce2101b`, web `dca314f`): lista "no repetir" revisada; BUG-388 arreglado (prueba de plantillas por el SMTP real); BUG-377 y BUG-381 cerrados.
 - **M2.8.3 hecha** (backend `0fc6ab2`): Filament dice "Destacados"; `EventOnboardingResource` se queda hasta que se borre Filament entero (Branding usa sus secciones). Roadmap 143/238.
+- **Cierre del dia:** roadmap 143/238. Ultima corrida completa del runner del MSI en verde sobre C# `ce2101b` (BUG-388). Falta que el runner pase el cambio de PHP de M2.8.3 (backend `0fc6ab2`, solo textos de Filament): entra en la proxima corrida, con el siguiente push de C# (avisar a Kamilo que prenda el MSI).
+- **Despliegue (acumulado):** `php artisan migrate` (`2026_11_03_120000` de la 32 y `2026_11_05_120000`, con `APP_URL` bien puesto) y `npm run build` en eventos-backend (tema de Filament, de la 33). El aviso general de Filament no necesita compilar el tema (reusa sus clases).
 - **Sigue: proponer M2.8.1 (otorgar puntos manuales en el perfil del asistente, motivo obligatorio y quien los dio), con sonda del motor de puntos antes.**
 
 ## SESION 2026-11-04 (Opus 5.5, 33) — M2.7.1 Y M2.2.8 HECHAS: FILAMENT DE SOLO LECTURA EN 35 PANTALLAS; SEGURIDAD DE TU CUENTA EN EL ADMIN NUEVO; CINCO HUECOS AL ROADMAP
