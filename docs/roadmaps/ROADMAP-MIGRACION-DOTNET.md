@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 141/237
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 141/238
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -521,15 +521,16 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 ---
 
 <details>
-<summary><b>Fase 5: Apagar PHP (3 semanas) — 0/12</b></summary>
+<summary><b>Fase 5: Apagar PHP (3 semanas) — 0/13</b></summary>
 
-## Fase 5: Apagar PHP (3 semanas) — 0/12
+## Fase 5: Apagar PHP (3 semanas) — 0/13
 
-### 5.1 Esquema y datos (1 semana) — 0/4
+### 5.1 Esquema y datos (1 semana) — 0/5
 - [ ] M5.1.1 EF Core toma el esquema: migracion inicial "baseline" que no cambia nada; la tabla `migrations` de Laravel queda como historia **[local]**
 - [ ] M5.1.2 Tablas que solo usaba Laravel y se van: `jobs`, `job_batches`, `failed_jobs`, `cache`, `cache_locks`, `sessions`, `telescope_*`, `pulse_*` (si se instalo). Respaldo antes **[servidor]**
 - [ ] M5.1.3 `personal_access_tokens` sigue igual (es el contrato de los clientes). Decidir si algun dia se pasa a JWT: fuera de este roadmap **[local]**
 - [ ] M5.1.4 `encrypted` casts: re-cifrar `two_factor_secret` con DataProtection de .NET y retirar el descifrador de Laravel **[local]**
+- [ ] M5.1.5 Columnas huerfanas que nadie lee y se van: `events.silent_disco_enabled` (Silent Disco funciona por `event_sessions.silent_disco_group_id`; decision de Kamilo 2026-11-05). Revisar que ningun cliente la lea antes de borrarla; respaldo antes **[servidor]**
 
 ### 5.2 Infraestructura (1 semana) — 0/5
 - [ ] M5.2.1 Quitar el proxy por ruta: todo a C# salvo Next; `X-Backend` se queda **[servidor]**
