@@ -486,6 +486,9 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] Al retomar: re-escribir el piloto de Encuestas con el tono aprobado
       (natural, humanizado, sin tecnicismos — feedback Kamilo) y producir
       M1-M7 contra el inventario blindado
+- [ ] Ayuda del panel (M2.8.4b), capitulo Aprobar registros, paso 3 "O a varias a la vez": la captura sale alta y angosta (la
+      barra de "Aprobar marcados" arriba y las dos filas marcadas abajo: se ven las 7 filas de la lista). Acortarla, por ejemplo
+      marcando las dos primeras filas. Aplazado por Kamilo 2026-11-08: no frena nada.
 
 ---
 
