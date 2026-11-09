@@ -104,6 +104,9 @@ h3.sec small{font:500 13px var(--f);color:var(--t3)}
 .tipos button.on{background:var(--ink);color:var(--ink-c);border-color:var(--ink)}
 .tipos button span{opacity:.6;margin-left:4px}
 .mas{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;color:var(--t3);font-size:13px}
+.pag{display:flex;align-items:center;gap:12px}.pag label{display:flex;align-items:center;gap:8px}
+.sel{background:var(--campo);border:1px solid var(--b-hi);border-radius:var(--r);padding:4px 8px;color:var(--t)}
+.ico-b{border:0;background:none;color:var(--t2);display:grid;place-items:center;width:30px;height:30px;border-radius:var(--r);cursor:pointer}.ico-b:hover{background:var(--card-hi)}.ico-b:disabled{opacity:.35;cursor:default}
 .btn{border:1px solid var(--b-hi);background:var(--card-hi);border-radius:var(--r);padding:8px 14px;font-weight:700;cursor:pointer;color:var(--t)}
 @media (max-width:900px){.rapidas{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:760px){.app{grid-template-columns:1fr}.lado{display:none}.cont{padding:20px 16px 48px}.rapidas{grid-template-columns:1fr}.it{grid-template-columns:1fr auto}.it .ico{display:none}.hora{grid-column:1/-1;padding:0}}
@@ -117,7 +120,7 @@ h3.sec small{font:500 13px var(--f);color:var(--t3)}
   <span class="lb">Tema</span>
   <div class="seg" id="tema"><button class="on" data-v="noir">Noir</button><button data-v="lux">Lux</button></div>
 </div>
-<div class="desc"><strong>Versión 2.</strong> Arriba seis respuestas rápidas con su semáforo; después solo lo que falló. La historia completa queda cerrada: lo repetido se agrupa en una línea y se carga de a 20, así la página no se vuelve infinita aunque la persona tenga miles de movimientos.</div>
+<div class="desc"><strong>Versión 2.</strong> Arriba seis respuestas rápidas con su semáforo; después solo lo que falló. La historia completa queda cerrada: lo repetido se agrupa en una línea y se pagina como el resto del panel (de a 25, con Por página), así la página no se vuelve infinita aunque la persona tenga miles de movimientos.</div>
 
 <div class="app">
   <nav class="lado">
@@ -236,7 +239,7 @@ function pinta() {
   document.getElementById("tipos").innerHTML = TIPOS.map(([v, n]) => `<button data-v="${v}" class="${v === tipo ? "on" : ""}">${n}<span>${cuenta(v).toLocaleString("es-CO")}</span></button>`).join("");
   const lista = h.map((x, i) => [x, i]).filter(([x]) => !tipo || x.t === tipo || (tipo === "acceso" && x.t === "registro"));
   document.getElementById("linea").innerHTML = `<div class="linea">${lista.map(([x, i]) => x.hijos ? fila(x, true, i) + (abiertos.has(i) ? `<div class="hijos">${x.hijos.map((y) => fila(y)).join("")}${x.n > x.hijos.length ? `<div class="it"><span></span><span></span><div class="qd">Y ${x.n - x.hijos.length} más.</div><div></div></div>` : ""}</div>` : "") : fila(x)).join("")}</div>`;
-  document.getElementById("mas").innerHTML = actual === "activa" && !tipo ? `<span>Se ven los 20 más recientes de 284.</span><button class="btn">Ver 20 más</button>` : "";
+  { const tot = h.filter((x) => !tipo || x.t === tipo || (tipo === "acceso" && x.t === "registro")).length; const n = actual === "activa" && !tipo ? 284 : tot; const ult = Math.max(1, Math.ceil(n / 25)); document.getElementById("mas").innerHTML = `<span>Se muestran de 1 a ${Math.min(25, n)} de ${n.toLocaleString("es-CO")} resultados</span><span class="pag"><label>Por página <select class="sel"><option>25</option><option>50</option><option>100</option></select></label><button class="ico-b" aria-label="Página anterior" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><span>Página 1 de ${ult}</span><button class="ico-b" aria-label="Página siguiente" ><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button></span>`; }
 }
 const seg = (id, fn) => document.getElementById(id).addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
