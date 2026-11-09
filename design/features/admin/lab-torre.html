@@ -7,246 +7,373 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Lab M2.9.1 y M2.9.2: la Torre de control del panel de EventOS, una sola direccion (alcance de Kamilo 2026-11-08).
-   Semaforo por metrica con palabra y color: Bien, Atencion, Mal. Datos de mentira; los escenarios cambian lo que pasa. */
+/* Lab M2.9.1 y M2.9.2 v4 (alcance real, Kamilo 2026-11-08): pantalla completa estilo Pulse/Mission Control, lecturas por
+   servidor estilo pm2. Toda lectura es una barra, mini grafica o indicador con la cifra pequena al lado. Color SOLO en la
+   X roja (mal) y la admiracion ambar (atencion). Los umbrales viven en un solo bloque (UMBRALES), como el archivo de
+   configuracion de la implementacion. Datos de mentira. */
 :root{
-  --bg:#0A0A0A;--bg-1:#0E0E0E;--card:rgba(255,255,255,.03);--card-hi:rgba(255,255,255,.05);--campo:rgba(255,255,255,.05);
-  --b:rgba(255,255,255,.06);--b-hi:rgba(255,255,255,.10);--b-st:rgba(255,255,255,.14);
-  --t:#FFFFFF;--t2:rgba(255,255,255,.6);--t3:rgba(255,255,255,.4);
-  --ink:#FFFFFF;--ink-c:#101010;--sombra:none;
-  --at:#E8A93E;--mal:#F26D6D;--mal-f:rgba(242,109,109,.08);
+  --bg:#0A0A0A;--bg-1:#0E0E0E;--card:rgba(255,255,255,.03);--card-hi:rgba(255,255,255,.05);
+  --b:rgba(255,255,255,.06);--b-hi:rgba(255,255,255,.10);--b-st:rgba(255,255,255,.16);
+  --t:#FFFFFF;--t2:rgba(255,255,255,.62);--t3:rgba(255,255,255,.4);--t4:rgba(255,255,255,.22);
+  --pista:rgba(255,255,255,.08);--llena:rgba(255,255,255,.55);--llena-f:#FFFFFF;--area:rgba(255,255,255,.06);
+  --at:#E8A93E;--mal:#F26D6D;
   --f:'Urbanist',ui-sans-serif,system-ui,sans-serif;--fh:'Plus Jakarta Sans',var(--f);--r:8px;--r-l:12px;
 }
 body.lux{
-  --bg:#F6F8FA;--bg-1:#FAFBFC;--card:#FFFFFF;--card-hi:#F6F8FA;--campo:#F0F2F5;
-  --b:rgba(0,0,0,.08);--b-hi:rgba(0,0,0,.13);--b-st:rgba(0,0,0,.18);
-  --t:#131417;--t2:#3A3B40;--t3:#5C5D63;--ink:#1A1B1E;--ink-c:#FFFFFF;
-  --sombra:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.06);
-  --at:#C2740A;--mal:#C73838;--mal-f:rgba(199,56,56,.08);
+  --bg:#F6F8FA;--bg-1:#FFFFFF;--card:#FFFFFF;--card-hi:#F0F2F5;
+  --b:rgba(0,0,0,.07);--b-hi:rgba(0,0,0,.12);--b-st:rgba(0,0,0,.2);
+  --t:#131417;--t2:#3A3B40;--t3:#6B6C72;--t4:#9A9BA0;
+  --pista:rgba(0,0,0,.07);--llena:rgba(0,0,0,.45);--llena-f:#131417;--area:rgba(0,0,0,.05);
+  --at:#C2740A;--mal:#C73838;
 }
-*{box-sizing:border-box}html,body{margin:0}
-body{background:var(--bg);color:var(--t);font:500 14px/1.5 var(--f);-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--t);font:500 14px/1.45 var(--f);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
 button{font:inherit;color:inherit}
-.lab{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 16px;background:#0b0b0c;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
-.lab h1{font:800 14px var(--fh);margin:0 6px 0 0}.lab .lb{color:rgba(255,255,255,.45);font-size:13px}
+.lab{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:8px 16px;background:#0b0b0c;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}
+.lab h1{font:800 13px var(--fh);margin:0 6px 0 0}.lab .lb{color:rgba(255,255,255,.45)}
 .seg{display:flex;padding:3px;gap:2px;border-radius:10px;background:#1c1c1f}
-.seg button{border:0;background:none;color:rgba(255,255,255,.6);font-weight:600;font-size:12.5px;padding:6px 10px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.seg button{border:0;background:none;color:rgba(255,255,255,.6);font-weight:600;font-size:12.5px;padding:5px 10px;border-radius:7px;cursor:pointer;white-space:nowrap}
 .seg button.on{background:#fff;color:#111}
-.desc{padding:12px 24px;font-size:13.5px;color:var(--t2);border-bottom:1px solid var(--b)}.desc strong{color:var(--t);font-family:var(--fh)}
 
-.app{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 100px)}
-.lado{border-right:1px solid var(--b);padding:20px 14px;background:var(--bg-1)}
-.lado .marca-ev{font:700 15px var(--fh);margin:0 0 18px 10px}
-.lado .gr{font-size:11px;color:var(--t3);margin:14px 0 4px 12px}
-.lado a{display:block;padding:7px 12px;border-radius:var(--r);color:var(--t2);font-size:14px;text-decoration:none}
-.lado a.on{background:var(--ink);color:var(--ink-c)}
-.cont{padding:28px 32px 60px;min-width:0;max-width:1240px}
-.miga{font-size:12.5px;color:var(--t3)}
-.cabeza{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:4px 0 22px}
-h2.tit{font:800 28px var(--fh);letter-spacing:-.02em;margin:0}
-.lectura{margin-left:auto;color:var(--t3);font-size:13px;text-align:right}
+/* la torre */
+.torre{flex:1;display:flex;flex-direction:column;padding:28px 40px 20px;min-height:0}
+.cab{display:flex;align-items:flex-start;gap:20px}
+.marca{font:700 15px var(--fh)}.marca span{display:block;font:600 11px var(--f);color:var(--t3);margin-top:2px}
+.lectura{margin-left:auto;text-align:right;color:var(--t3);font-size:12.5px}
+.lectura b{display:block;font:700 22px var(--fh);color:var(--t);letter-spacing:-.01em}
+.estado{margin:26px 0 18px;display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap}
+.estado h2{font:800 44px/1.05 var(--fh);letter-spacing:-.03em;margin:0;display:flex;align-items:center;gap:14px}
+.estado h2 svg{width:34px;height:34px}
+.estado ul{margin:6px 0 0;padding:0;list-style:none;color:var(--t2);font-size:14px;display:flex;flex-direction:column;gap:4px}
+.estado li{display:flex;gap:8px;align-items:center}
+.franja{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.nodo{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--b-hi);border-radius:var(--r);font-weight:600;font-size:13px;color:var(--t2);background:var(--card)}
+.nodo small{color:var(--t4);font-weight:500;font-size:11.5px}
+.nodo.fuera{color:var(--t);border-color:var(--b-st)}
+.ic{display:inline-flex;flex:none}.ic svg{width:15px;height:15px}.ic.at{color:var(--at)}.ic.mal{color:var(--mal)}
+.vista{flex:1;min-height:0;overflow:auto;padding-bottom:12px}
+.pest{display:flex;justify-content:center;gap:6px;padding-top:14px;border-top:1px solid var(--b)}
+.pest button{border:1px solid var(--b-hi);background:none;border-radius:999px;padding:7px 16px;font:600 11.5px var(--f);color:var(--t3);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.pest button.on{background:var(--t);color:var(--bg);border-color:var(--t)}
 
+/* piezas */
+.rejilla{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.caja{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:16px 18px;min-width:0}
+.caja h3{margin:0 0 10px;font:600 11.5px var(--f);color:var(--t3);display:flex;align-items:center;gap:8px}
+.caja h3 .esp{flex:1}
+.sub{color:var(--t3);font-size:12.5px}
+.arco{display:flex;flex-direction:column;align-items:center}
+.arco > svg{width:100%;max-width:220px;height:auto;overflow:visible}
+.arco .cifra{margin-top:-34px;font:800 26px var(--fh);letter-spacing:-.02em}
+.arco .cifra small{font:600 13px var(--f);color:var(--t3);margin-left:3px}
+.arco .lim{color:var(--t4);font-size:11.5px;margin-top:2px}
+.linea > svg{width:100%;height:110px;display:block;overflow:visible}
+.linea .pie{display:flex;justify-content:space-between;color:var(--t4);font-size:11px;margin-top:4px}
+.ahora{font:700 15px var(--fh)}.ahora small{font:500 12px var(--f);color:var(--t3);margin-left:4px}
 
-.resumen{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:26px}
-.tar{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:14px 16px;box-shadow:var(--sombra);display:flex;flex-direction:column;gap:8px;min-width:0}
-.tar .et{color:var(--t3);font-size:13px}
-.tar .num{font:800 24px var(--fh);letter-spacing:-.01em}
-.tar .num small{font:600 13px var(--f);color:var(--t3);margin-left:4px}
-.tar .pie{color:var(--t2);font-size:12.5px}
+/* barra con su marca de limite */
+.barra{display:grid;grid-template-columns:62px 1fr 52px 18px;gap:10px;align-items:center;font-size:12.5px;color:var(--t3)}
+.barra .p{position:relative;height:8px;border-radius:4px;background:var(--pista)}
+.barra .p i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--llena)}
+.barra .p i.fuera{background:var(--llena-f)}
+.barra .p b{position:absolute;top:-4px;bottom:-4px;width:1px;background:var(--t3)}
+.barra .n{text-align:right;color:var(--t2);font-variant-numeric:tabular-nums}
+.barra .n.fuera{color:var(--t);font-weight:700}
 
-.sec{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);box-shadow:var(--sombra);margin-bottom:20px;overflow:hidden}
-.sec-cab{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--b);flex-wrap:wrap}
-.sec-cab h3{font:700 16px var(--fh);margin:0}
-.sec-cab p{margin:0;color:var(--t3);font-size:13px}
-.sec-cab .esp{flex:1}
-.filtro{display:flex;padding:3px;gap:2px;border-radius:9px;background:var(--campo)}
-.filtro button{border:0;background:none;color:var(--t2);font-weight:600;font-size:12.5px;padding:5px 10px;border-radius:7px;cursor:pointer}
-.filtro button.on{background:var(--ink);color:var(--ink-c)}
-.desliza{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13.5px}
-th{text-align:left;font-weight:600;color:var(--t3);font-size:12.5px;padding:10px 18px;border-bottom:1px solid var(--b);white-space:nowrap}
-td{padding:11px 18px;border-bottom:1px solid var(--b);white-space:nowrap;vertical-align:middle}
-tr:last-child td{border-bottom:0}
-th.n,td.n{text-align:right}
-.ruta{font-weight:600}
-.ruta small{display:block;color:var(--t3);font-weight:500;font-size:12px}
-.back{display:inline-block;padding:2px 8px;border-radius:6px;border:1px solid var(--b-st);font:700 11.5px var(--fh);color:var(--t2)}
-.val{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}
-.gris{color:var(--t3)}
-.dos{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.colas{display:grid;grid-template-columns:repeat(3,1fr)}
-.colas div{padding:14px 18px;border-right:1px solid var(--b)}.colas div:last-child{border-right:0}
-.colas dt{color:var(--t3);font-size:12.5px}.colas dd{margin:4px 0 0;font:800 20px var(--fh);display:flex;align-items:center;gap:8px}
-.nota{padding:10px 18px 14px;color:var(--t3);font-size:12.5px}
-.aviso{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r);background:var(--card-hi);color:var(--t2);margin-bottom:20px;border:1px solid var(--b-st)}
-.aviso svg{color:var(--mal);flex:none;margin-top:2px}
-.aviso strong{font-family:var(--fh);color:var(--t)}
-@media (max-width:1100px){.resumen{grid-template-columns:repeat(2,1fr)}.dos{grid-template-columns:1fr}}
-@media (max-width:760px){.app{grid-template-columns:1fr}.lado{display:none}.cont{padding:20px 16px 48px}.colas{grid-template-columns:1fr}.colas div{border-right:0;border-bottom:1px solid var(--b)}}
-/* Semaforo (Kamilo 2026-11-08): el color va SOLO en el icono: la X en rojo (mal) y la admiracion en ambar (atencion).
-   Sin insignias, sin palabras, sin bordes ni fondos de color; lo que esta bien no se marca. */
-.sem{display:inline-flex;vertical-align:-2px;margin-left:6px}.sem svg{width:15px;height:15px;flex:none}
-.sem.ok{display:none}.sem.at{color:var(--at)}.sem.mal{color:var(--mal)}
-.est{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:13px;color:var(--t2);white-space:nowrap}
-.est svg{width:15px;height:15px;flex:none}.est.at svg{color:var(--at)}.est.mal svg{color:var(--mal)}.est.at,.est.mal{color:var(--t)}
+/* filas estilo pm2 */
+.grupo{margin-bottom:18px}
+.grupo > h4{margin:0 0 8px;font:600 11.5px var(--f);color:var(--t3)}
+.fila{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);margin-bottom:8px}
+.fila-cab{display:grid;grid-template-columns:150px minmax(0,1fr) 160px 90px 22px;gap:22px;align-items:center;padding:14px 18px;cursor:pointer}
+.fila-cab .nom{font:700 15px var(--fh);display:flex;gap:8px;align-items:center}
+.fila-cab .nom small{display:block;font:500 12px var(--f);color:var(--t3)}
+.barras{display:flex;flex-direction:column;gap:7px}
+.spark svg{width:100%;height:36px;display:block}
+.prendido{color:var(--t3);font-size:12.5px;text-align:right}
+.flecha{width:8px;height:8px;border-right:2px solid var(--t3);border-bottom:2px solid var(--t3);transform:rotate(45deg);justify-self:center}
+.fila.abierta .flecha{transform:rotate(-135deg)}
+.procs{display:none;border-top:1px solid var(--b);padding:10px 18px 14px}
+.fila.abierta .procs{display:block}
+.proc{display:grid;grid-template-columns:170px minmax(0,1fr) minmax(0,1fr) 120px;gap:22px;align-items:center;padding:7px 0;font-size:13px}
+.proc .nom{color:var(--t2);font-weight:600;display:flex;gap:8px;align-items:center}
+.proc .rein{color:var(--t3);font-size:12.5px;text-align:right}
+.sindato{color:var(--t3);font-size:13px}
+
+/* barras horizontales de rutas */
+.hbar{display:grid;grid-template-columns:minmax(0,300px) 1fr 70px 18px;gap:12px;align-items:center;padding:6px 0;font-size:13px}
+.hbar .r{color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar .r small{color:var(--t4);margin-right:6px}
+.hbar .p{position:relative;height:14px}
+.hbar .p i{position:absolute;left:0;top:0;bottom:0;border-radius:0 4px 4px 0;background:var(--llena);max-width:100%}
+.hbar .p i.fuera{background:var(--llena-f)}
+.hbar .p b{position:absolute;top:-4px;bottom:-4px;width:1px;background:var(--t3)}
+.hbar .n{text-align:right;color:var(--t2);font-variant-numeric:tabular-nums}
+.sel{display:flex;gap:4px}
+.sel button{border:0;background:none;color:var(--t3);font:600 12px var(--f);padding:3px 8px;border-radius:6px;cursor:pointer}
+.sel button.on{background:var(--card-hi);color:var(--t)}
+.ind{display:flex;align-items:baseline;gap:8px}
+.ind b{font:800 22px var(--fh)}
+
+.tip{position:fixed;pointer-events:none;background:var(--bg-1);border:1px solid var(--b-st);border-radius:var(--r);padding:6px 10px;font-size:12.5px;color:var(--t);box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:99;display:none}
+.tip small{display:block;color:var(--t3)}
+@media (max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.fila-cab{grid-template-columns:120px 1fr 22px}.fila-cab .spark,.fila-cab .prendido{display:none}.proc{grid-template-columns:1fr 1fr}}
+@media (max-width:700px){.torre{padding:20px 16px}.g4,.g2{grid-template-columns:1fr}.estado h2{font-size:32px}.hbar{grid-template-columns:1fr 70px 18px}.hbar .p{grid-column:1/-1;order:3}}
 </style>
 </head>
 <body>
 <div class="lab">
   <h1>Lab Torre de control</h1>
   <span class="lb">Escenario</span>
-  <div class="seg" id="esc">
-    <button class="on" data-v="bien">Todo bien</button>
-    <button data-v="caido">Un servidor sin señal</button>
-    <button data-v="errores">Errores altos</button>
-  </div>
+  <div class="seg" id="esc"><button class="on" data-v="bien">Todo bien</button><button data-v="carga">Carga alta</button><button data-v="caido">Un servidor caído</button></div>
   <span class="lb">Tema</span>
   <div class="seg" id="tema"><button class="on" data-v="noir">Noir</button><button data-v="lux">Lux</button></div>
 </div>
-<div class="desc"><strong>Una sola dirección.</strong> Arriba el resumen con su semáforo; abajo el detalle: servidores, rutas, colas y conectados. Cada número que importa trae su semáforo con palabra (Bien, Atención, Mal), no solo el color. Los umbrales son provisionales hasta medir el hito 1.</div>
 
-<div class="app">
-  <nav class="lado">
-    <div class="marca-ev">EventOS</div>
-    <a>Escritorio</a>
-    <div class="gr">Personas</div><a>Asistentes</a><a>Entrada</a>
-    <div class="gr">En vivo</div><a>Chat</a><a>Encuestas</a><a>Event Pulse</a>
-    <div class="gr">Sistema</div><a>Eventos</a><a>Staff y permisos</a><a class="on">Torre de control</a><a>Ayuda</a>
-  </nav>
-  <main class="cont">
-    <div class="miga">Sistema</div>
-    <div class="cabeza">
-      <h2 class="tit">Torre de control</h2>
-      <div class="lectura">Se actualiza cada 10 segundos mientras tienes esta página a la vista.<br>Última lectura: hace <span id="hace">3</span> s.</div>
-    </div>
-    <div id="aviso"></div>
-    <div class="resumen" id="resumen"></div>
-
-    <section class="sec">
-      <div class="sec-cab"><h3>Servidores de la API</h3><p>Cada uno deja su resumen cada 10 segundos. Sin resumen en 30 segundos, sale sin señal.</p></div>
-      <div class="desliza"><table id="nodos"></table></div>
-    </section>
-
-    <section class="sec">
-      <div class="sec-cab">
-        <h3>Rutas en el último minuto</h3><p>De la más pedida a la menos.</p><span class="esp"></span>
-        <div class="filtro" id="fback"><button class="on" data-v="">Todas</button><button data-v="PHP">PHP</button><button data-v="C#">C#</button></div>
-      </div>
-      <div class="desliza"><table id="rutas"></table></div>
-    </section>
-
-    <div class="dos">
-      <section class="sec">
-        <div class="sec-cab"><h3>Colas de trabajos</h3></div>
-        <div id="colas"></div>
-      </section>
-      <section class="sec">
-        <div class="sec-cab"><h3>Conectados</h3><p>Por servidor de sockets.</p></div>
-        <div class="desliza"><table id="sockets"></table></div>
-      </section>
-    </div>
-  </main>
+<div class="torre">
+  <div class="cab">
+    <div class="marca">EventOS<span>Torre de control</span></div>
+    <div class="lectura"><b id="reloj">14:32</b>Última lectura hace <span id="hace">3</span> s. Se actualiza cada 10 s.</div>
+  </div>
+  <div class="estado" id="estado"></div>
+  <div class="franja" id="franja"></div>
+  <div class="vista" id="vista"></div>
+  <nav class="pest" id="pest"></nav>
 </div>
+<div class="tip" id="tip"></div>
 
 <script>
+/* ---------- El archivo de configuracion (umbrales.json en la implementacion): se recalibra con M2.10.1 sin tocar codigo. */
+const UMBRALES = {
+  procesador:   { atencion: 50, mal: 70, sostenido_s: 60, unidad: "%" },   // COMO-CRECEMOS: se opera al 50 %, el codo antes del 60 %
+  ram:          { atencion: 80, mal: 92, unidad: "%" },
+  disco:        { atencion: 80, mal: 90, unidad: "%" },
+  p95:          { atencion: 500, mal: 1500, unidad: "ms" },
+  errores:      { atencion: 0.5, mal: 2, unidad: "%" },
+  php_ocupados: { atencion: 80, mal: 100, unidad: "%" },
+  fallidos:     { atencion: 1, mal: 5 },
+  fallos_hora:  { atencion: 1, mal: 20 },
+  mysql_conex:  { atencion: 70, mal: 90, unidad: "%" },
+  mysql_lentas: { atencion: 1 },
+  redis_mem:    { atencion: 75, mal: 90, unidad: "%" },
+  redis_aciertos:{ atencion_bajo: 80, unidad: "%" },
+  logins_fallidos_min: { atencion: 20, mal: 60 },
+  bloqueos_min: { atencion: 5, mal: 20 },
+  reconexiones_min: { atencion: 50, mal: 200 },
+  sin_senal_s: 30,
+};
+const nivel = (v, u) => (u.mal !== undefined && v >= u.mal ? "mal" : v >= u.atencion ? "at" : "ok");
+
 const ICO = {
-  ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
-  at: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 8v5M12 17h.01"/></svg>',
+  at: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 6v8M12 18.5h.01"/></svg>',
   mal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
 };
-const PALABRA = { ok: "Bien", at: "Atención", mal: "Mal" };
-const sem = (n, texto) => texto !== undefined ? `<span class="est ${n}">${n === "ok" ? "" : ICO[n]}${texto}</span>` : `<span class="sem ${n}" role="img" aria-label="${PALABRA[n]}">${ICO[n]}</span>`;
-// Umbrales provisionales (se calibran con M2.10.1).
-const nivelP95 = (ms) => (ms < 500 ? "ok" : ms < 1500 ? "at" : "mal");
-const nivelErr = (p) => (p < 0.5 ? "ok" : p < 2 ? "at" : "mal");
+const ic = (n, etq) => (n === "ok" ? "" : `<span class="ic ${n}" role="img" aria-label="${etq ?? (n === "mal" ? "Mal" : "Atención")}">${ICO[n]}</span>`);
+const peor = (...ns) => (ns.includes("mal") ? "mal" : ns.includes("at") ? "at" : "ok");
 const fmt = (n, d = 0) => n.toLocaleString("es-CO", { minimumFractionDigits: d, maximumFractionDigits: d });
 
-const BASE = {
-  nodos: [
-    { nombre: "api-1", vivo: true, rps: 41.2, p95: 312, err: 0.1 },
-    { nombre: "api-2", vivo: true, rps: 39.8, p95: 298, err: 0.2 },
-  ],
-  rutas: [
-    { m: "GET", r: "/api/v1/events/{id}/agenda", b: "PHP", rps: 22.4, p95: 280, err: 0 },
-    { m: "GET", r: "/api/v1/auth/me", b: "C#", rps: 18.1, p95: 64, err: 0 },
-    { m: "GET", r: "/api/v1/events/{id}/feed", b: "PHP", rps: 12.7, p95: 410, err: 0.1 },
-    { m: "POST", r: "/api/v1/sessions/{id}/start", b: "C#", rps: 0.4, p95: 120, err: 0 },
-    { m: "GET", r: "/api/v1/events/{id}/badge", b: "C#", rps: 6.3, p95: 88, err: 0 },
-    { m: "POST", r: "/api/v1/checkin/scan", b: "PHP", rps: 9.2, p95: 350, err: 0.3 },
-    { m: "GET", r: "/api/v1/events/{id}/documents/zip", b: "C#", rps: 0.1, p95: 1280, err: 0 },
-  ],
-  hangfire: { cola: 3, corriendo: 1, fallidos: 0 },
-  horizon: { cola: 0, corriendo: 0, fallidos: 0 },
-  sockets: [{ nombre: "sock-1", n: 812 }, { nombre: "sock-2", n: 472 }],
-};
-function escenario(v) {
-  const d = structuredClone(BASE);
-  if (v === "caido") { d.nodos[1] = { nombre: "api-2", vivo: false, hace: 42 }; d.nodos[0].rps = 80.6; d.nodos[0].p95 = 640; }
-  if (v === "errores") {
-    d.rutas[2].err = 6.4; d.rutas[2].p95 = 2100; d.rutas[5].err = 1.2;
-    d.nodos[0].err = 3.1; d.nodos[1].err = 2.8; d.horizon.fallidos = 4; d.hangfire.fallidos = 1;
-  }
+/* ---------- Datos de mentira: 90 lecturas = 15 minutos de a 10 s */
+let semilla = 7; const azar = () => ((semilla = (semilla * 9301 + 49297) % 233280) / 233280);
+const serie = (base, ruido, sube = 0) => Array.from({ length: 90 }, (_, i) => Math.max(0, base + (azar() - 0.5) * ruido + (sube * i) / 90));
+function mundo(esc) {
+  semilla = 7;
+  const carga = esc === "carga";
+  const api = (n, cpu, caido) => ({ nombre: n, tipo: "API", caido, hace: caido ? 42 : 0, cpu: carga ? cpu + 26 : cpu, ram: carga ? 71 : 58, disco: 41, prendido: "12 d 4 h",
+    hist: serie(carga ? cpu + 18 : cpu, 10, carga ? 16 : 0),
+    procs: [
+      { n: "C# (Api)", cpu: carga ? 38 : 14, ram: carga ? 22 : 16, rein: 0 },
+      { n: "PHP (trabajadores)", cpu: carga ? 41 : 19, ram: 28, rein: 0, ocupados: carga ? 26 : 9, max: 28 },
+      { n: "Nginx", cpu: 2, ram: 1, rein: 0 },
+    ] });
+  const d = {
+    servidores: [
+      api("api-1", 31), api("api-2", 29, esc === "caido"),
+      { nombre: "sock-1", tipo: "Sockets", cpu: carga ? 22 : 9, ram: 44, disco: 30, prendido: "12 d 4 h", hist: serie(carga ? 20 : 8, 6),
+        procs: [{ n: "Node (proceso 1)", cpu: 5, ram: 9, rein: 0, conectados: carga ? 2480 : 812 }, { n: "Node (proceso 2)", cpu: 4, ram: 8, rein: esc === "carga" ? 1 : 0, conectados: carga ? 2210 : 472 }, { n: "Horizon (PHP)", cpu: 1, ram: 6, rein: 0 }] },
+      { nombre: "web-1", tipo: "Webapp", cpu: carga ? 48 : 22, ram: 63, disco: 35, prendido: "12 d 4 h", hist: serie(carga ? 44 : 20, 10), procs: [{ n: "Next", cpu: carga ? 44 : 19, ram: 31, rein: 0 }] },
+      { nombre: "web-2", tipo: "Webapp", cpu: carga ? 46 : 21, ram: 61, disco: 35, prendido: "12 d 4 h", hist: serie(carga ? 43 : 19, 10), procs: [{ n: "Next", cpu: carga ? 42 : 18, ram: 30, rein: 0 }] },
+    ],
+    pedidos: serie(carga ? 210 : 81, 18, carga ? 60 : 0),
+    p95: serie(carga ? 720 : 310, 90, carga ? 300 : 0),
+    errores: carga ? 0.9 : 0.1,
+    conectados: serie(carga ? 4500 : 1260, 60, carga ? 300 : 30),
+    reconexiones: serie(carga ? 70 : 8, carga ? 40 : 6),
+    rutas: [
+      { m: "GET", r: "/api/v1/events/{id}/agenda", rps: 22.4, p95: carga ? 980 : 280, err: 0 },
+      { m: "GET", r: "/api/v1/auth/me", rps: 18.1, p95: 64, err: 0 },
+      { m: "GET", r: "/api/v1/events/{id}/feed", rps: 12.7, p95: carga ? 1900 : 410, err: carga ? 2.6 : 0.1 },
+      { m: "POST", r: "/api/v1/checkin/scan", rps: 9.2, p95: 350, err: 0.3 },
+      { m: "GET", r: "/api/v1/events/{id}/badge", rps: 6.3, p95: 88, err: 0 },
+      { m: "GET", r: "/api/v1/events/{id}/documents/zip", rps: 0.1, p95: 1280, err: 0 },
+      { m: "POST", r: "/api/v1/sessions/{id}/start", rps: 0.4, p95: 120, err: 0 },
+    ],
+    logins: serie(carga ? 28 : 3, carga ? 14 : 3), bloqueos: serie(carga ? 6 : 0.4, carga ? 4 : 0.8),
+    colas: [
+      { n: "C# (Hangfire)", sub: "Correos, push programadas, importaciones", cola: carga ? 42 : 3, corriendo: carga ? 8 : 1, fallidos: carga ? 2 : 0, hist: serie(carga ? 35 : 3, carga ? 20 : 3) },
+      { n: "PHP (Horizon)", sub: "Lo que aún corre en PHP", cola: 0, corriendo: 0, fallidos: 0, hist: serie(0.5, 1) },
+    ],
+    fallosHora: [{ n: "Correos", v: carga ? 7 : 0 }, { n: "Push", v: carga ? 31 : 2 }, { n: "Webhooks en necesita atención", v: carga ? 1 : 0 }, { n: "Importaciones cortadas", v: 0 }],
+    mysql: { conex: carga ? 112 : 38, max: 151, qps: serie(carga ? 1900 : 640, 120, carga ? 300 : 0), lentas: carga ? 3 : 0 },
+    redis: { mem: carga ? 61 : 34, ops: serie(carga ? 5200 : 1800, 300), aciertos: carga ? 93 : 97, clientes: carga ? 340 : 120 },
+  };
   return d;
 }
 
-let actual = "bien", back = "";
-function pinta() {
-  const d = escenario(actual);
-  const vivos = d.nodos.filter((n) => n.vivo);
-  const rps = vivos.reduce((s, n) => s + n.rps, 0);
-  const p95 = Math.max(...vivos.map((n) => n.p95));
-  const err = vivos.reduce((s, n) => s + n.err * n.rps, 0) / rps;
-  const fallidos = d.hangfire.fallidos + d.horizon.fallidos;
-  const conectados = d.sockets.reduce((s, x) => s + x.n, 0);
-  const nNodos = vivos.length === d.nodos.length ? "ok" : vivos.length ? "at" : "mal";
-  const nCola = fallidos === 0 ? "ok" : fallidos < 5 ? "at" : "mal";
-
-  const caidos = d.nodos.filter((n) => !n.vivo);
-  const malos = [];
-  if (caidos.length) malos.push(`${caidos.map((n) => n.nombre).join(" y ")} no manda su resumen hace ${caidos[0].hace} s.`);
-  if (nivelErr(err) === "mal") malos.push(`Los errores del último minuto están en ${fmt(err, 1)} %.`);
-  document.getElementById("aviso").innerHTML = malos.length
-    ? `<div class="aviso">${ICO.mal.replace("<svg", '<svg width="18" height="18"')}<div><strong>Algo necesita atención.</strong> ${malos.join(" ")}</div></div>` : "";
-
-  const tar = (n, et, num, unidad, pie) => `<div class="tar ${n}"><span class="et">${et}${sem(n)}</span><span class="num">${num}<small>${unidad}</small></span><span class="pie">${pie}</span></div>`;
-  document.getElementById("resumen").innerHTML = [
-    tar(nNodos, "Servidores de la API", `${vivos.length} de ${d.nodos.length}`, "vivos", nNodos === "ok" ? "Todos mandan su resumen." : "Uno no responde."),
-    tar("ok", "Pedidos", fmt(rps, 1), "por segundo", "Entre todos los servidores."),
-    tar(nivelP95(p95), "Tiempo de respuesta", fmt(p95), "ms", "El 95 % responde en menos."),
-    tar(nivelErr(err), "Errores", fmt(err, 1), "%", "Respuestas 5xx del último minuto."),
-    tar(nCola, "Trabajos fallidos", fmt(fallidos), "", `${fmt(conectados)} personas conectadas.`),
-  ].join("");
-
-  document.getElementById("nodos").innerHTML =
-    `<thead><tr><th>Servidor</th><th>Estado</th><th class="n">Pedidos por segundo</th><th class="n">Tiempo p95</th><th class="n">Errores</th></tr></thead><tbody>` +
-    d.nodos.map((n) => n.vivo
-      ? `<tr><td class="ruta">${n.nombre}</td><td>${sem("ok", "Vivo")}</td><td class="n">${fmt(n.rps, 1)}</td><td class="n"><span class="val">${fmt(n.p95)} ms ${sem(nivelP95(n.p95))}</span></td><td class="n"><span class="val">${fmt(n.err, 1)} % ${sem(nivelErr(n.err))}</span></td></tr>`
-      : `<tr><td class="ruta">${n.nombre}</td><td>${sem("mal", `Sin señal hace ${n.hace} s`)}</td><td class="n gris">Sin dato</td><td class="n gris">Sin dato</td><td class="n gris">Sin dato</td></tr>`).join("") + "</tbody>";
-
-  const rutas = d.rutas.filter((r) => !back || r.b === back).sort((a, b) => b.rps - a.rps);
-  document.getElementById("rutas").innerHTML =
-    `<thead><tr><th>Ruta</th><th>Atiende</th><th class="n">Pedidos por segundo</th><th class="n">Tiempo p95</th><th class="n">Errores</th></tr></thead><tbody>` +
-    rutas.map((r) => `<tr><td class="ruta">${r.r}<small>${r.m}</small></td><td><span class="back">${r.b}</span></td><td class="n">${fmt(r.rps, 1)}</td><td class="n"><span class="val">${fmt(r.p95)} ms ${sem(nivelP95(r.p95))}</span></td><td class="n"><span class="val">${fmt(r.err, 1)} % ${sem(nivelErr(r.err))}</span></td></tr>`).join("") + "</tbody>";
-
-  const cola = (t, c) => {
-    const n = c.fallidos === 0 ? "ok" : c.fallidos < 5 ? "at" : "mal";
-    return `<div class="sec-cab" style="border-bottom:0;padding-bottom:0"><p>${t}</p></div><dl class="colas"><div><dt>En cola</dt><dd>${fmt(c.cola)}</dd></div><div><dt>Corriendo</dt><dd>${fmt(c.corriendo)}</dd></div><div><dt>Fallidos</dt><dd>${fmt(c.fallidos)} ${sem(n)}</dd></div></dl>`;
-  };
-  document.getElementById("colas").innerHTML = cola("C# (Hangfire): correos, push programadas, importaciones", d.hangfire) + cola("PHP (Horizon): lo que aún corre en PHP", d.horizon) +
-    `<p class="nota">Se lee de Redis; desde aquí no se reintenta ni se borra nada.</p>`;
-
-  document.getElementById("sockets").innerHTML =
-    `<thead><tr><th>Servidor</th><th class="n">Conectados</th></tr></thead><tbody>` +
-    d.sockets.map((s) => `<tr><td class="ruta">${s.nombre}</td><td class="n">${fmt(s.n)}</td></tr>`).join("") +
-    `<tr><td class="gris">Total</td><td class="n" style="font-weight:700">${fmt(conectados)}</td></tr></tbody>`;
+/* ---------- Graficos */
+function arco(v, max, u, unidad, dec = 0) {
+  const a = (x) => Math.PI * (1 - Math.min(1, x / max));
+  const p = (x, r) => [110 + r * Math.cos(a(x)), 110 - r * Math.sin(a(x))];
+  const [x0, y0] = p(0, 90), [x1, y1] = p(max, 90), [xv, yv] = p(v, 90);
+  const n = nivel(v, u);
+  const marca = (x) => { const [ax, ay] = p(x, 80), [bx, by] = p(x, 100); return `<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" stroke="var(--t3)" stroke-width="1.5"/>`; };
+  return { n, svg: `<svg viewBox="0 0 220 120" role="img" aria-label="${fmt(v, dec)} ${unidad}"><path d="M${x0} ${y0} A90 90 0 0 1 ${x1} ${y1}" fill="none" stroke="var(--pista)" stroke-width="12" stroke-linecap="round"/><path d="M${x0} ${y0} A90 90 0 0 1 ${xv} ${yv}" fill="none" stroke="${n === "ok" ? "var(--llena)" : "var(--llena-f)"}" stroke-width="12" stroke-linecap="round"/>${marca(u.atencion)}${u.mal !== undefined && u.mal <= max ? marca(u.mal) : ""}</svg>` };
 }
+let idg = 0;
+function linea(datos, { alto = 110, limite, unidad = "", dec = 0, etq = "", piso = 10 } = {}) {
+  const id = "g" + idg++, W = 600, H = alto, max = Math.max(piso, ...datos, limite ?? 0) * 1.15;
+  const pts = datos.map((v, i) => [(i / (datos.length - 1)) * W, H - (v / max) * H]);
+  const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join("");
+  const lim = limite !== undefined ? `<line x1="0" x2="${W}" y1="${H - (limite / max) * H}" y2="${H - (limite / max) * H}" stroke="var(--t3)" stroke-width="1"/>` : "";
+  return `<svg id="${id}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" data-serie="${datos.map((v) => v.toFixed(dec)).join(",")}" data-unidad="${unidad}" data-etq="${etq}"><line x1="0" x2="${W}" y1="${H}" y2="${H}" stroke="var(--b-hi)" stroke-width="1"/>${lim}<path d="${d}L${W} ${H}L0 ${H}Z" fill="var(--area)"/><path d="${d}" fill="none" stroke="var(--llena-f)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/><line class="cruz" x1="0" x2="0" y1="0" y2="${H}" stroke="var(--t3)" stroke-width="1" vector-effect="non-scaling-stroke" visibility="hidden"/></svg>`;
+}
+const barra = (etq, v, u, txt) => {
+  const n = nivel(v, u);
+  return `<div class="barra"><span>${etq}</span><span class="p"><i class="${n === "ok" ? "" : "fuera"}" style="width:${Math.min(100, v)}%"></i><b style="left:${u.atencion}%"></b></span><span class="n ${n === "ok" ? "" : "fuera"}">${txt ?? fmt(v) + " %"}</span>${ic(n)}</div>`;
+};
+
+/* ---------- Pestanas */
+let esc = "bien", pest = "general", orden = "lentas", abiertas = new Set(["api-1"]);
+function pinta() {
+  idg = 0;
+  const d = mundo(esc);
+  const p95 = d.p95.at(-1), conectados = d.conectados.at(-1);
+  const masCargado = d.servidores.filter((s) => !s.caido).sort((a, b) => b.cpu - a.cpu)[0];
+
+  // Estado de cada servidor
+  const estadoServ = (s) => s.caido ? "mal" : peor(nivel(s.cpu, UMBRALES.procesador), nivel(s.ram, UMBRALES.ram), nivel(s.disco, UMBRALES.disco),
+    ...s.procs.map((p) => (p.ocupados ? nivel((p.ocupados / p.max) * 100, UMBRALES.php_ocupados) : "ok")), ...s.procs.map((p) => (p.rein ? "at" : "ok")));
+
+  // Que mirar
+  const mirar = [];
+  for (const s of d.servidores) {
+    if (s.caido) { mirar.push(["mal", `${s.nombre} sin señal hace ${s.hace} s`]); continue; }
+    const c = nivel(s.cpu, UMBRALES.procesador); if (c !== "ok") mirar.push([c, `Procesador de ${s.nombre} en ${s.cpu} % hace más de 1 minuto`]);
+    for (const p of s.procs) { if (p.rein) mirar.push(["at", `${p.n} de ${s.nombre} se reinició hace 6 minutos`]); if (p.ocupados && nivel((p.ocupados / p.max) * 100, UMBRALES.php_ocupados) !== "ok") mirar.push([nivel((p.ocupados / p.max) * 100, UMBRALES.php_ocupados), `PHP de ${s.nombre}: ${p.ocupados} de ${p.max} trabajadores ocupados`]); }
+  }
+  if (nivel(p95, UMBRALES.p95) !== "ok") mirar.push([nivel(p95, UMBRALES.p95), `Tiempo de respuesta en ${fmt(p95)} ms`]);
+  if (nivel(d.errores, UMBRALES.errores) !== "ok") mirar.push([nivel(d.errores, UMBRALES.errores), `Errores en ${fmt(d.errores, 1)} %`]);
+  const fh = d.fallosHora.reduce((s, x) => s + x.v, 0); if (nivel(fh, UMBRALES.fallos_hora) !== "ok" && fh >= 5) mirar.push([nivel(fh, UMBRALES.fallos_hora), `${fh} fallos en la última hora (correos, push, webhooks)`]);
+  mirar.sort((a, b) => (a[0] === b[0] ? 0 : a[0] === "mal" ? -1 : 1));
+  const vistos = mirar.slice(0, 4);
+  const general = peor(...mirar.map((m) => m[0]));
+  document.getElementById("estado").innerHTML = `<h2>${ic(general)}${mirar.length ? (mirar.length === 1 ? "1 cosa para mirar" : `${mirar.length} cosas para mirar`) : "Todo en orden"}</h2>${mirar.length ? `<ul>${vistos.map(([n, t]) => `<li>${ic(n)}${t}</li>`).join("")}${mirar.length > 4 ? `<li class="sub">Y ${mirar.length - 4} más.</li>` : ""}</ul>` : ""}`;
+
+  document.getElementById("franja").innerHTML = d.servidores.map((s) => { const n = estadoServ(s); return `<div class="nodo ${n === "ok" ? "" : "fuera"}">${ic(n)}${s.nombre}<small>${s.tipo}</small></div>`; }).join("");
+
+  const pes = { general: "General", servidores: "Servidores", trafico: "Tráfico", colas: "Colas", base: "Base de datos" };
+  const marcaPest = {
+    servidores: peor(...d.servidores.map(estadoServ)),
+    trafico: peor(nivel(p95, UMBRALES.p95), nivel(d.errores, UMBRALES.errores), nivel(d.logins.at(-1), UMBRALES.logins_fallidos_min)),
+    colas: peor(...d.colas.map((c) => nivel(c.fallidos, UMBRALES.fallidos)), nivel(fh, UMBRALES.fallos_hora)),
+    base: peor(nivel((d.mysql.conex / d.mysql.max) * 100, UMBRALES.mysql_conex), nivel(d.mysql.lentas, UMBRALES.mysql_lentas), nivel(d.redis.mem, UMBRALES.redis_mem)),
+  };
+  document.getElementById("pest").innerHTML = Object.entries(pes).map(([k, v]) => `<button data-v="${k}" class="${k === pest ? "on" : ""}">${ic(marcaPest[k] ?? "ok")}${v}</button>`).join("");
+
+  const v = document.getElementById("vista");
+  if (pest === "general") {
+    const a1 = arco(p95, 2500, UMBRALES.p95, "ms"), a2 = arco(d.errores, 4, UMBRALES.errores, "%", 1), a3 = arco(masCargado.cpu, 100, UMBRALES.procesador, "%");
+    const vivos = d.servidores.filter((s) => !s.caido).length;
+    const a4 = arco(vivos, d.servidores.length, { atencion: d.servidores.length + 1 }, "");
+    v.innerHTML = `<div class="rejilla g4">
+      <div class="caja arco"><h3>${ic(a1.n)}Tiempo de respuesta</h3>${a1.svg}<div class="cifra">${fmt(p95)}<small>ms</small></div><div class="lim">El 95 % responde en menos. Límite ${fmt(UMBRALES.p95.atencion)} ms</div></div>
+      <div class="caja arco"><h3>${ic(a2.n)}Errores</h3>${a2.svg}<div class="cifra">${fmt(d.errores, 1)}<small>%</small></div><div class="lim">Respuestas 5xx del último minuto</div></div>
+      <div class="caja arco"><h3>${ic(a3.n)}Procesador</h3>${a3.svg}<div class="cifra">${masCargado.cpu}<small>%</small></div><div class="lim">El más cargado: ${masCargado.nombre}</div></div>
+      <div class="caja arco"><h3>${ic(vivos < d.servidores.length ? "mal" : "ok")}Servidores</h3>${a4.svg.replace(/stroke="var\(--llena\)"/, `stroke="${vivos < d.servidores.length ? "var(--llena-f)" : "var(--llena)"}"`)}<div class="cifra">${vivos}<small>de ${d.servidores.length}</small></div><div class="lim">Reportando cada 10 s</div></div>
+    </div>
+    <div class="rejilla g2" style="margin-top:14px">
+      <div class="caja linea"><h3>Pedidos por segundo<span class="esp"></span><span class="ahora">${fmt(d.pedidos.at(-1), 1)}<small>ahora</small></span></h3>${linea(d.pedidos, { unidad: "por segundo", dec: 1, etq: "Pedidos" })}<div class="pie"><span>Hace 15 min</span><span>Ahora</span></div></div>
+      <div class="caja linea"><h3>${ic(nivel(p95, UMBRALES.p95))}Tiempo de respuesta<span class="esp"></span><span class="ahora">${fmt(p95)}<small>ms</small></span></h3>${linea(d.p95, { limite: UMBRALES.p95.atencion, unidad: "ms", etq: "p95" })}<div class="pie"><span>Hace 15 min</span><span>La línea es el límite</span><span>Ahora</span></div></div>
+      <div class="caja linea"><h3>Personas conectadas<span class="esp"></span><span class="ahora">${fmt(conectados)}<small>ahora</small></span></h3>${linea(d.conectados, { unidad: "personas", etq: "Conectadas" })}<div class="pie"><span>Hace 15 min</span><span>Ahora</span></div></div>
+      <div class="caja linea"><h3>${ic(nivel(d.reconexiones.at(-1), UMBRALES.reconexiones_min))}Reconexiones de sockets<span class="esp"></span><span class="ahora">${fmt(d.reconexiones.at(-1))}<small>por minuto</small></span></h3>${linea(d.reconexiones, { limite: UMBRALES.reconexiones_min.atencion, unidad: "por minuto", etq: "Reconexiones" })}<div class="pie"><span>Hace 15 min</span><span>Ahora</span></div></div>
+    </div>`;
+  }
+  if (pest === "servidores") {
+    const tipos = ["API", "Sockets", "Webapp"];
+    v.innerHTML = tipos.map((t) => `<div class="grupo"><h4>${t === "API" ? "Servidores de la API" : t === "Sockets" ? "Servidores de sockets" : "Webapp"}</h4>${d.servidores.filter((s) => s.tipo === t).map((s) => {
+      const n = estadoServ(s);
+      if (s.caido) return `<div class="fila"><div class="fila-cab"><div class="nom">${ic("mal")}<div>${s.nombre}<small>Sin señal hace ${s.hace} s</small></div></div><div class="sindato">Su último reporte llegó hace ${s.hace} s. Si vuelve, aparece solo.</div><div></div><div></div><div></div></div></div>`;
+      return `<div class="fila ${abiertas.has(s.nombre) ? "abierta" : ""}" data-f="${s.nombre}"><div class="fila-cab"><div class="nom">${ic(n)}<div>${s.nombre}<small>${s.procs.length} procesos</small></div></div>
+        <div class="barras">${barra("Procesador", s.cpu, UMBRALES.procesador)}${barra("RAM", s.ram, UMBRALES.ram)}${barra("Disco", s.disco, UMBRALES.disco)}</div>
+        <div class="spark">${linea(s.hist, { alto: 36, limite: UMBRALES.procesador.atencion, unidad: "% procesador", etq: s.nombre })}</div>
+        <div class="prendido">Prendido<br>${s.prendido}</div><span class="flecha"></span></div>
+        <div class="procs">${s.procs.map((p) => `<div class="proc"><span class="nom">${ic(p.rein ? "at" : "ok")}${p.n}</span>${barra("Procesador", p.cpu, UMBRALES.procesador)}${p.ocupados ? barra("Ocupados", (p.ocupados / p.max) * 100, UMBRALES.php_ocupados, `${p.ocupados} de ${p.max}`) : p.conectados ? barra("RAM", p.ram, UMBRALES.ram) : barra("RAM", p.ram, UMBRALES.ram)}<span class="rein">${p.conectados ? `${fmt(p.conectados)} conectados<br>` : ""}${p.rein ? `Se reinició hace 6 min` : "Sin reinicios"}</span></div>`).join("")}</div></div>`;
+    }).join("")}</div>`).join("");
+  }
+  if (pest === "trafico") {
+    const conf = { lentas: ["p95", "ms", UMBRALES.p95, 2500], errores: ["err", "%", UMBRALES.errores, 4], pedidas: ["rps", "por s", null, 25] }[orden];
+    const rutas = [...d.rutas].sort((a, b) => b[conf[0]] - a[conf[0]]).slice(0, 5);
+    v.innerHTML = `<div class="caja"><h3>Rutas<span class="esp"></span><span class="sel" id="orden">${[["lentas", "Más lentas"], ["errores", "Con más errores"], ["pedidas", "Más pedidas"]].map(([k, t]) => `<button data-v="${k}" class="${k === orden ? "on" : ""}">${t}</button>`).join("")}</span></h3>
+      ${rutas.map((r) => { const val = r[conf[0]]; const n = conf[2] ? nivel(val, conf[2]) : "ok"; return `<div class="hbar" title="${r.m} ${r.r}: ${fmt(val, conf[1] === "ms" ? 0 : 1)} ${conf[1]}"><span class="r"><small>${r.m}</small>${r.r}</span><span class="p"><i class="${n === "ok" ? "" : "fuera"}" style="width:${(val / conf[3]) * 100}%"></i>${conf[2] ? `<b style="left:${(conf[2].atencion / conf[3]) * 100}%"></b>` : ""}</span><span class="n">${fmt(val, conf[1] === "ms" ? 0 : 1)} ${conf[1]}</span>${ic(n)}</div>`; }).join("")}
+      <div class="sub" style="margin-top:8px">${conf[2] ? "La raya vertical es el límite." : "Último minuto."}</div></div>
+      <div class="rejilla g2" style="margin-top:14px">
+        <div class="caja linea"><h3>${ic(nivel(d.logins.at(-1), UMBRALES.logins_fallidos_min))}Logins fallidos<span class="esp"></span><span class="ahora">${fmt(d.logins.at(-1))}<small>por minuto</small></span></h3>${linea(d.logins, { limite: UMBRALES.logins_fallidos_min.atencion, unidad: "por minuto", etq: "Logins fallidos" })}<div class="pie"><span>Hace 15 min</span><span>Del registro de Nginx</span><span>Ahora</span></div></div>
+        <div class="caja linea"><h3>${ic(nivel(d.bloqueos.at(-1), UMBRALES.bloqueos_min))}Bloqueos<span class="esp"></span><span class="ahora">${fmt(d.bloqueos.at(-1))}<small>por minuto</small></span></h3>${linea(d.bloqueos, { limite: UMBRALES.bloqueos_min.atencion, unidad: "por minuto", etq: "Bloqueos" })}<div class="pie"><span>Hace 15 min</span><span>Baneos, cuentas bloqueadas y demasiados intentos</span><span>Ahora</span></div></div>
+      </div>`;
+  }
+  if (pest === "colas") {
+    const maxF = Math.max(10, ...d.fallosHora.map((x) => x.v));
+    v.innerHTML = `<div class="rejilla g2">${d.colas.map((c) => { const n = nivel(c.fallidos, UMBRALES.fallidos); const tope = Math.max(50, c.cola);
+      return `<div class="caja"><h3>${ic(n)}${c.n}</h3><div class="sub" style="margin:-4px 0 12px">${c.sub}</div>
+        <div class="barras">${barra("En cola", (c.cola / tope) * 100, { atencion: 101 }, fmt(c.cola))}${barra("Corriendo", (c.corriendo / tope) * 100, { atencion: 101 }, fmt(c.corriendo))}${barra("Fallidos", Math.min(100, c.fallidos * 10), { atencion: UMBRALES.fallidos.atencion * 10, mal: UMBRALES.fallidos.mal * 10 }, fmt(c.fallidos))}</div>
+        <div class="linea" style="margin-top:12px">${linea(c.hist, { alto: 60, unidad: "en cola", etq: "En cola" })}<div class="pie"><span>En cola, hace 15 min</span><span>Ahora</span></div></div></div>`; }).join("")}</div>
+      <div class="caja" style="margin-top:14px"><h3>${ic(nivel(fh, UMBRALES.fallos_hora))}Fallos de la última hora</h3>
+        ${d.fallosHora.map((x) => { const n = x.v ? "at" : "ok"; return `<div class="hbar"><span class="r">${x.n}</span><span class="p"><i class="${x.v ? "fuera" : ""}" style="width:${(x.v / maxF) * 100}%"></i></span><span class="n">${fmt(x.v)}</span>${ic(n)}</div>`; }).join("")}
+        <div class="sub" style="margin-top:8px">Se lee de lo que ya se guarda; desde aquí no se reintenta ni se borra nada. El detalle de una persona está en Qué le pasó.</div></div>`;
+  }
+  if (pest === "base") {
+    const pc = (d.mysql.conex / d.mysql.max) * 100;
+    const ac = arco(d.redis.aciertos, 100, { atencion: 101 }, "%");
+    const nAc = d.redis.aciertos < UMBRALES.redis_aciertos.atencion_bajo ? "at" : "ok";
+    v.innerHTML = `<div class="rejilla g2">
+      <div class="caja"><h3>${ic(peor(nivel(pc, UMBRALES.mysql_conex), nivel(d.mysql.lentas, UMBRALES.mysql_lentas)))}MySQL</h3>
+        <div class="barras">${barra("Conexiones", pc, UMBRALES.mysql_conex, `${d.mysql.conex} de ${d.mysql.max}`)}</div>
+        <div class="linea" style="margin-top:14px"><div class="ahora">${fmt(d.mysql.qps.at(-1))}<small>consultas por segundo</small></div>${linea(d.mysql.qps, { alto: 70, unidad: "consultas por segundo", etq: "MySQL" })}</div>
+        <div class="ind" style="margin-top:12px">${ic(nivel(d.mysql.lentas, UMBRALES.mysql_lentas))}<b>${d.mysql.lentas}</b><span class="sub">consultas lentas en el último minuto</span></div></div>
+      <div class="caja"><h3>${ic(peor(nivel(d.redis.mem, UMBRALES.redis_mem), nAc))}Redis</h3>
+        <div class="barras">${barra("Memoria", d.redis.mem, UMBRALES.redis_mem)}</div>
+        <div class="linea" style="margin-top:14px"><div class="ahora">${fmt(d.redis.ops.at(-1))}<small>operaciones por segundo, ${d.redis.clientes} clientes</small></div>${linea(d.redis.ops, { alto: 70, unidad: "operaciones por segundo", etq: "Redis" })}</div>
+        <div class="ind" style="margin-top:12px">${ic(nAc)}<b>${d.redis.aciertos} %</b><span class="sub">de aciertos de caché</span></div></div>
+    </div><div class="sub" style="margin-top:12px">El procesador de MySQL y de Redis administrados llega cuando se prenda el servidor (API de DigitalOcean).</div>`;
+  }
+}
+
+/* ---------- Interaccion */
 const seg = (id, fn) => document.getElementById(id).addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
   [...e.currentTarget.children].forEach((x) => x.classList.toggle("on", x === b)); fn(b.dataset.v);
 });
-seg("esc", (v) => { actual = v; pinta(); });
+seg("esc", (v) => { esc = v; pinta(); });
 seg("tema", (v) => document.body.classList.toggle("lux", v === "lux"));
-seg("fback", (v) => { back = v; pinta(); });
+document.getElementById("pest").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; pest = b.dataset.v; pinta(); });
+document.getElementById("vista").addEventListener("click", (e) => {
+  const o = e.target.closest("#orden button"); if (o) { orden = o.dataset.v; pinta(); return; }
+  const f = e.target.closest(".fila[data-f] .fila-cab"); if (f) { const n = f.parentElement.dataset.f; abiertas.has(n) ? abiertas.delete(n) : abiertas.add(n); pinta(); }
+});
+const tip = document.getElementById("tip");
+document.getElementById("vista").addEventListener("pointermove", (e) => {
+  const svg = e.target.closest("svg[data-serie]");
+  document.querySelectorAll("svg[data-serie] .cruz").forEach((c) => c.setAttribute("visibility", "hidden"));
+  if (!svg) { tip.style.display = "none"; return; }
+  const datos = svg.dataset.serie.split(",").map(Number), r = svg.getBoundingClientRect();
+  const i = Math.max(0, Math.min(datos.length - 1, Math.round(((e.clientX - r.left) / r.width) * (datos.length - 1))));
+  const x = (i / (datos.length - 1)) * svg.viewBox.baseVal.width, cruz = svg.querySelector(".cruz");
+  cruz.setAttribute("x1", x); cruz.setAttribute("x2", x); cruz.setAttribute("visibility", "visible");
+  const seg = (datos.length - 1 - i) * 10;
+  tip.textContent = ""; const b = document.createElement("b"); b.textContent = `${svg.dataset.etq}: ${datos[i].toLocaleString("es-CO")} ${svg.dataset.unidad}`;
+  const s = document.createElement("small"); s.textContent = seg ? `Hace ${seg >= 60 ? Math.round(seg / 60) + " min" : seg + " s"}` : "Ahora";
+  tip.append(b, s); tip.style.display = "block"; tip.style.left = e.clientX + 14 + "px"; tip.style.top = e.clientY - 44 + "px";
+});
+document.getElementById("vista").addEventListener("pointerleave", () => { tip.style.display = "none"; });
 let s = 3; setInterval(() => { s = s >= 10 ? 0 : s + 1; document.getElementById("hace").textContent = s; }, 1000);
 pinta();
 </script>
