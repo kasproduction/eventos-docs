@@ -9,6 +9,9 @@ hay una prueba de cada lado con el JSON exacto (`TorreDeControlTest.Lee_un_repor
 ## Donde
 
 Todo en la base de Redis del socket (`Redis:BaseSocket` en C#, `REDIS_DB` en el socket, la base de `TORRE_REDIS_URL` en Next).
+La lectura de Redis (`INFO`: memoria, clientes, comandos, aciertos) va por una segunda conexion de la Api, solo de la torre y en modo
+administrador (`Torre/ConexionDeLaTorre.cs`, cliente `eventos-torre`; decision de Kamilo 2026-11-09, opcion b). Usa la misma
+`ConnectionStrings__Redis`: no pide variable nueva. Si Redis no responde, la muestra compartida sale con `redis: null`.
 
 | Llave | Que guarda | Vida |
 |---|---|---|
