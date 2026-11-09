@@ -16,7 +16,7 @@
   --b:rgba(255,255,255,.06);--b-hi:rgba(255,255,255,.10);--b-st:rgba(255,255,255,.14);
   --t:#FFFFFF;--t2:rgba(255,255,255,.6);--t3:rgba(255,255,255,.4);
   --ink:#FFFFFF;--ink-c:#101010;--sombra:none;
-  --ok:#3FB37F;--ok-f:rgba(63,179,127,.12);--at:#E2A93B;--at-f:rgba(226,169,59,.13);--mal:#E5534B;--mal-f:rgba(229,83,75,.13);
+  --at:#E8A93E;--mal:#F26D6D;--mal-f:rgba(242,109,109,.08);
   --f:'Urbanist',ui-sans-serif,system-ui,sans-serif;--fh:'Plus Jakarta Sans',var(--f);--r:8px;--r-l:12px;
 }
 body.lux{
@@ -24,7 +24,7 @@ body.lux{
   --b:rgba(0,0,0,.08);--b-hi:rgba(0,0,0,.13);--b-st:rgba(0,0,0,.18);
   --t:#131417;--t2:#3A3B40;--t3:#5C5D63;--ink:#1A1B1E;--ink-c:#FFFFFF;
   --sombra:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.06);
-  --ok:#1F8A5B;--ok-f:rgba(31,138,91,.10);--at:#A86F06;--at-f:rgba(168,111,6,.10);--mal:#C4362E;--mal-f:rgba(196,54,46,.09);
+  --at:#C2740A;--mal:#C73838;--mal-f:rgba(199,56,56,.08);
 }
 *{box-sizing:border-box}html,body{margin:0}
 body{background:var(--bg);color:var(--t);font:500 14px/1.5 var(--f);-webkit-font-smoothing:antialiased}
@@ -62,34 +62,27 @@ h3.sec small{font:500 13px var(--f);color:var(--t3)}
 /* respuestas rapidas */
 .rapidas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
 .rap{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:14px 16px;box-shadow:var(--sombra);display:flex;flex-direction:column;gap:6px;min-width:0}
-.rap.at{border-color:color-mix(in srgb,var(--at) 45%,transparent)}.rap.mal{border-color:color-mix(in srgb,var(--mal) 55%,transparent)}
 .rap .pr{color:var(--t3);font-size:13px}
 .rap .re{font:700 16px var(--fh)}
 .rap .de{color:var(--t2);font-size:12.5px}
-.sem{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font:700 12px var(--fh);white-space:nowrap;align-self:flex-start}
-.sem svg{width:13px;height:13px}
-.sem.ok{background:var(--ok-f);color:var(--ok)}.sem.at{background:var(--at-f);color:var(--at)}.sem.mal{background:var(--mal-f);color:var(--mal)}
 
 .linea{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);box-shadow:var(--sombra);overflow:hidden}
 .it{display:grid;grid-template-columns:118px 34px 1fr auto;gap:12px;align-items:start;padding:12px 16px;border-bottom:1px solid var(--b)}
 .it:last-child{border-bottom:0}
-.it.mal{background:linear-gradient(90deg,var(--mal-f),transparent 60%)}
 .hora{color:var(--t3);font-size:13px;padding-top:6px}
 .ico{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--card-hi);border:1px solid var(--b);color:var(--t2)}
 .ico svg{width:16px;height:16px}
 .qt{font-weight:600}
 .qd{color:var(--t3);font-size:13px}
-.qe{margin-top:6px;font-size:13px;color:var(--t2);background:var(--mal-f);border-radius:var(--r);padding:6px 10px}
+.qe{margin-top:6px;font-size:13px;color:var(--t2);background:var(--mal-f);border:1px solid color-mix(in srgb,var(--mal) 30%,transparent);border-radius:var(--r);padding:6px 10px}
 .qe strong{color:var(--mal);font-family:var(--fh)}
-.est{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font:700 12px var(--fh);white-space:nowrap;margin-top:4px}
-.est.ok{background:var(--ok-f);color:var(--ok)}.est.at{background:var(--at-f);color:var(--at)}.est.mal{background:var(--mal-f);color:var(--mal)}
 .grupo{cursor:pointer}
 .grupo .qt::after{content:"";display:inline-block;width:7px;height:7px;border-right:2px solid var(--t3);border-bottom:2px solid var(--t3);transform:rotate(45deg);margin:0 0 3px 10px}
 .grupo.abierto .qt::after{transform:rotate(-135deg);margin-bottom:-1px}
 .hijos{background:var(--card-hi)}
 .hijos .it{padding-left:40px}
 .nada{display:flex;gap:10px;align-items:center;padding:14px 16px;color:var(--t2)}
-.nada svg{color:var(--ok)}
+.nada svg{color:var(--t)}
 
 .historia{margin-top:26px;border:1px solid var(--b);border-radius:var(--r-l);overflow:hidden;background:var(--card)}
 .historia > button{display:flex;width:100%;align-items:center;gap:10px;border:0;background:none;padding:14px 16px;cursor:pointer;text-align:left}
@@ -110,6 +103,16 @@ h3.sec small{font:500 13px var(--f);color:var(--t3)}
 .btn{border:1px solid var(--b-hi);background:var(--card-hi);border-radius:var(--r);padding:8px 14px;font-weight:700;cursor:pointer;color:var(--t)}
 @media (max-width:900px){.rapidas{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:760px){.app{grid-template-columns:1fr}.lado{display:none}.cont{padding:20px 16px 48px}.rapidas{grid-template-columns:1fr}.it{grid-template-columns:1fr auto}.it .ico{display:none}.hora{grid-column:1/-1;padding:0}}
+/* Semaforo con la insignia del panel (adm-insignia): rectangular, sin relleno de color; Bien en tinta, Atencion en ambar
+   (--lum-aviso) y Mal en rojo (--lum-error, el de "Baneado"). Sin verde: el panel no lo usa (Kamilo 2026-11-08). */
+.sem,.est{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border:1px solid var(--b-hi);border-radius:6px;font:600 12px var(--f);color:var(--t2);background:none;white-space:nowrap}
+.sem svg{width:13px;height:13px;flex:none}
+.tar .sem,.rap .sem{align-self:flex-start}
+.sem.ok,.est.ok{color:var(--t);border-color:var(--b-st)}
+.sem.at,.est.at{color:var(--at);border-color:currentColor}
+.sem.mal,.est.mal{color:var(--mal);border-color:currentColor}
+body.lux .sem,body.lux .est{border-color:transparent;background:var(--campo)}
+body.lux .sem.at,body.lux .sem.mal,body.lux .est.at,body.lux .est.mal{background:none;border-color:transparent}
 </style>
 </head>
 <body>

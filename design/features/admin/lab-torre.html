@@ -14,7 +14,7 @@
   --b:rgba(255,255,255,.06);--b-hi:rgba(255,255,255,.10);--b-st:rgba(255,255,255,.14);
   --t:#FFFFFF;--t2:rgba(255,255,255,.6);--t3:rgba(255,255,255,.4);
   --ink:#FFFFFF;--ink-c:#101010;--sombra:none;
-  --ok:#3FB37F;--ok-f:rgba(63,179,127,.12);--at:#E2A93B;--at-f:rgba(226,169,59,.13);--mal:#E5534B;--mal-f:rgba(229,83,75,.13);
+  --at:#E8A93E;--mal:#F26D6D;--mal-f:rgba(242,109,109,.08);
   --f:'Urbanist',ui-sans-serif,system-ui,sans-serif;--fh:'Plus Jakarta Sans',var(--f);--r:8px;--r-l:12px;
 }
 body.lux{
@@ -22,7 +22,7 @@ body.lux{
   --b:rgba(0,0,0,.08);--b-hi:rgba(0,0,0,.13);--b-st:rgba(0,0,0,.18);
   --t:#131417;--t2:#3A3B40;--t3:#5C5D63;--ink:#1A1B1E;--ink-c:#FFFFFF;
   --sombra:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.06);
-  --ok:#1F8A5B;--ok-f:rgba(31,138,91,.10);--at:#A86F06;--at-f:rgba(168,111,6,.10);--mal:#C4362E;--mal-f:rgba(196,54,46,.09);
+  --at:#C2740A;--mal:#C73838;--mal-f:rgba(199,56,56,.08);
 }
 *{box-sizing:border-box}html,body{margin:0}
 body{background:var(--bg);color:var(--t);font:500 14px/1.5 var(--f);-webkit-font-smoothing:antialiased}
@@ -46,14 +46,9 @@ button{font:inherit;color:inherit}
 h2.tit{font:800 28px var(--fh);letter-spacing:-.02em;margin:0}
 .lectura{margin-left:auto;color:var(--t3);font-size:13px;text-align:right}
 
-/* semaforo: palabra y color, nunca un punto solo */
-.sem{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font:700 12px var(--fh);white-space:nowrap}
-.sem svg{width:13px;height:13px;flex:none}
-.sem.ok{background:var(--ok-f);color:var(--ok)}.sem.at{background:var(--at-f);color:var(--at)}.sem.mal{background:var(--mal-f);color:var(--mal)}
 
 .resumen{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:26px}
 .tar{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:14px 16px;box-shadow:var(--sombra);display:flex;flex-direction:column;gap:8px;min-width:0}
-.tar.at{border-color:color-mix(in srgb,var(--at) 45%,transparent)}.tar.mal{border-color:color-mix(in srgb,var(--mal) 55%,transparent)}
 .tar .et{color:var(--t3);font-size:13px}
 .tar .num{font:800 24px var(--fh);letter-spacing:-.01em}
 .tar .num small{font:600 13px var(--f);color:var(--t3);margin-left:4px}
@@ -77,18 +72,27 @@ th.n,td.n{text-align:right}
 .ruta small{display:block;color:var(--t3);font-weight:500;font-size:12px}
 .back{display:inline-block;padding:2px 8px;border-radius:6px;border:1px solid var(--b-st);font:700 11.5px var(--fh);color:var(--t2)}
 .val{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}
-.val .sem{padding:2px 8px}
 .gris{color:var(--t3)}
 .dos{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .colas{display:grid;grid-template-columns:repeat(3,1fr)}
 .colas div{padding:14px 18px;border-right:1px solid var(--b)}.colas div:last-child{border-right:0}
 .colas dt{color:var(--t3);font-size:12.5px}.colas dd{margin:4px 0 0;font:800 20px var(--fh);display:flex;align-items:center;gap:8px}
 .nota{padding:10px 18px 14px;color:var(--t3);font-size:12.5px}
-.aviso{display:flex;gap:10px;align-items:flex-start;padding:12px 16px;border-radius:var(--r-l);background:var(--mal-f);color:var(--t);margin-bottom:20px;border:1px solid color-mix(in srgb,var(--mal) 40%,transparent)}
+.aviso{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r);background:var(--mal-f);color:var(--t2);margin-bottom:20px;border:1px solid color-mix(in srgb,var(--mal) 30%,transparent)}
 .aviso svg{color:var(--mal);flex:none;margin-top:2px}
 .aviso strong{font-family:var(--fh)}
 @media (max-width:1100px){.resumen{grid-template-columns:repeat(2,1fr)}.dos{grid-template-columns:1fr}}
 @media (max-width:760px){.app{grid-template-columns:1fr}.lado{display:none}.cont{padding:20px 16px 48px}.colas{grid-template-columns:1fr}.colas div{border-right:0;border-bottom:1px solid var(--b)}}
+/* Semaforo con la insignia del panel (adm-insignia): rectangular, sin relleno de color; Bien en tinta, Atencion en ambar
+   (--lum-aviso) y Mal en rojo (--lum-error, el de "Baneado"). Sin verde: el panel no lo usa (Kamilo 2026-11-08). */
+.sem,.est{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border:1px solid var(--b-hi);border-radius:6px;font:600 12px var(--f);color:var(--t2);background:none;white-space:nowrap}
+.sem svg{width:13px;height:13px;flex:none}
+.tar .sem,.rap .sem{align-self:flex-start}
+.sem.ok,.est.ok{color:var(--t);border-color:var(--b-st)}
+.sem.at,.est.at{color:var(--at);border-color:currentColor}
+.sem.mal,.est.mal{color:var(--mal);border-color:currentColor}
+body.lux .sem,body.lux .est{border-color:transparent;background:var(--campo)}
+body.lux .sem.at,body.lux .sem.mal,body.lux .est.at,body.lux .est.mal{background:none;border-color:transparent}
 </style>
 </head>
 <body>
