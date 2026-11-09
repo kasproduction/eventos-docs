@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab Torre de control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Lab M2.9.1 y M2.9.2: la Torre de control del panel de EventOS, una sola direccion (alcance de Kamilo 2026-11-08).
+   Semaforo por metrica con palabra y color: Bien, Atencion, Mal. Datos de mentira; los escenarios cambian lo que pasa. */
+:root{
+  --bg:#0A0A0A;--bg-1:#0E0E0E;--card:rgba(255,255,255,.03);--card-hi:rgba(255,255,255,.05);--campo:rgba(255,255,255,.05);
+  --b:rgba(255,255,255,.06);--b-hi:rgba(255,255,255,.10);--b-st:rgba(255,255,255,.14);
+  --t:#FFFFFF;--t2:rgba(255,255,255,.6);--t3:rgba(255,255,255,.4);
+  --ink:#FFFFFF;--ink-c:#101010;--sombra:none;
+  --ok:#3FB37F;--ok-f:rgba(63,179,127,.12);--at:#E2A93B;--at-f:rgba(226,169,59,.13);--mal:#E5534B;--mal-f:rgba(229,83,75,.13);
+  --f:'Urbanist',ui-sans-serif,system-ui,sans-serif;--fh:'Plus Jakarta Sans',var(--f);--r:8px;--r-l:12px;
+}
+body.lux{
+  --bg:#F6F8FA;--bg-1:#FAFBFC;--card:#FFFFFF;--card-hi:#F6F8FA;--campo:#F0F2F5;
+  --b:rgba(0,0,0,.08);--b-hi:rgba(0,0,0,.13);--b-st:rgba(0,0,0,.18);
+  --t:#131417;--t2:#3A3B40;--t3:#5C5D63;--ink:#1A1B1E;--ink-c:#FFFFFF;
+  --sombra:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.06);
+  --ok:#1F8A5B;--ok-f:rgba(31,138,91,.10);--at:#A86F06;--at-f:rgba(168,111,6,.10);--mal:#C4362E;--mal-f:rgba(196,54,46,.09);
+}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--t);font:500 14px/1.5 var(--f);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.lab{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 16px;background:#0b0b0c;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+.lab h1{font:800 14px var(--fh);margin:0 6px 0 0}.lab .lb{color:rgba(255,255,255,.45);font-size:13px}
+.seg{display:flex;padding:3px;gap:2px;border-radius:10px;background:#1c1c1f}
+.seg button{border:0;background:none;color:rgba(255,255,255,.6);font-weight:600;font-size:12.5px;padding:6px 10px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.seg button.on{background:#fff;color:#111}
+.desc{padding:12px 24px;font-size:13.5px;color:var(--t2);border-bottom:1px solid var(--b)}.desc strong{color:var(--t);font-family:var(--fh)}
+
+.app{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 100px)}
+.lado{border-right:1px solid var(--b);padding:20px 14px;background:var(--bg-1)}
+.lado .marca-ev{font:700 15px var(--fh);margin:0 0 18px 10px}
+.lado .gr{font-size:11px;color:var(--t3);margin:14px 0 4px 12px}
+.lado a{display:block;padding:7px 12px;border-radius:var(--r);color:var(--t2);font-size:14px;text-decoration:none}
+.lado a.on{background:var(--ink);color:var(--ink-c)}
+.cont{padding:28px 32px 60px;min-width:0;max-width:1240px}
+.miga{font-size:12.5px;color:var(--t3)}
+.cabeza{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:4px 0 22px}
+h2.tit{font:800 28px var(--fh);letter-spacing:-.02em;margin:0}
+.lectura{margin-left:auto;color:var(--t3);font-size:13px;text-align:right}
+
+/* semaforo: palabra y color, nunca un punto solo */
+.sem{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font:700 12px var(--fh);white-space:nowrap}
+.sem svg{width:13px;height:13px;flex:none}
+.sem.ok{background:var(--ok-f);color:var(--ok)}.sem.at{background:var(--at-f);color:var(--at)}.sem.mal{background:var(--mal-f);color:var(--mal)}
+
+.resumen{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:26px}
+.tar{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:14px 16px;box-shadow:var(--sombra);display:flex;flex-direction:column;gap:8px;min-width:0}
+.tar.at{border-color:color-mix(in srgb,var(--at) 45%,transparent)}.tar.mal{border-color:color-mix(in srgb,var(--mal) 55%,transparent)}
+.tar .et{color:var(--t3);font-size:13px}
+.tar .num{font:800 24px var(--fh);letter-spacing:-.01em}
+.tar .num small{font:600 13px var(--f);color:var(--t3);margin-left:4px}
+.tar .pie{color:var(--t2);font-size:12.5px}
+
+.sec{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);box-shadow:var(--sombra);margin-bottom:20px;overflow:hidden}
+.sec-cab{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--b);flex-wrap:wrap}
+.sec-cab h3{font:700 16px var(--fh);margin:0}
+.sec-cab p{margin:0;color:var(--t3);font-size:13px}
+.sec-cab .esp{flex:1}
+.filtro{display:flex;padding:3px;gap:2px;border-radius:9px;background:var(--campo)}
+.filtro button{border:0;background:none;color:var(--t2);font-weight:600;font-size:12.5px;padding:5px 10px;border-radius:7px;cursor:pointer}
+.filtro button.on{background:var(--ink);color:var(--ink-c)}
+.desliza{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--t3);font-size:12.5px;padding:10px 18px;border-bottom:1px solid var(--b);white-space:nowrap}
+td{padding:11px 18px;border-bottom:1px solid var(--b);white-space:nowrap;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+th.n,td.n{text-align:right}
+.ruta{font-weight:600}
+.ruta small{display:block;color:var(--t3);font-weight:500;font-size:12px}
+.back{display:inline-block;padding:2px 8px;border-radius:6px;border:1px solid var(--b-st);font:700 11.5px var(--fh);color:var(--t2)}
+.val{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}
+.val .sem{padding:2px 8px}
+.gris{color:var(--t3)}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.colas{display:grid;grid-template-columns:repeat(3,1fr)}
+.colas div{padding:14px 18px;border-right:1px solid var(--b)}.colas div:last-child{border-right:0}
+.colas dt{color:var(--t3);font-size:12.5px}.colas dd{margin:4px 0 0;font:800 20px var(--fh);display:flex;align-items:center;gap:8px}
+.nota{padding:10px 18px 14px;color:var(--t3);font-size:12.5px}
+.aviso{display:flex;gap:10px;align-items:flex-start;padding:12px 16px;border-radius:var(--r-l);background:var(--mal-f);color:var(--t);margin-bottom:20px;border:1px solid color-mix(in srgb,var(--mal) 40%,transparent)}
+.aviso svg{color:var(--mal);flex:none;margin-top:2px}
+.aviso strong{font-family:var(--fh)}
+@media (max-width:1100px){.resumen{grid-template-columns:repeat(2,1fr)}.dos{grid-template-columns:1fr}}
+@media (max-width:760px){.app{grid-template-columns:1fr}.lado{display:none}.cont{padding:20px 16px 48px}.colas{grid-template-columns:1fr}.colas div{border-right:0;border-bottom:1px solid var(--b)}}
+</style>
+</head>
+<body>
+<div class="lab">
+  <h1>Lab Torre de control</h1>
+  <span class="lb">Escenario</span>
+  <div class="seg" id="esc">
+    <button class="on" data-v="bien">Todo bien</button>
+    <button data-v="caido">Un servidor sin señal</button>
+    <button data-v="errores">Errores altos</button>
+  </div>
+  <span class="lb">Tema</span>
+  <div class="seg" id="tema"><button class="on" data-v="noir">Noir</button><button data-v="lux">Lux</button></div>
+</div>
+<div class="desc"><strong>Una sola dirección.</strong> Arriba el resumen con su semáforo; abajo el detalle: servidores, rutas, colas y conectados. Cada número que importa trae su semáforo con palabra (Bien, Atención, Mal), no solo el color. Los umbrales son provisionales hasta medir el hito 1.</div>
+
+<div class="app">
+  <nav class="lado">
+    <div class="marca-ev">EventOS</div>
+    <a>Escritorio</a>
+    <div class="gr">Personas</div><a>Asistentes</a><a>Entrada</a>
+    <div class="gr">En vivo</div><a>Chat</a><a>Encuestas</a><a>Event Pulse</a>
+    <div class="gr">Sistema</div><a>Eventos</a><a>Staff y permisos</a><a class="on">Torre de control</a><a>Ayuda</a>
+  </nav>
+  <main class="cont">
+    <div class="miga">Sistema</div>
+    <div class="cabeza">
+      <h2 class="tit">Torre de control</h2>
+      <div class="lectura">Se actualiza cada 10 segundos mientras tienes esta página a la vista.<br>Última lectura: hace <span id="hace">3</span> s.</div>
+    </div>
+    <div id="aviso"></div>
+    <div class="resumen" id="resumen"></div>
+
+    <section class="sec">
+      <div class="sec-cab"><h3>Servidores de la API</h3><p>Cada uno deja su resumen cada 10 segundos. Sin resumen en 30 segundos, sale sin señal.</p></div>
+      <div class="desliza"><table id="nodos"></table></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-cab">
+        <h3>Rutas en el último minuto</h3><p>De la más pedida a la menos.</p><span class="esp"></span>
+        <div class="filtro" id="fback"><button class="on" data-v="">Todas</button><button data-v="PHP">PHP</button><button data-v="C#">C#</button></div>
+      </div>
+      <div class="desliza"><table id="rutas"></table></div>
+    </section>
+
+    <div class="dos">
+      <section class="sec">
+        <div class="sec-cab"><h3>Colas de trabajos</h3></div>
+        <div id="colas"></div>
+      </section>
+      <section class="sec">
+        <div class="sec-cab"><h3>Conectados</h3><p>Por servidor de sockets.</p></div>
+        <div class="desliza"><table id="sockets"></table></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+const ICO = {
+  ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  at: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 8v5M12 17h.01"/></svg>',
+  mal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+};
+const PALABRA = { ok: "Bien", at: "Atención", mal: "Mal" };
+const sem = (n, texto) => `<span class="sem ${n}">${ICO[n]}${texto ?? PALABRA[n]}</span>`;
+// Umbrales provisionales (se calibran con M2.10.1).
+const nivelP95 = (ms) => (ms < 500 ? "ok" : ms < 1500 ? "at" : "mal");
+const nivelErr = (p) => (p < 0.5 ? "ok" : p < 2 ? "at" : "mal");
+const fmt = (n, d = 0) => n.toLocaleString("es-CO", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+const BASE = {
+  nodos: [
+    { nombre: "api-1", vivo: true, rps: 41.2, p95: 312, err: 0.1 },
+    { nombre: "api-2", vivo: true, rps: 39.8, p95: 298, err: 0.2 },
+  ],
+  rutas: [
+    { m: "GET", r: "/api/v1/events/{id}/agenda", b: "PHP", rps: 22.4, p95: 280, err: 0 },
+    { m: "GET", r: "/api/v1/auth/me", b: "C#", rps: 18.1, p95: 64, err: 0 },
+    { m: "GET", r: "/api/v1/events/{id}/feed", b: "PHP", rps: 12.7, p95: 410, err: 0.1 },
+    { m: "POST", r: "/api/v1/sessions/{id}/start", b: "C#", rps: 0.4, p95: 120, err: 0 },
+    { m: "GET", r: "/api/v1/events/{id}/badge", b: "C#", rps: 6.3, p95: 88, err: 0 },
+    { m: "POST", r: "/api/v1/checkin/scan", b: "PHP", rps: 9.2, p95: 350, err: 0.3 },
+    { m: "GET", r: "/api/v1/events/{id}/documents/zip", b: "C#", rps: 0.1, p95: 1280, err: 0 },
+  ],
+  hangfire: { cola: 3, corriendo: 1, fallidos: 0 },
+  horizon: { cola: 0, corriendo: 0, fallidos: 0 },
+  sockets: [{ nombre: "sock-1", n: 812 }, { nombre: "sock-2", n: 472 }],
+};
+function escenario(v) {
+  const d = structuredClone(BASE);
+  if (v === "caido") { d.nodos[1] = { nombre: "api-2", vivo: false, hace: 42 }; d.nodos[0].rps = 80.6; d.nodos[0].p95 = 640; }
+  if (v === "errores") {
+    d.rutas[2].err = 6.4; d.rutas[2].p95 = 2100; d.rutas[5].err = 1.2;
+    d.nodos[0].err = 3.1; d.nodos[1].err = 2.8; d.horizon.fallidos = 4; d.hangfire.fallidos = 1;
+  }
+  return d;
+}
+
+let actual = "bien", back = "";
+function pinta() {
+  const d = escenario(actual);
+  const vivos = d.nodos.filter((n) => n.vivo);
+  const rps = vivos.reduce((s, n) => s + n.rps, 0);
+  const p95 = Math.max(...vivos.map((n) => n.p95));
+  const err = vivos.reduce((s, n) => s + n.err * n.rps, 0) / rps;
+  const fallidos = d.hangfire.fallidos + d.horizon.fallidos;
+  const conectados = d.sockets.reduce((s, x) => s + x.n, 0);
+  const nNodos = vivos.length === d.nodos.length ? "ok" : vivos.length ? "at" : "mal";
+  const nCola = fallidos === 0 ? "ok" : fallidos < 5 ? "at" : "mal";
+
+  const caidos = d.nodos.filter((n) => !n.vivo);
+  const malos = [];
+  if (caidos.length) malos.push(`${caidos.map((n) => n.nombre).join(" y ")} no manda su resumen hace ${caidos[0].hace} s.`);
+  if (nivelErr(err) === "mal") malos.push(`Los errores del último minuto están en ${fmt(err, 1)} %.`);
+  document.getElementById("aviso").innerHTML = malos.length
+    ? `<div class="aviso">${ICO.mal.replace("<svg", '<svg width="18" height="18"')}<div><strong>Algo necesita atención.</strong> ${malos.join(" ")}</div></div>` : "";
+
+  const tar = (n, et, num, unidad, pie) => `<div class="tar ${n}"><span class="et">${et}</span><span class="num">${num}<small>${unidad}</small></span>${sem(n)}<span class="pie">${pie}</span></div>`;
+  document.getElementById("resumen").innerHTML = [
+    tar(nNodos, "Servidores de la API", `${vivos.length} de ${d.nodos.length}`, "vivos", nNodos === "ok" ? "Todos mandan su resumen." : "Uno no responde."),
+    tar("ok", "Pedidos", fmt(rps, 1), "por segundo", "Entre todos los servidores."),
+    tar(nivelP95(p95), "Tiempo de respuesta", fmt(p95), "ms", "El 95 % responde en menos."),
+    tar(nivelErr(err), "Errores", fmt(err, 1), "%", "Respuestas 5xx del último minuto."),
+    tar(nCola, "Trabajos fallidos", fmt(fallidos), "", `${fmt(conectados)} personas conectadas.`),
+  ].join("");
+
+  document.getElementById("nodos").innerHTML =
+    `<thead><tr><th>Servidor</th><th>Estado</th><th class="n">Pedidos por segundo</th><th class="n">Tiempo p95</th><th class="n">Errores</th></tr></thead><tbody>` +
+    d.nodos.map((n) => n.vivo
+      ? `<tr><td class="ruta">${n.nombre}</td><td>${sem("ok", "Vivo")}</td><td class="n">${fmt(n.rps, 1)}</td><td class="n"><span class="val">${fmt(n.p95)} ms ${sem(nivelP95(n.p95))}</span></td><td class="n"><span class="val">${fmt(n.err, 1)} % ${sem(nivelErr(n.err))}</span></td></tr>`
+      : `<tr><td class="ruta">${n.nombre}</td><td>${sem("mal", `Sin señal hace ${n.hace} s`)}</td><td class="n gris">Sin dato</td><td class="n gris">Sin dato</td><td class="n gris">Sin dato</td></tr>`).join("") + "</tbody>";
+
+  const rutas = d.rutas.filter((r) => !back || r.b === back).sort((a, b) => b.rps - a.rps);
+  document.getElementById("rutas").innerHTML =
+    `<thead><tr><th>Ruta</th><th>Atiende</th><th class="n">Pedidos por segundo</th><th class="n">Tiempo p95</th><th class="n">Errores</th></tr></thead><tbody>` +
+    rutas.map((r) => `<tr><td class="ruta">${r.r}<small>${r.m}</small></td><td><span class="back">${r.b}</span></td><td class="n">${fmt(r.rps, 1)}</td><td class="n"><span class="val">${fmt(r.p95)} ms ${sem(nivelP95(r.p95))}</span></td><td class="n"><span class="val">${fmt(r.err, 1)} % ${sem(nivelErr(r.err))}</span></td></tr>`).join("") + "</tbody>";
+
+  const cola = (t, c) => {
+    const n = c.fallidos === 0 ? "ok" : c.fallidos < 5 ? "at" : "mal";
+    return `<div class="sec-cab" style="border-bottom:0;padding-bottom:0"><p>${t}</p></div><dl class="colas"><div><dt>En cola</dt><dd>${fmt(c.cola)}</dd></div><div><dt>Corriendo</dt><dd>${fmt(c.corriendo)}</dd></div><div><dt>Fallidos</dt><dd>${fmt(c.fallidos)} ${sem(n)}</dd></div></dl>`;
+  };
+  document.getElementById("colas").innerHTML = cola("C# (Hangfire): correos, push programadas, importaciones", d.hangfire) + cola("PHP (Horizon): lo que aún corre en PHP", d.horizon) +
+    `<p class="nota">Se lee de Redis; desde aquí no se reintenta ni se borra nada.</p>`;
+
+  document.getElementById("sockets").innerHTML =
+    `<thead><tr><th>Servidor</th><th class="n">Conectados</th></tr></thead><tbody>` +
+    d.sockets.map((s) => `<tr><td class="ruta">${s.nombre}</td><td class="n">${fmt(s.n)}</td></tr>`).join("") +
+    `<tr><td class="gris">Total</td><td class="n" style="font-weight:700">${fmt(conectados)}</td></tr></tbody>`;
+}
+const seg = (id, fn) => document.getElementById(id).addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  [...e.currentTarget.children].forEach((x) => x.classList.toggle("on", x === b)); fn(b.dataset.v);
+});
+seg("esc", (v) => { actual = v; pinta(); });
+seg("tema", (v) => document.body.classList.toggle("lux", v === "lux"));
+seg("fback", (v) => { back = v; pinta(); });
+let s = 3; setInterval(() => { s = s >= 10 ? 0 : s + 1; document.getElementById("hace").textContent = s; }, 1000);
+pinta();
+</script>
+</body>
+</html>

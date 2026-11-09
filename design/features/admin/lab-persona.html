@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab Qué le pasó</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Lab M2.9.4: "Que le paso a esta persona", una sola direccion (alcance de Kamilo 2026-11-08). Solo lee lo que ya se guarda
+   (attendees, consent_logs, magic_link_tokens, personal_access_tokens, email_logs, push_notification_logs, attendee_bans,
+   attendee_role_changes, room_movements, points_log), siempre dentro del evento elegido. Datos de mentira. */
+:root{
+  --bg:#0A0A0A;--bg-1:#0E0E0E;--card:rgba(255,255,255,.03);--card-hi:rgba(255,255,255,.05);--campo:rgba(255,255,255,.05);
+  --b:rgba(255,255,255,.06);--b-hi:rgba(255,255,255,.10);--b-st:rgba(255,255,255,.14);
+  --t:#FFFFFF;--t2:rgba(255,255,255,.6);--t3:rgba(255,255,255,.4);
+  --ink:#FFFFFF;--ink-c:#101010;--sombra:none;
+  --ok:#3FB37F;--ok-f:rgba(63,179,127,.12);--at:#E2A93B;--at-f:rgba(226,169,59,.13);--mal:#E5534B;--mal-f:rgba(229,83,75,.13);
+  --f:'Urbanist',ui-sans-serif,system-ui,sans-serif;--fh:'Plus Jakarta Sans',var(--f);--r:8px;--r-l:12px;
+}
+body.lux{
+  --bg:#F6F8FA;--bg-1:#FAFBFC;--card:#FFFFFF;--card-hi:#F6F8FA;--campo:#F0F2F5;
+  --b:rgba(0,0,0,.08);--b-hi:rgba(0,0,0,.13);--b-st:rgba(0,0,0,.18);
+  --t:#131417;--t2:#3A3B40;--t3:#5C5D63;--ink:#1A1B1E;--ink-c:#FFFFFF;
+  --sombra:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.06);
+  --ok:#1F8A5B;--ok-f:rgba(31,138,91,.10);--at:#A86F06;--at-f:rgba(168,111,6,.10);--mal:#C4362E;--mal-f:rgba(196,54,46,.09);
+}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--t);font:500 14px/1.5 var(--f);-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+.lab{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 16px;background:#0b0b0c;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+.lab h1{font:800 14px var(--fh);margin:0 6px 0 0}.lab .lb{color:rgba(255,255,255,.45);font-size:13px}
+.seg{display:flex;padding:3px;gap:2px;border-radius:10px;background:#1c1c1f}
+.seg button{border:0;background:none;color:rgba(255,255,255,.6);font-weight:600;font-size:12.5px;padding:6px 10px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.seg button.on{background:#fff;color:#111}
+.desc{padding:12px 24px;font-size:13.5px;color:var(--t2);border-bottom:1px solid var(--b)}.desc strong{color:var(--t);font-family:var(--fh)}
+
+.app{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 100px)}
+.lado{border-right:1px solid var(--b);padding:20px 14px;background:var(--bg-1)}
+.lado .marca-ev{font:700 15px var(--fh);margin:0 0 18px 10px}
+.lado .gr{font-size:11px;color:var(--t3);margin:14px 0 4px 12px}
+.lado a{display:block;padding:7px 12px;border-radius:var(--r);color:var(--t2);font-size:14px}
+.lado a.on{background:var(--ink);color:var(--ink-c)}
+.cont{padding:28px 32px 60px;min-width:0;max-width:980px}
+.miga{font-size:12.5px;color:var(--t3)}
+h2.tit{font:800 28px var(--fh);letter-spacing:-.02em;margin:4px 0 6px}
+.sub{color:var(--t2);margin:0 0 20px}
+
+.buscar{position:relative;margin-bottom:22px}
+.buscar input{width:100%;background:var(--campo);border:1px solid var(--b-hi);border-radius:var(--r-l);padding:12px 14px 12px 40px;outline:none;font-size:15px}
+.buscar svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--t3)}
+.resultados{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--bg-1);border:1px solid var(--b-hi);border-radius:var(--r-l);box-shadow:0 12px 30px rgba(0,0,0,.35);overflow:hidden;z-index:5}
+.resultados button{display:flex;width:100%;gap:10px;align-items:center;border:0;background:none;padding:10px 14px;text-align:left;cursor:pointer}
+.resultados button:hover{background:var(--card-hi)}
+.resultados small{color:var(--t3)}
+
+.ficha{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:16px 18px;box-shadow:var(--sombra);margin-bottom:18px}
+.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--ink-c);font:800 15px var(--fh);flex:none}
+.ficha h3{font:800 18px var(--fh);margin:0}
+.ficha p{margin:0;color:var(--t3);font-size:13px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--b-st);font:700 12px var(--fh);color:var(--t2)}
+.chip.ok{border-color:transparent;background:var(--ok-f);color:var(--ok)}.chip.at{border-color:transparent;background:var(--at-f);color:var(--at)}.chip.mal{border-color:transparent;background:var(--mal-f);color:var(--mal)}
+.perfil{margin-left:4px;color:var(--t2);font-weight:600;font-size:13px;border:1px solid var(--b-hi);background:var(--card-hi);border-radius:var(--r);padding:6px 10px;cursor:pointer}
+
+.tipos{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.tipos button{border:1px solid var(--b-hi);background:none;border-radius:999px;padding:6px 12px;font-weight:600;font-size:13px;color:var(--t2);cursor:pointer}
+.tipos button.on{background:var(--ink);color:var(--ink-c);border-color:var(--ink)}
+.tipos button span{opacity:.6;margin-left:4px}
+
+.dia{font:700 13px var(--fh);color:var(--t3);margin:18px 0 8px}
+.linea{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);box-shadow:var(--sombra);overflow:hidden}
+.it{display:grid;grid-template-columns:56px 34px 1fr auto;gap:12px;align-items:start;padding:12px 16px;border-bottom:1px solid var(--b)}
+.it:last-child{border-bottom:0}
+.it.mal{background:linear-gradient(90deg,var(--mal-f),transparent 60%)}
+.hora{color:var(--t3);font-size:13px;padding-top:6px}
+.ico{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--card-hi);border:1px solid var(--b);color:var(--t2)}
+.ico svg{width:16px;height:16px}
+.qt{font-weight:600}
+.qd{color:var(--t3);font-size:13px}
+.qe{margin-top:6px;font-size:13px;color:var(--t2);background:var(--mal-f);border-radius:var(--r);padding:6px 10px}
+.qe strong{color:var(--mal);font-family:var(--fh)}
+.est{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font:700 12px var(--fh);white-space:nowrap;margin-top:4px}
+.est.ok{background:var(--ok-f);color:var(--ok)}.est.at{background:var(--at-f);color:var(--at)}.est.mal{background:var(--mal-f);color:var(--mal)}.est.neutro{border:1px solid var(--b-st);color:var(--t2)}
+.vacio{color:var(--t3);padding:30px;text-align:center}
+@media (max-width:760px){.app{grid-template-columns:1fr}.lado{display:none}.cont{padding:20px 16px 48px}.it{grid-template-columns:44px 1fr;}.it .ico{display:none}.it .est-c{grid-column:2}.chips{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="lab">
+  <h1>Lab Qué le pasó</h1>
+  <span class="lb">Persona</span>
+  <div class="seg" id="esc"><button class="on" data-v="bien">Todo bien</button><button data-v="mal">Con problemas</button></div>
+  <span class="lb">Tema</span>
+  <div class="seg" id="tema"><button class="on" data-v="noir">Noir</button><button data-v="lux">Lux</button></div>
+</div>
+<div class="desc"><strong>Una sola dirección.</strong> Buscas a la persona dentro del evento que tienes elegido arriba y ves todo lo que le pasó, de lo más nuevo a lo más viejo. Lo que falló sale marcado con el motivo exacto. Solo lee lo que ya se guarda: no hay datos nuevos.</div>
+
+<div class="app">
+  <nav class="lado">
+    <div class="marca-ev">EventOS</div>
+    <a>Escritorio</a>
+    <div class="gr">Personas</div><a>Asistentes</a><a>Entrada</a>
+    <div class="gr">En vivo</div><a>Chat</a><a>Soporte</a>
+    <div class="gr">Sistema</div><a>Torre de control</a><a class="on">Qué le pasó</a><a>Ayuda</a>
+  </nav>
+  <main class="cont">
+    <div class="miga">Sistema</div>
+    <h2 class="tit">Qué le pasó</h2>
+    <p class="sub">Busca a una persona de este evento y mira su historia: accesos, correos, push, bloqueos, check-in y puntos.</p>
+
+    <div class="buscar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" value="laura" placeholder="Nombre o correo" aria-label="Buscar por nombre o correo">
+      <div class="resultados" id="res" hidden></div>
+    </div>
+
+    <div id="ficha"></div>
+    <div class="tipos" id="tipos"></div>
+    <div id="linea"></div>
+  </main>
+</div>
+
+<script>
+const I = {
+  acceso: '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',
+  correo: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  push: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  bloqueo: '<circle cx="12" cy="12" r="9"/><path d="m5.7 5.7 12.6 12.6"/>',
+  checkin: '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/>',
+  puntos: '<path d="M12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5z"/>',
+  registro: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
+};
+const TIPOS = [["", "Todo"], ["acceso", "Accesos"], ["correo", "Correos"], ["push", "Push"], ["bloqueo", "Bloqueos"], ["checkin", "Check-in"], ["puntos", "Puntos"]];
+
+const BIEN = [
+  { d: "Hoy, 6 de diciembre", h: "11:42", t: "puntos", q: "Ganó 50 puntos", e: "Encuesta respondida: ¿Qué te pareció la charla?" },
+  { d: "Hoy, 6 de diciembre", h: "10:15", t: "push", q: "Push: La charla de apertura empieza en 10 minutos", e: "Push programada", est: ["ok", "Abierta 10:17"] },
+  { d: "Hoy, 6 de diciembre", h: "08:31", t: "checkin", q: "Check-in en la puerta principal", e: "Tótem 2, con su QR" },
+  { d: "Hoy, 6 de diciembre", h: "08:12", t: "acceso", q: "Entró a la app", e: "iPhone de Laura, con enlace mágico" },
+  { d: "Ayer, 5 de diciembre", h: "18:00", t: "correo", q: "Correo: Recordatorio, mañana es el evento", e: "laura@ejemplo.com", est: ["ok", "Enviado"] },
+  { d: "2 de diciembre", h: "09:05", t: "correo", q: "Correo: Tu registro fue aprobado", e: "laura@ejemplo.com", est: ["ok", "Enviado"] },
+  { d: "2 de diciembre", h: "09:05", t: "registro", q: "Su registro fue aprobado", e: "Por Andrés Ruiz" },
+  { d: "1 de diciembre", h: "20:48", t: "registro", q: "Se registró y aceptó el tratamiento de datos", e: "Desde la webapp" },
+];
+const MAL = [
+  { d: "Hoy, 6 de diciembre", h: "12:20", t: "bloqueo", q: "Le levantaron el bloqueo", e: "Por Andrés Ruiz" },
+  { d: "Hoy, 6 de diciembre", h: "11:05", t: "bloqueo", q: "La bloquearon hasta las 14:00", e: "Motivo: mensajes repetidos en el chat. Por Moderación", est: ["at", "Levantado 12:20"] },
+  { d: "Hoy, 6 de diciembre", h: "10:15", t: "push", q: "Push: La charla de apertura empieza en 10 minutos", e: "Push programada", est: ["mal", "No llegó"], err: "El celular ya no está registrado (DeviceNotRegistered). Desinstaló la app o cambió de equipo." },
+  { d: "Hoy, 6 de diciembre", h: "08:40", t: "checkin", q: "Intentó entrar por la puerta principal", e: "Tótem 2: el QR ya se había usado", est: ["at", "Rechazado"] },
+  { d: "Hoy, 6 de diciembre", h: "08:12", t: "acceso", q: "Pidió un enlace para entrar", e: "Nunca lo usó: venció a las 08:27", est: ["at", "Sin usar"] },
+  { d: "2 de diciembre", h: "09:05", t: "correo", q: "Correo: Tu registro fue aprobado", e: "laura@ejmplo.com", est: ["mal", "Falló"], err: "El servidor de correo respondió 550: la dirección no existe. Revisa el correo de su registro." },
+  { d: "2 de diciembre", h: "09:05", t: "registro", q: "Su registro fue aprobado", e: "Por Andrés Ruiz" },
+  { d: "1 de diciembre", h: "20:48", t: "registro", q: "Se registró y aceptó el tratamiento de datos", e: "Desde la webapp" },
+];
+let actual = "bien", tipo = "";
+const est = (e) => e ? `<span class="est ${e[0]}">${e[1]}</span>` : "";
+function pinta() {
+  const datos = actual === "bien" ? BIEN : MAL;
+  const chips = actual === "bien"
+    ? `<span class="chip ok">Aprobada</span><span class="chip ok">Con check-in 08:31</span><span class="chip">120 puntos</span>`
+    : `<span class="chip ok">Aprobada</span><span class="chip at">Sin check-in</span><span class="chip mal">2 envíos fallidos</span>`;
+  document.getElementById("ficha").innerHTML = `<div class="ficha"><div class="avatar">LG</div><div><h3>Laura Gómez</h3><p>${actual === "bien" ? "laura@ejemplo.com" : "laura@ejmplo.com"}, asistente</p></div><div class="chips">${chips}<button class="perfil">Abrir su perfil</button></div></div>`;
+  document.getElementById("tipos").innerHTML = TIPOS.map(([v, n]) => {
+    const c = v ? datos.filter((x) => x.t === v).length : datos.length;
+    return `<button data-v="${v}" class="${v === tipo ? "on" : ""}">${n}<span>${c}</span></button>`;
+  }).join("");
+  const lista = datos.filter((x) => !tipo || x.t === tipo || (tipo === "acceso" && x.t === "registro"));
+  if (!lista.length) { document.getElementById("linea").innerHTML = `<div class="linea"><div class="vacio">No hay nada de este tipo.</div></div>`; return; }
+  let html = "", dia = "";
+  for (const x of lista) {
+    if (x.d !== dia) { if (dia) html += "</div>"; html += `<div class="dia">${x.d}</div><div class="linea">`; dia = x.d; }
+    const mal = x.est && x.est[0] === "mal";
+    html += `<div class="it ${mal ? "mal" : ""}"><span class="hora">${x.h}</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${I[x.t]}</svg></span><div><div class="qt">${x.q}</div><div class="qd">${x.e}</div>${x.err ? `<div class="qe"><strong>Motivo:</strong> ${x.err}</div>` : ""}</div><div class="est-c">${est(x.est)}</div></div>`;
+  }
+  document.getElementById("linea").innerHTML = html + "</div>";
+}
+const seg = (id, fn) => document.getElementById(id).addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  [...e.currentTarget.children].forEach((x) => x.classList.toggle("on", x === b)); fn(b.dataset.v);
+});
+seg("esc", (v) => { actual = v; tipo = ""; pinta(); });
+seg("tema", (v) => document.body.classList.toggle("lux", v === "lux"));
+document.getElementById("tipos").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; tipo = b.dataset.v; pinta(); });
+const q = document.getElementById("q"), res = document.getElementById("res");
+q.addEventListener("focus", () => { res.hidden = false; res.innerHTML = `<button><span class="avatar" style="width:28px;height:28px;font-size:11px">LG</span><span>Laura Gómez <small>laura@ejemplo.com</small></span></button><button><span class="avatar" style="width:28px;height:28px;font-size:11px">LP</span><span>Laura Pérez <small>lperez@ejemplo.com</small></span></button>`; });
+res.addEventListener("click", () => { res.hidden = true; });
+document.addEventListener("click", (e) => { if (!e.target.closest(".buscar")) res.hidden = true; });
+pinta();
+</script>
+</body>
+</html>
