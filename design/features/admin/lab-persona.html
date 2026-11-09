@@ -7,9 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Lab M2.9.4: "Que le paso a esta persona", una sola direccion (alcance de Kamilo 2026-11-08). Solo lee lo que ya se guarda
-   (attendees, consent_logs, magic_link_tokens, personal_access_tokens, email_logs, push_notification_logs, attendee_bans,
-   attendee_role_changes, room_movements, points_log), siempre dentro del evento elegido. Datos de mentira. */
+/* Lab M2.9.4: "Que le paso a esta persona" (alcance de Kamilo 2026-11-08). v2 por Kamilo: con miles de movimientos la linea de
+   tiempo no puede ser infinita. Arriba las respuestas rapidas, despues solo lo que fallo; la historia completa cerrada, con lo
+   repetido agrupado y de a 20. Solo lee lo que ya se guarda (attendees, consent_logs, magic_link_tokens, personal_access_tokens,
+   email_logs, push_notification_logs, attendee_bans, attendee_role_changes, room_movements, points_log), dentro del evento elegido. */
 :root{
   --bg:#0A0A0A;--bg-1:#0E0E0E;--card:rgba(255,255,255,.03);--card-hi:rgba(255,255,255,.05);--campo:rgba(255,255,255,.05);
   --b:rgba(255,255,255,.06);--b-hi:rgba(255,255,255,.10);--b-st:rgba(255,255,255,.14);
@@ -41,36 +42,36 @@ button,input{font:inherit;color:inherit}
 .lado .gr{font-size:11px;color:var(--t3);margin:14px 0 4px 12px}
 .lado a{display:block;padding:7px 12px;border-radius:var(--r);color:var(--t2);font-size:14px}
 .lado a.on{background:var(--ink);color:var(--ink-c)}
-.cont{padding:28px 32px 60px;min-width:0;max-width:980px}
+.cont{padding:28px 32px 60px;min-width:0;max-width:1020px}
 .miga{font-size:12.5px;color:var(--t3)}
 h2.tit{font:800 28px var(--fh);letter-spacing:-.02em;margin:4px 0 6px}
 .sub{color:var(--t2);margin:0 0 20px}
+h3.sec{font:700 16px var(--fh);margin:26px 0 10px;display:flex;align-items:center;gap:10px}
+h3.sec small{font:500 13px var(--f);color:var(--t3)}
 
 .buscar{position:relative;margin-bottom:22px}
 .buscar input{width:100%;background:var(--campo);border:1px solid var(--b-hi);border-radius:var(--r-l);padding:12px 14px 12px 40px;outline:none;font-size:15px}
 .buscar svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--t3)}
-.resultados{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--bg-1);border:1px solid var(--b-hi);border-radius:var(--r-l);box-shadow:0 12px 30px rgba(0,0,0,.35);overflow:hidden;z-index:5}
-.resultados button{display:flex;width:100%;gap:10px;align-items:center;border:0;background:none;padding:10px 14px;text-align:left;cursor:pointer}
-.resultados button:hover{background:var(--card-hi)}
-.resultados small{color:var(--t3)}
 
-.ficha{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:16px 18px;box-shadow:var(--sombra);margin-bottom:18px}
+.ficha{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:16px 18px;box-shadow:var(--sombra)}
 .avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--ink-c);font:800 15px var(--fh);flex:none}
 .ficha h3{font:800 18px var(--fh);margin:0}
 .ficha p{margin:0;color:var(--t3);font-size:13px}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--b-st);font:700 12px var(--fh);color:var(--t2)}
-.chip.ok{border-color:transparent;background:var(--ok-f);color:var(--ok)}.chip.at{border-color:transparent;background:var(--at-f);color:var(--at)}.chip.mal{border-color:transparent;background:var(--mal-f);color:var(--mal)}
-.perfil{margin-left:4px;color:var(--t2);font-weight:600;font-size:13px;border:1px solid var(--b-hi);background:var(--card-hi);border-radius:var(--r);padding:6px 10px;cursor:pointer}
+.perfil{margin-left:auto;color:var(--t2);font-weight:600;font-size:13px;border:1px solid var(--b-hi);background:var(--card-hi);border-radius:var(--r);padding:6px 10px;cursor:pointer}
 
-.tipos{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
-.tipos button{border:1px solid var(--b-hi);background:none;border-radius:999px;padding:6px 12px;font-weight:600;font-size:13px;color:var(--t2);cursor:pointer}
-.tipos button.on{background:var(--ink);color:var(--ink-c);border-color:var(--ink)}
-.tipos button span{opacity:.6;margin-left:4px}
+/* respuestas rapidas */
+.rapidas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.rap{background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);padding:14px 16px;box-shadow:var(--sombra);display:flex;flex-direction:column;gap:6px;min-width:0}
+.rap.at{border-color:color-mix(in srgb,var(--at) 45%,transparent)}.rap.mal{border-color:color-mix(in srgb,var(--mal) 55%,transparent)}
+.rap .pr{color:var(--t3);font-size:13px}
+.rap .re{font:700 16px var(--fh)}
+.rap .de{color:var(--t2);font-size:12.5px}
+.sem{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font:700 12px var(--fh);white-space:nowrap;align-self:flex-start}
+.sem svg{width:13px;height:13px}
+.sem.ok{background:var(--ok-f);color:var(--ok)}.sem.at{background:var(--at-f);color:var(--at)}.sem.mal{background:var(--mal-f);color:var(--mal)}
 
-.dia{font:700 13px var(--fh);color:var(--t3);margin:18px 0 8px}
 .linea{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--b);border-radius:var(--r-l);box-shadow:var(--sombra);overflow:hidden}
-.it{display:grid;grid-template-columns:56px 34px 1fr auto;gap:12px;align-items:start;padding:12px 16px;border-bottom:1px solid var(--b)}
+.it{display:grid;grid-template-columns:118px 34px 1fr auto;gap:12px;align-items:start;padding:12px 16px;border-bottom:1px solid var(--b)}
 .it:last-child{border-bottom:0}
 .it.mal{background:linear-gradient(90deg,var(--mal-f),transparent 60%)}
 .hora{color:var(--t3);font-size:13px;padding-top:6px}
@@ -80,21 +81,43 @@ h2.tit{font:800 28px var(--fh);letter-spacing:-.02em;margin:4px 0 6px}
 .qd{color:var(--t3);font-size:13px}
 .qe{margin-top:6px;font-size:13px;color:var(--t2);background:var(--mal-f);border-radius:var(--r);padding:6px 10px}
 .qe strong{color:var(--mal);font-family:var(--fh)}
-.est{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font:700 12px var(--fh);white-space:nowrap;margin-top:4px}
-.est.ok{background:var(--ok-f);color:var(--ok)}.est.at{background:var(--at-f);color:var(--at)}.est.mal{background:var(--mal-f);color:var(--mal)}.est.neutro{border:1px solid var(--b-st);color:var(--t2)}
-.vacio{color:var(--t3);padding:30px;text-align:center}
-@media (max-width:760px){.app{grid-template-columns:1fr}.lado{display:none}.cont{padding:20px 16px 48px}.it{grid-template-columns:44px 1fr;}.it .ico{display:none}.it .est-c{grid-column:2}.chips{margin-left:0}}
+.est{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font:700 12px var(--fh);white-space:nowrap;margin-top:4px}
+.est.ok{background:var(--ok-f);color:var(--ok)}.est.at{background:var(--at-f);color:var(--at)}.est.mal{background:var(--mal-f);color:var(--mal)}
+.grupo{cursor:pointer}
+.grupo .qt::after{content:"";display:inline-block;width:7px;height:7px;border-right:2px solid var(--t3);border-bottom:2px solid var(--t3);transform:rotate(45deg);margin:0 0 3px 10px}
+.grupo.abierto .qt::after{transform:rotate(-135deg);margin-bottom:-1px}
+.hijos{background:var(--card-hi)}
+.hijos .it{padding-left:40px}
+.nada{display:flex;gap:10px;align-items:center;padding:14px 16px;color:var(--t2)}
+.nada svg{color:var(--ok)}
+
+.historia{margin-top:26px;border:1px solid var(--b);border-radius:var(--r-l);overflow:hidden;background:var(--card)}
+.historia > button{display:flex;width:100%;align-items:center;gap:10px;border:0;background:none;padding:14px 16px;cursor:pointer;text-align:left}
+.historia > button strong{font:700 15px var(--fh)}
+.historia > button span{color:var(--t3);font-size:13px}
+.historia > button i{margin-left:auto;width:8px;height:8px;border-right:2px solid var(--t2);border-bottom:2px solid var(--t2);transform:rotate(45deg)}
+.historia.abierta > button i{transform:rotate(-135deg)}
+.historia .dentro{border-top:1px solid var(--b);padding:14px 16px 16px;display:none}
+.historia.abierta .dentro{display:block}
+.tipos{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tipos button{border:1px solid var(--b-hi);background:none;border-radius:999px;padding:6px 12px;font-weight:600;font-size:13px;color:var(--t2);cursor:pointer}
+.tipos button.on{background:var(--ink);color:var(--ink-c);border-color:var(--ink)}
+.tipos button span{opacity:.6;margin-left:4px}
+.mas{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;color:var(--t3);font-size:13px}
+.btn{border:1px solid var(--b-hi);background:var(--card-hi);border-radius:var(--r);padding:8px 14px;font-weight:700;cursor:pointer;color:var(--t)}
+@media (max-width:900px){.rapidas{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:760px){.app{grid-template-columns:1fr}.lado{display:none}.cont{padding:20px 16px 48px}.rapidas{grid-template-columns:1fr}.it{grid-template-columns:1fr auto}.it .ico{display:none}.hora{grid-column:1/-1;padding:0}}
 </style>
 </head>
 <body>
 <div class="lab">
   <h1>Lab Qué le pasó</h1>
   <span class="lb">Persona</span>
-  <div class="seg" id="esc"><button class="on" data-v="bien">Todo bien</button><button data-v="mal">Con problemas</button></div>
+  <div class="seg" id="esc"><button class="on" data-v="bien">Todo bien</button><button data-v="mal">Con problemas</button><button data-v="activa">Muy activa</button></div>
   <span class="lb">Tema</span>
   <div class="seg" id="tema"><button class="on" data-v="noir">Noir</button><button data-v="lux">Lux</button></div>
 </div>
-<div class="desc"><strong>Una sola dirección.</strong> Buscas a la persona dentro del evento que tienes elegido arriba y ves todo lo que le pasó, de lo más nuevo a lo más viejo. Lo que falló sale marcado con el motivo exacto. Solo lee lo que ya se guarda: no hay datos nuevos.</div>
+<div class="desc"><strong>Versión 2.</strong> Arriba seis respuestas rápidas con su semáforo; después solo lo que falló. La historia completa queda cerrada: lo repetido se agrupa en una línea y se carga de a 20, así la página no se vuelve infinita aunque la persona tenga miles de movimientos.</div>
 
 <div class="app">
   <nav class="lado">
@@ -107,17 +130,19 @@ h2.tit{font:800 28px var(--fh);letter-spacing:-.02em;margin:4px 0 6px}
   <main class="cont">
     <div class="miga">Sistema</div>
     <h2 class="tit">Qué le pasó</h2>
-    <p class="sub">Busca a una persona de este evento y mira su historia: accesos, correos, push, bloqueos, check-in y puntos.</p>
-
+    <p class="sub">Busca a una persona de este evento y mira, de un vistazo, si algo le falló.</p>
     <div class="buscar">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" value="laura" placeholder="Nombre o correo" aria-label="Buscar por nombre o correo">
-      <div class="resultados" id="res" hidden></div>
+      <input value="laura" placeholder="Nombre o correo" aria-label="Buscar por nombre o correo">
     </div>
-
     <div id="ficha"></div>
-    <div class="tipos" id="tipos"></div>
-    <div id="linea"></div>
+    <div class="rapidas" id="rapidas"></div>
+    <h3 class="sec">Lo que falló <small id="nfallo"></small></h3>
+    <div id="fallo"></div>
+    <div class="historia" id="historia">
+      <button type="button"><strong>Historia completa</strong><span id="nhist"></span><i></i></button>
+      <div class="dentro"><div class="tipos" id="tipos"></div><div id="linea"></div><div class="mas" id="mas"></div></div>
+    </div>
   </main>
 </div>
 
@@ -131,61 +156,97 @@ const I = {
   puntos: '<path d="M12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5z"/>',
   registro: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
 };
+const ICO = {
+  ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  at: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 8v5M12 17h.01"/></svg>',
+  mal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+};
+const PAL = { ok: "Bien", at: "Atención", mal: "Mal" };
 const TIPOS = [["", "Todo"], ["acceso", "Accesos"], ["correo", "Correos"], ["push", "Push"], ["bloqueo", "Bloqueos"], ["checkin", "Check-in"], ["puntos", "Puntos"]];
 
-const BIEN = [
-  { d: "Hoy, 6 de diciembre", h: "11:42", t: "puntos", q: "Ganó 50 puntos", e: "Encuesta respondida: ¿Qué te pareció la charla?" },
-  { d: "Hoy, 6 de diciembre", h: "10:15", t: "push", q: "Push: La charla de apertura empieza en 10 minutos", e: "Push programada", est: ["ok", "Abierta 10:17"] },
-  { d: "Hoy, 6 de diciembre", h: "08:31", t: "checkin", q: "Check-in en la puerta principal", e: "Tótem 2, con su QR" },
-  { d: "Hoy, 6 de diciembre", h: "08:12", t: "acceso", q: "Entró a la app", e: "iPhone de Laura, con enlace mágico" },
-  { d: "Ayer, 5 de diciembre", h: "18:00", t: "correo", q: "Correo: Recordatorio, mañana es el evento", e: "laura@ejemplo.com", est: ["ok", "Enviado"] },
-  { d: "2 de diciembre", h: "09:05", t: "correo", q: "Correo: Tu registro fue aprobado", e: "laura@ejemplo.com", est: ["ok", "Enviado"] },
-  { d: "2 de diciembre", h: "09:05", t: "registro", q: "Su registro fue aprobado", e: "Por Andrés Ruiz" },
-  { d: "1 de diciembre", h: "20:48", t: "registro", q: "Se registró y aceptó el tratamiento de datos", e: "Desde la webapp" },
-];
-const MAL = [
-  { d: "Hoy, 6 de diciembre", h: "12:20", t: "bloqueo", q: "Le levantaron el bloqueo", e: "Por Andrés Ruiz" },
-  { d: "Hoy, 6 de diciembre", h: "11:05", t: "bloqueo", q: "La bloquearon hasta las 14:00", e: "Motivo: mensajes repetidos en el chat. Por Moderación", est: ["at", "Levantado 12:20"] },
-  { d: "Hoy, 6 de diciembre", h: "10:15", t: "push", q: "Push: La charla de apertura empieza en 10 minutos", e: "Push programada", est: ["mal", "No llegó"], err: "El celular ya no está registrado (DeviceNotRegistered). Desinstaló la app o cambió de equipo." },
-  { d: "Hoy, 6 de diciembre", h: "08:40", t: "checkin", q: "Intentó entrar por la puerta principal", e: "Tótem 2: el QR ya se había usado", est: ["at", "Rechazado"] },
-  { d: "Hoy, 6 de diciembre", h: "08:12", t: "acceso", q: "Pidió un enlace para entrar", e: "Nunca lo usó: venció a las 08:27", est: ["at", "Sin usar"] },
-  { d: "2 de diciembre", h: "09:05", t: "correo", q: "Correo: Tu registro fue aprobado", e: "laura@ejmplo.com", est: ["mal", "Falló"], err: "El servidor de correo respondió 550: la dirección no existe. Revisa el correo de su registro." },
-  { d: "2 de diciembre", h: "09:05", t: "registro", q: "Su registro fue aprobado", e: "Por Andrés Ruiz" },
-  { d: "1 de diciembre", h: "20:48", t: "registro", q: "Se registró y aceptó el tratamiento de datos", e: "Desde la webapp" },
-];
-let actual = "bien", tipo = "";
-const est = (e) => e ? `<span class="est ${e[0]}">${e[1]}</span>` : "";
+// Respuestas rapidas por escenario: [nivel, pregunta, respuesta, detalle]
+const RAP = {
+  bien: [["ok", "¿Está registrada?", "Sí, aprobada", "Se registró el 1 de diciembre; aprobada el 2."], ["ok", "¿Entró a la app?", "Sí, hoy 08:12", "iPhone de Laura, con enlace mágico."], ["ok", "¿Le llegan los correos?", "4 de 4 enviados", "El último: ayer 18:00."], ["ok", "¿Le llegan las push?", "6 de 6 entregadas", "Abrió 4."], ["ok", "¿Hizo check-in?", "Sí, hoy 08:31", "Puerta principal, tótem 2."], ["ok", "¿Cuántos puntos tiene?", "120 puntos", "El último: hoy 11:42, encuesta."]],
+  mal: [["ok", "¿Está registrada?", "Sí, aprobada", "Aprobada el 2 de diciembre."], ["at", "¿Entró a la app?", "Nunca entró", "Pidió un enlace hoy 08:12 y no lo usó."], ["mal", "¿Le llegan los correos?", "0 de 2 enviados", "Su correo rebota: revisa cómo lo escribió."], ["mal", "¿Le llegan las push?", "0 de 1 entregadas", "Su celular ya no está registrado."], ["at", "¿Hizo check-in?", "No", "La puerta la rechazó hoy 08:40."], ["ok", "¿Cuántos puntos tiene?", "0 puntos", "Todavía no ha ganado."]],
+  activa: [["ok", "¿Está registrada?", "Sí, aprobada", "Aprobada el 2 de diciembre."], ["ok", "¿Entró a la app?", "Sí, hoy 08:02", "Entró 23 veces en 2 días."], ["ok", "¿Le llegan los correos?", "11 de 11 enviados", "El último: hoy 07:00."], ["at", "¿Le llegan las push?", "47 de 48 entregadas", "Una no llegó: ayer 21:10."], ["ok", "¿Hizo check-in?", "Sí, ayer 08:20", "Y 14 entradas a salones."], ["ok", "¿Cuántos puntos tiene?", "2.340 puntos", "186 movimientos; el último hace 4 min."]],
+};
+const FALLO = {
+  bien: [],
+  mal: [
+    { h: "Hoy 10:15", t: "push", q: "Push: La charla de apertura empieza en 10 minutos", e: "Push programada", est: ["mal", "No llegó"], err: "El celular ya no está registrado (DeviceNotRegistered). Desinstaló la app o cambió de equipo." },
+    { h: "Hoy 08:40", t: "checkin", q: "Intentó entrar por la puerta principal", e: "Tótem 2", est: ["at", "Rechazado"], err: "El QR ya se había usado a las 08:35 en el tótem 1." },
+    { h: "2 dic 09:05", t: "correo", q: "Correo: Tu registro fue aprobado", e: "laura@ejmplo.com", est: ["mal", "Falló"], err: "El servidor de correo respondió 550: la dirección no existe. Revisa el correo de su registro." },
+  ],
+  activa: [{ h: "Ayer 21:10", t: "push", q: "Push: Mañana arrancamos a las 8", e: "Push a todos", est: ["mal", "No llegó"], err: "Expo no respondió a tiempo (timeout). Se reintentó y no entró." }],
+};
+// Historia: un item suelto o un grupo { n, q, h, hijos }
+function historia(v) {
+  if (v === "bien") return [
+    { h: "Hoy 11:42", t: "puntos", q: "Ganó 50 puntos", e: "Encuesta: ¿Qué te pareció la charla?" },
+    { h: "Hoy 10:15", t: "push", q: "Push: La charla de apertura empieza en 10 minutos", e: "Push programada", est: ["ok", "Abierta 10:17"] },
+    { h: "Hoy 08:31", t: "checkin", q: "Check-in en la puerta principal", e: "Tótem 2, con su QR" },
+    { h: "Hoy 08:12", t: "acceso", q: "Entró a la app", e: "iPhone de Laura, con enlace mágico" },
+    { h: "Ayer 18:00", t: "correo", q: "Correo: Recordatorio, mañana es el evento", e: "laura@ejemplo.com", est: ["ok", "Enviado"] },
+    { h: "2 dic 09:05", t: "correo", q: "Correo: Tu registro fue aprobado", e: "laura@ejemplo.com", est: ["ok", "Enviado"] },
+    { h: "2 dic 09:05", t: "registro", q: "Su registro fue aprobado", e: "Por Andrés Ruiz" },
+    { h: "1 dic 20:48", t: "registro", q: "Se registró y aceptó el tratamiento de datos", e: "Desde la webapp" },
+  ];
+  if (v === "mal") return [
+    ...FALLO.mal.slice(0, 2),
+    { h: "Hoy 08:12", t: "acceso", q: "Pidió un enlace para entrar", e: "Nunca lo usó: venció a las 08:27", est: ["at", "Sin usar"] },
+    FALLO.mal[2],
+    { h: "2 dic 09:05", t: "registro", q: "Su registro fue aprobado", e: "Por Andrés Ruiz" },
+    { h: "1 dic 20:48", t: "registro", q: "Se registró y aceptó el tratamiento de datos", e: "Desde la webapp" },
+  ];
+  const puntos = (n, desde, hasta, dia) => ({ t: "puntos", n, q: `Ganó puntos ${n} veces`, h: `${dia} ${desde} a ${hasta}`, e: "Encuestas, trivias, check-in en salones y fotos", hijos: Array.from({ length: Math.min(n, 5) }, (_, i) => ({ h: `${dia} ${hasta.slice(0, 2)}:${String(50 - i * 9).padStart(2, "0")}`, t: "puntos", q: `Ganó ${[10, 50, 20, 10, 30][i]} puntos`, e: ["Entró al Auditorio", "Encuesta respondida", "Trivia", "Entró a la Sala B", "Foto aprobada"][i] })) });
+  const push = (n, desde, hasta, dia) => ({ t: "push", n, q: `${n} push entregadas`, h: `${dia} ${desde} a ${hasta}`, e: "Recordatorios de charlas y avisos", hijos: Array.from({ length: Math.min(n, 4) }, (_, i) => ({ h: `${dia} ${String(17 - i * 2).padStart(2, "0")}:50`, t: "push", q: "Push: Tu próxima charla empieza en 10 minutos", e: "Push programada", est: ["ok", "Entregada"] })) });
+  const salones = (n, dia) => ({ t: "checkin", n, q: `Entró a salones ${n} veces`, h: `${dia} 09:00 a 17:40`, e: "Auditorio, Sala B y Sala C", hijos: [{ h: `${dia} 09:02`, t: "checkin", q: "Entró al Auditorio", e: "Escáner del salón" }, { h: `${dia} 11:30`, t: "checkin", q: "Entró a la Sala B", e: "Escáner del salón" }] });
+  return [
+    puntos(64, "08:10", "12:40", "Hoy"), push(18, "07:50", "12:20", "Hoy"),
+    { h: "Hoy 08:02", t: "acceso", q: "Entró a la app", e: "Android de Laura" },
+    { h: "Hoy 07:00", t: "correo", q: "Correo: Hoy es el segundo día", e: "laura@ejemplo.com", est: ["ok", "Enviado"] },
+    FALLO.activa[0],
+    puntos(122, "08:30", "20:50", "Ayer"), push(29, "07:40", "20:30", "Ayer"), salones(14, "Ayer"),
+    { h: "Ayer 08:20", t: "checkin", q: "Check-in en la puerta principal", e: "Tótem 1, con su QR" },
+    { t: "acceso", n: 21, q: "Entró a la app 21 veces", h: "1 al 5 dic", e: "Android de Laura", hijos: [{ h: "Ayer 07:58", t: "acceso", q: "Entró a la app", e: "Android de Laura" }] },
+    { t: "correo", n: 10, q: "10 correos enviados", h: "1 al 5 dic", e: "Confirmación, aprobación y recordatorios", hijos: [{ h: "2 dic 09:05", t: "correo", q: "Correo: Tu registro fue aprobado", e: "laura@ejemplo.com", est: ["ok", "Enviado"] }] },
+    { h: "2 dic 09:05", t: "registro", q: "Su registro fue aprobado", e: "Por Andrés Ruiz" },
+    { h: "1 dic 20:48", t: "registro", q: "Se registró y aceptó el tratamiento de datos", e: "Desde la webapp" },
+  ];
+}
+const total = (v) => ({ bien: 8, mal: 6, activa: 284 })[v];
+
+let actual = "bien", tipo = "", abiertos = new Set();
+const fila = (x, grupo, i) => {
+  const mal = x.est && x.est[0] === "mal";
+  return `<div class="it ${mal ? "mal" : ""} ${grupo ? "grupo" + (abiertos.has(i) ? " abierto" : "") : ""}" ${grupo ? `data-g="${i}"` : ""}><span class="hora">${x.h}</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${I[x.t]}</svg></span><div><div class="qt">${x.q}</div><div class="qd">${x.e}</div>${x.err ? `<div class="qe"><strong>Motivo:</strong> ${x.err}</div>` : ""}</div><div>${x.est ? `<span class="est ${x.est[0]}">${x.est[1]}</span>` : ""}</div></div>`;
+};
 function pinta() {
-  const datos = actual === "bien" ? BIEN : MAL;
-  const chips = actual === "bien"
-    ? `<span class="chip ok">Aprobada</span><span class="chip ok">Con check-in 08:31</span><span class="chip">120 puntos</span>`
-    : `<span class="chip ok">Aprobada</span><span class="chip at">Sin check-in</span><span class="chip mal">2 envíos fallidos</span>`;
-  document.getElementById("ficha").innerHTML = `<div class="ficha"><div class="avatar">LG</div><div><h3>Laura Gómez</h3><p>${actual === "bien" ? "laura@ejemplo.com" : "laura@ejmplo.com"}, asistente</p></div><div class="chips">${chips}<button class="perfil">Abrir su perfil</button></div></div>`;
-  document.getElementById("tipos").innerHTML = TIPOS.map(([v, n]) => {
-    const c = v ? datos.filter((x) => x.t === v).length : datos.length;
-    return `<button data-v="${v}" class="${v === tipo ? "on" : ""}">${n}<span>${c}</span></button>`;
-  }).join("");
-  const lista = datos.filter((x) => !tipo || x.t === tipo || (tipo === "acceso" && x.t === "registro"));
-  if (!lista.length) { document.getElementById("linea").innerHTML = `<div class="linea"><div class="vacio">No hay nada de este tipo.</div></div>`; return; }
-  let html = "", dia = "";
-  for (const x of lista) {
-    if (x.d !== dia) { if (dia) html += "</div>"; html += `<div class="dia">${x.d}</div><div class="linea">`; dia = x.d; }
-    const mal = x.est && x.est[0] === "mal";
-    html += `<div class="it ${mal ? "mal" : ""}"><span class="hora">${x.h}</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${I[x.t]}</svg></span><div><div class="qt">${x.q}</div><div class="qd">${x.e}</div>${x.err ? `<div class="qe"><strong>Motivo:</strong> ${x.err}</div>` : ""}</div><div class="est-c">${est(x.est)}</div></div>`;
-  }
-  document.getElementById("linea").innerHTML = html + "</div>";
+  const correo = actual === "mal" ? "laura@ejmplo.com" : "laura@ejemplo.com";
+  document.getElementById("ficha").innerHTML = `<div class="ficha"><div class="avatar">LG</div><div><h3>Laura Gómez</h3><p>${correo}, asistente</p></div><button class="perfil">Abrir su perfil</button></div>`;
+  document.getElementById("rapidas").innerHTML = RAP[actual].map(([n, p, r, d]) => `<div class="rap ${n}"><span class="pr">${p}</span><span class="re">${r}</span><span class="sem ${n}">${ICO[n]}${PAL[n]}</span><span class="de">${d}</span></div>`).join("");
+  const f = FALLO[actual];
+  document.getElementById("nfallo").textContent = f.length ? `${f.length} en todo el evento` : "";
+  document.getElementById("fallo").innerHTML = f.length
+    ? `<div class="linea">${f.map((x) => fila(x)).join("")}</div>`
+    : `<div class="linea"><div class="nada">${ICO.ok.replace("<svg", '<svg width="18" height="18"')}Nada falló en este evento.</div></div>`;
+  document.getElementById("nhist").textContent = `${total(actual).toLocaleString("es-CO")} movimientos, de lo más nuevo a lo más viejo`;
+  const h = historia(actual);
+  const cuenta = (v) => h.filter((x) => !v || x.t === v || (v === "acceso" && x.t === "registro")).reduce((s, x) => s + (x.n ?? 1), 0);
+  document.getElementById("tipos").innerHTML = TIPOS.map(([v, n]) => `<button data-v="${v}" class="${v === tipo ? "on" : ""}">${n}<span>${cuenta(v).toLocaleString("es-CO")}</span></button>`).join("");
+  const lista = h.map((x, i) => [x, i]).filter(([x]) => !tipo || x.t === tipo || (tipo === "acceso" && x.t === "registro"));
+  document.getElementById("linea").innerHTML = `<div class="linea">${lista.map(([x, i]) => x.hijos ? fila(x, true, i) + (abiertos.has(i) ? `<div class="hijos">${x.hijos.map((y) => fila(y)).join("")}${x.n > x.hijos.length ? `<div class="it"><span></span><span></span><div class="qd">Y ${x.n - x.hijos.length} más.</div><div></div></div>` : ""}</div>` : "") : fila(x)).join("")}</div>`;
+  document.getElementById("mas").innerHTML = actual === "activa" && !tipo ? `<span>Se ven los 20 más recientes de 284.</span><button class="btn">Ver 20 más</button>` : "";
 }
 const seg = (id, fn) => document.getElementById(id).addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
   [...e.currentTarget.children].forEach((x) => x.classList.toggle("on", x === b)); fn(b.dataset.v);
 });
-seg("esc", (v) => { actual = v; tipo = ""; pinta(); });
+seg("esc", (v) => { actual = v; tipo = ""; abiertos.clear(); pinta(); });
 seg("tema", (v) => document.body.classList.toggle("lux", v === "lux"));
 document.getElementById("tipos").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; tipo = b.dataset.v; pinta(); });
-const q = document.getElementById("q"), res = document.getElementById("res");
-q.addEventListener("focus", () => { res.hidden = false; res.innerHTML = `<button><span class="avatar" style="width:28px;height:28px;font-size:11px">LG</span><span>Laura Gómez <small>laura@ejemplo.com</small></span></button><button><span class="avatar" style="width:28px;height:28px;font-size:11px">LP</span><span>Laura Pérez <small>lperez@ejemplo.com</small></span></button>`; });
-res.addEventListener("click", () => { res.hidden = true; });
-document.addEventListener("click", (e) => { if (!e.target.closest(".buscar")) res.hidden = true; });
+document.getElementById("linea").addEventListener("click", (e) => { const g = e.target.closest("[data-g]"); if (!g) return; const i = +g.dataset.g; abiertos.has(i) ? abiertos.delete(i) : abiertos.add(i); pinta(); });
+document.querySelector("#historia > button").addEventListener("click", () => document.getElementById("historia").classList.toggle("abierta"));
 pinta();
 </script>
 </body>
