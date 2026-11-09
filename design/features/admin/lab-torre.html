@@ -149,7 +149,7 @@ body[data-color="C"] .area{fill:color-mix(in srgb,var(--azul) 12%,transparent)}
   <span class="lb">Escenario</span>
   <div class="seg" id="esc"><button class="on" data-v="bien">Todo bien</button><button data-v="carga">Carga alta</button><button data-v="caido">Un servidor caído</button></div>
   <span class="lb">Color</span>
-  <div class="seg" id="color"><button class="on" data-v="A">A Solo cuando se sale</button><button data-v="B">B Semáforo completo</button><button data-v="C">C Por tipo de lectura</button></div>
+  <div class="seg" id="color"><button data-v="A">A Solo cuando se sale</button><button class="on" data-v="B">B Semáforo completo (escogida)</button><button data-v="C">C Por tipo de lectura</button></div>
   <span class="lb">Tema</span>
   <div class="seg" id="tema"><button class="on" data-v="noir">Noir</button><button data-v="lux">Lux</button></div>
 </div>
@@ -380,7 +380,7 @@ const seg = (id, fn) => document.getElementById(id).addEventListener("click", (e
 seg("esc", (v) => { esc = v; pinta(); });
 seg("tema", (v) => document.body.classList.toggle("lux", v === "lux"));
 seg("color", (v) => { document.body.dataset.color = v; });
-document.body.dataset.color = "A";
+document.body.dataset.color = "B";
 document.getElementById("pest").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; pest = b.dataset.v; pinta(); });
 document.getElementById("vista").addEventListener("click", (e) => {
   const o = e.target.closest("#orden button"); if (o) { orden = o.dataset.v; pinta(); return; }
