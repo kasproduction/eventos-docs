@@ -119,6 +119,28 @@ button{font:inherit;color:inherit}
 .tip small{display:block;color:var(--t3)}
 @media (max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.fila-cab{grid-template-columns:120px 1fr 22px}.fila-cab .spark,.fila-cab .prendido{display:none}.proc{grid-template-columns:1fr 1fr}}
 @media (max-width:700px){.torre{padding:20px 16px}.g4,.g2{grid-template-columns:1fr}.estado h2{font-size:32px}.hbar{grid-template-columns:1fr 70px 18px}.hbar .p{grid-column:1/-1;order:3}}
+
+/* Color en las graficas (Kamilo 2026-11-08: "aca si nos toca ponerle algo de color"). Nunca pills ni fondos: solo barras,
+   arcos y lineas. A: color solo cuando se sale. B: semaforo completo. C: color por tipo de lectura (estado solo en el icono). */
+:root{--verde:#3BBF7A;--azul:#5B8DEF;--turq:#39D2C0;--plat:#B5A68B}
+body.lux{--verde:#1F8A5B;--azul:#3B6FD8;--turq:#12998A;--plat:#8B7E5F}
+body[data-color="A"] .p i.n-at,body[data-color="B"] .p i.n-at{background:var(--at)}
+body[data-color="A"] .p i.n-mal,body[data-color="B"] .p i.n-mal{background:var(--mal)}
+body[data-color="A"] .relleno.n-at,body[data-color="B"] .relleno.n-at,body[data-color="A"] .trazo.n-at,body[data-color="B"] .trazo.n-at{stroke:var(--at)}
+body[data-color="A"] .relleno.n-mal,body[data-color="B"] .relleno.n-mal,body[data-color="A"] .trazo.n-mal,body[data-color="B"] .trazo.n-mal{stroke:var(--mal)}
+body[data-color="A"] .area.n-at,body[data-color="B"] .area.n-at{fill:color-mix(in srgb,var(--at) 14%,transparent)}
+body[data-color="A"] .area.n-mal,body[data-color="B"] .area.n-mal{fill:color-mix(in srgb,var(--mal) 14%,transparent)}
+body[data-color="B"] .p i.n-ok{background:var(--verde)}
+body[data-color="B"] .relleno.n-ok,body[data-color="B"] .trazo.n-ok{stroke:var(--verde)}
+body[data-color="B"] .area.n-ok{fill:color-mix(in srgb,var(--verde) 12%,transparent)}
+body[data-color="C"] .p i[data-m="Procesador"]{background:var(--azul)}
+body[data-color="C"] .p i[data-m="RAM"]{background:var(--turq)}
+body[data-color="C"] .p i[data-m="Disco"]{background:var(--plat)}
+body[data-color="C"] .p i[data-m="ruta"],body[data-color="C"] .p i[data-m="Ocupados"]{background:var(--azul)}
+body[data-color="C"] .p i[data-m="fallo"],body[data-color="C"] .p i[data-m="Fallidos"]{background:var(--plat)}
+body[data-color="C"] .p i[data-m="Conexiones"],body[data-color="C"] .p i[data-m="Memoria"],body[data-color="C"] .p i[data-m="En cola"],body[data-color="C"] .p i[data-m="Corriendo"]{background:var(--turq)}
+body[data-color="C"] .relleno,body[data-color="C"] .trazo{stroke:var(--azul)}
+body[data-color="C"] .area{fill:color-mix(in srgb,var(--azul) 12%,transparent)}
 </style>
 </head>
 <body>
@@ -126,6 +148,8 @@ button{font:inherit;color:inherit}
   <h1>Lab Torre de control</h1>
   <span class="lb">Escenario</span>
   <div class="seg" id="esc"><button class="on" data-v="bien">Todo bien</button><button data-v="carga">Carga alta</button><button data-v="caido">Un servidor caído</button></div>
+  <span class="lb">Color</span>
+  <div class="seg" id="color"><button class="on" data-v="A">A Solo cuando se sale</button><button data-v="B">B Semáforo completo</button><button data-v="C">C Por tipo de lectura</button></div>
   <span class="lb">Tema</span>
   <div class="seg" id="tema"><button class="on" data-v="noir">Noir</button><button data-v="lux">Lux</button></div>
 </div>
@@ -226,19 +250,20 @@ function arco(v, max, u, unidad, dec = 0) {
   const [x0, y0] = p(0, 90), [x1, y1] = p(max, 90), [xv, yv] = p(v, 90);
   const n = nivel(v, u);
   const marca = (x) => { const [ax, ay] = p(x, 80), [bx, by] = p(x, 100); return `<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" stroke="var(--t3)" stroke-width="1.5"/>`; };
-  return { n, svg: `<svg viewBox="0 0 220 120" role="img" aria-label="${fmt(v, dec)} ${unidad}"><path d="M${x0} ${y0} A90 90 0 0 1 ${x1} ${y1}" fill="none" stroke="var(--pista)" stroke-width="12" stroke-linecap="round"/><path d="M${x0} ${y0} A90 90 0 0 1 ${xv} ${yv}" fill="none" stroke="${n === "ok" ? "var(--llena)" : "var(--llena-f)"}" stroke-width="12" stroke-linecap="round"/>${marca(u.atencion)}${u.mal !== undefined && u.mal <= max ? marca(u.mal) : ""}</svg>` };
+  return { n, svg: `<svg viewBox="0 0 220 120" role="img" aria-label="${fmt(v, dec)} ${unidad}"><path d="M${x0} ${y0} A90 90 0 0 1 ${x1} ${y1}" fill="none" stroke="var(--pista)" stroke-width="12" stroke-linecap="round"/><path d="M${x0} ${y0} A90 90 0 0 1 ${xv} ${yv}" fill="none" class="relleno n-${n}" stroke="${n === "ok" ? "var(--llena)" : "var(--llena-f)"}" stroke-width="12" stroke-linecap="round"/>${marca(u.atencion)}${u.mal !== undefined && u.mal <= max ? marca(u.mal) : ""}</svg>` };
 }
 let idg = 0;
-function linea(datos, { alto = 110, limite, unidad = "", dec = 0, etq = "", piso = 10 } = {}) {
+function linea(datos, { alto = 110, limite, unidad = "", dec = 0, etq = "", piso = 10, nv } = {}) {
+  nv = nv ?? (limite !== undefined && datos.at(-1) >= limite ? "at" : "ok");
   const id = "g" + idg++, W = 600, H = alto, max = Math.max(piso, ...datos, limite ?? 0) * 1.15;
   const pts = datos.map((v, i) => [(i / (datos.length - 1)) * W, H - (v / max) * H]);
   const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join("");
   const lim = limite !== undefined ? `<line x1="0" x2="${W}" y1="${H - (limite / max) * H}" y2="${H - (limite / max) * H}" stroke="var(--t3)" stroke-width="1"/>` : "";
-  return `<svg id="${id}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" data-serie="${datos.map((v) => v.toFixed(dec)).join(",")}" data-unidad="${unidad}" data-etq="${etq}"><line x1="0" x2="${W}" y1="${H}" y2="${H}" stroke="var(--b-hi)" stroke-width="1"/>${lim}<path d="${d}L${W} ${H}L0 ${H}Z" fill="var(--area)"/><path d="${d}" fill="none" stroke="var(--llena-f)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/><line class="cruz" x1="0" x2="0" y1="0" y2="${H}" stroke="var(--t3)" stroke-width="1" vector-effect="non-scaling-stroke" visibility="hidden"/></svg>`;
+  return `<svg id="${id}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" data-serie="${datos.map((v) => v.toFixed(dec)).join(",")}" data-unidad="${unidad}" data-etq="${etq}"><line x1="0" x2="${W}" y1="${H}" y2="${H}" stroke="var(--b-hi)" stroke-width="1"/>${lim}<path d="${d}L${W} ${H}L0 ${H}Z" fill="var(--area)" class="area n-${nv}"/><path d="${d}" class="trazo n-${nv}" fill="none" stroke="var(--llena-f)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/><line class="cruz" x1="0" x2="0" y1="0" y2="${H}" stroke="var(--t3)" stroke-width="1" vector-effect="non-scaling-stroke" visibility="hidden"/></svg>`;
 }
 const barra = (etq, v, u, txt) => {
   const n = nivel(v, u);
-  return `<div class="barra"><span>${etq}</span><span class="p"><i class="${n === "ok" ? "" : "fuera"}" style="width:${Math.min(100, v)}%"></i><b style="left:${u.atencion}%"></b></span><span class="n ${n === "ok" ? "" : "fuera"}">${txt ?? fmt(v) + " %"}</span>${ic(n)}</div>`;
+  return `<div class="barra"><span>${etq}</span><span class="p"><i class="n-${n} ${n === "ok" ? "" : "fuera"}" data-m="${etq}" style="width:${Math.min(100, v)}%"></i><b style="left:${u.atencion}%"></b></span><span class="n ${n === "ok" ? "" : "fuera"}">${txt ?? fmt(v) + " %"}</span>${ic(n)}</div>`;
 };
 
 /* ---------- Pestanas */
@@ -313,7 +338,7 @@ function pinta() {
     const conf = { lentas: ["p95", "ms", UMBRALES.p95, 2500], errores: ["err", "%", UMBRALES.errores, 4], pedidas: ["rps", "por s", null, 25] }[orden];
     const rutas = [...d.rutas].sort((a, b) => b[conf[0]] - a[conf[0]]).slice(0, 5);
     v.innerHTML = `<div class="caja"><h3>Rutas<span class="esp"></span><span class="sel" id="orden">${[["lentas", "Más lentas"], ["errores", "Con más errores"], ["pedidas", "Más pedidas"]].map(([k, t]) => `<button data-v="${k}" class="${k === orden ? "on" : ""}">${t}</button>`).join("")}</span></h3>
-      ${rutas.map((r) => { const val = r[conf[0]]; const n = conf[2] ? nivel(val, conf[2]) : "ok"; return `<div class="hbar" title="${r.m} ${r.r}: ${fmt(val, conf[1] === "ms" ? 0 : 1)} ${conf[1]}"><span class="r"><small>${r.m}</small>${r.r}</span><span class="p"><i class="${n === "ok" ? "" : "fuera"}" style="width:${(val / conf[3]) * 100}%"></i>${conf[2] ? `<b style="left:${(conf[2].atencion / conf[3]) * 100}%"></b>` : ""}</span><span class="n">${fmt(val, conf[1] === "ms" ? 0 : 1)} ${conf[1]}</span>${ic(n)}</div>`; }).join("")}
+      ${rutas.map((r) => { const val = r[conf[0]]; const n = conf[2] ? nivel(val, conf[2]) : "ok"; return `<div class="hbar" title="${r.m} ${r.r}: ${fmt(val, conf[1] === "ms" ? 0 : 1)} ${conf[1]}"><span class="r"><small>${r.m}</small>${r.r}</span><span class="p"><i class="n-${n} ${n === "ok" ? "" : "fuera"}" data-m="ruta" style="width:${(val / conf[3]) * 100}%"></i>${conf[2] ? `<b style="left:${(conf[2].atencion / conf[3]) * 100}%"></b>` : ""}</span><span class="n">${fmt(val, conf[1] === "ms" ? 0 : 1)} ${conf[1]}</span>${ic(n)}</div>`; }).join("")}
       <div class="sub" style="margin-top:8px">${conf[2] ? "La raya vertical es el límite." : "Último minuto."}</div></div>
       <div class="rejilla g2" style="margin-top:14px">
         <div class="caja linea"><h3>${ic(nivel(d.logins.at(-1), UMBRALES.logins_fallidos_min))}Logins fallidos<span class="esp"></span><span class="ahora">${fmt(d.logins.at(-1))}<small>por minuto</small></span></h3>${linea(d.logins, { limite: UMBRALES.logins_fallidos_min.atencion, unidad: "por minuto", etq: "Logins fallidos" })}<div class="pie"><span>Hace 15 min</span><span>Del registro de Nginx</span><span>Ahora</span></div></div>
@@ -327,7 +352,7 @@ function pinta() {
         <div class="barras">${barra("En cola", (c.cola / tope) * 100, { atencion: 101 }, fmt(c.cola))}${barra("Corriendo", (c.corriendo / tope) * 100, { atencion: 101 }, fmt(c.corriendo))}${barra("Fallidos", Math.min(100, c.fallidos * 10), { atencion: UMBRALES.fallidos.atencion * 10, mal: UMBRALES.fallidos.mal * 10 }, fmt(c.fallidos))}</div>
         <div class="linea" style="margin-top:12px">${linea(c.hist, { alto: 60, unidad: "en cola", etq: "En cola" })}<div class="pie"><span>En cola, hace 15 min</span><span>Ahora</span></div></div></div>`; }).join("")}</div>
       <div class="caja" style="margin-top:14px"><h3>${ic(nivel(fh, UMBRALES.fallos_hora))}Fallos de la última hora</h3>
-        ${d.fallosHora.map((x) => { const n = x.v ? "at" : "ok"; return `<div class="hbar"><span class="r">${x.n}</span><span class="p"><i class="${x.v ? "fuera" : ""}" style="width:${(x.v / maxF) * 100}%"></i></span><span class="n">${fmt(x.v)}</span>${ic(n)}</div>`; }).join("")}
+        ${d.fallosHora.map((x) => { const n = x.v ? "at" : "ok"; return `<div class="hbar"><span class="r">${x.n}</span><span class="p"><i class="n-${n} ${x.v ? "fuera" : ""}" data-m="fallo" style="width:${(x.v / maxF) * 100}%"></i></span><span class="n">${fmt(x.v)}</span>${ic(n)}</div>`; }).join("")}
         <div class="sub" style="margin-top:8px">Se lee de lo que ya se guarda; desde aquí no se reintenta ni se borra nada. El detalle de una persona está en Qué le pasó.</div></div>`;
   }
   if (pest === "base") {
@@ -354,6 +379,8 @@ const seg = (id, fn) => document.getElementById(id).addEventListener("click", (e
 });
 seg("esc", (v) => { esc = v; pinta(); });
 seg("tema", (v) => document.body.classList.toggle("lux", v === "lux"));
+seg("color", (v) => { document.body.dataset.color = v; });
+document.body.dataset.color = "A";
 document.getElementById("pest").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; pest = b.dataset.v; pinta(); });
 document.getElementById("vista").addEventListener("click", (e) => {
   const o = e.target.closest("#orden button"); if (o) { orden = o.dataset.v; pinta(); return; }
