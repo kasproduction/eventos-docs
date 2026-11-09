@@ -323,6 +323,10 @@ Solo los necesarios para la operación:
 | Socket room denied | user_id, event_id, reason | Console (socket server) |
 | File upload | user_id, filename, size, mime | Laravel log |
 
+### Accesos del personal a datos de asistentes
+
+Cada vez que alguien del equipo del evento consulta el historial de un asistente en el panel de EventOS, queda registrado quién lo consultó, de qué asistente y cuándo, para responder por el uso de los datos personales según la Ley 1581 de 2012 (habeas data).
+
 ### Planificado (SEC-5.1)
 
 Canal de logging dedicado `security` con formato JSON structured:

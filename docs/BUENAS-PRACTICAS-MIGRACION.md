@@ -153,6 +153,11 @@ puede borrar, una validación que falta, un efecto que PHP no dispara), se pregu
     El token nunca llega al JavaScript del navegador: las llamadas a C# salen del servidor de Next. Lo que se conserva
     al vencer la sesion (lo que se estaba escribiendo) va en memoria o `sessionStorage`, nunca en `localStorage`.
 
+31. **Toda pantalla que junta los datos personales de una persona deja rastro de quien la abrio** (Kamilo 2026-11-09,
+    M2.9.4, Ley 1581 de Colombia). Al abrirla se escribe en la bitacora del panel (`admin_audit_log`) quien, a quien,
+    cuando y desde que IP, con su prueba (abrir la pantalla deja la fila; sin permiso no queda ni se ve nada). Lo que se
+    muestra de un envio fallido es el error del servidor, nunca el contenido del mensaje.
+
 ## Documentacion
 
 28. **La documentacion tecnica se genera desde el codigo cuando se puede; lo escrito a mano es solo decisiones y el
