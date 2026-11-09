@@ -51,12 +51,20 @@
    `Correo__Seguridad` (ssl), `Correo__Usuario` (resend), `Correo__Clave`, `Correo__DesdeCorreo`, `Correo__DesdeNombre`,
    opcional `Correo__EnviosPorSegundo` (8), `Almacen__R2__Key/Secret/Bucket/Endpoint/PublicUrl`, `Almacen__RutaPublica`,
    `Sentry__Dsn`, `ASPNETCORE_ENVIRONMENT=Production` y, si se cambian, los limites `Puerta__*`.
+   **Torre de control (M2.9.1):** `Torre__RegistroDeNginx` (por defecto `/var/log/nginx/eventos-api.log`; el usuario de la Api
+   tiene que poder leerlo: sumarlo al grupo `adm`), `Torre__PoolDeFpm` (por defecto `/etc/php/8.3/fpm/pool.d/www.conf`),
+   `Torre__PrefijoDeRedisDePhp` (el `REDIS_PREFIX` de Laravel, por defecto `eventos_database_`), `Torre__BaseDeRedisDePhp` (0) y
+   `Torre__ColasDePhp` (`default,heavy`, las de Horizon); opcionales `Torre__Servidor` (si el nombre de la maquina no dice nada)
+   y `Torre__Umbrales` (otra ruta para `Torre/umbrales.json`). Formato y llaves: `docs/contratos/torre.md`.
 8. **Variables del Worker de C#:** las mismas de conexion, `App__Key`, `App__QrSecret`, `App__Url`, `App__WebappUrl`,
    `Php__Cache__*`, `Redis__BaseSocket`, `Servicios__Socket__*`, `Servicios__Webapp__*`, `Correo__*`, `Almacen__*`, y
    `Servicios__WebPush__LlavePublica`, `__LlavePrivada` y `__Asunto` (las VAPID de PHP; sin ellas no manda al navegador).
 9. **Variables de la webapp:** `ADMIN_API_URL` (la API del panel de EventOS, `<C#>/api/admin/v1`; falta en `.env.example`),
    `API_INTERNAL_URL`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SOCKET_URL`, `NEXT_PUBLIC_APP_URL`, `WEBAPP_INTERNAL_SECRET`,
    `MAGIC_LINK_SECRET`, `CDN_HOSTNAME` (sin el, las imagenes de R2 no se ven), `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y Sentry.
+   **Torre de control (M2.9.1):** `TORRE_REDIS_URL` (la base del socket: `rediss://usuario:clave@host:puerto/2` en el Redis
+   administrado; sin ella la webapp no aparece en la torre) y opcional `TORRE_SERVIDOR`. El socket no pide nada nuevo (usa su
+   `REDIS_DB`; opcional `TORRE_SERVIDOR`).
 10. **PHP, Api y Worker de C# del mismo corte, juntos, con el Worker corriendo:** varios trabajos salieron de PHP y los hace
     ahora el Worker (aviso de cambio de horario, vencer baneos, push programadas, correo directo sin outbox). Uno sin el otro
     deja avisos sin mandar o mandados dos veces. Confirmar en el panel de Hangfire que estan los recurrentes.
