@@ -3,6 +3,16 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-08 — Encontrado al revisar el socket para la torre de control (M2.9.2)
+
+### BUG-544: Event Pulse recibe la cuenta de "en la app" de un solo proceso del socket (ABIERTO, sin confirmar)
+- **Severidad propuesta:** MEDIA (la cifra de usuarios activos de Pulse puede salir baja o saltar entre valores)
+- **Que pasa:** `eventos-socket/src/index.ts` (temporizador de 10 s) cuenta las conexiones en la memoria de CADA proceso y emite
+  `pulse:active_users` a la sala de Pulse. Con pm2 en modo cluster (`instances: 'max'`) cada proceso emite su propia cuenta por el
+  adaptador de Redis, asi que Pulse recibe varias cifras parciales cada 10 s y se queda con la ultima.
+- **Visto:** 2026-11-08, leyendo el codigo (no probado con varios procesos).
+- **Arreglo:** pendiente. La torre ya suma por proceso (vigilante de M2.9.2); Pulse podria leer esa suma o el socket sumar en Redis. Se decide con Kamilo; Pulse pasa a C# en M4d.8.
+
 ## 2026-11-06 — Encontrado al correr las e2e del panel en M2.8.4b
 
 ### BUG-543: El Escritorio del panel dice "admin nuevo" y "admin actual" en pantalla (ABIERTO)
