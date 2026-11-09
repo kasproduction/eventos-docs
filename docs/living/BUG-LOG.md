@@ -3,6 +3,23 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-09 — De las pruebas (BUG-543)
+
+### BUG-546: Las capturas de la Ayuda cambian de un dia a otro por la fecha de lo importado (ABIERTO)
+- **Severidad propuesta:** BAJA (solo la Ayuda: la revision no falla, pero cada `ayuda:capturar` reescribe `importar/3-resultado`)
+- **Que pasa:** la fila de Mateo Velez en `importar/3-resultado` muestra la fecha del dia en que se importa (08/11 contra 09/11): la
+  importacion de la captura corre con el reloj de verdad, no con el congelado del ContratoSeeder. Tambien se movieron unos pixeles
+  las marcas de `importar/3-resultado` y `marca/2-colores`.
+- **Visto:** 2026-11-09, al capturar de nuevo `crear-evento` por BUG-543. Se dejaron las capturas de `importar` como estaban.
+- **Arreglo:** pendiente (la fecha del importado con el reloj congelado, o taparla en la captura).
+
+### BUG-545: e2e del admin intermitente otra vez despues de BUG-524 (ABIERTO, conteo 1)
+- **Severidad propuesta:** BAJA (solo pruebas)
+- **Conteo (regla de Kamilo: a la tercera se investiga la causa):**
+  1. 2026-11-09: `entrada.spec` "primer ingreso", sola: en `primerIngreso` fallo `toHaveURL` (no llego al Escritorio); la corrida
+     siguiente igual paso. La corrida de antes no arranco el servidor web de Playwright ("Process from config.webServer was not
+     able to start", exit 1) y la siguiente si.
+
 ## 2026-11-08 — Encontrado al revisar el socket para la torre de control (M2.9.2)
 
 ### BUG-544: Event Pulse recibe la cuenta de "en la app" de un solo proceso del socket (ABIERTO, sin confirmar)
@@ -15,14 +32,19 @@
 
 ## 2026-11-06 — Encontrado al correr las e2e del panel en M2.8.4b
 
-### BUG-543: El Escritorio del panel dice "admin nuevo" y "admin actual" en pantalla (ABIERTO)
+### BUG-543: El Escritorio del panel dice "admin nuevo" y "admin actual" en pantalla (RESUELTO 2026-11-09)
 - **Severidad propuesta:** MEDIA (va contra la regla de decir "el panel de EventOS"; sale en la captura del paso "Tu evento ya existe" de la Ayuda)
 - **Que pasa:** el Escritorio de un evento muestra "El admin nuevo se arma pantalla por pantalla. Mientras tanto, cada seccion del
   menu te lleva a su pagina en el admin actual." Es un texto de M2.2.7, de antes de la regla, y hoy casi todas las secciones ya
   tienen pagina propia.
 - **Visto:** 2026-11-06, en la captura `crear-evento/6-listo` de la Ayuda (M2.8.4b).
-- **Arreglo:** pendiente de decision de Kamilo (que dice el Escritorio mientras llega su pantalla, M2.2.x). Al cambiarlo, la Ayuda
-  pide volver a capturar `crear-evento` (pnpm ayuda:revisar lo marca).
+- **Arreglado en:** web `ef60a5c` (opcion b de Kamilo 2026-11-09): una linea de bienvenida, "Desde aquí administras tu evento. Usa el
+  menú de la izquierda para ir a cada sección.". Captura `crear-evento/6-listo` de nuevo (lux y noir); el texto del capitulo seguia bien.
+  El Escritorio con cifras queda para despues del hito 1, con lab (decisiones.md).
+- **Prueba:** `e2e-admin/entrada.spec.ts` "primer ingreso": ve la bienvenida y nada dice "admin nuevo" ni "admin actual" en el
+  contenido. Control: con el texto viejo, rojo en esa linea. `ayuda:revisar` 8/8.
+- **Queda (no es este bug):** las tarjetas de las secciones que siguen en Filament (`EnElActual`) y algunos botones dicen "admin
+  actual"; caen con cada seccion que se porta.
 
 ### BUG-542: e2e-admin/entrada.spec "una seccion que no esta hecha" quedo vieja desde M2.7.3 (ABIERTO)
 - **Severidad propuesta:** BAJA (pruebas: falla siempre, no es el panel)
