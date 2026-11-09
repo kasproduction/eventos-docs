@@ -74,8 +74,8 @@ h3.sec small{font:500 13px var(--f);color:var(--t3)}
 .ico svg{width:16px;height:16px}
 .qt{font-weight:600}
 .qd{color:var(--t3);font-size:13px}
-.qe{margin-top:6px;font-size:13px;color:var(--t2);background:var(--mal-f);border:1px solid color-mix(in srgb,var(--mal) 30%,transparent);border-radius:var(--r);padding:6px 10px}
-.qe strong{color:var(--mal);font-family:var(--fh)}
+.qe{margin-top:6px;font-size:13px;color:var(--t2);background:var(--card-hi);border:1px solid var(--b-hi);border-radius:var(--r);padding:6px 10px}
+.qe strong{color:var(--t);font-family:var(--fh)}
 .grupo{cursor:pointer}
 .grupo .qt::after{content:"";display:inline-block;width:7px;height:7px;border-right:2px solid var(--t3);border-bottom:2px solid var(--t3);transform:rotate(45deg);margin:0 0 3px 10px}
 .grupo.abierto .qt::after{transform:rotate(-135deg);margin-bottom:-1px}
@@ -103,16 +103,12 @@ h3.sec small{font:500 13px var(--f);color:var(--t3)}
 .btn{border:1px solid var(--b-hi);background:var(--card-hi);border-radius:var(--r);padding:8px 14px;font-weight:700;cursor:pointer;color:var(--t)}
 @media (max-width:900px){.rapidas{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:760px){.app{grid-template-columns:1fr}.lado{display:none}.cont{padding:20px 16px 48px}.rapidas{grid-template-columns:1fr}.it{grid-template-columns:1fr auto}.it .ico{display:none}.hora{grid-column:1/-1;padding:0}}
-/* Semaforo con la insignia del panel (adm-insignia): rectangular, sin relleno de color; Bien en tinta, Atencion en ambar
-   (--lum-aviso) y Mal en rojo (--lum-error, el de "Baneado"). Sin verde: el panel no lo usa (Kamilo 2026-11-08). */
-.sem,.est{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border:1px solid var(--b-hi);border-radius:6px;font:600 12px var(--f);color:var(--t2);background:none;white-space:nowrap}
-.sem svg{width:13px;height:13px;flex:none}
-.tar .sem,.rap .sem{align-self:flex-start}
-.sem.ok,.est.ok{color:var(--t);border-color:var(--b-st)}
-.sem.at,.est.at{color:var(--at);border-color:currentColor}
-.sem.mal,.est.mal{color:var(--mal);border-color:currentColor}
-body.lux .sem,body.lux .est{border-color:transparent;background:var(--campo)}
-body.lux .sem.at,body.lux .sem.mal,body.lux .est.at,body.lux .est.mal{background:none;border-color:transparent}
+/* Semaforo (Kamilo 2026-11-08): el color va SOLO en el icono: la X en rojo (mal) y la admiracion en ambar (atencion).
+   Sin insignias, sin palabras, sin bordes ni fondos de color; lo que esta bien no se marca. */
+.sem{display:inline-flex;vertical-align:-2px;margin-left:6px}.sem svg{width:15px;height:15px;flex:none}
+.sem.ok{display:none}.sem.at{color:var(--at)}.sem.mal{color:var(--mal)}
+.est{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:13px;color:var(--t2);white-space:nowrap}
+.est svg{width:15px;height:15px;flex:none}.est.at svg{color:var(--at)}.est.mal svg{color:var(--mal)}.est.at,.est.mal{color:var(--t)}
 </style>
 </head>
 <body>
@@ -225,12 +221,12 @@ const total = (v) => ({ bien: 8, mal: 6, activa: 284 })[v];
 let actual = "bien", tipo = "", abiertos = new Set();
 const fila = (x, grupo, i) => {
   const mal = x.est && x.est[0] === "mal";
-  return `<div class="it ${mal ? "mal" : ""} ${grupo ? "grupo" + (abiertos.has(i) ? " abierto" : "") : ""}" ${grupo ? `data-g="${i}"` : ""}><span class="hora">${x.h}</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${I[x.t]}</svg></span><div><div class="qt">${x.q}</div><div class="qd">${x.e}</div>${x.err ? `<div class="qe"><strong>Motivo:</strong> ${x.err}</div>` : ""}</div><div>${x.est ? `<span class="est ${x.est[0]}">${x.est[1]}</span>` : ""}</div></div>`;
+  return `<div class="it ${mal ? "mal" : ""} ${grupo ? "grupo" + (abiertos.has(i) ? " abierto" : "") : ""}" ${grupo ? `data-g="${i}"` : ""}><span class="hora">${x.h}</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${I[x.t]}</svg></span><div><div class="qt">${x.q}</div><div class="qd">${x.e}</div>${x.err ? `<div class="qe"><strong>Motivo:</strong> ${x.err}</div>` : ""}</div><div>${x.est ? `<span class="est ${x.est[0]}">${x.est[0] === "ok" ? "" : ICO[x.est[0]]}${x.est[1]}</span>` : ""}</div></div>`;
 };
 function pinta() {
   const correo = actual === "mal" ? "laura@ejmplo.com" : "laura@ejemplo.com";
   document.getElementById("ficha").innerHTML = `<div class="ficha"><div class="avatar">LG</div><div><h3>Laura Gómez</h3><p>${correo}, asistente</p></div><button class="perfil">Abrir su perfil</button></div>`;
-  document.getElementById("rapidas").innerHTML = RAP[actual].map(([n, p, r, d]) => `<div class="rap ${n}"><span class="pr">${p}</span><span class="re">${r}</span><span class="sem ${n}">${ICO[n]}${PAL[n]}</span><span class="de">${d}</span></div>`).join("");
+  document.getElementById("rapidas").innerHTML = RAP[actual].map(([n, p, r, d]) => `<div class="rap ${n}"><span class="pr">${p}<span class="sem ${n}" role="img" aria-label="${PAL[n]}">${ICO[n]}</span></span><span class="re">${r}</span><span class="de">${d}</span></div>`).join("");
   const f = FALLO[actual];
   document.getElementById("nfallo").textContent = f.length ? `${f.length} en todo el evento` : "";
   document.getElementById("fallo").innerHTML = f.length
