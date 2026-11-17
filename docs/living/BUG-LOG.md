@@ -5,13 +5,26 @@
 
 ## 2026-11-17 — Corridas del runner de M2.9.4a y BUG-543, y la primera revision de la Ayuda en el MSI (sesion 38)
 
-### BUG-553: La e2e de la webapp del asistente tiene 35 pruebas en rojo (ABIERTO)
-- **Severidad propuesta:** MEDIA (la suite de la webapp no protege nada mientras este en rojo)
-- **Que pasa:** la primera corrida completa de `pnpm test:e2e` en el MSI (`44174478258`, web `54bc95d`): 121 pasan, 35 fallan, 2
-  intermitentes, 69 no corren y 1 omitida. Las que fallan son todas de la webapp del asistente: `mobile-shell` 10, `live` 7,
-  `documentos` 5, `home` 4, `cartel` 3, `speakers` 2, `streaming` 2 y una en `agenda`, `anuncios`, `desafio`, `faq`, `perfil`,
-  `showcase`, `social` y `sponsors`. Nada del panel. Venian escondidas: desde el 05/11 la suite nunca terminaba (BUG-551).
-- **Arreglo:** pendiente de decision (revisar spec por spec: prueba vieja o falla real de la webapp).
+### BUG-554: En escritorio, abrir Anuncios marca todos los anuncios como leidos (ABIERTO)
+- **Severidad propuesta:** MEDIA (lo ve el asistente: la campana queda en 0 y todos los puntos en gris tras abrir uno)
+- **Que pasa:** `/anuncios` monta tambien la vista de celular escondida (`AnunciosM`, M.7 `51857d8`, 2026-07-10) y esa vista marca
+  TODOS como leidos al montar ("en celular verlo es leerlo"). En escritorio solo se lee lo que se abre.
+- **Prueba roja:** `anuncios.spec.ts` "abrir Anuncios en escritorio sin tocar nada no marca ningun anuncio como leido" (sin carreras),
+  en la lista de fallas conocidas como falla esperada; las dos pruebas viejas de la campana y del muro quedan apartadas (carrera).
+- **Arreglo:** pendiente del OK de Kamilo (que la vista de celular solo marque cuando se ve de verdad).
+
+### BUG-553: La e2e de la webapp del asistente tenia 35 pruebas en rojo (RESUELTO contra la lista de fallas conocidas)
+- **Severidad:** MEDIA (la suite no protegia nada)
+- **Desde:** no hay verde en la CI desde `471cf94` (2026-07-05); la e2e se cancelaba por tiempo desde el 09/07 (BUG-551).
+- **Causas:** mock sin las rutas partidas de lo de todos y lo mio (B3.7, B.1 y B3.9, 2026-10-18 a 21) ni `modules`/`pages`; escenarios
+  por token cuando by-slug va sin token desde `ab6e6ff` (2026-08-02), y la memoria del servidor los cruzaba; escritorio y celular
+  juntos en el DOM desde M.7 (`51857d8`) con selectores estrictos; diseno de julio (inicio ENDED `c30b55d`, cartel con el Desafio,
+  titulos canon `a1fabf3`, Ver introduccion `9d02140`); calificaciones en `/mine`. Clasificacion: 33 pruebas viejas, 2 de BUG-554,
+  0 intermitentes de causa desconocida.
+- **Auditoria del cache (Kamilo):** sin cruce entre personas ni eventos.
+- **Arreglo:** web `f9379e6`: el arnes vacia la memoria de la webapp antes de cada escenario; el mock al dia y con el evento por slug
+  desde `auth/me`; ruta desconocida = la prueba falla con la lista (`e2e/_helpers/prueba.ts`); `e2e/_helpers/fallasConocidas.ts`.
+  Control: sin el arnes 36 en rojo; con las rutas desconocidas visibles 76; al final 224 pasan con un worker. Falta la corrida del MSI.
 
 ### BUG-552: La revision de la Ayuda fallaba en el MSI por el dominio de un enlace (RESUELTO)
 - **Severidad:** BAJA (solo pruebas)
@@ -77,7 +90,7 @@
 - **Visto:** 2026-11-09, al capturar de nuevo `crear-evento` por BUG-543. Se dejaron las capturas de `importar` como estaban.
 - **Arreglo:** pendiente (la fecha del importado con el reloj congelado, o taparla en la captura).
 
-### BUG-545: e2e del admin intermitente otra vez despues de BUG-524 (ABIERTO, conteo 2)
+### BUG-545: e2e intermitente por la primera compilacion de Next en dev (ABIERTO, conteo 3: investigar la causa)
 - **Severidad propuesta:** BAJA (solo pruebas)
 - **Conteo (regla de Kamilo: a la tercera se investiga la causa):**
   1. 2026-11-09: `entrada.spec` "primer ingreso", sola: en `primerIngreso` fallo `toHaveURL` (no llego al Escritorio); la corrida
@@ -85,6 +98,9 @@
      able to start", exit 1) y la siguiente si.
   2. 2026-11-17: `que-le-paso.spec` "desde la fila", primera corrida del dia: en `primerIngreso` fallo `toHaveURL` (quedo en
      `/admin/login?volver=%2Fadmin` y luego `/admin`, 5 s); la siguiente corrida paso el ingreso. Mismo sintoma que la 1.
+  3. 2026-11-17: e2e de la webapp, `anuncios.spec` "CTA ... navega a /desafio": `toHaveURL` paso de 5 s la primera vez que la
+     corrida abria /desafio (Next compilando la ruta); las dos corridas siguientes pasaron. Causa comun: la primera compilacion de
+     una ruta en `next dev` pasa de la espera de 5 s. Opciones: calentar rutas, e2e contra `next build`, o subir la espera.
 
 ## 2026-11-08 — Encontrado al revisar el socket para la torre de control (M2.9.2)
 
