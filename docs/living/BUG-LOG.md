@@ -5,36 +5,52 @@
 
 ## 2026-11-17 — Corridas del runner de M2.9.4a y BUG-543, y la primera revision de la Ayuda en el MSI (sesion 38)
 
+### BUG-553: La e2e de la webapp del asistente tiene 35 pruebas en rojo (ABIERTO)
+- **Severidad propuesta:** MEDIA (la suite de la webapp no protege nada mientras este en rojo)
+- **Que pasa:** la primera corrida completa de `pnpm test:e2e` en el MSI (`44174478258`, web `54bc95d`): 121 pasan, 35 fallan, 2
+  intermitentes, 69 no corren y 1 omitida. Las que fallan son todas de la webapp del asistente: `mobile-shell` 10, `live` 7,
+  `documentos` 5, `home` 4, `cartel` 3, `speakers` 2, `streaming` 2 y una en `agenda`, `anuncios`, `desafio`, `faq`, `perfil`,
+  `showcase`, `social` y `sponsors`. Nada del panel. Venian escondidas: desde el 05/11 la suite nunca terminaba (BUG-551).
+- **Arreglo:** pendiente de decision (revisar spec por spec: prueba vieja o falla real de la webapp).
+
 ### BUG-552: La revision de la Ayuda fallaba en el MSI por el dominio de un enlace (RESUELTO)
 - **Severidad:** BAJA (solo pruebas)
 - **Que paso:** la primera vez que la revision llego a correr en el MSI (corridas `44168225817` y `44168230544`, ya con pnpm) fallaron
   `etiquetas` y `marca`. La huella guardaba la direccion del enlace "en el admin actual", que sale de `NEXT_PUBLIC_API_URL`: con
   dominio en Laragon (`http://eventos-backend.test/...`), relativa en el MSI. Estaba escondido desde M2.8.4b porque antes el paso caia en
   BUG-549.
-- **Arreglo:** web, la huella quita el dominio de los enlaces y `capturas.json` de nuevo (las imagenes no cambian). Control: en local
-  sin `NEXT_PUBLIC_API_URL`, antes 2 fallidas como en el MSI; despues 8/8 con y sin la variable.
+- **Arreglo:** web `f7368be`, la huella quita el dominio de los enlaces y `capturas.json` de nuevo (las imagenes no cambian). Control: en local
+  sin `NEXT_PUBLIC_API_URL`, antes 2 fallidas como en el MSI; despues 8/8 con y sin la variable; en el MSI, `ayuda.yml` y verificar
+  en verde.
 - **Patron:** lo que mide una prueba no puede depender de la configuracion de la maquina que la corre.
 
-### BUG-551: La e2e de la CI de la web (GitHub) pasa de 15 minutos y se cancela (ABIERTO)
+### BUG-551: La e2e de la CI de la web (GitHub) pasa de 15 minutos y se cancela (RESUELTO)
 - **Severidad propuesta:** BAJA (solo pruebas; la e2e del admin corre en local y en el MSI)
 - **Que pasa:** el trabajo `e2e` de `ci.yml` corre en GitHub con `timeout-minutes: 15` y se cancela antes de terminar. Asi salieron
   las corridas de la CI del 05 y 06/11 (9 canceladas) y la del 17/11 (`44160559401`, 15 min exactos ya con Chromium instalado).
 - **Arreglo:** la e2e pasa al runner del MSI con el candado (decision de Kamilo 2026-11-17), web `05f8acb`. La primera corrida ahi
   (`44168226031`) se corto a los 30 minutos: 18 de espera del candado y 11 de pruebas (228, un worker). El tope cuenta la espera:
-  sube a 60. Sigue abierto hasta ver una corrida completa.
+  sube a 60 (web `54bc95d`). Control: la corrida `44174478258` termino entera en el MSI (22,6 min de pruebas); lo que fallo ahi es
+  BUG-553.
 
-### BUG-550: El workflow `ayuda.yml` de la web no tiene runner (ABIERTO)
+### BUG-550: El workflow `ayuda.yml` de la web no tiene runner (RESUELTO)
 - **Severidad propuesta:** BAJA (la revision de la Ayuda si corre dentro de `verificar.sh` de C#)
 - **Que pasa:** `ayuda.yml` pide `runs-on: [self-hosted, msi]`, pero el runner del MSI esta registrado solo en eventos-api-dotnet
   (eventos-web tiene 0 runners). La corrida espera 24 horas y se cancela: la `42699192133` no fue "MSI apagado", nunca tuvo donde correr.
-- **Arreglo:** pendiente de decision (registrar un segundo runner para eventos-web en el MSI o quitar `ayuda.yml`).
+- **Arreglo (decision de Kamilo 2026-11-17):** segundo runner `msi-web` en el MSI (`~/actions-runner-web`, servicio
+  `actions.runner.kasproduction-eventos-web.msi-web`, etiqueta `msi`). Los dos runners se turnan con el candado `/tmp/eventos-msi.lock`
+  (`flock`): lo toman `verificar.sh` de C# (`a86e8bb`), `ayuda-revisar.sh` sin `--ya-preparado` y la e2e de la CI (web `05f8acb`).
+  Control: en el MSI, un segundo `flock` espera al primero (2,5 s de 3); en vivo, verificar esperaba mientras la Ayuda tenia el
+  candado. La corrida `44174478042` de `ayuda.yml` salio verde.
 
-### BUG-549: El runner del MSI no tiene `pnpm` y el paso de la Ayuda de `verificar.sh` falla (ABIERTO)
+### BUG-549: El runner del MSI no tiene `pnpm` y el paso de la Ayuda de `verificar.sh` falla (RESUELTO)
 - **Severidad propuesta:** MEDIA (deja en rojo cada corrida de C# aunque todo lo demas pase)
 - **Que pasa:** en la corrida `44160566134` (C# `acd847d`) pasaron C# (285 sin base y 376 con MySQL), los contratos (12) y las
   cruzadas (108); despues `scripts/ayuda-revisar.sh` de la web cae en `pnpm: command not found` (exit 127). El MSI tiene Node 24 y
   corepack, sin `pnpm`.
-- **Arreglo:** pendiente de decision (`sudo corepack enable` en el MSI, o que el script use `corepack pnpm` si no hay `pnpm`).
+- **Arreglo (decision de Kamilo 2026-11-17):** sin tocar el MSI, `ayuda-revisar.sh` pone en el PATH un `pnpm` que llama a
+  `corepack pnpm@10` si la maquina no tiene uno (lo usa tambien el `pnpm dev` de Playwright), web `05f8acb`. Control en el MSI: sin
+  la calza 127, con ella pnpm 10.34.9. La corrida `44168230544` de verificar (repetida) salio verde de punta a punta.
 
 ### BUG-548: La CI de la web no instalaba Chromium: `ubuntu-latest` paso a Ubuntu 26.04 (RESUELTO)
 - **Severidad:** BAJA (solo pruebas)
