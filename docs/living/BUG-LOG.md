@@ -19,7 +19,9 @@
 - **Severidad propuesta:** BAJA (solo pruebas; la e2e del admin corre en local y en el MSI)
 - **Que pasa:** el trabajo `e2e` de `ci.yml` corre en GitHub con `timeout-minutes: 15` y se cancela antes de terminar. Asi salieron
   las corridas de la CI del 05 y 06/11 (9 canceladas) y la del 17/11 (`44160559401`, 15 min exactos ya con Chromium instalado).
-- **Arreglo:** pendiente de decision (subir el tope, partir la e2e o llevarla al MSI).
+- **Arreglo:** la e2e pasa al runner del MSI con el candado (decision de Kamilo 2026-11-17), web `05f8acb`. La primera corrida ahi
+  (`44168226031`) se corto a los 30 minutos: 18 de espera del candado y 11 de pruebas (228, un worker). El tope cuenta la espera:
+  sube a 60. Sigue abierto hasta ver una corrida completa.
 
 ### BUG-550: El workflow `ayuda.yml` de la web no tiene runner (ABIERTO)
 - **Severidad propuesta:** BAJA (la revision de la Ayuda si corre dentro de `verificar.sh` de C#)
