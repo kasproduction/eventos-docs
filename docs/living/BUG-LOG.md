@@ -3,7 +3,17 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
-## 2026-11-17 — Corridas del runner de M2.9.4a y BUG-543 (sesion 38)
+## 2026-11-17 — Corridas del runner de M2.9.4a y BUG-543, y la primera revision de la Ayuda en el MSI (sesion 38)
+
+### BUG-552: La revision de la Ayuda fallaba en el MSI por el dominio de un enlace (RESUELTO)
+- **Severidad:** BAJA (solo pruebas)
+- **Que paso:** la primera vez que la revision llego a correr en el MSI (corridas `44168225817` y `44168230544`, ya con pnpm) fallaron
+  `etiquetas` y `marca`. La huella guardaba la direccion del enlace "en el admin actual", que sale de `NEXT_PUBLIC_API_URL`: con
+  dominio en Laragon (`http://eventos-backend.test/...`), relativa en el MSI. Estaba escondido desde M2.8.4b porque antes el paso caia en
+  BUG-549.
+- **Arreglo:** web, la huella quita el dominio de los enlaces y `capturas.json` de nuevo (las imagenes no cambian). Control: en local
+  sin `NEXT_PUBLIC_API_URL`, antes 2 fallidas como en el MSI; despues 8/8 con y sin la variable.
+- **Patron:** lo que mide una prueba no puede depender de la configuracion de la maquina que la corre.
 
 ### BUG-551: La e2e de la CI de la web (GitHub) pasa de 15 minutos y se cancela (ABIERTO)
 - **Severidad propuesta:** BAJA (solo pruebas; la e2e del admin corre en local y en el MSI)
