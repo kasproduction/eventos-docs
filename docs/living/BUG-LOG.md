@@ -3,6 +3,42 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-17 — Corridas del runner de M2.9.4a y BUG-543 (sesion 38)
+
+### BUG-551: La e2e de la CI de la web (GitHub) pasa de 15 minutos y se cancela (ABIERTO)
+- **Severidad propuesta:** BAJA (solo pruebas; la e2e del admin corre en local y en el MSI)
+- **Que pasa:** el trabajo `e2e` de `ci.yml` corre en GitHub con `timeout-minutes: 15` y se cancela antes de terminar. Asi salieron
+  las corridas de la CI del 05 y 06/11 (9 canceladas) y la del 17/11 (`44160559401`, 15 min exactos ya con Chromium instalado).
+- **Arreglo:** pendiente de decision (subir el tope, partir la e2e o llevarla al MSI).
+
+### BUG-550: El workflow `ayuda.yml` de la web no tiene runner (ABIERTO)
+- **Severidad propuesta:** BAJA (la revision de la Ayuda si corre dentro de `verificar.sh` de C#)
+- **Que pasa:** `ayuda.yml` pide `runs-on: [self-hosted, msi]`, pero el runner del MSI esta registrado solo en eventos-api-dotnet
+  (eventos-web tiene 0 runners). La corrida espera 24 horas y se cancela: la `42699192133` no fue "MSI apagado", nunca tuvo donde correr.
+- **Arreglo:** pendiente de decision (registrar un segundo runner para eventos-web en el MSI o quitar `ayuda.yml`).
+
+### BUG-549: El runner del MSI no tiene `pnpm` y el paso de la Ayuda de `verificar.sh` falla (ABIERTO)
+- **Severidad propuesta:** MEDIA (deja en rojo cada corrida de C# aunque todo lo demas pase)
+- **Que pasa:** en la corrida `44160566134` (C# `acd847d`) pasaron C# (285 sin base y 376 con MySQL), los contratos (12) y las
+  cruzadas (108); despues `scripts/ayuda-revisar.sh` de la web cae en `pnpm: command not found` (exit 127). El MSI tiene Node 24 y
+  corepack, sin `pnpm`.
+- **Arreglo:** pendiente de decision (`sudo corepack enable` en el MSI, o que el script use `corepack pnpm` si no hay `pnpm`).
+
+### BUG-548: La CI de la web no instalaba Chromium: `ubuntu-latest` paso a Ubuntu 26.04 (RESUELTO)
+- **Severidad:** BAJA (solo pruebas)
+- **Que paso:** corrida `42699192380`: "Playwright does not support chromium on ubuntu26.04-x64".
+- **Arreglo:** web `e85adbd`, la CI corre en `ubuntu-24.04` fijo. Control: la corrida `44160559401` ya instala Chromium y pasa el
+  trabajo `check` (la e2e se corta por BUG-551).
+
+### BUG-547: Una prueba sin base fallaba en la pasada sin MySQL del runner (RESUELTO)
+- **Severidad:** BAJA (solo pruebas)
+- **Que paso:** corrida `42699180512` (M2.9.4a): `QueLePasoTest.La_puerta_dice_lo_mismo_que_PHP_en_el_mismo_orden` era `[Fact]` dentro
+  de una clase que abre MySQL al arrancar (`InitializeAsync`); en la primera pasada de `verificar.sh` (sin `EVENTOS_MYSQL_PRUEBAS`)
+  fallaba con "Unable to connect to any of the specified MySQL hosts". En local pasaba porque MySQL estaba prendido.
+- **Arreglo:** C# `acd847d`, la prueba pasa a su propia clase `QueLePasoPuertaTest`. Control: sin la variable, antes 1 fallida, despues
+  1 pasada y 2 omitidas; en el runner `44160566134`, 285 y 376 pasadas.
+- **Patron:** una prueba pura no va en una clase con `IAsyncLifetime` que toca la base.
+
 ## 2026-11-09 — De las pruebas (BUG-543)
 
 ### BUG-546: Las capturas de la Ayuda cambian de un dia a otro por la fecha de lo importado (ABIERTO)
@@ -13,12 +49,14 @@
 - **Visto:** 2026-11-09, al capturar de nuevo `crear-evento` por BUG-543. Se dejaron las capturas de `importar` como estaban.
 - **Arreglo:** pendiente (la fecha del importado con el reloj congelado, o taparla en la captura).
 
-### BUG-545: e2e del admin intermitente otra vez despues de BUG-524 (ABIERTO, conteo 1)
+### BUG-545: e2e del admin intermitente otra vez despues de BUG-524 (ABIERTO, conteo 2)
 - **Severidad propuesta:** BAJA (solo pruebas)
 - **Conteo (regla de Kamilo: a la tercera se investiga la causa):**
   1. 2026-11-09: `entrada.spec` "primer ingreso", sola: en `primerIngreso` fallo `toHaveURL` (no llego al Escritorio); la corrida
      siguiente igual paso. La corrida de antes no arranco el servidor web de Playwright ("Process from config.webServer was not
      able to start", exit 1) y la siguiente si.
+  2. 2026-11-17: `que-le-paso.spec` "desde la fila", primera corrida del dia: en `primerIngreso` fallo `toHaveURL` (quedo en
+     `/admin/login?volver=%2Fadmin` y luego `/admin`, 5 s); la siguiente corrida paso el ingreso. Mismo sintoma que la 1.
 
 ## 2026-11-08 — Encontrado al revisar el socket para la torre de control (M2.9.2)
 

@@ -156,7 +156,10 @@ puede borrar, una validación que falta, un efecto que PHP no dispara), se pregu
 31. **Toda pantalla que junta los datos personales de una persona deja rastro de quien la abrio** (Kamilo 2026-11-09,
     M2.9.4, Ley 1581 de Colombia). Al abrirla se escribe en la bitacora del panel (`admin_audit_log`) quien, a quien,
     cuando y desde que IP, con su prueba (abrir la pantalla deja la fila; sin permiso no queda ni se ve nada). Lo que se
-    muestra de un envio fallido es el error del servidor, nunca el contenido del mensaje.
+    muestra de un envio fallido es el error del servidor, nunca el contenido del mensaje. **Una linea por mirada, no por
+    llamada** (Kamilo 2026-11-17): no se repite si el mismo staff miro a la misma persona en los ultimos 10 minutos (paginar
+    y filtrar no escriben de nuevo), sea la pagina que sea la primera que pida; la prueba lleva sus dos controles (sin la
+    ventana quedan varias lineas; una llamada directa a la pagina 2 si escribe la primera).
 
 ## Documentacion
 
