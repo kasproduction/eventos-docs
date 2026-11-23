@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 151/239
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 153/239
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -433,15 +433,15 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 ---
 
 
-## Fase 3: Tiempo real en SignalR (20 a 23 sesiones; plan 6 semanas) — 0/23
+## Fase 3: Tiempo real en SignalR (20 a 23 sesiones; plan 6 semanas) — 2/23
 
 > El hub vive en el mismo proceso que la API admin (o en `Hub`, mismo repo). Mantiene una fachada HTTP identica a los
 > 17 endpoints internos de Node para que PHP siga avisando sin enterarse. Los 8 clientes cambian un archivo cada uno.
 > Doble emision solo las semanas de transicion y sin app en tiendas (D.5).
 
-### 3.1 Hub y entrada (1,5 semanas) — 0/6
-- [ ] M3.1.1 Hub SignalR con `Microsoft.AspNetCore.SignalR.StackExchangeRedis`, solo WebSockets, `skipNegotiation` exigido a los clientes (sin afinidad, como hoy) **[local]**
-- [ ] M3.1.2 Autenticacion del handshake igual que `auth.ts`: token en `access_token` o cabecera; `ep_` valida contra `pulse_token`; Sanctum lee la ficha `socketauth:t:{sha256}` en Redis (TTL deslizante 15 min, tope 24 h), si no esta valida contra la tabla y escribe la ficha con el mismo JSON **[local]**
+### 3.1 Hub y entrada (1,5 semanas) — 2/6
+- [x] M3.1.1 Hub SignalR con `Microsoft.AspNetCore.SignalR.StackExchangeRedis`, solo WebSockets, `skipNegotiation` exigido a los clientes (sin afinidad, como hoy) **[local]** — **Hecho 2026-11-22** (C# `21922bc`): `/tiempo-real` dentro de la Api (decisiones.md 2026-11-22: se separa antes del primer evento real con la fase 3 encendida), solo WebSockets, backplane de Redis con la conexion de la Api (prefijo `eventos-hub`), negociacion en 404. Paquetes 10.0.15 por GHSA-wr8v-9x5q-ggcm. Pruebas: `HubDeTiempoRealTest` (WebSocket de punta a punta)
+- [x] M3.1.2 Autenticacion del handshake igual que `auth.ts`: token en `access_token` o cabecera; `ep_` valida contra `pulse_token`; Sanctum lee la ficha `socketauth:t:{sha256}` en Redis (TTL deslizante 15 min, tope 24 h), si no esta valida contra la tabla y escribe la ficha con el mismo JSON **[local]** — **Hecho 2026-11-22** (C# `21922bc`): `PuertaDelSocket`; la ficha se escribe con la forma de PHP; BUG-557 cerrado en C#. El motivo llega en el cierre con el texto de Node. Pruebas: 12/12 con 4 controles en rojo (BUG-557, pendientes, staff D.1, tope de 24 h)
 - [ ] M3.1.3 Estado de conexiones en Redis, no en memoria: maximo 5 por usuario, mapa asistente → conexiones (para `emit-to-user` y `networking:notify`), salas de cada conexion (para exigir `join:session` antes de `chat:send`) **[local]**
 - [ ] M3.1.4 Salas con los mismos nombres (`event:{id}`, `pulse:{id}`, `session:{id}`, `chat:session:{id}`, `display:session:{id}`) como grupos; `join:event` valida el evento del token; `join:session` valida acceso con cache 5 min fail-closed **[local]**
 - [ ] M3.1.5 Rate limits `rl:chat`, `rl:emoji`, `rl:join:session` con las mismas claves y ventanas (`rateLimit.ts`) **[local]**

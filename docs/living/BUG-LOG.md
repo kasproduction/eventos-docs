@@ -3,6 +3,18 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-22 — Encontrado al portar la entrada del socket a C# (M3.1.2, sesion 40)
+
+### BUG-557: El registro sin aprobar entra al socket de Node con la ficha que el mismo Node escribio (RESUELTO EN C#; Node sin tocar)
+- **Severidad propuesta:** MEDIA (salta BUG-440: alguien que el organizador no aprobo recibe el tiempo real del evento)
+- **Que pasa:** sin ficha en Redis, `auth.ts` valida contra `/auth/me` y guarda esa respuesta como ficha (`writeSharedAuth`) ANTES de
+  que `io.use` lo rechace por pendiente. La respuesta de `/auth/me` no trae `pending` (trae `registration_approved_at: null`) y
+  `readSharedAuth` solo mira `pending === true`: en la siguiente conexion, dentro de los 15 minutos de la ficha, entra.
+- **Visto:** 2026-11-22, leyendo `eventos-socket/src/auth.ts` para M3.1.2 (no reproducido contra Node).
+- **Arreglado en:** C# `21922bc`: la ficha se escribe con la forma de PHP (con `pending`) y al leer cuenta tambien
+  `registration_approved_at: null`. Node no se toca: se apaga en M3.5.3. Prueba: `HubDeTiempoRealTest` "BUG557 ..." (una ficha con
+  la forma de Node para Kiko); control: sin mirar `registration_approved_at`, rojo.
+
 ## 2026-11-22 — Revision de la Ayuda en rojo en el MSI y decisiones del 17 (sesion 39)
 
 ### BUG-556: En Nuevo documento, "Ver archivo" y el tipo y peso salen pegados (RESUELTO 2026-11-22)

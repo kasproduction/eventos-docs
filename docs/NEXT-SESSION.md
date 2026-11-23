@@ -43,7 +43,8 @@
    viejo del staff que da 401 y correr `php artisan security:check` contra el `.env` real (S.7.2); confirmar que el super_admin
    puede entrar.
 6. **`npm run build` en eventos-backend** (tema de Filament: estilos de los avisos de solo lectura).
-7. **Variables de la Api de C#** (doble guion bajo; tabla en `contratos/variables.md`): `ConnectionStrings__MySql`,
+7. **Runtime de ASP.NET Core 10.0.15 o mas** en la maquina de la Api y del Worker (GHSA-wr8v-9x5q-ggcm, M3.1.1; `dotnet --list-runtimes`).
+   **Variables de la Api de C#** (doble guion bajo; tabla en `contratos/variables.md`): `ConnectionStrings__MySql`,
    `ConnectionStrings__Redis`, `App__Key`, `App__PreviousKeys`, `App__QrSecret`, `App__Url`, `App__WebappUrl`,
    `App__TrustedProxies`, `Sesion__Minutos` (120, como `SESSION_LIFETIME`), `Php__Cache__Prefijo` y `Php__Cache__BaseDeRedis`
    (los de PHP), `Redis__BaseSocket`, `Servicios__Socket__Url` y `__SecretoInterno`, `Servicios__Webapp__UrlsInternas` y
