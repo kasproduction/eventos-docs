@@ -65,6 +65,8 @@
    **Torre de control (M2.9.1):** `TORRE_REDIS_URL` (la base del socket: `rediss://usuario:clave@host:puerto/2` en el Redis
    administrado; sin ella la webapp no aparece en la torre) y opcional `TORRE_SERVIDOR`. El socket no pide nada nuevo (usa su
    `REDIS_DB`; opcional `TORRE_SERVIDOR`).
+   **Build de la webapp (BUG-555):** ya no sale a Google: Urbanist y Plus Jakarta Sans van en `src/fonts` (`next/font/local`). La
+   maquina que compila no necesita salida a `fonts.googleapis.com` ni `fonts.gstatic.com`.
 10. **PHP, Api y Worker de C# del mismo corte, juntos, con el Worker corriendo:** varios trabajos salieron de PHP y los hace
     ahora el Worker (aviso de cambio de horario, vencer baneos, push programadas, correo directo sin outbox). Uno sin el otro
     deja avisos sin mandar o mandados dos veces. Confirmar en el panel de Hangfire que estan los recurrentes.

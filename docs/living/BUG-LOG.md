@@ -5,7 +5,7 @@
 
 ## 2026-11-22 — Revision de la Ayuda en rojo en el MSI y decisiones del 17 (sesion 39)
 
-### BUG-555: `next build` y `next dev` fallan a veces con `next/font/google` en Turbopack (ABIERTO, decision de Kamilo)
+### BUG-555: `next build` y `next dev` fallan a veces con `next/font/google` en Turbopack (RESUELTO 2026-11-22)
 - **Severidad propuesta:** ALTA (tumba al azar la CI y puede tumbar el build del despliegue)
 - **Que pasa:** Turbopack (Next 16.2.4) a veces no resuelve su propio archivo de la fuente: "Module not found: Can't resolve
   '@vercel/turbopack-next/internal/font/google/font'" y "next/font/google queries have exactly one entry" (Urbanist y Plus Jakarta
@@ -15,6 +15,10 @@
 - **Arreglo:** pendiente. Opciones: (a) fuentes servidas desde el repo con `next/font/local` (las mismas, sin bajar nada al
   compilar; recomendada), (b) compilar con webpack (`next build --webpack`), (c) esperar una version de Next que lo arregle.
   Mientras tanto la revision lo dice claro ("El next build fallo antes de revisar ... correr de nuevo").
+- **Arreglado en:** web (sesion 39, opcion a de Kamilo): `src/lib/fuentes.ts` con `next/font/local` y los archivos variables latin
+  de Fontsource 5.3.0 (los mismos que sirve Google) en `src/fonts`, con sus licencias OFL; las mismas variables `--font-urbanist` y
+  `--font-jakarta`. Control: 4 de 4 `next build` sin fallas ni referencias a Google (antes 1 de 3 fallaba); en el navegador cargan
+  `urbanist 100 900` y `jakarta 200 800`. Despliegue: paso 9.
 
 ## 2026-11-17 — Corridas del runner de M2.9.4a y BUG-543, y la primera revision de la Ayuda en el MSI (sesion 38)
 
