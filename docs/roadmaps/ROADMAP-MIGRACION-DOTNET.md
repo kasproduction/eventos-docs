@@ -7,10 +7,18 @@
 > Clasificacion de pendientes: `docs/pendientes-2026-10.md`. Fuente unica de tareas: `docs/living/PENDIENTES.md`
 > (cuando Kamilo de el dale, este roadmap se registra alla como bloque con sus contadores).
 >
-> **Decision en evaluacion (Kamilo 2026-10-21):** el evento del 6 de diciembre se cayo, no entran mas pendientes,
-> y se quiere un solo sistema entendible de punta a punta para la linea enterprise. Este roadmap es el camino
-> desde hoy (PHP + Node hacen todo) hasta "C# hace todo lo que PHP hace hoy", con los dos sistemas vivos en el medio
-> sobre la misma base de datos y el mismo dominio.
+> **Decision tomada (Kamilo 2026-10-22, dale a la fase 0; planteada el 2026-10-21):** el evento del 6 de diciembre se cayo,
+> no entran mas pendientes, y se quiere un solo sistema entendible de punta a punta para la linea enterprise. Este roadmap
+> es el camino desde PHP + Node haciendo todo hasta "C# hace todo lo que PHP hace hoy", con los dos sistemas vivos en el
+> medio sobre la misma base de datos y el mismo dominio. En ejecucion: fases 0 y 2 cerradas en lo local, fase 1 tambien
+> (las tareas que piden el servidor quedan abiertas hasta que Kamilo lo prenda).
+>
+> **Estimacion en sesiones (Kamilo 2026-11-22, despues de la retro de la fase 2).** La unidad es la sesion; el calendario
+> sale a 5 sesiones por semana. Referencia medida: la fase 2 se planeo en 10 a 12 semanas (50 a 60 sesiones) y costo unas
+> 39, entre 0,65 y 0,78 del plan; ese factor se aplica a lo que falta. Fase 3: 20 a 23 sesiones (4 a 5 semanas). Fase 4: 88
+> a 105 (18 a 21 semanas). Fase 5: 10 a 12 (2 a 2,5 semanas). Total que falta: 118 a 140 sesiones, unas 24 a 28 semanas.
+> Riesgo de pasarse en 3 y 4: los clientes (webapp, app, kiosko) exigen respuestas identicas a las de hoy y la app se
+> prueba en celulares reales. Se revisa en la retro de cada fase.
 >
 > **Por que se migra (lo medido, no lo supuesto).** Agosto de 2026, droplet de 4 vCPU, 300 personas activas: Laravel
 > gastaba 1,0 nucleo, Next 0,4, MySQL 0,3. PHP era el 60% de la carga. Antes de cachear el marco la maquina iba al 61%
@@ -42,7 +50,8 @@
 > publica esta medida y funciona.
 >
 > Etiquetas como en los otros roadmaps: **[local]** se hace sin servidor · **[local+medir]** se codea local y cierra
-> midiendo · **[servidor]** solo con servidor. Semanas = una persona con IA, tiempo completo.
+> midiendo · **[servidor]** solo con servidor. Las estimaciones van en sesiones (arriba); las semanas de cada bloque son
+> las del plan original.
 
 ---
 
@@ -81,15 +90,16 @@ por usuario virtual). Instalacion pendiente para el arranque de la fase 1 (decis
 
 ## HITOS VENDIBLES
 
-| Hito | Semana | Que se le muestra a un cliente | Que corre por dentro |
+| Hito | Fecha | Que se le muestra a un cliente | Que corre por dentro |
 |---|---|---|---|
-| 0 | 3 | Lo de hoy, con seguridad al dia | PHP + Node |
-| 1 | 12 a 15 | **Admin enterprise nuevo** + webapp + app | PHP (API publica, correos, jobs) + C# (admin) + Next |
-| 2 | 21 | Lo mismo, con el tiempo real sin Node | PHP (API publica) + C# (admin + hub) |
-| 3 | 48 | Lo mismo | C# casi todo, PHP solo Data Center y exports |
-| 4 | 54 | Lo mismo | Solo C# + Next. Filament, Node, PM2, Horizon y PHP-FPM apagados |
+| 0 | **2026-10-24** (real) | Lo de hoy, con seguridad al dia | PHP + Node |
+| 1 | **2026-11-22** (real, en lo local; falta la medicion en el servidor, M2.10.1) | **Admin enterprise nuevo** + webapp + app | PHP (API publica) + C# (admin y Worker) + Next |
+| 2 | ~2026-12-21 a 12-28 (fase 3, desde el 2026-11-23) | Lo mismo, con el tiempo real sin Node | PHP (API publica) + C# (admin + hub) |
+| 3 | ~2027-04-23 a 05-21 (fase 4) | Lo mismo | C# casi todo, PHP solo Data Center y exports |
+| 4 | ~2027-05-07 a 06-04 (fase 5) | Lo mismo | Solo C# + Next. Filament, Node, PM2, Horizon y PHP-FPM apagados |
 
-Total realista: **54 semanas**. Optimista: 30 a 34. Lo que separa los dos esta en `migracion-dotnet.md` seccion 5.
+Las fechas por venir salen de la estimacion en sesiones de arriba a 5 por semana; se corrigen en cada retro. El plan
+original (agosto a octubre de 2026) era de 54 semanas realistas y 30 a 34 optimistas (`migracion-dotnet.md` seccion 5).
 
 ## DECISIONES DE KAMILO
 
@@ -284,7 +294,10 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 
 ---
 
-## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 78/80
+<details>
+<summary><b>Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 78/80 (local HECHO 2026-11-22; faltan M2.9.3 y M2.10.1, servidor)</b></summary>
+
+## Fase 2: Admin nuevo (hito 1, 10 a 12 semanas) — 78/80 (local HECHO 2026-11-22; faltan M2.9.3 y M2.10.1, servidor)
 
 > Next sirve la interfaz; C# sirve la API admin y reproduce los efectos secundarios que hoy hacen los observers de
 > Laravel. Filament se apaga modulo por modulo. La API publica, Node y los correos siguen en PHP y no se enteran.
@@ -415,13 +428,12 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
      la API publica, con consumidores (webapp, app, kiosko) que exigen identico a PHP.
   5. **`docs/ARQUITECTURA.md` v5:** el panel reemplaza a Filament (solo lectura), el Worker de C#, la torre de control, la
      Ayuda y los dos runners del MSI.
+</details>
 
 ---
 
-<details>
-<summary><b>Fase 3: Tiempo real en SignalR (6 semanas) — 0/23</b></summary>
 
-## Fase 3: Tiempo real en SignalR (6 semanas) — 0/23
+## Fase 3: Tiempo real en SignalR (20 a 23 sesiones; plan 6 semanas) — 0/23
 
 > El hub vive en el mismo proceso que la API admin (o en `Hub`, mismo repo). Mantiene una fachada HTTP identica a los
 > 17 endpoints internos de Node para que PHP siga avisando sin enterarse. Los 8 clientes cambian un archivo cada uno.
@@ -462,14 +474,13 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 ### 3.6 Cierre de la fase (hito 2) — 0/1
 - [ ] M3.6.1 Retro de la fase 3 (la medicion del hito es M3.5.2) **[local]**
 
-</details>
 
 ---
 
 <details>
-<summary><b>Fase 4: API publica, modulo por modulo (27 semanas) — 1/49</b></summary>
+<summary><b>Fase 4: API publica, modulo por modulo (88 a 105 sesiones; plan 27 semanas) — 1/49</b></summary>
 
-## Fase 4: API publica, modulo por modulo (27 semanas) — 1/49
+## Fase 4: API publica, modulo por modulo (88 a 105 sesiones; plan 27 semanas) — 1/49
 
 > Cada modulo sigue el mismo ciclo: portar servicios con nombre, pasar snapshots, mover sus jobs y tareas a Hangfire,
 > cruzar las rutas con `cruzar.sh` cumpliendo el criterio de cruce (M1.5.5), medir en el MSI, quitar el codigo PHP una
@@ -543,9 +554,9 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 ---
 
 <details>
-<summary><b>Fase 5: Apagar PHP (3 semanas) — 0/13</b></summary>
+<summary><b>Fase 5: Apagar PHP (10 a 12 sesiones; plan 3 semanas) — 0/13</b></summary>
 
-## Fase 5: Apagar PHP (3 semanas) — 0/13
+## Fase 5: Apagar PHP (10 a 12 sesiones; plan 3 semanas) — 0/13
 
 ### 5.1 Esquema y datos (1 semana) — 0/5
 - [ ] M5.1.1 EF Core toma el esquema: migracion inicial "baseline" que no cambia nada; la tabla `migrations` de Laravel queda como historia **[local]**
