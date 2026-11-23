@@ -3,15 +3,31 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-22 — Revision de la Ayuda en rojo en el MSI y decisiones del 17 (sesion 39)
+
+### BUG-555: `next build` y `next dev` fallan a veces con `next/font/google` en Turbopack (ABIERTO, decision de Kamilo)
+- **Severidad propuesta:** ALTA (tumba al azar la CI y puede tumbar el build del despliegue)
+- **Que pasa:** Turbopack (Next 16.2.4) a veces no resuelve su propio archivo de la fuente: "Module not found: Can't resolve
+  '@vercel/turbopack-next/internal/font/google/font'" y "next/font/google queries have exactly one entry" (Urbanist y Plus Jakarta
+  Sans, `src/app/admin/layout.tsx` y `src/app/[locale]/layout.tsx`). No es la red: el mensaje es de resolucion interna.
+- **Visto:** 2026-11-17 en el MSI (la revision de la Ayuda de `f9379e6`: el `next dev` nunca contesto /admin/login en 180 s y el
+  paso solo decia "exit code 1"); 2026-11-22 en local, 1 de 3 `next build` y 1 de 2 arranques de la e2e del panel.
+- **Arreglo:** pendiente. Opciones: (a) fuentes servidas desde el repo con `next/font/local` (las mismas, sin bajar nada al
+  compilar; recomendada), (b) compilar con webpack (`next build --webpack`), (c) esperar una version de Next que lo arregle.
+  Mientras tanto la revision lo dice claro ("El next build fallo antes de revisar ... correr de nuevo").
+
 ## 2026-11-17 — Corridas del runner de M2.9.4a y BUG-543, y la primera revision de la Ayuda en el MSI (sesion 38)
 
-### BUG-554: En escritorio, abrir Anuncios marca todos los anuncios como leidos (ABIERTO)
+### BUG-554: En escritorio, abrir Anuncios marca todos los anuncios como leidos (RESUELTO 2026-11-22)
 - **Severidad propuesta:** MEDIA (lo ve el asistente: la campana queda en 0 y todos los puntos en gris tras abrir uno)
 - **Que pasa:** `/anuncios` monta tambien la vista de celular escondida (`AnunciosM`, M.7 `51857d8`, 2026-07-10) y esa vista marca
   TODOS como leidos al montar ("en celular verlo es leerlo"). En escritorio solo se lee lo que se abre.
 - **Prueba roja:** `anuncios.spec.ts` "abrir Anuncios en escritorio sin tocar nada no marca ningun anuncio como leido" (sin carreras),
   en la lista de fallas conocidas como falla esperada; las dos pruebas viejas de la campana y del muro quedan apartadas (carrera).
-- **Arreglo:** pendiente del OK de Kamilo (que la vista de celular solo marque cuando se ve de verdad).
+- **Arreglado en:** web (sesion 39, decision de Kamilo 2026-11-22): `AnunciosM` marca todo como leido solo cuando es la vista que se
+  ve (`useIsMobile`, el mismo corte de 639 px de `mobile:`). Las tres pruebas salen de la lista de fallas conocidas; nueva e2e "en
+  celular, abrir Anuncios sigue marcando todos como leidos" y vitest "escondida en escritorio no marca nada". anuncios.spec 16/16
+  contra `next build`. Control: sin el arreglo, la vitest nueva en rojo (y la e2e de escritorio en rojo con el build viejo).
 
 ### BUG-553: La e2e de la webapp del asistente tenia 35 pruebas en rojo (RESUELTO contra la lista de fallas conocidas)
 - **Severidad:** MEDIA (la suite no protegia nada)
@@ -88,9 +104,10 @@
   importacion de la captura corre con el reloj de verdad, no con el congelado del ContratoSeeder. Tambien se movieron unos pixeles
   las marcas de `importar/3-resultado` y `marca/2-colores`.
 - **Visto:** 2026-11-09, al capturar de nuevo `crear-evento` por BUG-543. Se dejaron las capturas de `importar` como estaban.
-- **Arreglo:** pendiente (la fecha del importado con el reloj congelado, o taparla en la captura).
+- **Arreglo:** pendiente (la fecha del importado con el reloj congelado, o taparla en la captura). 2026-11-22: no fue la causa del
+  rojo de la Ayuda del 17 (fue BUG-555); la revision no lo ve porque la huella cuenta los numeros como #.
 
-### BUG-545: e2e intermitente por la primera compilacion de Next en dev (ABIERTO, conteo 3: investigar la causa)
+### BUG-545: e2e intermitente por la primera compilacion de Next en dev (RESUELTO 2026-11-22)
 - **Severidad propuesta:** BAJA (solo pruebas)
 - **Conteo (regla de Kamilo: a la tercera se investiga la causa):**
   1. 2026-11-09: `entrada.spec` "primer ingreso", sola: en `primerIngreso` fallo `toHaveURL` (no llego al Escritorio); la corrida
@@ -101,6 +118,12 @@
   3. 2026-11-17: e2e de la webapp, `anuncios.spec` "CTA ... navega a /desafio": `toHaveURL` paso de 5 s la primera vez que la
      corrida abria /desafio (Next compilando la ruta); las dos corridas siguientes pasaron. Causa comun: la primera compilacion de
      una ruta en `next dev` pasa de la espera de 5 s. Opciones: calentar rutas, e2e contra `next build`, o subir la espera.
+  4. 2026-11-22 (investigando BUG-541, en dev): dos veces `primerIngreso` fallo `toHaveURL` en la primera corrida.
+- **Arreglo (decision de Kamilo 2026-11-22):** con `E2E_NEXT=start` el servidor de prueba hace `next build && next start` (en el
+  arranque de Playwright, para que use las mismas variables; las NEXT_PUBLIC_ quedan fijas en el build). La CI del MSI y
+  `ayuda-revisar.sh` lo usan siempre, dentro del candado; en local sigue `next dev` si no se pide. Pruebas: e2e de la webapp
+  226 pasan (las 2 rojas eran BUG-554 con el build anterior al arreglo), ninguna fallo y paso al reintento; Ayuda 8/8;
+  e2e del panel entrada 9/9 y paginas 2 de 2 sin fallas de ingreso.
 
 ## 2026-11-08 — Encontrado al revisar el socket para la torre de control (M2.9.2)
 
@@ -128,20 +151,25 @@
 - **Queda (no es este bug):** las tarjetas de las secciones que siguen en Filament (`EnElActual`) y algunos botones dicen "admin
   actual"; caen con cada seccion que se porta.
 
-### BUG-542: e2e-admin/entrada.spec "una seccion que no esta hecha" quedo vieja desde M2.7.3 (ABIERTO)
+### BUG-542: e2e-admin/entrada.spec "una seccion que no esta hecha" quedo vieja desde M2.7.3 (RESUELTO 2026-11-22: prueba vieja)
 - **Severidad propuesta:** BAJA (pruebas: falla siempre, no es el panel)
 - **Que pasa:** la prueba usa Event Pulse como la seccion que sigue en Filament, pero Event Pulse tiene pagina propia desde M2.7.3;
   ya no sale "Esta seccion todavia esta en el admin actual". La nota de NEXT-SESSION ya pedia moverla de seccion cuando se portara.
 - **Visto:** 2026-11-06, corriendo las e2e del panel para M2.8.4b; falla igual con los cambios de M2.8.4b guardados aparte (git stash).
-- **Arreglo:** pendiente: usar otra seccion que siga en Filament (o quitar la prueba si ya no queda ninguna).
+- **Arreglado en:** web (sesion 39): la unica seccion que sigue llevando al admin actual es Data Center (hasta M4e.10); la prueba va
+  ahi y espera el enlace a `/data-center/`. entrada.spec 9/9.
 
-### BUG-541: e2e-admin/paginas.spec pierde la negrita al insertar la imagen (ABIERTO)
+### BUG-541: e2e-admin/paginas.spec pierde la negrita al insertar la imagen (RESUELTO 2026-11-22: carrera de la prueba, el editor esta bien)
 - **Severidad propuesta:** MEDIA (la prueba de M2.8.6 esta roja; falta ver si es la prueba o el editor)
 - **Que pasa:** despues de poner "mundo" en negrita con la barra, la prueba baja con ArrowRight, Enter y sube una imagen con el "+".
   Al reabrir la pagina, el texto es "Hola" y la imagen: "mundo" desaparecio. Lo mas probable es que la seleccion siguiera sobre
   "mundo" (ArrowRight no la colapso porque el foco quedo en el boton de la barra) y la imagen la reemplazo.
 - **Visto:** 2026-11-06, 3 corridas seguidas en rojo (linea 81, `strong` "mundo"); igual con los cambios de M2.8.4b guardados aparte.
-- **Arreglo:** pendiente: revisar si al tocar un boton de la barra el foco vuelve al editor (si no, es del editor, no de la prueba).
+- **Causa (sonda con el HTML del editor en cada paso):** el foco si vuelve al editor. "mundo" se pierde en Flecha derecha + Enter:
+  la prueba los manda seguidos a ritmo de maquina y el editor todavia tiene "mundo" seleccionado cuando llega el Enter. Con 150 ms
+  entre teclas (mas rapido que una persona) "mundo" queda; no le pasa a quien escribe.
+- **Arreglado en:** web (sesion 39): despues de la flecha la prueba espera a que se esconda la barra de formato (el editor ya no
+  tiene seleccion). paginas.spec 2 de 2 contra `next build`.
 
 ## 2026-11-06 — Del runner del MSI
 
