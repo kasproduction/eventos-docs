@@ -125,6 +125,11 @@ puede borrar, una validación que falta, un efecto que PHP no dispara), se pregu
 25. **Retro al cerrar cada fase:** que se estimo y que costo, que regla falto, que se corrige del roadmap. Va al final de
     la fase en el roadmap, en cinco lineas. **La retro actualiza `docs/ARQUITECTURA.md`** (existe desde M1.5.9 y en la
     fase 5 queda como la version final, M5.3.2).
+32. **Retomar una tarea aplazada empieza por su costo y su urgencia** (Kamilo 2026-11-22, retro de la fase 2). Antes de tocar
+    nada se dice cuanto va a costar lo que falta (sesiones y lo que se deja de hacer mientras) y si sigue siendo critica
+    para lo que viene (la demo, el hito, un cliente). Con eso Kamilo decide si sigue, se recorta o vuelve a esperar. Paso con
+    M2.8.4: aplazada el 2026-11-08, retomada el 22 sin decir el costo; se recorto en el camino (archivo unico despues del hito
+    1, la lectura de Kamilo con una demo real).
 
 ## Seguridad
 

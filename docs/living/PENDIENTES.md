@@ -479,6 +479,7 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 9. MANUAL DEL ORGANIZADOR — EN PAUSA (decision Kamilo 2026-07-19) **[congelado hasta admin .NET: documenta pantallas que se van]**
 
+> 2026-11-22: el manual ya es la Ayuda dentro del panel (M2.8.4 hecha, 22 capitulos). Quedan solo las dos tareas de abajo.
 > Se retoma al final, pre-produccion (primero bugs/funcionalidad/deploy).
 > Ventana operativa: `docs/roadmaps/ROADMAP-MANUAL.md` (5/35 — quedan M1-M7:
 > 22 paginas + capturas + deploy del sitio + links contextuales en admin).
@@ -489,6 +490,10 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] Ayuda del panel (M2.8.4b), capitulo Aprobar registros, paso 3 "O a varias a la vez": la captura sale alta y angosta (la
       barra de "Aprobar marcados" arriba y las dos filas marcadas abajo: se ven las 7 filas de la lista). Acortarla, por ejemplo
       marcando las dos primeras filas. Aplazado por Kamilo 2026-11-08: no frena nada.
+- [ ] **Despues del hito 1** (Kamilo 2026-11-22, recorte de M2.8.4d): el archivo HTML unico de la Ayuda para mandar por correo
+      (portada con el indice, cada capitulo con resumen, pasos y captura marcada; Noir para pantalla, Lux para imprimir; por rol
+      o completo; lo arma un comando). Forma ya vista en `design/features/admin/lab-como-funciona.html` (Archivo unico).
+- [ ] **Con una demo real** (Kamilo 2026-11-22, fuera de M2.8.4): pase de lectura de Kamilo de los 22 capitulos de la Ayuda.
 
 ---
 

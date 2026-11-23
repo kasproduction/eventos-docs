@@ -1,6 +1,6 @@
 # Arquitectura de EventOS: PHP y C# conviviendo
 
-> **v1, 2026-10-25** (M1.5.9 del roadmap de la migracion). Estado actual de la convivencia mientras C# reemplaza a
+> **v5, 2026-11-22** (retro de la fase 2; v1 del 2026-10-25, M1.5.9 del roadmap de la migracion). Estado actual de la convivencia mientras C# reemplaza a
 > PHP ruta por ruta. Se actualiza en la retro de cada fase (regla 25); la version final (M5.3.2) es este mismo archivo,
 > ya sin PHP ni Node. Lo que se genera desde el codigo no se copia aca (regla 28): quien atiende cada ruta esta en
 > [`contratos/rutas-duenos.md`](contratos/rutas-duenos.md), las claves de Redis en
@@ -52,10 +52,14 @@
 
 ## Lo que sigue en un solo lado
 
-- **Colas y tareas programadas:** Horizon (PHP). El Worker de C# (Hangfire) llega con los modulos que lo necesiten.
+- **Colas y tareas programadas:** Horizon (PHP) para lo que sigue en PHP. El Worker de C# (Hangfire) ya hace lo que salio de
+  PHP en la fase 2: aviso de cambio de horario, vencer baneos, push programadas y correo directo sin outbox. PHP, Api y
+  Worker del mismo corte van juntos al servidor (paso 10 de la lista de despliegue).
 - **Tiempo real:** Node / Socket.IO. Pasa a SignalR en la fase 3; mientras tanto C# escribe en Redis lo que Node lee.
-- **Panel del staff:** Filament (PHP) y el Data Center (SPA con cookie de sesion en `/api/v1/data-center/*`, D.8).
-  El admin nuevo es la fase 2; el Data Center pasa a bearer en M2.7.2.
+- **Panel del staff:** el panel de EventOS (Next + la API del admin en C#) hace todo lo del hito 1. Filament queda de solo
+  lectura en las 35 pantallas cubiertas, con el aviso que lleva al panel (M2.7.1 y M2.7.4); se borra entero en la fase 5.
+  El Data Center (SPA con cookie de sesion en `/api/v1/data-center/*`, D.8) sigue con su propio login hasta M4e.10 (M2.7.2
+  se movio ahi: hacerlo antes pedia tocar PHP); el panel solo lo enlaza.
 - **Paginas servidas por PHP** (Mission Control, display, chat-monitor, control de asistencia, Event Pulse): siguen en
   Laravel hasta M4e.7.
 
@@ -99,6 +103,17 @@ El admin nuevo (Next en `eventos-web` bajo `/admin`) habla con una API propia de
 - Pruebas de punta a punta: `pnpm e2e:admin` (`playwright.admin.config.ts`) levanta el C# en modo contratos con reloj real
   sobre `eventos_cruzadas_pruebas` y Next en el puerto 3200.
 
+## La torre de control y la Ayuda (fase 2)
+
+- **Torre de control (M2.9.1 y M2.9.2):** pantalla completa solo del super_admin (`/admin/torre`) que lee
+  `GET /api/admin/v1/torre`. C#, Node y Next reportan cada uno su vigilante por Redis (la base del socket); C# lee el registro
+  de Nginx, el pool de FPM y las colas de Horizon y Hangfire. Umbrales en un archivo (`Torre/umbrales.json`); formato en
+  `contratos/torre.md`. Las alertas hacia afuera (M2.9.3) llegan con el servidor.
+- **Ayuda del panel (M2.8.4):** viaja con la webapp, sin API: los capitulos en `src/lib/admin/ayuda/capitulos/`, las capturas en
+  `public/admin/ayuda` y sus cajas en `capturas.json`. `pnpm ayuda:capturar` las saca del panel real (C# en modo contratos);
+  `pnpm ayuda:revisar` compara la huella de cada pantalla (texto en `e2e-ayuda/huellas`) y dice que linea cambio. Cada pantalla
+  con capitulo lleva "¿Primera vez aquí? Ver cómo funciona" bajo el subtitulo (`comoFunciona.ts`).
+
 ## Redis en el equipo de desarrollo (Windows)
 
 El servidor usa Redis 7; Laragon trae Redis 5.0.14 (sin `KEEPTTL` y otras de la 6 y la 7). Decision Kamilo 2026-10-25:
@@ -138,10 +153,17 @@ localhost:6379 como el de Laragon, asi PHP, C# y las pruebas no cambian de confi
   si se relanza una corrida vieja, usa el backend de hoy, y un cambio en el backend sin push no lo ve. Para reproducir
   una corrida pasada hay que mirar que commit del backend estaba en `main` a esa hora (comprobado 2026-11-01).
 
+Desde la fase 2 hay **dos runners** en el MSI: `msi` (eventos-api-dotnet, `verificar.sh`) y `msi-web` (eventos-web, en
+`~/actions-runner-web`: la e2e de la webapp y la revision de la Ayuda). Se turnan con el candado `/tmp/eventos-msi.lock`
+(comparten puertos, la base de referencia y la memoria). La e2e de la webapp y la revision de la Ayuda corren contra
+`next build` y `next start` (`E2E_NEXT=start`, BUG-545), no contra `next dev`. Las fuentes van en el repo (`next/font/local`,
+BUG-555): compilar no sale a Google.
+
 ## Historial
 
 | Version | Fecha | Que cambio |
 |---|---|---|
+| v5 | 2026-11-22 | Retro de la fase 2: el panel reemplaza a Filament (solo lectura), Worker de C#, torre de control, Ayuda, dos runners en el MSI y e2e contra `next build` |
 | v4 | 2026-10-26 | El admin nuevo en Next: rutas, cookies, llamadas a C# y lo que pide el despliegue |
 | v3 | 2026-10-25 | Redis 7 en el equipo de desarrollo por WSL2 |
 | v2 | 2026-10-25 | La API del admin nuevo (M2.1.4): prefijo propio, evento en la ruta, limite propio, OpenAPI y tipos generados |
