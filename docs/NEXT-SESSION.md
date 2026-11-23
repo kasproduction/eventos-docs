@@ -78,22 +78,24 @@
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
 
-## SESION 2026-11-22 (Opus 5.5, 39) — AYUDA EN ROJO EXPLICADA (BUG-555), DECISIONES DEL 17 APLICADAS (BUG-554 Y 545), TRIAJE DE 541 Y 542; M2.8.4 B Y C HECHAS, D EN LAB
+## SESION 2026-11-22 (Opus 5.5, 39) — AYUDA EN ROJO EXPLICADA (BUG-555), BUG-554 Y 545 APLICADOS, 541 Y 542 TRIADOS; M2.8.4 HECHA (RECORTADA); RETRO DE LA FASE 2
 
 - Decisiones Kamilo (decisiones.md): la revision de la Ayuda dice que captura cambio y por que; BUG-554 se arregla; BUG-545 con
-  `next build` y `next start` en la CI del MSI; BUG-555 con `next/font/local` y licencias en el repo (despliegue paso 9); M2.8.4 b,
-  c y d como se propusieron, con Data Center diciendo que entra con su propio login.
-- Hecho web: `ca00507` (diferencia linea por linea en la revision de la Ayuda y resumen del script; E2E_NEXT=start; BUG-554;
-  BUG-542 prueba vieja; BUG-541 carrera de la prueba), `6ea6ac2` (BUG-555; la CI sin `--with-deps`: apt fallaba por el PPA de PHP
-  "deprecated" del MSI), `2b24df1` (M2.8.4b Contenido y Encuestas; BUG-556), `8df600e` (M2.8.4c el dia del evento; tarjeta de
-  Data Center). Lab de d: `design/features/admin/lab-como-funciona.html`.
-- Pruebas: vitest 858/858; e2e de la webapp contra `next build` 226 (las 2 rojas eran BUG-554 con el build viejo), anuncios 16/16;
-  revision de la Ayuda 22/22 dos veces; e2e del panel ayuda y entrada 10/10, paginas 2/2; 4 de 4 `next build` sin Google.
-  Controles en rojo: BUG-554 (vitest), la revision con un texto cambiado (dice el paso y la linea), la tarjeta de Data Center.
-  MSI: CI y ayuda en verde en `ca00507` y `6ea6ac2`.
-- Despliegue: paso 9 (el build de la webapp ya no sale a Google).
-- **Sigue:** Kamilo escoge la forma del "¿Como funciona?" (A, B o C) y mira el archivo unico en el lab; despues se construyen,
-  y al final su pase de lectura de los 22 capitulos. Luego el servidor (M2.9.3, M2.10.1) y la retro M2.10.2.
+  `next build` y `next start` en la CI del MSI; BUG-555 con `next/font/local` y licencias en el repo; M2.8.4 b y c completas, d
+  recortada (forma B del "¿Como funciona?"; archivo unico despues del hito 1; su lectura de los 22 capitulos con una demo real);
+  Data Center dice que entra con su propio login; **regla 32: al retomar una tarea aplazada, antes de empezar decir cuanto cuesta
+  y si sigue siendo critica** (Kamilo se molesto porque se siguio con la Ayuda sin decirlo).
+- Hecho web: `ca00507` (diferencia linea por linea en la revision de la Ayuda; E2E_NEXT=start; BUG-554; BUG-542 prueba vieja;
+  BUG-541 carrera de la prueba), `6ea6ac2` (BUG-555; la CI sin `--with-deps`), `2b24df1` (M2.8.4b Contenido y Encuestas;
+  BUG-556), `8df600e` (M2.8.4c el dia del evento; tarjeta de Data Center), `4e2fe2f` (M2.8.4d, forma B). Docs: retro M2.10.2 en
+  el roadmap, regla 32 en BUENAS-PRACTICAS, ARQUITECTURA v5, PENDIENTES §9.
+- Pruebas: vitest 862/862; e2e de la webapp contra `next build` 226 (las 2 rojas eran BUG-554 con el build viejo), anuncios
+  16/16; revision de la Ayuda 22/22 dos veces y captura completa 22/22; e2e del panel ayuda 2/2, entrada 9/9 y paginas 2/2.
+  Controles en rojo: BUG-554, la revision con un texto cambiado, la tarjeta de Data Center y la linea "Ver como funciona".
+  MSI: CI y ayuda en verde hasta `8df600e`; las de `4e2fe2f` corrian al cerrar.
+- Despliegue: paso 9 (el build de la webapp ya no sale a Google). Lo demas de la lista sigue pendiente.
+- **Sigue:** confirmar en verde la CI y `ayuda` de `4e2fe2f`; despues lo que queda de la fase 2 (78/80) necesita el servidor:
+  M2.9.3 (alertas) y M2.10.1 (medicion del hito 1). Preguntarle a Kamilo cuando lo prende (dijo que lo prendia al terminar esto).
 
 ## SESION 2026-11-17 (Opus 5.5, 38) — M2.9.4 CERRADA ("QUE LE PASO", PANTALLA Y RASTRO DE UNA LINEA POR MIRADA); RUNNER DEL MSI EN VERDE (PNPM, SEGUNDO RUNNER, CANDADO); E2E DE LA WEBAPP AL DIA (BUG-553)
 
