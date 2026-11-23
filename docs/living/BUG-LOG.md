@@ -5,6 +5,14 @@
 
 ## 2026-11-22 — Encontrado al portar la entrada del socket a C# (M3.1.2, sesion 40)
 
+### BUG-558: CruceDeRedisConNodeTest "empezando por el hub" fallo una vez en una corrida combinada (ABIERTO, conteo 1)
+- **Severidad propuesta:** BAJA (solo pruebas)
+- **Que pasa:** en la primera corrida del hub junto con las transversales (justo despues de compilar), "El_limite_es_un_solo_contador_
+  empezando_por_el_hub" fallo; el mensaje no quedo. Seis corridas despues (tres del hub solo, tres combinadas) pasaron todas.
+- **Visto:** 2026-11-22, M3.1.5.
+- **Hecho:** las dos pruebas del limite revisan al empezar que la llave no exista ("La llave del limite ya existia"), para que una
+  proxima falla diga el motivo. Regla de Kamilo: a la tercera se investiga la causa.
+
 ### BUG-557: El registro sin aprobar entra al socket de Node con la ficha que el mismo Node escribio (RESUELTO EN C#; Node sin tocar)
 - **Severidad propuesta:** MEDIA (salta BUG-440: alguien que el organizador no aprobo recibe el tiempo real del evento)
 - **Que pasa:** sin ficha en Redis, `auth.ts` valida contra `/auth/me` y guarda esa respuesta como ficha (`writeSharedAuth`) ANTES de

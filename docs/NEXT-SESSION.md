@@ -44,6 +44,8 @@
    puede entrar.
 6. **`npm run build` en eventos-backend** (tema de Filament: estilos de los avisos de solo lectura).
 7. **Runtime de ASP.NET Core 10.0.15 o mas** en la maquina de la Api y del Worker (GHSA-wr8v-9x5q-ggcm, M3.1.1; `dotnet --list-runtimes`).
+   **Tiempo real (M3.1.6):** `TiempoReal__OrigenesPermitidos` con los origenes de la webapp y las paginas estaticas (como
+   `ALLOWED_ORIGINS` de Node); vacia, ningun navegador entra al hub. El hub (`/tiempo-real`) no va al Nginx hasta la fase 3.5.
    **Variables de la Api de C#** (doble guion bajo; tabla en `contratos/variables.md`): `ConnectionStrings__MySql`,
    `ConnectionStrings__Redis`, `App__Key`, `App__PreviousKeys`, `App__QrSecret`, `App__Url`, `App__WebappUrl`,
    `App__TrustedProxies`, `Sesion__Minutos` (120, como `SESSION_LIFETIME`), `Php__Cache__Prefijo` y `Php__Cache__BaseDeRedis`
@@ -78,6 +80,24 @@
 12. **Despues de prender:** medir las rutas cruzadas detras del Nginx real y anotarlas (`rutas-duenos.md`, regla 20; hoy
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
+
+## SESION 2026-11-22 (Opus 5.5, 40) — FASE 3 ABIERTA: HUB DE SIGNALR CON SU ENTRADA, CONEXIONES EN REDIS, SALAS, LIMITES Y ORIGENES (3.1 COMPLETO); ENCABEZADO DEL ROADMAP REESCRITO
+
+- Decisiones Kamilo (decisiones.md): encabezado del roadmap reescrito (decision tomada, hitos 0 y 1 con fecha real); estimacion en
+  sesiones (fase 3: 20 a 23; 4: 88 a 105; 5: 10 a 12; a 5 por semana, referencia 39 sesiones de la fase 2); el hub vive en la Api
+  hasta el primer evento real con la fase 3 encendida (cada despliegue de la Api tumba las conexiones); SignalR 10.0.15 por
+  GHSA-wr8v-9x5q-ggcm; las llaves de Redis compartidas con Node se prueban en los dos sentidos con el codigo real de Node; las
+  propuestas de bloque van sin estimacion en sesiones.
+- Hecho: C# `21922bc` (M3.1.1 y M3.1.2: hub `/tiempo-real` y `PuertaDelSocket`; BUG-557), `673b252` (M3.1.3: conexiones en
+  Redis, tope global de 5, grupo `asistente:{id}`), `e8ffdd3` (M3.1.4 a M3.1.6: salas, `join:*`, limites `rl:*`, origenes,
+  cruce con Node, `verificar.sh` baja el socket si hay llave); socket `5651a70` (`scripts/cruce-redis.ts`, `validateSessionAccess`
+  exportada).
+- Pruebas: hub 36/36 (tres veces), con el cruce de Node 8/8; 25 controles en rojo en la sesion (entrada 4, conexiones 5, cruce 4,
+  salas 6 y el de la ventana); transversales en verde. BUG-558 (intermitente, conteo 1). MSI: `verificar` de `673b252` en verde
+  (incluye `21922bc`); el de `e8ffdd3` corria al cerrar. Web `4e2fe2f`: CI y ayuda en verde.
+- Despliegue: paso 7 (runtime 10.0.15 y `TiempoReal__OrigenesPermitidos`).
+- **Sigue:** confirmar en verde el `verificar` de `e8ffdd3`; Kamilo crea en el MSI la llave de solo lectura `github-socket` (como
+  `github-web`) para que el cruce con Node corra en el runner; despues proponer el bloque 3.2 (chat, display y audiencia).
 
 ## SESION 2026-11-22 (Opus 5.5, 39) — AYUDA EN ROJO EXPLICADA (BUG-555), BUG-554 Y 545 APLICADOS, 541 Y 542 TRIADOS; M2.8.4 HECHA (RECORTADA); RETRO DE LA FASE 2
 
