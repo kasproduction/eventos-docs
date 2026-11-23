@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cómo funciona en el panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Lab M2.8.4d: donde va el "¿Cómo funciona?" de cada pantalla (abre la Ayuda en el capitulo de esa pantalla) y como se ve el
+   archivo unico de la Ayuda para mandar por correo. Mismos tokens del panel (Noir y Lux). La captura es la real de la Ayuda. */
+:root{
+  --bg:#0A0A0A;--bg-1:#0E0E0E;--card:rgba(255,255,255,.03);--card-hi:rgba(255,255,255,.05);--campo:rgba(255,255,255,.05);
+  --b:rgba(255,255,255,.06);--b-hi:rgba(255,255,255,.10);--b-st:rgba(255,255,255,.14);
+  --t:#FFFFFF;--t2:rgba(255,255,255,.6);--t3:rgba(255,255,255,.4);
+  --ink:#FFFFFF;--ink-c:#101010;--sombra:none;
+  --f:'Urbanist',ui-sans-serif,system-ui,sans-serif;--fh:'Plus Jakarta Sans',var(--f);--r:8px;--r-l:12px;
+}
+body.lux{
+  --bg:#F6F8FA;--bg-1:#FAFBFC;--card:#FFFFFF;--card-hi:#F6F8FA;--campo:#F0F2F5;
+  --b:rgba(0,0,0,.08);--b-hi:rgba(0,0,0,.13);--b-st:rgba(0,0,0,.18);
+  --t:#131417;--t2:#3A3B40;--t3:#5C5D63;--ink:#1A1B1E;--ink-c:#FFFFFF;
+  --sombra:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--t);font:500 14px/1.5 var(--f);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.lab{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 16px;background:#0b0b0c;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+.lab h1{font:800 14px var(--fh);margin:0 6px 0 0}.lab .lb{color:rgba(255,255,255,.45);font-size:13px}
+.seg{display:flex;padding:3px;gap:2px;border-radius:10px;background:#1c1c1f}
+.seg button{border:0;background:none;color:rgba(255,255,255,.6);font-weight:600;font-size:12.5px;padding:6px 10px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.seg button.on{background:#fff;color:#111}
+.desc{padding:14px 24px;font-size:14px;color:var(--t2);border-bottom:1px solid var(--b);max-width:980px}.desc strong{color:var(--t);font-family:var(--fh)}
+
+.app{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 110px)}
+.lado{border-right:1px solid var(--b);padding:20px 14px;background:var(--bg-1)}
+.lado .gr{font-size:11px;color:var(--t3);margin:14px 0 4px 12px}
+.lado span{display:block;padding:7px 12px;border-radius:var(--r);color:var(--t2);font-size:14px}
+.lado span.on{background:var(--ink);color:var(--ink-c)}
+.cont{padding:28px 32px 60px;min-width:0}
+.miga-fila{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.miga{font-size:12.5px;color:var(--t3)}
+.cabeza{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-top:4px}
+.h1{font:800 26px/1.2 var(--fh);letter-spacing:-.5px;margin:0}
+.sub{margin:4px 0 0;color:var(--t3)}
+.acciones{display:flex;gap:10px;align-items:center}
+.btn{border:0;border-radius:var(--r);padding:10px 16px;font-weight:700;cursor:pointer;background:var(--ink);color:var(--ink-c);white-space:nowrap}
+.btn.suave{background:var(--card-hi);color:var(--t);border:1px solid var(--b-hi)}
+/* Sin subrayado como accion (regla de Kamilo): el enlace de texto es negrita y cambia de tono al pasar. */
+.enlace{border:0;background:none;padding:0;cursor:pointer;font-weight:700;color:var(--t)}
+.enlace:hover{color:var(--t2)}
+.chico{font-size:12.5px;font-weight:600;color:var(--t2)}.chico:hover{color:var(--t)}
+.ayuda-linea{margin:10px 0 0;color:var(--t3);font-size:13.5px;display:flex;gap:8px;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;padding:5px;border-radius:var(--r-l);border:1px solid var(--b);background:var(--card);margin:22px 0 18px;width:max-content;box-shadow:var(--sombra)}
+.tabs span{padding:7px 14px;border-radius:var(--r);color:var(--t2)}.tabs span.on{background:var(--ink);color:var(--ink-c)}
+.tabla{border:1px solid var(--b);border-radius:var(--r-l);background:var(--card);box-shadow:var(--sombra);overflow:hidden}
+.fila{display:grid;grid-template-columns:2fr 1.4fr 1fr 1fr;gap:12px;padding:14px 18px;border-top:1px solid var(--b);color:var(--t2)}
+.fila:first-child{border-top:0;color:var(--t3);font-size:12.5px}
+.fila b{color:var(--t);font-weight:600}
+.nota{margin:18px 0 0;padding:12px 14px;border:1px dashed var(--b-st);border-radius:var(--r-l);color:var(--t2);font-size:13.5px;max-width:760px}
+.nota strong{color:var(--t)}
+
+/* Archivo unico */
+.doc{max-width:860px;margin:0 auto;padding:40px 32px 80px}
+.doc .portada{border-bottom:1px solid var(--b);padding-bottom:22px;margin-bottom:26px}
+.doc .marca-ev{font:800 13px var(--fh);color:var(--t3);letter-spacing:.02em}
+.doc h2{font:800 34px/1.15 var(--fh);letter-spacing:-.02em;margin:8px 0 6px}
+.doc .ind{columns:2;column-gap:32px;margin:18px 0 0;padding:0;list-style:none;font-size:14px;color:var(--t2)}
+.doc .ind li{break-inside:avoid;padding:3px 0}.doc .ind b{color:var(--t);font-family:var(--fh)}
+.doc h3{font:800 22px var(--fh);margin:34px 0 8px}
+.doc .res{border:1px solid var(--b-hi);background:var(--card);border-radius:var(--r-l);padding:12px 14px;color:var(--t2);box-shadow:var(--sombra)}
+.doc .res strong{color:var(--t)}
+.doc h4{font:700 16px var(--fh);margin:22px 0 8px;display:flex;gap:10px;align-items:center}
+.doc h4 i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--ink-c);font:800 12px var(--fh)}
+.doc .cap{position:relative;border-radius:var(--r-l);overflow:hidden;border:1px solid var(--b-hi);box-shadow:var(--sombra)}
+.doc .cap img{display:block;width:100%;height:auto}
+.mk{position:absolute;border:2px solid rgba(255,255,255,.9);border-radius:8px;box-shadow:0 0 0 3px rgba(0,0,0,.35)}
+.mk b{position:absolute;left:-13px;top:-13px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#0A0A0A;font:800 13px var(--fh);box-shadow:0 2px 10px rgba(0,0,0,.5)}
+.doc p{color:var(--t2);font-size:15px;margin:10px 0}.doc p strong{color:var(--t)}
+.oculto{display:none!important}
+@media (max-width:760px){.app{grid-template-columns:1fr}.lado{display:none}.cont{padding:20px 16px}.cabeza{flex-direction:column}.doc{padding:24px 16px}.doc .ind{columns:1}}
+</style>
+</head>
+<body>
+<div class="lab">
+  <h1>Cómo funciona</h1>
+  <span class="lb">Forma</span>
+  <div class="seg" id="formas">
+    <button class="on" data-f="a">A en la fila del título</button>
+    <button data-f="b">B bajo el subtítulo</button>
+    <button data-f="c">C junto a la miga</button>
+    <button data-f="doc">Archivo único</button>
+  </div>
+  <span class="lb">Tema</span>
+  <div class="seg" id="temas"><button class="on" data-t="noir">Noir</button><button data-t="lux">Lux</button></div>
+</div>
+
+<div class="desc" id="desc"></div>
+
+<div class="app" id="pantalla">
+  <nav class="lado" aria-label="Menú">
+    <span>Escritorio</span>
+    <div class="gr">Contenido</div>
+    <span class="on">Agenda</span><span>Speakers</span><span>Sponsors</span><span>Documentos</span><span>Páginas</span>
+    <div class="gr">Personas</div><span>Asistentes</span>
+    <div class="gr">Sistema</div><span>Ayuda</span>
+  </nav>
+  <main class="cont">
+    <div class="miga-fila">
+      <div class="miga">Agenda &gt; Sesiones</div>
+      <button class="enlace chico forma-c">¿Cómo funciona?</button>
+    </div>
+    <div class="cabeza">
+      <div>
+        <h2 class="h1">Sesiones</h2>
+        <p class="sub">Lo que ven los asistentes en la Agenda de la app.</p>
+        <p class="ayuda-linea forma-b"><span>¿Primera vez aquí?</span><button class="enlace">Ver cómo funciona</button></p>
+      </div>
+      <div class="acciones">
+        <button class="btn suave forma-a">¿Cómo funciona?</button>
+        <button class="btn">Crear sesión</button>
+      </div>
+    </div>
+    <div class="tabs"><span class="on">Sesiones</span><span>Tracks</span><span>Tipos de sesión</span></div>
+    <div class="tabla">
+      <div class="fila"><span>Título</span><span>Inicio</span><span>Sala</span><span>Estado</span></div>
+      <div class="fila"><b>Apertura</b><span>06/12/2026 08:30</span><span>Auditorio Principal</span><span>Finalizada</span></div>
+      <div class="fila"><b>Plataformas que aguantan</b><span>06/12/2026 09:45</span><span>Auditorio Principal</span><span>En vivo</span></div>
+      <div class="fila"><b>Datos para decidir</b><span>06/12/2026 11:00</span><span>Auditorio Principal</span><span>Programada</span></div>
+    </div>
+    <p class="nota"><strong>Al tocarlo:</strong> abre la Ayuda en el capítulo de esta pantalla ("Armar la agenda"), paso 1, en la misma pestaña. Las pantallas sin capítulo no lo muestran. Sin teclas visibles ni íconos nuevos.</p>
+  </main>
+</div>
+
+<article class="doc oculto" id="doc">
+  <header class="portada">
+    <div class="marca-ev">EventOS</div>
+    <h2>Ayuda del panel de EventOS</h2>
+    <p>Paso a paso, con las pantallas reales. Versión del 22 de noviembre de 2026.</p>
+    <ol class="ind">
+      <li><b>Primeros pasos</b> Crear tu evento, la marca, los módulos, tu equipo</li>
+      <li><b>Asistentes</b> Importar, aprobar, etiquetas, credencial</li>
+      <li><b>Contenido</b> Agenda, speakers, sponsors, documentos, páginas</li>
+      <li><b>Encuestas</b> Hacer una encuesta, activarla y cerrarla</li>
+      <li><b>El día del evento</b> Avisos, muro, soporte, Qué le pasó, Mission Control, Event Pulse, Data Center</li>
+    </ol>
+  </header>
+  <h3>Armar la agenda</h3>
+  <div class="res"><strong>Lo más importante:</strong> lo que guardas aquí lo ven los asistentes en la Agenda de la app. Cada sesión tiene su propio Mission Control para el día del evento.</div>
+  <h4><i>1</i>Entra a la Agenda</h4>
+  <div class="cap"><img id="cap" src="lab-como-funciona/agenda-noir.png" alt="La lista de sesiones del panel">
+    <span class="mk" style="left:0.7%;top:16.2%;width:16.3%;height:6.3%"><b>1</b></span>
+    <span class="mk" style="left:26.5%;top:22.4%;width:14.3%;height:6.3%"><b>2</b></span>
+    <span class="mk" style="left:20.2%;top:38.8%;width:77.4%;height:47.8%"><b>3</b></span>
+    <span class="mk" style="left:87.6%;top:13.5%;width:10.1%;height:6.7%"><b>4</b></span>
+  </div>
+  <p>En el menú, en <strong>Contenido</strong>, toca <strong>Agenda</strong>. Ves las sesiones con su hora, su sala y su estado.</p>
+  <p>En <strong>Tracks</strong> y <strong>Tipos de sesión</strong> creas las etiquetas que agrupan las charlas. Cuando estés listo, toca <strong>Crear sesión</strong>.</p>
+  <p class="nota"><strong>Cómo sale:</strong> un solo archivo HTML con las capturas adentro, sin internet para abrirlo. Va en el tema que se escoja al generarlo (Noir para leer en pantalla, Lux para imprimir), con los capítulos que puede usar cada rol o completo. Lo arma un comando, como las capturas.</p>
+</article>
+
+<script>
+const textos = {
+  a: "<strong>A, en la fila del título.</strong> Un botón suave al lado del botón principal de la pantalla. Siempre en el mismo lugar y fácil de encontrar; compite un poco con la acción principal.",
+  b: "<strong>B, bajo el subtítulo.</strong> Una línea tenue con el enlace en negrita, sin subrayado. Se lee como parte de la explicación de la pantalla y no compite con los botones; en pantallas con subtítulo largo queda más abajo.",
+  c: "<strong>C, junto a la miga.</strong> Pequeño y tenue, arriba a la derecha. Es lo que menos se nota: limpio para quien ya sabe, pero quien llega por primera vez puede no verlo.",
+  doc: "<strong>Archivo único.</strong> La Ayuda completa en un archivo para mandar por correo: portada con el índice y cada capítulo con su resumen, sus pasos y la captura marcada."
+};
+const desc = document.getElementById("desc");
+let forma = "a";
+function pintar() {
+  desc.innerHTML = textos[forma];
+  document.getElementById("pantalla").classList.toggle("oculto", forma === "doc");
+  document.getElementById("doc").classList.toggle("oculto", forma !== "doc");
+  for (const f of ["a", "b", "c"]) document.querySelectorAll(".forma-" + f).forEach((el) => el.classList.toggle("oculto", f !== forma));
+}
+document.getElementById("formas").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  forma = b.dataset.f;
+  document.querySelectorAll("#formas button").forEach((x) => x.classList.toggle("on", x === b));
+  pintar();
+});
+document.getElementById("temas").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  document.body.classList.toggle("lux", b.dataset.t === "lux");
+  document.getElementById("cap").src = "lab-como-funciona/agenda-" + b.dataset.t + ".png";
+  document.querySelectorAll("#temas button").forEach((x) => x.classList.toggle("on", x === b));
+});
+pintar();
+</script>
+</body>
+</html>

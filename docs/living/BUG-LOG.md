@@ -5,6 +5,12 @@
 
 ## 2026-11-22 — Revision de la Ayuda en rojo en el MSI y decisiones del 17 (sesion 39)
 
+### BUG-556: En Nuevo documento, "Ver archivo" y el tipo y peso salen pegados (RESUELTO 2026-11-22)
+- **Severidad:** BAJA (visual del panel: "Ver archivoPDF, 1 KB")
+- **Visto:** 2026-11-22, en la captura `documentos/1-subir` de la Ayuda (M2.8.4b).
+- **Causa:** `.adm-archivo-actual` no tenia estilo; el enlace y el texto tenue quedaban sin espacio.
+- **Arreglado en:** web `2b24df1`: flex con 12 px entre los dos (admin.css). Visto en la captura nueva `documentos/2-subir`.
+
 ### BUG-555: `next build` y `next dev` fallan a veces con `next/font/google` en Turbopack (RESUELTO 2026-11-22)
 - **Severidad propuesta:** ALTA (tumba al azar la CI y puede tumbar el build del despliegue)
 - **Que pasa:** Turbopack (Next 16.2.4) a veces no resuelve su propio archivo de la fuente: "Module not found: Can't resolve
