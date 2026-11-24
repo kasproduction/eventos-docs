@@ -5,6 +5,14 @@
 
 ## 2026-11-24 — El marco del panel contra Filament (sesion 42, lab "Panel nuevo contra Filament")
 
+### BUG-571: Paginas y las plantillas de correo dan error 500 al abrirlas en el panel (ABIERTO)
+- **Severidad propuesta:** ALTA (no se puede crear ni editar una pagina ni abrir ninguna plantilla de correo del evento real)
+- **Que pasa:** `EditorConFormato` llama a `DOMParser` mientras el servidor arma la pagina (`src/lib/admin/editor/contenido.ts:136`,
+  `seEntiende`, desde `EditorConFormato.tsx:37`); en el servidor no existe y Next responde 500 ("ReferenceError: DOMParser is not
+  defined"). Visto en la pasada de medicion del 2026-11-24: `paginas/nuevo`, `paginas/1` y `emails/invitation`, `welcome` y
+  `welcome_access`. Las e2e de Paginas y Emails pasan con los datos de prueba: no llegan a ese camino con el contenido real.
+- **Estado:** en la lista del lab "Panel nuevo contra Filament"; se arregla en el bloque de defectos que decida Kamilo.
+
 ### BUG-570: Las fotos de las tablas del panel salian aplastadas (8 x 40 px en Speakers) (RESUELTO 2026-11-24)
 - **Severidad propuesta:** MEDIA (visual; Kamilo lo vio en Speakers al comparar con Filament)
 - **Que pasa:** la regla general de las imagenes (`img { max-width: 100% }`) encogia `.adm-foto` al ancho que le dejaba la celda:

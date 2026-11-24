@@ -1,0 +1,7269 @@
+[
+ {
+  "id": "01",
+  "filament": "",
+  "nuevo": "eventos/1/",
+  "f": {
+   "url": "/admin",
+   "estado": 200,
+   "titulo": "Summit Empresarial 2026",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "¿Qué quieres hacer?"
+   ],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 5,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 666
+  },
+  "n": {
+   "url": "/admin/eventos/1",
+   "estado": 200,
+   "titulo": "Summit Empresarial 2026",
+   "migas": "Escritorio",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 159
+  }
+ },
+ {
+  "id": "02",
+  "filament": "mi-seguridad",
+  "nuevo": "cuenta/seguridad",
+  "f": {
+   "url": "/admin/cuenta/seguridad",
+   "estado": 200,
+   "titulo": "Seguridad de tu cuenta",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Cómo entras",
+    "Sesiones abiertas",
+    "Equipos de confianza",
+    "Actividad reciente"
+   ],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 24,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 2429
+  },
+  "n": {
+   "url": "/admin/cuenta/seguridad",
+   "estado": 200,
+   "titulo": "Seguridad de tu cuenta",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Cómo entras",
+    "Sesiones abiertas",
+    "Equipos de confianza",
+    "Actividad reciente"
+   ],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 24,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 2429
+  }
+ },
+ {
+  "id": "03",
+  "filament": "agenda/event-sessions",
+  "nuevo": "eventos/1/agenda",
+  "f": {
+   "url": "/admin/agenda/event-sessions",
+   "estado": 200,
+   "titulo": "Sesiones",
+   "migas": "Agenda Sesiones Listado",
+   "pestanas": [
+    "Sesiones (icono)",
+    "Tracks (icono)",
+    "Tipos de sesión (icono)"
+   ],
+   "columnas": [
+    "TÍTULO",
+    "INICIO",
+    "FIN",
+    "SALA",
+    "TIPO",
+    "TRACK",
+    "ESTADO"
+   ],
+   "filas": 25,
+   "accionesDeFila": [
+    "Monitor"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 37,
+   "insignias": [
+    "0",
+    "Keynote",
+    "Negocios",
+    "Programada",
+    "Workshop",
+    "Tecnología",
+    "Finalizada",
+    "Innovación",
+    "Networking",
+    "En vivo",
+    "Panel",
+    "Liderazgo"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 25 de 50 resultados por página 5 10 25 50 Todos 1 2",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0",
+    "Alternar columnas"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 3605
+  },
+  "n": {
+   "url": "/admin/eventos/1/agenda",
+   "estado": 200,
+   "titulo": "Sesiones",
+   "migas": "Agenda Sesiones",
+   "pestanas": [
+    "Sesiones",
+    "Tracks",
+    "Tipos de sesión"
+   ],
+   "columnas": [
+    "Título",
+    "Inicio",
+    "Fin",
+    "Sala",
+    "Tipo",
+    "Track",
+    "Estado",
+    "Acciones"
+   ],
+   "filas": 25,
+   "accionesDeFila": [
+    "Monitor",
+    "Editar",
+    "Borrar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]",
+    "Por página 5 10 25 50 [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 81,
+   "insignias": [
+    "Keynote",
+    "Negocios",
+    "Programada",
+    "Workshop",
+    "Tecnología",
+    "Finalizada",
+    "Innovación",
+    "Networking",
+    "En vivo",
+    "Panel",
+    "Liderazgo"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 3644
+  }
+ },
+ {
+  "id": "04",
+  "filament": "agenda/event-sessions/create",
+  "nuevo": "eventos/1/agenda/nueva",
+  "f": {
+   "url": "/admin/agenda/event-sessions/create",
+   "estado": 404,
+   "titulo": "404",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 17
+  },
+  "n": {
+   "url": "/admin/eventos/1/agenda/nueva",
+   "estado": 200,
+   "titulo": "Crear sesión",
+   "migas": "Sesiones Crear sesión",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "La sesión",
+    "Programación",
+    "Estado*",
+    "Lugar",
+    "Clasificación"
+   ],
+   "campos": [
+    "Título* [text]",
+    "Descripción [textarea]",
+    "URL del stream [text]",
+    "Iframe de transmisión [textarea]",
+    "URL de la grabación [text]",
+    "Panel interactivo inicial* [select]",
+    "Inicio* [datetime-local]",
+    "Fin* [datetime-local]",
+    "Programada [radio]",
+    "En vivo [radio]",
+    "Finalizada [radio]",
+    "Cancelada [radio]",
+    "Ubicación (texto en agenda) [text]",
+    "Salón (check-in) [select]",
+    "Aforo [text]",
+    "Tipo [select]",
+    "Track [select]",
+    "Grupo Silent Disco [text]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 2,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1041,
+   "textoLargo": 767
+  }
+ },
+ {
+  "id": "05",
+  "filament": "agenda/event-sessions/235/edit",
+  "nuevo": "eventos/1/agenda/235",
+  "f": {
+   "url": "/admin/agenda/event-sessions/235/edit",
+   "estado": 404,
+   "titulo": "404",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 17
+  },
+  "n": {
+   "url": "/admin/eventos/1/agenda/235",
+   "estado": 200,
+   "titulo": "Apertura: el futuro del trabajo corporativo",
+   "migas": "Sesiones Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "La sesión",
+    "Speakers",
+    "Mission Control",
+    "Programación",
+    "Estado*",
+    "Lugar",
+    "Clasificación"
+   ],
+   "campos": [
+    "Título* [text]",
+    "Descripción [textarea]",
+    "URL del stream [text]",
+    "Iframe de transmisión [textarea]",
+    "URL de la grabación [text]",
+    "Panel interactivo inicial* [select]",
+    "Inicio* [datetime-local]",
+    "Fin* [datetime-local]",
+    "Programada [radio]",
+    "En vivo [radio]",
+    "Finalizada [radio]",
+    "Cancelada [radio]",
+    "Ubicación (texto en agenda) [text]",
+    "Salón (check-in) [select]",
+    "Aforo [text]",
+    "Tipo [select]",
+    "Track [select]",
+    "Grupo Silent Disco [text]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "24x24 r=50%",
+    "24x24 r=50%",
+    "128x72 r=8px"
+   ],
+   "iconos": 7,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1376
+  }
+ },
+ {
+  "id": "06",
+  "filament": "agenda/session-tracks",
+  "nuevo": "eventos/1/agenda/tracks",
+  "f": {
+   "url": "/admin/agenda/session-tracks",
+   "estado": 200,
+   "titulo": "Tracks",
+   "migas": "Agenda Tracks Listado",
+   "pestanas": [
+    "Sesiones (icono)",
+    "Tracks (icono)",
+    "Tipos de sesión (icono)"
+   ],
+   "columnas": [
+    "COLOR",
+    "TRACK",
+    "SESIONES"
+   ],
+   "filas": 5,
+   "accionesDeFila": [
+    "Negocios",
+    "10",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 12,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 5 de 5 resultados por página 5 10 25 50 Todos",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 454
+  },
+  "n": {
+   "url": "/admin/eventos/1/agenda/tracks",
+   "estado": 200,
+   "titulo": "Tracks",
+   "migas": "Agenda Tracks",
+   "pestanas": [
+    "Sesiones",
+    "Tracks",
+    "Tipos de sesión"
+   ],
+   "columnas": [
+    "Color",
+    "Track",
+    "Sesiones",
+    "Editar"
+   ],
+   "filas": 5,
+   "accionesDeFila": [
+    "Editar",
+    "Borrar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 14,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 322
+  }
+ },
+ {
+  "id": "07",
+  "filament": "agenda/session-tracks/create",
+  "nuevo": "eventos/1/agenda/tracks/nuevo",
+  "f": {
+   "url": "/admin/agenda/session-tracks/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/agenda/tracks/nuevo",
+   "estado": 200,
+   "titulo": "Crear track",
+   "migas": "Agenda Crear track",
+   "pestanas": [
+    "Sesiones",
+    "Tracks",
+    "Tipos de sesión"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El track"
+   ],
+   "campos": [
+    "Nombre del track* [text]",
+    "Descripción [textarea]",
+    "Color* [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 162
+  }
+ },
+ {
+  "id": "08",
+  "filament": "agenda/session-tracks/6/edit",
+  "nuevo": "eventos/1/agenda/tracks/6",
+  "f": {
+   "url": "/admin/agenda/session-tracks/6/edit",
+   "estado": 200,
+   "titulo": "Editar Tecnología",
+   "migas": "Agenda Tracks Tecnología Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El track"
+   ],
+   "campos": [
+    "Nombre del track [text]",
+    "Descripción [textarea]",
+    "Color [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 4,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 268
+  },
+  "n": {
+   "url": "/admin/eventos/1/agenda/tracks/6",
+   "estado": 200,
+   "titulo": "Editar track",
+   "migas": "Agenda Editar track",
+   "pestanas": [
+    "Sesiones",
+    "Tracks",
+    "Tipos de sesión"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El track"
+   ],
+   "campos": [
+    "Nombre del track* [text]",
+    "Descripción [textarea]",
+    "Color* [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 174
+  }
+ },
+ {
+  "id": "09",
+  "filament": "agenda/session-types",
+  "nuevo": "eventos/1/agenda/tipos",
+  "f": {
+   "url": "/admin/agenda/session-types",
+   "estado": 200,
+   "titulo": "Tipos De Sesión",
+   "migas": "Agenda Tipos De Sesión Listado",
+   "pestanas": [
+    "Sesiones (icono)",
+    "Tracks (icono)",
+    "Tipos de sesión (icono)"
+   ],
+   "columnas": [
+    "COLOR",
+    "NOMBRE",
+    "SLUG",
+    "SESIONES"
+   ],
+   "filas": 4,
+   "accionesDeFila": [
+    "Keynote",
+    "keynote",
+    "18",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 13,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 4 de 4 resultados por página 5 10 25 50 Todos",
+   "buscar": 1,
+   "filtros": [
+    "Alternar columnas"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 508
+  },
+  "n": {
+   "url": "/admin/eventos/1/agenda/tipos",
+   "estado": 200,
+   "titulo": "Tipos de sesión",
+   "migas": "Agenda Tipos de sesión",
+   "pestanas": [
+    "Sesiones",
+    "Tracks",
+    "Tipos de sesión"
+   ],
+   "columnas": [
+    "Color",
+    "Nombre",
+    "Slug",
+    "Sesiones",
+    "Editar"
+   ],
+   "filas": 4,
+   "accionesDeFila": [
+    "Editar",
+    "Borrar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 12,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 351
+  }
+ },
+ {
+  "id": "10",
+  "filament": "agenda/session-types/create",
+  "nuevo": "eventos/1/agenda/tipos/nuevo",
+  "f": {
+   "url": "/admin/agenda/session-types/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/agenda/tipos/nuevo",
+   "estado": 200,
+   "titulo": "Crear tipo de sesión",
+   "migas": "Agenda Crear tipo de sesión",
+   "pestanas": [
+    "Sesiones",
+    "Tracks",
+    "Tipos de sesión"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El tipo"
+   ],
+   "campos": [
+    "Nombre* [text]",
+    "Color* [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 157
+  }
+ },
+ {
+  "id": "11",
+  "filament": "agenda/session-ratings",
+  "nuevo": "-",
+  "f": {
+   "url": "/admin/agenda/session-ratings",
+   "estado": 200,
+   "titulo": "Session Ratings",
+   "migas": "Agenda Session Ratings Listado",
+   "pestanas": [
+    "Sesiones (icono)",
+    "Tracks (icono)",
+    "Tipos de sesión (icono)"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Exportar CSV"
+   ],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 10,
+   "insignias": [
+    "0"
+   ],
+   "vacio": "No se encontraron registros",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0",
+    "Alternar columnas"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 156
+  },
+  "n": null
+ },
+ {
+  "id": "12",
+  "filament": "speakers",
+  "nuevo": "eventos/1/speakers",
+  "f": {
+   "url": "/admin/speakers",
+   "estado": 200,
+   "titulo": "Speakers",
+   "migas": "Speakers Listado",
+   "pestanas": [],
+   "columnas": [
+    "SPEAKER",
+    "SESIONES"
+   ],
+   "filas": 10,
+   "accionesDeFila": [
+    "Maria Garcia CEO & Fundadora · Kasproduction",
+    "8",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "40x40 r=9999px",
+    "40x40 r=9999px",
+    "40x40 r=9999px",
+    "40x40 r=9999px",
+    "40x40 r=9999px",
+    "40x40 r=9999px"
+   ],
+   "iconos": 14,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 10 de 18 resultados por página 5 10 25 50 Todos 1 2",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 930
+  },
+  "n": {
+   "url": "/admin/eventos/1/speakers",
+   "estado": 200,
+   "titulo": "Speakers",
+   "migas": "Speakers Listado",
+   "pestanas": [],
+   "columnas": [
+    "Foto",
+    "Speaker",
+    "Sesiones",
+    "Editar"
+   ],
+   "filas": 18,
+   "accionesDeFila": [
+    "Editar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "40x40 r=50%",
+    "40x40 r=50%",
+    "40x40 r=50%",
+    "40x40 r=50%",
+    "40x40 r=50%",
+    "40x40 r=50%"
+   ],
+   "iconos": 21,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1191
+  }
+ },
+ {
+  "id": "13",
+  "filament": "speakers/create",
+  "nuevo": "eventos/1/speakers/nuevo",
+  "f": {
+   "url": "/admin/speakers/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/speakers/nuevo",
+   "estado": 200,
+   "titulo": "Nuevo speaker",
+   "migas": "Speakers Nuevo speaker",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "La persona",
+    "Foto",
+    "Biografía"
+   ],
+   "campos": [
+    "Nombre* [text]",
+    "Cargo [text]",
+    "Empresa [text]",
+    "LinkedIn [text]",
+    "Foto del speaker, URL [text]",
+    "Biografía [textarea]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 335
+  }
+ },
+ {
+  "id": "14",
+  "filament": "speakers/19/edit",
+  "nuevo": "eventos/1/speakers/19",
+  "f": {
+   "url": "/admin/speakers/19/edit",
+   "estado": 200,
+   "titulo": "Maria Garcia",
+   "migas": "Speakers Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "La persona",
+    "Foto",
+    "Biografía"
+   ],
+   "campos": [
+    "Nombre [text]",
+    "Cargo [text]",
+    "Empresa [text]",
+    "LinkedIn [url]",
+    "Arrastra y suelta tus archivos o Examina",
+    "Foto del speaker — URL [url]",
+    "Bio [textarea]"
+   ],
+   "subidas": 1,
+   "arrastrar": true,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 534
+  },
+  "n": {
+   "url": "/admin/eventos/1/speakers/19",
+   "estado": 200,
+   "titulo": "Maria Garcia",
+   "migas": "Speakers Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "La persona",
+    "Foto",
+    "Biografía",
+    "Sesiones"
+   ],
+   "campos": [
+    "Nombre* [text]",
+    "Cargo [text]",
+    "Empresa [text]",
+    "LinkedIn [text]",
+    "Foto del speaker, URL [text]",
+    "Biografía [textarea]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "40x40 r=50%"
+   ],
+   "iconos": 10,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 955
+  }
+ },
+ {
+  "id": "15",
+  "filament": "sponsors/sponsors",
+  "nuevo": "eventos/1/sponsors",
+  "f": {
+   "url": "/admin/sponsors/sponsors",
+   "estado": 200,
+   "titulo": "Sponsors",
+   "migas": "Sponsors Listado",
+   "pestanas": [
+    "Sponsors (icono)"
+   ],
+   "columnas": [
+    "NOMBRE",
+    "TIER",
+    "LÍDER",
+    "EQUIPO",
+    "VISIBLE"
+   ],
+   "filas": 10,
+   "accionesDeFila": [
+    "AWS",
+    "Platinum",
+    "Carlos López",
+    "0",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 26,
+   "insignias": [
+    "0",
+    "Platinum",
+    "Gold"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 10 de 30 resultados por página 5 10 25 50 Todos 1 2 3",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 688
+  },
+  "n": {
+   "url": "/admin/eventos/1/sponsors",
+   "estado": 200,
+   "titulo": "Sponsors",
+   "migas": "Sponsors Listado",
+   "pestanas": [],
+   "columnas": [
+    "Logo",
+    "Nombre",
+    "Tier",
+    "Líder",
+    "Equipo",
+    "Visible",
+    "Editar"
+   ],
+   "filas": 30,
+   "accionesDeFila": [
+    "Editar",
+    "Eliminar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "64x54 r=6px",
+    "64x54 r=6px",
+    "64x54 r=6px",
+    "64x54 r=6px",
+    "64x54 r=6px",
+    "64x54 r=6px"
+   ],
+   "iconos": 65,
+   "insignias": [
+    "Platinum",
+    "Gold",
+    "Silver",
+    "Bronze",
+    "Media"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1786
+  }
+ },
+ {
+  "id": "16",
+  "filament": "sponsors/sponsors/create",
+  "nuevo": "eventos/1/sponsors/nuevo",
+  "f": {
+   "url": "/admin/sponsors/sponsors/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/sponsors/nuevo",
+   "estado": 200,
+   "titulo": "Nuevo sponsor",
+   "migas": "Sponsors Nuevo sponsor",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El sponsor",
+    "Estado",
+    "Tier*",
+    "Equipo del stand",
+    "Gamificación"
+   ],
+   "campos": [
+    "Nombre* [text]",
+    "Descripción [textarea]",
+    "Logo, URL [text]",
+    "Banner, URL [text]",
+    "Sitio web [text]",
+    "Correo de contacto [email]",
+    "Mostrar botón de contacto en la app [interruptor]",
+    "Trivia activa [interruptor]",
+    "Visible en el evento [interruptor]",
+    "Platinum [radio]",
+    "Gold [radio]",
+    "Silver [radio]",
+    "Bronze [radio]",
+    "Media [radio]",
+    "Líder [text]",
+    "Máx. colaboradores [text]",
+    "Puntos por visitar el stand [text]",
+    "Participa en Passport [interruptor]"
+   ],
+   "subidas": 2,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 5,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1041,
+   "textoLargo": 1078
+  }
+ },
+ {
+  "id": "17",
+  "filament": "sponsors/sponsors/1/edit",
+  "nuevo": "eventos/1/sponsors/1",
+  "f": {
+   "url": "/admin/sponsors/sponsors/1/edit",
+   "estado": 200,
+   "titulo": "AWS",
+   "migas": "Sponsors AWS Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El sponsor",
+    "Trivia del stand",
+    "Servicios",
+    "Estado",
+    "Equipo del stand",
+    "Gamificación"
+   ],
+   "campos": [
+    "Nombre [text]",
+    "Descripción [textarea]",
+    "Arrastra y suelta tus archivos o Examina",
+    "Logo — URL [url]",
+    "Banner — URL [url]",
+    "Sitio web [url]",
+    "Email de contacto [email]",
+    "Mostrar botón de contacto en la app [interruptor]",
+    "Visible en el evento [interruptor]",
+    "Tier",
+    "Platinum [radio]",
+    "Gold [radio]",
+    "Silver [radio]",
+    "Bronze [radio]",
+    "Media [radio]",
+    "Líder [select]",
+    "Máx. colaboradores [number]",
+    "Miembros",
+    "Puntos por visitar el stand [number]",
+    "Participa en Passport [interruptor]"
+   ],
+   "subidas": 2,
+   "arrastrar": true,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 5,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1549
+  },
+  "n": {
+   "url": "/admin/eventos/1/sponsors/1",
+   "estado": 200,
+   "titulo": "AWS",
+   "migas": "Sponsors Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El sponsor",
+    "Estado",
+    "Tier*",
+    "Equipo del stand",
+    "Gamificación"
+   ],
+   "campos": [
+    "Nombre* [text]",
+    "Descripción [textarea]",
+    "Logo, URL [text]",
+    "Banner, URL [text]",
+    "Sitio web [text]",
+    "Correo de contacto [email]",
+    "Mostrar botón de contacto en la app [interruptor]",
+    "Trivia activa [interruptor]",
+    "Pregunta* [text]",
+    "Opciones, en orden* [text]",
+    "Respuesta correcta* [select]",
+    "Puntos bonus [text]",
+    "Activa [interruptor]",
+    "Visible en el evento [interruptor]",
+    "Platinum [radio]",
+    "Gold [radio]",
+    "Silver [radio]",
+    "Bronze [radio]",
+    "Media [radio]",
+    "Líder [span]",
+    "Máx. colaboradores [text]",
+    "Puntos por visitar el stand [text]",
+    "Participa en Passport [interruptor]"
+   ],
+   "subidas": 2,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 24,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1041,
+   "textoLargo": 1143
+  }
+ },
+ {
+  "id": "18",
+  "filament": "documents",
+  "nuevo": "eventos/1/documentos",
+  "f": {
+   "url": "/admin/documents",
+   "estado": 200,
+   "titulo": "Documentos",
+   "migas": "Documentos Listado",
+   "pestanas": [],
+   "columnas": [
+    "TÍTULO",
+    "SESIÓN",
+    "TIPO",
+    "TAMAÑO"
+   ],
+   "filas": 19,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 2,
+   "insignias": [
+    "PDF",
+    "Imagen",
+    "PowerPoint",
+    "Word",
+    "Archivo"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1592
+  },
+  "n": {
+   "url": "/admin/eventos/1/documentos",
+   "estado": 200,
+   "titulo": "Documentos",
+   "migas": "Documentos Listado",
+   "pestanas": [],
+   "columnas": [
+    "Título",
+    "Sesión",
+    "Tipo",
+    "Tamaño",
+    "Editar"
+   ],
+   "filas": 19,
+   "accionesDeFila": [
+    "Editar",
+    "Eliminar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 42,
+   "insignias": [
+    "PDF",
+    "Imagen",
+    "PowerPoint",
+    "Word",
+    "Archivo"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1684
+  }
+ },
+ {
+  "id": "19",
+  "filament": "documents/create",
+  "nuevo": "eventos/1/documentos/nuevo",
+  "f": {
+   "url": "/admin/documents/create",
+   "estado": 404,
+   "titulo": "404",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 17
+  },
+  "n": {
+   "url": "/admin/eventos/1/documentos/nuevo",
+   "estado": 200,
+   "titulo": "Nuevo documento",
+   "migas": "Documentos Nuevo documento",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Título* [text]",
+    "Sesión [select]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 2151
+  }
+ },
+ {
+  "id": "20",
+  "filament": "documents/7/edit",
+  "nuevo": "eventos/1/documentos/7",
+  "f": {
+   "url": "/admin/documents/7/edit",
+   "estado": 404,
+   "titulo": "404",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 17
+  },
+  "n": {
+   "url": "/admin/eventos/1/documentos/7",
+   "estado": 200,
+   "titulo": "Agenda completa del Summit",
+   "migas": "Documentos Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Título* [text]",
+    "Sesión [select]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 2115
+  }
+ },
+ {
+  "id": "21",
+  "filament": "custom-pages",
+  "nuevo": "eventos/1/paginas",
+  "f": {
+   "url": "/admin/custom-pages",
+   "estado": 200,
+   "titulo": "Páginas",
+   "migas": "Páginas Listado",
+   "pestanas": [],
+   "columnas": [
+    "TÍTULO",
+    "CONTENIDO",
+    "VISIBLE"
+   ],
+   "filas": 1,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 3,
+   "insignias": [
+    "Texto propio"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 330
+  },
+  "n": {
+   "url": "/admin/eventos/1/paginas",
+   "estado": 200,
+   "titulo": "Páginas",
+   "migas": "Páginas Listado",
+   "pestanas": [],
+   "columnas": [
+    "Título",
+    "Contenido",
+    "Quién la ve",
+    "Visible",
+    "Editar"
+   ],
+   "filas": 1,
+   "accionesDeFila": [
+    "Editar",
+    "Eliminar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 5,
+   "insignias": [
+    "Texto propio"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 269
+  }
+ },
+ {
+  "id": "22",
+  "filament": "custom-pages/create",
+  "nuevo": "eventos/1/paginas/nuevo",
+  "f": {
+   "url": "/admin/custom-pages/create",
+   "estado": 404,
+   "titulo": "404",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 17
+  },
+  "n": {
+   "url": "/admin/eventos/1/paginas/nuevo",
+   "estado": 500,
+   "titulo": "Nueva página",
+   "migas": "Páginas Nueva página",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Contenido",
+    "Quién la ve",
+    "Texto propio"
+   ],
+   "campos": [
+    "Título* [text]",
+    "Texto propio [radio]",
+    "Página externa [radio]",
+    "Ambos [radio]",
+    "Visible para los asistentes [interruptor]",
+    "Asistentes [checkbox]",
+    "Equipos de stands [checkbox]",
+    "Texto propio [div]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 1,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 435
+  }
+ },
+ {
+  "id": "23",
+  "filament": "custom-pages/1/edit",
+  "nuevo": "eventos/1/paginas/1",
+  "f": {
+   "url": "/admin/custom-pages/1/edit",
+   "estado": 404,
+   "titulo": "404",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 17
+  },
+  "n": {
+   "url": "/admin/eventos/1/paginas/1",
+   "estado": 500,
+   "titulo": "Información del recinto",
+   "migas": "Páginas Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Contenido",
+    "Quién la ve",
+    "Texto propio",
+    "Como llegar",
+    "Wifi"
+   ],
+   "campos": [
+    "Título* [text]",
+    "Texto propio [radio]",
+    "Página externa [radio]",
+    "Ambos [radio]",
+    "Visible para los asistentes [interruptor]",
+    "Asistentes [checkbox]",
+    "Equipos de stands [checkbox]",
+    "Texto propio [div]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 1,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 585
+  }
+ },
+ {
+  "id": "24",
+  "filament": "asistentes/attendee-admins",
+  "nuevo": "eventos/1/asistentes",
+  "f": {
+   "url": "/admin/asistentes/attendee-admins",
+   "estado": 200,
+   "titulo": "Asistentes",
+   "migas": "Asistentes Listado",
+   "pestanas": [
+    "Asistentes (icono)",
+    "Bloqueos (icono)"
+   ],
+   "columnas": [
+    "NOMBRE",
+    "EMAIL",
+    "ROL",
+    "CHECK-IN",
+    "ACCESO",
+    "INVITACION"
+   ],
+   "filas": 10,
+   "accionesDeFila": [
+    "Anya forguer",
+    "presencial@eventos.test",
+    "Asistente",
+    "—",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 28,
+   "insignias": [
+    "0",
+    "Asistente",
+    "Vendedor"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 10 de 72 resultados por página 5 10 25 50 Todos 1 2 3 4 ... 7 8",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0",
+    "Alternar columnas"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1031
+  },
+  "n": {
+   "url": "/admin/eventos/1/asistentes",
+   "estado": 200,
+   "titulo": "Asistentes",
+   "migas": "Personas Asistentes",
+   "pestanas": [],
+   "columnas": [
+    "Nombre",
+    "Rol",
+    "Etiquetas",
+    "Check-in",
+    "Acceso",
+    "Invitación",
+    "Registro",
+    "Acciones"
+   ],
+   "filas": 25,
+   "accionesDeFila": [
+    "Perfil",
+    "Qué le pasó"
+   ],
+   "botones": [],
+   "secciones": [
+    "Importar asistentes"
+   ],
+   "campos": [
+    " [search]",
+    "Por página 10 25 50 100 [select]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 59,
+   "insignias": [
+    "Asistente",
+    "Vendedor"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 3144
+  }
+ },
+ {
+  "id": "25",
+  "filament": "asistentes/attendee-admins/2/edit",
+  "nuevo": "eventos/1/asistentes/2",
+  "f": {
+   "url": "/admin/asistentes/attendee-admins/2/edit",
+   "estado": 200,
+   "titulo": "Anya forguer",
+   "migas": "Asistentes Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Regenerar recap",
+    "Elegir tags",
+    "Banear",
+    "Cambiar rol"
+   ],
+   "secciones": [
+    "Datos de registro",
+    "Perfil en el evento",
+    "Historial",
+    "Estado",
+    "Acceso",
+    "Acciones"
+   ],
+   "campos": [
+    "Profile header",
+    "Registration values",
+    "Tags",
+    "Visible en directorio de networking [interruptor]",
+    "Status summary",
+    "Ban info"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "56x56 r=50%"
+   ],
+   "iconos": 7,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 840
+  },
+  "n": {
+   "url": "/admin/eventos/1/asistentes/2",
+   "estado": 200,
+   "titulo": "Anya forguer",
+   "migas": "Personas Anya forguer",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Datos de registro",
+    "Perfil en el evento",
+    "Estado",
+    "Acceso",
+    "Puntos",
+    "Acciones"
+   ],
+   "campos": [
+    "Visible en el directorio de networking [interruptor]",
+    "Rol [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "40x40 r=50%"
+   ],
+   "iconos": 4,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 792
+  }
+ },
+ {
+  "id": "26",
+  "filament": "asistentes/attendee-bans",
+  "nuevo": "-",
+  "f": {
+   "url": "/admin/asistentes/attendee-bans",
+   "estado": 200,
+   "titulo": "Attendee Bans",
+   "migas": "Asistentes Attendee Bans Listado",
+   "pestanas": [
+    "Asistentes (icono)",
+    "Bloqueos (icono)"
+   ],
+   "columnas": [
+    "ASISTENTE",
+    "MOTIVO",
+    "BANEADO POR",
+    "EXPIRA EL",
+    "DESBANEADO EL",
+    "DESBANEADO POR",
+    "ESTADO",
+    "BANEADO EL"
+   ],
+   "filas": 9,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 7,
+   "insignias": [
+    "desbaneado",
+    "expirado",
+    "activo"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 9 de 9 resultados por página 5 10 25 50 Todos",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1612
+  },
+  "n": null
+ },
+ {
+  "id": "27",
+  "filament": "-",
+  "nuevo": "eventos/1/asistentes/que-le-paso",
+  "f": null,
+  "n": {
+   "url": "/admin/eventos/1/asistentes/que-le-paso",
+   "estado": 200,
+   "titulo": "Qué le pasó",
+   "migas": "Personas Qué le pasó",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Persona [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 156
+  }
+ },
+ {
+  "id": "28",
+  "filament": "entrada/registration-settings/1/edit",
+  "nuevo": "eventos/1/entrada",
+  "f": {
+   "url": "/admin/entrada/registration-settings/1/edit",
+   "estado": 200,
+   "titulo": "Registro",
+   "migas": "Entrada Registro Editar",
+   "pestanas": [
+    "Registro (icono)",
+    "Campos del formulario (icono)",
+    "Códigos de acceso (icono)"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Cómo entra la gente",
+    "Restricción por email o dominio",
+    "Verificación de identidad (CSV)",
+    "La puerta hoy",
+    "Ventana de registro"
+   ],
+   "campos": [
+    "Registro habilitado [interruptor]",
+    "Modo de registro",
+    "Abierto [radio]",
+    "Solo invitados [radio]",
+    "Híbrido [radio]",
+    "Mode hint",
+    "Requiere aprobación manual [interruptor]",
+    "Requiere código de acceso [interruptor]",
+    "Door summary",
+    "Abre el [text]",
+    "Cierra el [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 8,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1313
+  },
+  "n": {
+   "url": "/admin/eventos/1/entrada",
+   "estado": 200,
+   "titulo": "Registro",
+   "migas": "Entrada Registro",
+   "pestanas": [
+    "Registro",
+    "Campos del formulario",
+    "Códigos de acceso",
+    "Landing y widget"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Guardar cambios"
+   ],
+   "secciones": [
+    "Cómo entra la gente",
+    "Modo de registro*",
+    "La puerta hoy",
+    "Ventana de registro"
+   ],
+   "campos": [
+    "Registro habilitado [interruptor]",
+    "Abierto [radio]",
+    "Solo invitados [radio]",
+    "Híbrido [radio]",
+    "Requiere aprobación manual [interruptor]",
+    "Requiere código de acceso [interruptor]",
+    "Restringir registro [interruptor]",
+    "Campo de verificación [select]",
+    "Abre el [datetime-local]",
+    "Cierra el [datetime-local]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 3,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1041,
+   "textoLargo": 1138
+  }
+ },
+ {
+  "id": "29",
+  "filament": "entrada/registration-fields",
+  "nuevo": "eventos/1/entrada/campos",
+  "f": {
+   "url": "/admin/entrada/registration-fields",
+   "estado": 200,
+   "titulo": "Campos del formulario",
+   "migas": "Entrada Campos Del Formulario Listado",
+   "pestanas": [
+    "Registro (icono)",
+    "Campos del formulario (icono)",
+    "Códigos de acceso (icono)"
+   ],
+   "columnas": [
+    "ETIQUETA",
+    "TIPO",
+    "OBLIGATORIO",
+    "EDITABLE",
+    "VISIBLE EN"
+   ],
+   "filas": 10,
+   "accionesDeFila": [
+    "Cargo",
+    "Texto",
+    "Registro",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 38,
+   "insignias": [
+    "0",
+    "Texto",
+    "Registro",
+    "Lista con buscador",
+    "Lista desplegable",
+    "Casillas múltiples",
+    "Teléfono",
+    "URL",
+    "Casilla Sí/No"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 10 de 11 resultados por página 5 10 25 50 Todos 1 2",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 930
+  },
+  "n": {
+   "url": "/admin/eventos/1/entrada/campos",
+   "estado": 200,
+   "titulo": "Campos del formulario",
+   "migas": "Entrada Campos del formulario",
+   "pestanas": [
+    "Registro",
+    "Campos del formulario",
+    "Códigos de acceso",
+    "Landing y widget"
+   ],
+   "columnas": [
+    "Etiqueta",
+    "Tipo",
+    "Obligatorio",
+    "Editable",
+    "Visible en",
+    "Editar"
+   ],
+   "filas": 11,
+   "accionesDeFila": [
+    "Editar",
+    "Eliminar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 26,
+   "insignias": [
+    "Texto",
+    "Lista con buscador",
+    "Lista desplegable",
+    "Casillas múltiples",
+    "Teléfono",
+    "URL",
+    "Casilla Sí/No"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 873
+  }
+ },
+ {
+  "id": "30",
+  "filament": "entrada/registration-fields/create",
+  "nuevo": "eventos/1/entrada/campos/nuevo",
+  "f": {
+   "url": "/admin/entrada/registration-fields/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/entrada/campos/nuevo",
+   "estado": 200,
+   "titulo": "Nuevo campo",
+   "migas": "Entrada Nuevo campo",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El campo",
+    "Mostrar solo si…",
+    "Comportamiento",
+    "Visible en"
+   ],
+   "campos": [
+    "Etiqueta* [text]",
+    "Tipo de campo* [select]",
+    "Depende del campo [select]",
+    "Registro [radio]",
+    "Onboarding [radio]",
+    "Ambos [radio]",
+    "Obligatorio [interruptor]",
+    "Editable después del registro [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 887
+  }
+ },
+ {
+  "id": "31",
+  "filament": "entrada/registration-fields/1/edit",
+  "nuevo": "eventos/1/entrada/campos/1",
+  "f": {
+   "url": "/admin/entrada/registration-fields/1/edit",
+   "estado": 200,
+   "titulo": "Editar Empresa",
+   "migas": "Entrada Campos Del Formulario Empresa Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El campo",
+    "Mostrar solo si…",
+    "Comportamiento",
+    "Dónde aparece"
+   ],
+   "campos": [
+    "Etiqueta [text]",
+    "Tipo de campo [select]",
+    "Texto de ayuda dentro del campo [text]",
+    "Visible en",
+    "Registro [radio]",
+    "Onboarding [radio]",
+    "Ambos [radio]",
+    "Obligatorio [interruptor]",
+    "Editable después del registro [interruptor]",
+    "Usage map"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 5,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 727
+  },
+  "n": {
+   "url": "/admin/eventos/1/entrada/campos/1",
+   "estado": 200,
+   "titulo": "Empresa",
+   "migas": "Entrada Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El campo",
+    "Mostrar solo si…",
+    "Comportamiento",
+    "Visible en",
+    "Dónde aparece"
+   ],
+   "campos": [
+    "Etiqueta* [text]",
+    "Tipo de campo* [select]",
+    "Texto de ayuda dentro del campo [text]",
+    "Depende del campo [select]",
+    "Registro [radio]",
+    "Onboarding [radio]",
+    "Ambos [radio]",
+    "Obligatorio [interruptor]",
+    "Editable después del registro [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 890
+  }
+ },
+ {
+  "id": "32",
+  "filament": "entrada/access-codes",
+  "nuevo": "eventos/1/entrada/codigos",
+  "f": {
+   "url": "/admin/entrada/access-codes",
+   "estado": 200,
+   "titulo": "Códigos de acceso",
+   "migas": "Entrada Códigos de acceso Listado",
+   "pestanas": [
+    "Registro (icono)",
+    "Campos del formulario (icono)",
+    "Códigos de acceso (icono)"
+   ],
+   "columnas": [
+    "CÓDIGO",
+    "USOS",
+    "ACTIVO",
+    "EXPIRA",
+    "CREADO"
+   ],
+   "filas": 1,
+   "accionesDeFila": [
+    "Ver usos"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 10,
+   "insignias": [
+    "0"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestra un resultado por página 5 10 25 50 Todos",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 434
+  },
+  "n": {
+   "url": "/admin/eventos/1/entrada/codigos",
+   "estado": 200,
+   "titulo": "Códigos de acceso",
+   "migas": "Entrada Códigos de acceso",
+   "pestanas": [
+    "Registro",
+    "Campos del formulario",
+    "Códigos de acceso",
+    "Landing y widget"
+   ],
+   "columnas": [
+    "Código",
+    "Usos",
+    "Activo",
+    "Expira",
+    "Creado",
+    "Editar"
+   ],
+   "filas": 1,
+   "accionesDeFila": [
+    "Ver usos",
+    "Editar",
+    "Eliminar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Estado Todos Activos Inactivos [select]",
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 8,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 382
+  }
+ },
+ {
+  "id": "33",
+  "filament": "-",
+  "nuevo": "eventos/1/entrada/codigos/nuevo",
+  "f": null,
+  "n": {
+   "url": "/admin/eventos/1/entrada/codigos/nuevo",
+   "estado": 200,
+   "titulo": "Nuevo código de acceso",
+   "migas": "Códigos de acceso Nuevo código de acceso",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Código* [text]",
+    "Máximo de usos [number]",
+    "Expira el [datetime-local]",
+    "Activo [interruptor]",
+    "Notas (uso interno) [textarea]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 2,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 431
+  }
+ },
+ {
+  "id": "34",
+  "filament": "entrada/landing-widget",
+  "nuevo": "eventos/1/entrada/landing",
+  "f": {
+   "url": "http://eventos-backend.test/admin/entrada/landing-widget",
+   "error": "page.goto: Timeout 45000ms exceeded."
+  },
+  "n": {
+   "url": "http://localhost:3000/admin/eventos/1/entrada/landing",
+   "error": "page.goto: Timeout 45000ms exceeded."
+  }
+ },
+ {
+  "id": "35",
+  "filament": "anuncios/announcements",
+  "nuevo": "eventos/1/anuncios",
+  "f": {
+   "url": "/admin/anuncios/announcements",
+   "estado": 200,
+   "titulo": "Anuncios",
+   "migas": "Anuncios Listado",
+   "pestanas": [
+    "Anuncios (icono)",
+    "Push programadas (icono)",
+    "Recordatorios (icono)"
+   ],
+   "columnas": [
+    "TÍTULO",
+    "ESTADO",
+    "FECHA",
+    "PUSH ENVIADA"
+   ],
+   "filas": 10,
+   "accionesDeFila": [
+    "Ganaste: CAMISETA",
+    "Publicado",
+    "20/07/2026 00:32",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 28,
+   "insignias": [
+    "Publicado"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 10 de 23 resultados por página 5 10 25 50 Todos 1 2 3",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1029
+  },
+  "n": {
+   "url": "/admin/eventos/1/anuncios",
+   "estado": 200,
+   "titulo": "Anuncios",
+   "migas": "Anuncios Anuncios",
+   "pestanas": [
+    "Anuncios",
+    "Push programadas",
+    "Recordatorios"
+   ],
+   "columnas": [
+    "Título",
+    "Estado",
+    "Fecha",
+    "Push enviada",
+    "Abrir"
+   ],
+   "filas": 11,
+   "accionesDeFila": [
+    "Editar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Estado Todos Publicado Programado Borrador [select]",
+    "Solo generales [checkbox]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 13,
+   "insignias": [
+    "Publicado"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1134
+  }
+ },
+ {
+  "id": "36",
+  "filament": "anuncios/announcements/create",
+  "nuevo": "eventos/1/anuncios/nuevo",
+  "f": {
+   "url": "/admin/anuncios/announcements/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/anuncios/nuevo",
+   "estado": 200,
+   "titulo": "Nuevo anuncio",
+   "migas": "Anuncios Nuevo anuncio",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El anuncio",
+    "Al tocarlo Un anuncio con destino se vuelve tocable en la app. Sin destino es informativo.",
+    "Publicación",
+    "Audiencia",
+    "Visible para",
+    "Vista previa"
+   ],
+   "campos": [
+    "Título* [text]",
+    "Contenido* [textarea]",
+    "Imagen (opcional) [text]",
+    "Lleva a [select]",
+    "Publicar en [datetime-local]",
+    "Asistente [checkbox]",
+    "Vendedor [checkbox]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 666
+  }
+ },
+ {
+  "id": "37",
+  "filament": "anuncios/announcements/1/edit",
+  "nuevo": "eventos/1/anuncios/1",
+  "f": {
+   "url": "/admin/anuncios/announcements/1/edit",
+   "estado": 200,
+   "titulo": "¡Bienvenidos al Summit Empresarial 2026!",
+   "migas": "Anuncios ¡Bienvenidos al Summit Empresarial 2026! Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El anuncio",
+    "Al tocarlo",
+    "Publicación",
+    "Audiencia",
+    "Vista previa"
+   ],
+   "campos": [
+    "Título [text]",
+    "Contenido [textarea]",
+    "Arrastra y suelta tus archivos o Examina",
+    "Lleva a [select]",
+    "Publish status",
+    "Publicar en [text]",
+    "Visible para",
+    "Asistente [checkbox]",
+    "Vendedor [checkbox]",
+    "Announcement preview"
+   ],
+   "subidas": 1,
+   "arrastrar": true,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 3,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 861
+  },
+  "n": {
+   "url": "/admin/eventos/1/anuncios/1",
+   "estado": 200,
+   "titulo": "¡Bienvenidos al Summit Empresarial 2026!",
+   "migas": "Anuncios Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El anuncio",
+    "Al tocarlo Un anuncio con destino se vuelve tocable en la app. Sin destino es informativo.",
+    "Publicación",
+    "Audiencia",
+    "Visible para",
+    "Vista previa"
+   ],
+   "campos": [
+    "Título* [text]",
+    "Contenido* [textarea]",
+    "Imagen (opcional) [text]",
+    "Lleva a [select]",
+    "Publicar en [datetime-local]",
+    "Asistente [checkbox]",
+    "Vendedor [checkbox]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 834
+  }
+ },
+ {
+  "id": "38",
+  "filament": "anuncios/scheduled-notifications",
+  "nuevo": "eventos/1/anuncios/push-programadas",
+  "f": {
+   "url": "/admin/anuncios/scheduled-notifications",
+   "estado": 200,
+   "titulo": "Scheduled Notifications",
+   "migas": "Anuncios Scheduled Notifications Listado",
+   "pestanas": [
+    "Anuncios (icono)",
+    "Push programadas (icono)",
+    "Recordatorios (icono)"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 7,
+   "insignias": [],
+   "vacio": "No se encontraron registros",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 309
+  },
+  "n": {
+   "url": "/admin/eventos/1/anuncios/push-programadas",
+   "estado": 200,
+   "titulo": "Push programadas",
+   "migas": "Anuncios Push programadas",
+   "pestanas": [
+    "Anuncios",
+    "Push programadas",
+    "Recordatorios"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 2,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 284
+  }
+ },
+ {
+  "id": "39",
+  "filament": "anuncios/scheduled-notifications/create",
+  "nuevo": "eventos/1/anuncios/push-programadas/nueva",
+  "f": {
+   "url": "/admin/anuncios/scheduled-notifications/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/anuncios/push-programadas/nueva",
+   "estado": 200,
+   "titulo": "Nueva push",
+   "migas": "Anuncios Nueva push",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "La push",
+    "Cuándo",
+    "A quién",
+    "Vista previa"
+   ],
+   "campos": [
+    "Título* [text]",
+    "Mensaje* [textarea]",
+    "Ahora [radio]",
+    "Programar [radio]",
+    "Asistente [checkbox]",
+    "Vendedor [checkbox]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 413
+  }
+ },
+ {
+  "id": "40",
+  "filament": "anuncios/reminder-settings/1/edit",
+  "nuevo": "eventos/1/anuncios/recordatorios",
+  "f": {
+   "url": "/admin/anuncios/reminder-settings/1/edit",
+   "estado": 200,
+   "titulo": "Recordatorios",
+   "migas": "Anuncios Recordatorios Editar",
+   "pestanas": [
+    "Anuncios (icono)",
+    "Push programadas (icono)",
+    "Recordatorios (icono)"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Recordatorios push de sesiones",
+    "Cambios de horario"
+   ],
+   "campos": [
+    "Recordatorios activados [interruptor]",
+    "Minutos antes de la sesion [text]",
+    "Notificar cambios de horario [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 8,
+   "insignias": [
+    "15",
+    "5"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 921
+  },
+  "n": {
+   "url": "/admin/eventos/1/anuncios/recordatorios",
+   "estado": 200,
+   "titulo": "Recordatorios",
+   "migas": "Anuncios Recordatorios",
+   "pestanas": [
+    "Anuncios",
+    "Push programadas",
+    "Recordatorios"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Guardar cambios"
+   ],
+   "secciones": [
+    "Recordatorios push de sesiones Notificaciones push automáticas para asistentes que agregar",
+    "Cambios de horario Notificar automáticamente a los asistentes cuando una sesión que tienen"
+   ],
+   "campos": [
+    "Recordatorios activados [interruptor]",
+    "Notificar cambios de horario [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 3,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 791
+  }
+ },
+ {
+  "id": "41",
+  "filament": "emails/email-templates",
+  "nuevo": "eventos/1/emails",
+  "f": {
+   "url": "/admin/emails/email-templates",
+   "estado": 200,
+   "titulo": "Emails",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "REGISTRO Y LLEGADA",
+    "ANTES Y DURANTE",
+    "NETWORKING Y SPONSORS",
+    "CIERRE",
+    "SISTEMA"
+   ],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 2894
+  },
+  "n": {
+   "url": "/admin/eventos/1/emails",
+   "estado": 200,
+   "titulo": "Plantillas",
+   "migas": "Emails Plantillas",
+   "pestanas": [
+    "Plantillas",
+    "Envío (SMTP)",
+    "Historial"
+   ],
+   "columnas": [
+    "Correo",
+    "Asunto",
+    "Estado",
+    "Editar"
+   ],
+   "filas": 19,
+   "accionesDeFila": [
+    "Editar"
+   ],
+   "botones": [],
+   "secciones": [
+    "Registro y llegada",
+    "Antes y durante",
+    "Networking y sponsors",
+    "Cierre",
+    "Sistema"
+   ],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 20,
+   "insignias": [
+    "Del sistema",
+    "Personalizado"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 3098
+  }
+ },
+ {
+  "id": "42",
+  "filament": "emails/organization-email-settings/1/edit",
+  "nuevo": "eventos/1/emails/envio",
+  "f": {
+   "url": "/admin/emails/organization-email-settings/1/edit",
+   "estado": 200,
+   "titulo": "Envío (SMTP)",
+   "migas": "Emails Envío Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "¿Quién envía los correos?"
+   ],
+   "campos": [
+    "Enviar con el servidor de mi organización [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 2,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 364
+  },
+  "n": {
+   "url": "/admin/eventos/1/emails/envio",
+   "estado": 200,
+   "titulo": "Envío (SMTP)",
+   "migas": "Emails Envío (SMTP)",
+   "pestanas": [
+    "Plantillas",
+    "Envío (SMTP)",
+    "Historial"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "¿Quién envía los correos?"
+   ],
+   "campos": [
+    "Enviar con el servidor de mi organización [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 288
+  }
+ },
+ {
+  "id": "43",
+  "filament": "emails/email-logs",
+  "nuevo": "eventos/1/emails/historial",
+  "f": {
+   "url": "/admin/emails/email-logs",
+   "estado": 200,
+   "titulo": "Email Logs",
+   "migas": "Emails Email Logs Listado",
+   "pestanas": [
+    "Plantillas de email (icono)",
+    "Envío (SMTP) (icono)"
+   ],
+   "columnas": [
+    "DESTINATARIO",
+    "TIPO",
+    "ESTADO",
+    "ENVIADO"
+   ],
+   "filas": 10,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 9,
+   "insignias": [
+    "0",
+    "magic_link",
+    "sent",
+    "Bienvenida"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 10 de 125 resultados por página 5 10 25 50 Todos 1 2 3 4 ... 12 13",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0",
+    "Alternar columnas"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1196
+  },
+  "n": {
+   "url": "/admin/eventos/1/emails/historial",
+   "estado": 200,
+   "titulo": "Historial",
+   "migas": "Emails Historial",
+   "pestanas": [
+    "Plantillas",
+    "Envío (SMTP)",
+    "Historial"
+   ],
+   "columnas": [
+    "Destinatario",
+    "Tipo",
+    "Estado",
+    "Fecha",
+    "Push",
+    "Último envío",
+    "Personas",
+    "Entregadas",
+    "Abiertas",
+    "Fallidas"
+   ],
+   "filas": 62,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Correos",
+    "Notificaciones push"
+   ],
+   "campos": [
+    "Estado Todos Enviado Fallido En cola No enviado [select]",
+    "Tipo Todos Invitación al evento Bienvenida Bienvenida con enlace de acceso Registro pendie [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 4,
+   "insignias": [
+    "Enviado"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 4621
+  }
+ },
+ {
+  "id": "44",
+  "filament": "identidad/event-branding/1/edit",
+  "nuevo": "eventos/1/identidad",
+  "f": {
+   "url": "/admin/identidad/event-branding/1/edit?tab=-lo-esencial-tab",
+   "estado": 200,
+   "titulo": "Branding",
+   "migas": "Identidad Branding Editar",
+   "pestanas": [
+    "Branding (icono)",
+    "Slides del login (icono)",
+    "Destacados (icono)",
+    "FAQ del asistente (icono)",
+    "Recap (icono)",
+    "Lo esencial",
+    "Identidad común",
+    "App móvil",
+    "Onboarding app",
+    "Webapp"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "El evento",
+    "Estado del evento"
+   ],
+   "campos": [
+    "Nombre del evento [text]",
+    "Descripción [textarea]",
+    "Zona horaria [select]",
+    "Estado [select]",
+    "Modalidad [select]",
+    "Fecha inicio [text]",
+    "Fecha fin [text]",
+    "Lugar / Venue [text]",
+    "Capacidad maxima [number]"
+   ],
+   "subidas": 3,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 8,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 692
+  },
+  "n": {
+   "url": "/admin/eventos/1/identidad",
+   "estado": 200,
+   "titulo": "Branding",
+   "migas": "Identidad Branding",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela",
+    "Lo esencial",
+    "Identidad común",
+    "App móvil",
+    "Webapp",
+    "Onboarding app"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Guardar cambios"
+   ],
+   "secciones": [
+    "El evento",
+    "Estado del evento"
+   ],
+   "campos": [
+    "Nombre del evento* [text]",
+    "Descripción [textarea]",
+    "Zona horaria* [select]",
+    "Estado* [select]",
+    "Modalidad* [select]",
+    "Fecha de inicio* [datetime-local]",
+    "Fecha de fin* [datetime-local]",
+    "Lugar [text]",
+    "Capacidad máxima [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 7488
+  }
+ },
+ {
+  "id": "45",
+  "filament": "-",
+  "nuevo": "eventos/1/identidad/onboarding",
+  "f": null,
+  "n": {
+   "url": "/admin/eventos/1/identidad/onboarding",
+   "estado": 200,
+   "titulo": "Onboarding de la app",
+   "migas": "Identidad Onboarding de la app",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela",
+    "Lo esencial",
+    "Identidad común",
+    "App móvil",
+    "Webapp",
+    "Ajustes",
+    "Bienvenida",
+    "Login y registro",
+    "Foto de perfil",
+    "Formularios",
+    "Intereses",
+    "Pantalla final"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Guardar cambios"
+   ],
+   "secciones": [
+    "Ajustes"
+   ],
+   "campos": [
+    "Fondo animado [select]",
+    "Color de los títulos [text]",
+    "Color de los subtítulos [text]",
+    "Permitir saltar pasos opcionales [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 773
+  }
+ },
+ {
+  "id": "46",
+  "filament": "-",
+  "nuevo": "eventos/1/identidad/escarapela",
+  "f": null,
+  "n": {
+   "url": "/admin/eventos/1/identidad/escarapela",
+   "estado": 200,
+   "titulo": "Escarapela",
+   "migas": "Identidad Escarapela",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Guardar cambios"
+   ],
+   "secciones": [
+    "Etiquetas en la credencial"
+   ],
+   "campos": [
+    "prensa [checkbox]",
+    "speaker [checkbox]",
+    "vip [checkbox]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 421
+  }
+ },
+ {
+  "id": "47",
+  "filament": "identidad/login-slides",
+  "nuevo": "eventos/1/identidad/slides",
+  "f": {
+   "url": "/admin/identidad/login-slides",
+   "estado": 200,
+   "titulo": "Slides Login",
+   "migas": "Identidad Slides Login Listado",
+   "pestanas": [
+    "Branding (icono)",
+    "Slides del login (icono)",
+    "Destacados (icono)",
+    "FAQ del asistente (icono)",
+    "Recap (icono)"
+   ],
+   "columnas": [
+    "IMAGEN",
+    "ETIQUETA",
+    "TITULO",
+    "OVERLAY",
+    "VIDEO",
+    "ACTIVO"
+   ],
+   "filas": 2,
+   "accionesDeFila": [
+    "Bienvenido",
+    "Test slide DaVinci",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "64x64 r=0px",
+    "64x64 r=0px"
+   ],
+   "iconos": 16,
+   "insignias": [
+    "0"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 2 de 2 resultados por página 5 10 25 50 Todos",
+   "buscar": 0,
+   "filtros": [
+    "Filtrar 0"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 503
+  },
+  "n": {
+   "url": "/admin/eventos/1/identidad/slides",
+   "estado": 200,
+   "titulo": "Slides del login",
+   "migas": "Identidad Slides del login",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela"
+   ],
+   "columnas": [
+    "Imagen",
+    "Etiqueta",
+    "Título",
+    "Texto encima",
+    "Video",
+    "Activo",
+    "Editar"
+   ],
+   "filas": 2,
+   "accionesDeFila": [
+    "Editar",
+    "Borrar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]",
+    " [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "64x54 r=6px",
+    "64x54 r=6px"
+   ],
+   "iconos": 8,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 373
+  }
+ },
+ {
+  "id": "48",
+  "filament": "identidad/login-slides/1/edit",
+  "nuevo": "eventos/1/identidad/slides/1",
+  "f": {
+   "url": "/admin/identidad/login-slides/1/edit",
+   "estado": 200,
+   "titulo": "Editar Slide Del Login",
+   "migas": "Identidad Slides Login Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Imagen del slide",
+    "Texto overlay",
+    "Click-through (opcional)",
+    "Visibilidad"
+   ],
+   "campos": [
+    "Arrastra y suelta tus archivos o Examina",
+    "Imagen — URL [url]",
+    "URL de video MP4 (opcional) [url]",
+    "La imagen necesita overlay de texto [interruptor]",
+    "Etiqueta (uppercase pequena) [text]",
+    "Titulo (display 800) [text]",
+    "Subtitulo (texto chico debajo) [textarea]",
+    "Habilitado [interruptor]",
+    "Mostrar desde [text]",
+    "Mostrar hasta [text]",
+    "Slide preview"
+   ],
+   "subidas": 1,
+   "arrastrar": true,
+   "editorDeTexto": 0,
+   "fotos": [
+    "334x187 r=0px"
+   ],
+   "iconos": 4,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1041
+  },
+  "n": {
+   "url": "/admin/eventos/1/identidad/slides/1",
+   "estado": 200,
+   "titulo": "Editar slide del login",
+   "migas": "Identidad Editar slide del login",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Imagen del slide",
+    "Texto encima",
+    "Enlace al tocar (opcional)",
+    "Visibilidad"
+   ],
+   "campos": [
+    "Imagen, URL* [text]",
+    "Video MP4, URL (opcional) [text]",
+    "La imagen necesita texto encima [interruptor]",
+    "Etiqueta [text]",
+    "Título [text]",
+    "Subtítulo [textarea]",
+    "Texto del botón [text]",
+    "URL al tocar [text]",
+    "Habilitado [interruptor]",
+    "Mostrar desde [datetime-local]",
+    "Mostrar hasta [datetime-local]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "342x256 r=0px"
+   ],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 782
+  }
+ },
+ {
+  "id": "49",
+  "filament": "identidad/highlights",
+  "nuevo": "eventos/1/identidad/destacados",
+  "f": {
+   "url": "/admin/identidad/highlights",
+   "estado": 200,
+   "titulo": "Destacados",
+   "migas": "Identidad Destacados Listado",
+   "pestanas": [
+    "Branding (icono)",
+    "Slides del login (icono)",
+    "Destacados (icono)",
+    "FAQ del asistente (icono)",
+    "Recap (icono)"
+   ],
+   "columnas": [
+    "IMAGEN",
+    "TITULO",
+    "DESDE",
+    "HASTA",
+    "ORDEN",
+    "ACTIVO"
+   ],
+   "filas": 4,
+   "accionesDeFila": [
+    "Keynote especial: El futuro de la IA",
+    "04/07 23:06",
+    "08/07 00:06",
+    "1",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "120x60 r=0px",
+    "120x60 r=0px",
+    "120x60 r=0px",
+    "120x60 r=0px"
+   ],
+   "iconos": 12,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 4 de 4 resultados por página 5 10 25 50 Todos",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 697
+  },
+  "n": {
+   "url": "/admin/eventos/1/identidad/destacados",
+   "estado": 200,
+   "titulo": "Destacados",
+   "migas": "Identidad Destacados",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela"
+   ],
+   "columnas": [
+    "Imagen",
+    "Título",
+    "Desde",
+    "Hasta",
+    "Orden",
+    "Activo",
+    "Editar"
+   ],
+   "filas": 4,
+   "accionesDeFila": [
+    "Editar",
+    "Borrar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]",
+    " [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "64x54 r=6px",
+    "64x54 r=6px",
+    "64x54 r=6px",
+    "64x54 r=6px"
+   ],
+   "iconos": 12,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 556
+  }
+ },
+ {
+  "id": "50",
+  "filament": "identidad/highlights/create",
+  "nuevo": "eventos/1/identidad/destacados/nuevo",
+  "f": {
+   "url": "/admin/identidad/highlights/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/identidad/destacados/nuevo",
+   "estado": 200,
+   "titulo": "Nuevo destacado",
+   "migas": "Identidad Nuevo destacado",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Imagen del destacado",
+    "Detalles"
+   ],
+   "campos": [
+    "Imagen, URL* [text]",
+    "Título encima de la imagen [text]",
+    "A dónde lleva al tocar [text]",
+    "Mostrar desde [datetime-local]",
+    "Mostrar hasta [datetime-local]",
+    "Orden [text]",
+    "Habilitado [interruptor]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 517
+  }
+ },
+ {
+  "id": "51",
+  "filament": "identidad/highlights/1/edit",
+  "nuevo": "eventos/1/identidad/destacados/1",
+  "f": {
+   "url": "/admin/identidad/highlights/1/edit",
+   "estado": 200,
+   "titulo": "Editar Destacado",
+   "migas": "Identidad Destacados Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Imagen del highlight",
+    "Detalles"
+   ],
+   "campos": [
+    "Arrastra y suelta tus archivos o Examina",
+    "Imagen — URL [url]",
+    "Titulo (overlay) [text]",
+    "URL de destino (al tocar) [text]",
+    "Mostrar desde [text]",
+    "Mostrar hasta [text]",
+    "Orden [number]",
+    "Habilitado [interruptor]"
+   ],
+   "subidas": 1,
+   "arrastrar": true,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 3,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 738
+  },
+  "n": {
+   "url": "/admin/eventos/1/identidad/destacados/1",
+   "estado": 200,
+   "titulo": "Editar destacado",
+   "migas": "Identidad Editar destacado",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Imagen del destacado",
+    "Detalles"
+   ],
+   "campos": [
+    "Imagen, URL* [text]",
+    "Título encima de la imagen [text]",
+    "A dónde lleva al tocar [text]",
+    "Mostrar desde [datetime-local]",
+    "Mostrar hasta [datetime-local]",
+    "Orden [text]",
+    "Habilitado [interruptor]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 538
+  }
+ },
+ {
+  "id": "52",
+  "filament": "identidad/event-faqs",
+  "nuevo": "eventos/1/identidad/preguntas",
+  "f": {
+   "url": "/admin/identidad/event-faqs",
+   "estado": 200,
+   "titulo": "Preguntas",
+   "migas": "Identidad Preguntas Listado",
+   "pestanas": [
+    "Branding (icono)",
+    "Slides del login (icono)",
+    "Destacados (icono)",
+    "FAQ del asistente (icono)",
+    "Recap (icono)"
+   ],
+   "columnas": [
+    "SECCION",
+    "PREGUNTA",
+    "ORDEN",
+    "ACTIVA"
+   ],
+   "filas": 10,
+   "accionesDeFila": [
+    "General",
+    "¿Cuál es el horario del evento?",
+    "0",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 22,
+   "insignias": [
+    "0",
+    "General",
+    "Lugar",
+    "Mi cuenta"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 10 de 13 resultados por página 5 10 25 50 Todos 1 2",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 956
+  },
+  "n": {
+   "url": "/admin/eventos/1/identidad/preguntas",
+   "estado": 200,
+   "titulo": "Preguntas frecuentes",
+   "migas": "Identidad Preguntas frecuentes",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela"
+   ],
+   "columnas": [
+    "Sección",
+    "Pregunta",
+    "Orden",
+    "Activa",
+    "Editar"
+   ],
+   "filas": 13,
+   "accionesDeFila": [
+    "Editar",
+    "Borrar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]",
+    " [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 30,
+   "insignias": [
+    "General",
+    "Lugar",
+    "Mi cuenta",
+    "Agenda"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1010
+  }
+ },
+ {
+  "id": "53",
+  "filament": "identidad/event-faqs/create",
+  "nuevo": "eventos/1/identidad/preguntas/nuevo",
+  "f": {
+   "url": "/admin/identidad/event-faqs/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/identidad/preguntas/nuevo",
+   "estado": 200,
+   "titulo": "Nueva pregunta",
+   "migas": "Identidad Nueva pregunta",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Pregunta y respuesta"
+   ],
+   "campos": [
+    "Sección* [text]",
+    "Pregunta* [text]",
+    "Respuesta* [textarea]",
+    "Enlace de acción (opcional) [text]",
+    "Imagen, URL (opcional) [text]",
+    "Orden [text]",
+    "Activa [interruptor]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 429
+  }
+ },
+ {
+  "id": "54",
+  "filament": "identidad/event-faqs/1/edit",
+  "nuevo": "eventos/1/identidad/preguntas/1",
+  "f": {
+   "url": "/admin/identidad/event-faqs/1/edit",
+   "estado": 200,
+   "titulo": "Editar Pregunta",
+   "migas": "Identidad Preguntas Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Pregunta y respuesta"
+   ],
+   "campos": [
+    "Seccion [text]",
+    "Pregunta [text]",
+    "Respuesta [textarea]",
+    "Link de accion (opcional) [url]",
+    "Arrastra y suelta tus archivos o Examina",
+    "Orden [number]",
+    "Activa [interruptor]"
+   ],
+   "subidas": 1,
+   "arrastrar": true,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 3,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 459
+  },
+  "n": {
+   "url": "/admin/eventos/1/identidad/preguntas/1",
+   "estado": 200,
+   "titulo": "Editar pregunta",
+   "migas": "Identidad Editar pregunta",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Pregunta y respuesta"
+   ],
+   "campos": [
+    "Sección* [text]",
+    "Pregunta* [text]",
+    "Respuesta* [textarea]",
+    "Enlace de acción (opcional) [text]",
+    "Imagen, URL (opcional) [text]",
+    "Orden [text]",
+    "Activa [interruptor]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 448
+  }
+ },
+ {
+  "id": "55",
+  "filament": "identidad/event-recap-settings/1/edit",
+  "nuevo": "eventos/1/identidad/recap",
+  "f": {
+   "url": "/admin/identidad/event-recap-settings/1/edit",
+   "estado": 200,
+   "titulo": "Recap",
+   "migas": "Identidad Events Editar",
+   "pestanas": [
+    "Branding (icono)",
+    "Slides del login (icono)",
+    "Destacados (icono)",
+    "FAQ del asistente (icono)",
+    "Recap (icono)"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "General",
+    "Branding",
+    "Tiers",
+    "Bloques de la card",
+    "Textos"
+   ],
+   "campos": [
+    "Recap habilitado [interruptor]",
+    "Color signature personal por attendee [interruptor]",
+    "Color primario [text]",
+    "Color secundario [text]",
+    "Lockup del titulo del evento [select]",
+    "Texto del titulo [text]",
+    "Mostrar insignia de tier [interruptor]",
+    "Insider: maximo de horas [number]",
+    "Activo: maximo de horas [number]",
+    "Label tier 1 [text]",
+    "Label tier 2 [text]",
+    "Label tier 3 [text]",
+    "Header estilo IG (avatar + handle) [interruptor]",
+    "Mostrar cargo + empresa en header [interruptor]",
+    "Foto si existe, si no nombre protagonista [interruptor]",
+    "Bloque certificado [interruptor]",
+    "Texto del label certificado [text]",
+    "Stats que se muestran en el certificado",
+    "Tiempo en vivo [checkbox]",
+    "Sesiones [checkbox]",
+    "Dias [checkbox]",
+    "Mostrar numero de serie en footer [interruptor]",
+    "Mostrar URL de verificacion en footer [interruptor]",
+    "Reverso: lista de sesiones (flip 3D en app) [interruptor]",
+    "Reverso: QR de verificacion [interruptor]",
+    "Texto del boton en la cover [text]",
+    "Texto del boton \"Compartir en Stories\" [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 13,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1528
+  },
+  "n": {
+   "url": "/admin/eventos/1/identidad/recap",
+   "estado": 200,
+   "titulo": "Recap",
+   "migas": "Identidad Recap",
+   "pestanas": [
+    "Branding",
+    "Slides del login",
+    "Destacados",
+    "Preguntas frecuentes",
+    "Recap",
+    "Escarapela"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Guardar cambios"
+   ],
+   "secciones": [
+    "Stats que se muestran en el certificado"
+   ],
+   "campos": [
+    "Recap habilitado [interruptor]",
+    "Color signature personal por asistente [interruptor]",
+    "Color primario [text]",
+    "Color secundario [text]",
+    "Lockup del título del evento [select]",
+    "Texto del título [text]",
+    "Mostrar insignia de tier [interruptor]",
+    "Insider: máximo de horas [number]",
+    "Activo: máximo de horas [number]",
+    "Label tier 1 [text]",
+    "Label tier 2 [text]",
+    "Label tier 3 [text]",
+    "Header estilo IG (avatar y handle) [interruptor]",
+    "Mostrar cargo y empresa en el header [interruptor]",
+    "Foto si existe, si no nombre protagonista [interruptor]",
+    "Bloque certificado [interruptor]",
+    "Texto del label certificado [text]",
+    "Tiempo en vivo [checkbox]",
+    "Sesiones [checkbox]",
+    "Días [checkbox]",
+    "Mostrar número de serie en el footer [interruptor]",
+    "Mostrar URL de verificación en el footer [interruptor]",
+    "Reverso: lista de sesiones (flip 3D en la app) [interruptor]",
+    "Reverso: QR de verificación [interruptor]",
+    "Texto del botón en la cover [text]",
+    "Texto del botón \"Compartir en Stories\" [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 6,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1543
+  }
+ },
+ {
+  "id": "56",
+  "filament": "modulos",
+  "nuevo": "eventos/1/modulos",
+  "f": {
+   "url": "/admin/eventos/1/modulos",
+   "estado": 200,
+   "titulo": "Módulos",
+   "migas": "Módulos Módulos",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "MENÚ DEL EVENTO"
+   ],
+   "campos": [
+    " [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 37,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 807
+  },
+  "n": {
+   "url": "/admin/eventos/1/modulos",
+   "estado": 200,
+   "titulo": "Módulos",
+   "migas": "Módulos Módulos",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "MENÚ DEL EVENTO"
+   ],
+   "campos": [
+    " [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 37,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 807
+  }
+ },
+ {
+  "id": "57",
+  "filament": "social/wall-posts",
+  "nuevo": "eventos/1/social",
+  "f": {
+   "url": "/admin/social/wall-posts",
+   "estado": 200,
+   "titulo": "Publicaciones",
+   "migas": "Social Publicaciones Listado",
+   "pestanas": [
+    "Publicaciones (icono)",
+    "Fotos (icono)",
+    "Ajustes (icono)"
+   ],
+   "columnas": [
+    "AUTOR",
+    "CONTENIDO",
+    "FOTO",
+    "ESTADO",
+    "LIKES",
+    "COMENT.",
+    "FECHA"
+   ],
+   "filas": 25,
+   "accionesDeFila": [
+    "Anya forguer",
+    "ocultar m342 b",
+    "Oculto",
+    "0",
+    "24/11/2026 12:34",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 37,
+   "insignias": [
+    "0",
+    "Oculto",
+    "Publicado"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 25 de 105 resultados por página 5 10 25 50 Todos 1 2 3 4 5",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0",
+    "Alternar columnas"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 3589
+  },
+  "n": {
+   "url": "/admin/eventos/1/social",
+   "estado": 200,
+   "titulo": "Publicaciones",
+   "migas": "Social Listado",
+   "pestanas": [
+    "Publicaciones",
+    "Fotos",
+    "Ajustes"
+   ],
+   "columnas": [
+    "Autor",
+    "Contenido",
+    "Foto",
+    "Estado",
+    "Likes",
+    "Coment.",
+    "Fecha",
+    "Acciones"
+   ],
+   "filas": 25,
+   "accionesDeFila": [
+    "Ver",
+    "Publicar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Estado Todos Pendiente Publicado Oculto [select]",
+    " [search]",
+    "por página 10 25 50 100 [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 54,
+   "insignias": [
+    "Oculto",
+    "Publicado"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 3350
+  }
+ },
+ {
+  "id": "58",
+  "filament": "social/wall-posts/1",
+  "nuevo": "eventos/1/social/1",
+  "f": {
+   "url": "/admin/social/wall-posts/1",
+   "estado": 200,
+   "titulo": "Ver Publicación",
+   "migas": "Social Publicaciones Ver",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Post",
+    "Autor"
+   ],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "192x128 r=0px"
+   ],
+   "iconos": 2,
+   "insignias": [
+    "published"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 476
+  },
+  "n": {
+   "url": "/admin/eventos/1/social/1",
+   "estado": 200,
+   "titulo": "Ver publicación",
+   "migas": "Social Ver",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Publicaciones",
+    "Ocultar"
+   ],
+   "secciones": [
+    "Post",
+    "Autor"
+   ],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "320x213 r=8px"
+   ],
+   "iconos": 3,
+   "insignias": [
+    "Publicado"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 355
+  }
+ },
+ {
+  "id": "59",
+  "filament": "social/event-photos",
+  "nuevo": "eventos/1/social/fotos",
+  "f": {
+   "url": "/admin/social/event-photos",
+   "estado": 200,
+   "titulo": "Fotos",
+   "migas": "Social Fotos Listado",
+   "pestanas": [
+    "Publicaciones (icono)",
+    "Fotos (icono)",
+    "Ajustes (icono)"
+   ],
+   "columnas": [
+    "FOTO",
+    "OFICIAL",
+    "ASISTENTE",
+    "CAPTION",
+    "ESTADO",
+    "LIKES",
+    "CONCURSO",
+    "PUESTO",
+    "SUBIDA"
+   ],
+   "filas": 14,
+   "accionesDeFila": [
+    "Anya forguer",
+    "—",
+    "Aprobada",
+    "0",
+    "09/07/2026 16:17",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "60x60 r=0px",
+    "60x60 r=0px",
+    "60x60 r=0px",
+    "60x60 r=0px",
+    "60x60 r=0px",
+    "60x60 r=0px"
+   ],
+   "iconos": 52,
+   "insignias": [
+    "0",
+    "Aprobada",
+    "Rechazada"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 14 de 14 resultados por página 5 10 25 50 Todos",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0",
+    "Alternar columnas"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1551
+  },
+  "n": {
+   "url": "/admin/eventos/1/social/fotos",
+   "estado": 200,
+   "titulo": "Fotos",
+   "migas": "Social Listado",
+   "pestanas": [
+    "Publicaciones",
+    "Fotos",
+    "Ajustes"
+   ],
+   "columnas": [
+    "Foto",
+    "Oficial",
+    "Asistente",
+    "Caption",
+    "Estado",
+    "Likes",
+    "Concurso",
+    "Puesto",
+    "Subida",
+    "Acciones"
+   ],
+   "filas": 14,
+   "accionesDeFila": [
+    "Ver",
+    "Rechazar"
+   ],
+   "botones": [
+    "Premiar top fotos",
+    "Subir foto oficial"
+   ],
+   "secciones": [],
+   "campos": [
+    "Estado Todos Pendiente Aprobada Rechazada [select]",
+    "Tipo Todas Solo oficiales Solo asistentes [select]",
+    "Concurso Todas Solo concurso Sin concurso [select]",
+    " [search]",
+    "por página 10 25 50 100 [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "25x60 r=6px",
+    "25x60 r=6px",
+    "25x60 r=6px",
+    "25x60 r=6px",
+    "25x60 r=6px",
+    "25x60 r=6px"
+   ],
+   "iconos": 43,
+   "insignias": [
+    "Aprobada",
+    "Rechazada"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1535
+  }
+ },
+ {
+  "id": "60",
+  "filament": "social/event-photos/1",
+  "nuevo": "eventos/1/social/fotos/1",
+  "f": {
+   "url": "/admin/social/event-photos/1",
+   "estado": 200,
+   "titulo": "Ver Foto",
+   "migas": "Social Fotos Ver",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Foto",
+    "Asistente"
+   ],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "192x128 r=0px"
+   ],
+   "iconos": 2,
+   "insignias": [
+    "approved"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 381
+  },
+  "n": {
+   "url": "/admin/eventos/1/social/fotos/1",
+   "estado": 200,
+   "titulo": "Ver foto",
+   "migas": "Social Ver",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Fotos",
+    "Premiar",
+    "Rechazar"
+   ],
+   "secciones": [
+    "Foto",
+    "Asistente"
+   ],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "320x213 r=8px"
+   ],
+   "iconos": 4,
+   "insignias": [
+    "Aprobada"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 269
+  }
+ },
+ {
+  "id": "61",
+  "filament": "social/wall-settings/1/edit",
+  "nuevo": "eventos/1/social/ajustes",
+  "f": {
+   "url": "/admin/social/wall-settings/1/edit",
+   "estado": 200,
+   "titulo": "Ajustes",
+   "migas": "Social Ajustes Editar",
+   "pestanas": [
+    "Publicaciones (icono)",
+    "Fotos (icono)",
+    "Ajustes (icono)"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Publicaciones del feed",
+    "Fotos y momentos",
+    "El social hoy"
+   ],
+   "campos": [
+    "Auto-aprobar posts [interruptor]",
+    "Máximo de posts por asistente [number]",
+    "Auto-aprobar fotos [interruptor]",
+    "Máximo de fotos por asistente [number]",
+    "Social summary"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 6,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 703
+  },
+  "n": {
+   "url": "/admin/eventos/1/social/ajustes",
+   "estado": 200,
+   "titulo": "Ajustes",
+   "migas": "Social Ajustes",
+   "pestanas": [
+    "Publicaciones",
+    "Fotos",
+    "Ajustes"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Guardar cambios"
+   ],
+   "secciones": [
+    "Publicaciones del feed",
+    "Fotos y momentos",
+    "El social hoy"
+   ],
+   "campos": [
+    "Auto-aprobar posts [interruptor]",
+    "Máximo de posts por asistente* [number]",
+    "Auto-aprobar fotos [interruptor]",
+    "Máximo de fotos por asistente* [number]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 563
+  }
+ },
+ {
+  "id": "62",
+  "filament": "gamificacion/gamification-settings/1/edit",
+  "nuevo": "eventos/1/gamificacion",
+  "f": {
+   "url": "/admin/gamificacion/gamification-settings/1/edit",
+   "estado": 200,
+   "titulo": "Gamificación",
+   "migas": "Gamificación Editar",
+   "pestanas": [
+    "Gamificación (icono)",
+    "Premios (icono)",
+    "Golden Tickets 8 (icono)",
+    "Premios Ganados (icono)"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Módulos",
+    "Pasaporte",
+    "Concurso de fotos",
+    "Asistencia a sesiones",
+    "Acciones y puntos",
+    "La gamificación hoy"
+   ],
+   "campos": [
+    "Premios canjeables [interruptor]",
+    "Pasaporte activo [interruptor]",
+    "Stands requeridos para ganar [number]",
+    "Tiene premio al completar [interruptor]",
+    "Puntos bonus al completar la ruta [number]",
+    "Concurso activo [interruptor]",
+    "Actions manager",
+    "Gamification summary"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 7,
+   "insignias": [
+    "8"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1694
+  },
+  "n": {
+   "url": "/admin/eventos/1/gamificacion",
+   "estado": 200,
+   "titulo": "Ajustes",
+   "migas": "Gamificación Ajustes",
+   "pestanas": [
+    "Ajustes",
+    "Premios",
+    "Golden Tickets",
+    "Premios Ganados"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Guardar cambios"
+   ],
+   "secciones": [
+    "Módulos",
+    "Pasaporte La ruta de stands: visitar stands otorga stamps; completarla puede dar premio.",
+    "Concurso de fotos Las fotos subidas durante el horario compiten por likes. El ganador reci",
+    "Acciones y puntos Cada acción del evento con sus puntos. Haz clic en una para editarla: se",
+    "La gamificación hoy"
+   ],
+   "campos": [
+    "Premios canjeables [interruptor]",
+    "Pasaporte activo [interruptor]",
+    "Stands requeridos para ganar [number]",
+    "Tiene premio al completar [interruptor]",
+    "Puntos bonus al completar la ruta [number]",
+    "Concurso activo [interruptor]",
+    "Minutos mínimos [number]",
+    "Puntos por asistir [number]",
+    "Bonus sesión completa [number]",
+    "Sesiones mínimas certificado [number]",
+    "% mínimo duración [number]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 2,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1041,
+   "textoLargo": 1547
+  }
+ },
+ {
+  "id": "63",
+  "filament": "gamificacion/golden-tickets",
+  "nuevo": "eventos/1/gamificacion/golden-tickets",
+  "f": {
+   "url": "/admin/gamificacion/golden-tickets",
+   "estado": 200,
+   "titulo": "Golden Tickets",
+   "migas": "Gamificación Golden Tickets Listado",
+   "pestanas": [
+    "Gamificación (icono)",
+    "Premios (icono)",
+    "Golden Tickets 8 (icono)",
+    "Premios Ganados (icono)"
+   ],
+   "columnas": [
+    "PREMIO",
+    "GANADOR",
+    "EMAIL",
+    "CODIGO",
+    "MOTIVO",
+    "ESTADO",
+    "RECLAMADO",
+    "OTORGADO"
+   ],
+   "filas": 8,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 13,
+   "insignias": [
+    "8",
+    "0",
+    "XWCG5F",
+    "Sin reclamar",
+    "XHCU6A",
+    "C4VUUL",
+    "PGMBHB",
+    "PC9EWB",
+    "SZMMAS",
+    "GNXQAJ",
+    "KEVJDV"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 8 de 8 resultados por página 5 10 25 50 Todos",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0",
+    "Alternar columnas"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1389
+  },
+  "n": {
+   "url": "/admin/eventos/1/gamificacion/golden-tickets",
+   "estado": 200,
+   "titulo": "Golden Tickets",
+   "migas": "Gamificación Golden Tickets",
+   "pestanas": [
+    "Ajustes",
+    "Premios",
+    "Golden Tickets",
+    "Premios Ganados"
+   ],
+   "columnas": [
+    "Premio",
+    "Ganador",
+    "Código",
+    "Estado",
+    "Otorgado",
+    "Marcar reclamado"
+   ],
+   "filas": 8,
+   "accionesDeFila": [
+    "Marcar reclamado",
+    "Reenviar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Estado Todos Sin reclamar Reclamado [select]",
+    "Tipo Todos Juego (Jackpot) Concurso de fotos Manual [select]",
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 19,
+   "insignias": [
+    "Sin reclamar"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1418
+  }
+ },
+ {
+  "id": "64",
+  "filament": "-",
+  "nuevo": "eventos/1/gamificacion/golden-tickets/nuevo",
+  "f": null,
+  "n": {
+   "url": "/admin/eventos/1/gamificacion/golden-tickets/nuevo",
+   "estado": 200,
+   "titulo": "Otorgar Golden Ticket",
+   "migas": "Golden Tickets Otorgar Golden Ticket",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Asistente* [text]",
+    "Título del premio* [text]",
+    "Patrocinador [select]",
+    "Descripción o instrucciones [textarea]",
+    "Motivo [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 667
+  }
+ },
+ {
+  "id": "65",
+  "filament": "gamificacion/rewards",
+  "nuevo": "eventos/1/gamificacion/premios",
+  "f": {
+   "url": "/admin/gamificacion/rewards",
+   "estado": 200,
+   "titulo": "Premios",
+   "migas": "Gamificación Premios Listado",
+   "pestanas": [
+    "Gamificación (icono)",
+    "Premios (icono)",
+    "Golden Tickets 8 (icono)",
+    "Premios Ganados (icono)"
+   ],
+   "columnas": [
+    "PREMIO",
+    "SPONSOR",
+    "PUNTOS",
+    "STOCK",
+    "ACTIVO"
+   ],
+   "filas": 1,
+   "accionesDeFila": [
+    "Camiseta",
+    "AWS",
+    "100",
+    "Ilimitado",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "40x40 r=9999px"
+   ],
+   "iconos": 13,
+   "insignias": [
+    "8",
+    "0",
+    "100"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestra un resultado por página 5 10 25 50 Todos",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 420
+  },
+  "n": {
+   "url": "/admin/eventos/1/gamificacion/premios",
+   "estado": 200,
+   "titulo": "Premios",
+   "migas": "Gamificación Premios",
+   "pestanas": [
+    "Ajustes",
+    "Premios",
+    "Golden Tickets",
+    "Premios Ganados"
+   ],
+   "columnas": [
+    "Imagen",
+    "Premio",
+    "Patrocinador",
+    "Puntos",
+    "Stock",
+    "Activo",
+    "Editar"
+   ],
+   "filas": 1,
+   "accionesDeFila": [
+    "Editar",
+    "Eliminar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "64x54 r=6px"
+   ],
+   "iconos": 5,
+   "insignias": [
+    "100"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 290
+  }
+ },
+ {
+  "id": "66",
+  "filament": "gamificacion/rewards/create",
+  "nuevo": "eventos/1/gamificacion/premios/nuevo",
+  "f": {
+   "url": "/admin/gamificacion/rewards/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/gamificacion/premios/nuevo",
+   "estado": 200,
+   "titulo": "Nuevo premio",
+   "migas": "Gamificación Nuevo premio",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Quién puede canjear"
+   ],
+   "campos": [
+    "Nombre* [text]",
+    "Instrucciones [textarea]",
+    "Patrocinador [select]",
+    "Puntos requeridos* [number]",
+    "Stock [number]",
+    "Activo [interruptor]",
+    "Asistente [checkbox]",
+    "Vendedor [checkbox]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 696
+  }
+ },
+ {
+  "id": "67",
+  "filament": "gamificacion/rewards/7/edit",
+  "nuevo": "eventos/1/gamificacion/premios/7",
+  "f": {
+   "url": "/admin/gamificacion/rewards/7/edit",
+   "estado": 200,
+   "titulo": "Camiseta",
+   "migas": "Gamificación Premios Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Premio"
+   ],
+   "campos": [
+    "Nombre [text]",
+    "Instrucciones [textarea]",
+    "Patrocinador (opcional) [select]",
+    "Arrastra y suelta tus archivos o Examina",
+    "Puntos requeridos [number]",
+    "Stock (vacio = ilimitado) [number]",
+    "Activo [interruptor]",
+    "Roles que pueden canjear (vacio = todos)",
+    "Asistente [checkbox]",
+    "Vendedor [checkbox]"
+   ],
+   "subidas": 1,
+   "arrastrar": true,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 3,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 426
+  },
+  "n": {
+   "url": "/admin/eventos/1/gamificacion/premios/7",
+   "estado": 200,
+   "titulo": "Camiseta",
+   "migas": "Gamificación Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Quién puede canjear"
+   ],
+   "campos": [
+    "Nombre* [text]",
+    "Instrucciones [textarea]",
+    "Patrocinador [select]",
+    "Puntos requeridos* [number]",
+    "Stock [number]",
+    "Activo [interruptor]",
+    "Asistente [checkbox]",
+    "Vendedor [checkbox]"
+   ],
+   "subidas": 1,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "128x72 r=8px"
+   ],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 632
+  }
+ },
+ {
+  "id": "68",
+  "filament": "gamificacion/prize-redemptions",
+  "nuevo": "eventos/1/gamificacion/ganados",
+  "f": {
+   "url": "/admin/gamificacion/prize-redemptions",
+   "estado": 200,
+   "titulo": "Prize Redemptions",
+   "migas": "Gamificación",
+   "pestanas": [
+    "Gamificación (icono)",
+    "Premios (icono)",
+    "Golden Tickets 8 (icono)",
+    "Premios Ganados (icono)"
+   ],
+   "columnas": [
+    "CODIGO",
+    "GANADOR",
+    "PREMIO",
+    "JUEGO",
+    "ESTADO",
+    "RECLAMADO EL",
+    "CONFIRMADO POR",
+    "GANADO EL"
+   ],
+   "filas": 8,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 7,
+   "insignias": [
+    "8",
+    "0",
+    "XWCG5F",
+    "Pendiente",
+    "XHCU6A",
+    "C4VUUL",
+    "PGMBHB",
+    "PC9EWB",
+    "SZMMAS",
+    "GNXQAJ",
+    "KEVJDV"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 8 de 8 resultados por página 5 10 25 50 Todos",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1124
+  },
+  "n": {
+   "url": "/admin/eventos/1/gamificacion/ganados",
+   "estado": 200,
+   "titulo": "Premios Ganados",
+   "migas": "Gamificación Premios Ganados",
+   "pestanas": [
+    "Ajustes",
+    "Premios",
+    "Golden Tickets",
+    "Premios Ganados"
+   ],
+   "columnas": [
+    "Código",
+    "Ganador",
+    "Premio",
+    "Estado",
+    "Ganado el",
+    "Marcar reclamado"
+   ],
+   "filas": 8,
+   "accionesDeFila": [
+    "Marcar reclamado"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Estado Todos Sin reclamar Reclamado [select]",
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 10,
+   "insignias": [
+    "Sin reclamar"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1198
+  }
+ },
+ {
+  "id": "69",
+  "filament": "salones",
+  "nuevo": "eventos/1/salones",
+  "f": {
+   "url": "/admin/salones",
+   "estado": 200,
+   "titulo": "Salones",
+   "migas": "Salones Listado",
+   "pestanas": [],
+   "columnas": [
+    "SALÓN",
+    "CAPACIDAD",
+    "OCUPACIÓN AHORA",
+    "PUERTAS"
+   ],
+   "filas": 3,
+   "accionesDeFila": [
+    "Auditorio Principal",
+    "200",
+    "24 / 200",
+    "0 de 1 en línea",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 5,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 467
+  },
+  "n": {
+   "url": "/admin/eventos/1/salones",
+   "estado": 200,
+   "titulo": "Salones",
+   "migas": "Salones Listado",
+   "pestanas": [],
+   "columnas": [
+    "Salón",
+    "Capacidad",
+    "Ocupación ahora",
+    "Puertas",
+    "Editar"
+   ],
+   "filas": 3,
+   "accionesDeFila": [
+    "Editar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 6,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 312
+  }
+ },
+ {
+  "id": "70",
+  "filament": "salones/1/edit",
+  "nuevo": "eventos/1/salones/1",
+  "f": {
+   "url": "/admin/salones/1/edit",
+   "estado": 200,
+   "titulo": "Auditorio Principal",
+   "migas": "Salones Editar",
+   "pestanas": [],
+   "columnas": [
+    "KIOSKO",
+    "ESTADO",
+    "ACTIVO"
+   ],
+   "filas": 1,
+   "accionesDeFila": [
+    "Conectar tablet"
+   ],
+   "botones": [],
+   "secciones": [
+    "Kioskos de la puerta"
+   ],
+   "campos": [
+    "Nombre del salón [text]",
+    "Capacidad [number]",
+    "Salón activo [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 2,
+   "insignias": [
+    "Sin conexión — visto hace 2 meses"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 543
+  },
+  "n": {
+   "url": "/admin/eventos/1/salones/1",
+   "estado": 200,
+   "titulo": "Auditorio Principal",
+   "migas": "Salones Editar",
+   "pestanas": [],
+   "columnas": [
+    "Kiosko",
+    "Estado",
+    "Activo",
+    "Editar"
+   ],
+   "filas": 1,
+   "accionesDeFila": [
+    "Conectar tablet",
+    "Editar",
+    "Eliminar"
+   ],
+   "botones": [],
+   "secciones": [
+    "Kioskos de la puerta"
+   ],
+   "campos": [
+    "Nombre del salón* [text]",
+    "Capacidad [text]",
+    "Salón activo [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 5,
+   "insignias": [
+    "Sin conexión, visto hace 2 meses"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 428
+  }
+ },
+ {
+  "id": "71",
+  "filament": "chat-settings/1/edit",
+  "nuevo": "eventos/1/chat",
+  "f": {
+   "url": "/admin/chat-settings/1/edit",
+   "estado": 200,
+   "titulo": "Chat",
+   "migas": "Chat Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Moderación automática",
+    "Control de flujo"
+   ],
+   "campos": [
+    "Palabras bloqueadas [textarea]",
+    "Slow mode [number]",
+    "Pausar el chat [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 635
+  },
+  "n": {
+   "url": "/admin/eventos/1/chat",
+   "estado": 200,
+   "titulo": "Chat",
+   "migas": "En vivo Chat",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Guardar cambios"
+   ],
+   "secciones": [
+    "Moderación automática Antes de que un mensaje llegue a verse, pasa por aquí.",
+    "Control de flujo"
+   ],
+   "campos": [
+    "Palabras bloqueadas [textarea]",
+    "Modo lento [number]",
+    "Pausar el chat [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 483
+  }
+ },
+ {
+  "id": "72",
+  "filament": "event-pulse/1/edit",
+  "nuevo": "eventos/1/eventPulse",
+  "f": {
+   "url": "/admin/event-pulse/1/edit",
+   "estado": 200,
+   "titulo": "Editar Event Pulse",
+   "migas": "Event Pulse Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Regenerar token"
+   ],
+   "secciones": [
+    "Event Pulse",
+    "Secciones activas"
+   ],
+   "campos": [
+    "Activar Event Pulse [interruptor]",
+    "Enlace del dashboard [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 4,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 579
+  },
+  "n": {
+   "url": "/admin/eventos/1/eventPulse",
+   "estado": 200,
+   "titulo": "Event Pulse",
+   "migas": "En vivo Event Pulse",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Event Pulse",
+    "Secciones activas"
+   ],
+   "campos": [
+    "Activar Event Pulse [interruptor]",
+    "Enlace del tablero [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 2,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 455
+  }
+ },
+ {
+  "id": "73",
+  "filament": "support-requests",
+  "nuevo": "eventos/1/soporte",
+  "f": {
+   "url": "/admin/support-requests",
+   "estado": 200,
+   "titulo": "Soporte",
+   "migas": "Soporte Listado",
+   "pestanas": [],
+   "columnas": [
+    "ASISTENTE",
+    "EMAIL",
+    "ASUNTO",
+    "ESTADO",
+    "FECHA"
+   ],
+   "filas": 4,
+   "accionesDeFila": [
+    "Carlos López",
+    "vendedor@eventos.test",
+    "La rata mayor",
+    "Leída",
+    "hace 4 meses",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": true,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 9,
+   "insignias": [
+    "0",
+    "Leída",
+    "Resuelta"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 4 de 4 resultados por página 5 10 25 50 Todos",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0",
+    "Alternar columnas"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 806
+  },
+  "n": {
+   "url": "/admin/eventos/1/soporte",
+   "estado": 200,
+   "titulo": "Soporte",
+   "migas": "En vivo Soporte",
+   "pestanas": [],
+   "columnas": [
+    "Asistente",
+    "Asunto",
+    "Estado",
+    "Fecha",
+    "Abrir"
+   ],
+   "filas": 4,
+   "accionesDeFila": [
+    "Abrir"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Estado Todos Abierta Leída Resuelta [select]",
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": true,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 6,
+   "insignias": [
+    "Leída",
+    "Resuelta"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 601
+  }
+ },
+ {
+  "id": "74",
+  "filament": "support-requests/4/edit",
+  "nuevo": "eventos/1/soporte/4",
+  "f": {
+   "url": "/admin/support-requests/4/edit",
+   "estado": 200,
+   "titulo": "Soporte",
+   "migas": "Soporte Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Tu respuesta"
+   ],
+   "campos": [
+    "Solicitud",
+    "Respuesta enviada"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 402
+  },
+  "n": {
+   "url": "/admin/eventos/1/soporte/4",
+   "estado": 200,
+   "titulo": "Soporte",
+   "migas": "En vivo Solicitud",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "La rata mayor",
+    "Tu respuesta"
+   ],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": true,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [
+    "Leída"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 305
+  }
+ },
+ {
+  "id": "75",
+  "filament": "encuestas",
+  "nuevo": "eventos/1/encuestas",
+  "f": {
+   "url": "/admin/encuestas",
+   "estado": 200,
+   "titulo": "Encuestas",
+   "migas": "Encuestas Listado",
+   "pestanas": [],
+   "columnas": [
+    "ENCUESTA",
+    "TIPO",
+    "ESTADO",
+    "PREGUNTAS",
+    "RESPUESTAS"
+   ],
+   "filas": 2,
+   "accionesDeFila": [
+    "Encuesta de satisfaccion — EventOS Summit 2026",
+    "Post-evento",
+    "Activa",
+    "5",
+    "36",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 3,
+   "insignias": [
+    "Post-evento",
+    "Activa",
+    "General",
+    "Borrador"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 454
+  },
+  "n": {
+   "url": "/admin/eventos/1/encuestas",
+   "estado": 200,
+   "titulo": "Encuestas",
+   "migas": "En vivo Encuestas",
+   "pestanas": [],
+   "columnas": [
+    "Encuesta",
+    "Tipo",
+    "Estado",
+    "Preguntas",
+    "Respuestas",
+    "Editar"
+   ],
+   "filas": 2,
+   "accionesDeFila": [
+    "Cerrar",
+    "Editar"
+   ],
+   "botones": [
+    "Nueva encuesta"
+   ],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 4,
+   "insignias": [
+    "Post-evento",
+    "Activa",
+    "General",
+    "Borrador"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 339
+  }
+ },
+ {
+  "id": "76",
+  "filament": "encuestas/8/edit",
+  "nuevo": "eventos/1/encuestas/8",
+  "f": {
+   "url": "/admin/encuestas/8/edit",
+   "estado": 200,
+   "titulo": "Encuestas",
+   "migas": "Encuestas Editar",
+   "pestanas": [],
+   "columnas": [
+    "PREGUNTA",
+    "TIPO",
+    "OPCIONES",
+    "RESPUESTAS"
+   ],
+   "filas": 5,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Preguntas"
+   ],
+   "campos": [
+    "Título de la encuesta [text]",
+    "Estado"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [
+    "Estrellas 1-5",
+    "Opción múltiple",
+    "Texto libre"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 800
+  },
+  "n": {
+   "url": "/admin/eventos/1/encuestas/8",
+   "estado": 200,
+   "titulo": "Encuestas",
+   "migas": "Encuestas Encuesta de satisfaccion — EventOS Summit 2026",
+   "pestanas": [],
+   "columnas": [
+    "Pregunta",
+    "Tipo",
+    "Opciones",
+    "Respuestas",
+    "Editar"
+   ],
+   "filas": 5,
+   "accionesDeFila": [
+    "Editar",
+    "Borrar"
+   ],
+   "botones": [
+    "Cerrar encuesta",
+    "Guardar cambios"
+   ],
+   "secciones": [
+    "Preguntas"
+   ],
+   "campos": [
+    "Título de la encuesta* [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 13,
+   "insignias": [
+    "Estrellas 1-5",
+    "Opción múltiple",
+    "Texto libre"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 788
+  }
+ },
+ {
+  "id": "77",
+  "filament": "live-game-results",
+  "nuevo": "-",
+  "f": {
+   "url": "/admin/live-game-results",
+   "estado": 200,
+   "titulo": "Live Game Results",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [
+    "TIPO",
+    "TITULO",
+    "SESION",
+    "ESTADO",
+    "PARTICIPANTES",
+    "SPONSOR",
+    "GANADOR",
+    "INICIO"
+   ],
+   "filas": 25,
+   "accionesDeFila": [
+    "CSV"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 29,
+   "insignias": [
+    "0",
+    "Trivia",
+    "finished",
+    "Ruleta",
+    "Sorteo",
+    "draft",
+    "cancelled"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 25 de 69 resultados por página 5 10 25 50 Todos 1 2 3",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0",
+    "Alternar columnas"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 2165
+  },
+  "n": null
+ },
+ {
+  "id": "78",
+  "filament": "events",
+  "nuevo": "eventos/1/eventos",
+  "f": {
+   "url": "/admin/events",
+   "estado": 200,
+   "titulo": "Eventos",
+   "migas": "Eventos Listado",
+   "pestanas": [],
+   "columnas": [
+    "EVENTO",
+    "ESTADO",
+    "INICIO",
+    "FIN"
+   ],
+   "filas": 1,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [
+    "En vivo"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 284
+  },
+  "n": {
+   "url": "/admin/eventos/1/eventos",
+   "estado": 200,
+   "titulo": "Eventos",
+   "migas": "Eventos Listado",
+   "pestanas": [],
+   "columnas": [
+    "Evento",
+    "Estado",
+    "Inicio",
+    "Fin",
+    "Trabajar en este"
+   ],
+   "filas": 1,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 2,
+   "insignias": [
+    "En vivo"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 143
+  }
+ },
+ {
+  "id": "79",
+  "filament": "events/create",
+  "nuevo": "eventos/nuevo",
+  "f": {
+   "url": "/admin/events/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/nuevo",
+   "estado": 200,
+   "titulo": "Crear nuevo evento",
+   "migas": "Eventos Crear",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Nombre del evento* [text]",
+    "Tipo de evento* [select]",
+    "Inicio* [datetime-local]",
+    "Fin* [datetime-local]",
+    "Modalidad* [select]",
+    "Zona horaria* [select]",
+    "Lugar [text]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 5,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 7422
+  }
+ },
+ {
+  "id": "80",
+  "filament": "users",
+  "nuevo": "eventos/1/staff",
+  "f": {
+   "url": "/admin/users",
+   "estado": 200,
+   "titulo": "Staff y permisos",
+   "migas": "Staff y permisos Listado",
+   "pestanas": [],
+   "columnas": [
+    "NOMBRE",
+    "EMAIL",
+    "ROLES",
+    "ACTIVA",
+    "SEGUNDO FACTOR"
+   ],
+   "filas": 3,
+   "accionesDeFila": [
+    "Super Admin",
+    "superadmin@eventos.test",
+    "Super admin",
+    "Activo",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 11,
+   "insignias": [
+    "0",
+    "Super admin",
+    "Activo",
+    "Admin de evento",
+    "Sin activar",
+    "attendee"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestran de 1 a 3 de 3 resultados por página 5 10 25 50 Todos",
+   "buscar": 1,
+   "filtros": [
+    "Filtrar 0"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 664
+  },
+  "n": {
+   "url": "/admin/eventos/1/staff",
+   "estado": 200,
+   "titulo": "Staff y permisos",
+   "migas": "Staff y permisos Listado",
+   "pestanas": [],
+   "columnas": [
+    "Nombre",
+    "Correo",
+    "Roles",
+    "Activa",
+    "Segundo factor",
+    "Editar"
+   ],
+   "filas": 2,
+   "accionesDeFila": [
+    "Editar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Cuenta Todas Activas Inactivas [select]",
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 7,
+   "insignias": [
+    "Super admin",
+    "Activo",
+    "Admin de evento",
+    "Sin activar"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 424
+  }
+ },
+ {
+  "id": "81",
+  "filament": "users/create",
+  "nuevo": "eventos/1/staff/nuevo",
+  "f": {
+   "url": "/admin/users/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/staff/nuevo",
+   "estado": 200,
+   "titulo": "Nuevo miembro del staff",
+   "migas": "Staff y permisos Nuevo miembro del staff",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "La persona",
+    "Qué puede hacer",
+    "Roles",
+    "Dónde trabaja",
+    "Eventos asignados"
+   ],
+   "campos": [
+    "Nombre* [text]",
+    "Correo* [email]",
+    "Contraseña* [password]",
+    "Teléfono [tel]",
+    "Empresa [text]",
+    "Cargo [text]",
+    "Super admin todo, incluye grupo Sistema [checkbox]",
+    "Admin de organización eventos, contenido, personas [checkbox]",
+    "Admin de evento opera el evento, no crea eventos [checkbox]",
+    "Moderador modera contenido y check-in [checkbox]",
+    "Staff de check-in solo escanear y puerta [checkbox]",
+    "Organizador (cliente) solo mira el Data Center y descarga reportes [checkbox]",
+    "Cuenta activa [interruptor]",
+    "Organización [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 914
+  }
+ },
+ {
+  "id": "82",
+  "filament": "users/2/edit",
+  "nuevo": "eventos/1/staff/2",
+  "f": {
+   "url": "/admin/users/2/edit",
+   "estado": 200,
+   "titulo": "Admin Evento",
+   "migas": "Staff y permisos Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "La persona",
+    "Qué puede hacer",
+    "Dónde trabaja",
+    "Actividad de acceso"
+   ],
+   "campos": [
+    "Nombre [text]",
+    "Email [email]",
+    "Contraseña [password]",
+    "Teléfono [tel]",
+    "Empresa [text]",
+    "Cargo [text]",
+    "Roles",
+    "Admin de evento opera el evento, no crea eventos [checkbox]",
+    "Moderador modera contenido y check-in [checkbox]",
+    "Admin de organización eventos, contenido, personas [checkbox]",
+    "Organizador (cliente) solo mira el Data Center y descarga reportes [checkbox]",
+    "Staff de check-in solo escanear y puerta [checkbox]",
+    "Super admin todo, incluye grupo Sistema [checkbox]",
+    "Cuenta activa [interruptor]",
+    "Organización [select]",
+    "Eventos asignados [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 975
+  },
+  "n": {
+   "url": "/admin/eventos/1/staff/2",
+   "estado": 200,
+   "titulo": "Admin Evento",
+   "migas": "Staff y permisos Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "La persona",
+    "Qué puede hacer",
+    "Roles",
+    "Dónde trabaja",
+    "Eventos asignados",
+    "Actividad de acceso"
+   ],
+   "campos": [
+    "Nombre* [text]",
+    "Correo* [email]",
+    "Contraseña [password]",
+    "Teléfono [tel]",
+    "Empresa [text]",
+    "Cargo [text]",
+    "Super admin todo, incluye grupo Sistema [checkbox]",
+    "Admin de organización eventos, contenido, personas [checkbox]",
+    "Admin de evento opera el evento, no crea eventos [checkbox]",
+    "Moderador modera contenido y check-in [checkbox]",
+    "Staff de check-in solo escanear y puerta [checkbox]",
+    "Organizador (cliente) solo mira el Data Center y descarga reportes [checkbox]",
+    "Cuenta activa [interruptor]",
+    "Organización [select]",
+    "Summit Empresarial 2026 [checkbox]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1019
+  }
+ },
+ {
+  "id": "83",
+  "filament": "rate-limit-settings/1/edit",
+  "nuevo": "eventos/1/limites",
+  "f": {
+   "url": "/admin/rate-limit-settings/1/edit",
+   "estado": 200,
+   "titulo": "Límites de uso",
+   "migas": "Events Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Limites de uso",
+    "Publicaciones",
+    "Interaccion",
+    "Soporte y Leads"
+   ],
+   "campos": [
+    "Limitar posts en muro [interruptor]",
+    "Posts por dia [number]",
+    "Limitar comentarios [interruptor]",
+    "Comentarios por dia [number]",
+    "Limitar preguntas Q&A [interruptor]",
+    "Preguntas por dia por sesion [number]",
+    "Limitar fotos [interruptor]",
+    "Fotos por dia [number]",
+    "Limitar momentos [interruptor]",
+    "Momentos por dia [number]",
+    "Limitar consultas de soporte [interruptor]",
+    "Consultas por dia [number]",
+    "Limitar leads (vendedor) [interruptor]",
+    "Leads por dia [number]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 5,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 757
+  },
+  "n": {
+   "url": "/admin/eventos/1/limites",
+   "estado": 200,
+   "titulo": "Límites de uso",
+   "migas": "Sistema Límites de uso",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [
+    "Guardar cambios"
+   ],
+   "secciones": [
+    "Límites de uso Controla cuántas acciones por día puede realizar cada asistente. Desactiva ",
+    "Publicaciones",
+    "Interacción",
+    "Soporte y Leads"
+   ],
+   "campos": [
+    "Limitar posts en muro [interruptor]",
+    "Posts por día [number]",
+    "Limitar comentarios [interruptor]",
+    "Comentarios por día [number]",
+    "Limitar preguntas Q&A [interruptor]",
+    "Preguntas por día por sesión [number]",
+    "Limitar fotos [interruptor]",
+    "Fotos por día [number]",
+    "Limitar momentos [interruptor]",
+    "Momentos por día [number]",
+    "Limitar consultas de soporte [interruptor]",
+    "Consultas por día [number]",
+    "Limitar leads (vendedor) [interruptor]",
+    "Leads por día [number]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 617
+  }
+ },
+ {
+  "id": "84",
+  "filament": "webhooks/webhook-endpoints",
+  "nuevo": "eventos/1/webhooks",
+  "f": {
+   "url": "/admin/webhooks/webhook-endpoints",
+   "estado": 200,
+   "titulo": "Webhooks Salientes",
+   "migas": "Webhooks Webhooks Salientes Listado",
+   "pestanas": [
+    "Webhooks (icono)",
+    "API Keys (icono)"
+   ],
+   "columnas": [
+    "PARTNER",
+    "URL",
+    "EVENTOS",
+    "ESTADO",
+    "TEST",
+    "ACTIVO",
+    "ULTIMO ENVIO"
+   ],
+   "filas": 1,
+   "accionesDeFila": [
+    "CRM Integration",
+    "https://example.com/webhooks/eventos",
+    "lead.created attendee.checked_in",
+    "needs_attention",
+    "hace 4 meses",
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]",
+    "por página 5 10 25 50 Todos [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 8,
+   "insignias": [
+    "lead.created",
+    "attendee.checked_in",
+    "needs_attention"
+   ],
+   "vacio": "",
+   "paginacion": "Se muestra un resultado por página 5 10 25 50 Todos",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 501
+  },
+  "n": {
+   "url": "/admin/eventos/1/webhooks",
+   "estado": 200,
+   "titulo": "Webhooks",
+   "migas": "Webhooks Listado",
+   "pestanas": [
+    "Webhooks",
+    "Llaves de entrada"
+   ],
+   "columnas": [
+    "Partner",
+    "Eventos",
+    "Estado",
+    "Prueba",
+    "Activo",
+    "Último envío",
+    "Editar"
+   ],
+   "filas": 1,
+   "accionesDeFila": [
+    "Enviar prueba",
+    "Reenviar fallidos",
+    "Historial",
+    "Editar",
+    "Eliminar"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 12,
+   "insignias": [
+    "lead.created",
+    "Check-in realizado",
+    "Requiere atención"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 576
+  }
+ },
+ {
+  "id": "85",
+  "filament": "webhooks/webhook-endpoints/create",
+  "nuevo": "eventos/1/webhooks/nuevo",
+  "f": {
+   "url": "/admin/webhooks/webhook-endpoints/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/webhooks/nuevo",
+   "estado": 200,
+   "titulo": "Crear webhook",
+   "migas": "Webhooks Crear webhook",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Eventos a enviar*",
+    "Campos a enviar"
+   ],
+   "campos": [
+    "Nombre del partner* [text]",
+    "URL del webhook* [url]",
+    "Registro nuevo [checkbox]",
+    "Registro aprobado [checkbox]",
+    "Perfil actualizado [checkbox]",
+    "Check-in realizado [checkbox]",
+    "Registro cancelado [checkbox]",
+    "Nombre [checkbox]",
+    "Correo [checkbox]",
+    "Teléfono [checkbox]",
+    "Empresa [checkbox]",
+    "Cargo [checkbox]",
+    "Rol [checkbox]",
+    "Etiquetas [checkbox]",
+    "Foto [checkbox]",
+    "Hora del check-in [checkbox]",
+    "Hora del registro [checkbox]",
+    "Modo prueba [interruptor]",
+    "Activo [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 536
+  }
+ },
+ {
+  "id": "86",
+  "filament": "webhooks/webhook-endpoints/1/edit",
+  "nuevo": "eventos/1/webhooks/1",
+  "f": {
+   "url": "/admin/webhooks/webhook-endpoints/1/edit",
+   "estado": 200,
+   "titulo": "Editar Webhook",
+   "migas": "Webhooks Webhooks Salientes Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Nombre del partner [text]",
+    "URL del webhook [url]",
+    "Secret (HMAC) [text]",
+    "Eventos a enviar",
+    "Registro nuevo [checkbox]",
+    "Registro aprobado [checkbox]",
+    "Perfil actualizado [checkbox]",
+    "Check-in realizado [checkbox]",
+    "Registro cancelado [checkbox]",
+    "Campos a enviar",
+    "Nombre [checkbox]",
+    "Email [checkbox]",
+    "Telefono [checkbox]",
+    "Empresa [checkbox]",
+    "Cargo [checkbox]",
+    "Rol [checkbox]",
+    "Tags [checkbox]",
+    "Foto [checkbox]",
+    "Hora check-in [checkbox]",
+    "Hora registro [checkbox]",
+    "Modo prueba [interruptor]",
+    "Activo [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 2,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 671
+  },
+  "n": {
+   "url": "/admin/eventos/1/webhooks/1",
+   "estado": 200,
+   "titulo": "CRM Integration",
+   "migas": "Webhooks Editar",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Eventos a enviar*",
+    "Campos a enviar"
+   ],
+   "campos": [
+    "Nombre del partner* [text]",
+    "URL del webhook* [url]",
+    "Registro nuevo [checkbox]",
+    "Registro aprobado [checkbox]",
+    "Perfil actualizado [checkbox]",
+    "Check-in realizado [checkbox]",
+    "Registro cancelado [checkbox]",
+    "Nombre [checkbox]",
+    "Correo [checkbox]",
+    "Teléfono [checkbox]",
+    "Empresa [checkbox]",
+    "Cargo [checkbox]",
+    "Rol [checkbox]",
+    "Etiquetas [checkbox]",
+    "Foto [checkbox]",
+    "Hora del check-in [checkbox]",
+    "Hora del registro [checkbox]",
+    "Modo prueba [interruptor]",
+    "Activo [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 3,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 596
+  }
+ },
+ {
+  "id": "87",
+  "filament": "webhooks/webhook-api-keys",
+  "nuevo": "eventos/1/webhooks/llaves",
+  "f": {
+   "url": "/admin/webhooks/webhook-api-keys",
+   "estado": 200,
+   "titulo": "API Keys Entrantes",
+   "migas": "Webhooks API Keys Entrantes Listado",
+   "pestanas": [
+    "Webhooks (icono)",
+    "API Keys (icono)"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Búsqueda [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 6,
+   "insignias": [],
+   "vacio": "No se encontraron registros",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 277
+  },
+  "n": {
+   "url": "/admin/eventos/1/webhooks/llaves",
+   "estado": 200,
+   "titulo": "Llaves de entrada",
+   "migas": "Webhooks Listado",
+   "pestanas": [
+    "Webhooks",
+    "Llaves de entrada"
+   ],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 3,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 256
+  }
+ },
+ {
+  "id": "88",
+  "filament": "webhooks/webhook-api-keys/create",
+  "nuevo": "eventos/1/webhooks/llaves/nueva",
+  "f": {
+   "url": "/admin/webhooks/webhook-api-keys/create",
+   "estado": 403,
+   "titulo": "403",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 0,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 13
+  },
+  "n": {
+   "url": "/admin/eventos/1/webhooks/llaves/nueva",
+   "estado": 200,
+   "titulo": "Crear llave",
+   "migas": "Llaves de entrada Crear llave",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Permisos*"
+   ],
+   "campos": [
+    "Nombre del partner* [text]",
+    "Partner (webhook) [select]",
+    "Check-in (marcar asistencia) [checkbox]",
+    "Checkout (marcar salida) [checkbox]",
+    "Límite por hora [number]",
+    "Activa [interruptor]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 1,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 438
+  }
+ },
+ {
+  "id": "89",
+  "filament": "webhooks/webhook-logs",
+  "nuevo": "eventos/1/webhooks/historial",
+  "f": {
+   "url": "/admin/eventos/1/webhooks/historial",
+   "estado": 200,
+   "titulo": "Historial de webhooks",
+   "migas": "Historial de webhooks Listado",
+   "pestanas": [],
+   "columnas": [
+    "Fecha",
+    "Tipo",
+    "Evento",
+    "Partner o llave",
+    "Estado",
+    "Intento",
+    "Duración",
+    "Prueba",
+    "Ver"
+   ],
+   "filas": 25,
+   "accionesDeFila": [
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Tipo Todos Saliente Entrante [select]",
+    "Estado Todos Exitosos (2xx) Error del partner (4xx) Error del servidor (5xx) Sin respuesta [select]",
+    "Pruebas Todas Solo pruebas Sin pruebas [select]",
+    "Partner Todos los partners CRM Integration [select]",
+    "Por página 25 50 100 [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 54,
+   "insignias": [
+    "Saliente",
+    "405"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [
+    "Tipo Todos Saliente Entrante",
+    "Todos Saliente Entrante",
+    "Estado Todos Exitosos (2xx) Error del partner (4xx) Error del servidor (5xx) Sin respuesta",
+    "Todos Exitosos (2xx) Error del partner (4xx) Error del servidor (5xx) Sin respuesta",
+    "Pruebas Todas Solo pruebas Sin pruebas",
+    "Todas Solo pruebas Sin pruebas",
+    "Partner Todos los partners CRM Integration",
+    "Todos los partners CRM Integration"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 2494
+  },
+  "n": {
+   "url": "/admin/eventos/1/webhooks/historial",
+   "estado": 200,
+   "titulo": "Historial de webhooks",
+   "migas": "Historial de webhooks Listado",
+   "pestanas": [],
+   "columnas": [
+    "Fecha",
+    "Tipo",
+    "Evento",
+    "Partner o llave",
+    "Estado",
+    "Intento",
+    "Duración",
+    "Prueba",
+    "Ver"
+   ],
+   "filas": 25,
+   "accionesDeFila": [
+    "Ver"
+   ],
+   "botones": [],
+   "secciones": [],
+   "campos": [
+    "Tipo Todos Saliente Entrante [select]",
+    "Estado Todos Exitosos (2xx) Error del partner (4xx) Error del servidor (5xx) Sin respuesta [select]",
+    "Pruebas Todas Solo pruebas Sin pruebas [select]",
+    "Partner Todos los partners CRM Integration [select]",
+    "Por página 25 50 100 [select]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 54,
+   "insignias": [
+    "Saliente",
+    "405"
+   ],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [
+    "Tipo Todos Saliente Entrante",
+    "Todos Saliente Entrante",
+    "Estado Todos Exitosos (2xx) Error del partner (4xx) Error del servidor (5xx) Sin respuesta",
+    "Todos Exitosos (2xx) Error del partner (4xx) Error del servidor (5xx) Sin respuesta",
+    "Pruebas Todas Solo pruebas Sin pruebas",
+    "Todas Solo pruebas Sin pruebas",
+    "Partner Todos los partners CRM Integration",
+    "Todos los partners CRM Integration"
+   ],
+   "anchoDelContenido": 1056,
+   "textoLargo": 2494
+  }
+ },
+ {
+  "id": "90",
+  "filament": "-",
+  "nuevo": "eventos/1/ayuda",
+  "f": null,
+  "n": {
+   "url": "/admin/eventos/1/ayuda",
+   "estado": 200,
+   "titulo": "Ayuda",
+   "migas": "Sistema Ayuda",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Crear tu evento",
+    "Entra a Eventos"
+   ],
+   "campos": [
+    " [search]"
+   ],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [
+    "762x520 r=0px"
+   ],
+   "iconos": 2,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 1,
+   "filtros": [],
+   "anchoDelContenido": 1056,
+   "textoLargo": 1183
+  }
+ },
+ {
+  "id": "91",
+  "filament": "-",
+  "nuevo": "torre",
+  "f": null,
+  "n": {
+   "url": "/admin/torre",
+   "estado": 200,
+   "titulo": "5 cosas para mirar",
+   "migas": "",
+   "pestanas": [],
+   "columnas": [],
+   "filas": 0,
+   "accionesDeFila": [],
+   "botones": [],
+   "secciones": [
+    "Tiempo de respuesta",
+    "Errores",
+    "Procesador",
+    "Servidores",
+    "Pedidos por segundo 0,0ahora",
+    "Tiempo de respuesta 0ms",
+    "Personas conectadas 0ahora",
+    "Reconexiones de sockets 0por minuto"
+   ],
+   "campos": [],
+   "subidas": 0,
+   "arrastrar": false,
+   "editorDeTexto": 0,
+   "fotos": [],
+   "iconos": 20,
+   "insignias": [],
+   "vacio": "",
+   "paginacion": "",
+   "buscar": 0,
+   "filtros": [],
+   "anchoDelContenido": 1440,
+   "textoLargo": 763
+  }
+ }
+]
