@@ -130,6 +130,12 @@ puede borrar, una validación que falta, un efecto que PHP no dispara), se pregu
     para lo que viene (la demo, el hito, un cliente). Con eso Kamilo decide si sigue, se recorta o vuelve a esperar. Paso con
     M2.8.4: aplazada el 2026-11-08, retomada el 22 sin decir el costo; se recorto en el camino (archivo unico despues del hito
     1, la lectura de Kamilo con una demo real).
+33. **Antes de subir codigo de C#, la suite completa sin base y sin Redis** (Kamilo 2026-11-23, retro de la fase 3). Ademas de
+    las pruebas del modulo con las transversales (contra MySQL y Redis), en local se corre `dotnet test tests/Tests` SIN
+    `EVENTOS_MYSQL_PRUEBAS` (unos 30 s): es la primera pasada del MSI y la unica que prueba la Api con la base y Redis caidos
+    (`SistemaTest`: health "degraded" en vez de no arrancar) y que el OpenAPI del panel esta al dia (`ApiDelAdminTest`). En la
+    fase 3 dos fallas solo las vio el MSI por saltarse esta pasada: BUG-563 (sin Redis al arrancar, el canal del hub tumbaba la
+    Api) y el OpenAPI de `fa17657` (un texto de una ruta cambiado sin regenerarlo).
 
 ## Seguridad
 

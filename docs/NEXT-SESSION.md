@@ -10,6 +10,51 @@
 
 ---
 
+## PRUEBA DE M3.4.2: LA APP CON EL HUB EN ANDROID Y EN IPHONE (Kamilo, 2026-11-24)
+
+> **Ojo: todo lo de Expo se ha probado solo en Android. En iPhone nunca se probo nada (Kamilo 2026-11-23).** Esta es la primera
+> vez de la app en iOS: pueden salir fallas que no son del tiempo real. Propuesta: M3.4.2 cierra si el tiempo real funciona en los
+> dos; lo demas de iOS se anota como BUG (con captura y la pantalla donde paso) y se decide aparte, sin arreglarlo dentro de M3.4.2.
+> Ya quedo hecho: el codigo (app `8b29829`), `EXPO_PUBLIC_SOCKET_URL=http://192.168.50.142:5230` en el `.env` de la app (local, no
+> esta en git) y `EN_LA_RED=1` en `scripts/api-local.sh`. Si la IP del PC cambio, corregirla en los dos `EXPO_PUBLIC_*` del `.env`.
+
+**Preparacion en el PC (una vez):**
+1. Laragon prendido (MySQL y Redis). Desde Git Bash, en `eventos-api-dotnet`: `EN_LA_RED=1 scripts/api-local.sh`.
+   **Tiene que pasar:** dice `Api de C# en http://0.0.0.0:5230 (hub en /tiempo-real)`. La primera vez Windows pregunta por el
+   firewall: permitir en redes privadas.
+2. En el `.env` de `eventos-backend` (local): `SOCKET_SERVER_URL=http://127.0.0.1:5230` (estaba en 3001, Node) y
+   `php artisan config:clear`. Se deja asi: Node ya no existe. **Tiene que pasar:** nada visible; es para que los avisos de PHP
+   (publicar en el muro) lleguen al hub.
+3. En el panel (`localhost:3000/admin`, Social, Ajustes): **Auto-aprobar publicaciones prendido** (si no, el post del paso 8 queda
+   pendiente y no se reparte). Una sesion **en vivo con el modo interactivo en Chat** (panel o Mission Control).
+4. En `eventos-app`: `npx expo start --clear` (el `--clear` es obligatorio: las `EXPO_PUBLIC_*` se meten al armar el paquete).
+
+**En cada telefono (los dos en el mismo wifi que el PC):**
+5. En el navegador del telefono abrir `http://192.168.50.142:5230/api/v1/health`. **Tiene que pasar:** sale `{"status":"ok",...}`.
+   Si no carga, el problema es la red o el firewall, no la app: no seguir hasta que cargue.
+6. Abrir la app. **Android:** como siempre (Expo Go o el build de desarrollo). **iPhone:** abrir Expo Go desde la App Store y usar
+   "Scan QR code" DENTRO de Expo Go (la camara de iOS no siempre ofrece abrirlo). Cuando iOS pregunte por la **red local**, Permitir
+   (si se nego: Ajustes, Privacidad, Red local, Expo Go). **Si Expo Go dice que el SDK del proyecto no coincide:** parar ahi; en
+   iPhone hace falta un build de desarrollo por EAS (pide cuenta de Apple Developer) y eso se decide antes de seguir.
+   **Tiene que pasar:** entra con tu cuenta y carga el inicio como en Android.
+
+**La prueba (Android y iPhone a la vez; puede ser la misma cuenta o dos):**
+7. **Chat:** en los dos, Agenda, la sesion en vivo, Ver en vivo, Chat. Escribir "hola desde android" en uno.
+   **Tiene que pasar:** aparece en el otro en menos de 1 segundo, sin recargar. Repetir desde el iPhone ("hola desde iphone").
+8. **Aviso de PHP:** publicar algo en el muro desde el Android (Social). **Tiene que pasar:** aparece arriba en el muro del iPhone
+   sin recargar (`wall:post`: lo manda PHP al hub, M3.3.2).
+9. **Ocultar:** en el panel (Social, Publicaciones), ocultar esa publicacion. **Tiene que pasar:** desaparece del muro de los dos
+   telefonos sin recargar (`wall:hidden`, M3.4.1).
+10. **Segundo plano:** en el iPhone volver a la sesion en vivo (Chat), boton de inicio y esperar 1 minuto. Mientras, desde el Android
+    escribir dos mensajes en el chat. Volver a la app en el iPhone. **Tiene que pasar:** en pocos segundos se ven los dos mensajes
+    (al volver entra otra vez a la sala y recibe el historial) y lo que se escriba despues sigue llegando. Repetir al reves
+    (Android en segundo plano, escribir desde el iPhone).
+11. **Hub caido y de vuelta:** en el PC, Ctrl+C a `api-local.sh`, esperar 30 segundos y volver a correr el paso 1. **Tiene que
+    pasar:** sin tocar los telefonos, al minuto el chat vuelve a funcionar en los dos (escribir de un lado y verlo del otro).
+
+**Si algo no pasa:** anotar en que paso, en que telefono y que se vio (captura si se puede), y lo revisamos antes de tocar codigo. Si
+falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
+
 ## DESPLIEGUE PENDIENTE (lista unica, en orden)
 
 > Decision de Kamilo 2026-11-06: todo lo que falta para desplegar vive SOLO aqui, en el orden en que se hace. Cada tarea

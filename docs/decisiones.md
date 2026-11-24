@@ -8,6 +8,8 @@
 
 | Fecha | Que | Por que |
 |---|---|---|
+| 2026-11-23 | **Se borran `stress-sockets.js` (k6), `stress-sockets.yml` y `stress-sockets-prod.yml` de `eventos-backend/tests/load`** (Kamilo) | Prueban un protocolo que ya no existe (Socket.IO); la cobertura la dan las pruebas nuevas sobre el hub: los 9 scripts de Node con `hub.cjs` (la medicion de 1.000 en una sala es `e4-chat-magistral.js`, M3.5.2) y las del hub en C# |
+| 2026-11-23 | **Antes de cada push con codigo de C#, la suite completa sin base y sin Redis en local** (Kamilo; regla 33 de BUENAS-PRACTICAS) | BUG-563 y el OpenAPI de `fa17657` solo los vio el MSI: los atrapa esa pasada, que en local no se corria |
 | 2026-11-23 | **Node esta descartado: no vuelve a correr en ningun lado** (Kamilo, al cerrar el alcance de la fase 3). Salen M3.5.1 (doble emision) y M3.4.4 (bandera para volver a socket.io); M3.5.3 pasa a ser local (sacar `eventos-socket` del despliegue y de `verificar`). La condicion del 2026-11-22 de probar las llaves de Redis con el codigo real de Node deja de aplicar: lo que PHP sigue leyendo de Redis va con la cruzada de la regla 7 en los dos sentidos | Sin evento ni gente conectada no hay transicion que cuidar; mantener Node solo para volver atras es costo sin uso |
 | 2026-11-23 | **La medicion de 1.000 personas en una sala (M3.5.2) es el primer paso el dia que se prenda el servidor, antes de cualquier evento** (Kamilo) | Es la unica forma de saber si el hub aguanta lo que aguantaba Node en agosto |
 | 2026-11-23 | **Arreglos del bloque 3.2 en C#** (Kamilo): el modo lento y la pausa del chat valen para todas las copias (BUG-559, el de la sesion sale de la base), Pulse recibe el total real de personas conectadas (BUG-544), la asistencia por sesion se guarda con la hora real de Bogota (BUG-562; PHP la dejaba 5 h corrida) y el horario de `FlushSessionAttendanceJob` de PHP se apaga en el mismo commit | Son defectos de datos sin consumidor que dependa del error; no hay datos viejos que mezclar |
@@ -182,9 +184,6 @@
 
 ### Migracion a .NET
 
-- **(2026-11-23) Borrar `stress-sockets.js` (k6), `stress-sockets.yml` y `stress-sockets-prod.yml` de `eventos-backend/tests/load`:**
-  solo hablan Socket.IO y ya no sirven contra el hub (M3.5.3). Los scripts de Node pasaron a `hub.cjs`. Se borran o se reescriben
-  cuando Kamilo diga.
 - **D.5** App en tiendas: no publicar build antes de la fase 3 (cada build congela el cliente de Socket.IO semanas). Si un cliente la pide antes, la fase 3 se adelanta.
 - Zona horaria por evento (hoy toda la API usa la de la app): se decide despues de la fase 5.
 - **Por decidir:** la solicitud de borrado de datos personales (Ley 1581 de Colombia, habeas data) se resuelve anonimizando, no eliminando: eliminar un asistente se lleva en cascada los datos de los sponsors y no borra a la persona (Kamilo 2026-10-31, al portar M2.4.1b).
