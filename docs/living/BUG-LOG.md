@@ -3,6 +3,50 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-24 — El marco del panel contra Filament (sesion 42, lab "Panel nuevo contra Filament")
+
+### BUG-570: Las fotos de las tablas del panel salian aplastadas (8 x 40 px en Speakers) (RESUELTO 2026-11-24)
+- **Severidad propuesta:** MEDIA (visual; Kamilo lo vio en Speakers al comparar con Filament)
+- **Que pasa:** la regla general de las imagenes (`img { max-width: 100% }`) encogia `.adm-foto` al ancho que le dejaba la celda:
+  `.adm-tabla-foto` media 56 px con 24 px de relleno a cada lado y quedaban 8 px. Medido en el panel de Kamilo con el CSS de antes:
+  celda de 56 px y foto de 8 x 40 con la tabla de 1214 px. Filament usa `max-w-none`. Cuanto se aplasta depende de cuanto espacio
+  le sobra a la tabla: con los 3 speakers del seeder de pruebas la tabla ensanchaba la columna (88 px) y la foto salia bien.
+- **Arreglado en:** web `ed2f60b`: `.adm-foto` con `max-width: none` (vale tambien en Fotos, Muro y el formulario de sesion) y
+  la celda de 88 px.
+- **Prueba:** `e2e-admin/speakers.spec.ts` ("la foto de la lista sale redonda de 40 x 40"): tamano, forma y la causa
+  (`max-width: none`), con una imagen que carga de verdad. Tres controles con medidas no la veian (imagen rota, textos cortos y
+  largos); el cuarto, sobre la causa, sale rojo con el CSS de antes. Leccion: cuando la falla depende de los datos, la prueba va
+  sobre la causa.
+
+### BUG-569: La e2e de la torre falla porque `web-e2e` sale "sin señal" (ABIERTO)
+- **Severidad propuesta:** BAJA (pruebas: `torre.spec.ts`, "el super_admin entra por el menu...", 2 corridas seguidas en local el
+  2026-11-24; el menu ya andaba, falla despues)
+- **Que pasa:** `web-e2e` (el vigilante de Next de la e2e, cada 10 s) sale con la X de sin señal: la torre lo recuerda de corridas
+  anteriores (`torre:servidores`, un dia) y el reporte actual no estaba. Medido: hubo 3 minutos sin reporte de `webapp:web-e2e:next`
+  con el `next dev` de la e2e arriba; despues volvio a reportar cada 10 s. Ademas la Api local (5230) y la de la e2e (5092) escriben
+  la torre en la misma base 2 de Redis y se mezclan sus servidores. No se busco aun por que el vigilante calla esos minutos.
+- **Propuesta:** investigarlo aparte (regla 34); en el MSI la e2e corre con `next build` y Redis limpio, ver si alli tambien falla.
+
+### BUG-568: El menu del panel no copiaba el de Filament (sin iconos, sin grupos plegables, espacios en cero) (MENU RESUELTO 2026-11-24; faltan pestanas, tablas y la parte 2)
+- **Severidad propuesta:** MEDIA (visual: la regla del panel es copiar Lumina como se ve hoy en Filament, decision de Kamilo
+  2026-10-25; Kamilo lo vio al comparar los dos paneles)
+- **Que pasa:** medido en el navegador en Agenda > Tracks a 1568 px (lab, version 2): el menu no tenia iconos (0 de 26; Filament
+  23 de 23, Heroicons outline de 15 px), ni grupos plegables (Filament 6, Sistema plegado), ni el espacio entre grupos (0 contra
+  28 px) ni del titulo a la primera opcion (0 contra 12) ni entre opciones (0 contra 4); opcion de 37 px y 14 px al 60 % contra 30 px y
+  13,5 px en el gris de Filament; menu de 256 contra 320 px; barra de 64 contra 52 px; contenido sin el maximo de 1280 px. Los
+  espacios en cero tenian una causa: `.adm-grupo` estaba dos veces en `admin.css` (el titulo del menu y el fieldset de los
+  formularios) y la segunda regla le borraba el espacio a la primera.
+- **Arreglado en (parte 1, el menu):** web `019b291`: iconos sacados de los mismos SVG de Filament (`vendor/blade-ui-kit/blade-heroicons`),
+  grupos plegables con la flecha de Filament y el estado en una cookie HttpOnly que lee el servidor (regla 30; Sistema plegado;
+  guardada por una ruta: con `localStorage` el menu saltaba de cerrado a abierto al cargar y con una Server Action la pagina se
+  refrescaba y cancelaba el clic siguiente, las dos cosas las cazaron las e2e), clase propia `.adm-lado-grupo`, las
+  medidas y los tonos de Filament en Noir y Lux (tokens `--lum-menu-*`), barra de 52 px y contenido centrado a 1280 px.
+- **Prueba:** `e2e-admin/marco.spec.ts` (medidas en Noir, tonos en Lux, plegar y recordar, el HTML del servidor ya plegado), roja antes; controles: sin el espacio
+  de 12 px, rojo; la ruta sin guardar la cookie, rojo. Las e2e que usan Sistema lo abren antes (`abrirGrupoDelMenu`): eventos, staff,
+  webhooks y torre; anuncios, ayuda, emails y soporte en verde sin cambios.
+- **Falta (siguientes partes):** iconos de las pestanas, encabezados de tabla y "por pagina" (parte 1, siguiente commit);
+  notificaciones y buscador global (parte 2, con C#, se propone aparte).
+
 ## 2026-11-24 — Encontrado en la prueba de M3.4.2 en el emulador de Android (sesion 42)
 
 ### BUG-567: En local con EN_LA_RED, los avisos de C# al hub se perdian por "localhost" (RESUELTO 2026-11-24)

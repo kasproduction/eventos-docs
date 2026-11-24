@@ -138,7 +138,7 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
 
-## SESION 2026-11-24 (Opus 5.5, 42) — M3.4.2 EN ANDROID (EMULADOR) EN VERDE; BUG-564 (EL HUB RECHAZABA A LA APP), 565 (PANEL SIN TEMA), 566 (AUTOCOMPLETADO) Y 567; REGLA 34
+## SESION 2026-11-24 (Opus 5.5, 42) — M3.4.2 EN ANDROID (EMULADOR) EN VERDE; BUG-564 A 570; REGLA 34; EL PANEL CONTRA FILAMENT (MENU Y FOTOS)
 
 - Decisiones Kamilo: probar Android en el emulador de Android Studio (sin telefono), con la webapp como segundo cliente; el hub deja
   entrar su propio origen calculado con lo que reenvia Nginx, con la prueba de que la Api no sirve paginas escrita en el BUG; arreglar
@@ -156,8 +156,21 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
   `e2e/tema.spec.ts` 4 y `e2e/autocompletado-admin.spec.ts` 2 (contra `next dev`), con 2 controles cada uno; `tsc` y eslint limpios.
   Pendiente: el runner del MSI (C# `29aa974`, web `b09bb5f`, la e2e con `next build`).
 - Despliegue: sin pasos nuevos (BUG-564 no pide variable: la app no va en `TiempoReal__OrigenesPermitidos`). Lo demas sigue igual.
-- **Sigue:** mirar el runner del MSI de `29aa974` y `b09bb5f`; decidir el iPhone de M3.4.2 (EAS con cuenta de Apple o subir de
-  SDK) y hacer los pasos 5 a 11 en el iPhone. Despues: M3.5.2 al prender el servidor.
+- **Segunda parte (el panel contra Filament):** Kamilo vio que el panel nuevo no se parece a Filament ("como vas a decir que es
+  igual"): el "copiado de Filament" nunca se midio. Lab "Panel nuevo contra Filament" (https://claude.ai/artifact/HQoez3LYnCBzvaKt97XNws,
+  v2) con Agenda > Tracks medido en el navegador. Hecho: web `019b291` y `9ea6702` (BUG-568: el menu como Filament: iconos de los
+  mismos Heroicons, grupos plegables con cookie HttpOnly, medidas y tonos en Noir y Lux, animaciones de 200/75 ms, contenido a
+  1280 px; `.adm-grupo` duplicado en `admin.css` borraba los espacios) y `ed2f60b` (BUG-570: fotos de las tablas aplastadas a 8 px).
+  Migraciones de `eventos_db` al dia (6 pendientes). BUG-569 abierto (e2e de la torre: `web-e2e` sin señal). Pruebas:
+  `e2e-admin/marco.spec.ts` 5 y `speakers.spec.ts` 2 con controles; eventos, staff, webhooks, anuncios, ayuda, emails y soporte en
+  verde (las de Sistema lo abren antes). Lo que si esta probado del panel: datos (contratos y cruzadas) y funcionamiento
+  (e2e-admin); lo que no: como se ve y lo que Filament hace y el nuevo no.
+- **Sigue:** la revision completa del panel contra Filament (Kamilo dijo dale): pantalla por pantalla y pestaña por pestaña, lo que
+  se ve (medido, no a ojo) y lo que falta (notificaciones, buscador, arrastrar archivos), todo en el lab con estado por pantalla para
+  que Kamilo decida; arreglos por modulo con prueba roja y control. Empieza por terminar Speakers (la ficha: subir foto arrastrando,
+  sesiones al lado, ancho) y siguen pestañas e encabezados de tabla (resto de BUG-568). Antes: mirar el runner del MSI de C#
+  `29aa974` y web `ed2f60b`. Pendientes de Kamilo: el "dale" de M3.4.2 solo Android + M3.4.2b iPhone aplazada, y el aviso de
+  migraciones pendientes en `api-local.sh`. Despues: M3.5.2 al prender el servidor.
 
 ## SESION 2026-11-23 (Opus 5.5, 41) — FASE 3 EN 19/21: NODE DESCARTADO; CHAT, ASISTENCIA Y AUDIENCIA EN EL HUB; PHP LE HABLA AL HUB; LOS CINCO CLIENTES SOBRE SIGNALR
 

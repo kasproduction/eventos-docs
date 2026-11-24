@@ -8,6 +8,7 @@
 
 | Fecha | Que | Por que |
 |---|---|---|
+| 2026-11-24 | **Revision completa del panel de EventOS contra Filament** (Kamilo, "dale"): pantalla por pantalla y pestaña por pestaña, lo que se ve medido en el navegador y lo que Filament hace y el nuevo no, en un lab con estado por pantalla; Kamilo decide que se arregla; cada arreglo con prueba roja y control | La regla era copiar Lumina como en Filament, pero nunca se comparo con medidas: el menu, las fotos y los anchos no eran iguales y se daban por copiados |
 | 2026-11-24 | **"Venia de antes" no cierra una falla** (Kamilo; regla 34 de BUENAS-PRACTICAS): se dice de donde salio y se arregla con su BUG o se anota en PENDIENTES con la razon | El aviso de React del tema se dio por "de antes" y era la causa de que el panel quedara sin tema (BUG-565) |
 | 2026-11-24 | **El hub deja entrar el origen igual a su propia direccion** (Kamilo, BUG-564): la direccion sale de lo que reenvia Nginx (X-Forwarded-Proto y Host), con la prueba detras del Nginx real; la app de Expo no va en `TiempoReal__OrigenesPermitidos` | React Native manda Origin con la direccion del hub; ningun navegador llega con ese origen porque nada sirve paginas en ese dominio (confirmado en BUG-564) |
 | 2026-11-24 | **M3.4.2 en Android se prueba en el emulador de Android Studio**, con la webapp como segundo cliente (Kamilo) | El emulador ya tenia Expo Go del SDK 55; el telefono pedia otra version de Expo Go |

@@ -460,6 +460,11 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 8. ADMIN Y MODULOS DEL ORGANIZADOR **[congelado hasta admin .NET, salvo Mission Control iPad]**
 
+- [ ] **Revision completa del panel de EventOS contra Filament** (Kamilo 2026-11-24, decisiones.md): cada pantalla y pestaña,
+      lo que se ve (medido) y lo que falta (notificaciones, buscador global, subir arrastrando), en el lab "Panel nuevo contra
+      Filament" (https://claude.ai/artifact/HQoez3LYnCBzvaKt97XNws). Hecho: el menu (BUG-568) y las fotos de las tablas (BUG-570).
+      Sigue: la ficha de Speakers, pestañas con iconos, encabezados de tabla y "por pagina", y las demas secciones.
+
 > Tambien congelados (lista `pendientes-2026-10.md` §7, C1 a C3): renombrar "Highlights" a "Destacados", donde vive "Otorgar puntos manuales" y el toggle de Silent Disco. Las preguntas estan en `decisiones.md` (Abiertas, Producto) y el trabajo en el roadmap de la migracion (M2.8.1 y M2.8.3).
 
 > Justificacion por item en `docs/pendientes-2026-10.md` seccion 7. Nacen en el admin nuevo (fase 2 del roadmap de migracion).
