@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 163/237
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 166/237
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -433,7 +433,7 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 ---
 
 
-## Fase 3: Tiempo real en SignalR (20 a 23 sesiones; plan 6 semanas) — 12/21
+## Fase 3: Tiempo real en SignalR (20 a 23 sesiones; plan 6 semanas) — 15/21
 
 > El hub vive en el mismo proceso que la API admin (o en `Hub`, mismo repo). Mantiene una fachada HTTP identica a los
 > 17 endpoints internos de Node para que PHP siga avisando sin enterarse. Los 8 clientes cambian un archivo cada uno.
@@ -455,10 +455,10 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 - [x] M3.2.5 Display: `display:project` y `display:stop` con estado en `display:active:session:{id}` (TTL 4 h) **[local]** — **Hecho 2026-11-23** (C# `bf5eca6`, backend `70390fa`): `DisplayDelHub`, los campos opcionales solo si son "verdaderos" como en JavaScript y `restored: true` al entrar
 - [x] M3.2.6 Propagacion de configuracion entre instancias por el backplane (reemplaza el canal `socket:config` de Node) **[local]** — **Hecho 2026-11-23** (C# `bf5eca6`, backend `70390fa`): `CanalDeConfiguracion` sobre el canal de Redis `hub:config` (la misma conexion del backplane): palabras bloqueadas y modo lento ahora; el baneo se engancha en M3.3.1. Un mensaje roto se ignora
 
-### 3.3 Fachada para PHP (1 semana) — 0/3
-- [ ] M3.3.1 Los 17 endpoints `/internal/*` de Node reimplementados como minimal API con el mismo `X-Internal-Secret` y los mismos payloads, llamando a `IHubContext` (lista en `migracion-dotnet.md` §1.10) **[local]**
-- [ ] M3.3.2 `SOCKET_SERVER_URL` de PHP apunta al hub; `InvalidationService`, `GameService::broadcast`, `PollController`, `CheckinService`, observers y jobs no cambian **[local]**
-- [ ] M3.3.3 Prueba cruzada: cada accion de PHP que emite (los snapshots de M0.3 mas un cliente SignalR de prueba) llega con el payload del catalogo **[local]**
+### 3.3 Fachada para PHP (1 semana) — 3/3
+- [x] M3.3.1 Los 17 endpoints `/internal/*` de Node reimplementados como minimal API con el mismo `X-Internal-Secret` y los mismos payloads, llamando a `IHubContext` (lista en `migracion-dotnet.md` §1.10) **[local]** — **Hecho 2026-11-23** (C# `f07a590`, backend `17dcefa`): `FachadaInterna`, eran 18 (sin `/health`: la Api tiene el suyo). Secreto `Servicios:Socket:SecretoInterno` (el `SOCKET_INTERNAL_SECRET` de PHP), fail-closed (BUG-447), 401/400 sin cuerpo como Node. BUG-451 (check-in sin nombre a la sala, Pulse excluido por `hub:pulse:{evento}`), BUG-449 (preguntas sin moderar solo a quien modera), BUG-373 (`ConexionesLocales`: el baneo llega a todas las copias por `hub:config` y cada una corta a la persona). `session-metrics` y `session/viewers` desde la audiencia en Redis. `FachadaInternaTest` 10 con 4 controles en rojo. BUG-563 (el canal tumbaba la Api sin Redis) visto por el MSI y arreglado (`d6795bd`)
+- [x] M3.3.2 `SOCKET_SERVER_URL` de PHP apunta al hub; `InvalidationService`, `GameService::broadcast`, `PollController`, `CheckinService`, observers y jobs no cambian **[local]** — **Hecho 2026-11-23**: ningun cambio de codigo en PHP ni en `AvisosDeCambios` de C#; solo la URL (despliegue, paso 7). Lo prueba la cruzada de M3.3.3 con el codigo real de PHP
+- [x] M3.3.3 Prueba cruzada: cada accion de PHP que emite (los snapshots de M0.3 mas un cliente SignalR de prueba) llega con el payload del catalogo **[local]** — **Hecho 2026-11-23** (C# `f07a590`, backend `17dcefa`): `AvisosAlHubTest` (5): CheckinService, InvalidationService (aviso, dato y a una persona), PollController, GameService (aviso y pool de la sala), QuestionController, SessionEffects y BanService contra el hub de C#, con oyentes de SignalR reales (`OyentesDelHub`, solo modo contratos) que entran con el bearer de cada persona. PHP usa ahi un cliente HTTP sin simular (TestCase simula los avisos a 127.0.0.1, BUG-347). Controles en rojo (el nombre a toda la sala, el baneo sin cortar)
 
 ### 3.4 Clientes (1 semana) — 0/3
 - [ ] M3.4.1 `realtime.ts` de la webapp con `@microsoft/signalr` detras de la misma interfaz de M0.4.2; `/api/auth/socket-token` igual **[local]** — **Anotado 2026-11-03 (Kamilo):** al cambiar la capa realtime, un evento `wall:hidden` para que la app y la webapp quiten un post oculto sin recargar (hoy ocultar no avisa al socket, igual que PHP; M2.6.5a lo deja identico).

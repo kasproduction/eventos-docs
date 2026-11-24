@@ -5,6 +5,14 @@
 
 ## 2026-11-23 — Encontrado al portar el chat, la asistencia y la audiencia a C# (bloque 3.2, sesion 41)
 
+### BUG-563: Sin Redis al arrancar, el canal de configuracion del hub tumbaba la Api (RESUELTO 2026-11-23)
+- **Severidad propuesta:** ALTA (con Redis caido la Api entera no arrancaba, en vez de responder "degraded")
+- **Que pasa:** `CanalDeConfiguracion` (M3.2.6) se suscribia a `hub:config` en un BackgroundService sin atrapar el error; un
+  BackgroundService que falla detiene el host. En local no se vio porque Redis estaba prendido.
+- **Visto:** 2026-11-23, el `verificar` del MSI de `bf5eca6` (4 rojas en la pasada sin base: `SistemaTest` y `ModoContratosTest`).
+- **Arreglado en:** C# `d6795bd`: reintenta cada 5 s. Prueba: la suite sin base (la misma que fallo en el MSI). Leccion: correr
+  tambien en local la pasada sin base antes de subir.
+
 ### BUG-562: La asistencia por sesion se guardaba 5 horas corrida (RESUELTO EN C# 2026-11-23)
 - **Severidad propuesta:** ALTA (dato: el Data Center, los CSV y el Recap del asistente dicen 15:00 a quien entro a las 10:00; las
   sesiones despues de las 7 de la noche quedan en el dia siguiente)

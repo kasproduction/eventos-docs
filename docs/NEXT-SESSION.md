@@ -46,6 +46,9 @@
 7. **Runtime de ASP.NET Core 10.0.15 o mas** en la maquina de la Api y del Worker (GHSA-wr8v-9x5q-ggcm, M3.1.1; `dotnet --list-runtimes`).
    **Tiempo real (M3.1.6):** `TiempoReal__OrigenesPermitidos` con los origenes de la webapp y las paginas estaticas (como
    `ALLOWED_ORIGINS` de Node); vacia, ningun navegador entra al hub. El hub (`/tiempo-real`) no va al Nginx hasta la fase 3.5.
+   **Avisos al hub (M3.3.2):** `SOCKET_SERVER_URL` de PHP y `Servicios__Socket__Url` de la Api y del Worker apuntan a la Api de C#
+   (por la red interna, no por el Nginx publico); `Servicios__Socket__SecretoInterno` igual a `SOCKET_INTERNAL_SECRET`. El Nginx
+   publico nunca pasa `/internal/*` (lo que no esta en el mapa ya no pasa; revisarlo al instalarlo, paso 11).
    **Variables de la Api de C#** (doble guion bajo; tabla en `contratos/variables.md`): `ConnectionStrings__MySql`,
    `ConnectionStrings__Redis`, `App__Key`, `App__PreviousKeys`, `App__QrSecret`, `App__Url`, `App__WebappUrl`,
    `App__TrustedProxies`, `Sesion__Minutos` (120, como `SESSION_LIFETIME`), `Php__Cache__Prefijo` y `Php__Cache__BaseDeRedis`
@@ -71,7 +74,7 @@
    **Build de la webapp (BUG-555):** ya no sale a Google: Urbanist y Plus Jakarta Sans van en `src/fonts` (`next/font/local`). La
    maquina que compila no necesita salida a `fonts.googleapis.com` ni `fonts.gstatic.com`.
 10. **PHP, Api y Worker de C# del mismo corte, juntos, con el Worker corriendo:** varios trabajos salieron de PHP y los hace
-    ahora el Worker (aviso de cambio de horario, vencer baneos, push programadas, correo directo sin outbox, y desde M3.3 la
+    ahora el Worker (aviso de cambio de horario, vencer baneos, push programadas, correo directo sin outbox, y desde M3.2.3 la
     asistencia por sesion: el horario de `FlushSessionAttendanceJob` ya no esta en PHP). Uno sin el otro
     deja avisos sin mandar o mandados dos veces. Confirmar en el panel de Hangfire que estan los recurrentes.
 11. **Nginx:** el bloque `@dotnet` y el prefijo `/api/admin/v1` de `proxy/nginx-api.conf`, y el mapa `proxy/rutas-csharp.conf`
