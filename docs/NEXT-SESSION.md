@@ -171,8 +171,21 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
 - **Pasada de medicion hecha** (design/features/admin/comparacion-2026-11, `23644a2`): 91 pares de las 26 secciones; lab v3 con 16
   defectos, 20 faltas, 8 decisiones de diseño y 7 por confirmar; la vista de 24 de 26 secciones es solo afirmacion. BUG-571 abierto
   (Paginas y plantillas de correo dan 500).
-- **Sigue:** Kamilo decide con la lista del lab (https://claude.ai/artifact/HQoez3LYnCBzvaKt97XNws) que se arregla; los defectos
-  van en un bloque (con prueba roja y control cada uno). Despues, la fase 4. Antes: el runner del MSI de C# `936e6a7` y web `ed2f60b`. M3.5.2 al prender el servidor.
+- **Tercera parte (Kamilo decidio con la lista del lab):** los 7 "por confirmar" resueltos: ninguno perdio un campo editable
+  (Tier y Equipo del stand en Sponsors, Minutos antes en Recordatorios, los 16 campos de la sesion; el historial de roles y baneos
+  era solo lectura en Filament y lo cubre "Que le paso"). Errores de la pasada: "Leads por dia" (Limites) y "Quien puede canjear"
+  (Premios) si existian, y las columnas de Golden, Ganados, Soporte y Webhooks estaban como notas debajo de otra columna.
+  decisiones.md: las 7 diferencias que se quedan, las 8 confirmadas, el bloque y lo de despues de la fase 4 (tambien en PENDIENTES).
+  Hecho: web `fafde62`: BUG-571 (el editor ya no usa DOMParser en el servidor), BUG-572 (miniatura de Fotos; todas en 64 x 54 con
+  `max-width: none`), paginacion como Filament en 19 listas (`PaginasDeLaLista`), columnas aparte (Golden Tickets, Ganados, Soporte,
+  Webhooks) y encabezados de tabla como Lumina. Pruebas: `editor-en-el-servidor` 2 y `listas-como-filament` 6 (rojas antes, control
+  del corte de la paginacion); e2e-admin 86/88 y luego las 2 arregladas en verde (premios-ganados sigue la columna nueva; la torre
+  fallaba por el disco del PC al 93 %: ahora mide la señal, con control); vitest 868/868; `tsc` y eslint limpios. El ingreso de las
+  e2e espera 30 s (compilacion en frio, 3 veces hoy). Despliegue: sin pasos nuevos.
+- **Sigue:** (1) la corrida final de `comparar.mjs` con Kamilo entrando a mano a los dos paneles (copiarlo a la raiz de eventos-web
+  como `tmp-comparar.mjs`, `node tmp-comparar.mjs`; espera 15 min el ingreso): cierra la vista, se anota en M2.10.1 y se actualiza el
+  lab (las 7 decisiones dejan de contar como defecto, lo arreglado sale). (2) La fase 4. Antes de subir codigo: el runner del MSI
+  (C# `936e6a7`, web `fafde62`). M3.5.2 al prender el servidor.
 
 ## SESION 2026-11-23 (Opus 5.5, 41) — FASE 3 EN 19/21: NODE DESCARTADO; CHAT, ASISTENCIA Y AUDIENCIA EN EL HUB; PHP LE HABLA AL HUB; LOS CINCO CLIENTES SOBRE SIGNALR
 

@@ -469,6 +469,10 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
       lo que se ve (medido) y lo que falta (notificaciones, buscador global, subir arrastrando), en el lab "Panel nuevo contra
       Filament" (https://claude.ai/artifact/HQoez3LYnCBzvaKt97XNws). Hecho: el menu (BUG-568) y las fotos de las tablas (BUG-570).
       Ya visto en Speakers (va a la pasada): la ficha sube la foto arrastrando en Filament, las sesiones al lado, el ancho.
+- [ ] **Despues de la fase 4 (Kamilo 2026-11-24): lo que falta del panel frente a Filament** (lab "Panel nuevo contra Filament"):
+      campana de notificaciones; buscador global; subir archivos arrastrando (Speakers, Sponsors, Anuncios, Slides, Destacados,
+      Preguntas, Premios); iconos en las pestañas; buscadores en las listas cortas (Anuncios, Push programadas, Emails, Encuestas);
+      el Escritorio con cifras y "¿Que quieres hacer?". **El Escritorio entra antes si hay demo.**
 
 > Tambien congelados (lista `pendientes-2026-10.md` §7, C1 a C3): renombrar "Highlights" a "Destacados", donde vive "Otorgar puntos manuales" y el toggle de Silent Disco. Las preguntas estan en `decisiones.md` (Abiertas, Producto) y el trabajo en el roadmap de la migracion (M2.8.1 y M2.8.3).
 

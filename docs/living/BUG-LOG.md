@@ -5,13 +5,31 @@
 
 ## 2026-11-24 — El marco del panel contra Filament (sesion 42, lab "Panel nuevo contra Filament")
 
-### BUG-571: Paginas y las plantillas de correo dan error 500 al abrirlas en el panel (ABIERTO)
-- **Severidad propuesta:** ALTA (no se puede crear ni editar una pagina ni abrir ninguna plantilla de correo del evento real)
-- **Que pasa:** `EditorConFormato` llama a `DOMParser` mientras el servidor arma la pagina (`src/lib/admin/editor/contenido.ts:136`,
-  `seEntiende`, desde `EditorConFormato.tsx:37`); en el servidor no existe y Next responde 500 ("ReferenceError: DOMParser is not
-  defined"). Visto en la pasada de medicion del 2026-11-24: `paginas/nuevo`, `paginas/1` y `emails/invitation`, `welcome` y
-  `welcome_access`. Las e2e de Paginas y Emails pasan con los datos de prueba: no llegan a ese camino con el contenido real.
-- **Estado:** en la lista del lab "Panel nuevo contra Filament"; se arregla en el bloque de defectos que decida Kamilo.
+### BUG-572: La miniatura de la lista de Fotos salia aplastada (25 x 60 px) (RESUELTO 2026-11-24)
+- **Severidad propuesta:** MEDIA (visual; salio en la pasada de medicion del panel contra Filament)
+- **Que pasa:** la misma causa de BUG-570 (`img { max-width: 100% }` encoge la imagen al ancho de la celda) en otra clase:
+  la lista de Fotos usa `.adm-miniatura-foto`, no `.adm-foto`. La nota de BUG-570 decia que su arreglo "vale tambien en Fotos":
+  no era cierto para la lista, se dio por hecho sin medirla. Las miniaturas de Sponsors y Premios (`.adm-miniatura`) tenian el
+  mismo riesgo: median 96 px de ancho en una celda de 112 px con relleno y se veian de 64.
+- **Arreglado en:** web (bloque de arreglos del panel): todas las miniaturas de las listas en 64 x 54 con `max-width: none`
+  (decision de Kamilo 2026-11-24: el mismo tamaño en todo el panel); la del Muro conserva sus 40 x 40, tambien con `max-width: none`.
+- **Prueba:** `e2e-admin/listas-como-filament.spec.ts` ("la miniatura de la lista de Fotos no se aplasta"): mide 64 x 54 y
+  `max-width: none`. Roja antes del arreglo (salia de otra medida). Patron repetido con BUG-570: la regla general de las imagenes
+  contra celdas de ancho fijo; toda imagen nueva en una tabla lleva `max-width: none`.
+
+### BUG-571: Paginas y las plantillas de correo dan error 500 al abrirlas en el panel (RESUELTO 2026-11-24)
+- **Severidad propuesta:** ALTA (no se podia crear ni editar una pagina ni abrir ninguna plantilla de correo con la direccion)
+- **Que pasa:** `EditorConFormato` decidia al abrir si entiende el contenido con `seEntiende` (`src/lib/admin/editor/contenido.ts`),
+  que usa `DOMParser`; ese inicializador de `useState` corre tambien cuando el servidor arma la pagina, donde `DOMParser` no existe,
+  y Next respondia 500 ("ReferenceError: DOMParser is not defined"). Visto en la pasada de medicion: `paginas/nuevo`, `paginas/1` y
+  `emails/invitation`, `welcome` y `welcome_access`. Las e2e de Paginas y Emails pasaban porque llegaban por el menu (la pagina la
+  arma el navegador); al recargar o abrir el enlace directo, la arma el servidor.
+- **Arreglado en:** web (bloque de arreglos del panel): el servidor dibuja el lugar del editor vacio (`adm-editor--cargando`) y el
+  navegador decide y arma el editor al montar (`useSyncExternalStore`, sin diferencias al hidratar).
+- **Prueba:** `e2e-admin/editor-en-el-servidor.spec.ts`: entra con la direccion a la plantilla de Bienvenida (HTML real del
+  EmailTemplateSeeder) y a la pagina "Mapa del recinto" del seeder y espera 200. Roja antes del arreglo (500 con el error de
+  DOMParser en el servidor). La primera corrida en frio dio una vez ERR_ABORTED (el `goto` choco con la navegacion del ingreso):
+  la prueba espera la carga antes de ir a la direccion.
 
 ### BUG-570: Las fotos de las tablas del panel salian aplastadas (8 x 40 px en Speakers) (RESUELTO 2026-11-24)
 - **Severidad propuesta:** MEDIA (visual; Kamilo lo vio en Speakers al comparar con Filament)
@@ -34,6 +52,9 @@
   con el `next dev` de la e2e arriba; despues volvio a reportar cada 10 s. Ademas la Api local (5230) y la de la e2e (5092) escriben
   la torre en la misma base 2 de Redis y se mezclan sus servidores. No se busco aun por que el vigilante calla esos minutos.
 - **Propuesta:** investigarlo aparte (regla 34); en el MSI la e2e corre con `next build` y Redis limpio, ver si alli tambien falla.
+- **2026-11-24 (bloque de arreglos):** la misma prueba fallo otra vez por otra causa: el disco del PC al 93 % pone la X en todos los
+  nodos, sin nada roto. La prueba ahora mide la señal ("N de N reportando" y ningun "sin señal") en vez de la X; control: forzar
+  `web-e2e` sin señal la pone roja. La causa de este BUG (el vigilante que calla minutos) sigue sin investigar.
 
 ### BUG-568: El menu del panel no copiaba el de Filament (sin iconos, sin grupos plegables, espacios en cero) (MENU RESUELTO 2026-11-24; faltan pestanas, tablas y la parte 2)
 - **Severidad propuesta:** MEDIA (visual: la regla del panel es copiar Lumina como se ve hoy en Filament, decision de Kamilo
