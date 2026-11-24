@@ -3,6 +3,110 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-24 — Encontrado en la prueba de M3.4.2 en el emulador de Android (sesion 42)
+
+### BUG-567: En local con EN_LA_RED, los avisos de C# al hub se perdian por "localhost" (RESUELTO 2026-11-24)
+- **Severidad propuesta:** MEDIA (solo local: en produccion `Servicios__Socket__Url` es `https://socket.<dominio>`; pero invalido el
+  paso 9 de la prueba de M3.4.2: ocultar en el panel no se repartia)
+- **Que pasa:** `api-local.sh` ponia `Servicios__Socket__Url=http://localhost:5230`. Con `EN_LA_RED=1` la Api escucha solo en IPv4
+  (`0.0.0.0:5230`); en Windows .NET prueba primero `::1`, que tarda 2,0 s en fallar (medido: `[::1]:5230` 2,003 s,
+  `127.0.0.1` 2 ms), y `AvisosDeCambios` corta a los 2 s: "No se pudo avisar a http://localhost:5230/internal/broadcast"
+  (`TaskCanceledException`) y `wall:hidden` no salia. Los avisos de PHP no fallaban (usan `127.0.0.1`).
+- **Visto:** 2026-11-24, Kamilo oculto "muro desde android m342" (fila `hidden` a las 12:32:22) y la webapp la seguia mostrando; el
+  registro de la Api tenia el aviso cancelado.
+- **Arreglado en:** C# `29aa974`: `api-local.sh` usa `http://127.0.0.1:5230` (sirve con y sin `EN_LA_RED`).
+- **Prueba:** el paso 9 repetido con la Api reiniciada: otra publicacion ocultada desde el panel desaparece de la webapp en menos de
+  1 s sin recargar, la app recibe `wall:hidden` (`id: 105`) y la quita, y el registro no tiene ningun aviso cancelado. El rojo es
+  la primera corrida (con `localhost`).
+
+### BUG-566: Chrome pintaba de azul los campos autocompletados del panel, en Noir y en Lux (RESUELTO 2026-11-24)
+- **Severidad propuesta:** MEDIA (visual: el login y cualquier campo que Chrome llene se ven con el azul de Chrome, fuera del
+  sistema Noir/Lux; en Lux el texto pasa a negro puro)
+- **Que pasa:** Chrome marca el campo como `:autofill` y le pone su fondo (`rgba(70, 90, 126, 0.4)` en oscuro, `#E8F0FE` en claro)
+  y su color de texto con `!important` de la hoja del navegador, que el CSS de la pagina no puede pisar con `background-color`.
+  `admin.css` no tenia regla para ese estado. Se vio el 2026-11-24 en el login del panel con la cuenta guardada en Chrome; se dio
+  primero por "de antes" (regla 34 de BUENAS-PRACTICAS).
+- **Arreglado en:** web `b09bb5f`: `.adm-input:-webkit-autofill` (y `:hover`, `:focus`) con una transicion de
+  `background-color` de 99999 s (el cambio al azul de Chrome nunca termina: el campo se queda en `--lum-campo`, tambien
+  translucido) y `-webkit-text-fill-color` y `caret-color` en `--lum-t`. Vale para todos los campos `.adm-input` del panel.
+- **Prueba:** `e2e/autocompletado-admin.spec.ts` (Noir y Lux, correo y clave): fuerza el estado con el depurador de Chrome
+  (`CSS.forcePseudoState` con `autofill`) y compara fondo y color del texto con el campo sin autocompletar. Roja antes (Noir: el
+  azul; Lux: `#E8F0FE`). Controles: sin la transicion, rojo en los dos temas; sin `-webkit-text-fill-color`, rojo en Lux (negro
+  puro en vez de `--lum-t`; en Noir el blanco de Chrome coincide con `--lum-t`).
+- **Queda fuera:** la webapp (`/[locale]`) tiene sus propios campos; no se reviso aqui.
+
+### BUG-565: El panel (y la webapp) quedaba sin tema al pasar de uno al otro sin recargar (RESUELTO 2026-11-24)
+- **Severidad propuesta:** ALTA (el panel se ve distinto, sin Noir ni Lux, cada vez que se llega desde la webapp; React avisa en
+  la consola "Encountered a script tag while rendering React component")
+- **Que pasa:** el tema lo ponia un `<script>` inline en el `<head>` de cada layout raiz (`/admin` y `/[locale]`). Al cargar, va
+  en el HTML del servidor y corre. Pero la webapp y el panel tienen cada uno su `<html>`: al navegar de uno al otro sin recargar
+  (Next 16 lo hace sin recargar), React arma el `<html>` nuevo en el navegador, crea el `<script>`, no lo ejecuta y avisa;
+  `data-theme` queda vacio. Reproducido con `next.router.push('/admin/login')` desde `/es/social`. El comentario de
+  `ThemeProvider` decia que ese script "si es safe en Next 16".
+- **Las dos formas de Next pedidas, probadas y descartadas (con la misma prueba):**
+  - `next/script` con `beforeInteractive`: en el router de app tambien devuelve un `<script>` que React arma
+    (`self.__next_s.push(...)`, `next/dist/client/script.js`): sin tema al navegar, y ademas el tema llega ~37 ms DESPUES de la
+    primera pintada (lo corre el arranque de Next): parpadeo en Lux.
+  - Archivo estatico con `<script src async>`: React lo carga una sola vez (recurso) y no lo vuelve a correr al cambiar de
+    layout: sin tema al navegar; y llega ~125 ms despues de la primera pintada.
+- **Arreglado en:** web `4c6dc93`: `ScriptDelTema` (componente de cliente) en los dos layouts. Con `useSyncExternalStore`
+  devuelve el `<script>` solo en el HTML del servidor y al hidratar (se hidrata, no se crea: React no avisa); en un render del
+  navegador no hay `<script>` y la misma funcion corre en `useLayoutEffect`, antes de pintar. El texto del script sale de esa
+  funcion (`toString`), una sola fuente. Corregido el comentario de `ThemeProvider`.
+- **Prueba:** `e2e/tema.spec.ts`: de la webapp al panel y del panel a la webapp sin recargar (verifica que no recargo), en Lux:
+  `data-theme="lux"` y ningun aviso de React (rojas antes); y al cargar `/admin/login` y `/es/login` en Lux el tema esta antes de
+  la primera pintada y no hay aviso de hidratacion (guardia contra el parpadeo: verdes antes y despues; rojas con
+  `beforeInteractive` y con el archivo). Controles: sin el `useLayoutEffect`, rojo al navegar; con el `<script>` siempre, vuelve
+  el aviso de React y la prueba lo caza.
+- **Pendiente de ver en el MSI:** la prueba se corrio contra `next dev`; la e2e del MSI la corre con `next build` + `start`.
+
+### BUG-564: El hub rechazaba con 403 a la app de Expo: React Native SI manda Origin (RESUELTO 2026-11-24)
+- **Severidad propuesta:** CRITICA (la app en Android, y por la misma causa en iPhone, quedaba sin tiempo real: chat "Offline", sin
+  muro en vivo ni avisos; en produccion igual)
+- **Que pasa:** M3.1.6 supuso que la app no manda la cabecera Origin y por eso la lista `TiempoReal:OrigenesPermitidos` solo
+  lleva la webapp. El WebSocket de React Native la manda con la direccion del propio hub (ws -> `http://`, wss -> `https://`, el
+  puerto solo si no es el de siempre): en el emulador `http://192.168.50.142:5230`, en produccion `https://socket.<dominio>`. Como
+  no esta en la lista, 403 en el saludo; `realtime.ts` reintenta en silencio (`LogLevel.None`) y la app solo muestra "Offline".
+  Node no lo vio nunca: socket.io no revisaba el origen en el WebSocket. El kiosko tampoco "no manda Origin" (es un navegador):
+  en produccion vive en `<webapp>/kiosko` y su origen es el de la webapp (si pasa); en local (Vite, 5173) no estaba en la lista de
+  `api-local.sh`.
+- **Visto:** 2026-11-24, emulador `Medium_Phone` con Expo Go 55: desde adentro de la app (depurador de Hermes), un WebSocket al hub
+  con el Origin de React Native da `403 Forbidden`, con el de la webapp abre; el mismo token desde el PC conecta en 10 ms.
+- **Arreglado en:** C# `8a78658`: `HubDeTiempoReal.EsSuPropioOrigen`: pasa, aunque no este en la lista, el origen igual a la
+  direccion del hub calculada DESPUES de `UseForwardedHeaders` (esquema de X-Forwarded-Proto, host de Host; puerto por defecto 443
+  o 80). `api-local.sh` deja entrar al kiosko local (5173) y su comentario ya no dice que la app y el kiosko no mandan Origin.
+- **Por que es seguro (confirmado, no supuesto), 2026-11-24:** ningun navegador llega al hub con ese origen porque en produccion
+  nada sirve paginas en el dominio del hub:
+  - Nginx (bloque del socket de `docs/infra/deploy.sh`) solo deja pasar `/tiempo-real` y `/internal/`; lo demas, 404. Probado con
+    Nginx 1.29.1 real y ese bloque copiado tal cual: `/`, `/scalar`, `/openapi/v1.json`, `/api/v1/health`, `/storage/...` e
+    `/index.html` dan 404.
+  - La Api en produccion no sirve ninguna pagina: no hay `UseStaticFiles` ni `MapStaticAssets` ni respuestas `text/html`; Scalar y
+    `/openapi/v1.json` solo se publican si `App:Env` no es `production`, y `appsettings.json` lo trae en `production` (solo
+    `appsettings.Development.json` lo cambia a `local`). Probado: la Api con `ASPNETCORE_ENVIRONMENT=Production` da 404 en
+    `/scalar`, `/scalar/v1`, `/openapi/v1.json`, `/`, `/index.html`, `/storage/x.png` y `/favicon.ico`. Control: en desarrollo
+    `/scalar/v1` da 200 `text/html` (el 404 de produccion no es por una ruta mal escrita).
+  - Los archivos subidos van a R2 (`AlmacenDeArchivos`); si R2 falla, al disco publico de PHP, que se sirve en `App:Url/storage`
+    (el dominio de PHP), nunca en el del hub. Las unicas descargas de la Api (`Results.File`: exportaciones CSV/Excel, plantilla de
+    importacion, spec de webhooks) son de la API del panel, con sesion, como adjunto, y no son HTML.
+  - En desarrollo Scalar SI es una pagina en el mismo origen que el hub (`http://<ip>:5230/scalar`): es nuestra y solo existe en
+    local.
+- **Detras de Nginx (lo que ve la Api en produccion):** la app manda `https://socket.<dominio>` y la Api escucha en http. Nginx
+  termina el TLS en los dos modos de `deploy.sh` (certificado de origen de Cloudflare con `ROL != todo`, certbot con `ROL=todo`) y
+  manda `Host $host` y `X-Forwarded-Proto $scheme` (`https`) desde 127.0.0.1, que es proxy de confianza por defecto
+  (`App:TrustedProxies`). Prueba con Nginx real + TLS (certificado de prueba), la Api en `Production` y solo la webapp en la lista:
+  Origin `https://socket.eventos.test` 101; `http://socket.eventos.test` 403; `https://socket.eventos.test:8443` 403;
+  `https://atacante.example` 403; la webapp 101; sin Origin 101; directo a la Api sin Nginx con Host del socket y Origin https 403
+  (sin X-Forwarded-Proto la Api ve http: el esquema sale de Nginx). Conexion SignalR completa por Nginx con token real y el Origin de
+  la app: entra, `join:session` y `chat:send` vuelve por `chat:message`; con otro Origin, rechazada. Control: sin el arreglo, el
+  primer caso da 403 por Nginx tambien.
+- **Pruebas:** C# `OrigenDelHubTest` (19, sin base: la regla con esquema, host, puerto, mayusculas, `null`, rutas; y
+  `ForwardedHeadersMiddleware` con las opciones de `ProxiesDeConfianza`: desde 127.0.0.1 X-Forwarded-Proto vale, desde otra IP no)
+  con control (la funcion vacia: 7 en rojo) y `SalasDelHubTest.El_origen_con_la_direccion_del_propio_hub_entra...` (MySQL, la
+  lista vacia) con control (sin la llamada en el middleware: rojo). Suite sin base 304/304, transversales y TiempoReal con MySQL
+  122/122, cruzadas del hub 8/8.
+- **Leccion:** "la app no manda Origin" se supuso sin probarlo en un telefono; Expo solo se habia probado contra Node, que no
+  revisaba el origen en el WebSocket. Lo que se supone de un cliente se prueba con ese cliente.
+
 ## 2026-11-23 — Encontrado al portar el chat, la asistencia y la audiencia a C# (bloque 3.2, sesion 41)
 
 ### BUG-563: Sin Redis al arrancar, el canal de configuracion del hub tumbaba la Api (RESUELTO 2026-11-23)

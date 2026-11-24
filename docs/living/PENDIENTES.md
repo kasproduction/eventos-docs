@@ -359,6 +359,8 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] UI optimista en rating de agenda, ticket de soporte y forms de perfil (`NEXT-SESSION.md:2808`; ojo: el skip formal
       2026-07-05 decia que los forms con validacion 422 deben esperar, revisar antes)
 - [ ] W.9 Share rank social (backlog)
+- [ ] Autocompletado de Chrome en los campos de la webapp (`/[locale]`, login y formularios): BUG-566 lo arreglo solo en el panel
+      (`.adm-input`); falta revisar si la webapp tiene el mismo azul y, si si, el mismo arreglo con su prueba (2026-11-24, regla 34)
 - [ ] Opcional: 3 vitest de `TESTS-PENDIENTES.md` que no existen (fetchers SSR de speakers, SpeakersView, highlight de agenda);
       el E2E ya cubre el flujo
 
@@ -449,6 +451,10 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] Portar "click sesion → agenda highlight" del webapp W.5 al Expo
 - [ ] Validar si `banners.tsx` Expo es vista dedicada o solo carousel embebido
 - [ ] Decidir recap/[eventId] del Expo (→ Fase 2, no mapeado a webapp)
+- [ ] Expo Go: al primer armado con la cache vacia sale "Uncaught (in promise) ... ExpoAsset.downloadAsync ... MaterialCommunityIcons.ttf"
+      (Metro no entrega la fuente de `@expo/vector-icons`), y Expo avisa 30 paquetes por debajo de lo que espera el SDK 55
+      (`expo@55.0.9`, esperado `~55.0.32`). Visto en el emulador el 2026-11-24 (sesion 42); no afecto el tiempo real. Revisar antes
+      de la prueba en iPhone: puede ser la misma causa (regla 34)
 
 ---
 

@@ -8,6 +8,9 @@
 
 | Fecha | Que | Por que |
 |---|---|---|
+| 2026-11-24 | **"Venia de antes" no cierra una falla** (Kamilo; regla 34 de BUENAS-PRACTICAS): se dice de donde salio y se arregla con su BUG o se anota en PENDIENTES con la razon | El aviso de React del tema se dio por "de antes" y era la causa de que el panel quedara sin tema (BUG-565) |
+| 2026-11-24 | **El hub deja entrar el origen igual a su propia direccion** (Kamilo, BUG-564): la direccion sale de lo que reenvia Nginx (X-Forwarded-Proto y Host), con la prueba detras del Nginx real; la app de Expo no va en `TiempoReal__OrigenesPermitidos` | React Native manda Origin con la direccion del hub; ningun navegador llega con ese origen porque nada sirve paginas en ese dominio (confirmado en BUG-564) |
+| 2026-11-24 | **M3.4.2 en Android se prueba en el emulador de Android Studio**, con la webapp como segundo cliente (Kamilo) | El emulador ya tenia Expo Go del SDK 55; el telefono pedia otra version de Expo Go |
 | 2026-11-23 | **Se borran `stress-sockets.js` (k6), `stress-sockets.yml` y `stress-sockets-prod.yml` de `eventos-backend/tests/load`** (Kamilo) | Prueban un protocolo que ya no existe (Socket.IO); la cobertura la dan las pruebas nuevas sobre el hub: los 9 scripts de Node con `hub.cjs` (la medicion de 1.000 en una sala es `e4-chat-magistral.js`, M3.5.2) y las del hub en C# |
 | 2026-11-23 | **Antes de cada push con codigo de C#, la suite completa sin base y sin Redis en local** (Kamilo; regla 33 de BUENAS-PRACTICAS) | BUG-563 y el OpenAPI de `fa17657` solo los vio el MSI: los atrapa esa pasada, que en local no se corria |
 | 2026-11-23 | **Node esta descartado: no vuelve a correr en ningun lado** (Kamilo, al cerrar el alcance de la fase 3). Salen M3.5.1 (doble emision) y M3.4.4 (bandera para volver a socket.io); M3.5.3 pasa a ser local (sacar `eventos-socket` del despliegue y de `verificar`). La condicion del 2026-11-22 de probar las llaves de Redis con el codigo real de Node deja de aplicar: lo que PHP sigue leyendo de Redis va con la cruzada de la regla 7 en los dos sentidos | Sin evento ni gente conectada no hay transicion que cuidar; mantener Node solo para volver atras es costo sin uso |
@@ -184,6 +187,7 @@
 
 ### Migracion a .NET
 
+- **iPhone para M3.4.2** (2026-11-24): Expo Go de la App Store solo abre el SDK mas nuevo y la app esta en el 55. Opciones: build de desarrollo por EAS (cuenta de Apple Developer, 99 USD al ano, registrar el iPhone; hoy el perfil `development` de `eas.json` es solo para simulador y falta `expo-dev-client`) o subir la app de SDK (migracion aparte). Sin esto, M3.4.2 no cierra.
 - **D.5** App en tiendas: no publicar build antes de la fase 3 (cada build congela el cliente de Socket.IO semanas). Si un cliente la pide antes, la fase 3 se adelanta.
 - Zona horaria por evento (hoy toda la API usa la de la app): se decide despues de la fase 5.
 - **Por decidir:** la solicitud de borrado de datos personales (Ley 1581 de Colombia, habeas data) se resuelve anonimizando, no eliminando: eliminar un asistente se lleva en cascada los datos de los sponsors y no borra a la persona (Kamilo 2026-10-31, al portar M2.4.1b).

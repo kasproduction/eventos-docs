@@ -12,6 +12,12 @@
 
 ## PRUEBA DE M3.4.2: LA APP CON EL HUB EN ANDROID Y EN IPHONE (Kamilo, 2026-11-24)
 
+> **2026-11-24 (sesion 42): Android HECHO** en el emulador `Medium_Phone` (Android Studio, Expo Go del SDK 55) con la webapp como
+> segundo cliente: pasos 7 a 11 en verde tras BUG-564 (el hub rechazaba a la app) y BUG-567 (avisos locales). **Falta iPhone:**
+> Expo Go de la App Store solo abre el SDK mas nuevo; hace falta un build de desarrollo por EAS (cuenta de Apple Developer) o subir
+> de SDK: decision abierta de Kamilo (decisiones.md). Ya quedan hechos los pasos 1 y 2 en este PC (`SOCKET_SERVER_URL` de PHP en
+> 5230) y la webapp local apunta al hub (`NEXT_PUBLIC_SOCKET_URL=http://localhost:5230` en `.env.local`).
+
 > **Ojo: todo lo de Expo se ha probado solo en Android. En iPhone nunca se probo nada (Kamilo 2026-11-23).** Esta es la primera
 > vez de la app en iOS: pueden salir fallas que no son del tiempo real. Propuesta: M3.4.2 cierra si el tiempo real funciona en los
 > dos; lo demas de iOS se anota como BUG (con captura y la pantalla donde paso) y se decide aparte, sin arreglarlo dentro de M3.4.2.
@@ -131,6 +137,27 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
 12. **Despues de prender:** medir las rutas cruzadas detras del Nginx real y anotarlas (`rutas-duenos.md`, regla 20; hoy
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
+
+## SESION 2026-11-24 (Opus 5.5, 42) — M3.4.2 EN ANDROID (EMULADOR) EN VERDE; BUG-564 (EL HUB RECHAZABA A LA APP), 565 (PANEL SIN TEMA), 566 (AUTOCOMPLETADO) Y 567; REGLA 34
+
+- Decisiones Kamilo: probar Android en el emulador de Android Studio (sin telefono), con la webapp como segundo cliente; el hub deja
+  entrar su propio origen calculado con lo que reenvia Nginx, con la prueba de que la Api no sirve paginas escrita en el BUG; arreglar
+  ya el aviso de React del tema y el autocompletado de Chrome (cada uno con su BUG); aplicar las 6 migraciones pendientes en
+  `eventos_db`; **regla 34: "venia de antes" dice de donde salio una falla, no si se arregla**. iPhone: Expo Go de iOS no abre el
+  SDK 55: build por EAS (cuenta de Apple Developer) o subir de SDK, abierta (decisiones.md).
+- Hecho: C# `8a78658` (BUG-564: `EsSuPropioOrigen`; kiosko local 5173 en `api-local.sh`), `29aa974` (BUG-567: avisos locales por
+  127.0.0.1); web `4c6dc93` (BUG-565: `ScriptDelTema` en los dos layouts; `beforeInteractive` y archivo estatico probados y
+  descartados), `b09bb5f` (BUG-566). Local, sin git: `SOCKET_SERVER_URL` de PHP en 5230, `NEXT_PUBLIC_SOCKET_URL` de la webapp en
+  5230, 6 migraciones en `eventos_db` (ya estaba en la lista de despliegue). Docs: BUG-LOG 564 a 567, BUENAS-PRACTICAS 34.
+- Pruebas: prueba de M3.4.2 en el emulador: chat app a web 93 ms y web a app 137 ms, muro de PHP 1,8 s, ocultar < 1 s, segundo
+  plano 1 min, hub caido 30 s y la app de vuelta sola a los 8,4 s. C# `OrigenDelHubTest` 19 (sin base) y la de salas con MySQL, con
+  controles; suite sin base 304/304; transversales y TiempoReal con MySQL 122/122; cruzadas del hub 8/8. Nginx real con TLS y la
+  Api en `Production`: 21/21 (origenes y "ninguna pagina"), control en rojo sin el arreglo; SignalR completo por Nginx. Web:
+  `e2e/tema.spec.ts` 4 y `e2e/autocompletado-admin.spec.ts` 2 (contra `next dev`), con 2 controles cada uno; `tsc` y eslint limpios.
+  Pendiente: el runner del MSI (C# `29aa974`, web `b09bb5f`, la e2e con `next build`).
+- Despliegue: sin pasos nuevos (BUG-564 no pide variable: la app no va en `TiempoReal__OrigenesPermitidos`). Lo demas sigue igual.
+- **Sigue:** mirar el runner del MSI de `29aa974` y `b09bb5f`; decidir el iPhone de M3.4.2 (EAS con cuenta de Apple o subir de
+  SDK) y hacer los pasos 5 a 11 en el iPhone. Despues: M3.5.2 al prender el servidor.
 
 ## SESION 2026-11-23 (Opus 5.5, 41) — FASE 3 EN 19/21: NODE DESCARTADO; CHAT, ASISTENCIA Y AUDIENCIA EN EL HUB; PHP LE HABLA AL HUB; LOS CINCO CLIENTES SOBRE SIGNALR
 

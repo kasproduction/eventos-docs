@@ -136,6 +136,11 @@ puede borrar, una validación que falta, un efecto que PHP no dispara), se pregu
     (`SistemaTest`: health "degraded" en vez de no arrancar) y que el OpenAPI del panel esta al dia (`ApiDelAdminTest`). En la
     fase 3 dos fallas solo las vio el MSI por saltarse esta pasada: BUG-563 (sin Redis al arrancar, el canal del hub tumbaba la
     Api) y el OpenAPI de `fa17657` (un texto de una ruta cambiado sin regenerarlo).
+34. **"Venia de antes" dice de donde salio una falla, no si se arregla** (Kamilo 2026-11-24, sesion 42). Un error o un detalle
+    feo que ya estaba antes de la tarea no se descarta por eso: se dice de donde salio y se propone arreglarlo con su BUG,
+    su prueba roja y su control (regla 27), o se anota en `PENDIENTES.md` con la razon para dejarlo. Nunca "no es de hoy" como
+    cierre. Paso en la prueba de M3.4.2: el aviso de React por el `<script>` del tema y el autocompletado de Chrome en el login
+    del panel se dieron por "de antes"; el primero era ademas la causa de que el panel quedara sin tema (BUG-565).
 
 ## Seguridad
 
