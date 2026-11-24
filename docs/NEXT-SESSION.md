@@ -132,6 +132,28 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
 
+## SESION 2026-11-23 (Opus 5.5, 41) — FASE 3 EN 19/21: NODE DESCARTADO; CHAT, ASISTENCIA Y AUDIENCIA EN EL HUB; PHP LE HABLA AL HUB; LOS CINCO CLIENTES SOBRE SIGNALR
+
+- Decisiones Kamilo (decisiones.md): Node descartado (salen M3.5.1 y M3.4.4, M3.5.3 local, el cruce con Node sobra); la medicion de
+  1.000 en una sala es lo primero al prender el servidor; arreglos BUG-544, 559 y 562 (y 560, 561); apagar el horario de
+  `FlushSessionAttendanceJob` en PHP; tocar los 2 archivos estaticos de las paginas sueltas; `wall:hidden` hoy; borrar
+  `stress-sockets` (protocolo que ya no existe); **regla 33: antes de subir C#, la suite sin base y sin Redis**. Kamilo: **todo lo
+  de Expo se probo solo en Android, nunca en iPhone.**
+- Hecho: C# `bf5eca6` (3.2: chat, guardado por lotes, asistencia, audiencia, display, canal `hub:config`), `d6795bd` (BUG-563),
+  `f07a590` (3.3: fachada interna, baneo por el canal, oyentes de contratos), `fa17657` + `3b59d91` (`wall:hidden` y su OpenAPI),
+  `9770ddb` (Node fuera de `verificar`, torre con el reporte del hub), `4855811` (`api-local.sh` con `EN_LA_RED=1`); backend
+  `70390fa`, `17dcefa`, `c828ba7` (cruzadas y horario de PHP apagado), `141511c` (las 5 paginas), `ae80223` y `008fe66`
+  (`tests/load` sobre el hub con `hub.cjs`, `stress-sockets` borradas); web `795c6b7`, `ff1b970`, `7d5e019`; app `8b29829`;
+  kiosko `ea8b5b1`. Docs: ARQUITECTURA v6, claves-redis, eventos-socket.json (`wall:hidden`), retro M3.6.1, BUENAS-PRACTICAS 33.
+- Pruebas: hub 53 (chat 13, fachada 10, torre 1 y las de 3.1), con 20 controles en rojo; cruzadas `ChatYAsistenciaDelHubTest` 3,
+  `AvisosAlHubTest` 5 y `MuroTest` 3, con controles; suite sin base en verde en el MSI (en local, 284 antes del arreglo del OpenAPI); vitest 868 y e2e del socket 11; contra el hub
+  real: cliente JS, Chrome (origenes, corte y vuelta del hub) y `hub.cjs`. MSI: `verificar` en verde hasta `4855811`, web CI y
+  Ayuda en verde. El MSI vio BUG-563 y el OpenAPI de `fa17657` (por eso la regla 33).
+- Despliegue: pasos 7 (tiempo real: `socket.<dominio>` a la Api, las URLs y el secreto) y 10 (la asistencia la hace el Worker).
+  Lo demas de la lista sigue pendiente.
+- **Sigue:** la prueba de M3.4.2 en Android y iPhone (seccion de arriba; primera vez en iOS). Despues: M3.5.2 al prender el
+  servidor; la fase 4 se propone bloque por bloque cuando Kamilo diga.
+
 ## SESION 2026-11-22 (Opus 5.5, 40) — FASE 3 ABIERTA: HUB DE SIGNALR CON SU ENTRADA, CONEXIONES EN REDIS, SALAS, LIMITES Y ORIGENES (3.1 COMPLETO); ENCABEZADO DEL ROADMAP REESCRITO
 
 - Decisiones Kamilo (decisiones.md): encabezado del roadmap reescrito (decision tomada, hitos 0 y 1 con fecha real); estimacion en

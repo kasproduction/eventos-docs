@@ -1,6 +1,6 @@
 # Arquitectura de EventOS: PHP y C# conviviendo
 
-> **v5, 2026-11-22** (retro de la fase 2; v1 del 2026-10-25, M1.5.9 del roadmap de la migracion). Estado actual de la convivencia mientras C# reemplaza a
+> **v6, 2026-11-23** (retro de la fase 3; v1 del 2026-10-25, M1.5.9 del roadmap de la migracion). Estado actual de la convivencia mientras C# reemplaza a
 > PHP ruta por ruta. Se actualiza en la retro de cada fase (regla 25); la version final (M5.3.2) es este mismo archivo,
 > ya sin PHP ni Node. Lo que se genera desde el codigo no se copia aca (regla 28): quien atiende cada ruta esta en
 > [`contratos/rutas-duenos.md`](contratos/rutas-duenos.md), las claves de Redis en
@@ -23,7 +23,7 @@
         │     php    ─► PHP-FPM (Laravel)                        │ │
         │     dotnet ─► C# en 127.0.0.1:8080 (@dotnet)           │ │
         │  webapp  ─► Next (pm2)                                  │
-        │  socket  ─► Node / Socket.IO (pm2)                      │
+        │  socket. ─► C# 127.0.0.1:8080: /tiempo-real e /internal │
         └───────────────────┬─────────────────────────────────────┘
                             │
         MySQL (una sola base) · Redis (bases 0, 1, 2) · Cloudflare R2
@@ -43,7 +43,7 @@
 | Pieza | Como se comparte | Regla |
 |---|---|---|
 | **MySQL** | Una sola base. El esquema lo manda Laravel (migraciones de PHP); C# lo lee con EF Core (`scaffold.ps1`) | Nada de migraciones de EF antes de la fase 5. Fechas en hora de Bogota |
-| **Redis base 2** (sin prefijo) | Node, PHP y C# leen y escriben lo mismo en JSON: fichas del socket (`socketauth:*`), chat, presencia | Mismas claves y misma vida |
+| **Redis base 2** (sin prefijo) | PHP y C# (el hub) leen y escriben lo mismo en JSON, con las claves que eran de Node: fichas del socket (`socketauth:*`), chat, presencia, asistencia por sesion | Mismas claves y misma vida; lo que PHP sigue leyendo va con cruzada en los dos sentidos |
 | **Redis base 0 y 1** (prefijo de Laravel) | Solo PHP. C# puede borrar claves por nombre, nunca leerlas (van serializadas en PHP) | Ver `claves-redis.md` |
 | **Redis `dotnet:`** | Solo C#: limites de pedidos, cache por evento y su version | PHP no las lee |
 | **Canal `eventos:invalidate`** | PHP publica `{eventId, entity, op}` en cada cambio; C# sube la version de su cache | Un aviso perdido lo cubre la vida del valor |
@@ -55,7 +55,13 @@
 - **Colas y tareas programadas:** Horizon (PHP) para lo que sigue en PHP. El Worker de C# (Hangfire) ya hace lo que salio de
   PHP en la fase 2: aviso de cambio de horario, vencer baneos, push programadas y correo directo sin outbox. PHP, Api y
   Worker del mismo corte van juntos al servidor (paso 10 de la lista de despliegue).
-- **Tiempo real:** Node / Socket.IO. Pasa a SignalR en la fase 3; mientras tanto C# escribe en Redis lo que Node lee.
+- **Tiempo real (fase 3):** el hub de SignalR vive dentro de la Api de C# (`/tiempo-real`, solo WebSockets y sin negociacion,
+  backplane de Redis con el prefijo `eventos-hub`). Node esta descartado: no corre en ningun lado (decisiones.md 2026-11-23).
+  PHP y los avisos de C# le hablan por las mismas rutas `/internal/*` que tenia Node (`FachadaInterna`, con el secreto), por
+  `socket.<dominio>`, que el Nginx manda a la Api solo con `/tiempo-real` e `/internal/`. La webapp, la app, el kiosko y las 5
+  paginas sueltas usan `@microsoft/signalr` detras de la misma interfaz `Realtime`. Los cambios de configuracion entre copias
+  van por el canal `hub:config`; la asistencia por sesion la pasa a la base el Worker (Hangfire, cada minuto). El hub se separa
+  de la Api antes del primer evento real con la fase 3 encendida (cada despliegue de la Api corta las conexiones).
 - **Panel del staff:** el panel de EventOS (Next + la API del admin en C#) hace todo lo del hito 1. Filament queda de solo
   lectura en las 35 pantallas cubiertas, con el aviso que lleva al panel (M2.7.1 y M2.7.4); se borra entero en la fase 5.
   El Data Center (SPA con cookie de sesion en `/api/v1/data-center/*`, D.8) sigue con su propio login hasta M4e.10 (M2.7.2
@@ -106,7 +112,7 @@ El admin nuevo (Next en `eventos-web` bajo `/admin`) habla con una API propia de
 ## La torre de control y la Ayuda (fase 2)
 
 - **Torre de control (M2.9.1 y M2.9.2):** pantalla completa solo del super_admin (`/admin/torre`) que lee
-  `GET /api/admin/v1/torre`. C#, Node y Next reportan cada uno su vigilante por Redis (la base del socket); C# lee el registro
+  `GET /api/admin/v1/torre`. C# (la Api y, como `sockets`, el hub) y Next reportan cada uno su vigilante por Redis (la base del socket); C# lee el registro
   de Nginx, el pool de FPM y las colas de Horizon y Hangfire. Umbrales en un archivo (`Torre/umbrales.json`); formato en
   `contratos/torre.md`. Las alertas hacia afuera (M2.9.3) llegan con el servidor.
 - **Ayuda del panel (M2.8.4):** viaja con la webapp, sin API: los capitulos en `src/lib/admin/ayuda/capitulos/`, las capturas en
@@ -163,6 +169,7 @@ BUG-555): compilar no sale a Google.
 
 | Version | Fecha | Que cambio |
 |---|---|---|
+| v6 | 2026-11-23 | Retro de la fase 3: el hub de SignalR dentro de la Api reemplaza a Node (descartado); `socket.<dominio>` va a la Api; los cinco clientes sobre SignalR; la torre recibe los sockets del vigilante de la Api |
 | v5 | 2026-11-22 | Retro de la fase 2: el panel reemplaza a Filament (solo lectura), Worker de C#, torre de control, Ayuda, dos runners en el MSI y e2e contra `next build` |
 | v4 | 2026-10-26 | El admin nuevo en Next: rutas, cookies, llamadas a C# y lo que pide el despliegue |
 | v3 | 2026-10-25 | Redis 7 en el equipo de desarrollo por WSL2 |

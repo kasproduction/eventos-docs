@@ -20,6 +20,12 @@ los escribe a mano.
 
 ## Base 2: compartida entre Node y PHP (JSON o texto, sin prefijo)
 
+> **Fase 3 (2026-11-23): Node ya no corre.** Todo lo que dice "Node" en esta tabla lo escribe y lee ahora el hub de SignalR de C#
+> (`eventos-api-dotnet/src/Api/TiempoReal/`), con los mismos nombres, formatos y vidas. Cambios: el modo lento de una sesion sale
+> de la base, no de Redis (BUG-559); `session:{id}:joined/left` los pasa a la base el Worker de C# (`GuardarAsistenciaDeSesiones`,
+> el horario de PHP se apago); el canal `socket:config` es `hub:config` y `socket.io#*` es el backplane de SignalR. Las claves
+> nuevas del hub estan en la tabla de abajo.
+
 | Clave | Formato | Vida | Escribe | Lee / borra | Para que |
 |---|---|---|---|---|---|
 | `socketauth:t:{sha256 del token}` | JSON `{user, iat}` | 900 s (se renueva al usarla) | PHP `SocketAuthCache::put` (login); Node `auth.ts:89` | Node `auth.ts:37`; PHP borra al revocar el token (`AppServiceProvider:92`) y al banear | Ficha del token para no preguntarle a Laravel en cada conexion |
@@ -95,13 +101,26 @@ cache de palabras bloqueadas y el slow mode por sesion. `/internal/session/viewe
 | `dotnet:evento:{eventId}:{entidad}:v{version}:{clave}` | la que pida cada uso | Valor en cache (`CacheDelEvento`, M1.4.4), JSON |
 | `dotnet:version:evento:{eventId}:{entidad}` | no vence | Version de la cache de esa entidad; subirla la invalida. Si venciera, volver a 0 reviviria valores viejos |
 
+### Base 2: claves nuevas del hub de C# (fase 3)
+
+| Clave | Formato | Vida | Escribe y lee | Para que |
+|---|---|---|---|---|
+| `hub:conexiones:{persona}` | conjunto ordenado conexion → ultima vez vista (s) | 180 s, renovada cada 30 s | `ConexionesDelHub` | Tope de 5 conexiones por persona en todas las copias; vencen a los 90 s sin renovar. Pulse usa `-(evento + 900000)` |
+| `hub:audiencia:session:{id}` | hash conexion → JSON `{Persona, Nombre, Rol, Desde, Cuenta, Asistente}` | 12 h | `AudienciaDelHub` | Quien mira la sesion (audiencia, `session-metrics`, `session/viewers`) |
+| `hub:activos:{evento}` y `hub:activos:eventos` | conjunto ordenado persona → ultima vez vista; set de eventos | 180 s | `ActivosDelHub` | `pulse:active_users` con el total de todas las copias (BUG-544) |
+| `hub:activos:candado` | texto | 9 s | `ActivosDelHub` | Que una sola copia reparta la cuenta cada 10 s |
+| `hub:pulse:{evento}` | set de conexiones | 1 dia | `ConexionesLocales` | Las conexiones del tablero de Pulse (el check-in sin nombre no les llega) |
+| canal `hub:config` | pub/sub JSON `{tipo, ...}` | — | `CanalDeConfiguracion` | Palabras bloqueadas, modo lento y baneo en todas las copias (reemplaza `socket:config`) |
+| canales `eventos-hub*` | backplane de SignalR | — | `Microsoft.AspNetCore.SignalR.StackExchangeRedis` | Reparto de los mensajes entre copias (reemplaza `socket.io#*`) |
+
 PHP no lee ninguna de estas. Un aviso de `eventos:invalidate` que llegue mientras C# no esta suscrito se pierde: lo
 cubre la vida de cada valor.
 
 ## Lo que esto le dice a C#
 
-1. Base 2 se comparte tal cual: mismas claves, JSON, sin prefijo. Cuando el hub de SignalR reemplace a Node (fase 3),
-   escribe `session:{id}:joined/left` igual mientras `FlushSessionAttendanceJob` siga en PHP.
+1. Base 2 se comparte tal cual: mismas claves, JSON, sin prefijo. Desde la fase 3 el hub escribe `session:{id}:joined/left`
+   con la forma de Node y el Worker de C# las pasa a la base (la cruzada `ChatYAsistenciaDelHubTest` prueba que el trabajo de
+   PHP las lee igual).
 2. Cuando C# escriba algo que PHP tiene en cache (agenda, speakers, modulos, anuncios), borra la clave de la base 1 con
    el prefijo completo, o sube `event:{id}:modules:ver` (ese es un entero, se puede tocar).
 3. `socketauth:*` lo escriben los dos: C# respeta el JSON y la vida de 900 s, y borra al revocar un token.
