@@ -45,10 +45,12 @@
 6. **`npm run build` en eventos-backend** (tema de Filament: estilos de los avisos de solo lectura).
 7. **Runtime de ASP.NET Core 10.0.15 o mas** en la maquina de la Api y del Worker (GHSA-wr8v-9x5q-ggcm, M3.1.1; `dotnet --list-runtimes`).
    **Tiempo real (M3.1.6):** `TiempoReal__OrigenesPermitidos` con los origenes de la webapp y las paginas estaticas (como
-   `ALLOWED_ORIGINS` de Node); vacia, ningun navegador entra al hub. El hub (`/tiempo-real`) no va al Nginx hasta la fase 3.5.
-   **Avisos al hub (M3.3.2):** `SOCKET_SERVER_URL` de PHP y `Servicios__Socket__Url` de la Api y del Worker apuntan a la Api de C#
-   (por la red interna, no por el Nginx publico); `Servicios__Socket__SecretoInterno` igual a `SOCKET_INTERNAL_SECRET`. El Nginx
-   publico nunca pasa `/internal/*` (lo que no esta en el mapa ya no pasa; revisarlo al instalarlo, paso 11).
+   `ALLOWED_ORIGINS` de Node); vacia, ningun navegador entra al hub.
+   **Tiempo real (M3.3.2 y M3.5.3):** `socket.<dominio>` va a la Api de C# (127.0.0.1:8080) solo con `/tiempo-real` y `/internal/`
+   (`docs/infra/deploy.sh`), como antes iba entero a Node. `SOCKET_SERVER_URL=https://socket.<dominio>` en PHP (avisa ahi y se la
+   pasa a las paginas sueltas), `Servicios__Socket__Url` igual en la Api y el Worker, `NEXT_PUBLIC_SOCKET_URL` en la webapp y
+   `EXPO_PUBLIC_SOCKET_URL` en la app con esa misma base; `Servicios__Socket__SecretoInterno` igual a `SOCKET_INTERNAL_SECRET`.
+   Node y su pm2 no se instalan.
    **Variables de la Api de C#** (doble guion bajo; tabla en `contratos/variables.md`): `ConnectionStrings__MySql`,
    `ConnectionStrings__Redis`, `App__Key`, `App__PreviousKeys`, `App__QrSecret`, `App__Url`, `App__WebappUrl`,
    `App__TrustedProxies`, `Sesion__Minutos` (120, como `SESSION_LIFETIME`), `Php__Cache__Prefijo` y `Php__Cache__BaseDeRedis`

@@ -181,6 +181,10 @@
 ## Abiertas
 
 ### Migracion a .NET
+
+- **(2026-11-23) Borrar `stress-sockets.js` (k6), `stress-sockets.yml` y `stress-sockets-prod.yml` de `eventos-backend/tests/load`:**
+  solo hablan Socket.IO y ya no sirven contra el hub (M3.5.3). Los scripts de Node pasaron a `hub.cjs`. Se borran o se reescriben
+  cuando Kamilo diga.
 - **D.5** App en tiendas: no publicar build antes de la fase 3 (cada build congela el cliente de Socket.IO semanas). Si un cliente la pide antes, la fase 3 se adelanta.
 - Zona horaria por evento (hoy toda la API usa la de la app): se decide despues de la fase 5.
 - **Por decidir:** la solicitud de borrado de datos personales (Ley 1581 de Colombia, habeas data) se resuelve anonimizando, no eliminando: eliminar un asistente se lleva en cascada los datos de los sponsors y no borra a la persona (Kamilo 2026-10-31, al portar M2.4.1b).

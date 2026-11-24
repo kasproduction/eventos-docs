@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 166/237
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 170/237
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -433,7 +433,7 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 ---
 
 
-## Fase 3: Tiempo real en SignalR (20 a 23 sesiones; plan 6 semanas) — 15/21
+## Fase 3: Tiempo real en SignalR (20 a 23 sesiones; plan 6 semanas) — 19/21
 
 > El hub vive en el mismo proceso que la API admin (o en `Hub`, mismo repo). Mantiene una fachada HTTP identica a los
 > 17 endpoints internos de Node para que PHP siga avisando sin enterarse. Los 8 clientes cambian un archivo cada uno.
@@ -460,19 +460,32 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 - [x] M3.3.2 `SOCKET_SERVER_URL` de PHP apunta al hub; `InvalidationService`, `GameService::broadcast`, `PollController`, `CheckinService`, observers y jobs no cambian **[local]** — **Hecho 2026-11-23**: ningun cambio de codigo en PHP ni en `AvisosDeCambios` de C#; solo la URL (despliegue, paso 7). Lo prueba la cruzada de M3.3.3 con el codigo real de PHP
 - [x] M3.3.3 Prueba cruzada: cada accion de PHP que emite (los snapshots de M0.3 mas un cliente SignalR de prueba) llega con el payload del catalogo **[local]** — **Hecho 2026-11-23** (C# `f07a590`, backend `17dcefa`): `AvisosAlHubTest` (5): CheckinService, InvalidationService (aviso, dato y a una persona), PollController, GameService (aviso y pool de la sala), QuestionController, SessionEffects y BanService contra el hub de C#, con oyentes de SignalR reales (`OyentesDelHub`, solo modo contratos) que entran con el bearer de cada persona. PHP usa ahi un cliente HTTP sin simular (TestCase simula los avisos a 127.0.0.1, BUG-347). Controles en rojo (el nombre a toda la sala, el baneo sin cortar)
 
-### 3.4 Clientes (1 semana) — 0/3
-- [ ] M3.4.1 `realtime.ts` de la webapp con `@microsoft/signalr` detras de la misma interfaz de M0.4.2; `/api/auth/socket-token` igual **[local]** — **Anotado 2026-11-03 (Kamilo):** al cambiar la capa realtime, un evento `wall:hidden` para que la app y la webapp quiten un post oculto sin recargar (hoy ocultar no avisa al socket, igual que PHP; M2.6.5a lo deja identico).
-- [ ] M3.4.2 Expo con `@microsoft/signalr` (WebSockets, `skipNegotiation`), reconexion con re-join de evento y sesiones (ya existe el ref-count), probado en segundo plano en Android e iOS **[local]**
-- [ ] M3.4.3 Kiosko y las 5 paginas estaticas con el `realtime.js` compartido en version SignalR **[local]**
+### 3.4 Clientes (1 semana) — 2/3
+- [x] M3.4.1 `realtime.ts` de la webapp con `@microsoft/signalr` detras de la misma interfaz de M0.4.2; `/api/auth/socket-token` igual **[local]** — **Hecho 2026-11-23** (web `795c6b7`, `ff1b970`, `7d5e019`; C# `fa17657`, `3b59d91`; backend `c828ba7`): `@microsoft/signalr` 10.0.11 exacto (10.0.15 no existe en npm; la 11 es de este mes), fuera `socket.io-client`. `connect`/`disconnect` como Socket.IO, lo mandado sin conexion sale al conectar, reintentos sin fin y degradacion en silencio; los oyentes no le devuelven nada al servidor (SignalR lo tomaba como respuesta, visto con el hub real). vitest 7 con 3 controles, 868 en total; e2e del socket global y streaming 11; probado contra el hub real con el cliente JS y en Chrome (origen permitido y no). **`wall:hidden`** (Kamilo dijo si hoy): C# lo avisa al ocultar, la webapp y Expo quitan la publicacion; cruzada del Muro con control — **Anotado 2026-11-03 (Kamilo):** al cambiar la capa realtime, un evento `wall:hidden` para que la app y la webapp quiten un post oculto sin recargar (hoy ocultar no avisa al socket, igual que PHP; M2.6.5a lo deja identico).
+- [ ] M3.4.2 Expo con `@microsoft/signalr` (WebSockets, `skipNegotiation`), reconexion con re-join de evento y sesiones (ya existe el ref-count), probado en segundo plano en Android e iOS **[local]** — **Codigo hecho 2026-11-23** (app `8b29829`): la misma clase que la webapp, el ref-count y el re-join de antes, reintento inmediato al volver de segundo plano (`AppState`), `wall:hidden` en el muro; `tsc` limpio. **Falta:** la prueba en el Android y el iPhone de Kamilo (app en segundo plano y de vuelta) con `EXPO_PUBLIC_SOCKET_URL` apuntando a la Api de C#
+- [x] M3.4.3 Kiosko y las 5 paginas estaticas con el `realtime.js` compartido en version SignalR **[local]** — **Hecho 2026-11-23** (backend `141511c`, kiosko `ea8b5b1`; Kamilo dijo si a tocar los 2 archivos estaticos del repo de PHP): `motor.js` es el cliente de SignalR para navegador y `realtime.js` reparte `connect`, `disconnect`, `reconnect_attempt` y `connect_error` como Socket.IO (ninguna pagina cambio). Probado en Chrome contra el hub real: conectar, aviso, cortar el hub, reintentos, volver, re-entrar a la sala y aviso otra vez. Kiosko: misma clase, build y lint limpios
 - M3.4.4 ~~Bandera `REALTIME=socketio|signalr` por cliente para volver atras en un despliegue~~: **sacada** (decisiones.md 2026-11-23: Node no vuelve a correr)
 
-### 3.5 Transicion y apagado (1 semana) — 0/2
+### 3.5 Transicion y apagado (1 semana) — 1/2
 - M3.5.1 ~~Doble emision: PHP avisa a Node y al hub a la vez mientras los clientes cambian~~: **sacada** (decisiones.md 2026-11-23: sin evento ni gente conectada no hay transicion)
 - [ ] M3.5.2 Medir con `e4-chat-magistral.js` adaptado a SignalR: 1.000 en una sala, 40 mensajes por segundo, mismo criterio que agosto **[servidor]** (Kamilo 2026-11-23: el dia que se prenda el servidor, antes de cualquier evento)
-- [ ] M3.5.3 Sacar Node y PM2 del despliegue: borrar `eventos-socket` de los archivos de despliegue y de `verificar`, el cruce con Node y `tests/load` actualizados (decisiones.md 2026-11-23: es local; en el servidor no se vuelve a instalar) **[local]**
+- [x] M3.5.3 Sacar Node y PM2 del despliegue: borrar `eventos-socket` de los archivos de despliegue y de `verificar`, el cruce con Node y `tests/load` actualizados (decisiones.md 2026-11-23: es local; en el servidor no se vuelve a instalar) **[local]** — **Hecho 2026-11-23** (C# `9770ddb`, backend `ae80223`, docs): `deploy.sh` sin Node ni el pm2 del socket; `socket.<dominio>` va a la Api (127.0.0.1:8080) solo con `/tiempo-real` y `/internal/` (lo demas 404); `verificar` sin `eventos-socket` ni la llave `github-socket`; se borra `CruceDeRedisConNodeTest`. **La torre:** el vigilante de la Api manda el reporte `sockets` del hub (personas y reconexiones, lo que contaba el de Node), con prueba y control. **`tests/load`:** `hub.cjs` (forma de Socket.IO sobre SignalR; un token malo da `connect_error` con el texto de Node) y los 9 scripts de Node lo cargan; probado contra el hub real. `stress-sockets` (k6 y Artillery) ya no sirven: quedan hasta que Kamilo decida
 
-### 3.6 Cierre de la fase (hito 2) — 0/1
-- [ ] M3.6.1 Retro de la fase 3 (la medicion del hito es M3.5.2) **[local]**
+### 3.6 Cierre de la fase (hito 2) — 1/1
+- [x] M3.6.1 Retro de la fase 3 (la medicion del hito es M3.5.2) **[local]** — **Hecho 2026-11-23. Retro:**
+  1. **Estimado contra real:** 20 a 23 sesiones estimadas el 2026-11-22; costo 2 (sesiones 40 y 41), porque Kamilo descarto Node
+     (salieron M3.5.1 y M3.4.4 y el cruce con Node) y porque el hub reusa la entrada, los datos y las pruebas de las fases 1 y 2.
+     19/21: quedan M3.4.2 (la prueba en el telefono) y M3.5.2 (la medicion de 1.000 en una sala, con el servidor, antes de
+     cualquier evento). 7 bugs (BUG-557 a 563); 5 arreglados en C# por decision de Kamilo (544, 559, 560, 561, 562). Commits:
+     C# 9, backend 5, web 3, app 1, kiosko 1, socket 1.
+  2. **Lo que salio en el MSI y no en local:** BUG-563 (sin Redis la Api no arrancaba) y el OpenAPI desactualizado de `fa17657`.
+     Los dos los atrapa la pasada SIN base, que en local no se corria antes de subir. Leccion sin regla nueva: antes de cada push
+     con codigo, la pasada sin base completa (30 s) ademas de las del modulo con las transversales.
+  3. **Regla que falto:** ninguna nueva. La 29 (probar con la pieza real) fue la que mas rindio: el cliente JS contra el hub real
+     encontro que un oyente que devuelve algo se toma como respuesta, y Chrome confirmo el origen y la reconexion.
+  4. **Que se corrige del roadmap:** M3.5.1 y M3.4.4 fuera; M3.5.3 local; M3.4.2 cierra con la prueba en el telefono; M3.5.2
+     es el primer paso al prender el servidor. La fase 4 no se recalcula con este ritmo: porta la API publica con consumidores
+     que exigen identico a PHP, como se dijo en la retro de la fase 2.
 
 
 ---

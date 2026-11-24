@@ -51,7 +51,7 @@
 
 ## 2026-11-22 — Encontrado al portar la entrada del socket a C# (M3.1.2, sesion 40)
 
-### BUG-558: CruceDeRedisConNodeTest "empezando por el hub" fallo una vez en una corrida combinada (ABIERTO, conteo 1)
+### BUG-558: CruceDeRedisConNodeTest "empezando por el hub" fallo una vez en una corrida combinada (CERRADO 2026-11-23: la prueba se borro con Node, M3.5.3)
 - **Severidad propuesta:** BAJA (solo pruebas)
 - **Que pasa:** en la primera corrida del hub junto con las transversales (justo despues de compilar), "El_limite_es_un_solo_contador_
   empezando_por_el_hub" fallo; el mensaje no quedo. Seis corridas despues (tres del hub solo, tres combinadas) pasaron todas.

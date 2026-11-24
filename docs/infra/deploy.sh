@@ -31,7 +31,8 @@
 #   todo     nginx + PHP-FPM + Next + socket + Horizon + MySQL + Redis locales (lo de siempre)
 #   api      nginx + PHP-FPM (Laravel) — lo que se multiplica al crecer
 #   web      nginx + Next (pm2), escucha 3000 en la red privada para la invalidacion del marco
-#   sockets  nginx + socket (pm2) + Horizon + cron del scheduler (PHP-CLI, sin FPM)
+#   sockets  nginx + la Api de C# con el hub de tiempo real + Horizon + cron del scheduler (PHP-CLI, sin FPM)
+#            (M3.5.3: Node y su pm2 ya no se instalan; el hub vive en la Api, ver eventos-api-dotnet)
 #
 # NO instala el codigo: los repos son privados. Al final imprime que falta.
 
@@ -206,7 +207,7 @@ systemctl daemon-reload
 # 5. nginx
 # ─────────────────────────────────────────────────────────────────────────
 echo "[5/7] nginx (rol $ROL)..."
-mkdir -p /var/www/backend /var/www/socket /var/www/web
+mkdir -p /var/www/backend /var/www/web
 
 # Con ROL != todo los sitios escuchan 443 con el certificado de origen de
 # Cloudflare (el borde habla con el nodo por HTTPS; modo Full (strict) en la zona).
@@ -286,8 +287,17 @@ es todo,sockets && cat > /etc/nginx/sites-available/$SOCKET <<EOF
 server {
     $LISTEN
     server_name $SOCKET;
-    location / {
-        proxy_pass http://127.0.0.1:3001;
+    # M3.5.3: el hub de tiempo real de la Api de C# (127.0.0.1:8080, como @dotnet de proxy/nginx-api.conf). Solo pasan el
+    # WebSocket del hub y las rutas internas que llama PHP (con X-Internal-Secret); lo demas, 404. Antes iba entero a Node (3001).
+    location / { return 404; }
+    location /internal/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Forwarded-For \$remote_addr;
+        proxy_read_timeout 30s;
+    }
+    location /tiempo-real {
+        proxy_pass http://127.0.0.1:8080;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -361,7 +371,6 @@ cat <<EOF
 Los repos son privados, asi que el codigo se sube aparte. Desde tu maquina:
 
   cd eventos-backend && git archive --format=tar HEAD | ssh root@IP "tar -xf - -C /var/www/backend"
-  cd eventos-socket  && git archive --format=tar HEAD | ssh root@IP "tar -xf - -C /var/www/socket"
   cd eventos-web     && git archive --format=tar HEAD | ssh root@IP "tar -xf - -C /var/www/web"
 
 (Para produccion de verdad: llave de despliegue en el servidor y \`git pull\`.)
@@ -403,12 +412,9 @@ Despues, en el servidor:
   #   find bootstrap/cache/filament -type f   # debe listar panels/admin.php
   #   ls bootstrap/cache/blade-icons.php
 
-  cd /var/www/socket && pnpm install && pnpm build
-  pm2 start ecosystem.config.js && pm2 save && pm2 startup systemd -u root --hp /root
-
   cd /var/www/web && pnpm install
   NODE_OPTIONS="--max-old-space-size=3072" pnpm build
-  pm2 start "pnpm start" --name eventos-web --time && pm2 save
+  pm2 start "pnpm start" --name eventos-web --time && pm2 save && pm2 startup systemd -u root --hp /root
 
   systemctl start horizon
 
@@ -418,7 +424,9 @@ VARIABLES QUE NO SE PUEDEN OLVIDAR (cada una costo una hora de depuracion):
                                 los correos se guardan con URL absoluta
   WEBAPP_URL=https://$APP       si falta, el magic link apunta a la API y nadie
                                 puede entrar
-  LARAVEL_API_URL=https://$API/api/v1     el socket lo necesita CON /api/v1
+  SOCKET_SERVER_URL=https://$SOCKET        el hub de C# (M3.3.2): PHP le avisa ahi y se la pasa a
+                                las paginas sueltas; la webapp y la app la usan como
+                                NEXT_PUBLIC_SOCKET_URL y EXPO_PUBLIC_SOCKET_URL
   KIOSK_URL=https://$APP/kiosko
   QUEUE_CONNECTION=redis        en desarrollo es 'sync'
   CLOUDFLARE_R2_PUBLIC_URL      sin esto las URLs de archivos salen rotas

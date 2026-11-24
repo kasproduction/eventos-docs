@@ -366,6 +366,10 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 6. QA PRESENCIAL CON KAMILO (device + tiempo)
 
+- [ ] **M3.4.2 (fase 3, 2026-11-23): la app con el hub de C# en el Android y el iPhone** (unos 10 minutos): `EXPO_PUBLIC_SOCKET_URL`
+      del `.env` de la app a la Api local (`scripts/api-local.sh`, puerto 5230, por la IP de la red), entrar, abrir el chat y el muro,
+      mandar la app a segundo plano un minuto y volver: tiene que reconectar sola, volver a la sala y recibir lo nuevo
+
 - [ ] Mobile parity M.2-M.8 en telefono real: heart, momentos, shuffle, trivia sponsor, desafio, anuncios, soporte,
       orb FAQ, encuestas, vendor (scanner con camara por HTTPS, export, invitacion en vivo, gates ban/pending)
 - [ ] W.12 Fase C: 3 viewports en device, Edge, Firefox, **Safari de escritorio**, toques de 44 px, Lighthouse, WCAG

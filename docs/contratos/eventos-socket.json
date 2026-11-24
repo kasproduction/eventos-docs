@@ -174,6 +174,12 @@
       "escuchan": ["webapp", "expo"]
     },
     {
+      "nombre": "wall:hidden", "tipado": true, "sala": "event:{eventId}",
+      "emisor": "C# Muro.CambiarAsync al ocultar, por /internal/broadcast (M3.4.1, 2026-11-23; PHP no avisaba)",
+      "payload": { "id": "int" },
+      "escuchan": ["webapp", "expo"]
+    },
+    {
       "nombre": "data:invalidate", "tipado": true, "sala": "event:{eventId}; o persona (InvalidationService::broadcastToAttendee por /internal/emit-to-user)",
       "emisor": "Laravel /internal/data/invalidate (InvalidationService:59, EditEventBranding, EditEventOnboardingSettings, SessionConfigController:471) y /internal/emit-to-user",
       "payload": { "entity": "string" },
