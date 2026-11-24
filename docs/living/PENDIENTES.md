@@ -427,6 +427,9 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] Tab Bar polish con `@callstack/liquid-glass` cuando la libreria soporte Expo (actualmente solo iOS 26 nativo)
 
 ### Tiendas y build
+- [ ] **M3.4.2b** La app con el hub de C# en iPhone (Kamilo 2026-11-24): los pasos 5 a 11 de "PRUEBA DE M3.4.2" (NEXT-SESSION) en un
+      iPhone, con el build de desarrollo o de tiendas por EAS (cuenta de Apple Developer); Expo Go de iOS no abre el SDK 55. Es la primera
+      vez de la app en iOS: lo que falle y no sea del tiempo real va como BUG aparte. En Android quedo en verde (emulador, sesion 42).
 
 - [ ] EAS build de produccion Android + iOS, cuentas, envio y revision. **Riesgo:** la revision toma dias o
       semanas; si el cliente pide app en tiendas, dejar margen
@@ -460,10 +463,12 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 8. ADMIN Y MODULOS DEL ORGANIZADOR **[congelado hasta admin .NET, salvo Mission Control iPad]**
 
-- [ ] **Revision completa del panel de EventOS contra Filament** (Kamilo 2026-11-24, decisiones.md): cada pantalla y pestaña,
+- [ ] **Revision del panel de EventOS contra Filament** (Kamilo 2026-11-24, decisiones.md): primero UNA pasada de medicion de las 26
+      secciones sin arreglar nada (cada diferencia: defecto, falta o decision de diseño; por pantalla, que tiene prueba y que es solo
+      afirmacion); Kamilo decide con la lista y los defectos van en un bloque; despues la fase 4. Cada pantalla y pestaña,
       lo que se ve (medido) y lo que falta (notificaciones, buscador global, subir arrastrando), en el lab "Panel nuevo contra
       Filament" (https://claude.ai/artifact/HQoez3LYnCBzvaKt97XNws). Hecho: el menu (BUG-568) y las fotos de las tablas (BUG-570).
-      Sigue: la ficha de Speakers, pestañas con iconos, encabezados de tabla y "por pagina", y las demas secciones.
+      Ya visto en Speakers (va a la pasada): la ficha sube la foto arrastrando en Filament, las sesiones al lado, el ancho.
 
 > Tambien congelados (lista `pendientes-2026-10.md` §7, C1 a C3): renombrar "Highlights" a "Destacados", donde vive "Otorgar puntos manuales" y el toggle de Silent Disco. Las preguntas estan en `decisiones.md` (Abiertas, Producto) y el trabajo en el roadmap de la migracion (M2.8.1 y M2.8.3).
 

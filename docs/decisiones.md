@@ -8,7 +8,9 @@
 
 | Fecha | Que | Por que |
 |---|---|---|
-| 2026-11-24 | **Revision completa del panel de EventOS contra Filament** (Kamilo, "dale"): pantalla por pantalla y pestaña por pestaña, lo que se ve medido en el navegador y lo que Filament hace y el nuevo no, en un lab con estado por pantalla; Kamilo decide que se arregla; cada arreglo con prueba roja y control | La regla era copiar Lumina como en Filament, pero nunca se comparo con medidas: el menu, las fotos y los anchos no eran iguales y se daban por copiados |
+| 2026-11-24 | **M3.4.2 cerrada con Android; el iPhone pasa a M3.4.2b, con el build de tiendas** (Kamilo; PENDIENTES seccion 7) | No hay iPhone ni cuenta de Apple Developer; Expo Go de iOS no abre el SDK 55 |
+| 2026-11-24 | **`api-local.sh` avisa si la base local tiene migraciones de Laravel sin correr** (Kamilo; solo avisa, no aplica) | 6 migraciones sin correr en `eventos_db` rompieron Social en el panel sin que nadie lo notara |
+| 2026-11-24 | **Revision del panel de EventOS contra Filament: una sola pasada de medicion de las 26 secciones, sin arreglar nada** (Kamilo): produce la lista en el lab con cada diferencia clasificada en defecto, falta o decision de diseño, y por pantalla que tiene prueba y que es solo afirmacion. Con la lista Kamilo decide que se arregla; los defectos van en un bloque. Despues sigue la fase 4 | El panel se dio por copiado de Filament sin medirlo; primero el inventario completo, despues las decisiones |
 | 2026-11-24 | **"Venia de antes" no cierra una falla** (Kamilo; regla 34 de BUENAS-PRACTICAS): se dice de donde salio y se arregla con su BUG o se anota en PENDIENTES con la razon | El aviso de React del tema se dio por "de antes" y era la causa de que el panel quedara sin tema (BUG-565) |
 | 2026-11-24 | **El hub deja entrar el origen igual a su propia direccion** (Kamilo, BUG-564): la direccion sale de lo que reenvia Nginx (X-Forwarded-Proto y Host), con la prueba detras del Nginx real; la app de Expo no va en `TiempoReal__OrigenesPermitidos` | React Native manda Origin con la direccion del hub; ningun navegador llega con ese origen porque nada sirve paginas en ese dominio (confirmado en BUG-564) |
 | 2026-11-24 | **M3.4.2 en Android se prueba en el emulador de Android Studio**, con la webapp como segundo cliente (Kamilo) | El emulador ya tenia Expo Go del SDK 55; el telefono pedia otra version de Expo Go |
@@ -188,7 +190,6 @@
 
 ### Migracion a .NET
 
-- **iPhone para M3.4.2** (2026-11-24): Expo Go de la App Store solo abre el SDK mas nuevo y la app esta en el 55. Opciones: build de desarrollo por EAS (cuenta de Apple Developer, 99 USD al ano, registrar el iPhone; hoy el perfil `development` de `eas.json` es solo para simulador y falta `expo-dev-client`) o subir la app de SDK (migracion aparte). Sin esto, M3.4.2 no cierra.
 - **D.5** App en tiendas: no publicar build antes de la fase 3 (cada build congela el cliente de Socket.IO semanas). Si un cliente la pide antes, la fase 3 se adelanta.
 - Zona horaria por evento (hoy toda la API usa la de la app): se decide despues de la fase 5.
 - **Por decidir:** la solicitud de borrado de datos personales (Ley 1581 de Colombia, habeas data) se resuelve anonimizando, no eliminando: eliminar un asistente se lleva en cascada los datos de los sponsors y no borra a la persona (Kamilo 2026-10-31, al portar M2.4.1b).

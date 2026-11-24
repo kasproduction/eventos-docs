@@ -165,12 +165,13 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
   `e2e-admin/marco.spec.ts` 5 y `speakers.spec.ts` 2 con controles; eventos, staff, webhooks, anuncios, ayuda, emails y soporte en
   verde (las de Sistema lo abren antes). Lo que si esta probado del panel: datos (contratos y cruzadas) y funcionamiento
   (e2e-admin); lo que no: como se ve y lo que Filament hace y el nuevo no.
-- **Sigue:** la revision completa del panel contra Filament (Kamilo dijo dale): pantalla por pantalla y pestaña por pestaña, lo que
-  se ve (medido, no a ojo) y lo que falta (notificaciones, buscador, arrastrar archivos), todo en el lab con estado por pantalla para
-  que Kamilo decida; arreglos por modulo con prueba roja y control. Empieza por terminar Speakers (la ficha: subir foto arrastrando,
-  sesiones al lado, ancho) y siguen pestañas e encabezados de tabla (resto de BUG-568). Antes: mirar el runner del MSI de C#
-  `29aa974` y web `ed2f60b`. Pendientes de Kamilo: el "dale" de M3.4.2 solo Android + M3.4.2b iPhone aplazada, y el aviso de
-  migraciones pendientes en `api-local.sh`. Despues: M3.5.2 al prender el servidor.
+- **Cierre (Kamilo):** M3.4.2 cerrada con Android y el iPhone a M3.4.2b (PENDIENTES seccion 7, build de tiendas): fase 3 en 20/21,
+  171/237. C# `936e6a7`: `api-local.sh` avisa de migraciones de Laravel pendientes (`scripts/migraciones-pendientes.sh`, probado con una
+  base de control).
+- **Sigue:** la pasada de medicion del panel contra Filament (decisiones.md, como la pidio Kamilo): las 26 secciones y sus pestañas, en
+  UNA pasada y sin arreglar nada; cada diferencia clasificada en defecto, falta o decision de diseño, y por pantalla que tiene prueba y
+  que es solo afirmacion; todo en el lab. Kamilo decide con la lista y los defectos van en un bloque. Despues, la fase 4. Antes: el
+  runner del MSI de C# `936e6a7` y web `ed2f60b`. M3.5.2 al prender el servidor.
 
 ## SESION 2026-11-23 (Opus 5.5, 41) — FASE 3 EN 19/21: NODE DESCARTADO; CHAT, ASISTENCIA Y AUDIENCIA EN EL HUB; PHP LE HABLA AL HUB; LOS CINCO CLIENTES SOBRE SIGNALR
 
