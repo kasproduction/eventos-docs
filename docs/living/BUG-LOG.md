@@ -3,6 +3,44 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-23 — Encontrado al portar el chat, la asistencia y la audiencia a C# (bloque 3.2, sesion 41)
+
+### BUG-562: La asistencia por sesion se guardaba 5 horas corrida (RESUELTO EN C# 2026-11-23)
+- **Severidad propuesta:** ALTA (dato: el Data Center, los CSV y el Recap del asistente dicen 15:00 a quien entro a las 10:00; las
+  sesiones despues de las 7 de la noche quedan en el dia siguiente)
+- **Que pasa:** el socket anota la hora en UTC (`toISOString`, con `Z`) y `FlushSessionAttendanceJob` de PHP la pasa tal cual a
+  `joined_at` y `left_at`; el cast `datetime` de Laravel la guarda con la hora UTC como si fuera de Bogota. La duracion salia bien.
+- **Visto:** 2026-11-23, al portar el trabajo (M3.2.3); comprobado con tinker (`2026-12-06T15:00:00.000Z` queda `2026-12-06 15:00:00`).
+- **Arreglado en:** `GuardarAsistenciaDeSesiones` de C# (Hangfire, cada minuto) guarda la hora real y sin fracciones (decision de
+  Kamilo: arreglar; no hay datos viejos que mezclar). El horario de PHP se apago (`routes/console.php`). Prueba: cruzada
+  `ChatYAsistenciaDelHubTest` "con lo mismo en Redis..." (mismas filas y duraciones que PHP, la hora fija la real); control: la hora
+  corrida como PHP, rojo.
+
+### BUG-561: Borrar desde el socket un mensaje que no estaba en el historial borraba otro (RESUELTO EN C# 2026-11-23)
+- **Severidad propuesta:** ALTA (dato: el moderador borra un mensaje y desaparece el ultimo de la sala, que era de otra persona)
+- **Que pasa:** `chat:delete` de Node busca el mensaje en los ultimos 20 de Redis; si no esta (mas viejo, o un id de la base que la
+  app cargo por la API), le manda a PHP el pedido sin autor ni texto, y `InternalChatController::borrarMensaje` borra
+  `latest('id')` de la sala sin mas filtro.
+- **Visto:** 2026-11-23, leyendo `chat.ts` y el controlador para M3.2.1 (no reproducido contra Node).
+- **Arreglado en:** `ChatDelHub.BorrarAsync`: sin el mensaje en el historial se avisa el borrado a las pantallas, pero en la base no se
+  toca nada (el admin lo borra por la API, BUG-448). Prueba: `ChatDelHubTest` "Borrar_es_solo_del_admin..."; control: borrar igual
+  sin historial, rojo.
+
+### BUG-560: El texto del chat se limpiaba solo cuando el lote traia un mensaje (RESUELTO EN C# 2026-11-23)
+- **Severidad propuesta:** BAJA (con varios mensajes en 200 ms, las etiquetas HTML quedaban en `chat_messages.body`)
+- **Que pasa:** `guardarMensaje` usa `ChatMessage::create` (dispara HasSanitizedHtml: `trim(strip_tags)`); `guardarLote` usa
+  `ChatMessage::insert`, que no dispara eventos del modelo. Node manda uno u otro segun cuantos junto.
+- **Arreglado en:** `GuardadoDelChat` limpia siempre (lo que pedia el modelo). Lo que se reparte en vivo y el historial de Redis van
+  tal cual, como Node. Prueba: `ChatDelHubTest` "Un_mensaje_llega..." y la cruzada del chat; control: sin limpiar, rojo.
+
+### BUG-559: El modo lento por sesion se perdia al reiniciar el socket y no llegaba a todos (RESUELTO EN C# 2026-11-23)
+- **Severidad propuesta:** MEDIA (Mission Control pone 10 s a una sesion y, tras un reinicio de Node, vuelve a 2 s sin que nadie lo vea)
+- **Que pasa:** Node guardaba el modo lento de cada sesion en un mapa en memoria (`sessionSlowMode`), lleno solo por el aviso de
+  `/internal/session-config`; al reiniciar quedaba vacio. La pausa y las palabras del evento vivian 5 min en la memoria de cada proceso.
+- **Arreglado en:** `ConfiguracionDelChat`: el modo lento de la sesion sale de la base (`event_sessions.slow_mode_seconds`, lo que
+  guarda SessionConfigController), si no el del evento, si no 2 s; los cambios llegan a todas las copias por el canal `hub:config`
+  (M3.2.6). Decision de Kamilo. Prueba: `ChatDelHubTest` "El_segundo_mensaje..."; control: sin el de la sesion, rojo.
+
 ## 2026-11-22 — Encontrado al portar la entrada del socket a C# (M3.1.2, sesion 40)
 
 ### BUG-558: CruceDeRedisConNodeTest "empezando por el hub" fallo una vez en una corrida combinada (ABIERTO, conteo 1)
@@ -157,13 +195,16 @@
 
 ## 2026-11-08 — Encontrado al revisar el socket para la torre de control (M2.9.2)
 
-### BUG-544: Event Pulse recibe la cuenta de "en la app" de un solo proceso del socket (ABIERTO, sin confirmar)
+### BUG-544: Event Pulse recibe la cuenta de "en la app" de un solo proceso del socket (RESUELTO EN C# 2026-11-23)
 - **Severidad propuesta:** MEDIA (la cifra de usuarios activos de Pulse puede salir baja o saltar entre valores)
 - **Que pasa:** `eventos-socket/src/index.ts` (temporizador de 10 s) cuenta las conexiones en la memoria de CADA proceso y emite
   `pulse:active_users` a la sala de Pulse. Con pm2 en modo cluster (`instances: 'max'`) cada proceso emite su propia cuenta por el
   adaptador de Redis, asi que Pulse recibe varias cifras parciales cada 10 s y se queda con la ultima.
 - **Visto:** 2026-11-08, leyendo el codigo (no probado con varios procesos).
-- **Arreglo:** pendiente. La torre ya suma por proceso (vigilante de M2.9.2); Pulse podria leer esa suma o el socket sumar en Redis. Se decide con Kamilo; Pulse pasa a C# en M4d.8.
+- **Arreglado en:** `ActivosDelHub` de C# (M3.2.4, decision de Kamilo 2026-11-23): `hub:activos:{evento}` en Redis con la ultima vez
+  que se vio a cada persona (al entrar y en cada renovacion de 30 s); cuenta la de los ultimos 90 s de todas las copias, y cada 10 s
+  reparte una sola copia (candado). Prueba: `ChatDelHubTest` "Pulse_recibe_la_cuenta_de_todas_las_copias..." (dos servidores sobre el
+  mismo Redis); control: contar solo la copia, rojo.
 
 ## 2026-11-06 — Encontrado al correr las e2e del panel en M2.8.4b
 

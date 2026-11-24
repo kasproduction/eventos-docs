@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 157/239
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 163/237
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -433,7 +433,7 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 ---
 
 
-## Fase 3: Tiempo real en SignalR (20 a 23 sesiones; plan 6 semanas) — 6/23
+## Fase 3: Tiempo real en SignalR (20 a 23 sesiones; plan 6 semanas) — 12/21
 
 > El hub vive en el mismo proceso que la API admin (o en `Hub`, mismo repo). Mantiene una fachada HTTP identica a los
 > 17 endpoints internos de Node para que PHP siga avisando sin enterarse. Los 8 clientes cambian un archivo cada uno.
@@ -447,29 +447,29 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 - [x] M3.1.5 Rate limits `rl:chat`, `rl:emoji`, `rl:join:session` con las mismas claves y ventanas (`rateLimit.ts`) **[local]** — **Hecho 2026-11-22** (C# `e8ffdd3`): `LimitesDelHub` igual a `rateLimit.ts` (INCR, EXPIRE al primero, fail-open) con las mismas llaves; `rl:join:session` probada en los dos sentidos con Node (un solo contador, la ventana la fija el primero); `rl:chat` y `rl:emoji` con su formato, se usan en M3.2.1
 - [x] M3.1.6 CORS fail-closed con la lista de `ALLOWED_ORIGINS` **[local]** — **Hecho 2026-11-22** (C# `e8ffdd3`): `TiempoReal:OrigenesPermitidos` (lista por comas), fail-closed para navegadores; sin cabecera Origin (Expo, kiosko) pasa. **Diferencia con Node:** socket.io no revisaba el origen en el WebSocket, el hub si. Pruebas de las salas 10/10 con 6 controles en rojo; cruce 8/8 con 4 controles
 
-### 3.2 Chat, display y audiencia (1,5 semanas) — 0/6
-- [ ] M3.2.1 Chat: historial en `chat:history:session:{id}` (20), anclado con TTL 24 h, modo lento por sesion y por evento, palabras bloqueadas (cache 5 min invalidada por `socket:config` o por el canal propio), pausa, throttle 50 ms por sala, emojis permitidos, borrado y anclado solo admin (`chat.ts`) **[local]**
-- [ ] M3.2.2 Persistencia del chat directa a MySQL desde C# por lotes de 200 ms (muere `/internal/chat/message` y `messages-batch` de PHP); contador `chat:count:session:{id}` **[local]**
-- [ ] M3.2.3 Asistencia por sesion: `session:{id}:viewers/joined/left` igual, y `FlushSessionAttendanceJob` pasa a Hangfire en el mismo despliegue (regla 4) **[local]**
-- [ ] M3.2.4 Audiencia con debounce 500 ms a `session:{id}` y `pulse:{id}` (excluye staff), `session:metrics`, `pulse:active_users` cada 10 s calculado desde Redis **[local]**
-- [ ] M3.2.5 Display: `display:project` y `display:stop` con estado en `display:active:session:{id}` (TTL 4 h) **[local]**
-- [ ] M3.2.6 Propagacion de configuracion entre instancias por el backplane (reemplaza el canal `socket:config` de Node) **[local]**
+### 3.2 Chat, display y audiencia (1,5 semanas) — 6/6
+- [x] M3.2.1 Chat: historial en `chat:history:session:{id}` (20), anclado con TTL 24 h, modo lento por sesion y por evento, palabras bloqueadas (cache 5 min invalidada por `socket:config` o por el canal propio), pausa, throttle 50 ms por sala, emojis permitidos, borrado y anclado solo admin (`chat.ts`) **[local]** — **Hecho 2026-11-23** (C# `bf5eca6`, backend `70390fa`): `ChatDelHub` y `ConfiguracionDelChat` con las llaves, eventos, errores y formas de Node (el historial con el texto sin escapar, como `JSON.stringify`); la configuracion directo de la base (Node se la pedia a PHP). Arreglos: BUG-559 (modo lento de la sesion desde la base, para todas las copias) y BUG-561 (borrar sin historial no toca otro mensaje). Pruebas: `ChatDelHubTest` 13 con 7 controles en rojo
+- [x] M3.2.2 Persistencia del chat directa a MySQL desde C# por lotes de 200 ms (muere `/internal/chat/message` y `messages-batch` de PHP); contador `chat:count:session:{id}` **[local]** — **Hecho 2026-11-23** (C# `bf5eca6`, backend `70390fa`): `GuardadoDelChat` (las reglas de `guardarLote`: sesion del evento, remitente asistente, puntos `chat_session` una vez por sesion). BUG-560: el texto se limpia siempre. Cruzada `ChatYAsistenciaDelHubTest` (filas, puntos y lo que lee `GET /sessions/{id}/chat/messages`, iguales a PHP) con control
+- [x] M3.2.3 Asistencia por sesion: `session:{id}:viewers/joined/left` igual, y `FlushSessionAttendanceJob` pasa a Hangfire en el mismo despliegue (regla 4) **[local]** — **Hecho 2026-11-23** (C# `bf5eca6`, backend `70390fa`): `AsistenciaDelHub` (entrar, salir, desconectar la ultima conexion de todas las copias, BUG-450) y `GuardarAsistenciaDeSesiones` en el Worker cada minuto; el horario de PHP se apago (Kamilo dijo si). BUG-562 (la hora salia 5 h corrida) arreglado por decision de Kamilo. Cruzada en los dos sentidos: lo que anota el hub lo lee el trabajo de PHP, y con lo mismo en Redis el de C# deja las mismas filas y duraciones (la hora, la real); controles en rojo
+- [x] M3.2.4 Audiencia con debounce 500 ms a `session:{id}` y `pulse:{id}` (excluye staff), `session:metrics`, `pulse:active_users` cada 10 s calculado desde Redis **[local]** — **Hecho 2026-11-23** (C# `bf5eca6`, backend `70390fa`): `AudienciaDelHub` (cada conexion anotada en `hub:audiencia:session:{id}`; las de una copia caida no cuentan; nombres solo al staff, BUG-451) y `ActivosDelHub` (BUG-544 cerrado: el total de todas las copias, repartido por una sola). Prueba con dos servidores sobre el mismo Redis
+- [x] M3.2.5 Display: `display:project` y `display:stop` con estado en `display:active:session:{id}` (TTL 4 h) **[local]** — **Hecho 2026-11-23** (C# `bf5eca6`, backend `70390fa`): `DisplayDelHub`, los campos opcionales solo si son "verdaderos" como en JavaScript y `restored: true` al entrar
+- [x] M3.2.6 Propagacion de configuracion entre instancias por el backplane (reemplaza el canal `socket:config` de Node) **[local]** — **Hecho 2026-11-23** (C# `bf5eca6`, backend `70390fa`): `CanalDeConfiguracion` sobre el canal de Redis `hub:config` (la misma conexion del backplane): palabras bloqueadas y modo lento ahora; el baneo se engancha en M3.3.1. Un mensaje roto se ignora
 
 ### 3.3 Fachada para PHP (1 semana) — 0/3
 - [ ] M3.3.1 Los 17 endpoints `/internal/*` de Node reimplementados como minimal API con el mismo `X-Internal-Secret` y los mismos payloads, llamando a `IHubContext` (lista en `migracion-dotnet.md` §1.10) **[local]**
 - [ ] M3.3.2 `SOCKET_SERVER_URL` de PHP apunta al hub; `InvalidationService`, `GameService::broadcast`, `PollController`, `CheckinService`, observers y jobs no cambian **[local]**
 - [ ] M3.3.3 Prueba cruzada: cada accion de PHP que emite (los snapshots de M0.3 mas un cliente SignalR de prueba) llega con el payload del catalogo **[local]**
 
-### 3.4 Clientes (1 semana) — 0/4
+### 3.4 Clientes (1 semana) — 0/3
 - [ ] M3.4.1 `realtime.ts` de la webapp con `@microsoft/signalr` detras de la misma interfaz de M0.4.2; `/api/auth/socket-token` igual **[local]** — **Anotado 2026-11-03 (Kamilo):** al cambiar la capa realtime, un evento `wall:hidden` para que la app y la webapp quiten un post oculto sin recargar (hoy ocultar no avisa al socket, igual que PHP; M2.6.5a lo deja identico).
 - [ ] M3.4.2 Expo con `@microsoft/signalr` (WebSockets, `skipNegotiation`), reconexion con re-join de evento y sesiones (ya existe el ref-count), probado en segundo plano en Android e iOS **[local]**
 - [ ] M3.4.3 Kiosko y las 5 paginas estaticas con el `realtime.js` compartido en version SignalR **[local]**
-- [ ] M3.4.4 Bandera `REALTIME=socketio|signalr` por cliente para volver atras en un despliegue **[local]**
+- M3.4.4 ~~Bandera `REALTIME=socketio|signalr` por cliente para volver atras en un despliegue~~: **sacada** (decisiones.md 2026-11-23: Node no vuelve a correr)
 
-### 3.5 Transicion y apagado (1 semana) — 0/3
-- [ ] M3.5.1 Doble emision: PHP avisa a Node y al hub a la vez (dos URLs en `SOCKET_SERVER_URL`) mientras los clientes cambian **[local+medir]**
-- [ ] M3.5.2 Medir con `e4-chat-magistral.js` adaptado a SignalR: 1.000 en una sala, 40 mensajes por segundo, mismo criterio que agosto **[servidor]**
-- [ ] M3.5.3 Apagar Node y PM2; borrar `eventos-socket` del despliegue; `tests/load` actualizados **[servidor]**
+### 3.5 Transicion y apagado (1 semana) — 0/2
+- M3.5.1 ~~Doble emision: PHP avisa a Node y al hub a la vez mientras los clientes cambian~~: **sacada** (decisiones.md 2026-11-23: sin evento ni gente conectada no hay transicion)
+- [ ] M3.5.2 Medir con `e4-chat-magistral.js` adaptado a SignalR: 1.000 en una sala, 40 mensajes por segundo, mismo criterio que agosto **[servidor]** (Kamilo 2026-11-23: el dia que se prenda el servidor, antes de cualquier evento)
+- [ ] M3.5.3 Sacar Node y PM2 del despliegue: borrar `eventos-socket` de los archivos de despliegue y de `verificar`, el cruce con Node y `tests/load` actualizados (decisiones.md 2026-11-23: es local; en el servidor no se vuelve a instalar) **[local]**
 
 ### 3.6 Cierre de la fase (hito 2) — 0/1
 - [ ] M3.6.1 Retro de la fase 3 (la medicion del hito es M3.5.2) **[local]**

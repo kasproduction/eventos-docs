@@ -71,7 +71,8 @@
    **Build de la webapp (BUG-555):** ya no sale a Google: Urbanist y Plus Jakarta Sans van en `src/fonts` (`next/font/local`). La
    maquina que compila no necesita salida a `fonts.googleapis.com` ni `fonts.gstatic.com`.
 10. **PHP, Api y Worker de C# del mismo corte, juntos, con el Worker corriendo:** varios trabajos salieron de PHP y los hace
-    ahora el Worker (aviso de cambio de horario, vencer baneos, push programadas, correo directo sin outbox). Uno sin el otro
+    ahora el Worker (aviso de cambio de horario, vencer baneos, push programadas, correo directo sin outbox, y desde M3.3 la
+    asistencia por sesion: el horario de `FlushSessionAttendanceJob` ya no esta en PHP). Uno sin el otro
     deja avisos sin mandar o mandados dos veces. Confirmar en el panel de Hangfire que estan los recurrentes.
 11. **Nginx:** el bloque `@dotnet` y el prefijo `/api/admin/v1` de `proxy/nginx-api.conf`, y el mapa `proxy/rutas-csharp.conf`
     (9 rutas: health, version, auth/me, start/end/cancel/delay de sesiones, documents/zip y badge de Mi QR) instalado como
