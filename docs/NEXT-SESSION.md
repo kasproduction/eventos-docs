@@ -168,10 +168,11 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
 - **Cierre (Kamilo):** M3.4.2 cerrada con Android y el iPhone a M3.4.2b (PENDIENTES seccion 7, build de tiendas): fase 3 en 20/21,
   171/237. C# `936e6a7`: `api-local.sh` avisa de migraciones de Laravel pendientes (`scripts/migraciones-pendientes.sh`, probado con una
   base de control).
-- **Sigue:** la pasada de medicion del panel contra Filament (decisiones.md, como la pidio Kamilo): las 26 secciones y sus pestañas, en
-  UNA pasada y sin arreglar nada; cada diferencia clasificada en defecto, falta o decision de diseño, y por pantalla que tiene prueba y
-  que es solo afirmacion; todo en el lab. Kamilo decide con la lista y los defectos van en un bloque. Despues, la fase 4. Antes: el
-  runner del MSI de C# `936e6a7` y web `ed2f60b`. M3.5.2 al prender el servidor.
+- **Pasada de medicion hecha** (design/features/admin/comparacion-2026-11, `23644a2`): 91 pares de las 26 secciones; lab v3 con 16
+  defectos, 20 faltas, 8 decisiones de diseño y 7 por confirmar; la vista de 24 de 26 secciones es solo afirmacion. BUG-571 abierto
+  (Paginas y plantillas de correo dan 500).
+- **Sigue:** Kamilo decide con la lista del lab (https://claude.ai/artifact/HQoez3LYnCBzvaKt97XNws) que se arregla; los defectos
+  van en un bloque (con prueba roja y control cada uno). Despues, la fase 4. Antes: el runner del MSI de C# `936e6a7` y web `ed2f60b`. M3.5.2 al prender el servidor.
 
 ## SESION 2026-11-23 (Opus 5.5, 41) — FASE 3 EN 19/21: NODE DESCARTADO; CHAT, ASISTENCIA Y AUDIENCIA EN EL HUB; PHP LE HABLA AL HUB; LOS CINCO CLIENTES SOBRE SIGNALR
 
