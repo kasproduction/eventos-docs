@@ -138,6 +138,25 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
 
+## SESION 2026-11-25 (Opus 5.5, 46) — M4a.2b EN C#: EL RESTO DEL CONTENIDO, 111/111 CONTRATOS; BUG-582; PULSE EN VERDE EN LOCAL
+
+- Decisiones Kamilo: dale a M4a.2b; lo que depende de rol o estado se prueba por sus dos puertas (la lista y la ruta directa por id) con
+  el resultado de PHP; `pulse bootstrap` no puede quedar rojo en local. Por decidir (decisiones.md): un modulo apagado o de otro rol sale
+  de la lista pero su ruta responde (PHP y C# igual).
+- MSI al arrancar: C# `37b9490` (con `9156f3e` y backend `8667f41`) VERDE completo: contratos 72/72, PHP 341 + orden inverso 338 + suite
+  1375, C# con base 432, cruzadas 116, Ayuda.
+- Hecho: backend `bfcf843` (phpunit.xml fija `SOCKET_SERVER_URL` en 3001: el `.env` de desarrollo apunta el socket a 5230 y el contrato
+  salia rojo en local) y `0e6c219` (solo pruebas: escenarios `contenido-completo` y `modulos-por-audiencia`, 26 contratos). C# `1fd9eb4`
+  (BUG-582) y `d27a038` (M4a.2b: `Contenido/ContenidoDelAsistente`, `CacheDelEvento` a Trabajos, el panel suelta las 5 caches de C# al
+  instante, `EfectosDeLosAnuncios.Recurso`). Anuncios y destacados no tienen ruta por id en PHP: su unica puerta es la lista. Roadmap
+  174/238; 4a en 3/7.
+- Pruebas: contra C# 38 rojas sin las rutas (control) y 111/111 despues de TODA la suite de C# con base (437/437), en el orden del MSI;
+  las 5 pruebas de cache con control (sin canal y sin la invalidacion directa, las 5 rojas; con ella, verdes); BUG-582 con control; suite
+  sin base 323/323; PHP ContenidoTest y ErroresTest 109/109 con MySQL y en orden inverso (pulse en verde). El runner del MSI corre
+  `d27a038` y `0e6c219` (sin esperarlo).
+- Despliegue: sin pasos nuevos (nada cruzado hasta M4a.5).
+- **Sigue:** mirar el runner del MSI; despues M4a.3 (`GET /events/{id}/mine?piezas=`, LoMioService, 6 piezas) con la regla de la fase 4.
+
 ## SESION 2026-11-25 (Opus 5.5, 45) — M4a.2a EN C#: LA AGENDA DEL ASISTENTE, 72/72 CONTRATOS; BUG-580 Y 581; REGLA DE LA FASE 4
 
 - Decisiones Kamilo: regla de la fase 4 (antes de portar, que cubren los contratos y que no; el hueco en rojo contra C#), escrita en

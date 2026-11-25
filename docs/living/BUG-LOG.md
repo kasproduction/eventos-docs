@@ -3,6 +3,19 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-25 — M4a.2b, el resto del contenido (sesion 46)
+
+### BUG-582: PaginasTest de C# dejaba movido el orden de la pagina del seeder (RESUELTO 2026-11-25)
+- **Severidad propuesta:** MEDIA (pruebas; el mismo patron que BUG-580)
+- **Que pasa:** la prueba de reordenar paginas movia "Mapa del recinto" (sort_order 1 a 2) en `eventos_contratos_base` y no la devolvia.
+  Los contratos de paginas que corren despues de las pruebas de C# con base (desde M4a.2b) salian rojos. Antes no se veia porque las
+  paginas no estaban en `contratos-csharp.txt`.
+- **Arreglado en:** C# `1fd9eb4`: guarda orden y fecha al empezar y los devuelve en DisposeAsync.
+- **Prueba:** control contando la base: sin el arreglo, la pagina queda en 2 tras PaginasTest; con el arreglo, 1. Contratos 111/111
+  despues de toda la suite de C# con base (437).
+- **Patron (2 veces: BUG-580 y 582):** una prueba de C# que escribe en la base de referencia y no la deja como estaba solo se ve si
+  los contratos corren despues; por eso la regla de la fase 4 los corre en ese orden.
+
 ## 2026-11-25 — M4a.2a, la agenda del asistente (sesion 45)
 
 ### BUG-580: OnboardingTest de C# borraba las opciones de la encuesta del seeder (RESUELTO 2026-11-25)

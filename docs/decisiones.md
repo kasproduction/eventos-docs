@@ -201,6 +201,7 @@
 
 ### Migracion a .NET
 
+- **Por decidir (M4a.2b, 2026-11-25):** un modulo apagado o de otro rol sale de la lista de modulos, pero su ruta sigue respondiendo (PHP solo frena en la puerta por check-in y por grupo, AudienciaDelModulo). C# lo copia igual porque lo consumen la webapp y la app. ¿Se cierra la puerta tambien por apagado y por rol cuando se crucen las rutas (M4a.5)?
 - **D.5** App en tiendas: no publicar build antes de la fase 3 (cada build congela el cliente de Socket.IO semanas). Si un cliente la pide antes, la fase 3 se adelanta.
 - Zona horaria por evento (hoy toda la API usa la de la app): se decide despues de la fase 5.
 - **Por decidir:** la solicitud de borrado de datos personales (Ley 1581 de Colombia, habeas data) se resuelve anonimizando, no eliminando: eliminar un asistente se lleva en cascada los datos de los sponsors y no borra a la persona (Kamilo 2026-10-31, al portar M2.4.1b).

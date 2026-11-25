@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 173/238
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 174/238
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -497,7 +497,7 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 ---
 
 
-## Fase 4: API publica, modulo por modulo (88 a 105 sesiones; plan 27 semanas) — 3/50
+## Fase 4: API publica, modulo por modulo (88 a 105 sesiones; plan 27 semanas) — 4/50
 
 > Cada modulo sigue el mismo ciclo: portar servicios con nombre, pasar snapshots, mover sus jobs y tareas a Hangfire,
 > cruzar las rutas con `cruzar.sh` cumpliendo el criterio de cruce (M1.5.5), medir en el MSI, quitar el codigo PHP una
@@ -510,10 +510,10 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 > contratos y escenarios nuevos que se corren en rojo contra C# sin el bloque (control) y en verde despues. La propuesta del bloque
 > dice ese hueco.
 
-### 4a. Lectura publica y contenido (3 semanas) — 2/7
+### 4a. Lectura publica y contenido (3 semanas) — 3/7
 - [x] M4a.1 Publicos pre-login (12): by-slug, landing, login-slides, presets, campos de registro, onboarding GET; cache propia con prefijo `dotnet:` e invalidacion por el canal **[local]** — **Hecho 2026-11-25** (C# `c2ee863`, backend `9fbd486`, solo pruebas): las 7 lecturas en `Publico/LecturasPublicas`, identicas a PHP; antes de portar, 26 contratos nuevos y 3 escenarios (`publico-en-vivo`, `evento-terminado`, `onboarding-completo`), 36 rojas contra C# como control y 48/48 despues. `config/presets.php` por `scripts/presets-de-php.php`. Cache `dotnet:` de 5 min en los slides (el panel la suelta) y de 60 s en la landing, como PHP; los slides editados en Filament tardan hasta 5 min (solo lectura desde M2.7.4, decisiones.md). BUG-578 (404 sin id con punto) y BUG-579. Sin cruce: va en M4a.5
 - [x] M4a.2a Agenda, lo que pasa ahora, `.ics`, tracks y speakers (8 rutas) **[local]** — **Hecho 2026-11-25** (C# `37b9490`, backend `8667f41`, solo pruebas; partida en a y b por Kamilo): `Contenido/AgendaDelAsistente` y `RecursoDeSesion` (la forma de EventSessionResource y SpeakerResource en un solo lugar, tambien para la pieza del panel); 13 contratos nuevos y 2 escenarios (`agenda-completa`, `nada-en-vivo`) mas 3 de ErroresTest, 24 rojas contra C# como control y 72/72 despues. Cache `dotnet:` de 5 min en speakers que el panel suelta al instante (control sin el canal). BUG-580 (OnboardingTest borraba las opciones del seeder) y BUG-581 (sesion borrada en los filtros). Sin cruce: va en M4a.5
-- [ ] M4a.2b Resto del contenido (10 rutas): sponsors (shared + mine), documentos, FAQ, paginas (lista y una), highlights, anuncios por rol, branding, modulos **[local]**
+- [x] M4a.2b Resto del contenido (10 rutas): sponsors (shared + mine), documentos, FAQ, paginas (lista y una), highlights, anuncios por rol, branding, modulos **[local]** — **Hecho 2026-11-25** (C# `d27a038`, `1fd9eb4`; backend `0e6c219` y `bfcf843`, solo pruebas): `Contenido/ContenidoDelAsistente`; 26 contratos nuevos y 2 escenarios (`contenido-completo`, `modulos-por-audiencia`), lo que alguien no ve probado por la lista y por la ruta directa donde PHP la tiene; 38 rojas contra C# como control y 111/111 despues de toda la suite de C# con base (437). Caches `dotnet:` soltadas al instante por el panel (5 pruebas, control sin el canal); `CacheDelEvento` pasa a Trabajos. BUG-582 (PaginasTest movia el orden del seeder). Sin cruce: va en M4a.5
 - [ ] M4a.3 `GET /events/{id}/mine?piezas=` (`LoMioService`, 6 piezas con estado por pieza) **[local]**
 - [ ] M4a.4 Aviso a la webapp (`POST /api/internal/invalidate` con `WEBAPP_INTERNAL_SECRET`) para las entidades del marco **[local]**
 - [ ] M4a.5 Cruce de rutas tras snapshots verdes; medir `e3-agenda-storm.js` contra C# **[local+medir]**
