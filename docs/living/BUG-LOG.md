@@ -3,6 +3,23 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-25 — M4a.1, publicos de antes del ingreso (sesion 44)
+
+### BUG-578: El 404 de un registro buscado sin id salia sin el punto final de Laravel (RESUELTO 2026-11-25)
+- **Severidad propuesta:** BAJA (texto del error; la webapp no lo muestra)
+- **Que pasa:** `ModelNotFoundException` de Laravel termina el mensaje con el id (`[App\Models\Event] 9999`) o, si no hay id
+  (`firstOrFail()`), con un punto (`[App\Models\Event].`). C# armaba los dos sin punto.
+- **Visto:** 2026-11-25, al correr contra C# `GET /api/v1/events/by-slug/no-existe` (PublicoTest): la primera ruta portada que
+  busca sin id.
+- **Arreglado en:** C# (`ErroresDeLaravel.TextoDeModelo` y `FueraDelEventoException`): sin id, punto final. Las dos esperas de
+  `FiltroPorEventoTest` (una fila nueva escrita fuera del evento) pasan a la forma de Laravel.
+- **Prueba:** el snapshot de `by-slug que no existe`, rojo contra C# antes del arreglo.
+
+### BUG-579: `ContratoEscenarios` de PHP usaba `DB` sin importarlo (RESUELTO 2026-11-25)
+- **Severidad propuesta:** BAJA (pruebas, latente: ninguna prueba de PHP pide `staff-bloqueada`, el unico que lo usaba)
+- **Que pasa:** en modo interno, el escenario habria caido con `Class "Database\Seeders\DB" not found`.
+- **Arreglado en:** backend (solo pruebas): `use Illuminate\Support\Facades\DB;`, que tambien usan los 3 escenarios de M4a.1.
+
 ## 2026-11-25 — La corrida final de la comparacion del panel contra Filament (sesion 43)
 
 ### BUG-573: Los encabezados de las columnas que ordenan no salian en mayusculas (RESUELTO 2026-11-25)

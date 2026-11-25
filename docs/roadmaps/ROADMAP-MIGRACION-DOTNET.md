@@ -1,4 +1,4 @@
-# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 171/237
+# ROADMAP — MIGRACION A .NET (dos sistemas conviviendo) — 172/237
 
 > **Ventana operativa de la migracion.** Analisis base: `docs/migracion-dotnet.md` (inventario, riesgos, equivalentes).
 > **Reglas:** `docs/BUENAS-PRACTICAS-MIGRACION.md` (version para Claude: `docs/plantillas/CLAUDE-dotnet.md`).
@@ -497,9 +497,9 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 ---
 
 <details>
-<summary><b>Fase 4: API publica, modulo por modulo (88 a 105 sesiones; plan 27 semanas) — 1/49</b></summary>
+<summary><b>Fase 4: API publica, modulo por modulo (88 a 105 sesiones; plan 27 semanas) — 2/49</b></summary>
 
-## Fase 4: API publica, modulo por modulo (88 a 105 sesiones; plan 27 semanas) — 1/49
+## Fase 4: API publica, modulo por modulo (88 a 105 sesiones; plan 27 semanas) — 2/49
 
 > Cada modulo sigue el mismo ciclo: portar servicios con nombre, pasar snapshots, mover sus jobs y tareas a Hangfire,
 > cruzar las rutas con `cruzar.sh` cumpliendo el criterio de cruce (M1.5.5), medir en el MSI, quitar el codigo PHP una
@@ -507,8 +507,8 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 > Orden: lo que no escribe primero; auth despues de tener contratos de todo lo que emite tokens; operacion del evento
 > al final porque es lo mas complejo; Data Center de ultimo porque es lo mas aislado.
 
-### 4a. Lectura publica y contenido (3 semanas) — 0/6
-- [ ] M4a.1 Publicos pre-login (12): by-slug, landing, login-slides, presets, campos de registro, onboarding GET; cache propia con prefijo `dotnet:` e invalidacion por el canal **[local]**
+### 4a. Lectura publica y contenido (3 semanas) — 1/6
+- [x] M4a.1 Publicos pre-login (12): by-slug, landing, login-slides, presets, campos de registro, onboarding GET; cache propia con prefijo `dotnet:` e invalidacion por el canal **[local]** — **Hecho 2026-11-25** (C# `c2ee863`, backend `9fbd486`, solo pruebas): las 7 lecturas en `Publico/LecturasPublicas`, identicas a PHP; antes de portar, 26 contratos nuevos y 3 escenarios (`publico-en-vivo`, `evento-terminado`, `onboarding-completo`), 36 rojas contra C# como control y 48/48 despues. `config/presets.php` por `scripts/presets-de-php.php`. Cache `dotnet:` de 5 min en los slides (el panel la suelta) y de 60 s en la landing, como PHP; los slides editados en Filament tardan hasta 5 min (solo lectura desde M2.7.4, decisiones.md). BUG-578 (404 sin id con punto) y BUG-579. Sin cruce: va en M4a.5
 - [ ] M4a.2 Contenido (31): agenda (compartida + personal, `.ics`), speakers, sponsors (shared + mine), documentos y ZIP, FAQ, paginas, highlights, anuncios por rol, tracks, branding, modulos, happening-now **[local]**
 - [ ] M4a.3 `GET /events/{id}/mine?piezas=` (`LoMioService`, 6 piezas con estado por pieza) **[local]**
 - [ ] M4a.4 Aviso a la webapp (`POST /api/internal/invalidate` con `WEBAPP_INTERNAL_SECRET`) para las entidades del marco **[local]**

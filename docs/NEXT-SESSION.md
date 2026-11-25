@@ -138,6 +138,32 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
 
+## SESION 2026-11-25 (Opus 5.5, 44) — M4a.1 EN C#: LAS 7 LECTURAS DE ANTES DEL INGRESO, 48/48 CONTRATOS; TIEMPOS DEL MSI
+
+- Decisiones Kamilo: dale a M4a.1 con (1a) contratos y escenarios nuevos en PublicoTest, en rojo contra C# antes de portar como
+  control; (2) `config/presets.php` a C# con un script guardado en el repo; (3) los slides editados en Filament tardan hasta 5 min
+  en C#: aceptado porque Filament es de solo lectura desde M2.7.4 (decisiones.md). C# desempata por id donde PHP ordena por una
+  columna.
+- Hecho: backend `9fbd486` (solo pruebas: escenarios `publico-en-vivo`, `evento-terminado`, `onboarding-completo`, 26 contratos
+  nuevos, BUG-579). C# `c2ee863`: `Publico/LecturasPublicas` (by-slug, login-slides, landing, presets y ciudades,
+  registration-fields, onboarding-fields, onboarding), `Publico/Presets` con `scripts/presets-de-php.php` (las listas de
+  `database/presets` reusan las de M2.3.6c), cache `dotnet:` de 5 min en los slides (el panel la suelta) y 60 s en la landing,
+  los escenarios espejo y BUG-578 (el 404 sin id termina en punto, como Laravel). Sin cruce: va en M4a.5. Roadmap 172/237.
+- Pruebas: PHP con MySQL 38/38 dos veces; orden inverso 35 (3 saltadas: sqlite no acepta `searchable_select`). Contra C#: 36
+  rojas sin las rutas (control) y 48/48 despues. C# `PresetsTest` 19 (casos raros comprobados contra PHP), `IdentidadTest` 5 con
+  la prueba nueva del login publico (control: sin soltar la cache, roja), tocadas y transversales con MySQL en verde, suite sin
+  base 323/323. El runner del MSI corre `9fbd486` y `c2ee863` (sin esperarlo).
+- MSI, las corridas repetidas de la sesion 43, VERDES: web `fc9db7c` CI y C# `936e6a7` verificar. **Cuanto dura cada parte**
+  (17:42 a 18:09, 27,5 min de reloj): C# `verificar` 22 min 8 s = compilar y suite sin base 1 min 10 s; vulnerabilidades 14 s;
+  contratos de PHP con MySQL y orden inverso 6 min 13 s; suite completa de PHP 2 min 41 s; contratos de C# mas las pruebas de C#
+  con base, Redis y OpenAPI 5 min 40 s (dotnet test 4 min 47 s); cruzadas 3 min 17 s; Ayuda 2 min 54 s. Web: `check` 4 min 49 s
+  (typecheck 39 s, lint 48 s, vitest 1 min 36 s, build 1 min 21 s); `e2e` 22 min 36 s, de los que 16 min 55 s fueron esperar el
+  candado de C#, 1 min compilar y arrancar y 5 min las 236 pruebas. Con M4a.1 los contratos de C# suben de 12 a 48 (unos 2 min mas).
+- Despliegue: sin pasos nuevos (las rutas no se cruzan hasta M4a.5).
+- **Sigue:** mirar primero el runner del MSI (`9fbd486`, `c2ee863`); despues proponer M4a.2 Contenido (31 rutas: agenda, speakers,
+  sponsors, documentos, FAQ, paginas, highlights, anuncios, tracks, branding, modulos, happening-now), empezando por ver que
+  cubren sus snapshots, como en M4a.1.
+
 ## SESION 2026-11-25 (Opus 5.5, 43) — CORRIDA FINAL DEL PANEL CONTRA FILAMENT (0 DEFECTOS); BUG-573 A 577; LA AYUDA EN VERDE
 
 - Decisiones Kamilo: arreglar ya BUG-573 a 576, cada uno con prueba y control, en un solo commit, el 576 primero (el MSI no
