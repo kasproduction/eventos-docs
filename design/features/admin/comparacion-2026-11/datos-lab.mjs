@@ -1,45 +1,65 @@
-// Datos de la pasada de medicion del 2026-11-24 (fichas.json + mediciones a mano en el Chrome de Kamilo). Sin arreglos.
-// clase: defecto | falta | decision | confirmar. prueba: datos (contratos y cruzadas), uso (e2e-admin), vista (comparada contra Filament).
+// Datos del lab "Panel nuevo contra Filament". Pasada de medicion del 2026-11-24 y corrida final del 2026-11-25 (fichas.json,
+// despues del bloque de arreglos web fafde62). Las 7 decisiones de Kamilo del 2026-11-24 (decisiones.md) cuentan como decision;
+// lo arreglado sale de las secciones y queda en ARREGLADO; los "por confirmar" quedaron resueltos (ninguno perdio un campo).
+// clase: defecto | falta | decision. prueba: datos (contratos y cruzadas), uso (e2e-admin), vista (comparada contra Filament).
 
 export const TRANSVERSAL = [
   ["falta", "Notificaciones", "Filament tiene la campana con la bandeja de avisos del panel (databaseNotifications, cada 30 s). El nuevo no tiene ni campana ni bandeja.", "Todo el panel"],
   ["falta", "Buscador global", "Filament busca en todo el panel desde la barra de arriba. El nuevo no.", "Todo el panel"],
   ["falta", "Subir archivos arrastrando", "En Filament cada imagen se sube con un recuadro de arrastrar y soltar al lado de la URL. En el nuevo hay un botón de elegir archivo, sin arrastrar.", "Speakers, Sponsors, Anuncios, Slides, Destacados, Preguntas, Premios (7 formularios)"],
   ["falta", "Íconos en las pestañas", "Las pestañas de Filament llevan ícono; las del nuevo no.", "Agenda, Asistentes, Entrada, Anuncios, Emails, Identidad, Social, Gamificación, Webhooks"],
-  ["defecto", "Encabezados de las tablas", "Filament: MAYÚSCULAS de 10 px con espaciado, blanco al 25 %, sin fondo. Nuevo: 13 px normales, blanco al 40 %, con fondo.", "Todas las listas"],
-  ["defecto", "Paginación", "Filament pagina todas las listas (5, 10, 25, 50 o Todos). El nuevo pagina solo Sesiones, Asistentes, Muro y Fotos (sin la opción Todos); en las demás muestra todo: el historial de correos, 62 filas de una vez.", "Listas"],
-  ["defecto", "Miniaturas de las listas", "Cada lista de Filament tiene su tamaño (slides 64 x 64, destacados 120 x 60, premios 40 x 40 redonda). En el nuevo todas son 64 x 54 con esquinas de 6 px.", "Slides, Destacados, Premios, Fotos"],
+  ["defecto", "Encabezados de las columnas que ordenan", "Los encabezados ya van en mayúsculas como Filament, menos los de las columnas que ordenan la lista (BUG-573).", "Agenda (Título, Inicio, Fin), Asistentes (Nombre, Registro), Staff (Nombre, Correo)"],
+  ["defecto", "Paginación del historial de push", "Todas las listas paginan como Filament (5, 10, 25, 50 o Todos), menos la tabla de notificaciones push del historial de Emails, que muestra todo de una vez (BUG-574).", "Emails, Historial"],
+  ["decision", "Miniaturas del mismo tamaño", "Todas las miniaturas de las listas en 64 x 54; Filament usa un tamaño distinto en cada lista (Kamilo 2026-11-24).", "Slides, Destacados, Premios, Fotos, Sponsors"],
   ["decision", "Textos en español con tildes", "Filament dice Titulo, Email, Seccion, Telefono; el nuevo Título, Correo, Sección, Teléfono. Regla de Kamilo: español de Colombia bien escrito.", "Todo el panel"],
   ["decision", "Sin el punto medio como separador", "Filament separa cargo y empresa con un punto medio; el nuevo con coma. Regla de interfaz de Kamilo.", "Speakers y otras listas"],
   ["decision", "Ver contra Editar", "En Filament las filas dicen Ver porque quedó de solo lectura (M2.7.1); el nuevo edita. No cuenta como diferencia.", "Todas las listas"],
 ];
 
+// Lo que la pasada encontro y la corrida final ya no encuentra (web fafde62, ed2f60b, 9ea6702).
+export const ARREGLADO = [
+  "Páginas y las plantillas de correo ya abren: antes daban error 500 (BUG-571).",
+  "Las 19 listas que mostraban todo ahora paginan como Filament, con la opción Todos.",
+  "Encabezados de tabla en mayúsculas pequeñas, sin fondo, como Filament (salvo los que ordenan, BUG-573).",
+  "Miniatura de la lista de Fotos de 64 x 54 (salía aplastada a 25 x 60, BUG-572) y fotos de las listas sin aplastar (BUG-570).",
+  "Columnas que faltaban: Golden Tickets (correo, motivo, reclamado), Ganados (juego, reclamado el, confirmado por), Soporte (correo de quien pide) y Webhooks (URL).",
+  "El menú como Filament: íconos, grupos plegables, medidas, tonos y animaciones (BUG-568).",
+];
+
+// Lo que la pasada dio por diferencia y era un error de medicion.
+export const ERRORES_DE_LA_PASADA = [
+  "Límites: «Leads por día» sí existía (la ficha lo muestra en la pasada y en la corrida final).",
+  "Premios: «Quién puede canjear» sí existía, como las casillas Asistente y Vendedor.",
+  "Las columnas de Golden Tickets, Ganados, Soporte y Webhooks salían como notas debajo de otra columna; igual se sacaron aparte.",
+];
+
 // [seccion, pantallas medidas, diferencias [[clase, texto]], pruebas {datos, uso, vista}]
+const V = "Comparada (corrida final)";
 export const SECCIONES = [
-  ["Escritorio", "1", [["falta", "Filament tiene 4 cifras (registrados, ya llegaron, sesiones hoy, requieren acción) y los accesos de «¿Qué quieres hacer?». El nuevo, una frase."]], { datos: "-", uso: "-", vista: "no" }],
-  ["Tu cuenta (seguridad)", "1", [], { datos: "TuCuenta, SeguridadDeTuCuenta", uso: "seguridad-de-tu-cuenta", vista: "no" }],
-  ["Agenda (Sesiones, Tracks, Tipos)", "9", [["confirmar", "Crear y editar sesión, y crear track y tipo: Filament ya no los muestra (solo lectura); se comparan contra las capturas de octubre, sin ficha medida."]], { datos: "Sesiones, TracksYTipos", uso: "agenda, sesiones", vista: "no" }],
-  ["Speakers", "3", [["defecto", "Fotos de la lista aplastadas a 8 px: arreglado hoy (BUG-570)."], ["defecto", "Orden por nombre; Filament por creación. No está escrito que sea a propósito."], ["defecto", "La ficha pone las sesiones en una columna al lado; Filament no."], ["falta", "Subir la foto arrastrando."]], { datos: "Speakers", uso: "speakers", vista: "solo la foto de la lista" }],
-  ["Sponsors", "3", [["confirmar", "En la ficha de Filament salen Tier y Miembros; en la ficha medida del nuevo no aparecen con ese nombre."], ["falta", "Subir logo y banner arrastrando."], ["defecto", "Filament muestra la pestaña Sponsors arriba; el nuevo, ninguna."]], { datos: "Sponsors", uso: "sponsors", vista: "no" }],
-  ["Documentos", "3", [["confirmar", "Crear y editar: Filament da 404 hoy; contra las capturas de octubre."]], { datos: "Documentos", uso: "documentos", vista: "no" }],
-  ["Páginas", "3", [["defecto", "Crear y editar dan error 500: el editor con formato usa DOMParser al armar la página en el servidor (contenido.ts:136)."]], { datos: "Paginas, HtmlDePaginas", uso: "paginas (pasa con los datos de prueba)", vista: "no" }],
-  ["Asistentes", "3", [["falta", "La lista de Bloqueos (pestaña de Filament) no tiene pantalla; banear se hace desde la ficha."], ["confirmar", "La ficha no tiene la sección Historial (roles y baneos); puede estar en «Qué le pasó»."], ["defecto", "Foto de la ficha de 40 px; en Filament 56 px."], ["decision", "Regenerar recap sigue en Filament hasta M4e.5 (mapa de pantallas)."], ["decision", "«Qué le pasó» es pantalla nueva (M2.9.4a)."]], { datos: "Asistentes, PerfilDeAsistente, Baneos, ImportacionDeAsistentes, QueLePaso", uso: "asistentes, que-le-paso", vista: "no" }],
-  ["Entrada", "7", [["defecto", "Las secciones «Restricción por email o dominio» y «Verificación de identidad (CSV)» de Filament van juntas dentro de «Modo de registro»."], ["confirmar", "Landing y widget no tiene ficha: la vista previa en vivo nunca deja de pedir datos y la medición se cortó. Carga bien a mano."], ["decision", "Códigos de acceso tiene «Nuevo» propio (generar en lote, M2.4.5e)."]], { datos: "EntradaDelEvento, CamposDelFormulario, CodigosDeAcceso", uso: "entrada, entrada-del-evento, campos, codigos", vista: "no" }],
-  ["Anuncios (Anuncios, Push, Recordatorios)", "6", [["falta", "Sin buscador en Anuncios y en Push programadas; Filament lo tiene."], ["falta", "Imagen del anuncio sin arrastrar."], ["confirmar", "Recordatorios: el campo «Minutos antes de la sesión» no aparece con ese nombre en la ficha del nuevo."]], { datos: "Anuncios, PushProgramadas, AjustesDelEvento", uso: "anuncios, push-programadas, ajustes-del-evento", vista: "no" }],
-  ["Emails", "3 + 3 a mano", [["defecto", "Abrir una plantilla (invitation, welcome, welcome_access) da error 500: el mismo editor que Páginas. La e2e de Emails pasa porque sus plantillas de prueba no lo disparan."], ["confirmar", "El historial cambió de forma (una fila por envío con entregadas, abiertas y fallidas); falta ver si está escrito como decisión."], ["falta", "Sin buscador en la lista de plantillas."]], { datos: "PlantillasDeCorreo, EnvioDeLaOrganizacion, HistorialDeEnvios", uso: "emails (pasa con los datos de prueba)", vista: "no" }],
-  ["Identidad (Branding, Slides, Destacados, Preguntas, Recap)", "13", [["falta", "Subir imágenes arrastrando en Slides, Destacados y Preguntas."], ["defecto", "Miniaturas de Slides y Destacados de otro tamaño."], ["decision", "Escarapela y Onboarding son pantallas propias (M2.8.2 y la pestaña Onboarding app)."]], { datos: "Identidad, Branding, Onboarding, Escarapela, Recap", uso: "identidad, branding, onboarding, escarapela, recap", vista: "no" }],
-  ["Módulos", "1", [], { datos: "Modulos", uso: "modulos", vista: "no" }],
-  ["Social (Muro, Fotos, Ajustes)", "5", [["defecto", "Miniatura de la lista de Fotos aplastada a 25 x 60 px (el mismo tipo de falla que BUG-570, en otro elemento)."], ["defecto", "Foto del detalle de 320 x 213 con esquinas; en Filament 192 x 128 sin esquinas."]], { datos: "Muro, Fotos, PremiosDeFotos", uso: "social", vista: "no" }],
-  ["Gamificación (Ajustes, Golden Tickets, Premios, Ganados)", "7", [["falta", "Golden Tickets: Filament muestra Email, Motivo y Reclamado; el nuevo, Código y la acción Marcar reclamado."], ["falta", "Ganados: Filament muestra Juego, Reclamado el y Confirmado por; el nuevo no."], ["falta", "Premio: el campo «Roles que pueden canjear» no está en el nuevo."], ["falta", "Imagen del premio sin arrastrar."], ["defecto", "Foto de la lista de premios 64 x 54; en Filament 40 x 40 redonda."]], { datos: "Gamificacion, GoldenTickets, CatalogoDePremios", uso: "gamificacion, golden-tickets, premios, premios-ganados", vista: "no" }],
-  ["Salones", "2", [], { datos: "Salones", uso: "salones", vista: "no" }],
-  ["Chat", "1", [], { datos: "AjustesDelEvento", uso: "ajustes-del-evento", vista: "no" }],
-  ["Event Pulse", "1", [], { datos: "EventPulse", uso: "event-pulse", vista: "no" }],
-  ["Soporte", "2", [["falta", "La lista no muestra el correo de quien pide; Filament sí."]], { datos: "Soporte", uso: "soporte", vista: "no" }],
-  ["Encuestas", "2", [["falta", "Sin buscador en la lista."]], { datos: "Encuestas, PreguntasDeEncuesta", uso: "encuestas", vista: "no" }],
-  ["Eventos", "2", [], { datos: "EventoNuevo", uso: "eventos", vista: "no" }],
-  ["Staff", "3", [], { datos: "Staff, AccesoDelStaff", uso: "staff", vista: "no" }],
-  ["Límites de uso", "1", [["falta", "Falta «Leads por día»: Filament tiene 7 límites, el nuevo 6."]], { datos: "AjustesDelEvento, Limitador", uso: "ajustes-del-evento", vista: "no" }],
-  ["Webhooks (Webhooks, Llaves, Historial)", "6", [["falta", "La lista no muestra la URL de cada webhook; Filament sí."]], { datos: "Webhooks, LlavesDeEntrada, HistorialDeWebhooks", uso: "webhooks", vista: "no" }],
-  ["Torre de control y Ayuda", "2", [["decision", "Pantallas nuevas sin par en Filament (M2.9.1 y M2.8.4)."]], { datos: "-", uso: "torre, ayuda", vista: "no" }],
-  ["Menú y barra de arriba (todo el panel)", "-", [["defecto", "Iconos, grupos plegables, medidas, tonos y animaciones: arreglado hoy (BUG-568)."]], { datos: "-", uso: "marco", vista: "sí (marco.spec.ts)" }],
+  ["Escritorio", "1", [["falta", "Filament tiene 4 cifras (registrados, ya llegaron, sesiones hoy, requieren acción) y los accesos de «¿Qué quieres hacer?». El nuevo, una frase."]], { datos: "-", uso: "-", vista: V }],
+  ["Tu cuenta (seguridad)", "1", [], { datos: "TuCuenta, SeguridadDeTuCuenta", uso: "seguridad-de-tu-cuenta", vista: V }],
+  ["Agenda (Sesiones, Tracks, Tipos)", "9", [["defecto", "La acción Borrar de cada sesión se corta por la derecha a 1440 px (BUG-575; ya pasaba en la pasada)."]], { datos: "Sesiones, TracksYTipos", uso: "agenda, sesiones", vista: V }],
+  ["Speakers", "3", [["decision", "Orden por nombre; Filament por creación (Kamilo 2026-11-24)."], ["decision", "La ficha pone las sesiones en una columna al lado (Kamilo 2026-11-24)."], ["falta", "Subir la foto arrastrando."]], { datos: "Speakers", uso: "speakers", vista: V }],
+  ["Sponsors", "3", [["decision", "Sin la pestaña Sponsors arriba (Kamilo 2026-11-24)."], ["falta", "Subir logo y banner arrastrando."]], { datos: "Sponsors", uso: "sponsors", vista: V }],
+  ["Documentos", "3", [], { datos: "Documentos", uso: "documentos", vista: V }],
+  ["Páginas", "3", [], { datos: "Paginas, HtmlDePaginas", uso: "paginas, editor-en-el-servidor", vista: V }],
+  ["Asistentes", "3", [["falta", "La lista de Bloqueos (pestaña de Filament) no tiene pantalla; banear se hace desde la ficha."], ["decision", "Foto de la ficha de 40 px; en Filament 56 px (Kamilo 2026-11-24)."], ["decision", "Regenerar recap sigue en Filament hasta M4e.5 (mapa de pantallas)."], ["decision", "«Qué le pasó» es pantalla nueva (M2.9.4a) y cubre el historial de roles y baneos."]], { datos: "Asistentes, PerfilDeAsistente, Baneos, ImportacionDeAsistentes, QueLePaso", uso: "asistentes, que-le-paso", vista: V }],
+  ["Entrada", "7", [["decision", "La restricción por email o dominio y la verificación por CSV van dentro de «Modo de registro» (Kamilo 2026-11-24)."], ["decision", "Códigos de acceso tiene «Nuevo» propio (generar en lote, M2.4.5e)."]], { datos: "EntradaDelEvento, CamposDelFormulario, CodigosDeAcceso", uso: "entrada, entrada-del-evento, campos, codigos", vista: V }],
+  ["Anuncios (Anuncios, Push, Recordatorios)", "6", [["falta", "Sin buscador en Anuncios y en Push programadas; Filament lo tiene."], ["falta", "Imagen del anuncio sin arrastrar."]], { datos: "Anuncios, PushProgramadas, AjustesDelEvento", uso: "anuncios, push-programadas, ajustes-del-evento", vista: V }],
+  ["Emails", "3 + 3 a mano", [["defecto", "El historial no pagina las notificaciones push (BUG-574)."], ["decision", "El historial con los push, una fila por envío (M2.5.4)."], ["falta", "Sin buscador en la lista de plantillas."]], { datos: "PlantillasDeCorreo, EnvioDeLaOrganizacion, HistorialDeEnvios", uso: "emails, editor-en-el-servidor", vista: V }],
+  ["Identidad (Branding, Slides, Destacados, Preguntas, Recap)", "13", [["falta", "Subir imágenes arrastrando en Slides, Destacados y Preguntas."], ["decision", "Escarapela y Onboarding son pantallas propias (M2.8.2 y la pestaña Onboarding app)."]], { datos: "Identidad, Branding, Onboarding, Escarapela, Recap", uso: "identidad, branding, onboarding, escarapela, recap", vista: V }],
+  ["Módulos", "1", [], { datos: "Modulos", uso: "modulos", vista: V }],
+  ["Social (Muro, Fotos, Ajustes)", "5", [["decision", "Foto del detalle más grande y con esquinas (Kamilo 2026-11-24)."]], { datos: "Muro, Fotos, PremiosDeFotos", uso: "social, listas-como-filament", vista: V }],
+  ["Gamificación (Ajustes, Golden Tickets, Premios, Ganados)", "7", [["falta", "Imagen del premio sin arrastrar."]], { datos: "Gamificacion, GoldenTickets, CatalogoDePremios", uso: "gamificacion, golden-tickets, premios, premios-ganados", vista: V }],
+  ["Salones", "2", [], { datos: "Salones", uso: "salones", vista: V }],
+  ["Chat", "1", [], { datos: "AjustesDelEvento", uso: "ajustes-del-evento", vista: V }],
+  ["Event Pulse", "1", [], { datos: "EventPulse", uso: "event-pulse", vista: V }],
+  ["Soporte", "2", [], { datos: "Soporte", uso: "soporte", vista: V }],
+  ["Encuestas", "2", [["falta", "Sin buscador en la lista."]], { datos: "Encuestas, PreguntasDeEncuesta", uso: "encuestas", vista: V }],
+  ["Eventos", "2", [], { datos: "EventoNuevo", uso: "eventos", vista: V }],
+  ["Staff", "3", [], { datos: "Staff, AccesoDelStaff", uso: "staff", vista: V }],
+  ["Límites de uso", "1", [], { datos: "AjustesDelEvento, Limitador", uso: "ajustes-del-evento", vista: V }],
+  ["Webhooks (Webhooks, Llaves, Historial)", "6", [], { datos: "Webhooks, LlavesDeEntrada, HistorialDeWebhooks", uso: "webhooks", vista: V }],
+  ["Torre de control y Ayuda", "2", [["decision", "Pantallas nuevas sin par en Filament (M2.9.1 y M2.8.4)."]], { datos: "-", uso: "torre, ayuda", vista: V }],
+  ["Menú y barra de arriba (todo el panel)", "-", [], { datos: "-", uso: "marco", vista: "Sí (marco.spec.ts)" }],
 ];

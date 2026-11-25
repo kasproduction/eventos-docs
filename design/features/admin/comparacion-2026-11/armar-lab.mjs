@@ -1,14 +1,15 @@
 import fs from "node:fs";
-import { TRANSVERSAL, SECCIONES } from "./datos-lab.mjs";
+import { TRANSVERSAL, SECCIONES, ARREGLADO, ERRORES_DE_LA_PASADA } from "./datos-lab.mjs";
 
-const NOMBRE = { defecto: "Defecto", falta: "Falta", decision: "Decisión de diseño", confirmar: "Por confirmar" };
+const NOMBRE = { defecto: "Defecto", falta: "Falta", decision: "Decisión de diseño" };
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const chip = (c) => `<span class="estado ${c}">${NOMBRE[c]}</span>`;
 
-const cuenta = { defecto: 0, falta: 0, decision: 0, confirmar: 0 };
+const cuenta = { defecto: 0, falta: 0, decision: 0 };
 TRANSVERSAL.forEach(([c]) => cuenta[c]++);
 SECCIONES.forEach(([, , ds]) => ds.forEach(([c]) => cuenta[c]++));
 const sinVista = SECCIONES.filter(([, , , p]) => p.vista === "no").length;
+const lista = (a) => `<ul class="puntos">${a.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>`;
 
 const filasT = TRANSVERSAL.map(([c, que, det, donde]) => `<tr><td>${chip(c)}</td><td><strong>${esc(que)}</strong><br>${esc(det)}</td><td>${esc(donde)}</td></tr>`).join("\n");
 const filasS = SECCIONES.map(([sec, n, ds, p]) => {
@@ -57,7 +58,7 @@ li { line-height: 1.5; }
 .defecto { color: var(--rojo); background: var(--rojo-bg); }
 .falta { color: var(--ambar); background: var(--ambar-bg); }
 .decision { color: var(--azul); background: var(--azul-bg); }
-.confirmar { color: var(--t2); background: var(--linea); }
+.puntos { display: grid; gap: 6px; padding-left: 20px; list-style: disc; color: var(--t2); max-width: 78ch; }
 .igual { color: var(--verde); }
 .sin { color: var(--rojo); font-weight: 600; }
 .tenue { color: var(--t3); font-size: 13px; }
@@ -66,21 +67,20 @@ li { line-height: 1.5; }
 <div class="envoltura">
   <header>
     <h1>Panel nuevo contra Filament</h1>
-    <p>Pasada de medición del 24 de noviembre: 91 pares de pantallas de las 26 secciones, en Noir y a 1440 px, sin arreglar nada en la pasada. Cada pantalla se midió en el navegador (título, pestañas, columnas, campos y su tipo, subidas, fotos, paginación, filtros y buscador) y lo dudoso se revisó a mano. Kamilo decide qué se arregla; los defectos van en un bloque.</p>
+    <p>Corrida final del 25 de noviembre, después del bloque de arreglos: los mismos 91 pares de pantallas de las 26 secciones que la pasada del 24, en Noir y a 1440 px. Cada pantalla se midió en el navegador (título, pestañas, columnas, campos y su tipo, subidas, fotos, paginación, filtros y buscador) y lo que cambió se revisó en las capturas. Las 7 diferencias que Kamilo decidió dejar cuentan como decisión de diseño, no como defecto. Lo arreglado sale de la lista y queda abajo.</p>
   </header>
 
   <div class="resumen">
     <div class="cifra"><b>${cuenta.defecto}</b><span>Defectos</span></div>
     <div class="cifra"><b>${cuenta.falta}</b><span>Faltas</span></div>
     <div class="cifra"><b>${cuenta.decision}</b><span>Decisiones de diseño</span></div>
-    <div class="cifra"><b>${cuenta.confirmar}</b><span>Por confirmar</span></div>
-    <div class="cifra"><b>${sinVista} de ${SECCIONES.length}</b><span>secciones cuya vista es solo afirmación</span></div>
+    <div class="cifra"><b>${SECCIONES.length - sinVista} de ${SECCIONES.length}</b><span>secciones comparadas contra Filament</span></div>
   </div>
 
   <section>
     <h2>Cómo leer la lista</h2>
-    <p><strong>Defecto:</strong> existe y se ve o funciona distinto de Filament, y no está escrito que sea a propósito. <strong>Falta:</strong> Filament lo tiene y el nuevo no. <strong>Decisión de diseño:</strong> el cambio está escrito (decisiones.md, el mapa de pantallas o una regla de Kamilo). <strong>Por confirmar:</strong> la medición no alcanzó para clasificarlo.</p>
-    <p>En las pruebas: <strong>datos</strong> son los contratos de C# y las cruzadas con PHP (lo que se guarda y se lee), <strong>uso</strong> las e2e del panel contra el C# de verdad (crear, editar, borrar, permisos), y <strong>vista</strong> una comparación medida contra Filament. Hasta hoy ninguna pantalla tenía la tercera.</p>
+    <p><strong>Defecto:</strong> existe y se ve o funciona distinto de Filament, y no está escrito que sea a propósito. <strong>Falta:</strong> Filament lo tiene y el nuevo no. <strong>Decisión de diseño:</strong> el cambio está escrito (decisiones.md, el mapa de pantallas o una regla de Kamilo).</p>
+    <p>En las pruebas: <strong>datos</strong> son los contratos de C# y las cruzadas con PHP (lo que se guarda y se lee), <strong>uso</strong> las e2e del panel contra el C# de verdad (crear, editar, borrar, permisos), y <strong>vista</strong> una comparación medida contra Filament. La vista de todas las secciones se comparó en dos corridas (24 y 25 de noviembre); solo el menú tiene además una prueba que lo vigila (marco.spec.ts). Una comparación no es una prueba: si una pantalla cambia después, nada avisa.</p>
   </section>
 
   <section>
@@ -104,8 +104,18 @@ ${filasS}
   </section>
 
   <section>
+    <h2>Arreglado desde la pasada</h2>
+    ${lista(ARREGLADO)}
+  </section>
+
+  <section>
+    <h2>Errores de la pasada</h2>
+    ${lista(ERRORES_DE_LA_PASADA)}
+  </section>
+
+  <section>
     <h2>Lo que la medición no cubrió</h2>
-    <p>Los formularios de crear y editar que Filament ya no muestra (quedó de solo lectura: 403 o 404) se comparan contra sus capturas de octubre, sin ficha medida. Landing y widget no tiene ficha (la vista previa en vivo cortó la medición). Las plantillas de correo no estaban en la lista de pares y se midieron a mano. Lux no se midió pantalla por pantalla: el menú ya se probó en los dos temas. Las capturas y las fichas están en design/features/admin/comparacion-2026-11.</p>
+    <p>Los formularios de crear y editar que Filament ya no muestra (quedó de solo lectura: 403 o 404) se comparan contra sus capturas de octubre, sin ficha medida; Kamilo confirmó que ninguno perdió un campo editable. Landing y widget no tiene ficha (la vista previa en vivo cortó la medición). Las plantillas de correo no estaban en la lista de pares y se midieron a mano. Lux no se midió pantalla por pantalla: el menú ya se probó en los dos temas. Las capturas y las fichas están en design/features/admin/comparacion-2026-11.</p>
   </section>
 </div>`;
 

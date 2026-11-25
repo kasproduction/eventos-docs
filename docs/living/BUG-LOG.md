@@ -3,6 +3,36 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-25 — La corrida final de la comparacion del panel contra Filament (sesion 43)
+
+### BUG-573: Los encabezados de las columnas que ordenan no salen en mayusculas (ABIERTO 2026-11-25)
+- **Severidad propuesta:** MEDIA (visual; quedo a medias el arreglo de los encabezados como Lumina de `fafde62`)
+- **Que pasa:** en la corrida final de `comparar.mjs`, los encabezados normales ya salen en mayusculas, pero los que ordenan la
+  lista no: Agenda (Titulo, Inicio, Fin), Asistentes (Nombre, Registro) y Staff (Nombre, Correo). Se ve en `capturas/03-n.png`:
+  "Titulo" e "Inicio" en minusculas al lado de "SALA" y "TIPO".
+- **Visto:** 2026-11-25, `design/features/admin/comparacion-2026-11/fichas.json` (pares 03, 24 y 80).
+
+### BUG-574: El historial de Emails no pagina las notificaciones push (ABIERTO 2026-11-25)
+- **Severidad propuesta:** MEDIA (la lista crece sin limite; Filament pagina el historial de 10 en 10)
+- **Que pasa:** en `emails/historial` la tabla de Correos pagina (1 de 5, 107 correos), pero la de Notificaciones push muestra
+  todas las filas de una vez (unas 37 en `eventos_db`). La paginacion de las 19 listas de `fafde62` no la incluyo.
+- **Visto:** 2026-11-25, `capturas/43-n.png` (par 43).
+
+### BUG-575: En Agenda, la accion Borrar de cada sesion se corta por la derecha (ABIERTO 2026-11-25)
+- **Severidad propuesta:** MEDIA (a 1440 px de ancho no se lee la accion; la tabla no cabe en el contenido de 1280 px)
+- **Que pasa:** la columna de acciones (Monitor, Editar, Borrar) se sale del recuadro de la tabla y "Borrar" queda cortado en
+  "Bo". Ya pasaba en la pasada del 2026-11-24 (`capturas/03-n.png` de ese commit) y la pasada no lo anoto; regla 34: venia de antes
+  dice de donde salio, no si se arregla.
+- **Visto:** 2026-11-25, `capturas/03-n.png` (par 03).
+
+### BUG-576: Las pruebas de la Ayuda fallan en el runner desde los arreglos del panel (ABIERTO 2026-11-25)
+- **Severidad propuesta:** MEDIA (pruebas en rojo en el MSI; la Ayuda puede estar mostrando capturas viejas del panel)
+- **Que pasa:** el flujo `ayuda` del runner fallo en `ed2f60b` (BUG-570) y `fafde62`: 8 pruebas de `e2e-ayuda` (speakers,
+  sponsors, documentos, avisar a todos, soporte, crear tu evento, ponerle la marca, invitar a tu equipo) dicen "la pantalla cambio
+  en el paso 1-lista frente a la ultima captura y el capitulo no se toco". Los arreglos del menu, las fotos, la paginacion y los
+  encabezados cambiaron esas pantallas; falta revisar captura por captura que el cambio venga de ahi y volver a sacarlas.
+- **Visto:** 2026-11-25, corridas 45466155678 y 45485602957 de eventos-web (el CI general de `fafde62` en verde).
+
 ## 2026-11-24 — El marco del panel contra Filament (sesion 42, lab "Panel nuevo contra Filament")
 
 ### BUG-572: La miniatura de la lista de Fotos salia aplastada (25 x 60 px) (RESUELTO 2026-11-24)

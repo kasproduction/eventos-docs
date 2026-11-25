@@ -81,14 +81,14 @@
    "arrastrar": false,
    "editorDeTexto": 0,
    "fotos": [],
-   "iconos": 24,
+   "iconos": 20,
    "insignias": [],
    "vacio": "",
    "paginacion": "",
    "buscar": 0,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 2429
+   "textoLargo": 2044
   },
   "n": {
    "url": "/admin/cuenta/seguridad",
@@ -111,14 +111,14 @@
    "arrastrar": false,
    "editorDeTexto": 0,
    "fotos": [],
-   "iconos": 24,
+   "iconos": 20,
    "insignias": [],
    "vacio": "",
    "paginacion": "",
    "buscar": 0,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 2429
+   "textoLargo": 2042
   }
  },
  {
@@ -197,11 +197,11 @@
     "Título",
     "Inicio",
     "Fin",
-    "Sala",
-    "Tipo",
-    "Track",
-    "Estado",
-    "Acciones"
+    "SALA",
+    "TIPO",
+    "TRACK",
+    "ESTADO",
+    "ACCIONES"
    ],
    "filas": 25,
    "accionesDeFila": [
@@ -462,10 +462,10 @@
     "Tipos de sesión"
    ],
    "columnas": [
-    "Color",
-    "Track",
-    "Sesiones",
-    "Editar"
+    "COLOR",
+    "TRACK",
+    "SESIONES",
+    "EDITAR"
    ],
    "filas": 5,
    "accionesDeFila": [
@@ -475,7 +475,8 @@
    "botones": [],
    "secciones": [],
    "campos": [
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -488,7 +489,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 322
+   "textoLargo": 361
   }
  },
  {
@@ -686,11 +687,11 @@
     "Tipos de sesión"
    ],
    "columnas": [
-    "Color",
-    "Nombre",
-    "Slug",
-    "Sesiones",
-    "Editar"
+    "COLOR",
+    "NOMBRE",
+    "SLUG",
+    "SESIONES",
+    "EDITAR"
    ],
    "filas": 4,
    "accionesDeFila": [
@@ -700,7 +701,8 @@
    "botones": [],
    "secciones": [],
    "campos": [
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -713,7 +715,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 351
+   "textoLargo": 390
   }
  },
  {
@@ -877,19 +879,20 @@
    "migas": "Speakers Listado",
    "pestanas": [],
    "columnas": [
-    "Foto",
-    "Speaker",
-    "Sesiones",
-    "Editar"
+    "FOTO",
+    "SPEAKER",
+    "SESIONES",
+    "EDITAR"
    ],
-   "filas": 18,
+   "filas": 10,
    "accionesDeFila": [
     "Editar"
    ],
    "botones": [],
    "secciones": [],
    "campos": [
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -902,14 +905,14 @@
     "40x40 r=50%",
     "40x40 r=50%"
    ],
-   "iconos": 21,
+   "iconos": 15,
    "insignias": [],
    "vacio": "",
    "paginacion": "",
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 1191
+   "textoLargo": 824
   }
  },
  {
@@ -1118,15 +1121,15 @@
    "migas": "Sponsors Listado",
    "pestanas": [],
    "columnas": [
-    "Logo",
-    "Nombre",
-    "Tier",
-    "Líder",
-    "Equipo",
-    "Visible",
-    "Editar"
+    "LOGO",
+    "NOMBRE",
+    "TIER",
+    "LÍDER",
+    "EQUIPO",
+    "VISIBLE",
+    "EDITAR"
    ],
-   "filas": 30,
+   "filas": 10,
    "accionesDeFila": [
     "Editar",
     "Eliminar"
@@ -1134,7 +1137,8 @@
    "botones": [],
    "secciones": [],
    "campos": [
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -1147,20 +1151,17 @@
     "64x54 r=6px",
     "64x54 r=6px"
    ],
-   "iconos": 65,
+   "iconos": 27,
    "insignias": [
     "Platinum",
-    "Gold",
-    "Silver",
-    "Bronze",
-    "Media"
+    "Gold"
    ],
    "vacio": "",
    "paginacion": "",
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 1786
+   "textoLargo": 837
   }
  },
  {
@@ -1405,13 +1406,13 @@
    "migas": "Documentos Listado",
    "pestanas": [],
    "columnas": [
-    "Título",
-    "Sesión",
-    "Tipo",
-    "Tamaño",
-    "Editar"
+    "TÍTULO",
+    "SESIÓN",
+    "TIPO",
+    "TAMAÑO",
+    "EDITAR"
    ],
-   "filas": 19,
+   "filas": 10,
    "accionesDeFila": [
     "Editar",
     "Eliminar"
@@ -1419,26 +1420,24 @@
    "botones": [],
    "secciones": [],
    "campos": [
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
    "editorDeTexto": 0,
    "fotos": [],
-   "iconos": 42,
+   "iconos": 26,
    "insignias": [
     "PDF",
-    "Imagen",
-    "PowerPoint",
-    "Word",
-    "Archivo"
+    "Imagen"
    ],
    "vacio": "",
    "paginacion": "",
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 1684
+   "textoLargo": 1045
   }
  },
  {
@@ -1601,11 +1600,11 @@
    "migas": "Páginas Listado",
    "pestanas": [],
    "columnas": [
-    "Título",
-    "Contenido",
-    "Quién la ve",
-    "Visible",
-    "Editar"
+    "TÍTULO",
+    "CONTENIDO",
+    "QUIÉN LA VE",
+    "VISIBLE",
+    "EDITAR"
    ],
    "filas": 1,
    "accionesDeFila": [
@@ -1615,7 +1614,8 @@
    "botones": [],
    "secciones": [],
    "campos": [
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -1630,7 +1630,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 269
+   "textoLargo": 323
   }
  },
  {
@@ -1664,7 +1664,7 @@
   },
   "n": {
    "url": "/admin/eventos/1/paginas/nuevo",
-   "estado": 500,
+   "estado": 200,
    "titulo": "Nueva página",
    "migas": "Páginas Nueva página",
    "pestanas": [],
@@ -1732,7 +1732,7 @@
   },
   "n": {
    "url": "/admin/eventos/1/paginas/1",
-   "estado": 500,
+   "estado": 200,
    "titulo": "Información del recinto",
    "migas": "Páginas Editar",
    "pestanas": [],
@@ -1834,13 +1834,13 @@
    "pestanas": [],
    "columnas": [
     "Nombre",
-    "Rol",
-    "Etiquetas",
-    "Check-in",
-    "Acceso",
-    "Invitación",
+    "ROL",
+    "ETIQUETAS",
+    "CHECK-IN",
+    "ACCESO",
+    "INVITACIÓN",
     "Registro",
-    "Acciones"
+    "ACCIONES"
    ],
    "filas": 25,
    "accionesDeFila": [
@@ -2214,14 +2214,14 @@
     "Landing y widget"
    ],
    "columnas": [
-    "Etiqueta",
-    "Tipo",
-    "Obligatorio",
-    "Editable",
-    "Visible en",
-    "Editar"
+    "ETIQUETA",
+    "TIPO",
+    "OBLIGATORIO",
+    "EDITABLE",
+    "VISIBLE EN",
+    "EDITAR"
    ],
-   "filas": 11,
+   "filas": 10,
    "accionesDeFila": [
     "Editar",
     "Eliminar"
@@ -2229,7 +2229,8 @@
    "botones": [],
    "secciones": [],
    "campos": [
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -2250,7 +2251,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 873
+   "textoLargo": 861
   }
  },
  {
@@ -2469,12 +2470,12 @@
     "Landing y widget"
    ],
    "columnas": [
-    "Código",
-    "Usos",
-    "Activo",
-    "Expira",
-    "Creado",
-    "Editar"
+    "CÓDIGO",
+    "USOS",
+    "ACTIVO",
+    "EXPIRA",
+    "CREADO",
+    "EDITAR"
    ],
    "filas": 1,
    "accionesDeFila": [
@@ -2486,7 +2487,8 @@
    "secciones": [],
    "campos": [
     "Estado Todos Activos Inactivos [select]",
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -2499,7 +2501,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 382
+   "textoLargo": 437
   }
  },
  {
@@ -2611,13 +2613,13 @@
     "Recordatorios"
    ],
    "columnas": [
-    "Título",
-    "Estado",
-    "Fecha",
-    "Push enviada",
-    "Abrir"
+    "TÍTULO",
+    "ESTADO",
+    "FECHA",
+    "PUSH ENVIADA",
+    "ABRIR"
    ],
-   "filas": 11,
+   "filas": 10,
    "accionesDeFila": [
     "Editar"
    ],
@@ -2625,13 +2627,14 @@
    "secciones": [],
    "campos": [
     "Estado Todos Publicado Programado Borrador [select]",
-    "Solo generales [checkbox]"
+    "Solo generales [checkbox]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
    "editorDeTexto": 0,
    "fotos": [],
-   "iconos": 13,
+   "iconos": 14,
    "insignias": [
     "Publicado"
    ],
@@ -2640,7 +2643,7 @@
    "buscar": 0,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 1134
+   "textoLargo": 1112
   }
  },
  {
@@ -2862,7 +2865,7 @@
    "buscar": 0,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 284
+   "textoLargo": 276
   }
  },
  {
@@ -3059,10 +3062,10 @@
     "Historial"
    ],
    "columnas": [
-    "Correo",
-    "Asunto",
-    "Estado",
-    "Editar"
+    "CORREO",
+    "ASUNTO",
+    "ESTADO",
+    "EDITAR"
    ],
    "filas": 19,
    "accionesDeFila": [
@@ -3220,16 +3223,16 @@
     "Historial"
    ],
    "columnas": [
-    "Destinatario",
-    "Tipo",
-    "Estado",
-    "Fecha",
-    "Push",
-    "Último envío",
-    "Personas",
-    "Entregadas",
-    "Abiertas",
-    "Fallidas"
+    "DESTINATARIO",
+    "TIPO",
+    "ESTADO",
+    "FECHA",
+    "PUSH",
+    "ÚLTIMO ENVÍO",
+    "PERSONAS",
+    "ENTREGADAS",
+    "ABIERTAS",
+    "FALLIDAS"
    ],
    "filas": 62,
    "accionesDeFila": [],
@@ -3537,13 +3540,13 @@
     "Escarapela"
    ],
    "columnas": [
-    "Imagen",
-    "Etiqueta",
-    "Título",
-    "Texto encima",
-    "Video",
-    "Activo",
-    "Editar"
+    "IMAGEN",
+    "ETIQUETA",
+    "TÍTULO",
+    "TEXTO ENCIMA",
+    "VIDEO",
+    "ACTIVO",
+    "EDITAR"
    ],
    "filas": 2,
    "accionesDeFila": [
@@ -3554,7 +3557,8 @@
    "secciones": [],
    "campos": [
     " [search]",
-    " [interruptor]"
+    " [interruptor]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -3570,7 +3574,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 373
+   "textoLargo": 412
   }
  },
  {
@@ -3742,13 +3746,13 @@
     "Escarapela"
    ],
    "columnas": [
-    "Imagen",
-    "Título",
-    "Desde",
-    "Hasta",
-    "Orden",
-    "Activo",
-    "Editar"
+    "IMAGEN",
+    "TÍTULO",
+    "DESDE",
+    "HASTA",
+    "ORDEN",
+    "ACTIVO",
+    "EDITAR"
    ],
    "filas": 4,
    "accionesDeFila": [
@@ -3759,7 +3763,8 @@
    "secciones": [],
    "campos": [
     " [search]",
-    " [interruptor]"
+    " [interruptor]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -3777,7 +3782,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 556
+   "textoLargo": 595
   }
  },
  {
@@ -4007,13 +4012,13 @@
     "Escarapela"
    ],
    "columnas": [
-    "Sección",
-    "Pregunta",
-    "Orden",
-    "Activa",
-    "Editar"
+    "SECCIÓN",
+    "PREGUNTA",
+    "ORDEN",
+    "ACTIVA",
+    "EDITAR"
    ],
-   "filas": 13,
+   "filas": 10,
    "accionesDeFila": [
     "Editar",
     "Borrar"
@@ -4022,25 +4027,25 @@
    "secciones": [],
    "campos": [
     " [search]",
-    " [interruptor]"
+    " [interruptor]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
    "editorDeTexto": 0,
    "fotos": [],
-   "iconos": 30,
+   "iconos": 26,
    "insignias": [
     "General",
     "Lugar",
-    "Mi cuenta",
-    "Agenda"
+    "Mi cuenta"
    ],
    "vacio": "",
    "paginacion": "",
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 1010
+   "textoLargo": 890
   }
  },
  {
@@ -4462,14 +4467,14 @@
     "Ajustes"
    ],
    "columnas": [
-    "Autor",
-    "Contenido",
-    "Foto",
-    "Estado",
-    "Likes",
-    "Coment.",
-    "Fecha",
-    "Acciones"
+    "AUTOR",
+    "CONTENIDO",
+    "FOTO",
+    "ESTADO",
+    "LIKES",
+    "COMENT.",
+    "FECHA",
+    "ACCIONES"
    ],
    "filas": 25,
    "accionesDeFila": [
@@ -4650,16 +4655,16 @@
     "Ajustes"
    ],
    "columnas": [
-    "Foto",
-    "Oficial",
-    "Asistente",
-    "Caption",
-    "Estado",
-    "Likes",
-    "Concurso",
-    "Puesto",
-    "Subida",
-    "Acciones"
+    "FOTO",
+    "OFICIAL",
+    "ASISTENTE",
+    "CAPTION",
+    "ESTADO",
+    "LIKES",
+    "CONCURSO",
+    "PUESTO",
+    "SUBIDA",
+    "ACCIONES"
    ],
    "filas": 14,
    "accionesDeFila": [
@@ -4682,12 +4687,12 @@
    "arrastrar": false,
    "editorDeTexto": 0,
    "fotos": [
-    "25x60 r=6px",
-    "25x60 r=6px",
-    "25x60 r=6px",
-    "25x60 r=6px",
-    "25x60 r=6px",
-    "25x60 r=6px"
+    "64x54 r=6px",
+    "64x54 r=6px",
+    "64x54 r=6px",
+    "64x54 r=6px",
+    "64x54 r=6px",
+    "64x54 r=6px"
    ],
    "iconos": 43,
    "insignias": [
@@ -5035,12 +5040,15 @@
     "Premios Ganados"
    ],
    "columnas": [
-    "Premio",
-    "Ganador",
-    "Código",
-    "Estado",
-    "Otorgado",
-    "Marcar reclamado"
+    "PREMIO",
+    "GANADOR",
+    "CORREO",
+    "CÓDIGO",
+    "MOTIVO",
+    "ESTADO",
+    "RECLAMADO",
+    "OTORGADO",
+    "MARCAR RECLAMADO"
    ],
    "filas": 8,
    "accionesDeFila": [
@@ -5052,7 +5060,8 @@
    "campos": [
     "Estado Todos Sin reclamar Reclamado [select]",
     "Tipo Todos Juego (Jackpot) Concurso de fotos Manual [select]",
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -5067,7 +5076,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 1418
+   "textoLargo": 1488
   }
  },
  {
@@ -5176,13 +5185,13 @@
     "Premios Ganados"
    ],
    "columnas": [
-    "Imagen",
-    "Premio",
-    "Patrocinador",
-    "Puntos",
-    "Stock",
-    "Activo",
-    "Editar"
+    "IMAGEN",
+    "PREMIO",
+    "PATROCINADOR",
+    "PUNTOS",
+    "STOCK",
+    "ACTIVO",
+    "EDITAR"
    ],
    "filas": 1,
    "accionesDeFila": [
@@ -5192,7 +5201,8 @@
    "botones": [],
    "secciones": [],
    "campos": [
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -5209,7 +5219,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 290
+   "textoLargo": 344
   }
  },
  {
@@ -5431,12 +5441,15 @@
     "Premios Ganados"
    ],
    "columnas": [
-    "Código",
-    "Ganador",
-    "Premio",
-    "Estado",
-    "Ganado el",
-    "Marcar reclamado"
+    "CÓDIGO",
+    "GANADOR",
+    "PREMIO",
+    "JUEGO",
+    "ESTADO",
+    "RECLAMADO EL",
+    "CONFIRMADO POR",
+    "GANADO EL",
+    "MARCAR RECLAMADO"
    ],
    "filas": 8,
    "accionesDeFila": [
@@ -5446,7 +5459,8 @@
    "secciones": [],
    "campos": [
     "Estado Todos Sin reclamar Reclamado [select]",
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -5461,7 +5475,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 1198
+   "textoLargo": 1300
   }
  },
  {
@@ -5513,11 +5527,11 @@
    "migas": "Salones Listado",
    "pestanas": [],
    "columnas": [
-    "Salón",
-    "Capacidad",
-    "Ocupación ahora",
-    "Puertas",
-    "Editar"
+    "SALÓN",
+    "CAPACIDAD",
+    "OCUPACIÓN AHORA",
+    "PUERTAS",
+    "EDITAR"
    ],
    "filas": 3,
    "accionesDeFila": [
@@ -5526,7 +5540,8 @@
    "botones": [],
    "secciones": [],
    "campos": [
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -5539,7 +5554,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 312
+   "textoLargo": 351
   }
  },
  {
@@ -5592,10 +5607,10 @@
    "migas": "Salones Editar",
    "pestanas": [],
    "columnas": [
-    "Kiosko",
-    "Estado",
-    "Activo",
-    "Editar"
+    "KIOSKO",
+    "ESTADO",
+    "ACTIVO",
+    "EDITAR"
    ],
    "filas": 1,
    "accionesDeFila": [
@@ -5827,11 +5842,12 @@
    "migas": "En vivo Soporte",
    "pestanas": [],
    "columnas": [
-    "Asistente",
-    "Asunto",
-    "Estado",
-    "Fecha",
-    "Abrir"
+    "ASISTENTE",
+    "CORREO",
+    "ASUNTO",
+    "ESTADO",
+    "FECHA",
+    "ABRIR"
    ],
    "filas": 4,
    "accionesDeFila": [
@@ -5841,7 +5857,8 @@
    "secciones": [],
    "campos": [
     "Estado Todos Abierta Leída Resuelta [select]",
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": true,
@@ -5857,7 +5874,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 601
+   "textoLargo": 654
   }
  },
  {
@@ -5979,12 +5996,12 @@
    "migas": "En vivo Encuestas",
    "pestanas": [],
    "columnas": [
-    "Encuesta",
-    "Tipo",
-    "Estado",
-    "Preguntas",
-    "Respuestas",
-    "Editar"
+    "ENCUESTA",
+    "TIPO",
+    "ESTADO",
+    "PREGUNTAS",
+    "RESPUESTAS",
+    "EDITAR"
    ],
    "filas": 2,
    "accionesDeFila": [
@@ -5995,7 +6012,9 @@
     "Nueva encuesta"
    ],
    "secciones": [],
-   "campos": [],
+   "campos": [
+    "por página 5 10 25 50 Todos [select]"
+   ],
    "subidas": 0,
    "arrastrar": false,
    "editorDeTexto": 0,
@@ -6012,7 +6031,7 @@
    "buscar": 0,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 339
+   "textoLargo": 404
   }
  },
  {
@@ -6065,11 +6084,11 @@
    "migas": "Encuestas Encuesta de satisfaccion — EventOS Summit 2026",
    "pestanas": [],
    "columnas": [
-    "Pregunta",
-    "Tipo",
-    "Opciones",
-    "Respuestas",
-    "Editar"
+    "PREGUNTA",
+    "TIPO",
+    "OPCIONES",
+    "RESPUESTAS",
+    "EDITAR"
    ],
    "filas": 5,
    "accionesDeFila": [
@@ -6203,11 +6222,11 @@
    "migas": "Eventos Listado",
    "pestanas": [],
    "columnas": [
-    "Evento",
-    "Estado",
-    "Inicio",
-    "Fin",
-    "Trabajar en este"
+    "EVENTO",
+    "ESTADO",
+    "INICIO",
+    "FIN",
+    "TRABAJAR EN ESTE"
    ],
    "filas": 1,
    "accionesDeFila": [],
@@ -6355,10 +6374,10 @@
    "columnas": [
     "Nombre",
     "Correo",
-    "Roles",
-    "Activa",
-    "Segundo factor",
-    "Editar"
+    "ROLES",
+    "ACTIVA",
+    "SEGUNDO FACTOR",
+    "EDITAR"
    ],
    "filas": 2,
    "accionesDeFila": [
@@ -6368,7 +6387,8 @@
    "secciones": [],
    "campos": [
     "Cuenta Todas Activas Inactivas [select]",
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -6386,7 +6406,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 424
+   "textoLargo": 477
   }
  },
  {
@@ -6726,13 +6746,14 @@
     "Llaves de entrada"
    ],
    "columnas": [
-    "Partner",
-    "Eventos",
-    "Estado",
-    "Prueba",
-    "Activo",
-    "Último envío",
-    "Editar"
+    "PARTNER",
+    "URL",
+    "EVENTOS",
+    "ESTADO",
+    "PRUEBA",
+    "ACTIVO",
+    "ÚLTIMO ENVÍO",
+    "EDITAR"
    ],
    "filas": 1,
    "accionesDeFila": [
@@ -6745,7 +6766,8 @@
    "botones": [],
    "secciones": [],
    "campos": [
-    " [search]"
+    " [search]",
+    "por página 5 10 25 50 Todos [select]"
    ],
    "subidas": 0,
    "arrastrar": false,
@@ -6762,7 +6784,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 576
+   "textoLargo": 633
   }
  },
  {
@@ -7006,7 +7028,7 @@
    "buscar": 1,
    "filtros": [],
    "anchoDelContenido": 1056,
-   "textoLargo": 256
+   "textoLargo": 246
   }
  },
  {
@@ -7084,15 +7106,15 @@
    "migas": "Historial de webhooks Listado",
    "pestanas": [],
    "columnas": [
-    "Fecha",
-    "Tipo",
-    "Evento",
-    "Partner o llave",
-    "Estado",
-    "Intento",
-    "Duración",
-    "Prueba",
-    "Ver"
+    "FECHA",
+    "TIPO",
+    "EVENTO",
+    "PARTNER O LLAVE",
+    "ESTADO",
+    "INTENTO",
+    "DURACIÓN",
+    "PRUEBA",
+    "VER"
    ],
    "filas": 25,
    "accionesDeFila": [
@@ -7139,15 +7161,15 @@
    "migas": "Historial de webhooks Listado",
    "pestanas": [],
    "columnas": [
-    "Fecha",
-    "Tipo",
-    "Evento",
-    "Partner o llave",
-    "Estado",
-    "Intento",
-    "Duración",
-    "Prueba",
-    "Ver"
+    "FECHA",
+    "TIPO",
+    "EVENTO",
+    "PARTNER O LLAVE",
+    "ESTADO",
+    "INTENTO",
+    "DURACIÓN",
+    "PRUEBA",
+    "VER"
    ],
    "filas": 25,
    "accionesDeFila": [
@@ -7234,7 +7256,7 @@
   "n": {
    "url": "/admin/torre",
    "estado": 200,
-   "titulo": "5 cosas para mirar",
+   "titulo": "7 cosas para mirar",
    "migas": "",
    "pestanas": [],
    "columnas": [],
@@ -7263,7 +7285,7 @@
    "buscar": 0,
    "filtros": [],
    "anchoDelContenido": 1440,
-   "textoLargo": 763
+   "textoLargo": 789
   }
  }
 ]
