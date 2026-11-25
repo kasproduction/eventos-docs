@@ -138,6 +138,28 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
 
+## SESION 2026-11-25 (Opus 5.5, 47) — RECONCILIACION DE PENDIENTES; BUG-583 (PUERTA DE LOS MODULOS); /GUARDAR MUEVE LO DEL ROADMAP; PROPUESTA DE M4a.3
+
+- Decisiones Kamilo: la ruta de un modulo apagado o de otro rol se cierra en C# en M4a.5 al cruzar (BUG-583 "arreglado en C#"), con
+  dos condiciones: antes confirmar que la webapp y la app no piden rutas de modulos que no ven (si alguna lo hace, se arregla el
+  cliente primero), y responder el mismo 403 `MODULE_NOT_AVAILABLE` de PHP. `EventOnboardingResource` no se borra. Pasada de
+  reconciliacion de PENDIENTES antes de M4a.3, solo documentacion.
+- MSI: C# `d27a038` (con `1fd9eb4`, backend `bfcf843` y `0e6c219`) VERDE completo: contratos contra C# 111/111, PHP 367 + orden inverso
+  364 + suite 1375, C# con base 437, cruzadas 116, Ayuda.
+- Hecho (sin codigo): PENDIENTES §0 reescrita con el estado de hoy; a COMPLETADO (entrada 2026-11-25) B3.4, B4.3, B4.5, los bugs 375,
+  377 a 379, 381 a 383, 388, 395 y 483, la credencial con etiqueta, `EventOnboardingResource` y M3.4.2; BUG-395 resuelto por BUG-565
+  en el BUG-LOG; contadores de B3, B4 y §4. `feature/magic-link-auth` del backend YA ESTA UNIDA a `main` (0 delante, 120 detras),
+  escrito en §11; borrarla espera el "dale" de Kamilo. /guardar mueve a COMPLETADO tambien lo cerrado por el roadmap y los BUG
+  resueltos (`claude-config` `c235a7d`).
+- Pruebas: no se corrieron: sin codigo (la ultima corrida, la del MSI de arriba, verde).
+- Despliegue: sin pasos nuevos.
+- Propuesta hecha, sin "dale": **M4a.3** (`GET /events/{id}/mine?piezas=`, 6 piezas). Hueco: alguien sin registro en el evento (la ruta
+  salta el filtro de miembro, como toda `/mine`), piezas repetidas, vacias o mezcladas con desconocidas (422), el muro solo con los
+  likes de los primeros 20 publicados, empate en el ranking, acciones de puntos apagadas o por rol, evento que no existe. Decision
+  abierta: con una pieza rota, C# responde `{ok: false, error}` con su propio nombre de error (la webapp solo lo pone en un mensaje,
+  `lib/loMio.ts:79`); recomendado aceptarlo y anotarlo.
+- **Sigue:** el "dale" de Kamilo a M4a.3 (y la respuesta sobre el nombre del error); despues construirla con la regla de la fase 4.
+
 ## SESION 2026-11-25 (Opus 5.5, 46) — M4a.2b EN C#: EL RESTO DEL CONTENIDO, 111/111 CONTRATOS; BUG-582; PULSE EN VERDE EN LOCAL
 
 - Decisiones Kamilo: dale a M4a.2b; lo que depende de rol o estado se prueba por sus dos puertas (la lista y la ruta directa por id) con
