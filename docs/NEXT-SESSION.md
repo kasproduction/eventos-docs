@@ -156,8 +156,17 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
   corriendo al cerrar; C# `936e6a7` repetido (sus pruebas pasaron dos veces: 304 sin base y los contratos; caia en la revision de
   la Ayuda que corre `verificar.sh`, BUG-576).
 - Despliegue: sin pasos nuevos.
-- **Sigue:** la fase 4 por 4a (M4a.1 Publicos pre-login): proponer el primer bloque a Kamilo (que es, que cambia para el en dos
-  frases y las decisiones reales) y esperar el "dale". Antes, ver en verde las corridas del MSI de web `fc9db7c` y C# `936e6a7`.
+- **MSI al cerrar:** web `fc9db7c` Ayuda VERDE (22/22, BUG-576 cerrado tambien alla); web `fc9db7c` CI y C# `936e6a7` quedaron
+  en curso (en fila por el candado: juntas suman unos 40 min) y Kamilo apago el MSI: **se cortaron, hay que repetirlas** (`gh run
+  rerun` de la ultima de cada repo) con el MSI prendido.
+- **Regla nueva (Kamilo 2026-11-25, "imaginate esperar una hora esas pruebas"):** una sola subida con codigo al final de la
+  sesion, un solo "prende el MSI", y nunca se espera el resultado en vivo: la sesion siguiente lo mira primero. Subir la RAM del
+  MSI no deja correr en paralelo (puertos, bases de prueba y Redis compartidos; para eso habria que aislar cada corrida).
+- Propuesta hecha, sin "dale": **M4a.1 Publicos pre-login**: las 7 lecturas de antes del ingreso (by-slug, login-slides, landing,
+  registration-fields, onboarding, onboarding-fields, presets y ciudades; 12 snapshots en `PublicoTest`) a C#, identicas a PHP,
+  con `CacheDelEvento` y el limite `public_read` que ya existen; sin cruce en Nginx (va en M4a.5). Sin decisiones que bloqueen.
+- **Sigue:** (1) con el MSI prendido, repetir las corridas de web `fc9db7c` (CI) y C# `936e6a7` y dejarlas correr solas;
+  (2) Kamilo dice "dale" o ajusta la propuesta de M4a.1 y se construye (/davinci).
 
 ## SESION 2026-11-24 (Opus 5.5, 42) — M3.4.2 EN ANDROID (EMULADOR) EN VERDE; BUG-564 A 570; REGLA 34; EL PANEL CONTRA FILAMENT (MENU Y FOTOS)
 
