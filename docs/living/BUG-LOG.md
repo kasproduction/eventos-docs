@@ -5,6 +5,18 @@
 
 ## 2026-11-25 — M4a.2b, el resto del contenido (sesion 46)
 
+### BUG-583: La ruta de un modulo apagado o de otro rol sigue respondiendo (ABIERTO 2026-11-25; se arregla en C# en M4a.5)
+- **Severidad propuesta:** MEDIA (datos que la lista esconde salen por la ruta del modulo)
+- **Que pasa:** `ModuleController` saca de la lista un modulo apagado o de un rol que la persona no tiene, pero la puerta de sus rutas
+  (`AudienciaDelModulo` en PHP, `ConAudienciaDelModulo` en C#) solo frena por check-in y por grupo. Ejemplo (contratos de M4a.2b):
+  con speakers apagado, `GET /events/1/speakers` responde 200 con la lista; con anuncios solo para vendedores, una asistente los lee.
+- **Visto:** 2026-11-25, al probar las dos puertas de los modulos en M4a.2b (`modulos-por-audiencia`).
+- **Decision (Kamilo 2026-11-25, decisiones.md):** arreglado en C#, en M4a.5 al cruzar las rutas, con dos condiciones: antes confirmar
+  que ni la webapp ni la app piden rutas de modulos que no ven (si alguna lo hace, se arregla el cliente primero), y la respuesta
+  cerrada es la de PHP al frenar por check-in o grupo (403 `MODULE_NOT_AVAILABLE`). PHP no se toca: su puerta sigue abierta hasta
+  que la ruta se cruce.
+- **Prueba (cuando se haga):** los contratos de `modulos-por-audiencia` de speakers y anuncios pasan a 403, con control.
+
 ### BUG-582: PaginasTest de C# dejaba movido el orden de la pagina del seeder (RESUELTO 2026-11-25)
 - **Severidad propuesta:** MEDIA (pruebas; el mismo patron que BUG-580)
 - **Que pasa:** la prueba de reordenar paginas movia "Mapa del recinto" (sort_order 1 a 2) en `eventos_contratos_base` y no la devolvia.
@@ -2001,7 +2013,7 @@ controles en rojo (roles sin filtrar por nivel; sin cuidar el ultimo super_admin
   los tres botones. `PushAnuncioPrivadoTest` (falla con el codigo anterior). Suite 1.141.
 - **Archivos:** `app/Filament/Resources/AnnouncementResource.php`
 
-### BUG-395: React avisa en desarrollo por el script del tema dentro del layout (ABIERTO 2026-10-22)
+### BUG-395: React avisa en desarrollo por el script del tema dentro del layout (RESUELTO por BUG-565, 2026-11-24)
 - **Severidad:** BAJA (aviso de consola en `next dev`, no se ve) — `Encountered a script tag while rendering React
   component`: es el script que pone `data-theme` antes de pintar para que no parpadee el tema (`src/app/[locale]/layout.tsx:69`).
   En la primera carga si corre (va en el HTML). Moverlo mal trae de vuelta el parpadeo.
@@ -2009,6 +2021,8 @@ controles en rojo (roles sin filtrar por nivel; sin cuidar el ultimo super_admin
 - **Cuando se arregla:** cuando se toque el layout; opcion `next/script` con `beforeInteractive`, probando que no
   parpadee en las dos pieles.
 - **Archivos:** `eventos-web/src/app/[locale]/layout.tsx`
+- **Resuelto (anotado 2026-11-25):** por BUG-565 (web `4c6dc93`): el script del tema paso a `ScriptDelTema` en los dos layouts;
+  `beforeInteractive` y el archivo estatico se probaron y se descartaron. Prueba `e2e/tema.spec.ts` (4, con 2 controles).
 
 ### BUG-371: Con la suite corriendo, un pedido real del servidor local leyo la config de pruebas (ABIERTO 2026-10-22)
 - **Severidad:** BAJA (solo local) — durante `./vendor/bin/pest` completo, un pedido de Mission Control por Apache dio

@@ -6,40 +6,37 @@
 > cada `/guardar`.
 > Inventario completo de todos los docs: 2026-10-16 (45 archivos, ~1.700 casillas; las de planes viejos de modulos
 > cerrados NO se copiaron: esos docs llevan el aviso "HISTORICO" arriba).
-> Actualizado: 2026-10-25.
+> Actualizado: 2026-11-25 (reconciliado contra el roadmap, COMPLETADO y el BUG-LOG).
 > **Vista para priorizar (privada, celular):** https://claude.ai/artifact/UwSGdGXbJCHTeXEb7UpBDL. Kamilo marca
 > Ya / Antes del evento / Despues / Descartar y notas; Claude las lee con ArtifactData (coleccion `prioridades`, id = hash
 > de la tarea) y pasa el orden a este archivo. Si este archivo cambia, se regenera la pagina.
 
 ---
 
-## 0. ESTADO GENERAL AL 2026-10-25
+## 0. ESTADO GENERAL AL 2026-11-25
 
-> **2026-10-21: el evento del 6 de diciembre SE CAYO (Kamilo). No entran mas pendientes.** Se evalua migrar el backend a
-> .NET; fases 0 y 1 hechas (la 1 en 31/33: faltan dos tareas del servidor). Ventana operativa: `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md`
-> (89/210). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md`. Decisiones: `docs/decisiones.md`. Clasificacion de todo lo de aqui (que se hace ya, que se congela hasta el admin nuevo, que va con DTO y
-> contrato): `docs/pendientes-2026-10.md`. Regla: nada nuevo en PHP despues de la fase 0; si entra un pedido, la pregunta
-> es "en cual carro". Lo marcado **[congelado hasta admin .NET]** abajo sale de esa clasificacion (seccion 7).
-
-| Area | Avance | Que falta |
-|---|---|---|
-| **Migracion a .NET** (roadmap 89/210) | Fase 0 hecha; fase 1 31/33; fase 2 16/53 | Fase 1: M1.2.5 y M1.5.6 (servidor). Fase 2: bloque 2.1 cerrado; bloques 2.1 y 2.2 cerrados (el admin nuevo ya tiene login y marco en /admin); sigue M2.3.1 |
+> **No hay cliente para el 6 de diciembre (Kamilo 2026-10-16 y 2026-10-21); el servidor esta en pausa.** El trabajo es la
+> migracion del backend a .NET, en local, con el runner del MSI corriendo cada subida (una por sesion, al final). Plan y estado:
+> `docs/roadmaps/ROADMAP-MIGRACION-DOTNET.md` (174/238). Reglas: `docs/BUENAS-PRACTICAS-MIGRACION.md` y, para la fase 4, la regla
+> del encabezado de esa fase (que cubren los contratos y que no; el hueco en rojo contra C# antes de portar). Decisiones:
+> `docs/decisiones.md`. PHP esta congelado: lo nuevo nace en C# (las pruebas de PHP si se siguen escribiendo).
 
 | Area | Avance | Que falta |
 |---|---|---|
+| **Migracion a .NET** (roadmap 174/238) | Fase 0 41/41; fase 1 31/33; fase 2 78/80 (el panel de EventOS reemplazo a Filament, que quedo de solo lectura); fase 3 20/21 (tiempo real en el hub de C#, Node descartado); fase 4 4/50 | Fases 1 y 2: lo que pide servidor (M1.2.5, M1.5.6, M2.9.3, M2.10.1). Fase 3: M3.4.2b, la app en iPhone (build por EAS o subir de SDK, §7). Fase 4: sigue M4a.3 (`mine?piezas`); 4a en 3/7, sin cruzar todavia (M4a.5) |
 | Modulos del asistente (webapp W.0-W.18 + W.X) | 550/585 = **94%** | W.19 Spatial Player (mejora) y QA presencial |
-| Registro publico, landing y widget | 26/32 = **81%** | Llaves reales de Turnstile, toggle de tema para el demo, 4 menores (§4) |
-| Admin y modulos del organizador | **100%** | Nada bloqueante (decisiones menores en §2) |
+| Registro publico, landing y widget | 27/32 = **84%** | Llaves reales de Turnstile, toggle de tema para el demo, menores (§4) |
+| Admin del organizador | Panel de EventOS en C# (fase 2, local hecho 2026-11-22) | 14 faltas contra Filament para despues de la fase 4 (§8); lo de servidor |
 | Seguridad del staff (2FA) | 25/26 = **96%** | S.7.2: correr `security:check` en el servidor real |
-| App Expo | Implementada | Recap archivado para rediseño (rama local), QA en telefono, tiendas sin empezar |
+| App Expo | Probada en Android (telefono y emulador) con el hub de C# | iPhone sin probar (M3.4.2b, §7), Recap archivado para rediseño, tiendas sin empezar |
 | QA presencial con Kamilo | **0%** | §6 |
-| Bintec 2026 (B.1-B.6) | 0/6 = **0%** (B.1 casi) | Todo lo compartido ya vive en memoria del servidor (2026-10-21); queda juntar "lo mio" por pantalla y medir en servidor |
-| **Salida a produccion** (plan B1-B6) | ~4/31 = **13%** | §1 |
+| Bintec 2026 (B.1-B.6) | 0/6 | Lo compartido ya vive en memoria del servidor; queda medir en servidor |
+| **Salida a produccion** (plan B1-B6) | Varias tareas locales ya cerradas por la migracion (B3.4, B4.3, B4.5: ver COMPLETADO 2026-11-25) | §1: lo de servidor |
 
-**Lectura:** el producto esta casi completo; lo que no esta es correrlo en un servidor. Lo medido llega a 300
-personas por maquina (Nivel 1, agosto). El plan de servidor esta EN PAUSA por decision de Kamilo (2026-09-30)
-hasta cerrar features. De las 29 tareas abiertas de B1-B6: 8 se hacen enteras sin servidor, 8 se codean en local
-y se cierran midiendo en servidor, 13 solo con servidor.
+**Lectura:** el producto esta casi completo y la migracion avanza en local con cada bloque probado contra PHP (contratos,
+cruzadas y el runner del MSI). Lo que no esta es correrlo en un servidor: el plan de servidor sigue en pausa por decision de
+Kamilo. Lo medido en agosto llega a 300 personas por maquina (Nivel 1); la medicion de 1.000 personas en una sala (M3.5.2) es el
+primer paso el dia que se prenda el servidor.
 
 ---
 
@@ -67,24 +64,19 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 - [ ] B2.4 Humo funcional automatico, incluye correo de acceso recibido (= I.7.6) **[servidor]**
 - [ ] B2.5 Remontar de cero y destruir (= I.4 + I.7.10) **[servidor]**
 
-**B3 Arreglos de codigo que pide 5.000 — 0/8 (2 con codigo)**
+**B3 Arreglos de codigo que pide 5.000 — 1/8 (2 con codigo; B3.4 en COMPLETADO 2026-11-25)**
 - [~] B3.1 Correo con ritmo controlado. Codigo d5c3690, falta medir **[local+medir]**
 - [~] B3.2 La puerta (login cuenta fallos por red, rutas publicas por recinto). Codigo de80348, falta medir **[local+medir]**
 - [ ] B3.3 Juegos en vivo: limitar difusiones + cachear `GameService::getEligiblePool` **[local+medir]**
-- [ ] B3.4 Replica de lectura: conexion `reports` para Data Center, Pulse y exports **[local+medir]**
 - [ ] B3.5 ROL=admin en `deploy.sh`: admin en `admin.<dominio>` sin trafico de asistentes **[local+medir]**
 - [ ] B3.6 El 503 de la webapp con una persona: verificar si sigue y corregir **[local+medir]**
 - [~] B3.7 Agenda partida en compartida cacheada + personal. Codigo backend 5b923a7 + webapp 2928657 (2026-10-18): la agenda pasa de 3 pedidos (uno pesado) a 2 livianos. Falta medir con 300 en servidor; luego sponsors, muro y ranking (cruza con B.1) **[local+medir]**
 - [~] B3.8 Social pide 10 llamadas por apertura. Codigo webapp 3e23f65 (2026-10-18): cada pestaña pide lo suyo al abrirse; celular de 10 a 3, escritorio 4 + uno por pestaña. Visto en Chrome escritorio y 390 px con la sesion de Kamilo. Falta medir con 300 en servidor (cruza con B.1) **[local+medir]**
 
-**B4 Ver lo que pasa — 0/6**
+**B4 Ver lo que pasa — 2/6 (B4.3 y B4.5 en COMPLETADO 2026-11-25)**
 - [ ] B4.1 Alerta externa al telefono (BetterStack/UptimeRobot a health, app y socket) (= I.5 capa 1) **[servidor]**
 - [ ] B4.2 Respaldo cifrado a R2 por cron CON restauracion probada (= I.4) **[servidor]**
-- [ ] B4.3 Logs centralizados con id de peticion: "que le paso a la persona 1320 a las 10:42" **[local]**
 - [ ] B4.4 Alertas por umbral salidas de lo medido; cualquier 429 a un usuario legitimo suena **[servidor]**
-- [ ] B4.5 **Torre de control** (pedida 2026-04-19 y 2026-08-17): UNA pantalla en el admin solo super_admin con **[congelado hasta admin .NET si Kamilo elige D.4 (nace en el admin nuevo con los conectados del hub)]**
-      conectados por nodo, peticiones/s, p95 por endpoint, errores del ultimo minuto, CPU por rol, colas y estado de
-      cada nodo, en vivo por socket. Lab antes de codear. Brief: ROADMAP-INFRAESTRUCTURA I.5 **[local]**
 - [ ] B4.6 Escalar con un comando: `escalar.sh --api +1` desde el pipeline **[servidor]**
 
 **B5 Medir para 5.000 — 0/5**
@@ -122,13 +114,12 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 
 > Cerrados 2026-10-21: BUG-344, BUG-347, BUG-348, y los nuevos BUG-360 y BUG-361 (ver COMPLETADO).
 > Cerrados 2026-10-22: BUG-362 a BUG-370 y BUG-372.
+> Cerrados por el panel de EventOS y la migracion (movidos el 2026-11-25): BUG-375, 377 a 379, 381 a 383, 388, 395 y 483 (ver COMPLETADO).
 
-- [ ] BUG-395 Aviso de React en desarrollo por el script del tema en el layout (no se ve; cuando se toque el layout)
 
 - [ ] BUG-345 Correo sin ritmo: codigo hecho en B3.1, se cierra al medirlo
 
 **Del 2026-10-27** (sesiones y push en C#, detalle en BUG-LOG):
-  - [ ] BUG-483 Con el admin nuevo enfocado, ese navegador no muestra los push de la webapp (BAJA; M2.8.5)
   - [ ] Confirmar el `HASH_DRIVER` del servidor (BUG-482 ya corregido en C#; solo verificar que sea argon2id)
 
 **Del 2026-10-25** (fase 1 en C#, detalle en BUG-LOG):
@@ -137,22 +128,13 @@ y se cierran midiendo en servidor, 13 solo con servidor.
 **Abiertos el 2026-10-23** (auditoria M0.8.1, **las 65 confirmadas con prueba el mismo dia**; prioridad A en M0.8.6, B en M0.8.7, C en M0.8.8):
 
 **Abiertos el 2026-10-22** (orden de arreglo en `decisiones.md`):
-- Lista no repetir del admin nuevo (M2.8.5; antes si llega un cliente antes de la semana 12):
-  - [ ] BUG-375 Cuatro formas de mandar push "ya", cada una con otro publico
-  - [ ] BUG-377 "Marcar reclamado" del Golden Ticket sin quien, sin bloqueo, sin vencimiento
-  - [ ] BUG-378 Fotos: aprobar da resultados distintos; aprobar seleccionadas puede romper
-  - [ ] BUG-379 Muro: seis caminos con efectos distintos
-  - [ ] BUG-381 `QuestionsRelationManager` de sesiones es codigo muerto
-  - [ ] BUG-382 Activar o cerrar encuestas desde el admin no avisa por socket
-  - [ ] BUG-383 Abrir dos paginas del admin ya cambia datos
-  - [ ] BUG-388 El correo de prueba de plantillas no usa el SMTP de la organizacion
 - Solo local:
   - [ ] BUG-371 Con la suite corriendo, un pedido real leyo la config de pruebas (no correr la suite durante QA en vivo)
 - [ ] Pulse cuenta 84 mensajes y la BD tiene 2.156: revisar el criterio de `stats.messages` (sin verificar)
 
 ---
 
-## 4. REGISTRO PUBLICO, LANDING Y WIDGET — 26/32
+## 4. REGISTRO PUBLICO, LANDING Y WIDGET — 27/32
 
 > Hecho y decidido: `COMPLETADO.md` seccion 2026-10-16 (landing en la webapp `/[locale]/e/[slug]`, registro por
 > pasos sin contraseña, confirmacion con escarapela, widget embebible, Turnstile, SEO/OG, admin Landing y widget).
@@ -166,7 +148,6 @@ y se cierran midiendo en servidor, 13 solo con servidor.
   visible SOLO con `?demo` (una landing real no deja al asistente cambiar la plantilla del admin); el parametro viaja a la
   confirmacion y al widget. Minilab A (pildora abajo a la derecha) / B (barra fina arriba, con color del cliente como el lab v3)
   antes de codear. Sin backend. Hoy el tema se fuerza con `?tema=lux|noir` (`src/lib/landingEvent.ts:10`).
-- [ ] Credencial con etiqueta visible (VIP, Prensa): en el admin marcar que tags salen en la escarapela (idea Kamilo 2026-10-11, despues) **[congelado hasta admin .NET: es la misma de la seccion 8]**
 - [ ] "Ya tenias tu lugar" con varios eventos: hoy sale tambien si el correo tiene cuenta en OTRO evento y no en este
 - [ ] Tarjeta al compartir cuando el evento NO tiene "Card del Home": hoy sale sin imagen. Generarla (nombre, fecha, lugar,
   color del evento) necesita lab antes
@@ -368,9 +349,6 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 6. QA PRESENCIAL CON KAMILO (device + tiempo)
 
-- [ ] **M3.4.2 (fase 3, 2026-11-23): la app con el hub de C# en el Android y el iPhone** (unos 10 minutos): `EXPO_PUBLIC_SOCKET_URL`
-      del `.env` de la app a la Api local (`scripts/api-local.sh`, puerto 5230, por la IP de la red), entrar, abrir el chat y el muro,
-      mandar la app a segundo plano un minuto y volver: tiene que reconectar sola, volver a la sala y recibir lo nuevo
 
 - [ ] Mobile parity M.2-M.8 en telefono real: heart, momentos, shuffle, trivia sponsor, desafio, anuncios, soporte,
       orb FAQ, encuestas, vendor (scanner con camara por HTTPS, export, invitacion en vivo, gates ban/pending)
@@ -475,9 +453,7 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 - [ ] Configuracion canales WhatsApp/SMS desde Filament (email/SMTP ya existe;
       WhatsApp/SMS son nice-to-have seccion 9)
 - [ ] Branded QR codes con logo
-- [ ] Borrar `EventOnboardingResource` (muerto, sigue existiendo) (`NEXT-SESSION.md:1898`)
 - [ ] Mission Control: pulir iPad horizontal a 1024 px (`project_mission_control_notes`)
-- [ ] Credencial con etiqueta visible (VIP, Prensa): marcar en el admin que tags salen en la escarapela (§4)
 
 ### Paridad config admin ↔ 3 superficies (diseño con Kamilo; toca backend+Filament+Expo+webapp)
 - [ ] **Paginas custom: DEFERIDO POST-DEPLOY** (decision Kamilo 2026-07-20:
@@ -549,9 +525,9 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
   mirar la favorita del asistente; espera un `FavoriteRoom` o `session.is_keynote` que no existen
 - [ ] `eventos-app` `ProfileScreen.tsx:769` y `:894`: color morado fijo donde va el accent del evento (deuda de la Fase 3)
 - [ ] `eventos-app` `hooks/useTracker.ts:18`: el tracker no manda a ningun proveedor de analitica
-- Ramas del backend: se trabaja en `feature/magic-link-auth`, 166 commits delante de `main` (quieto desde 2026-05-02).
-  Desplegar desde `main` perderia cinco meses, seguridad incluida. Pendiente: decidir cuando se une a `main`.
-  Las ramas viejas de abril (backend, app, socket) no tienen nada que no este en la rama principal.
+- Ramas del backend (revisado 2026-11-25): `feature/magic-link-auth` YA ESTA UNIDA a `main` (0 commits delante, 120 detras; su
+  ultimo commit, `a23884a` del 2026-10-22, esta en `main`). Se trabaja y se despliega desde `main`. Queda borrarla en GitHub y en
+  local cuando Kamilo diga. Las ramas viejas de abril (backend, app, socket) no tienen nada que no este en la rama principal.
 
 ### Optimistic UI restantes (~3-4h) — pre-stress polish **[los que tocan el socket, congelados hasta decidir SignalR]**
 

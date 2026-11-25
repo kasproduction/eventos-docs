@@ -4,7 +4,26 @@
 > Consultar para contexto historico. El dia a dia es `PENDIENTES.md`.
 > **NOTA:** Los numeros BUG-XXX en este archivo son historicos. La numeracion fue reorganizada el 2026-04-23.
 > Fuente de verdad para bugs: `docs/BUG-LOG.md` (numeracion secuencial BUG-001 a BUG-232).
-> Actualizado: 2026-10-28
+> Actualizado: 2026-11-25
+
+---
+
+## 2026-11-25: movidos de PENDIENTES en la reconciliacion contra el roadmap y el BUG-LOG (solo documentacion)
+
+- **§1 B3.4** Replica de lectura: el `DbContext` de solo lectura `ReportesDb` (conexion `reports`) existe desde M1.2.4 (`3aa3075`,
+  2026-10-25). Lo que falta va en el roadmap: los endpoints del Data Center sobre la replica (M4e.1) y medir en servidor.
+- **§1 B4.3** Logs centralizados con id de peticion: logs estructurados con `X-Request-Id` y Sentry desde M1.1.3; "que le paso a la
+  persona" es la vista de M2.9.4 (2026-11-17).
+- **§1 B4.5** Torre de control: M2.9.1, M2.9.2 y M2.9.4 en el panel de EventOS (solo super_admin, estilo Pulse). Las alertas por
+  umbral (M2.9.3, B4.4) siguen en el roadmap, con el servidor.
+- **§3 bugs:** BUG-375 (M2.5.1b y M2.5.2), BUG-377 (M2.4.5c), BUG-378, 379, 382 y 383 (resueltos por reemplazo el 2026-11-04: esas
+  pantallas de Filament quedaron de solo lectura), BUG-381 (no aplica: se va con Filament, M2.8.5), BUG-388 (M2.8.5), BUG-483
+  (2026-11-03) y BUG-395 (resuelto por BUG-565, web `4c6dc93`: `ScriptDelTema` en los dos layouts; `beforeInteractive` probado y
+  descartado). Detalle de cada uno en el BUG-LOG.
+- **§4 y §8** Credencial con etiqueta visible (VIP, Prensa): M2.8.2 (2026-11-06), en el panel (Identidad, Escarapela) y en Mi QR.
+- **§8** Borrar `EventOnboardingResource`: **no se borra** (decision de Kamilo); se va con Filament en la fase 5.
+- **§6** M3.4.2: la prueba en Android quedo hecha el 2026-11-24 (fase 3); el iPhone sigue como M3.4.2b en §7.
+- **Ramas:** `feature/magic-link-auth` del backend ya esta unida a `main` (nota en PENDIENTES §11).
 
 ---
 

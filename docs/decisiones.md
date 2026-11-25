@@ -8,6 +8,7 @@
 
 | Fecha | Que | Por que |
 |---|---|---|
+| 2026-11-25 | **La ruta de un modulo apagado o de otro rol se cierra en C#, en M4a.5 al cruzar** (Kamilo, BUG-583 "arreglado en C#"), con dos condiciones: (1) antes, confirmar que ni la webapp ni la app piden rutas de modulos que no ven; si alguna lo hace, se arregla el cliente primero; (2) la respuesta cerrada es la misma que PHP da al frenar por check-in o grupo (403 `MODULE_NOT_AVAILABLE`, "Este contenido no esta disponible para ti.") | Hoy la lista esconde el modulo pero su ruta sigue sirviendo los datos: la puerta tiene que cumplir la misma regla que la lista |
 | 2026-11-25 | **Regla de la fase 4** (Kamilo): antes de portar un bloque se dice que cubren sus contratos y que no, y el hueco se cierra con contratos y escenarios en rojo contra C# sin el bloque; la propuesta dice ese hueco (roadmap, encabezado de la fase 4, y `eventos-api-dotnet/CLAUDE.md`). **M4a.2 partida en a y b** (Kamilo): 2a agenda, `.ics`, lo que pasa ahora, tracks y speakers; 2b el resto | En M4a.1 los contratos de antes no cubrian lo que usa la app; 19 rutas de una vez hacian la parte de pruebas demasiado larga |
 | 2026-11-25 | Las caches `dotnet:` de lo que el panel cambia se sueltan dos veces: directo en el efecto del panel (al instante) y por el canal `eventos:invalidate` (lo que venga de PHP) | El aviso por el canal es asincrono: un cliente que lee justo despues del guardado podia ver lo viejo |
 | 2026-11-25 | En modo contratos C# corre con `App__Url` vacio | PHP corre sus contratos con `Storage::fake('public')`, que da `/storage/...` sin dominio; en produccion los dos usan la URL completa |
@@ -201,7 +202,6 @@
 
 ### Migracion a .NET
 
-- **Por decidir (M4a.2b, 2026-11-25):** un modulo apagado o de otro rol sale de la lista de modulos, pero su ruta sigue respondiendo (PHP solo frena en la puerta por check-in y por grupo, AudienciaDelModulo). C# lo copia igual porque lo consumen la webapp y la app. ¿Se cierra la puerta tambien por apagado y por rol cuando se crucen las rutas (M4a.5)?
 - **D.5** App en tiendas: no publicar build antes de la fase 3 (cada build congela el cliente de Socket.IO semanas). Si un cliente la pide antes, la fase 3 se adelanta.
 - Zona horaria por evento (hoy toda la API usa la de la app): se decide despues de la fase 5.
 - **Por decidir:** la solicitud de borrado de datos personales (Ley 1581 de Colombia, habeas data) se resuelve anonimizando, no eliminando: eliminar un asistente se lleva en cascada los datos de los sponsors y no borra a la persona (Kamilo 2026-10-31, al portar M2.4.1b).

@@ -516,7 +516,7 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 - [x] M4a.2b Resto del contenido (10 rutas): sponsors (shared + mine), documentos, FAQ, paginas (lista y una), highlights, anuncios por rol, branding, modulos **[local]** — **Hecho 2026-11-25** (C# `d27a038`, `1fd9eb4`; backend `0e6c219` y `bfcf843`, solo pruebas): `Contenido/ContenidoDelAsistente`; 26 contratos nuevos y 2 escenarios (`contenido-completo`, `modulos-por-audiencia`), lo que alguien no ve probado por la lista y por la ruta directa donde PHP la tiene; 38 rojas contra C# como control y 111/111 despues de toda la suite de C# con base (437). Caches `dotnet:` soltadas al instante por el panel (5 pruebas, control sin el canal); `CacheDelEvento` pasa a Trabajos. BUG-582 (PaginasTest movia el orden del seeder). Sin cruce: va en M4a.5
 - [ ] M4a.3 `GET /events/{id}/mine?piezas=` (`LoMioService`, 6 piezas con estado por pieza) **[local]**
 - [ ] M4a.4 Aviso a la webapp (`POST /api/internal/invalidate` con `WEBAPP_INTERNAL_SECRET`) para las entidades del marco **[local]**
-- [ ] M4a.5 Cruce de rutas tras snapshots verdes; medir `e3-agenda-storm.js` contra C# **[local+medir]**
+- [ ] M4a.5 Cruce de rutas tras snapshots verdes; medir `e3-agenda-storm.js` contra C# **[local+medir]** — **Incluye BUG-583 (Kamilo 2026-11-25):** al cruzar, la ruta de un modulo apagado o de otro rol se cierra en C# con el 403 `MODULE_NOT_AVAILABLE` de PHP; antes, confirmar que la webapp y la app no piden rutas de modulos que no ven (si alguna lo hace, se arregla el cliente primero)
 - [ ] M4a.6 Quitar los controladores PHP del modulo una semana despues **[local]**
 
 ### 4b. Perfil, social y gamificacion (5 semanas) — 0/9
