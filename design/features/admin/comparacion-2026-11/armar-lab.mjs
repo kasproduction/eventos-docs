@@ -67,7 +67,7 @@ li { line-height: 1.5; }
 <div class="envoltura">
   <header>
     <h1>Panel nuevo contra Filament</h1>
-    <p>Corrida final del 25 de noviembre, después del bloque de arreglos: los mismos 91 pares de pantallas de las 26 secciones que la pasada del 24, en Noir y a 1440 px. Cada pantalla se midió en el navegador (título, pestañas, columnas, campos y su tipo, subidas, fotos, paginación, filtros y buscador) y lo que cambió se revisó en las capturas. Las 7 diferencias que Kamilo decidió dejar cuentan como decisión de diseño, no como defecto. Lo arreglado sale de la lista y queda abajo.</p>
+    <p>Corrida final del 25 de noviembre, después del bloque de arreglos (los 3 defectos que dejó, BUG-573 a 575, se arreglaron el mismo día con su prueba): los mismos 91 pares de pantallas de las 26 secciones que la pasada del 24, en Noir y a 1440 px. Cada pantalla se midió en el navegador (título, pestañas, columnas, campos y su tipo, subidas, fotos, paginación, filtros y buscador) y lo que cambió se revisó en las capturas. Las 7 diferencias que Kamilo decidió dejar cuentan como decisión de diseño, no como defecto. Lo arreglado sale de la lista y queda abajo.</p>
   </header>
 
   <div class="resumen">

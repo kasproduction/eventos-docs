@@ -138,6 +138,27 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
 
+## SESION 2026-11-25 (Opus 5.5, 43) — CORRIDA FINAL DEL PANEL CONTRA FILAMENT (0 DEFECTOS); BUG-573 A 577; LA AYUDA EN VERDE
+
+- Decisiones Kamilo: arreglar ya BUG-573 a 576, cada uno con prueba y control, en un solo commit, el 576 primero (el MSI no
+  queda con una suite roja); la fase 4 arranca por 4a proponiendo el primer bloque (que es, que cambia para Kamilo en dos frases,
+  decisiones reales).
+- Hecho: la corrida final de `comparar.mjs` (91 pares, Kamilo entro a mano; hubo que prender la Api de C# en 5230 para el
+  ingreso del panel). Lab v5: 0 defectos, 14 faltas, 16 decisiones; nota en M2.10.1; la revision sale de PENDIENTES a COMPLETADO.
+  Web `fc9db7c`: BUG-576 (la Ayuda abre Sistema antes de Eventos y Staff, los dos capitulos dicen "abre Sistema", la marca vuelve
+  arriba antes de Guardar, las 22 capturas otra vez), BUG-573 (`.adm-orden` hereda mayusculas y espaciado), BUG-574 (los push del
+  historial de Emails paginan), BUG-575 (tablas densas: titulo de 160 px minimo, acciones a 10 px que bajan a otra linea si no
+  caben; tambien Asistentes con Aprobar, que se salia 57 px y venia de antes). BUG-577 abierto (pruebas: la primera e2e de una
+  corrida falla en frio; conteo 1).
+- Pruebas: `ayuda:revisar` 22/22 (antes 8 rojas, las del MSI); e2e-admin de las pantallas tocadas 29/29 (una vez 28/29 por
+  BUG-577, sola 2/2); `listas-como-filament` con 3 pruebas nuevas, rojas antes (BUG-574 con control quitando el arreglo); vitest
+  868/868 (atrapo la marca que se salia del recorte en Asistentes); `tsc` y eslint limpios. Runner del MSI: web `fc9db7c`
+  corriendo al cerrar; C# `936e6a7` repetido (sus pruebas pasaron dos veces: 304 sin base y los contratos; caia en la revision de
+  la Ayuda que corre `verificar.sh`, BUG-576).
+- Despliegue: sin pasos nuevos.
+- **Sigue:** la fase 4 por 4a (M4a.1 Publicos pre-login): proponer el primer bloque a Kamilo (que es, que cambia para el en dos
+  frases y las decisiones reales) y esperar el "dale". Antes, ver en verde las corridas del MSI de web `fc9db7c` y C# `936e6a7`.
+
 ## SESION 2026-11-24 (Opus 5.5, 42) — M3.4.2 EN ANDROID (EMULADOR) EN VERDE; BUG-564 A 570; REGLA 34; EL PANEL CONTRA FILAMENT (MENU Y FOTOS)
 
 - Decisiones Kamilo: probar Android en el emulador de Android Studio (sin telefono), con la webapp como segundo cliente; el hub deja

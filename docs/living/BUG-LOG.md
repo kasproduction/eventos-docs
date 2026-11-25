@@ -5,33 +5,65 @@
 
 ## 2026-11-25 — La corrida final de la comparacion del panel contra Filament (sesion 43)
 
-### BUG-573: Los encabezados de las columnas que ordenan no salen en mayusculas (ABIERTO 2026-11-25)
+### BUG-573: Los encabezados de las columnas que ordenan no salian en mayusculas (RESUELTO 2026-11-25)
 - **Severidad propuesta:** MEDIA (visual; quedo a medias el arreglo de los encabezados como Lumina de `fafde62`)
 - **Que pasa:** en la corrida final de `comparar.mjs`, los encabezados normales ya salen en mayusculas, pero los que ordenan la
   lista no: Agenda (Titulo, Inicio, Fin), Asistentes (Nombre, Registro) y Staff (Nombre, Correo). Se ve en `capturas/03-n.png`:
   "Titulo" e "Inicio" en minusculas al lado de "SALA" y "TIPO".
 - **Visto:** 2026-11-25, `design/features/admin/comparacion-2026-11/fichas.json` (pares 03, 24 y 80).
+- **Causa:** el encabezado que ordena es un boton (`.adm-orden`) y Chrome les pone `text-transform: none` y
+  `letter-spacing: normal` a los botones: `font: inherit` no los trae.
+- **Arreglado en:** web `fc9db7c`: `.adm-orden` hereda `text-transform` y `letter-spacing` del th.
+- **Prueba:** `e2e-admin/listas-como-filament.spec.ts` ("los encabezados de las columnas que ordenan tambien van en
+  mayusculas"): Agenda, Asistentes y Staff, cada boton en `uppercase 1px`. Roja antes del arreglo ("Titulo: none 1px").
 
-### BUG-574: El historial de Emails no pagina las notificaciones push (ABIERTO 2026-11-25)
+### BUG-574: El historial de Emails no paginaba las notificaciones push (RESUELTO 2026-11-25)
 - **Severidad propuesta:** MEDIA (la lista crece sin limite; Filament pagina el historial de 10 en 10)
 - **Que pasa:** en `emails/historial` la tabla de Correos pagina (1 de 5, 107 correos), pero la de Notificaciones push muestra
   todas las filas de una vez (unas 37 en `eventos_db`). La paginacion de las 19 listas de `fafde62` no la incluyo.
 - **Visto:** 2026-11-25, `capturas/43-n.png` (par 43).
+- **Arreglado en:** web `fc9db7c`: la tabla de push usa `usePaginasDeLaLista` (la lista llega completa del C#, como las otras 19).
+- **Prueba:** `listas-como-filament.spec.ts` ("el historial de Emails pagina las notificaciones push"): publica 6 anuncios con
+  push (el seeder no trae push), espera el rango y corta con 5. Control: con `Emails.tsx` de antes, roja (no hay pie).
 
-### BUG-575: En Agenda, la accion Borrar de cada sesion se corta por la derecha (ABIERTO 2026-11-25)
+### BUG-575: En Agenda, la accion Borrar de cada sesion se cortaba por la derecha (RESUELTO 2026-11-25)
 - **Severidad propuesta:** MEDIA (a 1440 px de ancho no se lee la accion; la tabla no cabe en el contenido de 1280 px)
 - **Que pasa:** la columna de acciones (Monitor, Editar, Borrar) se sale del recuadro de la tabla y "Borrar" queda cortado en
   "Bo". Ya pasaba en la pasada del 2026-11-24 (`capturas/03-n.png` de ese commit) y la pasada no lo anoto; regla 34: venia de antes
   dice de donde salio, no si se arregla.
 - **Visto:** 2026-11-25, `capturas/03-n.png` (par 03).
+- **Tambien en Asistentes:** con un registro por aprobar (Aprobar, Perfil y Que le paso) la tabla se salia 57 px; venia de antes
+  (medido sin el arreglo de BUG-573). Salio al sacar otra vez las capturas de la Ayuda (vitest: la marca se salia del recorte).
+- **Arreglado en:** web `fc9db7c`: en las tablas densas el titulo baja su minimo de 180 a 160 px, las acciones van a 10 px y
+  bajan a una segunda linea a la derecha si no caben (antes `nowrap`). Sesiones cabe en una linea a 1440.
+- **Prueba:** `listas-como-filament.spec.ts` ("Sesiones cabe a 1440 px"): a 1440 x 900, en Sesiones y Asistentes la tabla no se
+  desliza (`scrollWidth - clientWidth = 0`) y Borrar queda dentro. Roja antes (sobraban 23 px en Sesiones y 57 en Asistentes).
 
-### BUG-576: Las pruebas de la Ayuda fallan en el runner desde los arreglos del panel (ABIERTO 2026-11-25)
+### BUG-576: Las pruebas de la Ayuda fallaban en el runner desde los arreglos del panel (RESUELTO 2026-11-25)
 - **Severidad propuesta:** MEDIA (pruebas en rojo en el MSI; la Ayuda puede estar mostrando capturas viejas del panel)
 - **Que pasa:** el flujo `ayuda` del runner fallo en `ed2f60b` (BUG-570) y `fafde62`: 8 pruebas de `e2e-ayuda` (speakers,
   sponsors, documentos, avisar a todos, soporte, crear tu evento, ponerle la marca, invitar a tu equipo) dicen "la pantalla cambio
   en el paso 1-lista frente a la ultima captura y el capitulo no se toco". Los arreglos del menu, las fotos, la paginacion y los
   encabezados cambiaron esas pantallas; falta revisar captura por captura que el cambio venga de ahi y volver a sacarlas.
 - **Visto:** 2026-11-25, corridas 45466155678 y 45485602957 de eventos-web (el CI general de `fafde62` en verde).
+- **Causa (tres):** (1) speakers, sponsors, documentos, avisos y soporte: la paginacion y la columna Correo de Soporte, a
+  proposito; ningun texto de capitulo los nombra. (2) Crear tu evento e Invitar a tu equipo: Sistema empieza plegado desde
+  BUG-568 y la prueba no encontraba el enlace; el capitulo decia "en Sistema, toca" y hay que abrirlo. (3) Ponerle la marca: el
+  boton Guardar esta arriba y la pagina, mas larga con el menu nuevo, quedaba bajada del paso anterior.
+- **Arreglado en:** web `fc9db7c`: los dos capitulos dicen "abre Sistema y toca", la prueba abre el grupo (`abrirGrupoDelMenu`),
+  la marca vuelve arriba antes del paso 5 y las capturas de los 22 capitulos se sacaron otra vez (tambien llevan BUG-573 y 575).
+- **Prueba:** la misma revision: `pnpm ayuda:revisar` 22/22 en local; antes 8 rojas, las mismas que en el MSI (control).
+
+### BUG-577: La primera prueba de una corrida de e2e-admin falla en frio y pasa sola (ABIERTO 2026-11-25)
+- **Severidad propuesta:** BAJA (solo pruebas; el producto no cambia)
+- **Que pasa:** en una corrida de 8 archivos (`listas-como-filament marco sesiones agenda asistentes staff emails anuncios`),
+  la primera prueba, `agenda.spec` "tracks: crear, editar, ordenar y borrar", fallo a los 26,5 s en un `toBeVisible` (espera de
+  20 s); sola paso 2/2 y la corrida completa siguiente paso 29/29. Corria con `next dev` recien levantado (compila cada ruta en la
+  primera visita). No es BUG-524 (cerrado: Hangfire en el reinicio).
+- **Conteo (regla de Kamilo 2026-11-04: a la tercera se investiga la causa, no se repite la corrida):**
+  1. 2026-11-25 (sesion 43): `agenda.spec` "tracks", primera de la corrida.
+- **Al tercer caso:** ver si es la compilacion en frio de `next dev` (el runner usa `next build`, BUG-545) y, si lo es, calentar las
+  rutas antes de la primera prueba o correr local con `E2E_NEXT=start`, con su control.
 
 ## 2026-11-24 — El marco del panel contra Filament (sesion 42, lab "Panel nuevo contra Filament")
 

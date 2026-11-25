@@ -463,12 +463,6 @@ Multi-stream simultaneo (dos salas a la vez) → Fase 2.
 
 ## 8. ADMIN Y MODULOS DEL ORGANIZADOR **[congelado hasta admin .NET, salvo Mission Control iPad]**
 
-- [ ] **Revision del panel de EventOS contra Filament** (Kamilo 2026-11-24, decisiones.md): primero UNA pasada de medicion de las 26
-      secciones sin arreglar nada (cada diferencia: defecto, falta o decision de diseño; por pantalla, que tiene prueba y que es solo
-      afirmacion); Kamilo decide con la lista y los defectos van en un bloque; despues la fase 4. Cada pantalla y pestaña,
-      lo que se ve (medido) y lo que falta (notificaciones, buscador global, subir arrastrando), en el lab "Panel nuevo contra
-      Filament" (https://claude.ai/artifact/HQoez3LYnCBzvaKt97XNws). Hecho: el menu (BUG-568) y las fotos de las tablas (BUG-570).
-      Ya visto en Speakers (va a la pasada): la ficha sube la foto arrastrando en Filament, las sesiones al lado, el ancho.
 - [ ] **Despues de la fase 4 (Kamilo 2026-11-24): lo que falta del panel frente a Filament** (lab "Panel nuevo contra Filament"):
       campana de notificaciones; buscador global; subir archivos arrastrando (Speakers, Sponsors, Anuncios, Slides, Destacados,
       Preguntas, Premios); iconos en las pestañas; buscadores en las listas cortas (Anuncios, Push programadas, Emails, Encuestas);

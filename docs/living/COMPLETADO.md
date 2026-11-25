@@ -8,6 +8,17 @@
 
 ---
 
+## 2026-11-25: revision del panel de EventOS contra Filament (cerrada en local)
+
+- **Pasada de medicion y corrida final** (Kamilo 2026-11-24, decisiones.md): 91 pares de pantallas de las 26 secciones medidos en
+  el navegador con `design/features/admin/comparacion-2026-11/comparar.mjs`, antes (24) y despues (25) del bloque de arreglos.
+  Lab "Panel nuevo contra Filament" (https://claude.ai/artifact/HQoez3LYnCBzvaKt97XNws, v5): 0 defectos, 14 faltas (van despues de
+  la fase 4, PENDIENTES seccion 8) y 16 decisiones de diseño (7 de Kamilo, decisiones.md). Arreglos: web `019b291`, `9ea6702`,
+  `ed2f60b`, `fafde62` y `fc9db7c` (BUG-568, 570 a 576), cada uno con su prueba y control. Solo el menu tiene una prueba que
+  vigila la vista (`marco.spec.ts`); el resto es comparacion medida. Nota en M2.10.1.
+
+---
+
 ## 2026-10-30: onboarding de la app en C# y en el admin nuevo (M2.3.4c)
 
 - **M2.3.4c** onboarding: `GET` y `PUT /events/{eventId}/onboarding` en C# con las reglas del formulario de Filament (lo escondido no se guarda, el merge del JSON por secciones y las opciones de la encuesta). Pantalla de siete pasos con vista previa en `/admin/eventos/{id}/identidad/onboarding`. Las opciones de la encuesta ya no llevan emoji. BUG-491 encontrado. Con esto M2.3.4 queda completa.

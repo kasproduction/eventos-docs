@@ -409,9 +409,9 @@ Viven en **`docs/decisiones.md`** (tomadas D.1 a D.4 y D.6 a D.9; solo D.5 sigue
 ### 2.10 Cierre de la fase (hito 1) — 1/2
 - [ ] M2.10.1 Medicion del hito 1 en el servidor real (admin nuevo + API PHP) con los k6 de agosto; numero anotado aqui **[servidor]**
   — **Vista del panel contra Filament, cerrada en local (2026-11-25):** corrida final de `comparar.mjs` despues del bloque de
-  arreglos (web `fafde62`): los 91 pares de las 26 secciones comparados; quedan 3 defectos abiertos (BUG-573 encabezados que ordenan,
-  BUG-574 paginacion de los push del historial, BUG-575 Borrar cortado en Agenda; el lab cuenta 4 porque BUG-574 sale en dos
-  lugares), 14 faltas y 16 decisiones de diseño. Lab https://claude.ai/artifact/HQoez3LYnCBzvaKt97XNws (v4); fichas y capturas en
+  arreglos (web `fafde62`): los 91 pares de las 26 secciones comparados; dejo 3 defectos (BUG-573 encabezados que ordenan, BUG-574
+  paginacion de los push del historial, BUG-575 acciones cortadas en Sesiones y Asistentes), arreglados el mismo dia con su
+  prueba (web `fc9db7c`); quedan 0 defectos, 14 faltas y 16 decisiones de diseño. Lab https://claude.ai/artifact/HQoez3LYnCBzvaKt97XNws (v5); fichas y capturas en
   `design/features/admin/comparacion-2026-11`. Una comparacion no es una prueba: solo el menu tiene la suya (`marco.spec.ts`).
   Lo de esta tarea (la medicion en el servidor) sigue abierto.
 - [x] M2.10.2 Retro de la fase 2 **[local]** — **Contar (Kamilo 2026-11-06):** la excepcion a la regla 6 de BUG-539 (pie de `EmailLayout.php` cambiado sin preguntar; la opcion sin PHP era normalizar la linea en las cruzadas), en `decisiones.md`.
