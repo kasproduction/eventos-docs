@@ -138,6 +138,28 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
 
+## SESION 2026-11-25 (Opus 5.5, 45) — M4a.2a EN C#: LA AGENDA DEL ASISTENTE, 72/72 CONTRATOS; BUG-580 Y 581; REGLA DE LA FASE 4
+
+- Decisiones Kamilo: regla de la fase 4 (antes de portar, que cubren los contratos y que no; el hueco en rojo contra C#), escrita en
+  el encabezado de la fase 4 del roadmap y en `eventos-api-dotnet/CLAUDE.md`; M4a.2 partida en a (agenda, `.ics`, lo que pasa ahora,
+  tracks, speakers) y b (el resto). Anotado en PENDIENTES §11: el orden inverso de PHP y la Ayuda salen de la corrida de cada push
+  (a una diaria o al cambiar lo suyo). Desfase corregido: la fase 4, activa, estaba plegada.
+- MSI al arrancar: web `fc9db7c` y C# `936e6a7` verdes (sesion 43); C# `c2ee863` ROJO: 47/48 contratos, `onboarding completo` con la
+  encuesta vacia. Causa: BUG-580 (OnboardingTest borraba las opciones del seeder y en el MSI corre antes que los contratos).
+- Hecho: C# `9156f3e` (BUG-580 y la regla en CLAUDE.md), `37b9490` (M4a.2a: `Contenido/AgendaDelAsistente` y `RecursoDeSesion`, la
+  pieza del panel usa la misma forma; el panel suelta la cache de speakers de C# al instante; BUG-581, sesion borrada en los filtros;
+  `App__Url` vacio en el servidor de contratos). Backend `8667f41` (solo pruebas: escenarios `agenda-completa` y `nada-en-vivo`,
+  13 contratos; uno se llamo "solo favoritas" porque Pest no deja un `=` en el filtro). Roadmap 173/238.
+- Pruebas: contra C# 24 rojas sin las rutas (control) y 72/72 despues, corridas despues de las pruebas de C# con base, como en el MSI;
+  BUG-581 con control; SpeakersTest con el asistente que ve el cambio al instante (control sin el canal: sin la invalidacion, roja);
+  C# con MySQL 118/118, suite sin base 323/323; PHP ContenidoTest y ErroresTest con MySQL y en orden inverso en verde menos `200 pulse
+  bootstrap` en local (el `.env` de este PC apunta el socket a 5230; en el MSI no). El runner del MSI corre `9156f3e`, `37b9490` y
+  `8667f41` (sin esperarlo).
+- Despliegue: sin pasos nuevos (nada cruzado hasta M4a.5).
+- **Sigue:** mirar el runner del MSI; despues M4a.2b (sponsors shared y mine, documentos, FAQ, paginas, highlights, anuncios por rol,
+  branding, modulos) con la regla de la fase 4: proponer el hueco (anuncios programados y dirigidos, paginas y destacados apagados,
+  modulos por rol y audiencia, marca con rutas relativas) y cerrarlo en rojo contra C#.
+
 ## SESION 2026-11-25 (Opus 5.5, 44) — M4a.1 EN C#: LAS 7 LECTURAS DE ANTES DEL INGRESO, 48/48 CONTRATOS; TIEMPOS DEL MSI
 
 - Decisiones Kamilo: dale a M4a.1 con (1a) contratos y escenarios nuevos en PublicoTest, en rojo contra C# antes de portar como

@@ -3,6 +3,24 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-25 — M4a.2a, la agenda del asistente (sesion 45)
+
+### BUG-580: OnboardingTest de C# borraba las opciones de la encuesta del seeder (RESUELTO 2026-11-25)
+- **Severidad propuesta:** MEDIA (pruebas: el MSI salio rojo en `c2ee863` con el contrato `onboarding completo`)
+- **Que pasa:** al terminar, la limpieza borraba todas las opciones de la encuesta del evento 1 de `eventos_contratos_base`, tambien
+  las 3 del seeder. En `verificar.sh` las pruebas de C# con base corren antes que los contratos: C# veia la encuesta vacia
+  (`survey: null`). En local no salio porque los contratos se corrieron antes.
+- **Arreglado en:** C# `9156f3e`: guarda las opciones al empezar y las vuelve a poner con sus ids.
+- **Prueba:** control contando la base: sin el arreglo, 0 opciones tras OnboardingTest; con el arreglo, 3. Los contratos se
+  corrieron despues de las pruebas de C# con base, como en el MSI: 72/72.
+
+### BUG-581: El filtro de miembro del evento dejaba pasar una sesion borrada (RESUELTO 2026-11-25)
+- **Severidad propuesta:** BAJA (texto del 404 en rutas con `{sessionId}`; ninguna estaba cruzada a C#)
+- **Que pasa:** en PHP `EventSession` usa SoftDeletes: `MiembroDelEvento` y `EventoDeLaPeticion` no ven una sesion borrada y
+  responden "Sesion no encontrada.". C# la encontraba y seguia (el .ics daba el 404 del modelo).
+- **Arreglado en:** C# `37b9490` (`FiltrosDeAcceso.ConMiembroDelEvento` y `EventoDeLaPeticion.IdAsync` con `DeletedAt == null`).
+- **Prueba:** contrato `calendar.ics (borrada)`; control: sin el arreglo, `No query results for model [App\Models\EventSession] 4`.
+
 ## 2026-11-25 — M4a.1, publicos de antes del ingreso (sesion 44)
 
 ### BUG-578: El 404 de un registro buscado sin id salia sin el punto final de Laravel (RESUELTO 2026-11-25)
