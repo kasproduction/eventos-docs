@@ -3,6 +3,19 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-26 — M4a.4, el aviso a la webapp (sesion 49)
+
+### BUG-585: Moderar el muro desde el panel de C# avisaba al socket antes de soltar la copia de la webapp (RESUELTO 2026-11-26)
+- **Severidad propuesta:** BAJA (sin efecto visible hoy: la webapp agrega o saca la publicacion con el dato de `wall:post` y
+  `wall:hidden`, sin volver a pedir el muro; quien entraba al muro en ese instante podia ver la copia vieja)
+- **Que pasa:** `Muro.CambiarAsync` mandaba `wall:post` o `wall:hidden` por cada publicacion y soltaba `wall` de la webapp al final.
+  El resto de los avisos de C# (`AvisosDeCambios`) y de PHP (`InvalidationService::broadcast`) suelta primero la webapp. PHP hace
+  lo mismo que hacia C# en `WallController::store` (primero `broadcastPost`); PHP no se toca.
+- **Visto:** 2026-11-26, con la prueba del orden de M4a.4 (`tests/Cruzadas/AvisosALaWebappTest`).
+- **Arreglado en:** C# (panel de EventOS): primero se cambian las publicaciones, despues se suelta `wall` una vez y al final salen
+  los avisos al socket.
+- **Prueba:** `muro: publicar y ocultar desde C# suelta wall antes de wall:post y de wall:hidden` (roja antes del arreglo).
+
 ## 2026-11-26 — M4a.3, lo mio en un pedido (sesion 48)
 
 ### BUG-584: La pieza `muro` de lo mio entrega los likes sin orden (ANOTADO 2026-11-26; sin efecto, C# los ordena)

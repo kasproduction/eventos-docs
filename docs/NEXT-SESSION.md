@@ -138,6 +138,19 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
 
+## SESION 2026-11-26 (Opus 5.5, 49) — M4a.4: EL AVISO A LA WEBAPP PROBADO EN LAS 10 ENTIDADES, CON EL ORDEN; BUG-585
+
+- Decisiones Kamilo: el aviso ya existia en C# (M2.3.1): M4a.4 se cierra con una cruzada por entidad y el orden (webapp antes que el
+  socket) en las 10, no en dos. El aviso para una sola persona (`attendeeId`) va escrito en M4b.5 del roadmap.
+- Hecho: backend `5f04da1` (solo pruebas: `tests/Cruzadas/AvisosALaWebappTest`, 10 pruebas). C# `baef75a` (BUG-585: el muro del
+  panel avisaba al socket antes de soltar la copia de la webapp). Roadmap 176/238; 4a en 5/7.
+- Pruebas: con el orden roto en `AvisosDeCambios`, 9 rojas (control); el muro rojo antes del arreglo. En el orden del MSI, con la
+  base de referencia recien sembrada: suite de C# 704 (2 saltadas), contratos 124/124, cruzadas 126/126. Subidos `5f04da1` y
+  `baef75a`: el runner del MSI los corre (sin esperarlo).
+- Despliegue: sin pasos nuevos.
+- **Sigue:** mirar el runner del MSI (sesiones 48 y 49); despues proponer M4a.5 (cruzar las rutas de 4a, medir `e3-agenda-storm.js`
+  contra C# y BUG-583 con sus dos condiciones).
+
 ## SESION 2026-11-26 (Opus 5.5, 48) — M4a.3 EN C#: LO MIO EN UN PEDIDO, 124/124 CONTRATOS; BUG-584
 
 - Decisiones Kamilo: dale a M4a.3 con la recomendacion: una pieza rota sale `{ok: false, error}` con el nombre de la excepcion de C#
