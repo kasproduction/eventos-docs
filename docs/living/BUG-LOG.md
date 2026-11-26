@@ -3,6 +3,18 @@
 > Registro completo de bugs encontrados y corregidos. Ordenado por fecha, mas reciente primero.
 > Severidades: CRITICA (seguridad/crash/data) | ALTA (feature roto) | MEDIA (visual/UX) | BAJA (cosmetic/warning)
 
+## 2026-11-26 — M4a.3, lo mio en un pedido (sesion 48)
+
+### BUG-584: La pieza `muro` de lo mio entrega los likes sin orden (ANOTADO 2026-11-26; sin efecto, C# los ordena)
+- **Severidad propuesta:** BAJA (sin efecto visible: la webapp los usa como conjunto, `new Set(mio.liked_ids)` en `lib/social.ts:104`)
+- **Que pasa:** `LoMioService::muro` saca los `liked_ids` con un `pluck` sin `orderBy`: el orden depende de la base. Con dos o mas likes
+  dentro de las 20 primeras, la corrida en orden inverso (`CONTRATO_ORDEN_INVERSO`) da otro snapshot.
+- **Visto:** 2026-11-26, con el escenario `lo-mio-completo` (tres likes dentro de las 20: `[4, 13, 23]` en MySQL y `[23, 13, 4]` invertido).
+- **Decision:** PHP no se toca (regla 6, sin consumidor afectado). C# los entrega por publicacion (decisiones.md, 2026-11-26) y el
+  escenario deja un solo like dentro de las 20, el de la orilla, para que el snapshot no dependa del orden.
+- **Prueba:** `GET events/{id}/mine (lo mio completo, ana)` en verde con MySQL y en orden inverso (control: con tres likes adentro, el
+  orden inverso sale rojo).
+
 ## 2026-11-25 — M4a.2b, el resto del contenido (sesion 46)
 
 ### BUG-583: La ruta de un modulo apagado o de otro rol sigue respondiendo (ABIERTO 2026-11-25; se arregla en C# en M4a.5)

@@ -138,6 +138,21 @@ falla el 7 en los dos, revisar primero la URL del `.env` de la app y el paso 5.
     "sin medir"); probar una subida real a R2 y el ZIP de documentos en R2; el push silencioso contra Expo real; opcional
     `UPDATE event_sessions SET status='cancelled' WHERE cancelled_at IS NOT NULL AND status<>'cancelled'`.
 
+## SESION 2026-11-26 (Opus 5.5, 48) — M4a.3 EN C#: LO MIO EN UN PEDIDO, 124/124 CONTRATOS; BUG-584
+
+- Decisiones Kamilo: dale a M4a.3 con la recomendacion: una pieza rota sale `{ok: false, error}` con el nombre de la excepcion de C#
+  (decisiones.md); se prueba en C# y no en un contrato.
+- Hecho: backend `2163187` (solo pruebas: escenario `lo-mio-completo`, 11 contratos; los dos de antes pierden el `=` del nombre,
+  que rompe el filtro de Pest). C# `b679a9d` (`Contenido/LoMioDelAsistente`: las 6 piezas, la mezcla de puntos de PHP y no la del
+  panel, la ruta solo con id de numeros; `LoMioDelAsistenteTest`). BUG-584 (PHP no ordena los likes; sin efecto, la webapp usa un
+  Set). Roadmap 175/238; 4a en 4/7.
+- Pruebas: contra C# 12 rojas sin la ruta (control) y 124/124 despues de toda la suite de C# con base (700, 6 saltadas); control de
+  la restriccion de numero y de la pieza rota (las dos rojas sin su proteccion); PHP ContenidoTest y ErroresTest 120/120 con MySQL y
+  en orden inverso. Subidos `2163187` y `b679a9d`: el runner del MSI los corre (sin esperarlo).
+- Despliegue: sin pasos nuevos (nada cruzado hasta M4a.5).
+- **Sigue:** mirar el runner del MSI; despues proponer M4a.4 (aviso a la webapp, `POST /api/internal/invalidate` con
+  `WEBAPP_INTERNAL_SECRET`) con la regla de la fase 4.
+
 ## SESION 2026-11-25 (Opus 5.5, 47) — RECONCILIACION DE PENDIENTES; BUG-583 (PUERTA DE LOS MODULOS); /GUARDAR MUEVE LO DEL ROADMAP; PROPUESTA DE M4a.3
 
 - Decisiones Kamilo: la ruta de un modulo apagado o de otro rol se cierra en C# en M4a.5 al cruzar (BUG-583 "arreglado en C#"), con

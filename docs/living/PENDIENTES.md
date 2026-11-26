@@ -23,7 +23,7 @@
 
 | Area | Avance | Que falta |
 |---|---|---|
-| **Migracion a .NET** (roadmap 174/238) | Fase 0 41/41; fase 1 31/33; fase 2 78/80 (el panel de EventOS reemplazo a Filament, que quedo de solo lectura); fase 3 20/21 (tiempo real en el hub de C#, Node descartado); fase 4 4/50 | Fases 1 y 2: lo que pide servidor (M1.2.5, M1.5.6, M2.9.3, M2.10.1). Fase 3: M3.4.2b, la app en iPhone (build por EAS o subir de SDK, §7). Fase 4: sigue M4a.3 (`mine?piezas`); 4a en 3/7, sin cruzar todavia (M4a.5) |
+| **Migracion a .NET** (roadmap 175/238) | Fase 0 41/41; fase 1 31/33; fase 2 78/80 (el panel de EventOS reemplazo a Filament, que quedo de solo lectura); fase 3 20/21 (tiempo real en el hub de C#, Node descartado); fase 4 5/50 | Fases 1 y 2: lo que pide servidor (M1.2.5, M1.5.6, M2.9.3, M2.10.1). Fase 3: M3.4.2b, la app en iPhone (build por EAS o subir de SDK, §7). Fase 4: sigue M4a.4 (aviso a la webapp, `POST /api/internal/invalidate`); 4a en 4/7, sin cruzar todavia (M4a.5) |
 | Modulos del asistente (webapp W.0-W.18 + W.X) | 550/585 = **94%** | W.19 Spatial Player (mejora) y QA presencial |
 | Registro publico, landing y widget | 27/32 = **84%** | Llaves reales de Turnstile, toggle de tema para el demo, menores (§4) |
 | Admin del organizador | Panel de EventOS en C# (fase 2, local hecho 2026-11-22) | 14 faltas contra Filament para despues de la fase 4 (§8); lo de servidor |
